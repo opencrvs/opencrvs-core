@@ -12,12 +12,15 @@
 import {
   PrecacheEntry,
   createHandlerBoundToURL,
-  precacheAndRoute
+  precacheAndRoute,
+  cleanupOutdatedCaches
 } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
-import { RouteHandler, skipWaiting } from 'workbox-core'
+import { clientsClaim } from 'workbox-core'
+
+declare let self: ServiceWorkerGlobalScope
 
 interface OnSyncCallbackOptions {
   queue: Queue
@@ -46,7 +49,6 @@ const queue = new Queue('registerQueue', {
 })
 const GraphQLMatch = /graphql(\S+)?/
 
-/* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('fetch', (event: any) => {
   if (
     null !== event.request.url.match(GraphQLMatch) &&
@@ -60,7 +62,6 @@ self.addEventListener('fetch', (event: any) => {
   }
 })
 
-/* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', async (event) => {
   if (!event.data) {
     return
@@ -73,22 +74,12 @@ self.addEventListener('message', async (event) => {
     await removeCache(event.data.minioUrls)
     return
   }
-
-  switch (event.data) {
-    case 'skipWaiting':
-      // About caches variable: https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/delete
-      caches
-        .keys()
-        .then((cs) => cs.forEach((c) => caches.delete(c)))
-        .then(() => skipWaiting())
-      break
-    default:
-      break
-  }
 })
 
 /* eslint-disable-next-line no-restricted-globals */
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
+
+cleanupOutdatedCaches()
 
 /*
  * As the config file can change after the app is built, we cannot precache it
@@ -106,16 +97,25 @@ registerRoute(/http(.+)validation\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 
 // This caches the minio urls
-registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
+registerRoute(
+  import.meta.env.DEV
+    ? /http(.+)localhost:3535\/ocrvs\/.+/
+    : /http(.+)minio\.(.+)\/ocrvs\/.+/,
+  new CacheFirst()
+)
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
+    ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
     denylist: [/^\/__.*$/]
   })
 )
+
+self.skipWaiting()
+clientsClaim()
 
 const removeCache = async (minioUrls: string) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>
