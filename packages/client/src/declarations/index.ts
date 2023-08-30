@@ -1045,10 +1045,29 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data)
       }
+      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
+        data.data
+      )
+      const allduplicateDeclarationsAttachments: string[] = []
+
+      if (duplicateDeclarations) {
+        for (const declaration of duplicateDeclarations) {
+          const fetchRegistration =
+            declaration.data?.fetchRegistrationForViewing
+          const attachments = fetchRegistration?.registration?.attachments || []
+          const filteredResults = attachments
+            .filter((a: Attachment): a is Attachment => Boolean(a))
+            .map((a: Attachment) => a.data)
+            .filter((maybeUrl: string): maybeUrl is string => Boolean(maybeUrl))
+          allduplicateDeclarationsAttachments.push(...filteredResults)
+        }
+      }
+
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
         ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data)
+        ...getProfileIconUrls(data.data),
+        ...allduplicateDeclarationsAttachments
       ]
 
       await Promise.all(
@@ -1097,6 +1116,20 @@ function getSignatureUrls(queryResultData: Query) {
   return SIGNATURE_KEYS.map(
     (propertyKey) => registration?.[propertyKey]
   ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+}
+
+function getduplicateDeclarationsAttachments(queryResultData: Query) {
+  const history =
+    queryResultData.fetchBirthRegistration?.history ||
+    queryResultData.fetchDeathRegistration?.history ||
+    queryResultData.fetchMarriageRegistration?.history
+
+  const userAvatars = (history ?? [])
+    .filter((h): h is History => Boolean(h))
+    .map((h) => h.user?.avatar?.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+  return [...new Set(userAvatars).values()]
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
