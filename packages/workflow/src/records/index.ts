@@ -428,6 +428,89 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       }
     },
     {
+      $lookup: {
+        from: 'Observation',
+        localField: `encounterIds`,
+        foreignField: 'context.reference',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    // Get PractitionerRoles for all found practitioners
+    {
+      $addFields: {
+        practitionerIds: {
+          $map: {
+            input: {
+              $filter: {
+                input: '$bundle',
+                as: 'item',
+                cond: { $eq: ['$$item.resourceType', 'Practitioner'] }
+              }
+            },
+            as: 'practitioner',
+            in: { $concat: ['Practitioner/', '$$practitioner.id'] }
+          }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'PractitionerRole',
+        localField: `practitionerIds`,
+        foreignField: 'practitioner.reference',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    // Get Locations for found PractitionerRoles
+    {
+      $addFields: {
+        practitionerLocationIds: flattenArray({
+          $map: {
+            input: {
+              $filter: {
+                input: '$bundle',
+                as: 'item',
+                cond: { $eq: ['$$item.resourceType', 'PractitionerRole'] }
+              }
+            },
+            as: 'practitionerRole',
+            in: {
+              $map: {
+                input: '$$practitionerRole.location',
+                as: 'location',
+                in: {
+                  $arrayElemAt: [{ $split: ['$$location.reference', '/'] }, 1]
+                }
+              }
+            }
+          }
+        })
+      }
+    },
+    {
+      $lookup: {
+        from: 'Location',
+        localField: `practitionerLocationIds`,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    {
       $addFields: {
         bundle: {
           $map: {
