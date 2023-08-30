@@ -31,7 +31,6 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import * as React from 'react'
 import styled from 'styled-components'
 import SignatureCanvas from 'react-signature-canvas'
-import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const InputWrapper = styled.div`
@@ -90,6 +89,7 @@ export function SignatureGenerator({
   const signatureData = value
   function apply() {
     setSignatureDialogOpen(false)
+    setSignatureError('')
     onChange(signatureValue)
   }
 
@@ -101,7 +101,9 @@ export function SignatureGenerator({
             <SignatureDescription>{description}</SignatureDescription>
           )}
           <ErrorMessage id="signature-upload-error">
-            {signatureError && <ErrorText>{signatureError}</ErrorText>}
+            {signatureError.length !== 0 && (
+              <ErrorText>{signatureError}</ErrorText>
+            )}
           </ErrorMessage>
           {!signatureData && (
             <>
@@ -151,7 +153,14 @@ export function SignatureGenerator({
             <SignaturePreview alt={label} src={signatureData} />
           )}
           {signatureData && (
-            <Button type="tertiary" size="medium" onClick={() => onChange('')}>
+            <Button
+              type="tertiary"
+              size="medium"
+              onClick={() => {
+                onChange('')
+                setSignatureValue('')
+              }}
+            >
               {intl.formatMessage(messages.signatureDelete)}
             </Button>
           )}
@@ -174,7 +183,7 @@ export function SignatureGenerator({
               <ApplyButton
                 key="apply"
                 id="apply_change"
-                disabled={false}
+                disabled={!Boolean(signatureValue)}
                 onClick={apply}
               >
                 {intl.formatMessage(buttonMessages.apply)}

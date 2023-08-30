@@ -143,7 +143,6 @@ import {
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -219,7 +218,7 @@ const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
 `
 
 const FooterArea = styled.div`
-  padding-top: 20px;
+  padding: 24px;
 `
 
 const FormData = styled.div`
@@ -1979,7 +1978,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         onClick={onContinue}
                         disabled={!isComplete || !this.hasChangesBeenMade}
                       >
-                        <Icon name="Target" />
                         {intl.formatMessage(buttonMessages.continueButton)}
                       </Button>
                     </FooterArea>

@@ -16,7 +16,7 @@ import {
   RADIO_GROUP
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 
 export const supportingDocumentsSectionGroup: IFormSectionGroup = {
   id: 'correctionDocumentsViewGroup',

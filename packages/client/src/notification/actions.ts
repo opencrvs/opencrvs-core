@@ -1,6 +1,3 @@
-import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,9 +9,13 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
+import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
 export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
+
+export const CONFIGURATION_ERROR = 'FORM_VALIDATION_ERROR'
 
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
@@ -48,6 +49,11 @@ export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
 
 export const SHOW_UNASSIGNED = 'SHOW_UNASSIGNED'
 export const HIDE_UNASSIGNED = 'HIDE_UNASSIGNED'
+
+type ConfigurationErrorAction = {
+  type: typeof CONFIGURATION_ERROR
+  payload: string
+}
 
 type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
@@ -125,6 +131,13 @@ export type ShowUserAuditSuccessToast = {
 type HideUserAuditSuccessToast = {
   type: typeof HIDE_USER_AUDIT_SUCCESS_TOAST
 }
+
+export const configurationErrorNotification = (
+  msg: string
+): ConfigurationErrorAction => ({
+  type: CONFIGURATION_ERROR,
+  payload: msg
+})
 
 export const showConfigurationErrorNotification =
   (): ShowConfigurationErrorAction => ({
@@ -299,6 +312,7 @@ export const hideUnassignedModal = (): HideUnassigned => ({
 
 export type Action =
   | SessionExpiredAction
+  | ConfigurationErrorAction
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction
   | toggleDraftSavedNotificationAction

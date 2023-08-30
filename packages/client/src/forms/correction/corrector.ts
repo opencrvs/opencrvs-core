@@ -15,7 +15,7 @@ import {
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'

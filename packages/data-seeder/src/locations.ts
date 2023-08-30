@@ -11,12 +11,13 @@
  */
 import fetch from 'node-fetch'
 import {
-  COUNTRY_CONFIG_URL,
-  GATEWAY_URL,
+  COUNTRY_CONFIG_HOST,
+  GATEWAY_HOST,
   OPENCRVS_SPECIFICATION_URL
 } from './constants'
-import { z } from 'zod'
+import { TypeOf, z } from 'zod'
 import { raise } from './utils'
+import { inspect } from 'util'
 
 const LocationSchema = z.array(
   z.object({
@@ -29,7 +30,6 @@ const LocationSchema = z.array(
       .enum([
         'STATE',
         'DISTRICT',
-        'LOCATION_LEVEL_3',
         'LOCATION_LEVEL_3',
         'LOCATION_LEVEL_4',
         'LOCATION_LEVEL_5'
@@ -49,96 +49,146 @@ const LocationSchema = z.array(
   })
 )
 
-type LocationStatistic = {
-  year: number
-  male_population: number
-  female_population: number
-  population: number
-  crude_birth_rate: number
-}
-
-type Statistics = Array<Record<number, number>>
-
-export function setExtensions(
-  malePopulations: Statistics,
-  femalePopulations: Statistics,
-  totalPopulations: Statistics,
-  birthRates: Statistics
-) {
-  const extensions: fhir3.Extension[] = [
-    {
-      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
-      valueAttachment: {
-        contentType: 'application/geo+json',
-        data: '<base64>' // base64 encoded geoJSON feature object
+function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
+  const statisticsErrors = new Array<Error>()
+  const locationsMap = new Map(
+    locations.map(({ statistics, ...loc }) => {
+      if (!statistics) {
+        statisticsErrors.push(
+          new Error(`No statistics data given for location: ${loc.name}`)
+        )
       }
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
-      valueString: JSON.stringify(malePopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
-      valueString: JSON.stringify(femalePopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
-      valueString: JSON.stringify(totalPopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-      valueString: JSON.stringify(birthRates)
-    }
-  ]
-  return extensions
-}
-
-export function generateStatisticalExtensions(
-  sourceStatistic: LocationStatistic[]
-) {
-  const malePopulations: Statistics = []
-  const femalePopulations: Statistics = []
-  const totalPopulations: Statistics = []
-  const birthRates: Statistics = []
-
-  for (const data of sourceStatistic) {
-    femalePopulations.push({
-      [data.year]: data.female_population
+      return [
+        loc.id,
+        {
+          ...loc,
+          statistics: new Map(
+            (statistics ?? []).map(({ year, ...stats }) => [year, stats])
+          )
+        }
+      ]
     })
-    malePopulations.push({
-      [data.year]: data.male_population
-    })
-    totalPopulations.push({
-      [data.year]: data.population
-    })
-    birthRates.push({
-      [data.year]: data.crude_birth_rate / 2
-    })
-  }
-
-  return setExtensions(
-    malePopulations,
-    femalePopulations,
-    totalPopulations,
-    birthRates
   )
+  const locationNodeMap = new Map(
+    locations.map((loc) => [
+      loc.id,
+      { id: loc.id, children: new Array<string>() }
+    ])
+  )
+  // this is the root location
+  locationNodeMap.set('0', { id: '0', children: [] })
+  locations.forEach((loc) => {
+    const parent = locationNodeMap.get(loc.partOf.split('/')[1])
+    if (!parent) {
+      raise(`Parent location "${loc.partOf}" not found for ${loc.name}`)
+    }
+    parent.children.push(loc.id)
+  })
+
+  function validateTree(root: string) {
+    const node = locationNodeMap.get(root)!
+    const location = locationsMap.get(node.id)!
+    const childLocations = node.children.map(
+      (child) => locationsMap.get(child)!
+    )
+    const accumulatedStatistics = new Map<
+      number,
+      { male_population: number; female_population: number; population: number }
+    >()
+    for (const [year, parentStats] of location.statistics.entries()) {
+      if (
+        parentStats.population <
+        parentStats.male_population + parentStats.female_population
+      ) {
+        statisticsErrors.push(
+          new Error(
+            `Location: ${
+              location.name
+            }, year: ${year} -> Sum of male population and female population ${
+              parentStats.male_population + parentStats.female_population
+            } is higher than the total population ${parentStats.population}`
+          )
+        )
+      }
+      childLocations.forEach((childLocation) => {
+        if (!childLocation.statistics.get(year)) {
+          statisticsErrors.push(
+            new Error(
+              `Couldn't find child location data: ${childLocation.name}, year: ${year} -> but that year's data exists for parent: ${location.name}`
+            )
+          )
+        }
+        const currentStats = accumulatedStatistics.get(year) ?? {
+          male_population: 0,
+          female_population: 0,
+          population: 0
+        }
+        const childStats = childLocation.statistics.get(year) ?? {
+          male_population: 0,
+          female_population: 0,
+          population: 0
+        }
+
+        accumulatedStatistics.set(year, {
+          male_population:
+            currentStats.male_population + childStats.male_population,
+          female_population:
+            currentStats.female_population + childStats.female_population,
+          population: currentStats.population + childStats.population
+        })
+      })
+      if (childLocations.length > 0) {
+        const sumPopulation = accumulatedStatistics.get(year)!.population
+        if (sumPopulation > parentStats.population) {
+          statisticsErrors.push(
+            new Error(
+              `Location: ${location.name}, year: ${year} -> Sum of child locations' population ${sumPopulation} is greater than the total population ${parentStats.population}, The total population should be >= ${sumPopulation}`
+            )
+          )
+        }
+      }
+    }
+  }
+  locationNodeMap.get('0')!.children.forEach((childId) => validateTree(childId))
+  if (statisticsErrors.length > 0) {
+    raise(statisticsErrors.map((error) => error.message).join('\n'))
+  }
+  return locationsMap
 }
 
 async function getLocations() {
-  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
   }
   const parsedLocations = LocationSchema.safeParse(await res.json())
   if (!parsedLocations.success) {
-    raise(parsedLocations.error.issues.toString())
+    raise(
+      `Error when getting locations from country-config: ${inspect(
+        parsedLocations.error.issues
+      )}`
+    )
   }
+  const adminStructureMap = validateAdminStructure(
+    parsedLocations.data.filter(
+      ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
+    )
+  )
+  parsedLocations.data
+    .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
+    .forEach((facilityOrOffice) => {
+      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
+        raise(
+          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
+        )
+      }
+    })
   return parsedLocations.data
 }
 
 export async function seedLocations(token: string) {
-  const savedLocations = await fetch(`${GATEWAY_URL}/location?_count=0`, {
+  const savedLocations = await fetch(`${GATEWAY_HOST}/location?_count=0`, {
     headers: {
       'Content-Type': 'application/fhir+json'
     }
@@ -172,7 +222,7 @@ export async function seedLocations(token: string) {
     }
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_URL}/location?`, {
+  const res = await fetch(`${GATEWAY_HOST}/location?`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

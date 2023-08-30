@@ -762,6 +762,7 @@ input UserInput {
   username: String
   mobile: String
   password: String
+  status: Status
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -817,17 +818,14 @@ type ApplicationConfiguration {
   MARRIAGE: Marriage
   MARRIAGE_REGISTRATION: Boolean
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
-  ADMIN_LEVELS: Int
   LOGIN_BACKGROUND: LoginBackground
 }
 
@@ -839,17 +837,14 @@ input ApplicationConfigurationInput {
   DEATH: DeathInput
   MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
-  ADMIN_LEVELS: Int
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
@@ -972,7 +967,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
-  system: System
+  system: IntegratedSystem
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1278,8 +1273,6 @@ input RegistrationInput {
   witnessTwoSignature: String
   informantType: String
   otherInformantType: String
-  contact: String
-  contactRelationship: String
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflowInput]
@@ -1499,6 +1492,12 @@ enum RegAction {
 
 type StatusReason {
   text: String
+}
+
+type IntegratedSystem {
+  name: String
+  username: String
+  type: String
 }
 
 type Comment {
