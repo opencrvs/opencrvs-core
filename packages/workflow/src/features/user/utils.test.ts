@@ -419,8 +419,8 @@ describe('Verify getPractitionerRef', () => {
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
       name: [
-        { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-        { use: 'bn', family: [''], given: [''] }
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
       ],
       gender: 'male',
       meta: {

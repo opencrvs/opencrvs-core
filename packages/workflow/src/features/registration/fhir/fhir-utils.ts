@@ -39,7 +39,7 @@ import {
   BundleEntry,
   Composition,
   Location,
-  OpenCRVSName,
+  OpenCRVSPatientName,
   Patient,
   Resource,
   Task
@@ -65,9 +65,9 @@ export async function getSharedContactEmail(fhirBundle: Bundle) {
   )
 }
 
-export function concatenateName(fhirNames: OpenCRVSName[]) {
+export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
-  const name = fhirNames.find((humanName: OpenCRVSName) => {
+  const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
   })
 
