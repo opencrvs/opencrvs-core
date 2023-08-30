@@ -36,7 +36,8 @@
     "pino": "^6.0.0",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1"
   },
   "devDependencies": {
     "@types/fhir": "^0.0.30",
