@@ -1118,20 +1118,6 @@ function getSignatureUrls(queryResultData: Query) {
   ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
-function getduplicateDeclarationsAttachments(queryResultData: Query) {
-  const history =
-    queryResultData.fetchBirthRegistration?.history ||
-    queryResultData.fetchDeathRegistration?.history ||
-    queryResultData.fetchMarriageRegistration?.history
-
-  const userAvatars = (history ?? [])
-    .filter((h): h is History => Boolean(h))
-    .map((h) => h.user?.avatar?.data)
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  return [...new Set(userAvatars).values()]
-}
-
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
