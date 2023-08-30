@@ -317,7 +317,11 @@ function RecordAuditBody({
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
-  const [actionDetailsData, setActionDetailsData] = React.useState({})
+
+  const [actionDetailsData, setActionDetailsData] = React.useState<History>({
+    documents: []
+  })
+
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
 

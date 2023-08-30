@@ -17,7 +17,6 @@ import styled from 'styled-components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import {
-  getFormattedDate,
   getPageItems,
   getStatusLabel,
   isFlaggedAsPotentialDuplicate,
@@ -212,9 +211,11 @@ export const GetHistory = ({
   }
 
   if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-    allHistoryData = allHistoryData.filter(({ regStatus }: History) => {
-      return regStatus !== RegStatus.WaitingValidation
-    })
+    allHistoryData = allHistoryData.filter(
+      ({ regStatus }: Partial<History>) => {
+        return regStatus !== RegStatus.WaitingValidation
+      }
+    )
   }
 
   // TODO: We need to figure out a way to sort the history in backend
