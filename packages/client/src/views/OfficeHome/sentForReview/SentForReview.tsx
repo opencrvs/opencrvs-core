@@ -236,7 +236,12 @@ class SentForReviewComponent extends React.Component<
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
             RegStatus.Validated
-          ) || ''
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          ''
       }
 
       const dateOfEvent =
