@@ -2,8 +2,8 @@ FROM node:gallium-alpine
 WORKDIR /app
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
-RUN chmod +x /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /app/wait
+RUN chmod +x /app/wait
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
@@ -18,4 +18,4 @@ RUN yarn install
 
 WORKDIR /app/packages/migration
 
-CMD /wait && yarn start:prod
+CMD /app/wait && yarn start:prod
