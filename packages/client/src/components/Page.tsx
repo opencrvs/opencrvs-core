@@ -59,6 +59,7 @@ const spinnerAppearAnimation = keyframes`
 `
 
 const StyledSpinner = styled(Spinner)`
+  opacity: 0;
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
