@@ -137,6 +137,8 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         (fields.nationalityField &&
           (info[fields.nationalityField] as string)) ||
         ''
+      const isExactDobUnknownForIdVerifier =
+        !!declaration?.data[corrector]?.exactDateOfBirthUnknown
 
       return {
         iD,
@@ -144,7 +146,8 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         firstNames,
         familyName,
         birthDate,
-        nationality
+        nationality,
+        isExactDobUnknownForIdVerifier
       }
     } else {
       return {
@@ -153,7 +156,8 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         firstNames: '',
         familyName: '',
         birthDate: '',
-        nationality: ''
+        nationality: '',
+        isExactDobUnknownForIdVerifier: undefined
       }
     }
   }

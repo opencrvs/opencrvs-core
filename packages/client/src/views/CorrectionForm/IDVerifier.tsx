@@ -27,6 +27,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { Content } from '@opencrvs/components/lib/Content'
 import { identityNameMapper } from '@client/forms/certificate/fieldDefinitions/messages'
+import { IDeclaration } from '@client/declarations'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -46,6 +47,7 @@ export interface ICorrectorInfo {
   familyName: string | undefined
   birthDate: string | undefined
   nationality: string | undefined
+  isExactDobUnknownForIdVerifier: boolean | undefined
 }
 
 interface IIDVerifierProps {
@@ -123,15 +125,17 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        {correctorInformation && correctorInformation.birthDate && (
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(
-              correctorInformation.birthDate as string,
-              intl.locale
-            )}
-          />
-        )}
+        {correctorInformation &&
+          correctorInformation.birthDate &&
+          !correctorInformation.isExactDobUnknownForIdVerifier && (
+            <LabelValuePair
+              label={intl.formatMessage(certificateMessages.dateOfBirth)}
+              value={formatLongDate(
+                correctorInformation.birthDate as string,
+                intl.locale
+              )}
+            />
+          )}
 
         {correctorInformation && correctorInformation.nationality && (
           <LabelValuePair
