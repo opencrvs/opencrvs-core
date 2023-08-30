@@ -407,20 +407,20 @@ export function setTrackingId(fhirBundle: Bundle): Bundle {
 }
 
 export function setupRegistrationType(
-  taskResource: fhir3.Task,
+  taskResource: Task,
   eventType: EVENT_TYPE
-): fhir3.Task {
+): Task {
   if (!taskResource.code || !taskResource.code.coding) {
     taskResource.code = {
       coding: [
         {
           system: `${OPENCRVS_SPECIFICATION_URL}types`,
-          code: eventType.toString()
+          code: eventType
         }
       ]
     }
   } else {
-    taskResource.code.coding[0].code = eventType.toString()
+    taskResource.code.coding[0].code = eventType
   }
   return taskResource
 }

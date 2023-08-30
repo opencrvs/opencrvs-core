@@ -124,6 +124,7 @@ function getOfficeLocationFromLocationList(
       })
     }
   })
+
   if (!office) {
     throw new Error('No CRVS office found')
   }

@@ -17,9 +17,13 @@ export type Unsaved<T extends BundleEntry> = Omit<T, 'fullUrl' | 'resource'> & {
   resource: UnsavedResource<T['resource']>
 }
 
-export type OpenCRVSName = Omit<fhir3.HumanName, 'use' | 'family'> & {
+export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use' | 'family'> & {
   use: string
   family: string[]
+}
+
+export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
+  use: string
 }
 
 type Address = Omit<fhir3.Address, 'type'> & {
@@ -29,7 +33,7 @@ type Address = Omit<fhir3.Address, 'type'> & {
 export type CompositionWithoutId = Omit<fhir3.Composition, 'id'>
 export type Extension = fhir3.Extension
 export type Practitioner = Omit<fhir3.Practitioner, 'name'> & {
-  name: Array<OpenCRVSName>
+  name: Array<OpenCRVSPractitionerName>
 }
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
@@ -40,12 +44,13 @@ export type TaskWithoutId = Omit<fhir3.Task, 'id'>
 
 export type Task = Omit<
   Saved<fhir3.Task>,
-  'extension' | 'businessStatus' | 'code'
+  'extension' | 'businessStatus' | 'code' | 'intent'
 > & {
   id: string
   lastModified: string
   extension: Array<Extension>
   businessStatus: BusinessStatus
+  intent?: fhir3.Task['intent']
   code: Omit<fhir3.CodeableConcept, 'coding'> & {
     coding: Array<
       Omit<fhir3.Coding, 'code' | 'system'> & {
@@ -55,16 +60,17 @@ export type Task = Omit<
     >
   }
   // This field is missing from the fhir3 spec
-  encounter: fhir3.Reference
+  // @todo Where exactly it's used?
+  encounter?: fhir3.Reference
 }
 
 export type Composition = CompositionWithoutId & { id: string }
 
 export type PaymentReconciliation = Saved<fhir3.PaymentReconciliation>
-export type DocumentReference = Saved<fhir3.DocumentReference>
+export type DocumentReference = Saved<Omit<fhir3.DocumentReference, 'indexed'>>
 export type Patient = Saved<
   Omit<fhir3.Patient, 'name' | 'address'> & {
-    name: Array<OpenCRVSName>
+    name: Array<OpenCRVSPatientName>
     address?: Address[]
     deceased?: boolean
   }
@@ -72,7 +78,15 @@ export type Patient = Saved<
 export type RelatedPerson = Saved<fhir3.RelatedPerson>
 export type Location = Saved<fhir3.Location>
 export type Encounter = Saved<fhir3.Encounter>
-export type Observation = Saved<fhir3.Observation>
+export type Observation = Saved<
+  Omit<fhir3.Observation, 'valueQuantity'> & {
+    valueQuantity?: Omit<fhir3.Quantity, 'value'> & {
+      // Birth plurality of Pregnancy
+      // { value: 'TWIN' }
+      value: number | string
+    }
+  }
+>
 
 export type Resource = fhir3.Resource
 

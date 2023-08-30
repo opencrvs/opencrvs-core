@@ -1,6 +1,17 @@
+import { PractitionerRole } from 'fhir/r3'
 import {
   Bundle,
+  Composition,
   CorrectionRequestedTask,
+  DocumentReference,
+  Encounter,
+  Location,
+  Observation,
+  Patient,
+  PaymentReconciliation,
+  Practitioner,
+  RelatedPerson,
+  Task,
   getBusinessStatus,
   isCorrectionRequestedTask,
   isTask,
@@ -20,7 +31,22 @@ export type WaitingForValidationRecord = Nominal<
   'WaitingForValidation'
 >
 export type ValidatedRecord = Nominal<RecordBase, 'Validated'>
-export type RegisteredRecord = Nominal<RecordBase, 'Registered'>
+export type RegisteredRecord = Nominal<
+  Bundle<
+    | Composition
+    | DocumentReference
+    | Encounter
+    | Patient
+    | RelatedPerson
+    | PaymentReconciliation
+    | Task
+    | Practitioner
+    | PractitionerRole
+    | Location
+    | Observation
+  >,
+  'Registered'
+>
 export type CorrectionRequestedRecord = Nominal<
   RecordBase,
   'CorrectionRequested'

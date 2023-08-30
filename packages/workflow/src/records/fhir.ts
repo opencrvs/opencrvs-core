@@ -33,7 +33,6 @@ export function createCorrectionProofOfLegalCorrectionDocument(
         system: 'urn:ietf:rfc:3986'
       },
       status: 'current',
-      indexed: new Date().toISOString(),
       subject: {
         reference: subjectReference
       },
@@ -127,7 +126,6 @@ export function createCorrectionPaymentResources(
           system: 'urn:ietf:rfc:3986'
         },
         status: 'current',
-        indexed: new Date().toISOString(),
         subject: {
           reference: `urn:uuid:${temporaryPaymentId}`
         },

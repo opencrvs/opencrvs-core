@@ -300,12 +300,12 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
                 )}
                 value={getReasonForRequest()}
               />
-              <Summary.Row
+              {/* <Summary.Row
                 label={intl.formatMessage(
                   messages.correctionSummarySupportingDocuments
                 )}
                 value={getSupportingDocuments()}
-              />
+              /> */}
               <Summary.Row
                 label={intl.formatMessage(messages.correctionSummaryComments)}
                 value={getComments()}
