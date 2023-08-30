@@ -398,15 +398,24 @@ function createAddressBuilder(sectionCode: string, sectionTitle: string) {
       if (!person.address) {
         person.address = []
       }
+
       if (!person.address[context._index.address]) {
         person.address[context._index.address] = {}
       }
       if (!person.address[context._index.address].line) {
         person.address[context._index.address].line = []
       }
-      ;(person.address[context._index.address].line as string[]).push(
-        fieldValue
-      )
+      if (
+        person.address[context._index.address].line![context._index.line] !==
+        undefined
+      ) {
+        person.address[context._index.address].line![context._index.line] =
+          fieldValue
+      } else {
+        ;(person.address[context._index.address].line as string[]).push(
+          fieldValue
+        )
+      }
     },
     city: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -1926,12 +1935,17 @@ export const builders: IFieldBuilders = {
         if (!person.address[context._index.address]) {
           person.address[context._index.address] = {}
         }
-        if (!person.address[context._index.address].line) {
-          person.address[context._index.address].line = []
+        if (
+          person.address[context._index.address].line![context._index.line] !==
+          undefined
+        ) {
+          person.address[context._index.address].line![context._index.line] =
+            fieldValue
+        } else {
+          ;(person.address[context._index.address].line as string[]).push(
+            fieldValue
+          )
         }
-        ;(person.address[context._index.address].line as string[]).push(
-          fieldValue
-        )
       },
       city: (
         fhirBundle: ITemplatedBundle,
