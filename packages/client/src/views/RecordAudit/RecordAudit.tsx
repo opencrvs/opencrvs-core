@@ -318,9 +318,7 @@ function RecordAuditBody({
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
 
-  const [actionDetailsData, setActionDetailsData] = React.useState<History>({
-    documents: []
-  })
+  const [actionDetailsData, setActionDetailsData] = React.useState<History>()
 
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
@@ -641,7 +639,12 @@ function RecordAuditBody({
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
-      <ActionDetailsModal {...actionDetailsModalProps} />
+      {actionDetailsModalProps.actionDetailsData && (
+        <ActionDetailsModal
+          {...actionDetailsModalProps}
+          actionDetailsData={actionDetailsModalProps.actionDetailsData}
+        />
+      )}
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
