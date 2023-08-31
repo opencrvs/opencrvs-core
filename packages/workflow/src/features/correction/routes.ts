@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { badRequest, conflict } from '@hapi/boom'
+import { badRequest, conflict, notFound } from '@hapi/boom'
 import {
   Bundle,
   CertifiedRecord,
@@ -43,7 +43,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { getRecordById } from '@workflow/records'
+import { RecordNotFoundError, getRecordById } from '@workflow/records'
 import { getAuthHeader } from '@opencrvs/commons'
 import { Request } from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -62,23 +62,6 @@ function validateRequest<T extends z.ZodType>(
 }
 
 export const routes = [
-  {
-    method: 'GET',
-    path: '/records/{recordId}',
-    config: {
-      auth: false
-    },
-    handler: async (request: Request): Promise<Bundle> => {
-      const record = await getRecordById(request.params.recordId, [
-        'REGISTERED',
-        'CERTIFIED',
-        'ISSUED',
-        'CORRECTION_REQUESTED'
-      ])
-
-      return record
-    }
-  },
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/request-correction',
@@ -335,6 +318,31 @@ export const routes = [
     }
   })
 ]
+
+if (process.env.NODE_ENV !== 'production') {
+  routes.push({
+    method: 'GET',
+    path: '/records/{recordId}',
+    options: {
+      auth: false
+    },
+    handler: async (request: Request): Promise<Bundle | void> => {
+      try {
+        const record = await getRecordById(request.params.recordId, [
+          'REGISTERED',
+          'CERTIFIED',
+          'ISSUED',
+          'CORRECTION_REQUESTED'
+        ])
+        return record
+      } catch (error) {
+        if (error instanceof RecordNotFoundError) {
+          throw notFound(error.message)
+        }
+      }
+    }
+  })
+}
 
 function findActiveCorrectionRequest(bundle: Bundle) {
   return bundle.entry

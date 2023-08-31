@@ -570,6 +570,10 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 
   const bundle = result[0]
 
+  if (!bundle) {
+    throw new RecordNotFoundError(`Record with id ${recordId} not found`)
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     try {
       checkForUnresolvedReferences(bundle)
@@ -582,7 +586,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     }
   }
 
-  const allEntries = uniqBy(result[0].entry!, ({ resource }) => resource.id)
+  const allEntries = uniqBy(result[0].entry, ({ resource }) => resource.id)
 
   /*
    * Many places in the code assumes that the composition is the first entry in the bundle.
