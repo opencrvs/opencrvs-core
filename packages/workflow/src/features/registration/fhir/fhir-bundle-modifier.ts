@@ -16,9 +16,8 @@ import {
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import {
-  getTaskResource,
-  selectOrCreateTaskRefResource,
-  getSectionEntryBySectionCode
+  getSectionEntryBySectionCode,
+  getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
@@ -81,7 +80,8 @@ export async function modifyRegistrationBundle(
   /* setting unique trackingid here */
   fhirBundle = setTrackingId(fhirBundle)
 
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle)
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+
   const eventType = getEventType(fhirBundle)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
@@ -114,7 +114,7 @@ export async function markBundleAsValidated(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -207,7 +207,7 @@ export async function markBundleAsWaitingValidation(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -231,7 +231,7 @@ export async function markBundleAsDeclarationUpdated(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -281,7 +281,7 @@ export async function markBundleAsCertified(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -302,7 +302,7 @@ export async function markBundleAsCertified(
 }
 
 export function makeTaskAnonymous(bundle: Bundle) {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   taskResource.extension = taskResource.extension?.filter(
     ({ url }) =>
@@ -320,7 +320,7 @@ export async function markBundleAsIssued(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -344,7 +344,7 @@ export async function touchBundle(
   bundle: Bundle,
   token: string
 ): Promise<Bundle> {
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -384,7 +384,7 @@ export function setTrackingId(fhirBundle: Bundle): Bundle {
   } else {
     compositionResource.identifier.value = trackingId
   }
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir3.Task
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
@@ -520,7 +520,7 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   const token = getToken(request)
   const { sub: systemId } = getTokenPayload(token)
   const bundle = request.payload as Bundle
-  const taskResource = getTaskResource(bundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundle)
   const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
 
   if (!taskResource.identifier) {

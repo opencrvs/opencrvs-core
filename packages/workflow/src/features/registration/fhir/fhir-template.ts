@@ -9,88 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { v4 as uuid } from 'uuid'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
-import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { getEventType } from '@workflow/features/registration/utils'
 import {
   Bundle,
-  BundleEntry,
   Composition,
+  isTask,
   Patient,
   RelatedPerson,
-  Task,
-  TaskWithoutId,
-  isTask
+  Task
 } from '@opencrvs/commons/types'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { CompositionSection } from 'fhir/r3'
 
 export const INFORMANT_CODE = 'informant-details'
 
-export function getTaskResource(bundle: Bundle): Task {
-  if (
-    !bundle ||
-    bundle.type !== 'document' ||
-    !bundle.entry ||
-    !bundle.entry[0].resource
-  ) {
-    throw new Error('Invalid FHIR bundle found')
+export function getTaskResourceFromFhirBundle(fhirBundle: Bundle): Task {
+  const resources = fhirBundle.entry.map((entry) => entry.resource)
+
+  const task = resources.find(isTask)
+
+  if (!task) {
+    throw new Error('No task resource found')
   }
 
-  if (bundle.entry[0].resource.resourceType === 'Composition') {
-    return selectOrCreateTaskRefResource(bundle as Bundle)
-  } else if (isTask(bundle.entry[0].resource)) {
-    return bundle.entry[0].resource
-  } else {
-    throw new Error('Unable to find Task Bundle from the provided data')
-  }
-}
-
-export function selectOrCreateTaskRefResource(fhirBundle: Bundle): Task {
-  let taskResource = getTaskResourceFromFhirBundle(fhirBundle)
-  if (!taskResource) {
-    const taskEntry = createTaskRefTemplate(getEventType(fhirBundle))
-    if (!fhirBundle.entry) {
-      fhirBundle.entry = []
-    }
-    taskResource = taskEntry.resource as Task
-    if (!taskResource.focus) {
-      taskResource.focus = { reference: '' }
-    }
-    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
-    fhirBundle.entry.push(taskEntry)
-  }
-  return taskResource
-}
-
-export function getTaskResourceFromFhirBundle(
-  fhirBundle: Bundle
-): Task | undefined {
-  const resources = fhirBundle.entry?.map((entry) => entry.resource!) || []
-
-  return resources.find(isTask)
-}
-
-function createTaskRefTemplate(event: EVENT_TYPE): BundleEntry<TaskWithoutId> {
-  return {
-    fullUrl: `urn:uuid:${uuid()}`,
-    resource: {
-      resourceType: 'Task',
-      status: 'ready',
-      intent: 'order',
-      code: {
-        coding: [
-          {
-            system: `${OPENCRVS_SPECIFICATION_URL}types`,
-            code: event.toString()
-          }
-        ]
-      }
-    }
-  }
+  return task
 }
 
 export async function findPersonEntry(
