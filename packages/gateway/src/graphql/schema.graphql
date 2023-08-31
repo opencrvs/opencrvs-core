@@ -703,6 +703,7 @@ input NotificationInput {
 
 input CorrectionInput {
   requester: String!
+  requesterOther: String
   hasShowedVerifiedDocument: Boolean!
   noSupportingDocumentationRequired: Boolean!
   attachments: [AttachmentInput!]!
@@ -997,6 +998,7 @@ type History {
   statusReason: StatusReason
   reason: String
   requester: String
+  requesterOther: String
   hasShowedVerifiedDocument: Boolean
   noSupportingDocumentationRequired: Boolean
   otherReason: String

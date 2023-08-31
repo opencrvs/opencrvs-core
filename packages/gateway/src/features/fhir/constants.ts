@@ -31,6 +31,7 @@ export const UNASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/
 export const MAKE_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection`
 export const REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/otherReason`
 export const REQUESTING_INDIVIDUAL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
+export const REQUESTING_INDIVIDUAL_OTHER = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividualOther`
 export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
 export const PAYMENT_DETAILS = `${OPENCRVS_SPECIFICATION_URL}extension/paymentDetails`
 export const NO_SUPPORTING_DOCUMENTATION_REQUIRED = `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`

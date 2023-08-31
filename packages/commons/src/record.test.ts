@@ -71,7 +71,11 @@ const REJECTED_TASK = {
       },
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-        valueString: 'FATHER'
+        valueString: 'OTHER'
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
+        valueString: 'Brother'
       },
       {
         url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',

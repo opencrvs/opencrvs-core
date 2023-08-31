@@ -9,6 +9,7 @@ export const CorrectionRequestPaymentInput = z.object({
 })
 export const CorrectionRequestInput = z.object({
   requester: z.string(),
+  requesterOther: z.string().optional(),
   hasShowedVerifiedDocument: z.boolean(),
   noSupportingDocumentationRequired: z.boolean(),
   attachments: z

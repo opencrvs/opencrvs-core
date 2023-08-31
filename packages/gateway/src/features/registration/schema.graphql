@@ -159,6 +159,7 @@ type History {
   statusReason: StatusReason
   reason: String
   requester: String
+  requesterOther: String
   hasShowedVerifiedDocument: Boolean
   noSupportingDocumentationRequired: Boolean
   otherReason: String
@@ -318,6 +319,7 @@ input CorrectionValueInput {
 
 input CorrectionInput {
   requester: String! # MOTHER, OTHER...
+  requesterOther: String # "The neighbour"
   hasShowedVerifiedDocument: Boolean!
   noSupportingDocumentationRequired: Boolean!
   attachments: [AttachmentInput!]!

@@ -138,6 +138,21 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
 
   const formSections = getViewableSection(registerForm, declaration)
 
+  const history = declaration.data.history as unknown as History[]
+  if (!history) {
+    throw new Error('No history found from record. Should never happen')
+  }
+
+  const correctionRequestTask = history.find(
+    (task: History) => task.action === 'REQUESTED_CORRECTION'
+  )
+
+  if (!correctionRequestTask) {
+    throw new Error(
+      'No correction request found from record history. Should never happen'
+    )
+  }
+
   const getCorrectionRequestTask = () => {
     const history = declaration.data.history as unknown as History[]
     return history.find(
@@ -153,12 +168,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getRequestedBy = () => {
-    const corrector = declaration.data.registration as IFormSectionData
-
-    const relationship =
-      corrector &&
-      corrector.correction &&
-      ((corrector.correction as IFormSectionData).requester as string)
+    const relationship = correctionRequestTask?.requester
     switch (relationship) {
       case CorrectorRelationship.INFORMANT:
         return getNameRequester(declaration.data.informant)
@@ -177,7 +187,11 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
       case CorrectorRelationship.COURT:
         return intl.formatMessage(messages.court)
       case CorrectorRelationship.OTHER:
-        return CorrectorRelationship.OTHER
+        return (
+          intl.formatMessage(messages.others) +
+          ' - ' +
+          correctionRequestTask.requesterOther
+        )
 
       default:
         return '-'

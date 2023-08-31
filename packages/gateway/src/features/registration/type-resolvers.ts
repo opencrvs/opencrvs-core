@@ -65,7 +65,8 @@ import {
   DUPLICATE_TRACKING_ID,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
   NO_SUPPORTING_DOCUMENTATION_REQUIRED,
-  PAYMENT_DETAILS
+  PAYMENT_DETAILS,
+  REQUESTING_INDIVIDUAL_OTHER
 } from '@gateway/features/fhir/constants'
 import {
   ITemplatedComposition,
@@ -1304,6 +1305,14 @@ export const typeResolvers: GQLResolver = {
     requester: (task: fhir.Task) => {
       const requestedBy = findExtension(
         REQUESTING_INDIVIDUAL,
+        task.extension as fhir.Extension[]
+      )
+
+      return requestedBy?.valueString || ''
+    },
+    requesterOther: (task: fhir.Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL_OTHER,
         task.extension as fhir.Extension[]
       )
 

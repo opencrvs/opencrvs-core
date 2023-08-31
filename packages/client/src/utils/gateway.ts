@@ -513,6 +513,7 @@ export type CorrectionInput = {
   payment?: InputMaybe<CorrectionPaymentInput>
   reason: Scalars['String']
   requester: Scalars['String']
+  requesterOther?: InputMaybe<Scalars['String']>
   values: Array<CorrectionValueInput>
 }
 
@@ -807,6 +808,7 @@ export type History = {
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
+  requesterOther?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   system?: Maybe<IntegratedSystem>
@@ -2421,6 +2423,26 @@ export type CreateDeathRegistrationCorrectionMutation = {
   createDeathRegistrationCorrection: string
 }
 
+export type ApproveBirthRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type ApproveBirthRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  approveBirthRegistrationCorrection: string
+}
+
+export type ApproveDeathRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type ApproveDeathRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  approveDeathRegistrationCorrection: string
+}
+
 export type RequestRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: CorrectionInput
@@ -3593,6 +3615,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      requesterOther?: string | null
       noSupportingDocumentationRequired?: boolean | null
       hasShowedVerifiedDocument?: boolean | null
       date?: any | null

@@ -136,7 +136,9 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
 export function updateDeclarationRegistrationWithCorrection(
   correctionData: {
     corrector?: {
-      relationship: string | { value: string }
+      relationship:
+        | string
+        | { value: string; nestedFields: { otherRelationship: string } }
       hasShowedVerifiedDocument?: boolean
     }
     reason?: {
@@ -156,6 +158,7 @@ export function updateDeclarationRegistrationWithCorrection(
 ) {
   let correctionValues: CorrectionInput = {
     requester: '',
+    requesterOther: '',
     hasShowedVerifiedDocument: false,
     noSupportingDocumentationRequired: false,
     reason: '',
@@ -169,9 +172,13 @@ export function updateDeclarationRegistrationWithCorrection(
   const data = correctionData
 
   if (data.corrector && data.corrector.relationship) {
-    correctionValues.requester = ((
-      data.corrector.relationship as IFormSectionData
-    ).value || data.corrector.relationship) as string
+    if (typeof data.corrector.relationship === 'string') {
+      correctionValues.requester = data.corrector.relationship
+    } else {
+      correctionValues.requester = data.corrector.relationship.value
+      correctionValues.requesterOther =
+        data.corrector.relationship.nestedFields.otherRelationship
+    }
   }
 
   correctionValues.hasShowedVerifiedDocument = Boolean(

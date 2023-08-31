@@ -562,6 +562,7 @@ export interface GQLNotificationInput {
 
 export interface GQLCorrectionInput {
   requester: string
+  requesterOther?: string
   hasShowedVerifiedDocument: boolean
   noSupportingDocumentationRequired: boolean
   attachments: Array<GQLAttachmentInput>
@@ -856,6 +857,7 @@ export interface GQLHistory {
   statusReason?: GQLStatusReason
   reason?: string
   requester?: string
+  requesterOther?: string
   hasShowedVerifiedDocument?: boolean
   noSupportingDocumentationRequired?: boolean
   otherReason?: string
@@ -7127,6 +7129,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
   requester?: HistoryToRequesterResolver<TParent>
+  requesterOther?: HistoryToRequesterOtherResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   noSupportingDocumentationRequired?: HistoryToNoSupportingDocumentationRequiredResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
@@ -7218,6 +7221,15 @@ export interface HistoryToReasonResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToRequesterOtherResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

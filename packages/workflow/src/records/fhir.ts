@@ -220,6 +220,10 @@ export function createCorrectedTask(
         valueString: correctionDetails.requester
       },
       {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
+        valueString: correctionDetails.requesterOther
+      },
+      {
         url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
         valueBoolean: correctionDetails.hasShowedVerifiedDocument
       },
@@ -309,6 +313,10 @@ export function createCorrectionRequestTask(
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',
         valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
+        valueString: correctionDetails.requesterOther
       },
       {
         url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
