@@ -287,6 +287,21 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
           }
         }),
         /*
+         * Creates a list of all references inside Task.requester
+         */
+        taskRequesterIds: {
+          $map: {
+            input: filterByType('Task'),
+            as: 'task',
+            in: {
+              $arrayElemAt: [
+                { $split: ['$$task.requester.agent.reference', '/'] },
+                1
+              ]
+            }
+          }
+        },
+        /*
          * Creates a list of all encounters inside Task.encounter.reference
          */
         taskEncounterIds: {
@@ -370,6 +385,13 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       }
     },
     // Get Task extension references
+    {
+      $addFields: {
+        taskReferenceIds: {
+          $concatArrays: ['$taskReferenceIds', '$taskRequesterIds']
+        }
+      }
+    },
     ...autoJoinAllCollections('taskReferenceIds'),
     // Get Patients by RelatedPersonIds
     {
@@ -554,6 +576,8 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error)
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify(query))
       throw error
     }
   }

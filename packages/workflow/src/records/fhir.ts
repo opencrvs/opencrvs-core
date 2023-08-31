@@ -4,6 +4,7 @@ import {
   BundleEntryWithFullUrl,
   DocumentReference,
   PaymentReconciliation,
+  Practitioner,
   Task,
   Unsaved
 } from '@opencrvs/commons/types'
@@ -274,6 +275,7 @@ export function createCorrectionRequestTask(
   previousTask: Task, // @todo do not require previous task, pass values from outside
   correctionDetails: CorrectionRequestInput,
   correctionEncounter: Unsaved<BundleEntry<fhir3.Encounter>>,
+  practitioner: Practitioner,
   paymentReconciliation?: Unsaved<BundleEntry<PaymentReconciliation>>
 ): Task {
   return {
@@ -283,6 +285,9 @@ export function createCorrectionRequestTask(
     code: previousTask.code,
     focus: previousTask.focus,
     id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
     encounter: { reference: correctionEncounter.fullUrl },
     identifier: previousTask.identifier,
     extension: [

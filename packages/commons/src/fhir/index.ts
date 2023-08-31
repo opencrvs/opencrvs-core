@@ -1,4 +1,7 @@
-import { UUID } from './uuid'
+// eslint-disable-next-line import/no-relative-parent-imports
+import { UUID } from '../uuid'
+
+export * from './practitioner'
 
 /*
  * These types should always strictly match the data formats
@@ -22,19 +25,12 @@ export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use' | 'family'> & {
   family: string[]
 }
 
-export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
-  use: string
-}
-
 type Address = Omit<fhir3.Address, 'type'> & {
   type: 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
 }
 
 export type CompositionWithoutId = Omit<fhir3.Composition, 'id'>
 export type Extension = fhir3.Extension
-export type Practitioner = Omit<fhir3.Practitioner, 'name'> & {
-  name: Array<OpenCRVSPractitionerName>
-}
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
   coding: fhir3.Coding[]
@@ -111,9 +107,12 @@ export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
   fullUrl: string
 }
 
-export type CorrectionRequestedTask = Omit<Task, 'encounter'> & {
+export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
   encounter: {
     reference: string
+  }
+  requester: {
+    agent: { reference: `Practitioner/${string}` }
   }
 }
 
@@ -176,6 +175,12 @@ export function getTaskFromBundle(bundle: Bundle): Task {
 }
 
 type KnownExtensionType = {
+  'http://opencrvs.org/specs/extension/regLastUser': {
+    url: 'http://opencrvs.org/specs/extension/paymentDetails'
+    valueReference: {
+      reference: `${string}/${string}`
+    }
+  }
   'http://opencrvs.org/specs/extension/paymentDetails': {
     url: 'http://opencrvs.org/specs/extension/paymentDetails'
     valueReference: {

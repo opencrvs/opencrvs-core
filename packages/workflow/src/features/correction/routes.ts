@@ -15,9 +15,13 @@ import {
   CertifiedRecord,
   CorrectionRequestedRecord,
   IssuedRecord,
+  OpenCRVSPractitionerName,
   RegisteredRecord,
-  Task,
-  withOnlyLatestTask
+  getPractitioner,
+  isTask,
+  withOnlyLatestTask,
+  getPractitionerContactDetails,
+  isCorrectionRequestedTask
 } from '@opencrvs/commons/types'
 import { uploadBase64ToMinio } from '@workflow/documents'
 import { createNewAuditEvent } from '@workflow/records/audit'
@@ -41,6 +45,10 @@ import { z } from 'zod'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
 import { getAuthHeader } from '@opencrvs/commons'
+import { Request } from '@hapi/hapi'
+import fetch from 'node-fetch'
+import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -54,6 +62,23 @@ function validateRequest<T extends z.ZodType>(
 }
 
 export const routes = [
+  {
+    method: 'GET',
+    path: '/records/{recordId}',
+    config: {
+      auth: false
+    },
+    handler: async (request: Request): Promise<Bundle> => {
+      const record = await getRecordById(request.params.recordId, [
+        'REGISTERED',
+        'CERTIFIED',
+        'ISSUED',
+        'CORRECTION_REQUESTED'
+      ])
+
+      return record
+    }
+  },
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/request-correction',
@@ -66,7 +91,7 @@ export const routes = [
       )
       const token = getToken(request)
 
-      if (hasActiveCorrectionRequest(record)) {
+      if (findActiveCorrectionRequest(record)) {
         throw conflict(
           'There is already a pending correction request for this record'
         )
@@ -119,7 +144,8 @@ export const routes = [
         request.payload
       )
 
-      if (!hasActiveCorrectionRequest(record)) {
+      const correctionRequest = findActiveCorrectionRequest(record)
+      if (!correctionRequest) {
         throw conflict(
           'There is no a pending correction request for this record'
         )
@@ -138,13 +164,39 @@ export const routes = [
 
       // This is just for backwards compatibility reasons as a lot of existing code assimes there
       // is only one task in the bundle
-      const recordWithOnlyTheLatestTask = withOnlyLatestTask(
+      const recordWithOnlyTheNewTask = withOnlyLatestTask(
         recordInPreviousStateWithCorrectionRejection
       )
 
-      await createNewAuditEvent(recordWithOnlyTheLatestTask, getToken(request))
-      await indexBundle(recordWithOnlyTheLatestTask, getToken(request))
-      return recordWithOnlyTheLatestTask
+      await createNewAuditEvent(recordWithOnlyTheNewTask, getToken(request))
+      await indexBundle(recordWithOnlyTheNewTask, getToken(request))
+
+      /*
+       * Notify the requesting practitioner that the correction request has been approved
+       */
+
+      const requestingPractitioner = getPractitioner(
+        correctionRequest.requester.agent.reference.split('/')[1],
+        record
+      )
+
+      const practitionerContacts = getPractitionerContactDetails(
+        requestingPractitioner
+      )
+
+      await sendNotification(
+        'rejectCorrectionRequest',
+        practitionerContacts,
+        getAuthHeader(request),
+        {
+          event: 'BIRTH',
+          trackingId: getTrackingId(recordWithOnlyTheNewTask)!,
+          userFullName: requestingPractitioner.name,
+          reason: rejectionDetails.reason
+        }
+      )
+
+      return recordWithOnlyTheNewTask
     }
   }),
   createRoute({
@@ -159,7 +211,7 @@ export const routes = [
       )
       const token = getToken(request)
 
-      if (hasActiveCorrectionRequest(record)) {
+      if (findActiveCorrectionRequest(record)) {
         throw conflict(
           'There is already a pending correction request for this record'
         )
@@ -213,27 +265,67 @@ export const routes = [
         request.payload
       )
       const token = getToken(request)
+      const correctionRequest = findActiveCorrectionRequest(record)
 
-      if (!hasActiveCorrectionRequest(record)) {
+      if (!correctionRequest) {
         throw conflict(
           'There is no pending correction requests for this record'
         )
       }
-      const practitioner = await getLoggedInPractitionerResource(token)
+
+      const approvingPractitioner = await getLoggedInPractitionerResource(token)
 
       const recordInCorrectedState = await toCorrectionApproved(
         record,
-        practitioner,
+        approvingPractitioner,
         correctionDetails
       )
 
+      /*
+       * Saves the previous task in the "approved" state and the new task (record put to Registered state)
+       */
+
       await sendBundleToHearth(recordInCorrectedState)
 
-      const recordWithOnlyThePreviousTask = withOnlyLatestTask(
+      const recordWithOnlyTheNewTask = withOnlyLatestTask(
         recordInCorrectedState
       )
-      await createNewAuditEvent(recordWithOnlyThePreviousTask, token)
-      await indexBundle(recordWithOnlyThePreviousTask, token)
+
+      /*
+       * Create metrics events & reindex the bundle in elasticsearch
+       */
+
+      await createNewAuditEvent(recordWithOnlyTheNewTask, token)
+      await indexBundle(recordWithOnlyTheNewTask, token)
+
+      /*
+       * Notify the requesting practitioner that the correction request has been approved
+       */
+
+      const requestingPractitioner = getPractitioner(
+        correctionRequest.requester.agent.reference.split('/')[1],
+        record
+      )
+
+      const practitionerContacts = getPractitionerContactDetails(
+        requestingPractitioner
+      )
+
+      await sendNotification(
+        'approveCorrectionRequest',
+        practitionerContacts,
+        getAuthHeader(request),
+        {
+          event: 'BIRTH',
+          trackingId: getTrackingId(recordWithOnlyTheNewTask)!,
+          userFullName: requestingPractitioner.name
+        }
+      )
+
+      /*
+       * Return the updated bundle to gateway for further processing using the user inputted changes.
+       * The reason we're just not returning recordWithOnlyTheNewTask is that it might contain new FHIR resources with temporary IDs
+       */
 
       const updatedRecord = await getRecordById(request.params.recordId, [
         'REGISTERED'
@@ -244,18 +336,55 @@ export const routes = [
   })
 ]
 
-function hasActiveCorrectionRequest(bundle: Bundle) {
-  return bundle.entry.some((entry) => {
-    if (entry.resource.resourceType !== 'Task') {
-      return false
-    }
-    const task = entry.resource as Task
+function findActiveCorrectionRequest(bundle: Bundle) {
+  return bundle.entry
+    .map(({ resource }) => resource)
+    .filter(isTask)
+    .filter(isCorrectionRequestedTask)
+    .find((task) => {
+      return task.status === 'requested'
+    })
+}
 
-    return (
-      task.status === 'requested' &&
-      task.businessStatus?.coding?.some(
-        (coding) => coding.code === 'CORRECTION_REQUESTED'
-      )
-    )
+type ApprovePayload = {
+  event: string
+  trackingId: string
+  userFullName: OpenCRVSPractitionerName[]
+}
+
+type RejectPayload = ApprovePayload & { reason: string }
+
+type Contacts =
+  | { email: string }
+  | { msisdn: string }
+  | { email: string; msisdn: string }
+
+type PayloadMap = {
+  approveCorrectionRequest: ApprovePayload
+  rejectCorrectionRequest: RejectPayload
+}
+
+async function sendNotification<T extends keyof PayloadMap>(
+  smsType: T,
+  recipient: Contacts,
+  authHeader: { Authorization: string },
+  notificationPayload: PayloadMap[T]
+) {
+  const res = await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      ...recipient,
+      ...notificationPayload
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
   })
+
+  if (!res.ok) {
+    throw new Error(`Failed to send notification ${res.statusText}`)
+  }
+
+  return res
 }
