@@ -143,7 +143,6 @@ import {
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};

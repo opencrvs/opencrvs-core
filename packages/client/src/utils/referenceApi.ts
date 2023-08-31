@@ -167,6 +167,12 @@ async function loadForms(): Promise<LoadFormsResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+  if (res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
 
   if (res && res.status !== 201) {
     throw Error(res.statusText)

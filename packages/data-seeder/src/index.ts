@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { AUTH_URL, GATEWAY_GQL_HOST, SUPER_USER_PASSWORD } from './constants'
+import { AUTH_HOST, GATEWAY_HOST, SUPER_USER_PASSWORD } from './constants'
 import fetch from 'node-fetch'
 import { seedCertificate } from './certificates'
 import { seedLocations } from './locations'
@@ -21,7 +21,7 @@ import gql from 'graphql-tag'
 import decode from 'jwt-decode'
 
 async function getToken(): Promise<string> {
-  const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
+  const authUrl = new URL('authenticate-super-user', AUTH_HOST).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({
@@ -72,7 +72,7 @@ function getTokenPayload(token: string): TokenPayload {
 
 async function deactivateSuperuser(token: string) {
   const { sub } = getTokenPayload(token)
-  const res = await fetch(GATEWAY_GQL_HOST, {
+  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

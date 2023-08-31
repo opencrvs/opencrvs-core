@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {

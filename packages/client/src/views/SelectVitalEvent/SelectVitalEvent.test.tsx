@@ -42,7 +42,7 @@ describe('when user is selecting the vital event', () => {
       })
       it('takes user to the event info view', async () => {
         expect(app.find('#content-name').hostNodes().first().text()).toBe(
-          'Who is applying for birth registration?'
+          'Introduce the birth registration process to the informant'
         )
       })
     })

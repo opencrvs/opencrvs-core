@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST } from './constants'
+import { COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import { raise, parseGQLResponse } from './utils'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -95,7 +95,7 @@ const getSystemRolesQuery = print(gql`
 `)
 
 async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
-  const res = await fetch(GATEWAY_GQL_HOST, {
+  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ async function updateRoles(
   let roleIdMap: RoleIdMap = {}
   await Promise.all(
     systemRoles.map((systemRole) =>
-      fetch(GATEWAY_GQL_HOST, {
+      fetch(`${GATEWAY_HOST}/graphql`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ async function updateRoles(
 }
 
 async function fetchCountryRoles() {
-  const url = new URL('roles', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('roles', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the roles from ${url}`)

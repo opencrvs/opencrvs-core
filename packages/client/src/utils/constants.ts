@@ -44,6 +44,10 @@ export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
 export const PERFORMANCE_MANAGEMENT_ROLES = ['PERFORMANCE_MANAGEMENT']
 export const NATL_ADMIN_ROLES = ['NATIONAL_SYSTEM_ADMIN']
 export const NATIONAL_REGISTRAR_ROLES = ['NATIONAL_REGISTRAR']
+export const NATIONAL_ID = 'NATIONAL_ID'
+
+export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
+export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
 
 export const REGISTRAR_ROLES = [
   ROLE_LOCAL_REGISTRAR,
@@ -81,3 +85,4 @@ export const INFORMANT_MINIMUM_AGE = 16
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
 export const APPLICATION_VERSION = 'v1.3.0-beta'
+export const IS_PROD_ENVIRONMENT = import.meta.env.PROD
