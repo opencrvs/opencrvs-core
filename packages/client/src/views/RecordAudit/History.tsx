@@ -80,7 +80,9 @@ function SystemUser({ name }: { name?: string }) {
   return (
     <NameAvatar>
       <HealthSystemLogo />
-      <span>{name ?? intl.formatMessage(userMessages.system)}</span>
+      <span>
+        {Boolean(name) ? name : intl.formatMessage(userMessages.system)}
+      </span>
     </NameAvatar>
   )
 }
@@ -295,7 +297,9 @@ export const GetHistory = ({
       getUserRole(currentLanguage, item.user?.role)
     ),
 
-    location: isVerifiedAction(item) ? (
+    location: isFlaggedAsPotentialDuplicate(item) ? (
+      <div />
+    ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
