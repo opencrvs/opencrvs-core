@@ -112,6 +112,11 @@ Array [
       ],
       "text": "OTHER",
     },
+    "requester": Object {
+      "agent": Object {
+        "reference": "Practitioner/7dc24408-d409-4ec0-bd9d-4a5aa817dcab",
+      },
+    },
     "resourceType": "Task",
     "status": "requested",
   },
