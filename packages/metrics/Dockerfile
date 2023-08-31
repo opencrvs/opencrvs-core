@@ -24,8 +24,6 @@ RUN yarn build
 
 # Step 2. Build the actual image
 
-FROM nginx
-
 COPY --from=0 /app/packages/metrics/build/ /usr/share/nginx/html/
 
 COPY infrastructure/nginx-deploy-config.sh /

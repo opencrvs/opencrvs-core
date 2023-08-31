@@ -22,8 +22,6 @@ RUN yarn build
 
 # Step 2. Build the actual image
 
-FROM nginx
-
 COPY --from=0 /app/packages/search/build/ /usr/share/nginx/html/
 
 COPY infrastructure/nginx-deploy-config.sh /
