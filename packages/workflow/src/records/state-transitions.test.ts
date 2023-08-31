@@ -43,6 +43,7 @@ jest.mock('@workflow/features/registration/fhir/fhir-utils', () => {
           }
 
         default:
+          // eslint-disable-next-line no-console
           console.log('request not handled:', suffix)
           throw new Error('Not implemented')
       }

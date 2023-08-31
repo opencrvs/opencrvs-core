@@ -62,7 +62,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
 import { Bundle, Composition, isTask } from '@opencrvs/commons/types'
-import { getTaskResourceFromFhirBundle } from '../registration/fhir/fhir-template'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as Bundle
