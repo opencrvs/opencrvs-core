@@ -215,6 +215,8 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
           <form id="security-question-form" onSubmit={this.handleContinue}>
             <Content
               title={intl.formatMessage(messages[this.state.questionKey])}
+              showTitleOnMobile
+              titleOverflow
               subtitle={intl.formatMessage(
                 sharedMessages.securityQuestionFormBodySubheader
               )}
