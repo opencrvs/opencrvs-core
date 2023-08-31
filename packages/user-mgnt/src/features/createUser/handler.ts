@@ -39,13 +39,13 @@ export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser & { password: string }
+  const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
 
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
-  let autoGenPassword = null
+  let password = null
 
   try {
     const practitioner = createFhirPractitioner(user, false)
@@ -75,7 +75,7 @@ export default async function createUser(
     ) {
       userScopes.push('demo')
     }
-    user.status = statuses.PENDING
+    user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
 
     if (
@@ -87,9 +87,9 @@ export default async function createUser(
       user.status = statuses.ACTIVE
     }
 
-    autoGenPassword = generateRandomPassword(hasDemoScope(request))
+    password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
     user.passwordHash = hash
 
@@ -123,7 +123,7 @@ export default async function createUser(
   sendCredentialsNotification(
     user.name,
     user.username,
-    autoGenPassword,
+    password,
     {
       Authorization: request.headers.authorization
     },

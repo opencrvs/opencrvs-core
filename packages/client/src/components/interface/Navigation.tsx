@@ -22,7 +22,6 @@ import {
   goToApplicationConfig,
   goToCertificateConfig,
   goToDashboardView,
-  goToFormConfigHome,
   goToHomeTab,
   goToInformantNotification,
   goToLeaderBoardsView,
@@ -44,16 +43,14 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -70,6 +67,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -96,7 +94,6 @@ export const WORKQUEUE_TABS = {
   systems: 'integration',
   userRoles: 'userroles',
   settings: 'settings',
-  declarationForms: 'form',
   logout: 'logout',
   communications: 'communications',
   informantNotification: 'informantnotification',
@@ -227,7 +224,6 @@ interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
-  goToFormConfigAction: typeof goToFormConfigHome
   goToUserRolesConfigAction: typeof goToUserRolesConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
@@ -295,7 +291,7 @@ const getSettingsAndLogout = (props: IFullProps) => {
   )
 }
 
-export const NavigationView = (props: IFullProps) => {
+const NavigationView = (props: IFullProps) => {
   const {
     intl,
     match,
@@ -308,7 +304,6 @@ export const NavigationView = (props: IFullProps) => {
     goToCertificateConfigAction,
     goToUserRolesConfigAction,
     goToVSExportsAction,
-    goToFormConfigAction,
     goToSystemViewAction,
     goToApplicationConfigAction,
     goToAdvancedSearchResultAction,
@@ -337,7 +332,6 @@ export const NavigationView = (props: IFullProps) => {
   const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.declarationForms,
     WORKQUEUE_TABS.systems,
     WORKQUEUE_TABS.userRoles
   ]
@@ -357,6 +351,15 @@ export const NavigationView = (props: IFullProps) => {
     const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
     return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
   })
+  const showRegDashboard =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
+  const showLeaderboard =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.LEADERBOARDS_DASHBOARD_URL)
+  const showStatistics =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -413,7 +416,6 @@ export const NavigationView = (props: IFullProps) => {
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
     >
       {userDetails?.systemRole === 'FIELD_AGENT' ? (
@@ -735,19 +737,6 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.certificate
                             }
                           />
-                          <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
-                            label={intl.formatMessage(
-                              navigationMessages[
-                                WORKQUEUE_TABS.declarationForms
-                              ]
-                            )}
-                            onClick={goToFormConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.declarationForms
-                            }
-                          />
 
                           <NavigationSubItem
                             id={`navigation_${WORKQUEUE_TABS.systems}`}
@@ -835,40 +824,48 @@ export const NavigationView = (props: IFullProps) => {
                     GROUP_ID.analytics
                   ) && (
                     <>
-                      <NavigationItem
-                        icon={() => <Icon name="ChartLine" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['dashboard']
-                        )}
-                        onClick={goToDashboardView}
-                        id="navigation_dashboard"
-                        isSelected={
-                          enableMenuSelection && activeMenuItem === 'dashboard'
-                        }
-                      />
-                      <NavigationItem
-                        icon={() => <Icon name="Activity" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['statistics']
-                        )}
-                        onClick={goToPerformanceStatistics}
-                        id="navigation_statistics"
-                        isSelected={
-                          enableMenuSelection && activeMenuItem === 'statistics'
-                        }
-                      />
-                      <NavigationItem
-                        icon={() => <Icon name="Medal" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['leaderboards']
-                        )}
-                        onClick={goToLeaderBoardsView}
-                        id="navigation_leaderboards"
-                        isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === 'leaderboards'
-                        }
-                      />
+                      {showRegDashboard && (
+                        <NavigationItem
+                          icon={() => <Icon name="ChartLine" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['dashboard']
+                          )}
+                          onClick={goToDashboardView}
+                          id="navigation_dashboard"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'dashboard'
+                          }
+                        />
+                      )}
+                      {showStatistics && (
+                        <NavigationItem
+                          icon={() => <Icon name="Activity" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['statistics']
+                          )}
+                          onClick={goToPerformanceStatistics}
+                          id="navigation_statistics"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'statistics'
+                          }
+                        />
+                      )}
+                      {showLeaderboard && (
+                        <NavigationItem
+                          icon={() => <Icon name="Medal" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['leaderboards']
+                          )}
+                          onClick={goToLeaderBoardsView}
+                          id="navigation_leaderboards"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'leaderboards'
+                          }
+                        />
+                      )}
                       <NavigationItem
                         icon={() => <Icon name="ChartBar" size="medium" />}
                         label={intl.formatMessage(
@@ -993,8 +990,6 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.settings
       : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
-      : window.location.href.endsWith(WORKQUEUE_TABS.declarationForms)
-      ? WORKQUEUE_TABS.declarationForms
       : window.location.href.endsWith(WORKQUEUE_TABS.systems)
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
@@ -1013,7 +1008,6 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
-  goToFormConfigAction: goToFormConfigHome,
   goToUserRolesConfigAction: goToUserRolesConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,

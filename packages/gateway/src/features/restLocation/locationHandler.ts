@@ -19,8 +19,9 @@ import {
   getLocationsByIdentifier,
   updateStatisticalExtensions
 } from './utils'
+import { v4 as uuid } from 'uuid'
 
-enum Code {
+export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   HEALTH_FACILITY = 'HEALTH_FACILITY'
@@ -96,7 +97,7 @@ function instanceOfJurisdiction(object: any): object is Location {
   return 'statistics' in object
 }
 
-export const requestSchema = Joi.object({
+const locationRequestSchema = Joi.object({
   statisticalID: Joi.string().required(),
   name: Joi.string().required(),
   alias: Joi.string().optional(),
@@ -117,6 +118,11 @@ export const requestSchema = Joi.object({
     .optional(),
   statistics: Joi.array().items(locationStatisticSchema).optional()
 })
+
+export const requestSchema = Joi.alternatives().try(
+  locationRequestSchema,
+  Joi.array().items(locationRequestSchema)
+)
 
 export const updateSchema = Joi.object({
   name: Joi.string().optional(),
@@ -156,19 +162,63 @@ export async function fetchLocationHandler(
   return response
 }
 
+function batchLocationsHandler(locations: Location[]) {
+  const locationsMap = new Map(
+    locations.map((location) => [
+      location.statisticalID,
+      { ...location, uid: `urn:uuid:${uuid()}` }
+    ])
+  )
+  const locationsBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: locations
+      .map((location) => ({
+        ...location,
+        // partOf is either Location/{statisticalID} of another location or 'Location/0'
+        partOf:
+          locationsMap.get(location.partOf.split('/')[1])?.uid ??
+          location.partOf
+      }))
+      .map(
+        (location): fhir.BundleEntry => ({
+          fullUrl: locationsMap.get(location.statisticalID)!.uid,
+          resource: {
+            ...composeFhirLocation(location),
+            ...(location.statistics && {
+              extension: generateStatisticalExtensions(location.statistics)
+            })
+          }
+        })
+      )
+  }
+  return fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
+}
+
 export async function createLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  if (Array.isArray(request.payload)) {
+    return batchLocationsHandler(request.payload as Location[])
+  }
   const payload = request.payload as Location | Facility
   const newLocation: fhir.Location = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
-  const locations = await getLocationsByIdentifier(
-    `ADMIN_STRUCTURE_${String(payload.statisticalID)}`
-  ).catch((err) => {
-    throw err
-  })
+  const locations = [
+    ...(await Promise.all([
+      getLocationsByIdentifier(
+        `${Code.ADMIN_STRUCTURE}_${String(payload.statisticalID)}`
+      ),
+      getLocationsByIdentifier(
+        `${Code.CRVS_OFFICE}_${String(payload.statisticalID)}`
+      ),
+      getLocationsByIdentifier(
+        `${Code.HEALTH_FACILITY}_${String(payload.statisticalID)}`
+      )
+    ]).then((results) => results.flat()))
+  ]
 
   if (locations.length !== 0) {
     throw conflict(`statisticalID ${payload.statisticalID} already exists`)

@@ -38,7 +38,7 @@ import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 // Checks that the &nonce= parameter matches the one in localStorage, removes it if yes, throws if not
 // Redirects to the pathname in state
 
-export const Page = styled.div`
+const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.grey100};
   min-height: 100vh;

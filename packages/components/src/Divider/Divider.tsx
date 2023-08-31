@@ -11,7 +11,23 @@
  */
 import styled from 'styled-components'
 
-export const Divider = styled.div`
+export interface DividerProps {
+  width?: string
+  border?: string
+  color?: string
+}
+
+export const Divider = styled.div<DividerProps>`
+  margin-bottom: 24px;
   padding: 8px 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: ${({ border }) => border || '1px'} solid
+    ${({ color, theme }) => color || theme.colors.grey200};
+  width: ${({ width }) => width || '100%'};
+`
+
+export const DividerVertical = styled.div`
+  background: ${({ theme }) => theme.colors.grey200};
+  width: 1px;
+  height: 100%;
+  min-height: 24px;
 `

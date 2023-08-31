@@ -14,8 +14,19 @@ import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { UserDetails } from './userUtils'
+import { lookup } from 'country-data'
+import { getDefaultLanguage } from '@client/i18n/utils'
+
+export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
+  const alpha2 =
+    isoCode === 'FAR'
+      ? 'FA'
+      : lookup.countries({ alpha3: isoCode.toUpperCase() })[0]?.alpha2
+
+  return alpha2
+}
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -67,7 +78,7 @@ export function generateLocationName(
   if (!location) {
     return ''
   }
-  let name = location.name
+  let name = getLocalizedLocationName(intl, location)
   location.jurisdictionType &&
     (name += ` ${
       intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
@@ -119,7 +130,7 @@ export function generateSearchableLocations(
 
     return {
       id: location.id,
-      searchableText: location.name,
+      searchableText: getLocalizedLocationName(intl, location),
       displayLabel: locationName
     }
   })
@@ -170,7 +181,8 @@ export type LocationName = string | MessageDescriptor
 
 export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
-  offlineLocations: Record<string, ILocation>
+  offlineLocations: Record<string, ILocation>,
+  countryAsString?: boolean
 ): Record<string, LocationName> {
   let location: ILocation = facilityLocation
   let continueLoop = true
@@ -179,13 +191,23 @@ export function getLocationNameMapOfFacility(
     const parent = location.partOf.split('/')[1]
     if (parent === '0') {
       continueLoop = false
-      map.country = countries.find(
-        ({ value }) => value === window.config.COUNTRY
-      )?.label as MessageDescriptor
+      map.country = countryAsString
+        ? (countries.find(({ value }) => value === window.config.COUNTRY)?.label
+            .defaultMessage as string)
+        : (countries.find(({ value }) => value === window.config.COUNTRY)
+            ?.label as MessageDescriptor)
     } else {
       location = offlineLocations[parent]
-      map[location.jurisdictionType as string] = location.name
+      map[location.jurisdictionType?.toLowerCase() as string] = location.name
     }
   }
   return map
+}
+
+export function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
+  if (intl.locale === getDefaultLanguage()) {
+    return location.name
+  } else {
+    return location.alias?.toString()
+  }
 }

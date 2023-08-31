@@ -16,7 +16,7 @@ import {
   RADIO_GROUP
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 
 export const supportingDocumentsSectionGroup: IFormSectionGroup = {
   id: 'correctionDocumentsViewGroup',
@@ -31,7 +31,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       mapping: {
         mutation: fieldValueSectionExchangeTransformer('correction', 'data')
       },
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'Affidavit',
@@ -55,7 +55,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       hideAsterisk: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: messages.selectPlaceholder,
       options: [
         {

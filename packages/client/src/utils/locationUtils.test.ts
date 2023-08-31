@@ -33,6 +33,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -42,6 +43,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
@@ -51,6 +53,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -76,6 +79,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -85,6 +89,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/321'
@@ -94,6 +99,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -163,8 +169,8 @@ describe('locationUtil tests', () => {
 
       const map = getLocationNameMapOfFacility(facilityLocation, locations)
       expect(map).toEqual({
-        DISTRICT: 'Abwe',
-        STATE: 'Central',
+        district: 'Abwe',
+        state: 'Central',
         country: {
           defaultMessage: 'Bangladesh',
           description: 'ISO Country: BGD',

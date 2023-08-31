@@ -12,7 +12,6 @@
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 export enum DraftStatus {
@@ -39,22 +38,5 @@ export async function getFormDraft(token: string) {
   } catch (err) {
     logger.error(`Unable to check form draft status for error : ${err}`)
     throw err
-  }
-}
-
-export async function checkFormDraftStatusToAddTestExtension(
-  taskResource: fhir.Task,
-  token: string
-) {
-  const formDraft: IDraft[] = await getFormDraft(token)
-  // Array.prototype.every returns true for an empty array
-  const isPublished =
-    formDraft.length === Object.values(EVENT_TYPE).length &&
-    Object.values(formDraft).every(
-      (draft) => draft.status === DraftStatus.PUBLISHED
-    )
-
-  if (!isPublished) {
-    setupTestExtension(taskResource)
   }
 }

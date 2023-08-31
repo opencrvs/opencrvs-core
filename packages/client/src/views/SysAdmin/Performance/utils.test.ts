@@ -11,7 +11,6 @@
  */
 
 import { getJurisidictionType, isUnderJurisdictionOfUser } from './utils'
-import { GQLLocationType } from '@opencrvs/gateway/src/graphql/schema'
 import { mockOfflineData } from '@client/tests/util'
 
 describe('Performance util tests', () => {
@@ -19,7 +18,7 @@ describe('Performance util tests', () => {
     it('transforms and returns only admin structure data, jurisidiction type if they have', () => {
       const mockLocationData = {
         id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
-        type: 'ADMIN_STRUCTURE' as GQLLocationType,
+        type: 'ADMIN_STRUCTURE',
         name: 'Ibombo District Office',
         status: 'active',
         partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -38,7 +37,7 @@ describe('Performance util tests', () => {
     it('returns null when child location is not admin structure', () => {
       const mockFacilitiesData = {
         id: 'e7fa94ba-5582-48f9-ba43-cf41d88253c6',
-        type: 'CRVS_OFFICE' as GQLLocationType,
+        type: 'CRVS_OFFICE',
         name: 'Ibombo District Office',
         status: 'active',
         partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',

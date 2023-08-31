@@ -26,19 +26,20 @@ import {
   IFormSectionGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
   CHECKBOX,
-  ICheckboxFormField
+  ICheckboxFormField,
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -272,7 +273,7 @@ export function sectionHasError(
   return false
 }
 
-export function renderSelectOrRadioLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
@@ -281,7 +282,7 @@ export function renderSelectOrRadioLabel(
   return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
@@ -342,7 +343,7 @@ const getCheckboxFieldValue = (
   )
 }
 
-export const getCheckBoxGroupFieldValue = (
+const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
   intl: IntlShape
@@ -356,7 +357,7 @@ export const getCheckBoxGroupFieldValue = (
   return ''
 }
 
-export const getFormFieldValue = (
+const getFormFieldValue = (
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -554,7 +555,7 @@ export function hasFieldChanged(
   return data[field.name] !== originalData[field.name]
 }
 
-export function hasNestedDataChanged(
+function hasNestedDataChanged(
   nestedFieldData: IFormData,
   previousNestedFieldData: IFormData
 ) {
@@ -654,9 +655,15 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
-    (type) => type === field.type
-  )
+  return [
+    BULLET_LIST,
+    PARAGRAPH,
+    WARNING,
+    TEXTAREA,
+    SUBSECTION_HEADER,
+    FETCH_BUTTON,
+    DIVIDER
+  ].find((type) => type === field.type)
 }
 
 export const getNestedFieldValue = (

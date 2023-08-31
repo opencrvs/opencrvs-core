@@ -29,7 +29,7 @@ import {
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
@@ -67,12 +67,7 @@ import { Event } from '@client/utils/gateway'
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
-export const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-  margin-top: 100px;
-`
+
 const FABContainer = styled.div`
   position: fixed;
   right: 40px;

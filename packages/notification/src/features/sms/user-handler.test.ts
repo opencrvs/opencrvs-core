@@ -28,7 +28,7 @@ describe('Verify user handlers', () => {
   })
   describe('userCredentials', () => {
     it('returns OK if the sms gets sent', async () => {
-      server = await createServerWithEnvironment({ SMS_PROVIDER: 'clickatell' })
+      server = await createServerWithEnvironment()
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
@@ -452,7 +452,7 @@ describe('Verify user handlers', () => {
   })
   describe('sendResetPasswordInvite', () => {
     it('returns OK if the sms gets sent', async () => {
-      server = await createServerWithEnvironment({ SMS_PROVIDER: 'clickatell' })
+      server = await createServerWithEnvironment()
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },

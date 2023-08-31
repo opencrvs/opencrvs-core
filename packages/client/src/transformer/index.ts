@@ -30,7 +30,7 @@ import {
 import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   EventRegistration,
@@ -62,7 +62,7 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const transformRegistrationCorrection = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
@@ -194,7 +194,7 @@ export const draftToGqlTransformer = (
           /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
-              `on section ${section.id}`
+              ` on section ${section.id}`
           )
           /* eslint-enable no-console */
           inCompleteFieldList.push(
@@ -314,15 +314,13 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {

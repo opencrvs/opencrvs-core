@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
@@ -21,7 +21,6 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
     fields: [
       {
         name: 'placeOfRegistration',
-        customisable: false,
         type: 'LOCATION_SEARCH_INPUT',
         label: advancedSearchForm.placeOfRegistrationlabel,
         helperText: advancedSearchForm.placeOfRegistrationHelperText,
@@ -30,25 +29,23 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
         initialValue: '',
         searchableResource: ['locations', 'offices'],
         searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
-        validate: []
+        validator: []
       },
       {
         name: 'dateOfRegistration',
-        customisable: false,
         type: 'DATE_RANGE_PICKER',
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validate: []
+        validator: []
       },
       {
         name: 'registrationStatuses',
-        customisable: false,
         type: 'SELECT_WITH_OPTIONS',
         label: advancedSearchForm.statusOfRecordLabel,
         required: false,
         initialValue: '',
-        validate: [],
+        validator: [],
         placeholder: formMessageDescriptors.formSelectPlaceholder,
         options: [
           {
@@ -90,43 +87,39 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'childDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'childFirstNames',
       previewGroup: 'childNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'childLastName',
       previewGroup: 'childNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'childGender',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: formMessageDescriptors.sex,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -152,14 +145,13 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'eventLocationType',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       previewGroup: 'placeOfBirth',
       ignoreFieldLabelOnErrorMessage: true,
       label: formMessageDescriptors.placeOfBirth,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -174,7 +166,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationId',
-      customisable: false,
       type: 'LOCATION_SEARCH_INPUT',
       label: formMessageDescriptors.healthInstitution,
       required: false,
@@ -184,7 +175,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
       dynamicOptions: {
         resource: 'facilities'
       },
-      validate: [],
+      validator: [],
       conditionals: [
         {
           action: 'hide',
@@ -194,7 +185,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventCountry',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: {
         defaultMessage: 'Country',
@@ -202,7 +192,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
         id: 'form.field.label.country'
       },
       required: false,
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -218,7 +208,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel1',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'Province',
@@ -227,7 +216,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
       },
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -255,7 +244,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel2',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'District',
@@ -264,7 +252,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
       },
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -303,34 +291,31 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'motherDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'motherFirstNames',
       previewGroup: 'motherFirstNamesEng',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'motherFamilyName',
       previewGroup: 'motherNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     }
   ]
 }
@@ -341,32 +326,29 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'fatherDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'fatherFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'fatherFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     }
   ]
 }
@@ -377,32 +359,29 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'informantDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     }
   ]
 }

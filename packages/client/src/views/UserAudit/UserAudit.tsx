@@ -50,7 +50,6 @@ import {
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { getOfflineData } from '@client/offline/selectors'
 import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
@@ -62,11 +61,6 @@ const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
-`
-
-export const InformationTitle = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  width: 320px;
 `
 
 interface IRouteProps {
@@ -478,7 +472,7 @@ export const UserAudit = () => {
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
               deliveryMethod,
-              recipient: deliveryMethod == 'sms' ? user.number : user.email
+              recipient: deliveryMethod === 'sms' ? user.number : user.email
             })}
           </ResponsiveModal>
           {showResendInviteSuccess && (

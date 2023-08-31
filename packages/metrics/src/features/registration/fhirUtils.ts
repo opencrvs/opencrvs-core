@@ -276,9 +276,10 @@ export function getDeclarationType(task: Task): DECLARATION_TYPE {
   return coding.code as DECLARATION_TYPE
 }
 
-export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
+export function getRecordInitiator(taskHistory: fhir.Bundle): string {
   const allowedPreviousStates = [
     'DECLARED',
+    'VALIDATED',
     'IN_PROGRESS',
     'WAITING_VALIDATION'
   ]

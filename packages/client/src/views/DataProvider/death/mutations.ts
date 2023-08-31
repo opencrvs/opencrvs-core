@@ -13,7 +13,7 @@ import { gql } from '@apollo/client'
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
-export const SUBMIT_DEATH_DECLARATION = gql`
+const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
@@ -22,12 +22,12 @@ export const SUBMIT_DEATH_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_DEATH_DECLARATION = gql`
+const APPROVE_DEATH_DECLARATION = gql`
   mutation markDeathAsValidated($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_DEATH_DECLARATION = gql`
+const REGISTER_DEATH_DECLARATION = gql`
   mutation markDeathAsRegistered($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
@@ -67,7 +67,7 @@ export const REGISTER_DEATH_DECLARATION = gql`
     }
   }
 `
-export const REJECT_DEATH_DECLARATION = gql`
+const REJECT_DEATH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -77,7 +77,7 @@ export const REJECT_DEATH_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_DEATH_DECLARATION = gql`
+const ARCHIVE_DEATH_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -93,13 +93,13 @@ export const ARCHIVE_DEATH_DECLARATION = gql`
   }
 `
 
-export const COLLECT_DEATH_CERTIFICATE = gql`
+const COLLECT_DEATH_CERTIFICATE = gql`
   mutation markDeathAsCertified($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
   }
 `
 
-export const ISSUE_DEATH_CERTIFICATE = gql`
+const ISSUE_DEATH_CERTIFICATE = gql`
   mutation markDeathAsIssued($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsIssued(id: $id, details: $details)
   }

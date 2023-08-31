@@ -50,6 +50,7 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
+    MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
@@ -58,7 +59,7 @@ interface Window {
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    HIDE_EVENT_REGISTER_INFORMATION: boolean
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
@@ -66,14 +67,13 @@ interface Window {
     DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
-    ADDRESSES: number
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
-    ADMIN_LEVELS: number
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
+  __WB_MANIFEST: Array<{ url: string; revision: string }>
 }

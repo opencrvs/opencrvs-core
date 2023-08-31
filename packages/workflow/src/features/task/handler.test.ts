@@ -40,13 +40,6 @@ describe('Verify handler', () => {
   beforeEach(async () => {
     fetch.resetMocks()
     server = await createServer()
-    jest
-      .spyOn(
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('../../utils/formDraftUtils'),
-        'checkFormDraftStatusToAddTestExtension'
-      )
-      .mockReturnValue('')
     fetch.mockResponses(
       [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
