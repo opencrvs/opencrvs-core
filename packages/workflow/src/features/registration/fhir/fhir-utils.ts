@@ -18,10 +18,10 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
-  getTaskResource,
   findPersonEntry,
   getSectionEntryBySectionCode,
-  findRelatedPersonEntry
+  findRelatedPersonEntry,
+  getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch, { RequestInit } from 'node-fetch'
@@ -50,7 +50,7 @@ export async function getSharedContactMsisdn(fhirBundle: Bundle) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   return getPhoneNo(
-    getTaskResource(fhirBundle as Bundle) as Task,
+    getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
     getEventType(fhirBundle)
   )
 }
@@ -60,7 +60,7 @@ export async function getSharedContactEmail(fhirBundle: Bundle) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   return getEmailAddress(
-    getTaskResource(fhirBundle as Bundle) as Task,
+    getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
     getEventType(fhirBundle)
   )
 }
@@ -115,7 +115,7 @@ export async function getCRVSOfficeName(fhirBundle: Bundle) {
       'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
     )
   }
-  const taskResource = getTaskResource(fhirBundle as Bundle)
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle as Bundle)
   const regLastOfficeExt = taskResource?.extension?.find(
     (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
@@ -197,7 +197,7 @@ export function hasRegistrationNumber(
 ) {
   try {
     getRegistrationNumber(
-      getTaskResource(fhirBundle as Bundle) as Task,
+      getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
       eventType
     )
     return true

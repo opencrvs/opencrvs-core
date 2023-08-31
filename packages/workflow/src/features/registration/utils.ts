@@ -32,7 +32,7 @@ import {
   INFORMANT_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
   getInformantSMSNotification,
@@ -48,6 +48,7 @@ import {
   Task
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { getTaskResourceFromFhirBundle } from './fhir/fhir-template'
 
 interface INotificationPayload {
   recipient: {
@@ -169,7 +170,7 @@ export async function sendEventNotification(
               INFORMANT_SECTION_CODE
             ),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle as Bundle) as Task,
+              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
               EVENT_TYPE[eventType]
             )
           }
@@ -265,7 +266,7 @@ export async function sendEventNotification(
             crvsOffice: await getCRVSOfficeName(fhirBundle),
             name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle as Bundle) as Task,
+              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
               EVENT_TYPE[eventType]
             ),
             informantName: await getInformantName(

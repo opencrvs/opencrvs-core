@@ -53,7 +53,7 @@ import fetch from 'node-fetch'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   INFORMANT_CODE,
-  getTaskResource
+  getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
@@ -242,7 +242,9 @@ export async function markEventAsValidatedHandler(
   try {
     let payload: Bundle
 
-    const taskResource = getTaskResource(request.payload as Bundle)
+    const taskResource = getTaskResourceFromFhirBundle(
+      request.payload as Bundle
+    )
 
     // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {
@@ -412,7 +414,9 @@ export async function markEventAsWaitingValidationHandler(
   try {
     let payload: Bundle
 
-    const taskResource = getTaskResource(request.payload as Bundle)
+    const taskResource = getTaskResourceFromFhirBundle(
+      request.payload as Bundle
+    )
 
     // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {

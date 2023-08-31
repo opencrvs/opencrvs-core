@@ -46,7 +46,6 @@ import {
 } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import {
   ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
@@ -63,6 +62,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
 import { Bundle, Composition, isTask } from '@opencrvs/commons/types'
+import { getTaskResourceFromFhirBundle } from '../registration/fhir/fhir-template'
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as Bundle
@@ -140,7 +140,7 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const taskResource = getTaskResource(fhirBundle)
+    const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
 
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
