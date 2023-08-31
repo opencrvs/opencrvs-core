@@ -13,7 +13,8 @@ import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
   taskBundleWithExtension,
-  checkUserAssignment
+  checkUserAssignment,
+  updateFHIRBundle
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,

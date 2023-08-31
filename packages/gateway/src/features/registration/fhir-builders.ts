@@ -1935,6 +1935,9 @@ export const builders: IFieldBuilders = {
         if (!person.address[context._index.address]) {
           person.address[context._index.address] = {}
         }
+        if (!person.address[context._index.address].line) {
+          person.address[context._index.address].line = []
+        }
         if (
           person.address[context._index.address].line![context._index.line] !==
           undefined
