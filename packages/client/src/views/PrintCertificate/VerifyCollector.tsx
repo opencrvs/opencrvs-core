@@ -143,9 +143,13 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const firstNames = info[firstNameIndex] as string
     const familyName = info[familyNameIndex] as string
 
-    const birthDate = fields.birthDateField
-      ? (info[fields.birthDateField] as string)
-      : ''
+    const isExactDobUnknownForIdVerifier =
+      !!declaration?.data[collector]?.exactDateOfBirthUnknown
+
+    const birthDate =
+      fields.birthDateField && !isExactDobUnknownForIdVerifier
+        ? (info[fields.birthDateField] as string)
+        : ''
     const nationality = info[fields.nationalityField] as string
 
     return {
