@@ -153,13 +153,6 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
     )
   }
 
-  const getCorrectionRequestTask = () => {
-    const history = declaration.data.history as unknown as History[]
-    return history.find(
-      (task: History) => task.action === 'REQUESTED_CORRECTION'
-    )
-  }
-
   const getNameRequester = (person: IFormSectionData) => {
     return [
       person.firstNamesEng as string,
@@ -199,12 +192,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getReasonForRequest = () => {
-    const reason = declaration.data.registration as IFormSectionData
-    const reasonValue =
-      reason &&
-      reason.correction &&
-      ((reason.correction as IFormSectionData).reason as string)
-    switch (reasonValue) {
+    switch (correctionRequestTask.reason) {
       case CorrectionReason.CLERICAL_ERROR:
         return intl.formatMessage(messages.clericalError)
       case CorrectionReason.MATERIAL_ERROR:
@@ -213,16 +201,19 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
         return intl.formatMessage(messages.materialOmission)
       case CorrectionReason.JUDICIAL_ORDER:
         return intl.formatMessage(messages.judicialOrder)
-      // case CorrectionReason.OTHER:
-      //   return (reasonType.nestedFields as IFormSectionData)
-      //     .otherReason as string
+      case CorrectionReason.OTHER:
+        return (
+          intl.formatMessage(messages.otherReason) +
+          ' - ' +
+          correctionRequestTask.otherReason
+        )
       default:
         return '-'
     }
   }
 
   const getSupportingDocuments = () => {
-    const correction = getCorrectionRequestTask()
+    const correction = correctionRequestTask
     const proofOfDoc = correction?.documents
 
     return (
@@ -243,7 +234,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getComments = () => {
-    const reason = getCorrectionRequestTask()
+    const reason = correctionRequestTask
     return reason?.comments && (reason.comments[0]?.comment as string)
   }
 
@@ -497,17 +488,17 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getSubmitter = () => {
-    const correction = getCorrectionRequestTask()
+    const correction = correctionRequestTask
     return correction?.user && getName(correction.user.name, 'en')
   }
 
   const getOffice = () => {
-    const correction = getCorrectionRequestTask()
+    const correction = correctionRequestTask
     return correction?.office && (correction.office?.name as string)
   }
 
   const getDate = () => {
-    const correction = getCorrectionRequestTask()
+    const correction = correctionRequestTask
     return correction?.date && (correction.date as Date)
   }
 

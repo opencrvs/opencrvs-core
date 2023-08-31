@@ -35,6 +35,7 @@ interface ICorrectionMessages
   materialError: MessageDescriptor
   materialOmission: MessageDescriptor
   judicialOrder: MessageDescriptor
+  otherReason: MessageDescriptor
   reasonForChangeError: MessageDescriptor
   idCheckTitle: MessageDescriptor
   otherIdCheckTitle: MessageDescriptor
@@ -190,6 +191,11 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.reason.judicialOrder',
     defaultMessage: 'Requested to do so by the court (Judicial order)',
     description: 'Label for judicial order for correction reason form'
+  },
+  otherReason: {
+    id: 'correction.reason.other',
+    defaultMessage: 'Other',
+    description: 'Label for other for correction reason form'
   },
   reasonForChangeError: {
     id: 'correction.reason.error',
