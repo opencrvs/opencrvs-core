@@ -166,11 +166,6 @@ interface IConstantsMessages
   matchedTo: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
-  notCurrentlyActive: {
-    defaultMessage: 'Not active',
-    description: 'Label for inactive feature',
-    id: 'constants.notActive'
-  },
   countryName: {
     defaultMessage: 'Farajaland',
     description: 'Name of the OpenCRVS implementation country',
