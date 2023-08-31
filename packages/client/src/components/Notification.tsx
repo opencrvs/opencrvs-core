@@ -35,6 +35,7 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
@@ -60,7 +61,7 @@ class Component extends React.Component<
   NotificationProps &
     DispatchProps &
     IntlShapeProps &
-    RouteComponentProps<{}> & { children?: any }
+    RouteComponentProps<{}> & { isOnline: boolean }
 > {
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
@@ -112,8 +113,13 @@ class Component extends React.Component<
       userCreateDuplicateMobileFailedToast,
       userCreateDuplicateEmailFailedToast,
       userReconnectedToast,
-      goToDeclarationRecordAudit
+      goToDeclarationRecordAudit,
+      isOnline
     } = this.props
+
+    const userFormSubmitErrorMessage = isOnline
+      ? intl.formatMessage(messages.userFormFail)
+      : intl.formatMessage(messages.userFormFailForOffline)
 
     return (
       <div>
@@ -170,7 +176,7 @@ class Component extends React.Component<
             type="warning"
             onClose={this.hideSubmitFormErrorToast}
           >
-            {intl.formatMessage(messages.userFormFail)}
+            {userFormSubmitErrorMessage}
           </Toast>
         )}
         {userAuditSuccessToast.visible && (
@@ -309,5 +315,5 @@ export const NotificationComponent = withRouter(
     hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
     goToDeclarationRecordAudit
-  })(injectIntl(Component))
+  })(injectIntl(withOnlineStatus(Component)))
 )
