@@ -13,6 +13,7 @@ import {
   RelatedPerson,
   Task,
   getBusinessStatus,
+  getTaskFromBundle,
   isCorrectionRequestedTask,
   isTask,
   sortTasksDescending
@@ -123,4 +124,18 @@ export function withOnlyLatestTask<
   )
 
   return newRec as any
+}
+
+export function getTrackingId(record: ValidRecord) {
+  const task = getTaskFromBundle(record)
+
+  const identifier = task.identifier.find((identifier) =>
+    identifier.system.endsWith('tracking-id')
+  )
+
+  if (!identifier) {
+    throw new Error('No tracking id found from task')
+  }
+
+  return identifier.value
 }

@@ -21,7 +21,8 @@ import {
   isTask,
   withOnlyLatestTask,
   getPractitionerContactDetails,
-  isCorrectionRequestedTask
+  isCorrectionRequestedTask,
+  getTrackingId
 } from '@opencrvs/commons/types'
 import { uploadBase64ToMinio } from '@workflow/documents'
 import { createNewAuditEvent } from '@workflow/records/audit'
@@ -48,7 +49,6 @@ import { getAuthHeader } from '@opencrvs/commons'
 import { Request } from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
-import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,

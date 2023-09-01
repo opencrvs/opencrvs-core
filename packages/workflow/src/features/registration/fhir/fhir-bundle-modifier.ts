@@ -258,11 +258,13 @@ export async function markEventAsRegistered(
   token: string
 ): Promise<Task> {
   /* Setting registration number here */
-  const identifierName = `${eventType.toLowerCase()}-registration-number`
+  const system = `${OPENCRVS_SPECIFICATION_URL}id/${
+    eventType.toLowerCase() as Lowercase<typeof eventType>
+  }-registration-number` as const
 
   if (taskResource && taskResource.identifier) {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
+      system: system,
       value: registrationNumber
     })
   }
@@ -363,7 +365,9 @@ export async function touchBundle(
 export function setTrackingId(fhirBundle: Bundle): Bundle {
   const eventType = getEventType(fhirBundle)
   const trackingId = generateTrackingIdForEvents(eventType)
-  const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
+  const trackingIdFhirName = `${
+    eventType.toLowerCase() as Lowercase<typeof eventType>
+  }-tracking-id` as const
 
   if (
     !fhirBundle ||
@@ -521,7 +525,8 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   const { sub: systemId } = getTokenPayload(token)
   const bundle = request.payload as Bundle
   const taskResource = getTaskResourceFromFhirBundle(bundle)
-  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+  const systemIdentifierUrl =
+    `${OPENCRVS_SPECIFICATION_URL}id/system_identifier` as const
 
   if (!taskResource.identifier) {
     taskResource.identifier = []
