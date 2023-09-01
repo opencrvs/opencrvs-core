@@ -129,6 +129,8 @@ describe('Submission middleware', () => {
         event === Event.Marriage &&
         [
           SubmissionAction.APPROVE_CORRECTION,
+          SubmissionAction.REJECT_CORRECTION,
+          SubmissionAction.MAKE_CORRECTION,
           SubmissionAction.REQUEST_CORRECTION
         ].includes(submissionAction)
       ) {
