@@ -560,6 +560,10 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
     taskResource.identifier = []
   }
 
+  taskResource.identifier = taskResource.identifier.filter(
+    ({ system }) => system != systemIdentifierUrl
+  )
+
   const systemInformation = await getSystem(systemId, {
     Authorization: `Bearer ${token}`
   })
