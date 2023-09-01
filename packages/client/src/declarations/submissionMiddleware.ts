@@ -65,8 +65,8 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.REQUEST_CORRECTION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
   [SubmissionAction.MAKE_CORRECTION]: SUBMISSION_STATUS.REQUESTING_CORRECTION,
-  [SubmissionAction.APPROVE_CORRECTION]:
-    SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.APPROVE_CORRECTION]: SUBMISSION_STATUS.APPROVING,
+  [SubmissionAction.REJECT_CORRECTION]: SUBMISSION_STATUS.REJECTING,
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.CERTIFYING,
@@ -230,6 +230,15 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           })
         }
         removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await client.mutate({
+          mutation,
+          variables: {
+            ...declaration.payload
+          }
+        })
+      } else if (
+        [SubmissionAction.REJECT_CORRECTION].includes(submissionAction)
+      ) {
         await client.mutate({
           mutation,
           variables: {

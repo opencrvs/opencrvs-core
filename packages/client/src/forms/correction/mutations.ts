@@ -51,3 +51,12 @@ export const REQUEST_REG_CORRECTION = gql`
     requestRegistrationCorrection(id: $id, details: $details)
   }
 `
+
+export const REJECT_REG_CORRECTION = gql`
+  mutation rejectRegistrationCorrection(
+    $id: ID!
+    $details: CorrectionRejectionInput!
+  ) {
+    rejectRegistrationCorrection(id: $id, details: $details)
+  }
+`

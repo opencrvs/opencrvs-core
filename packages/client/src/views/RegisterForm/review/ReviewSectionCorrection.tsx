@@ -12,20 +12,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/register'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { goToHomeTab } from '@client/navigation'
-import styled from 'styled-components'
 import { IFormSectionData, SubmissionAction } from '@client/forms'
-import {
-  IRejectCorrectionForm,
-  rejectCorrection
-} from '@client/review/reject-correction'
+import { IRejectCorrectionForm } from '@client/review/reject-correction'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasFormError } from '@client/forms/utils'
-
-const Instruction = styled.div`
-  margin-bottom: 28px;
-`
 
 interface IChildrenProps {
   toggleRejectModal: () => void
@@ -52,6 +44,7 @@ type State = {
   approvePrompt: boolean
   rejectPrompt: boolean
   enabledForReject: boolean
+  startTime: number
 }
 
 class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
@@ -61,8 +54,13 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
       data: {},
       approvePrompt: false,
       rejectPrompt: false,
-      enabledForReject: false
+      enabledForReject: false,
+      startTime: 0
     }
+  }
+
+  componentDidMount() {
+    this.setState({ startTime: Date.now() })
   }
 
   toggleRejectModal = () => {
@@ -77,7 +75,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     }))
   }
 
-  approveCorrection = () => {
+  approveCorrectionAction = () => {
     const recordWithSubmissionStatus = {
       ...this.props.declaration,
       submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
@@ -85,6 +83,27 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     }
     this.props.modifyDeclaration(recordWithSubmissionStatus)
     this.props.writeDeclaration(recordWithSubmissionStatus)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+  }
+
+  rejectCorrectionAction = () => {
+    const reason = this.state.data.rejectionReason as string
+    const payload = {
+      id: this.props.declaration.id,
+      reason
+    }
+    const updatedDeclaration = {
+      ...this.props.declaration,
+      submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+      action: SubmissionAction.REJECT_CORRECTION,
+      payload,
+      timeLoggedMS:
+        (this.props.declaration.timeLoggedMS || 0) +
+        Date.now() -
+        this.state.startTime
+    }
+
+    this.props.writeDeclaration(updatedDeclaration)
     this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
@@ -132,7 +151,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
               size="medium"
               id="confirm_save"
               key="confirm_save"
-              onClick={this.approveCorrection}
+              onClick={this.approveCorrectionAction}
             >
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
@@ -163,6 +182,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
               key="submit_reject_form"
               id="submit_reject_form"
               disabled={!this.state.enabledForReject}
+              onClick={this.rejectCorrectionAction}
             >
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
