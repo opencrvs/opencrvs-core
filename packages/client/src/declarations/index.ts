@@ -1050,7 +1050,7 @@ function requestWithStateWrapper(
       )
 
       const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
-        .flatMap(
+        .map(
           (declaration) =>
             declaration.data.fetchRegistrationForViewing?.registration
         )
