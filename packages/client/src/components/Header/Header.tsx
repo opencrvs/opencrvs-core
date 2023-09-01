@@ -45,7 +45,8 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES
+  PERFORMANCE_MANAGEMENT_ROLES,
+  EMAIL
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -369,6 +370,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       })
     }
+    searchTypeList.push({
+      label: intl.formatMessage(messages.email),
+      value: EMAIL,
+      icon: <Icon name="Lock" size="small" />,
+      placeHolderText: intl.formatMessage(messages.placeHolderEmail)
+    })
 
     const navigationList: INavigationType[] = [
       {

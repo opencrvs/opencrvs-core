@@ -20,6 +20,7 @@ interface IHeaderMessages
   placeHolderBrnDrn: MessageDescriptor
   placeHolderPhone: MessageDescriptor
   placeHolderNationalId: MessageDescriptor
+  placeHolderEmail: MessageDescriptor
   systemTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   helpTitle: MessageDescriptor
@@ -30,6 +31,11 @@ interface IHeaderMessages
 }
 
 const messagesToDefine: IHeaderMessages = {
+  email: {
+    id: 'home.header.email',
+    defaultMessage: 'Email',
+    description: 'Search email type'
+  },
   typeRN: {
     id: 'home.header.typeRN',
     defaultMessage: 'Registration no.',
@@ -64,6 +70,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeHolderNationalId',
     defaultMessage: 'Search for a national ID.',
     description: 'Search menu national ID place holder'
+  },
+  placeHolderEmail: {
+    id: 'home.header.placeHolderEmail',
+    defaultMessage: 'Search for a email.',
+    description: 'Search menu email place holder'
   },
   systemTitle: {
     id: 'home.header.systemTitle',
