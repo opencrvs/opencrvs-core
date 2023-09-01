@@ -87,10 +87,12 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
   }
 
   rejectCorrectionAction = () => {
-    const reason = this.state.data.rejectionReason as string
+    const reason = this.state.data.rejectionRaisonOfCorrection as string
     const payload = {
       id: this.props.declaration.id,
-      reason
+      details: {
+        reason
+      }
     }
     const updatedDeclaration = {
       ...this.props.declaration,
