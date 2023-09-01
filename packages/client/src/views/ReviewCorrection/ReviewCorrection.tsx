@@ -41,6 +41,7 @@ import {
 import {
   IFormData,
   IFormField,
+  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
@@ -624,9 +625,19 @@ function applyCorrectionToData(record: IDeclaration) {
   }
 
   const proposedChangesPatch = correctionRequestTask.input.reduce(
-    (acc: Record<string, Record<string, string>>, curr: any) => {
+    (acc: Record<string, Record<string, IFormFieldValue>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
-      acc[curr.valueCode][curr.valueId] = curr.valueString
+
+      switch (typeof record.data[curr.valueCode]?.[curr.valueId]) {
+        case 'number':
+          acc[curr.valueCode][curr.valueId] = Number(curr.valueString)
+          break
+
+        default:
+          acc[curr.valueCode][curr.valueId] = curr.valueString
+          break
+      }
+
       return acc
     },
     {}
@@ -657,7 +668,7 @@ function applyCorrectionToData(record: IDeclaration) {
       fieldName: input!.valueId,
       newValue: input!.valueString,
       section: input!.valueCode,
-      oldValue: (record.data[input!.valueCode][input!.valueId] as string) || ''
+      oldValue: (record.data[input!.valueCode][input!.valueId] || '').toString()
     }))
   }
 
