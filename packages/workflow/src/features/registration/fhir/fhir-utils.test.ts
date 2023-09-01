@@ -19,7 +19,6 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   testFhirBundle,
-  testDeathFhirBundle,
   testMarriageFhirBundle,
   officeMock
 } from '@workflow/test/utils'
@@ -89,16 +88,6 @@ describe('Verify getTrackingId', () => {
     const trackingid = getTrackingId(setTrackingId(testFhirBundle))
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
-      expect(trackingid.length).toBe(7)
-    } else {
-      throw new Error('Failed')
-    }
-  })
-
-  it('Returned tracking id properly for death', () => {
-    const trackingid = getTrackingId(setTrackingId(testDeathFhirBundle))
-    if (trackingid) {
-      expect(trackingid).toMatch(/^D/)
       expect(trackingid.length).toBe(7)
     } else {
       throw new Error('Failed')

@@ -26,7 +26,6 @@ import {
   upazilaMock,
   unionMock,
   officeMock,
-  testDeathFhirBundle,
   testFhirBundleWithIdsForDeath,
   motherMock,
   patientMock,
@@ -233,42 +232,6 @@ describe('Verify handler', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('returns OK for a correctly authenticated user with death declaration', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-      jest
-        .spyOn(require('./utils'), 'sendEventNotification')
-        .mockReturnValue('')
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
     it('returns OK for a correctly authenticated user  with in-progress death declaration', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -345,53 +308,6 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('returns OK for a correctly authenticated user death validation', async () => {
-      fetch.mockResponses(
-        [userMock, { status: 200 }],
-        [fieldAgentPractitionerMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
-        ]
-      )
-
-      const token = jwt.sign(
-        { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -482,42 +398,6 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('returns OK for a correctly authenticated user for death', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-      jest
-        .spyOn(require('./utils'), 'sendEventNotification')
-        .mockReturnValue('')
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

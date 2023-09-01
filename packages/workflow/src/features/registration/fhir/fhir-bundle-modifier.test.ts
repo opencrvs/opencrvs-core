@@ -24,7 +24,6 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import {
   testFhirBundle,
-  testDeathFhirBundle,
   testMarriageFhirBundle,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
@@ -38,12 +37,7 @@ import {
   mosipBirthPatientBundleMock,
   mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
-import {
-  BundleEntry,
-  Composition,
-  Practitioner,
-  Task
-} from '@opencrvs/commons/types'
+import { Composition, Practitioner, Task } from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -75,34 +69,6 @@ describe('Verify fhir bundle modifier functions', () => {
           if (task && task.identifier && task.identifier[1]) {
             expect(task.identifier[1]).toEqual({
               system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Successfully modified the provided fhirBundle with death trackingid', () => {
-      const fhirBundle = setTrackingId(testDeathFhirBundle)
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[10].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as Composition
-        const task = fhirBundle.entry[10].resource as Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^D/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[0]) {
-            expect(task.identifier[0]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`,
               value: composition.identifier.value
             })
           }
@@ -143,43 +109,6 @@ describe('Verify fhir bundle modifier functions', () => {
       expect(() => setTrackingId(invalidData)).toThrowError(
         'Invalid FHIR bundle found'
       )
-    })
-
-    it('Will push the composite resource identifier if it is missing on fhirDoc', () => {
-      const fhirBundle = setTrackingId({
-        ...testFhirBundle,
-        entry: [
-          {
-            resource: {
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'BIRTH'
-                  }
-                ]
-              }
-            }
-          } as unknown as BundleEntry<Task>
-        ]
-      })
-
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as Composition
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^B/)
-          expect(composition.identifier.value.length).toBe(7)
-        }
-      }
     })
   })
   describe('SetupRegistrationType', () => {

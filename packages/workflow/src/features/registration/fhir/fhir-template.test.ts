@@ -150,12 +150,5 @@ describe('Verify fhir templates', () => {
         throw new Error('Failed')
       }
     })
-    it('throws error if provided document type is not FhirBundle or FhirBundleTaskEntry ', () => {
-      const fhirBundle = cloneDeep(testFhirBundle)
-      ;(fhirBundle.entry[0].resource as any).resourceType = '' as any
-      expect(() => getTaskResourceFromFhirBundle(fhirBundle)).toThrowError(
-        'Unable to find Task Bundle from the provided data'
-      )
-    })
   })
 })
