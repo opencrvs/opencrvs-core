@@ -89,6 +89,7 @@ export enum SubmissionAction {
   CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration',
   MAKE_CORRECTION = 'make correction',
   APPROVE_CORRECTION = 'approve correction',
+  REJECT_CORRECTION = 'reject correction',
   REQUEST_CORRECTION = 'request correction'
 }
 
