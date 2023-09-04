@@ -1,8 +1,8 @@
-import { Nominal } from 'src/record'
+import { Nominal } from 'src/nominal'
 import { Bundle, BusinessStatus, Extension, Resource, Saved } from '.'
 
-type TrackingID = Nominal<string, 'TrackingID'>
-type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
+export type TrackingID = Nominal<string, 'TrackingID'>
+export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
 
 type TaskIdentifier =
   | {

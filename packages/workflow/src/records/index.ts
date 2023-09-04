@@ -3,6 +3,7 @@ import {
   BundleEntry,
   StateIdenfitiers,
   isComposition,
+  isEncounter,
   isRelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_MONGO_URL } from '@workflow/constants'
@@ -630,6 +631,14 @@ function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
             entry.reference!.split('/')[1]
           )?.fullUrl
         })
+      })
+    }
+    if (isEncounter(resource)) {
+      resource.location?.forEach(({ location }) => {
+        location.reference = findFromBundleById(
+          bundle,
+          location.reference.split('/')[1]
+        )?.fullUrl
       })
     }
 

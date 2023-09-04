@@ -18,13 +18,7 @@ import {
   isTask,
   sortTasksDescending
 } from './fhir'
-
-// https://dnlytras.com/blog/nominal-types
-declare const __nominal__type: unique symbol
-declare const __nominal__type__2: unique symbol
-export type Nominal<Type, Identifier extends string> = Type & {
-  readonly [__nominal__type]: Identifier
-}
+import { NestedNominal, Nominal } from './nominal'
 
 type RecordBase = Bundle
 export type WaitingForValidationRecord = Nominal<
@@ -98,13 +92,10 @@ export function getCorrectionRequestedTask(record: CorrectionRequestedRecord) {
   return task
 }
 
-export type RecordWithPreviousTask<T extends ValidRecord> = Omit<
+export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
   T,
-  typeof __nominal__type
-> & {
-  readonly [__nominal__type]: 'RecordWithPreviousTask'
-  readonly [__nominal__type__2]: T[typeof __nominal__type]
-}
+  'RecordWithPreviousTask'
+>
 
 export function withOnlyLatestTask<
   T extends RecordWithPreviousTask<ValidRecord>

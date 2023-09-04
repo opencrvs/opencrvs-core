@@ -1,5 +1,7 @@
 // eslint-disable-next-line import/no-relative-parent-imports
-import { UUID } from '../uuid'
+
+import { Nominal } from 'src/nominal'
+import { UUID } from 'src/uuid'
 
 export * from './practitioner'
 export * from './task'
@@ -11,6 +13,7 @@ export type UnsavedResource<T extends Resource> = Omit<T, 'id'>
 export type Saved<T> = Omit<T, 'id'> & {
   id: string
 }
+export type URLReference = Nominal<string, 'URLReference'>
 
 export type Bundle<T extends Resource = Resource> = Omit<
   fhir3.Bundle,
@@ -67,7 +70,15 @@ export type Patient = Saved<
 >
 export type RelatedPerson = Saved<fhir3.RelatedPerson>
 export type Location = Saved<fhir3.Location>
-export type Encounter = Saved<fhir3.Encounter>
+export type Encounter = Saved<
+  Omit<fhir3.Encounter, 'location'> & {
+    location: Array<{
+      location: {
+        reference: URLReference
+      }
+    }>
+  }
+>
 export type Observation = Saved<
   Omit<fhir3.Observation, 'valueQuantity'> & {
     valueQuantity?: Omit<fhir3.Quantity, 'value'> & {
@@ -82,7 +93,7 @@ export function isComposition(resource: Resource): resource is Composition {
   return resource.resourceType === 'Composition'
 }
 
-export function isEncounter(resource: Resource): resource is fhir3.Encounter {
+export function isEncounter(resource: Resource): resource is Encounter {
   return resource.resourceType === 'Encounter'
 }
 
