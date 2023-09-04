@@ -622,8 +622,8 @@ export function advancedQueryBuilder(
 
   if (params.contactEmail) {
     must.push({
-      match: {
-        contactEmail: params.contactEmail
+      terms: {
+        'contactEmail.keyword': [params.contactEmail]
       }
     })
   }

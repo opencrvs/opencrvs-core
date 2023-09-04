@@ -10404,6 +10404,7 @@ export interface UserAuditLogItemToPractitionerIdResolver<
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
+  contactEmail?: RegistrationSearchSetToContactEmailResolver<TParent>
   contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
   dateOfDeclaration?: RegistrationSearchSetToDateOfDeclarationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
@@ -10431,6 +10432,18 @@ export interface RegistrationSearchSetToStatusResolver<
 }
 
 export interface RegistrationSearchSetToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationSearchSetToContactEmailResolver<
   TParent = any,
   TResult = any
 > {

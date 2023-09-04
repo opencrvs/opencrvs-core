@@ -73,7 +73,7 @@ const messagesToDefine: IHeaderMessages = {
   },
   placeHolderEmail: {
     id: 'home.header.placeHolderEmail',
-    defaultMessage: 'Search for a email.',
+    defaultMessage: 'Search for an email.',
     description: 'Search menu email place holder'
   },
   systemTitle: {
