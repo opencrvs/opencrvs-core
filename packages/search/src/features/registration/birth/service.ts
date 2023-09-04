@@ -58,23 +58,7 @@ const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
 function getTypeFromTask(task: fhir.Task) {
-  const code = task?.businessStatus?.coding?.[0]?.code
-
-  if (!code) {
-    return undefined
-  }
-  /*
-   * Currently the only task that would be represented with a Task with a status
-   *
-   * status: requested
-   *
-   * is when a correction is requested by a registration agent
-   */
-  if (task.status === 'requested') {
-    return 'CORRECTION_REQUESTED'
-  }
-
-  return code
+  return task?.businessStatus?.coding?.[0]?.code
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
