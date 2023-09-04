@@ -129,6 +129,9 @@ export const transformData = (
           (assignedReg.registration &&
             assignedReg.registration.contactNumber) ||
           '',
+        contactEmail:
+          (assignedReg.registration && assignedReg.registration.contactEmail) ||
+          '',
         duplicates:
           (assignedReg.registration && assignedReg.registration.duplicates) ||
           [],

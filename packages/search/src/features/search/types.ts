@@ -21,6 +21,7 @@ export interface IAdvancedSearchParam {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string

@@ -45,6 +45,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
+  EMAIL,
   NAME_TEXT,
   NATIONAL_ID_TEXT,
   PHONE_TEXT,
@@ -474,6 +475,7 @@ class SearchResultView extends React.Component<
                   searchType === PHONE_TEXT
                     ? convertToMSISDN(searchText, window.config.COUNTRY)
                     : '',
+                contactEmail: searchType === EMAIL ? searchText : '',
                 name: searchType === NAME_TEXT ? searchText : ''
               },
               sort: SEARCH_RESULT_SORT

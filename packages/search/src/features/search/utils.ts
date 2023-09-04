@@ -620,6 +620,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.contactEmail) {
+    must.push({
+      match: {
+        contactEmail: params.contactEmail
+      }
+    })
+  }
+
   if (params.registrationNumber) {
     must.push({
       match: {

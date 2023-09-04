@@ -543,6 +543,7 @@ input AdvancedSearchParametersInput {
   dateOfEventStart: String
   dateOfEventEnd: String
   contactNumber: String
+  contactEmail: String
   nationalId: String
   registrationNumber: String
   trackingId: String
@@ -1526,6 +1527,7 @@ type AdvancedSeachParameters {
   dateOfEventStart: String
   dateOfEventEnd: String
   contactNumber: String
+  contactEmail: String
   nationalId: String
   registrationNumber: String
   trackingId: String
@@ -1621,6 +1623,7 @@ type UserAuditLogItem implements AuditLogItemBase {
 type RegistrationSearchSet {
   status: String
   contactNumber: String
+  contactEmail: String
   contactRelationship: String
   dateOfDeclaration: Date
   trackingId: String
