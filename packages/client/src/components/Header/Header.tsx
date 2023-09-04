@@ -373,7 +373,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     searchTypeList.push({
       label: intl.formatMessage(messages.email),
       value: EMAIL,
-      icon: <Icon name="Lock" size="small" />,
+      icon: <Icon name="Envelope" size="small" />,
       placeHolderText: intl.formatMessage(messages.placeHolderEmail)
     })
 
