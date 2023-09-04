@@ -31,7 +31,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactEmail: String
-  contactRelationship: String
+  informantType: String
   dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
