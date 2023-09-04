@@ -1,6 +1,6 @@
 type KnownExtensionType = {
   'http://opencrvs.org/specs/extension/regLastUser': {
-    url: 'http://opencrvs.org/specs/extension/paymentDetails'
+    url: 'http://opencrvs.org/specs/extension/regLastUser'
     valueReference: {
       reference: `${string}/${string}`
     }
