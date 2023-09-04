@@ -181,7 +181,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -493,7 +493,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:c690e34b-6fd2-42e4-90d5-639946fc039f',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -749,7 +749,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -989,7 +989,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:c690e34b-6fd2-42e4-90d5-639946fc039f',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {

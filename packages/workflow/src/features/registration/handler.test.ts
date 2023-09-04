@@ -338,7 +338,7 @@ describe('Verify handler', () => {
                 fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -644,7 +644,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -705,7 +705,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -784,7 +784,7 @@ describe('markEventAsRegisteredHandler handler', () => {
           fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             focus: {
               reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
             },
@@ -892,7 +892,7 @@ describe('markEventAsRegisteredHandler handler', () => {
           fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             focus: {
               reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
             },
@@ -1609,7 +1609,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
@@ -1993,7 +1993,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
@@ -2368,7 +2368,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c85509d2-004c-435b-b710-64a688e241e1',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
@@ -2760,7 +2760,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c85509d2-004c-435b-b710-64a688e241e1',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }

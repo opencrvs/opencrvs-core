@@ -393,7 +393,7 @@ type Registration { # -> Task
   contactEmail: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
-  inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
+  inCompleteFields: String # -> .status ('draft' | 'ready') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [DuplicatesInfo]

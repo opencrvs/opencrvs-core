@@ -272,7 +272,7 @@ export function createCorrectedTask(
   }
 }
 export function createCorrectionRequestTask(
-  previousTask: Task, // @todo do not require previous task, pass values from outside
+  previousTask: Task,
   correctionDetails: CorrectionRequestInput,
   correctionEncounter: Unsaved<BundleEntry<fhir3.Encounter>>,
   practitioner: Practitioner,

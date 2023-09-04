@@ -729,7 +729,7 @@ test('should update a task document as rejected', async () => {
       resource: {
         resourceType: 'Task',
         intent: '000',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
