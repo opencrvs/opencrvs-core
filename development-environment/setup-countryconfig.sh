@@ -34,9 +34,9 @@ echo -e "\033[32m::::::::::::::: Cloning the Country Configuration :::::::::::::
 echo
 
 cd ../
-git clone https://github.com/opencrvs/opencrvs-farajaland.git
+git clone https://github.com/opencrvs/opencrvs-countryconfig.git
 
-cd opencrvs-farajaland
+cd opencrvs-countryconfig
 if [[ $CI == "true" ]]; then
   git checkout develop
 else
@@ -67,5 +67,5 @@ echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::
 echo
 cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY
 cd ../
-cd opencrvs-farajaland
+cd opencrvs-countryconfig
 yarn start
