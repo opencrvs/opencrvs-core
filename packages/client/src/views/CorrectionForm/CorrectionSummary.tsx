@@ -986,7 +986,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     const declaration = this.props.declaration
     if (userRole === ROLE_REGISTRATION_AGENT) {
       declaration.action = SubmissionAction.REQUEST_CORRECTION
-      declaration.submissionStatus = SUBMISSION_STATUS.REQUESTED_CORRECTION
+      declaration.submissionStatus =
+        SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
     } else {
       declaration.action = SubmissionAction.MAKE_CORRECTION
       declaration.submissionStatus =

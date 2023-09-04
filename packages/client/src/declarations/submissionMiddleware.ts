@@ -215,7 +215,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,
-          SubmissionAction.ARCHIVE_DECLARATION
+          SubmissionAction.ARCHIVE_DECLARATION,
+          SubmissionAction.REJECT_CORRECTION
         ].includes(submissionAction)
       ) {
         if (
@@ -230,15 +231,6 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           })
         }
         removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
-        await client.mutate({
-          mutation,
-          variables: {
-            ...declaration.payload
-          }
-        })
-      } else if (
-        [SubmissionAction.REJECT_CORRECTION].includes(submissionAction)
-      ) {
         await client.mutate({
           mutation,
           variables: {
