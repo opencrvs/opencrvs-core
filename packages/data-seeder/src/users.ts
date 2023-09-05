@@ -33,6 +33,7 @@ const UserSchema = z.array(
     ]),
     role: z.string(),
     username: z.string(),
+    title: z.string(),
     mobile: z.string(),
     email: z.string().email(),
     password: z.string()
@@ -128,6 +129,7 @@ export async function seedUsers(
         givenNames,
         familyName,
         role,
+        title,
         primaryOfficeId: officeIdentifier,
         username,
         ...user
@@ -154,6 +156,7 @@ export async function seedUsers(
       const userPayload = {
         ...user,
         role: roleIdMap[role],
+        title,
         name: [
           {
             use: 'en',
