@@ -14,6 +14,3 @@ ENV OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=/environment-configuration.sql
 RUN apk update && apk add gettext
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]
-
-
-
