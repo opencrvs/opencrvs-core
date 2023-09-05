@@ -21,6 +21,9 @@ WORKDIR /app/packages/components
 RUN yarn build
 
 WORKDIR /app/packages/login
+
+ENV HOST "{{hostname}}"
+ENV COUNTRY_CONFIG_URL "THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE"
 RUN yarn build
 
 
@@ -28,10 +31,6 @@ RUN yarn build
 
 FROM nginx
 
-ARG HOST
-ARG COUNTRY_CONFIG_URL
-ENV HOST=$HOST
-ENV COUNTRY_CONFIG_URL=$COUNTRY_CONFIG_URL
 
 COPY --from=0 /app/packages/login/build/ /usr/share/nginx/html/
 
