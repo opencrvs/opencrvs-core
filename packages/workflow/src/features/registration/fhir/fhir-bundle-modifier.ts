@@ -528,6 +528,10 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   const systemIdentifierUrl =
     `${OPENCRVS_SPECIFICATION_URL}id/system_identifier` as const
 
+  if (!isSystemInitiated(request.auth.credentials.scope)) {
+    return
+  }
+
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
@@ -535,10 +539,6 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   taskResource.identifier = taskResource.identifier.filter(
     ({ system }) => system != systemIdentifierUrl
   )
-
-  if (!isSystemInitiated(request.auth.credentials.scope)) {
-    return
-  }
 
   const systemInformation = await getSystem(systemId, {
     Authorization: `Bearer ${token}`
