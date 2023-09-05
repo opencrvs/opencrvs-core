@@ -15,6 +15,7 @@ RUN rm -rf /app/packages/*
 COPY packages/migration /app/packages/migration
 
 RUN yarn install
+RUN yarn build
 
 WORKDIR /app/packages/migration
 
