@@ -92,17 +92,23 @@ function findDuplicates(arr: string[]): string[] {
 
 const REQUIRED_SECTIONS = ['registration', 'documents'] as const
 
-const REQUIRED_EVENT_ADDRESS_FIELDS = [
-  'country',
-  'state',
+const REQUIRED_EVENT_ADDRESS_FIELDS = ['country', 'state']
+
+const REQUIRED_PRIMARY_ADDRESS_FIELDS = ['countryPrimary', 'statePrimary']
+
+const OPTIONAL_EVENT_ADDRESS_FIELDS = [
   'district',
   'ruralOrUrban',
   'city',
   'addressLine3UrbanOption',
   'addressLine2UrbanOption',
   'addressLine1UrbanOption',
+  'addressLine3',
+  'addressLine2',
+  'addressLine1',
   'postalCode',
   'addressLine1RuralOption',
+  'addressLine1',
   'internationalState',
   'internationalDistrict',
   'internationalCity',
@@ -112,17 +118,19 @@ const REQUIRED_EVENT_ADDRESS_FIELDS = [
   'internationalPostalCode'
 ]
 
-const REQUIRED_PRIMARY_ADDRESS_FIELDS = [
-  'countryPrimary',
-  'statePrimary',
+const OPTIONAL_PRIMARY_ADDRESS_FIELDS = [
   'districtPrimary',
   'ruralOrUrbanPrimary',
   'cityPrimary',
   'addressLine3UrbanOptionPrimary',
   'addressLine2UrbanOptionPrimary',
   'addressLine1UrbanOptionPrimary',
+  'addressLine3Primary',
+  'addressLine2Primary',
+  'addressLine1Primary',
   'postalCodePrimary',
   'addressLine1RuralOptionPrimary',
+  'addressLine1Primary',
   'internationalStatePrimary',
   'internationalDistrictPrimary',
   'internationalCityPrimary',
@@ -219,7 +227,12 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
 }
 
 const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
-  child: ['attendantAtBirth', 'birthType', 'weightAtBirth'],
+  child: [
+    'attendantAtBirth',
+    'birthType',
+    'weightAtBirth',
+    ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
+  ],
   mother: [
     'primaryAddress',
     'exactDateOfBirthUnknown',
@@ -229,7 +242,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'maritalStatus',
     'multipleBirth',
     'occupation',
-    'educationalAttainment'
+    'educationalAttainment',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
     'primaryAddress',
@@ -239,35 +253,43 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'fatherNidVerification',
     'maritalStatus',
     'occupation',
-    'educationalAttainment'
+    'educationalAttainment',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'deceasedID',
-    'maritalStatus'
+    'maritalStatus',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   deathEvent: [
     'mannerOfDeath',
     'causeOfDeathEstablished',
     'causeOfDeathMethod',
-    'deathDescription'
+    'deathDescription',
+    ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofdeath`)
   ],
-  marriageEvent: ['typeOfMarriage'],
+  marriageEvent: [
+    'typeOfMarriage',
+    ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
+  ],
   groom: [
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
-    'marriedLastNameEng'
+    'marriedLastNameEng',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
-    'marriedLastNameEng'
+    'marriedLastNameEng',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
     'primaryAddress',
@@ -277,7 +299,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'ageOfIndividualInYears',
     'informantID',
     'informantNidVerification',
-    'primaryAddressSameAsOtherPrimary'
+    'primaryAddressSameAsOtherPrimary',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
   witnessOne: [],
   witnessTwo: []

@@ -31,19 +31,7 @@ const UserSchema = z.array(
       'PERFORMANCE_MANAGEMENT',
       'NATIONAL_REGISTRAR'
     ]),
-    role: z.enum([
-      'Field Agent',
-      'Police Officer',
-      'Local Leader',
-      'Social Worker',
-      'Healthcare Worker',
-      'Registration Agent',
-      'Local Registrar',
-      'Local System Admin',
-      'National System Admin',
-      'Performance Manager',
-      'National Registrar'
-    ]),
+    role: z.string(),
     username: z.string(),
     mobile: z.string(),
     email: z.string().email(),
