@@ -16,51 +16,10 @@ import {
   cleanupOutdatedCaches
 } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
-import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 
 declare let self: ServiceWorkerGlobalScope
-
-interface OnSyncCallbackOptions {
-  queue: Queue
-}
-interface OnSyncCallback {
-  (options: OnSyncCallbackOptions): void | Promise<void>
-}
-
-const callback = (requestArray: any[]) => {
-  let requestSynced = 0
-  requestArray.forEach((item) => {
-    if (!item.error) {
-      requestSynced++
-    }
-  })
-
-  if (requestSynced > 0) {
-    new BroadcastChannel('backgroundSynBroadCastChannel').postMessage(
-      requestSynced
-    )
-  }
-}
-
-const queue = new Queue('registerQueue', {
-  onSync: callback as unknown as OnSyncCallback
-})
-const GraphQLMatch = /graphql(\S+)?/
-
-self.addEventListener('fetch', (event: any) => {
-  if (
-    null !== event.request.url.match(GraphQLMatch) &&
-    navigator.onLine === false
-  ) {
-    const promiseChain = fetch(event.request.clone()).catch((err) => {
-      return queue.pushRequest(event.request)
-    })
-
-    event.waitUntil(promiseChain)
-  }
-})
 
 self.addEventListener('message', async (event) => {
   if (!event.data) {
@@ -127,6 +86,7 @@ const removeCache = async (minioUrls: string) => {
   const runtimecache = await caches.open(runTimeCacheKey)
   for (const minioUrl of minioUrls) {
     const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
+    // eslint-disable-next-line no-console
     console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
   }
 }

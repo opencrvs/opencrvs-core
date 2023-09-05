@@ -876,6 +876,7 @@ const ACTION_EXTENSIONS = [
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
+  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
   const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${compositionId}`,
     authHeader
@@ -886,6 +887,9 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   }
   taskEntry.resource.extension = taskEntry.resource.extension?.filter(
     ({ url }) => !ACTION_EXTENSIONS.includes(url)
+  )
+  taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
+    ({ system }) => system != systemIdentifierUrl
   )
   return taskEntry
 }
