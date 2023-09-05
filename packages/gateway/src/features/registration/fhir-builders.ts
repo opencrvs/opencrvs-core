@@ -899,7 +899,9 @@ async function createInformantType(
         fhirBundle,
         context
       )
-    } else if (fieldValue === 'BRIDE') {
+    }
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    if (fieldValue === 'BRIDE') {
       setInformantReference(
         BRIDE_CODE,
         BRIDE_TITLE,

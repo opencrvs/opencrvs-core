@@ -295,7 +295,7 @@ export const addressQueryTransformer =
       return transformedData
     }
 
-    if (config.lineNumber) {
+    if (config.lineNumber || config.lineNumber === 0) {
       transformedData[sectionId][field.name] =
         (address.line && address.line[config.lineNumber]) || ''
     }

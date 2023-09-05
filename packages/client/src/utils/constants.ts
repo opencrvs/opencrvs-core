@@ -93,3 +93,4 @@ export const INFORMANT_MINIMUM_AGE = 16
 export const APPLICATION_VERSION = 'v1.3.0-beta'
 
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const IS_PROD_ENVIRONMENT = import.meta.env.PROD

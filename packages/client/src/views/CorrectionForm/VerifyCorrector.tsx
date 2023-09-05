@@ -131,8 +131,12 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       const firstNames = info[firstNameIndex] as string
       const familyName = info[familyNameIndex] as string
 
-      const birthDate =
-        (fields.birthDateField && (info[fields.birthDateField] as string)) || ''
+      const isExactDobUnknownForIdVerifier =
+        !!declaration?.data[corrector]?.exactDateOfBirthUnknown
+
+      const birthDate = !isExactDobUnknownForIdVerifier
+        ? fields.birthDateField && (info[fields.birthDateField] as string)
+        : ''
       const nationality =
         (fields.nationalityField &&
           (info[fields.nationalityField] as string)) ||

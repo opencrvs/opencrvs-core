@@ -68,6 +68,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -344,6 +345,15 @@ const NavigationView = (props: IFullProps) => {
     const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
     return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
   })
+  const showRegDashboard =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
+  const showLeaderboard =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.LEADERBOARDS_DASHBOARD_URL)
+  const showStatistics =
+    !IS_PROD_ENVIRONMENT ||
+    (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -808,40 +818,48 @@ const NavigationView = (props: IFullProps) => {
                     GROUP_ID.analytics
                   ) && (
                     <>
-                      <NavigationItem
-                        icon={() => <Icon name="ChartLine" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['dashboard']
-                        )}
-                        onClick={goToDashboardView}
-                        id="navigation_dashboard"
-                        isSelected={
-                          enableMenuSelection && activeMenuItem === 'dashboard'
-                        }
-                      />
-                      <NavigationItem
-                        icon={() => <Icon name="Activity" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['statistics']
-                        )}
-                        onClick={goToPerformanceStatistics}
-                        id="navigation_statistics"
-                        isSelected={
-                          enableMenuSelection && activeMenuItem === 'statistics'
-                        }
-                      />
-                      <NavigationItem
-                        icon={() => <Icon name="Medal" size="medium" />}
-                        label={intl.formatMessage(
-                          navigationMessages['leaderboards']
-                        )}
-                        onClick={goToLeaderBoardsView}
-                        id="navigation_leaderboards"
-                        isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === 'leaderboards'
-                        }
-                      />
+                      {showRegDashboard && (
+                        <NavigationItem
+                          icon={() => <Icon name="ChartLine" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['dashboard']
+                          )}
+                          onClick={goToDashboardView}
+                          id="navigation_dashboard"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'dashboard'
+                          }
+                        />
+                      )}
+                      {showStatistics && (
+                        <NavigationItem
+                          icon={() => <Icon name="Activity" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['statistics']
+                          )}
+                          onClick={goToPerformanceStatistics}
+                          id="navigation_statistics"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'statistics'
+                          }
+                        />
+                      )}
+                      {showLeaderboard && (
+                        <NavigationItem
+                          icon={() => <Icon name="Medal" size="medium" />}
+                          label={intl.formatMessage(
+                            navigationMessages['leaderboards']
+                          )}
+                          onClick={goToLeaderBoardsView}
+                          id="navigation_leaderboards"
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === 'leaderboards'
+                          }
+                        />
+                      )}
                       <NavigationItem
                         icon={() => <Icon name="ChartBar" size="medium" />}
                         label={intl.formatMessage(

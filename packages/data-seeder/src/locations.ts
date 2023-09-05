@@ -11,8 +11,8 @@
  */
 import fetch from 'node-fetch'
 import {
-  COUNTRY_CONFIG_URL,
-  GATEWAY_URL,
+  COUNTRY_CONFIG_HOST,
+  GATEWAY_HOST,
   OPENCRVS_SPECIFICATION_URL
 } from './constants'
 import { TypeOf, z } from 'zod'
@@ -157,7 +157,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 }
 
 async function getLocations() {
-  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
@@ -189,7 +189,7 @@ async function getLocations() {
 }
 
 export async function seedLocations(token: string) {
-  const savedLocations = await fetch(`${GATEWAY_URL}/location?_count=0`, {
+  const savedLocations = await fetch(`${GATEWAY_HOST}/location?_count=0`, {
     headers: {
       'Content-Type': 'application/fhir+json'
     }
@@ -220,7 +220,7 @@ export async function seedLocations(token: string) {
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_URL}/location?`, {
+  const res = await fetch(`${GATEWAY_HOST}/location?`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

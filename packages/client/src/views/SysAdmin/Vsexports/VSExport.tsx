@@ -33,7 +33,6 @@ import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 import { Link } from '@client/../../components/lib'
 import { chunk, sortBy } from 'lodash'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getToken } from '@client/utils/authUtils'
 import { Toast } from '@opencrvs/components/lib/Toast'
 
 const DEFAULT_LIST_SIZE = 12
@@ -47,21 +46,6 @@ const UserTable = styled(BodyContent)`
 `
 type VSExportProps = {
   items: VsExport[]
-}
-
-async function getPreSignedURL(fileName: string) {
-  const url = new URL(
-    `document/${fileName}`,
-    window.config.API_GATEWAY_URL
-  ).toString()
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-  const resJSON = (await res.json()) as { presignedURL: string }
-  return resJSON.presignedURL
 }
 
 async function downloadURI(uri: string, name: string) {
@@ -142,8 +126,7 @@ const VSExport = () => {
                       disabled={false}
                       onClick={async () => {
                         try {
-                          const presignedURL = await getPreSignedURL(item.url)
-                          await downloadURI(presignedURL, fileName.trim())
+                          await downloadURI(item.url, fileName.trim())
                         } catch (error) {
                           setDocumentDownloadError(true)
                         }
