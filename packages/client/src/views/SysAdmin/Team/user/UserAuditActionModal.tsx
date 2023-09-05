@@ -25,7 +25,7 @@ import { IUserAuditForm } from '@client/user/user-audit'
 import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { FormFieldGenerator } from '@client/components/form'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -43,7 +43,7 @@ import { UserDetails } from '@client/utils/userUtils'
 const { useState, useEffect } = React
 
 interface ConnectProps {
-  form: IUserAuditForm
+  form: IUserAuditForm | null
 }
 
 interface DispatchProps {
@@ -116,6 +116,8 @@ function UserAuditActionModalComponent(
   }
 
   useEffect(() => {
+    if (!props.form?.fields) return
+
     if (
       hasFormError(props.form.fields, formValues, undefined, { formValues })
     ) {
@@ -129,7 +131,7 @@ function UserAuditActionModalComponent(
     } else {
       setFormError(null)
     }
-  }, [props.form.fields, formValues, intl, user])
+  }, [props.form?.fields, formValues, intl, user])
 
   useEffect(() => {
     function cleanUpFormState() {
@@ -154,7 +156,7 @@ function UserAuditActionModalComponent(
 
   function handleConfirm() {
     if (makeAllFieldsDirty) {
-      const touched = props.form.fields.reduce(
+      const touched = props.form?.fields.reduce(
         (memo: any, field: { name: any }) => ({ ...memo, [field.name]: true }),
         {}
       )
@@ -229,7 +231,7 @@ function UserAuditActionModalComponent(
       )}
       <FormFieldGenerator
         id="user-audit-form"
-        fields={form.fields}
+        fields={form?.fields ?? []}
         onChange={(values) => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         draftData={{ formValues }}

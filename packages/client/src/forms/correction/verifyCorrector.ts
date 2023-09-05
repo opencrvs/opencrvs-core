@@ -64,6 +64,7 @@ const verifyDeathCorrector: ICertificateCorrectorDefinition = {
         familyNameField: 'familyNameEng'
       }
     },
+    birthDateField: 'informantBirthDate',
     nationalityField: 'nationality'
   }
 }

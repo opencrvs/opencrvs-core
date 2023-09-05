@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, BirthSection, DeathSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { messages } from '@client/i18n/messages/views/review'
-import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
+import { deserializeForm } from '@client/forms/deserializer/deserializer'
+import { validators } from '@client/forms/validators'
 
 export type IRegisterFormState =
   | {
@@ -47,12 +47,12 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.APPLICATION_CONFIG_LOADED:
-      const { formConfig } = action.payload
+    case offlineActions.FORMS_LOADED:
+      const { forms } = action.payload
 
-      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
-      const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
-      const marriage = getConfiguredOrDefaultForm(formConfig, Event.Marriage)
+      const birth = deserializeForm(forms.birth, validators)
+      const death = deserializeForm(forms.death, validators)
+      const marriage = deserializeForm(forms.marriage, validators)
 
       const preview = {
         viewType: 'preview' as const,
@@ -72,24 +72,15 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         registerForm: {
           birth: {
             ...birth,
-            sections: [
-              ...birth.sections,
-              { ...preview, id: BirthSection.Preview }
-            ]
+            sections: [...birth.sections, { ...preview, id: 'preview' }]
           },
           death: {
             ...death,
-            sections: [
-              ...death.sections,
-              { ...preview, id: DeathSection.Preview }
-            ]
+            sections: [...death.sections, { ...preview, id: 'preview' }]
           },
           marriage: {
             ...marriage,
-            sections: [
-              ...marriage.sections,
-              { ...preview, id: DeathSection.Preview }
-            ]
+            sections: [...marriage.sections, { ...preview, id: 'preview' }]
           }
         }
       }

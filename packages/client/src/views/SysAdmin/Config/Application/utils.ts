@@ -20,13 +20,11 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { IOfflineData } from '@client/offline/reducer'
-import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
-export type IActionType =
+type IActionType =
   | keyof typeof GeneralActionId
   | keyof typeof BirthActionId
   | keyof typeof DeathActionId
@@ -82,11 +80,6 @@ export const getCurrencyObject = (value: string) => {
     isoCode: arr.pop(),
     languagesAndCountry: [arr.join('-')]
   }
-}
-
-export const getCountryName = (isoCode: string) => {
-  const countryName = lookup.countries({ alpha3: isoCode })[0]
-  return countryName && countryName.name
 }
 
 export function isValidRegEx(pattern: string): boolean {
@@ -191,16 +184,13 @@ export const isWithinFileLength = (base64data: string) => {
 }
 
 const isGeneralOrConfigAction = (
-  configProperty: IActionType | ConfigActionType
-): configProperty is GeneralActionId | ConfigActionType => {
-  return (
-    Object.keys(GeneralActionId).includes(configProperty) ||
-    Object.keys(ConfigActionType).includes(configProperty)
-  )
+  configProperty: IActionType
+): configProperty is GeneralActionId => {
+  return Object.keys(GeneralActionId).includes(configProperty)
 }
 
 export async function callApplicationConfigMutation(
-  configProperty: IActionType | ConfigActionType,
+  configProperty: IActionType,
   appConfig: IApplicationConfig,
   dispatch: Dispatch,
   setNotificationStatus: (status: NOTIFICATION_STATUS) => void
@@ -208,15 +198,8 @@ export async function callApplicationConfigMutation(
   try {
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      configProperty === ConfigActionType.INFORMANT_SIGNATURE
-        ? {
-            INFORMANT_SIGNATURE: appConfig.INFORMANT_SIGNATURE,
-            INFORMANT_SIGNATURE_REQUIRED: appConfig.INFORMANT_SIGNATURE_REQUIRED
-          }
-        : isGeneralOrConfigAction(configProperty)
-        ? {
-            [configProperty]: appConfig[configProperty]
-          }
+      isGeneralOrConfigAction(configProperty)
+        ? { [configProperty]: appConfig[configProperty] }
         : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
         : configProperty in DeathActionId

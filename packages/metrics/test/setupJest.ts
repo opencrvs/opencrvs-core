@@ -56,16 +56,13 @@ jest.mock('@metrics/configApi', () => {
         APPLICATION_NAME: 'Farajaland CRVS',
         FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
         DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-        HIDE_EVENT_REGISTER_INFORMATION: false,
         EXTERNAL_VALIDATION_WORKQUEUE: false,
         PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
         NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
         CURRENCY: {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']
-        },
-        ADDRESSES: 1,
-        ADMIN_LEVELS: 2
+        }
       })
   }
 })

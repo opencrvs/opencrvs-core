@@ -54,7 +54,7 @@ input SystemRoleInput {
 }
 
 type Response {
-  msg: String!
+  roleIdMap: Map!
 }
 
 type Query {

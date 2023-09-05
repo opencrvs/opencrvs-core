@@ -31,6 +31,7 @@ import { Link } from '@opencrvs/components/lib/Link'
 import { Toast } from '@opencrvs/components/lib/Toast'
 
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
   & > div {
@@ -117,6 +118,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     const { forgottenItem } = this.props.location.state
     const { resentAuthenticationCode } = this.state
     const notificationEvent = NotificationEvent.PASSWORD_RESET
+    const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
     return (
       <>
@@ -157,7 +159,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               )}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
             <Content
@@ -165,7 +169,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 messages.recoveryCodeEntryFormBodyHeader
               )}
               subtitle={intl.formatMessage(
-                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                notificationMethod === 'sms'
                   ? messages.recoveryCodeEntryFormBodySubheaderMobile
                   : messages.recoveryCodeEntryFormBodySubheaderEmail,
                 {
@@ -178,7 +182,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                       font="bold16"
                       type="button"
                     >
-                      {intl.formatMessage(messages.resend)}
+                      {intl.formatMessage(messages.resend, {
+                        notificationMethod
+                      })}
                     </Link>
                   )
                 }
@@ -199,7 +205,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 <Toast type="success">
                   {intl.formatMessage(messages.resentSMS, {
                     number:
-                      window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                      notificationMethod === 'sms'
                         ? this.props.location.state.mobile
                         : this.props.location.state.email
                   })}

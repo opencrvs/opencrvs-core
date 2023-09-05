@@ -69,14 +69,18 @@ export interface IDeclarationData {
   placeOfBirth?: string
   placeOfDeath?: string
   placeOfMarriage?: string
-  informant?: string
-  informantContact?: string
+  informant?: IInformantInfo
   registrationNo?: string
   nid?: string
   assignment?: GQLAssignmentData
 }
 
-export interface IGQLDeclaration {
+interface IInformantInfo {
+  registrationEmail?: string
+  registrationPhone?: string
+}
+
+interface IGQLDeclaration {
   id: string
   child?: { name: Array<GQLHumanName | null> }
   deceased?: { name: Array<GQLHumanName | null> }
@@ -133,7 +137,7 @@ export const getFieldValue = (
   return original
 }
 
-export const getLocation = (
+const getLocation = (
   declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
@@ -145,24 +149,29 @@ export const getLocation = (
   let internationalDistrict = EMPTY_STRING
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
-
   if (declaration.event === Event.Death) {
     locationType =
       declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
+
     locationId =
       declaration.data?.deathEvent?.deathLocation?.toString() || EMPTY_STRING
 
     district =
-      declaration.data?.deathEvent?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.deathEvent?.state?.toString() || EMPTY_STRING
-    country = declaration.data?.deathEvent?.country?.toString() || EMPTY_STRING
+      declaration.data?.deathEvent?.districtPlaceofdeath?.toString() ||
+      EMPTY_STRING
+    state =
+      declaration.data?.deathEvent?.statePlaceofdeath?.toString() ||
+      EMPTY_STRING
+    country =
+      declaration.data?.deathEvent?.countryPlaceofdeath?.toString() ||
+      EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.deathEvent?.internationalDistrict?.toString() ||
+      declaration.data?.deathEvent?.internationalDistrictPlaceofdeath?.toString() ||
       EMPTY_STRING
     internationalState =
-      declaration.data?.deathEvent?.internationalState?.toString() ||
+      declaration.data?.deathEvent?.internationalStatePlaceofdeath?.toString() ||
       EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
     locationType =
@@ -170,28 +179,37 @@ export const getLocation = (
     locationId =
       declaration.data?.child?.birthLocation?.toString() || EMPTY_STRING
 
-    district = declaration.data?.child?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.child?.state?.toString() || EMPTY_STRING
-    country = declaration.data?.child?.country?.toString() || EMPTY_STRING
-
-    // when address is outside of default country
-    internationalDistrict =
-      declaration.data?.child?.internationalDistrict?.toString() || EMPTY_STRING
-    internationalState =
-      declaration.data?.child?.internationalState?.toString() || EMPTY_STRING
-  } else if (declaration.event === Event.Marriage) {
     district =
-      declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.marriageEvent?.state?.toString() || EMPTY_STRING
+      declaration.data?.child?.districtPlaceofbirth?.toString() || EMPTY_STRING
+    state =
+      declaration.data?.child?.statePlaceofbirth?.toString() || EMPTY_STRING
     country =
-      declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
+      declaration.data?.child?.countryPlaceofbirth?.toString() || EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      declaration.data?.child?.internationalDistrictPlaceofbirth?.toString() ||
       EMPTY_STRING
     internationalState =
-      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      declaration.data?.child?.internationalStatePlaceofbirth?.toString() ||
+      EMPTY_STRING
+  } else if (declaration.event === Event.Marriage) {
+    district =
+      declaration.data?.marriageEvent?.districtPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    state =
+      declaration.data?.marriageEvent?.statePlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    country =
+      declaration.data?.marriageEvent?.countryPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrictPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalStatePlaceofmarriage?.toString() ||
       EMPTY_STRING
 
     if (country && country !== window.config.COUNTRY) {
@@ -237,15 +255,16 @@ export const getLocation = (
   // when address is default residence address of deceased
   if (locationType === 'DECEASED_USUAL_RESIDENCE') {
     const countryResidence =
-      declaration.data?.deceased?.countryPrimary?.toString() || EMPTY_STRING
+      declaration.data?.deceased?.countryPrimaryDeceased?.toString() ||
+      EMPTY_STRING
 
     if (countryResidence !== window.config.COUNTRY) {
       // residence address is other than default country
       const internationalDistrictResidence =
-        declaration.data?.deceased?.internationalDistrictPrimary?.toString() ||
+        declaration.data?.deceased?.internationalDistrictPrimaryDeceased?.toString() ||
         EMPTY_STRING
       const internationalStateResidence =
-        declaration.data?.deceased?.internationalStatePrimary?.toString() ||
+        declaration.data?.deceased?.internationalStatePrimaryDeceased?.toString() ||
         EMPTY_STRING
 
       let location = EMPTY_STRING
@@ -259,9 +278,11 @@ export const getLocation = (
       return location
     } else {
       const districtResidence =
-        declaration.data?.deceased?.districtPrimary?.toString() || EMPTY_STRING
+        declaration.data?.deceased?.districtPrimaryDeceased?.toString() ||
+        EMPTY_STRING
       const stateResidence =
-        declaration.data?.deceased?.statePrimary?.toString() || EMPTY_STRING
+        declaration.data?.deceased?.statePrimaryDeceased?.toString() ||
+        EMPTY_STRING
 
       return generateFullLocation(
         districtResidence,
@@ -297,25 +318,25 @@ export const removeUnderscore = (word: string): string => {
   return finalWord
 }
 
-export const isBirthDeclaration = (
+const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
   return (declaration && declaration.type === 'Birth') || false
 }
 
-export const isDeathDeclaration = (
+const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
   return (declaration && declaration.type === 'Death') || false
 }
 
-export const isMarriageDeclaration = (
+const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
   return (declaration && declaration.type === 'Marriage') || false
 }
 
-export const getDraftDeclarationName = (declaration: IDeclaration) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = EMPTY_STRING
   const declarationName = []
   if (declaration.event === Event.Birth) {
@@ -337,10 +358,6 @@ export const getDraftDeclarationName = (declaration: IDeclaration) => {
       .join(' & ')
   }
   return name
-}
-
-export function notNull<T>(value: T | null): value is T {
-  return value !== null
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {
@@ -377,14 +394,14 @@ export const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfMarriage: getLocation(declaration, resources, intl) || EMPTY_STRING,
-    informant:
-      ((declaration.data?.registration?.contactPoint as IFormSectionData)
-        ?.value as string) || EMPTY_STRING,
-    informantContact:
-      (
-        (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || EMPTY_STRING
+    informant: {
+      registrationPhone:
+        declaration.data?.informant?.registrationPhone?.toString() ||
+        EMPTY_STRING,
+      registrationEmail:
+        declaration.data?.informant?.registrationEmail?.toString() ||
+        EMPTY_STRING
+    }
   }
 }
 
@@ -426,8 +443,7 @@ export const getWQDeclarationData = (
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
-    placeOfBirth: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfBirth: EMPTY_STRING
   }
 }
 
@@ -468,8 +484,7 @@ export const getGQLDeclaration = (
     dateOfDeath: EMPTY_STRING,
     placeOfDeath: EMPTY_STRING,
     dateOfMarriage: EMPTY_STRING,
-    placeOfMarriage: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfMarriage: EMPTY_STRING
   }
 }
 

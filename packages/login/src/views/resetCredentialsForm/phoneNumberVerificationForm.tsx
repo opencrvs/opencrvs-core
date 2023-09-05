@@ -33,6 +33,7 @@ import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
 import { messages as validationMessages } from '@login/i18n/messages/validations'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
   & > div {
@@ -204,7 +205,9 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
               )}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form
             id="phone-or-email-verification-form"

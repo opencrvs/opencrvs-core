@@ -39,8 +39,8 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false
 
-export const USER_NOTIFICATION_DELIVERY_METHOD =
-  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
+export const AVATAR_API =
+  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
@@ -49,7 +49,7 @@ export function getLanguages() {
   const LANGUAGES = process.env.LANGUAGES || 'bn,en'
   return LANGUAGES.split(',')
 }
-
+export const DEFAULT_COUNTRY = process.env.COUNTRY || 'FAR'
 export const NATIVE_LANGUAGE = (() => {
   const languages = getLanguages()
   return languages.find((language) => language !== 'en')

@@ -47,9 +47,14 @@ describe('Route authorization', () => {
       method: 'POST',
       url: '/birthDeclarationSMS',
       payload: {
-        msisdn: '+447789778865',
+        recipient: {
+          sms: '+447789778865',
+          email: 'email@email.com'
+        },
         name: 'test',
-        trackingId: 'B123456'
+        trackingId: 'B123456',
+        crvsOffice: 'ALASKA',
+        informantName: 'SADMAN ANIK'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -72,7 +77,10 @@ describe('Route authorization', () => {
       method: 'POST',
       url: '/birthDeclarationSMS',
       payload: {
-        msisdn: '+447789778865',
+        recipient: {
+          sms: '+447789778865',
+          email: 'email@email.com'
+        },
         name: 'test',
         trackingId: 'B123456'
       },

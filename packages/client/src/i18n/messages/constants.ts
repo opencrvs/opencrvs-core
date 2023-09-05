@@ -136,7 +136,6 @@ interface IConstantsMessages
   maleOver18: MessageDescriptor
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
-  registrationTitle: MessageDescriptor
   withinTargetDays: MessageDescriptor
   withinTargetDaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
@@ -844,11 +843,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Location',
     description: 'Label for location',
     id: 'constants.location'
-  },
-  registrationTitle: {
-    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
-    description: 'Label for registrationTitle',
-    id: 'constants.registrationTitle'
   },
   withinTargetDays: {
     defaultMessage: `Within {registrationTargetDays} days`,

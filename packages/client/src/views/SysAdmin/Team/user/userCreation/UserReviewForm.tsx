@@ -11,6 +11,7 @@
  */
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
+  DIVIDER,
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
@@ -18,7 +19,7 @@ import {
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER,
-  SUBSECTION
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
@@ -50,8 +51,7 @@ import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT,
-  LinkButton
+  ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -73,8 +73,9 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Link } from '@opencrvs/components'
 
-export interface IUserReviewFormProps {
+interface IUserReviewFormProps {
   userId?: string
   section: IFormSection
   formData: IFormSectionData
@@ -138,7 +139,7 @@ class UserReviewFormComponent extends React.Component<
       group.fields.forEach((field: IFormField, idx) => {
         if (field.hideValueInPreview) {
           return
-        } else if (field.type === SUBSECTION) {
+        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -190,7 +191,7 @@ class UserReviewFormComponent extends React.Component<
                   field.name === 'registrationOffice' &&
                   this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
-                  <LinkButton
+                  <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
                       this.props.userId
@@ -208,7 +209,7 @@ class UserReviewFormComponent extends React.Component<
                     }}
                   >
                     {intl.formatMessage(messages.change)}
-                  </LinkButton>
+                  </Link>
                 ) : (
                   <></>
                 )
@@ -279,7 +280,7 @@ class UserReviewFormComponent extends React.Component<
       userDetails,
       offlineCountryConfiguration
     } = this.props
-    let title: string
+    let title: string | undefined
     let actionComponent: JSX.Element
     const locationId = formData['registrationOffice']
     const locationDetails =
@@ -304,7 +305,7 @@ class UserReviewFormComponent extends React.Component<
         </SuccessButton>
       )
     } else {
-      title = intl.formatMessage(section.title)
+      title = section.title && intl.formatMessage(section.title)
       actionComponent = (
         <PrimaryButton
           id="submit_user_form"

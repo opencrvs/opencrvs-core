@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { postMetrics } from '@gateway/features/fhir/utils'
+import {
+  isBase64FileString,
+  postMetrics,
+  uploadBase64ToMinio
+} from '@gateway/features/fhir/utils'
 import {
   IUserModelData,
   IUserPayload,
@@ -35,10 +39,7 @@ import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
-import {
-  validateAttachments,
-  validateNotificationDeliveryMethod
-} from '@gateway/utils/validators'
+import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -259,7 +260,6 @@ export const resolvers: GQLResolver = {
       }
 
       try {
-        await validateNotificationDeliveryMethod(user)
         if (user.signature) {
           await validateAttachments([user.signature])
         }
@@ -454,6 +454,15 @@ export const resolvers: GQLResolver = {
           )
         )
       }
+
+      if (isBase64FileString(avatar.data)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          avatar.data,
+          authHeader
+        )
+        avatar.data = docUploadResponse
+      }
+
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserAvatar`, {
         method: 'POST',
         body: JSON.stringify({ userId, avatar }),
@@ -612,6 +621,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
+    ...(user.password && { password: user.password }),
+    ...(user.status && { status: user.status }),
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',

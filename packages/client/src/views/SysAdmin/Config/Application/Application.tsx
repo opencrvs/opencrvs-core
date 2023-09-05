@@ -57,7 +57,7 @@ const ListGroupTitle = styled.div`
   align-items: center;
 `
 
-export enum TabId {
+enum TabId {
   GENERAL = 'general',
   BIRTH = 'birth',
   DEATH = 'death',
@@ -94,10 +94,6 @@ export enum MarriageActionId {
   MARRIAGE_REGISTRATION_DELAYED_TARGET = 'MARRIAGE_REGISTRATION_DELAYED_TARGET',
   MARRIAGE_ON_TIME_FEE = 'MARRIAGE_ON_TIME_FEE',
   MARRIAGE_DELAYED_FEE = 'MARRIAGE_DELAYED_FEE'
-}
-
-interface ISection {
-  title: React.ReactNode
 }
 
 function GeneralTabContent() {

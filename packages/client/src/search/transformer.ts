@@ -143,10 +143,7 @@ export const transformData = (
             assignedReg.registration.comment) ||
           '',
         createdAt: assignedReg?.registration?.createdAt,
-        assignment: assignedReg?.registration?.assignment as Record<
-          string,
-          unknown
-        >,
+        assignment: assignedReg?.registration?.assignment,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

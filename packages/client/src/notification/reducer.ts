@@ -36,6 +36,7 @@ type userCreateDuplicateEmailFailedToastState = {
 
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
+  configurationError: string | null
   configurationErrorVisible: boolean
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
@@ -54,8 +55,9 @@ export type NotificationState = {
   userReconnectedToast: boolean
 }
 
-export const initialState: NotificationState = {
+const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
+  configurationError: null,
   configurationErrorVisible: false,
   waitingSW: null,
   sessionExpired: false,
@@ -92,6 +94,11 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         sessionExpired: true
+      }
+    case actions.CONFIGURATION_ERROR:
+      return {
+        ...state,
+        configurationError: action.payload
       }
     case actions.SHOW_CONFIG_ERROR:
       return {

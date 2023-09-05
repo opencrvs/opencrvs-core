@@ -40,6 +40,7 @@ export const SEARCH_EVENTS = gql`
             firstName
             lastName
             officeName
+            avatarURL
           }
           createdAt
           modifiedAt

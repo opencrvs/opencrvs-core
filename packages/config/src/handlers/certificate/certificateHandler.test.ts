@@ -155,7 +155,7 @@ describe('getCertificate handler', () => {
       }
     })
 
-    expect(res.statusCode).toBe(204)
+    expect(res.statusCode).toBe(404)
   })
 })
 

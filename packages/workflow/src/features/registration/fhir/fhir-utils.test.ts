@@ -17,7 +17,7 @@ import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-
 import {
   getRegistrationNumber,
   getEntryId,
-  getInformantName,
+  getSubjectName,
   getCRVSOfficeName,
   getPaperFormID,
   getRegStatusCode,
@@ -50,7 +50,7 @@ describe('Verify getSharedContactMsisdn', () => {
     ).rejects.toThrow('Invalid FHIR bundle found for declaration')
   })
 
-  it('Returns false when phonenumber is missing for shared contact', async () => {
+  it('Returns null when phonenumber is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     if (
       fhirBundle &&
@@ -62,22 +62,22 @@ describe('Verify getSharedContactMsisdn', () => {
       fhirBundle.entry[1].resource.extension[1].url
     ) {
       fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
-      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
+      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(null)
     } else {
       throw new Error('Failed')
     }
   })
 })
 
-describe('Verify getInformantName', () => {
+describe('Verify getSubjectName', () => {
   it('Returned informant name properly', async () => {
-    const informantName = await getInformantName(testFhirBundle)
+    const informantName = await getSubjectName(testFhirBundle)
     expect(informantName).toEqual('অনিক অনিক')
   })
 
   it('Throws error when invalid fhir bundle is sent', async () => {
     await expect(
-      getInformantName({
+      getSubjectName({
         resourceType: 'Bundle',
         type: 'document'
       })
@@ -87,15 +87,15 @@ describe('Verify getInformantName', () => {
   it('Throws error when child name section is missing', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
-    await expect(getInformantName(fhirBundle)).rejects.toThrow(
-      "Didn't find informant's name information"
+    await expect(getSubjectName(fhirBundle)).rejects.toThrow(
+      "Didn't find subject's name information"
     )
   })
 
   it("Throws error when child's bn name block is missing", async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
-    await expect(getInformantName(fhirBundle)).rejects.toThrow(
+    await expect(getSubjectName(fhirBundle)).rejects.toThrow(
       "Didn't found informant's bn name"
     )
   })

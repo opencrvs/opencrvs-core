@@ -24,8 +24,11 @@ export interface ILanguage {
   messages: IMessageIdentifier
 }
 
-export interface ISMSPayload {
-  msisdn: string
+export interface IEventMessageRecipient {
+  recipient: {
+    sms?: string | null
+    email?: string | null
+  }
 }
 
 interface IUserName {
@@ -48,12 +51,13 @@ export async function sendNotification(
   request: Hapi.Request,
   templateName: {
     email?: string
-    sms: string
-  },
-  recipient: {
-    email?: string
     sms?: string
   },
+  recipient: {
+    email?: string | null
+    sms?: string | null
+  },
+  type: 'user' | 'informant',
   variables: Record<string, string>
 ) {
   const token = request.headers.authorization
@@ -62,6 +66,7 @@ export async function sendNotification(
     return await notifyCountryConfig(
       templateName,
       recipient,
+      type,
       variables,
       token,
       locale,

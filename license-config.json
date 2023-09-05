@@ -38,7 +38,8 @@
     ".idea",
     "packages/dashboards/*.jar",
     "packages/dashboards/plugins/*.jar",
-    "packages/dashboards/data/metabase/*.db"
+    "packages/dashboards/data/metabase/*.db",
+    "packages/client/dev-dist"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

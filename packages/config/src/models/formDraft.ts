@@ -12,6 +12,8 @@
 import { Document, model, Schema } from 'mongoose'
 import { Event } from '@config/models/certificate'
 
+// keeping these models to migrate from v1.2 to v1.3
+
 export enum DraftStatus {
   DRAFT = 'DRAFT',
   IN_PREVIEW = 'IN_PREVIEW',
