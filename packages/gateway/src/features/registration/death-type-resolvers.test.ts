@@ -350,7 +350,7 @@ describe('Registration type resolvers', () => {
       const mock = jest.fn().mockImplementation(() => {
         return mockPatient
       })
-      console.log('mock', mock)
+
       // @ts-ignore
       const person = await typeResolvers.RelatedPerson.name(
         {

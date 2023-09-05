@@ -198,7 +198,7 @@ export const mockUser = {
 
 export const mockTask = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   intent: '',
   identifier: [
     {
@@ -272,7 +272,7 @@ export const mockTask = {
 
 export const mockTaskDownloaded = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   intent: '',
   identifier: [
     {
@@ -354,7 +354,7 @@ export const mockTaskDownloaded = {
 
 export const mockTaskForDeath = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/death-tracking-id',
@@ -806,7 +806,7 @@ export const mockTaskBundle = {
         'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -962,7 +962,7 @@ export const mockFhirBundle = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -1547,7 +1547,7 @@ export const mockErrorComposition = {
 
 export const mockTaskForError = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
   identifier: [
     {

@@ -16,7 +16,6 @@ import {
   ATTACHMENT_DOCS_CODE,
   ATTACHMENT_DOCS_TITLE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_CORRECTION_ENCOUNTER_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
@@ -26,7 +25,6 @@ import {
   CHILD_CODE,
   CHILD_TITLE,
   createCompositionTemplate,
-  DEATH_CORRECTION_ENCOUNTER_CODE,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
   DECEASED_CODE,
@@ -59,7 +57,6 @@ import {
   WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
   WITNESS_TWO_TITLE,
-  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   updateTaskTemplate
 } from '@gateway/features/fhir/templates'
 import {
@@ -95,10 +92,9 @@ import {
   EVENT_TYPE,
   FHIR_SPECIFICATION_URL,
   HAS_SHOWED_VERIFIED_DOCUMENT,
-  OPENCRVS_SPECIFICATION_URL,
-  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
+  OPENCRVS_SPECIFICATION_URL
 } from '@gateway/features/fhir/constants'
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
@@ -402,15 +398,24 @@ function createAddressBuilder(sectionCode: string, sectionTitle: string) {
       if (!person.address) {
         person.address = []
       }
+
       if (!person.address[context._index.address]) {
         person.address[context._index.address] = {}
       }
       if (!person.address[context._index.address].line) {
         person.address[context._index.address].line = []
       }
-      ;(person.address[context._index.address].line as string[]).push(
-        fieldValue
-      )
+      if (
+        person.address[context._index.address].line![context._index.line] !==
+        undefined
+      ) {
+        person.address[context._index.address].line![context._index.line] =
+          fieldValue
+      } else {
+        ;(person.address[context._index.address].line as string[]).push(
+          fieldValue
+        )
+      }
     },
     city: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -1047,111 +1052,6 @@ function createQuestionnaireBuilder() {
         context
       )
       setQuestionnaireItem(questionnaire, context, null, fieldValue)
-    }
-  }
-}
-
-function createActionTypesBuilder() {
-  const actionType = {
-    coding: [
-      {
-        system: 'http://terminology.hl7.org/CodeSystem/action-type',
-        code: 'update'
-      }
-    ]
-  }
-  return {
-    section: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(
-        task,
-        'input',
-        fieldValue,
-        'valueCode',
-        context,
-        'values'
-      )
-      setObjectPropInResourceArray(
-        task,
-        'output',
-        fieldValue,
-        'valueCode',
-        context,
-        'values'
-      )
-    },
-    fieldName: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(
-        task,
-        'input',
-        fieldValue,
-        'valueId',
-        context,
-        'values'
-      )
-      setObjectPropInResourceArray(
-        task,
-        'output',
-        fieldValue,
-        'valueId',
-        context,
-        'values'
-      )
-    },
-    oldValue: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(
-        task,
-        'input',
-        actionType,
-        'type',
-        context,
-        'values'
-      )
-      setObjectPropInResourceArray(
-        task,
-        'input',
-        fieldValue,
-        'valueString',
-        context,
-        'values'
-      )
-    },
-    newValue: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(
-        task,
-        'output',
-        actionType,
-        'type',
-        context,
-        'values'
-      )
-      setObjectPropInResourceArray(
-        task,
-        'output',
-        fieldValue,
-        'valueString',
-        context,
-        'values'
-      )
     }
   }
 }
@@ -2056,9 +1956,17 @@ export const builders: IFieldBuilders = {
         if (!person.address[context._index.address].line) {
           person.address[context._index.address].line = []
         }
-        ;(person.address[context._index.address].line as string[]).push(
-          fieldValue
-        )
+        if (
+          person.address[context._index.address].line![context._index.line] !==
+          undefined
+        ) {
+          person.address[context._index.address].line![context._index.line] =
+            fieldValue
+        } else {
+          ;(person.address[context._index.address].line as string[]).push(
+            fieldValue
+          )
+        }
       },
       city: (
         fhirBundle: ITemplatedBundle,
@@ -2748,431 +2656,6 @@ export const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
-    },
-    correction: {
-      requester: async (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        if (!taskResource.extension) {
-          taskResource.extension = []
-        }
-        const requesterExtensionURL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
-        const requesterExtension = taskResource.extension.find(
-          (ext) => ext.url === requesterExtensionURL
-        )
-        if (!requesterExtension) {
-          taskResource.extension.push({
-            url: requesterExtensionURL,
-            valueString: fieldValue
-          })
-        } else {
-          requesterExtension.valueString = fieldValue
-        }
-      },
-      hasShowedVerifiedDocument: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          context.event,
-          true
-        )
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        if (!certDocResource.extension) {
-          certDocResource.extension = []
-        }
-        if (!taskResource.extension) {
-          taskResource.extension = []
-        }
-
-        const hasVerifiedExt = certDocResource.extension.find(
-          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
-        )
-
-        const hasVerifiedExtInTask = taskResource.extension.find(
-          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
-        )
-
-        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in DocReference
-        if (!hasVerifiedExt) {
-          certDocResource.extension.push({
-            url: HAS_SHOWED_VERIFIED_DOCUMENT,
-            valueString: fieldValue
-          })
-        } else {
-          hasVerifiedExt.valueString = fieldValue
-        }
-
-        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in Task
-        if (!hasVerifiedExtInTask) {
-          taskResource.extension.push({
-            url: HAS_SHOWED_VERIFIED_DOCUMENT,
-            valueString: fieldValue
-          })
-        } else {
-          hasVerifiedExtInTask.valueString = fieldValue
-        }
-      },
-      attestedAndCopied: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          context.event,
-          true
-        )
-        if (!certDocResource.extension) {
-          certDocResource.extension = []
-        }
-        const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`
-        )
-        if (!hasVerifiedExt) {
-          certDocResource.extension.push({
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`,
-            valueString: fieldValue
-          })
-        } else {
-          hasVerifiedExt.valueString = fieldValue
-        }
-      },
-      noSupportingDocumentationRequired: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          context.event,
-          true
-        )
-        if (!certDocResource.extension) {
-          certDocResource.extension = []
-        }
-        const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`
-        )
-        if (!hasVerifiedExt) {
-          certDocResource.extension.push({
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`,
-            valueString: fieldValue
-          })
-        } else {
-          hasVerifiedExt.valueString = fieldValue
-        }
-      },
-      payments: {
-        paymentId: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          if (!paymentResource.identifier) {
-            paymentResource.identifier = []
-          }
-          paymentResource.identifier.push({
-            system: `${OPENCRVS_SPECIFICATION_URL}id/payment-id`,
-            value: fieldValue
-          })
-        },
-        type: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                type: {
-                  coding: [{ code: fieldValue }]
-                }
-              }
-            ]
-          } else {
-            paymentResource.detail[0].type = {
-              coding: [{ code: fieldValue }]
-            }
-          }
-        },
-        total: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          paymentResource.total = fieldValue as fhir.Money
-        },
-        amount: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                /* should be replaced when type value comes in */
-                type: {
-                  coding: [{ code: 'payment' }]
-                },
-                amount: fieldValue as fhir.Money
-              }
-            ]
-          } else {
-            paymentResource.detail[0].amount = fieldValue as fhir.Money
-          }
-        },
-        outcome: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          paymentResource.outcome = {
-            coding: [{ code: fieldValue }]
-          }
-        },
-        date: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                /* should be replaced when type value comes in */
-                type: {
-                  coding: [{ code: 'payment' }]
-                },
-                date: fieldValue
-              }
-            ]
-          } else {
-            paymentResource.detail[0].date = fieldValue
-          }
-        },
-        data: async (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const certDocResource = selectOrCreateCertificateDocRefResource(
-            fhirBundle,
-            context,
-            context.event,
-            true
-          )
-          if (!certDocResource.content) {
-            certDocResource.content = []
-          }
-          if (isBase64FileString(fieldValue)) {
-            const docUploadResponse = await uploadBase64ToMinio(
-              fieldValue,
-              context.authHeader
-            )
-            fieldValue = docUploadResponse
-          }
-
-          certDocResource.content.push({
-            attachment: {
-              contentType: 'image/jpg',
-              data: fieldValue
-            }
-          })
-        }
-      },
-      location: {
-        _fhirID: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const taskResource = selectOrCreateTaskRefResource(
-            fhirBundle,
-            context
-          )
-          const encounterRef = selectOrCreateEncounterResource(
-            fhirBundle,
-            context,
-            true
-          )
-          const encounterLocationRef = selectOrCreateEncounterLocationRef(
-            fhirBundle,
-            context,
-            true
-          )
-
-          //@ts-ignore
-          taskResource.encounter = encounterRef._id
-          encounterLocationRef.reference = `Location/${fieldValue}`
-        },
-        type: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const location = selectOrCreateLocationRefResource(
-            context.event === EVENT_TYPE.BIRTH
-              ? BIRTH_CORRECTION_ENCOUNTER_CODE
-              : context.event === EVENT_TYPE.DEATH
-              ? DEATH_CORRECTION_ENCOUNTER_CODE
-              : MARRIAGE_CORRECTION_ENCOUNTER_CODE,
-            fhirBundle,
-            context
-          )
-          location.type = {
-            coding: [
-              {
-                system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
-                code: fieldValue
-              }
-            ]
-          }
-        },
-        partOf: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const location = selectOrCreateLocationRefResource(
-            context.event === EVENT_TYPE.BIRTH
-              ? BIRTH_CORRECTION_ENCOUNTER_CODE
-              : DEATH_CORRECTION_ENCOUNTER_CODE,
-            fhirBundle,
-            context
-          )
-          location.partOf = {
-            reference: fieldValue
-          }
-        },
-        address: (_, __, context: any) =>
-          createLocationAddressBuilder(
-            context.event === EVENT_TYPE.BIRTH
-              ? BIRTH_CORRECTION_ENCOUNTER_CODE
-              : DEATH_CORRECTION_ENCOUNTER_CODE
-          )
-      },
-      values: createActionTypesBuilder(),
-      data: async (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          context.event,
-          true
-        )
-        if (!certDocResource.content) {
-          certDocResource.content = []
-        }
-        if (isBase64FileString(fieldValue)) {
-          const docUploadResponse = await uploadBase64ToMinio(
-            fieldValue,
-            context.authHeader
-          )
-          fieldValue = docUploadResponse
-        }
-
-        certDocResource.content.push({
-          attachment: {
-            contentType: 'application/pdf',
-            data: fieldValue
-          }
-        })
-      },
-      reason: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        if (!taskResource.reason) {
-          taskResource.reason = {}
-        }
-        taskResource.reason.text = fieldValue
-      },
-      otherReason: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        if (!taskResource.reason) {
-          taskResource.reason = {}
-        }
-        taskResource.reason.extension = [
-          {
-            url: REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
-            valueString: fieldValue
-          }
-        ]
-      },
-      note: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-
-        const newNote: fhir.Annotation = {
-          text: fieldValue ? fieldValue : '',
-          time: new Date().toUTCString(),
-          authorString: ''
-        }
-        if (!taskResource.note) {
-          taskResource.note = []
-        }
-        taskResource.note.push(newNote)
-      }
     },
     status: {
       comments: {
@@ -4246,6 +3729,30 @@ export const builders: IFieldBuilders = {
   }
 }
 
+export async function updateFHIRBundle(
+  existingBundle: fhir.Bundle,
+  recordDetails:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  eventType: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const context = {
+    event: eventType,
+    authHeader: authHeader
+  }
+
+  await transformObj(
+    recordDetails as Record<string, unknown>,
+    existingBundle as unknown as Record<string, unknown>,
+    builders,
+    context
+  )
+
+  return existingBundle
+}
+
 export async function buildFHIRBundle(
   reg:
     | GQLBirthRegistrationInput
@@ -4270,7 +3777,7 @@ export async function buildFHIRBundle(
   }
   await transformObj(
     reg as Record<string, unknown>,
-    fhirBundle,
+    fhirBundle as Record<string, unknown>,
     builders,
     context
   )
@@ -4386,6 +3893,7 @@ export async function checkUserAssignment(
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
   const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+
   return userId === res?.userId
 }
 

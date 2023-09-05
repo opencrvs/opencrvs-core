@@ -453,6 +453,15 @@ const ActionDetailsModalListTable = ({
             content={[{ requester: requesterLabel }]}
           />
         )}
+      {/* Correction rejected */}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RejectedCorrection && (
+          <Table
+            noResultText=" "
+            columns={reasonColumn}
+            content={[{ text: actionDetailsData.reason }]}
+          />
+        )}
 
       {/* Correction Requester Id Verified */}
       {actionDetailsData.action === RegAction.RequestedCorrection &&

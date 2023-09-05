@@ -85,7 +85,7 @@ describe('fhirUtils', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -823,7 +823,7 @@ describe('fhirUtils', () => {
   it('returns time taken to complete task', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -897,7 +897,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no extension', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -927,7 +927,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no time logged', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]

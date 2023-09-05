@@ -164,7 +164,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     approvalTab: searchEvents(
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
-        registrationStatuses: ["VALIDATED"]
+        registrationStatuses: ["VALIDATED", "CORRECTION_REQUESTED"]
       }
       count: $pageSize
       skip: $approvalSkip

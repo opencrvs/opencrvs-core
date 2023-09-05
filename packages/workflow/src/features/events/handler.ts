@@ -20,7 +20,6 @@ import {
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
-  markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
@@ -30,7 +29,7 @@ import {
 import {
   getEventType,
   hasCertificateDataInDocRef,
-  hasCorrectionEncounterSection,
+  hasCorrectionExtension,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
@@ -47,7 +46,6 @@ import {
 } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import {
   ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
@@ -63,9 +61,11 @@ import {
   setupSystemIdentifier
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
+import { Bundle, Composition, isTask } from '@opencrvs/commons/types'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 
 function detectEvent(request: Hapi.Request): Events {
-  const fhirBundle = request.payload as fhir.Bundle
+  const fhirBundle = request.payload as Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
@@ -74,7 +74,7 @@ function detectEvent(request: Hapi.Request): Events {
     if (firstEntry) {
       const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
-        const composition = firstEntry as fhir.Composition
+        const composition = firstEntry as Composition
         const isADuplicate = composition?.extension?.find(
           (ext) =>
             ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
@@ -91,11 +91,15 @@ function detectEvent(request: Hapi.Request): Events {
               return Events[`${eventType}_WAITING_EXTERNAL_RESOURCE_VALIDATION`]
             }
           } else {
+            const tasks = fhirBundle.entry
+              .map((entry) => entry.resource)
+              .filter(isTask)
+
             if (
               hasRegisterScope(request) &&
-              hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              tasks.some(hasCorrectionExtension)
             ) {
-              return Events[`${eventType}_REQUEST_CORRECTION`]
+              return Events[`${eventType}_MAKE_CORRECTION`]
             } else if (!hasCertificateDataInDocRef(fhirBundle)) {
               return Events[`${eventType}_MARK_ISSUE`]
             } else {
@@ -136,7 +140,7 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const taskResource = getTaskResource(fhirBundle)
+    const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
 
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
@@ -239,11 +243,29 @@ export async function fhirWorkflowEventHandler(
       }
       break
     }
-    case Events.BIRTH_REQUEST_CORRECTION:
-    case Events.DEATH_REQUEST_CORRECTION:
-    case Events.MARRIAGE_REQUEST_CORRECTION:
-      response = await markEventAsRequestedForCorrectionHandler(request, h)
+    case Events.BIRTH_MAKE_CORRECTION:
+    case Events.DEATH_MAKE_CORRECTION:
+    case Events.MARRIAGE_MAKE_CORRECTION:
+      // Invoke event triggers so search and metrics are notified
       await triggerEvent(event, request.payload, request.headers)
+      // forward as-is to hearth
+
+      /*
+       * Temporary fix for task being saved again after correction. Currently the flow is
+       * 1. Workflow receives the updated task from the gateway, saves it to Heath, Search and Metrics (task saved once)
+       * 2. Bundle returns to gateway, gateway updates the bundle using the inputs from the client, sends it to Hearth
+       * 3. We land here, and forward the bundle to Hearth again (task saved twice)
+       *
+       * Remove the following lines after workflow is refactored to handle the correction approval / creation flows completely
+       */
+
+      const bundle = request.payload as Bundle
+      const bundleWithoutTask = {
+        ...bundle,
+        entry: bundle.entry?.filter((entry) => !isTask(entry.resource))
+      }
+
+      response = await forwardToHearth(request, h, bundleWithoutTask)
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
@@ -361,16 +383,12 @@ export async function triggerEvent(
   payload: Hapi.Request['payload'],
   headers: Record<string, string> = {}
 ) {
-  try {
-    await fetch(`${OPENHIM_URL}${event}`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to forward to openhim for error : ${err}`)
-  }
+  return fetch(`${OPENHIM_URL}${event}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    }
+  })
 }

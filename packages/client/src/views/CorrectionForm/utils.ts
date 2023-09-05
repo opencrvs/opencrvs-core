@@ -60,8 +60,13 @@ import {
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  CorrectionInput,
+  PaymentOutcomeType,
+  PaymentType
+} from '@client/utils/gateway'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -129,16 +134,51 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
 }
 
 export function updateDeclarationRegistrationWithCorrection(
-  declaration: IDeclaration,
+  correctionData: {
+    corrector?: {
+      relationship:
+        | string
+        | { value: string; nestedFields: { otherRelationship: string } }
+      hasShowedVerifiedDocument?: boolean
+    }
+    reason?: {
+      type: string | { value: string }
+      additionalComment?: string
+      nestedFields?: IFormSectionData
+    }
+    supportingDocuments?: {
+      supportDocumentRequiredForCorrection?: boolean
+      uploadDocForLegalProof?: IAttachmentValue
+    }
+    currectionFeesPayment?: {
+      correctionFees?: IFormSectionData
+    }
+  },
   meta?: { userPrimaryOffice?: UserDetails['primaryOffice'] }
-): void {
-  let correctionValues: Record<string, any> = {}
-  const { data } = declaration
+) {
+  let correctionValues: CorrectionInput = {
+    requester: '',
+    requesterOther: '',
+    hasShowedVerifiedDocument: false,
+    noSupportingDocumentationRequired: false,
+    reason: '',
+    otherReason: '',
+    location: {},
+    note: '',
+    attachments: [],
+    values: []
+  }
+
+  const data = correctionData
 
   if (data.corrector && data.corrector.relationship) {
-    correctionValues.requester = ((
-      data.corrector.relationship as IFormSectionData
-    ).value || data.corrector.relationship) as string
+    if (typeof data.corrector.relationship === 'string') {
+      correctionValues.requester = data.corrector.relationship
+    } else {
+      correctionValues.requester = data.corrector.relationship.value
+      correctionValues.requesterOther =
+        data.corrector.relationship.nestedFields.otherRelationship
+    }
   }
 
   correctionValues.hasShowedVerifiedDocument = Boolean(
@@ -176,49 +216,37 @@ export function updateDeclarationRegistrationWithCorrection(
       }
     }
 
-    if (data.supportingDocuments.uploadDocForLegalProof) {
-      correctionValues.data = (
-        data.supportingDocuments.uploadDocForLegalProof as IAttachmentValue
-      ).data
+    if (Array.isArray(data.supportingDocuments.uploadDocForLegalProof)) {
+      data.supportingDocuments.uploadDocForLegalProof.forEach((file) => {
+        correctionValues.attachments.push({
+          data: file.data,
+          type: file.optionValues[1]
+        })
+      })
     }
   }
 
   if (data.currectionFeesPayment) {
-    if (
-      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
-      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
-        'REQUIRED'
-    ) {
+    const correctionFees = (
+      data.currectionFeesPayment.correctionFees as IFormSectionData
+    )?.value
+
+    if (correctionFees === 'REQUIRED') {
       const { nestedFields }: { nestedFields?: IFormSectionData } = data
         .currectionFeesPayment.correctionFees as IFormSectionData
-      correctionValues.payments = [
-        {
-          type: 'MANUAL',
-          total: Number(nestedFields?.totalFees),
-          amount: Number(nestedFields?.totalFees),
-          outcome: 'COMPLETED' as const
-        }
-      ]
+
+      correctionValues.payment = {
+        type: PaymentType.Manual,
+        amount: Number(nestedFields?.totalFees),
+        outcome: PaymentOutcomeType.Completed,
+        date: new Date().toISOString()
+      }
+
       if (nestedFields?.proofOfPayment) {
-        correctionValues.payments[0].data = (
+        correctionValues.payment.attachmentData = (
           nestedFields?.proofOfPayment as IFileValue
         ).data
       }
-    } else if (
-      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
-      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
-        'NOT_REQUIRED'
-    ) {
-      correctionValues.payments = [
-        {
-          type: 'MANUAL',
-          total: 0,
-          amount: 0,
-          outcome: 'COMPLETED' as const,
-          data: EMPTY_STRING,
-          date: Date.now()
-        }
-      ]
     }
   }
 
@@ -230,12 +258,7 @@ export function updateDeclarationRegistrationWithCorrection(
     }
   }
 
-  data.registration.correction = data.registration.correction
-    ? {
-        ...(data.registration.correction as IFormSectionData),
-        ...correctionValues
-      }
-    : correctionValues
+  return correctionValues
 }
 
 export function sectionHasError(

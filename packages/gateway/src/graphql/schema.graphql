@@ -163,6 +163,32 @@ type Query {
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
+  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
+  rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
+  approveBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  approveDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  approveMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+  createBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  createDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  createMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
@@ -176,10 +202,6 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  requestBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
@@ -202,10 +224,6 @@ type Mutation {
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
-  requestDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
   markEventAsUnassigned(id: String!): ID!
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
@@ -215,10 +233,6 @@ type Mutation {
   ): MarriageRegistration!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
-  requestMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
   markEventAsDuplicate(
     id: String!
     reason: String!
@@ -689,10 +703,22 @@ input NotificationInput {
   updatedAt: Date
 }
 
-type CreatedIds {
-  compositionId: String
-  trackingId: String
-  isPotentiallyDuplicate: Boolean
+input CorrectionInput {
+  requester: String!
+  requesterOther: String
+  hasShowedVerifiedDocument: Boolean!
+  noSupportingDocumentationRequired: Boolean!
+  attachments: [AttachmentInput!]!
+  payment: CorrectionPaymentInput
+  values: [CorrectionValueInput!]!
+  location: LocationInput!
+  reason: String!
+  otherReason: String!
+  note: String!
+}
+
+input CorrectionRejectionInput {
+  reason: String!
 }
 
 input BirthRegistrationInput {
@@ -713,11 +739,6 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
-}
-
-type Reinstated {
-  taskEntryResourceID: ID!
-  registrationStatus: RegStatus
 }
 
 input DeathRegistrationInput {
@@ -755,6 +776,17 @@ input MarriageRegistrationInput {
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
+}
+
+type CreatedIds {
+  compositionId: String
+  trackingId: String
+  isPotentiallyDuplicate: Boolean
+}
+
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
 }
 
 input UserInput {
@@ -966,10 +998,13 @@ type History {
   regStatus: RegStatus
   ipAddress: String
   action: RegAction
+  note: String
   statusReason: StatusReason
   reason: String
   requester: String
+  requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
   location: Location
@@ -980,6 +1015,8 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  payment: Payment
+  documents: [Attachment!]!
   duplicateOf: String
   potentialDuplicates: [String!]
 }
@@ -1261,6 +1298,36 @@ input LocationInput {
   geoData: String
 }
 
+input AttachmentInput {
+  _fhirID: ID
+  contentType: String
+  data: String
+  uri: String
+  status: String
+  originalFileName: String
+  systemFileName: String
+  type: String
+  description: String
+  subject: String
+  createdAt: Date
+}
+
+input CorrectionPaymentInput {
+  _fhirID: ID
+  attachmentData: String
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+}
+
+input CorrectionValueInput {
+  section: String!
+  fieldName: String!
+  oldValue: String!
+  newValue: String!
+}
+
 input RegistrationInput {
   _fhirID: ID
   draftId: String
@@ -1323,23 +1390,24 @@ input QuestionnaireQuestionInput {
   value: String
 }
 
+input MedicalPractitionerInput {
+  name: String
+  qualification: String
+  lastVisitDate: Date
+}
+
 enum RegStatus {
   IN_PROGRESS
   ARCHIVED
   DECLARED
   DECLARATION_UPDATED
   WAITING_VALIDATION
+  CORRECTION_REQUESTED
   VALIDATED
   REGISTERED
   CERTIFIED
   REJECTED
   ISSUED
-}
-
-input MedicalPractitionerInput {
-  name: String
-  qualification: String
-  lastVisitDate: Date
 }
 
 input HumanNameInput {
@@ -1489,6 +1557,9 @@ enum RegAction {
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
+  APPROVED_CORRECTION
+  REJECTED_CORRECTION
+  CORRECTED
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
@@ -1514,9 +1585,18 @@ type Comment {
 }
 
 type InputOutput {
-  valueCode: String
-  valueId: String
-  valueString: String
+  valueCode: String!
+  valueId: String!
+  valueString: String!
+}
+
+type Payment {
+  id: ID!
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentURL: String
 }
 
 type RoleLabel {
@@ -1746,23 +1826,19 @@ input AddressInput {
   to: Date
 }
 
-input AttachmentInput {
-  _fhirID: ID
-  contentType: String
-  data: String
-  uri: String
-  status: String
-  originalFileName: String
-  systemFileName: String
-  type: String
-  description: String
-  subject: String
-  createdAt: Date
-}
-
 input DeceasedInput {
   deceased: Boolean
   deathDate: String
+}
+
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
 }
 
 input RegWorkflowInput {
@@ -1780,20 +1856,6 @@ input CertificateInput {
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
   data: String
-}
-
-input CorrectionInput {
-  requester: ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput]
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
 }
 
 input LabelInput {
@@ -1838,15 +1900,6 @@ input MarriageFeeInput {
   DELAYED: Float
 }
 
-type Payment {
-  paymentId: ID
-  type: PaymentType
-  total: Float
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
-}
-
 interface AuditLogItemBase {
   time: String!
   ipAddress: String!
@@ -1874,21 +1927,4 @@ input PaymentInput {
   outcome: PaymentOutcomeType
   date: Date
   data: String
-}
-
-input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
-}
-
-enum PaymentType {
-  MANUAL
-}
-
-enum PaymentOutcomeType {
-  COMPLETED
-  ERROR
-  PARTIAL
 }

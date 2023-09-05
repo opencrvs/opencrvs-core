@@ -159,6 +159,7 @@ interface IFormProps {
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
+  reviewSummaryHeader?: React.ReactNode
 }
 
 export type RouteProps = RouteComponentProps<{
@@ -316,23 +317,25 @@ function FormAppBar({
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
       return
     }
-    const [exitModalTitle, exitModalDescription] = isCorrection(declaration)
-      ? [
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordDescription
-          )
-        ]
-      : [
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalDescription
-          )
-        ]
+    const [exitModalTitle, exitModalDescription] =
+      isCorrection(declaration) ||
+      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+        ? [
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordDescription
+            )
+          ]
+        : [
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalDescription
+            )
+          ]
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -451,17 +454,20 @@ function FormAppBar({
             }
             desktopRight={
               <>
-                {!duplicate && !isCorrection(declaration) && (
-                  <Button
-                    id="save-exit-btn"
-                    type="primary"
-                    size="small"
-                    onClick={handleSaveAndExit}
-                  >
-                    <Icon name="DownloadSimple" />
-                    {intl.formatMessage(buttonMessages.saveExitButton)}
-                  </Button>
-                )}
+                {!duplicate &&
+                  !isCorrection(declaration) &&
+                  declaration.registrationStatus !==
+                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    <Button
+                      id="save-exit-btn"
+                      type="primary"
+                      size="small"
+                      onClick={handleSaveAndExit}
+                    >
+                      <Icon name="DownloadSimple" />
+                      {intl.formatMessage(buttonMessages.saveExitButton)}
+                    </Button>
+                  )}
                 <Button
                   id="exit-btn"
                   type="secondary"
@@ -940,7 +946,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       duplicate,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      reviewSummaryHeader
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -1007,6 +1014,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      reviewSummaryHeader={reviewSummaryHeader}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,

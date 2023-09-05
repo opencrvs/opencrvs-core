@@ -1893,30 +1893,6 @@
         "description": null,
         "fields": [
           {
-            "name": "ADDRESSES",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ADMIN_LEVELS",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "APPLICATION_NAME",
             "description": null,
             "args": [],
@@ -2013,36 +1989,12 @@
             "deprecationReason": null
           },
           {
-            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
+            "name": "INFORMANT_NOTIFICATION_DELIVERY_METHOD",
             "description": null,
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -2131,6 +2083,18 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "USER_NOTIFICATION_DELIVERY_METHOD",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -2144,30 +2108,6 @@
         "description": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "ADDRESSES",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ADMIN_LEVELS",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "APPLICATION_NAME",
             "description": null,
@@ -2265,35 +2205,11 @@
             "deprecationReason": null
           },
           {
-            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
+            "name": "INFORMANT_NOTIFICATION_DELIVERY_METHOD",
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null,
@@ -2362,6 +2278,18 @@
           },
           {
             "name": "PHONE_NUMBER_PATTERN",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_NOTIFICATION_DELIVERY_METHOD",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -4406,25 +4334,35 @@
         "description": null,
         "fields": [
           {
+<<<<<<< HEAD
             "name": "collector",
+=======
+            "name": "attachments",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
+<<<<<<< HEAD
               "kind": "OBJECT",
               "name": "RelatedPerson",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "data",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
+=======
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AttachmentInput",
+                    "ofType": null
+                  }
+                }
+              }
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -4434,23 +4372,55 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "payments",
+            "name": "location",
             "description": null,
             "args": [],
             "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "LocationInput",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+<<<<<<< HEAD
+            "name": "payments",
+=======
+            "name": "noSupportingDocumentationRequired",
+>>>>>>> correction-approval-feature
+            "description": null,
+            "args": [],
+            "type": {
+<<<<<<< HEAD
               "kind": "LIST",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Payment",
+=======
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+>>>>>>> correction-approval-feature
                 "ofType": null
               }
             },
@@ -4470,11 +4440,64 @@
         "fields": null,
         "inputFields": [
           {
+<<<<<<< HEAD
             "name": "collector",
             "description": null,
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "RelatedPersonInput",
+              "ofType": null
+=======
+            "name": "note",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+<<<<<<< HEAD
+            "name": "data",
+=======
+            "name": "otherReason",
+>>>>>>> correction-approval-feature
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+<<<<<<< HEAD
+            "name": "hasShowedVerifiedDocument",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+=======
+            "name": "payment",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CorrectionPaymentInput",
+>>>>>>> correction-approval-feature
               "ofType": null
             },
             "defaultValue": null,
@@ -4482,7 +4505,41 @@
             "deprecationReason": null
           },
           {
-            "name": "data",
+            "name": "reason",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+<<<<<<< HEAD
+=======
+          },
+          {
+            "name": "requester",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "requesterOther",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -4494,32 +4551,29 @@
             "deprecationReason": null
           },
           {
-            "name": "hasShowedVerifiedDocument",
+            "name": "values",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "payments",
-            "description": null,
-            "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "PaymentInput",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CorrectionValueInput",
+                    "ofType": null
+                  }
+                }
               }
             },
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
+>>>>>>> correction-approval-feature
           }
         ],
         "interfaces": null,
@@ -4562,12 +4616,31 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+<<<<<<< HEAD
           },
           {
             "name": "status",
+=======
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CorrectionPaymentInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "_fhirID",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
+<<<<<<< HEAD
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
@@ -4575,12 +4648,21 @@
                 "name": "CertificateStatus",
                 "ofType": null
               }
+=======
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "svgCode",
+=======
+            "name": "amount",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -4588,7 +4670,11 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
+<<<<<<< HEAD
                 "name": "String",
+=======
+                "name": "Float",
+>>>>>>> correction-approval-feature
                 "ofType": null
               }
             },
@@ -4596,7 +4682,11 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "svgDateCreated",
+=======
+            "name": "attachmentData",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -4612,9 +4702,74 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "svgDateUpdated",
+=======
+            "name": "date",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+<<<<<<< HEAD
+=======
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "outcome",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PaymentOutcomeType",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PaymentType",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CorrectionRejectionInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "reason",
+            "description": null,
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -4624,6 +4779,86 @@
                 "ofType": null
               }
             },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CorrectionValueInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "fieldName",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "newValue",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "oldValue",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "section",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+>>>>>>> correction-approval-feature
+                "name": "String",
+                "ofType": null
+              }
+            },
+<<<<<<< HEAD
+=======
+            "defaultValue": null,
+>>>>>>> correction-approval-feature
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -6852,7 +7087,35 @@
         "description": null,
         "fields": [
           {
+<<<<<<< HEAD
             "name": "delayed",
+=======
+            "name": "documents",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Attachment",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "duplicateOf",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -6920,6 +7183,7 @@
             "description": null,
             "args": [],
             "type": {
+<<<<<<< HEAD
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
@@ -6927,6 +7191,47 @@
                 "name": "Location",
                 "ofType": null
               }
+=======
+              "kind": "OBJECT",
+              "name": "Location",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "noSupportingDocumentationRequired",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "note",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "office",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Location",
+              "ofType": null
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6975,7 +7280,23 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "late",
+=======
+            "name": "payment",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Payment",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "potentialDuplicates",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -7062,7 +7383,23 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "home",
+=======
+            "name": "requesterOther",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "signature",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -7402,6 +7739,7 @@
         "description": null,
         "fields": [
           {
+<<<<<<< HEAD
             "name": "createdAt",
             "description": null,
             "args": [],
@@ -7409,12 +7747,82 @@
               "kind": "SCALAR",
               "name": "Date",
               "ofType": null
+=======
+            "name": "valueCode",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+            "name": "valueId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+<<<<<<< HEAD
             "name": "history",
+=======
+            "name": "valueString",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Int",
+        "description": "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "IntegratedSystem",
+        "description": null,
+        "fields": [
+          {
+            "name": "name",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -9228,7 +9636,158 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "REGISTRATION_TARGET",
+=======
+            "name": "approveBirthRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BirthRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "approveDeathRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeathRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "approveMarriageRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "MarriageRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "auditUser",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [],
             "type": {
@@ -9321,7 +9880,153 @@
           {
             "name": "id",
             "description": null,
+<<<<<<< HEAD
             "args": [],
+=======
+            "args": [
+              {
+                "name": "nonce",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "phoneNumber",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "userId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "verifyCode",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createBirthRegistration",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BirthRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CreatedIds",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createBirthRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BirthRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -9335,15 +10040,38 @@
             "deprecationReason": null
           },
           {
-            "name": "operationHistories",
+            "name": "createDeathRegistration",
             "description": null,
-            "args": [],
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeathRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+>>>>>>> correction-approval-feature
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
+<<<<<<< HEAD
+                "kind": "SCALAR",
+                "name": "ID",
+=======
                 "kind": "OBJECT",
-                "name": "OperationHistorySearchSet",
+                "name": "CreatedIds",
+>>>>>>> correction-approval-feature
                 "ofType": null
               }
             },
@@ -9351,9 +10079,92 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
+            "name": "operationHistories",
+            "description": null,
+            "args": [],
+=======
+            "name": "createDeathRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeathRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+>>>>>>> correction-approval-feature
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+<<<<<<< HEAD
+                "kind": "OBJECT",
+                "name": "OperationHistorySearchSet",
+=======
+                "kind": "SCALAR",
+                "name": "ID",
+>>>>>>> correction-approval-feature
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+<<<<<<< HEAD
             "name": "registration",
             "description": null,
             "args": [],
+=======
+            "name": "createMarriageRegistration",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "MarriageRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+>>>>>>> correction-approval-feature
             "type": {
               "kind": "OBJECT",
               "name": "RegistrationSearchSet",
@@ -9363,6 +10174,7 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "type",
             "description": null,
             "args": [],
@@ -9370,6 +10182,52 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+=======
+            "name": "createMarriageRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "MarriageRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -9889,6 +10747,7 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "qualification",
             "description": null,
             "args": [],
@@ -9988,6 +10847,44 @@
             "name": "estimated",
             "description": null,
             "args": [],
+=======
+            "name": "rejectRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CorrectionRejectionInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+>>>>>>> correction-approval-feature
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -10001,6 +10898,7 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "month",
             "description": null,
             "args": [],
@@ -10012,14 +10910,79 @@
                 "name": "Int",
                 "ofType": null
               }
+=======
+            "name": "removeBookmarkedAdvancedSearch",
+            "description": null,
+            "args": [
+              {
+                "name": "removeBookmarkedSearchInput",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "RemoveBookmarkedSeachInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "BookMarkedSearches",
+              "ofType": null
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "total",
             "description": null,
             "args": [],
+=======
+            "name": "requestRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CorrectionInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+>>>>>>> correction-approval-feature
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -12155,7 +13118,11 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
+<<<<<<< HEAD
                 "name": "ID",
+=======
+                "name": "Float",
+>>>>>>> correction-approval-feature
                 "ofType": null
               }
             },
@@ -12163,7 +13130,11 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "updateDeathRegistration",
+=======
+            "name": "attachmentURL",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [
               {
@@ -12200,6 +13171,7 @@
               }
             ],
             "type": {
+<<<<<<< HEAD
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
@@ -12207,12 +13179,21 @@
                 "name": "ID",
                 "ofType": null
               }
+=======
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "updatePermissions",
+=======
+            "name": "date",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [
               {
@@ -12233,15 +13214,29 @@
               }
             ],
             "type": {
+<<<<<<< HEAD
               "kind": "OBJECT",
               "name": "System",
               "ofType": null
+=======
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "updateRole",
+=======
+            "name": "id",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [
               {
@@ -12261,8 +13256,13 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
+<<<<<<< HEAD
                 "kind": "OBJECT",
                 "name": "Response",
+=======
+                "kind": "SCALAR",
+                "name": "ID",
+>>>>>>> correction-approval-feature
                 "ofType": null
               }
             },
@@ -12270,7 +13270,11 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "usernameReminder",
+=======
+            "name": "outcome",
+>>>>>>> correction-approval-feature
             "description": null,
             "args": [
               {
@@ -12291,9 +13295,19 @@
               }
             ],
             "type": {
+<<<<<<< HEAD
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+=======
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PaymentOutcomeType",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -12320,9 +13334,19 @@
               }
             ],
             "type": {
+<<<<<<< HEAD
               "kind": "OBJECT",
               "name": "Notification",
               "ofType": null
+=======
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PaymentType",
+                "ofType": null
+              }
+>>>>>>> correction-approval-feature
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -16791,7 +17815,19 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "APPROVED_CORRECTION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ASSIGNED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CORRECTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -16822,6 +17858,12 @@
           },
           {
             "name": "REINSTATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REJECTED_CORRECTION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -16869,6 +17911,12 @@
           },
           {
             "name": "CERTIFIED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CORRECTION_REQUESTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -17687,18 +18735,6 @@
             "deprecationReason": null
           },
           {
-            "name": "contact",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "contactEmail",
             "description": null,
             "type": {
@@ -17712,18 +18748,6 @@
           },
           {
             "name": "contactPhoneNumber",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contactRelationship",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -18945,7 +19969,7 @@
         "description": null,
         "fields": [
           {
-            "name": "msg",
+            "name": "roleIdMap",
             "description": null,
             "args": [],
             "type": {
@@ -18953,7 +19977,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Map",
                 "ofType": null
               }
             },
@@ -21426,7 +22450,11 @@
             "deprecationReason": null
           },
           {
+<<<<<<< HEAD
             "name": "primaryFacilityId",
+=======
+            "name": "password",
+>>>>>>> correction-approval-feature
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -21467,6 +22495,18 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "SignatureInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "status",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "Status",
               "ofType": null
             },
             "defaultValue": null,

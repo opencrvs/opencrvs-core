@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 
@@ -51,6 +52,7 @@ export const getRoutes = () => {
           'Register event based on tracking id and registration number.'
       }
     },
+    ...correctionRoutes,
     {
       method: '*',
       path: '/fhir/{path*}',
@@ -62,5 +64,6 @@ export const getRoutes = () => {
       }
     }
   ]
+
   return routes
 }
