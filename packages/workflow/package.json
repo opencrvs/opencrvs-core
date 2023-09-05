@@ -30,14 +30,15 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.10",
+    "mongodb": "4.16.0",
     "node-fetch": "^2.6.7",
     "node-verhoeff": "^0.0.11",
     "pino": "^6.0.0",
     "short-uid": "^0.1.0",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2",
-    "zod": "^3.17.3",
-    "lodash": "^4.17.10"
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@types/fhir": "0.0.37",
