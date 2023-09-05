@@ -20,8 +20,8 @@ services:
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION:-latest}
     build:
-      context: .
-      dockerfile: ./packages/dashboards/Dockerfile
+      context: ./packages/dashboards
+      dockerfile: ./Dockerfile
     restart: unless-stopped
 
   components:
