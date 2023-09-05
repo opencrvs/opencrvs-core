@@ -1558,7 +1558,12 @@ export const testDeathFhirBundle: Bundle<
       fullUrl: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a',
       resource: {
         resourceType: 'Encounter',
-        status: 'finished'
+        status: 'finished',
+        location: [
+          {
+            location: { reference: 'Location/123' }
+          }
+        ]
       }
     },
     {
