@@ -58,7 +58,8 @@ export const EVENT_STATUS = {
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION'
+  WAITING_VALIDATION: 'WAITING_VALIDATION',
+  CORRECTION_REQUESTED: 'CORRECTION_REQUESTED'
 }
 
 export interface IWorkqueue {
@@ -219,7 +220,11 @@ async function getWorkqueueData(
   const scope = getScope(state)
   const reviewStatuses =
     scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      ? [
+          EVENT_STATUS.DECLARED,
+          EVENT_STATUS.VALIDATED,
+          EVENT_STATUS.CORRECTION_REQUESTED
+        ]
       : [EVENT_STATUS.DECLARED]
 
   const {

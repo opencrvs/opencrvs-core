@@ -13,6 +13,7 @@ enum RegStatus {
   DECLARED
   DECLARATION_UPDATED
   WAITING_VALIDATION
+  CORRECTION_REQUESTED
   VALIDATED
   REGISTERED
   CERTIFIED
@@ -26,6 +27,9 @@ enum RegAction {
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
+  APPROVED_CORRECTION
+  REJECTED_CORRECTION
+  CORRECTED
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
@@ -59,13 +63,22 @@ input PaymentInput {
   data: String
 }
 
-type Payment { # -> PaymentReconciliation
-  paymentId: ID # -> .identifier
-  type: PaymentType # -> .detail.type
-  total: Float # -> .total
-  amount: Float # .detail.amount
-  outcome: PaymentOutcomeType # -> .outcome
-  date: Date # -> .detail.date
+input CorrectionPaymentInput {
+  _fhirID: ID
+  attachmentData: String
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+}
+
+type Payment {
+  id: ID!
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentURL: String
 }
 
 input MedicalPractitionerInput { # -> Encounter.participant
@@ -125,9 +138,9 @@ type DuplicatesInfo {
 }
 
 type InputOutput {
-  valueCode: String
-  valueId: String
-  valueString: String
+  valueCode: String!
+  valueId: String!
+  valueString: String!
 }
 
 type IntegratedSystem {
@@ -142,10 +155,13 @@ type History {
   regStatus: RegStatus
   ipAddress: String
   action: RegAction
+  note: String
   statusReason: StatusReason
   reason: String
   requester: String
+  requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  noSupportingDocumentationRequired: Boolean
   otherReason: String
   #This doesn't resolve to the System model properly rather
   #uses the getSystem endpoint in user-mgnt
@@ -158,6 +174,8 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  payment: Payment
+  documents: [Attachment!]!
   duplicateOf: String
   potentialDuplicates: [String!]
 }
@@ -293,24 +311,24 @@ type MarriageRegistration implements EventRegistration { # -> Composition
 }
 
 input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
+  section: String!
+  fieldName: String!
+  oldValue: String!
+  newValue: String!
 }
 
 input CorrectionInput {
-  requester: ID # -> Practitioner ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput]
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
+  requester: String! # MOTHER, OTHER...
+  requesterOther: String # "The neighbour"
+  hasShowedVerifiedDocument: Boolean!
+  noSupportingDocumentationRequired: Boolean!
+  attachments: [AttachmentInput!]!
+  payment: CorrectionPaymentInput
+  values: [CorrectionValueInput!]!
+  location: LocationInput!
+  reason: String!
+  otherReason: String!
+  note: String!
 }
 
 input RegistrationInput {
@@ -375,7 +393,7 @@ type Registration { # -> Task
   contactEmail: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
-  inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
+  inCompleteFields: String # -> .status ('draft' | 'ready') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [DuplicatesInfo]
@@ -514,7 +532,41 @@ type Query {
   fetchRecordDetailsForVerification(id: String!): RecordDetails
 }
 
+input CorrectionRejectionInput {
+  reason: String!
+}
+
 type Mutation {
+  # Generic correction handlers for all event types
+  # Applying a correction request is made on a event level as payload is dependant on event type
+  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
+  rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
+
+  approveBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  approveDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  approveMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+  createBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  createDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  createMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+
   # BIRTH
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
@@ -530,10 +582,6 @@ type Mutation {
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  requestBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
   markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
@@ -558,10 +606,6 @@ type Mutation {
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
-  requestDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
   #MARRIAGE
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
@@ -572,10 +616,6 @@ type Mutation {
   ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
-  requestMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
   markEventAsDuplicate(
     id: String!
     reason: String!

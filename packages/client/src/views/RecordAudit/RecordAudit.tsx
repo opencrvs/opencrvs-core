@@ -209,6 +209,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   VALIDATED: 'grey',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
+  CORRECTION_REQUESTED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
   SUBMITTING: 'orange',
@@ -316,7 +317,9 @@ function RecordAuditBody({
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
-  const [actionDetailsData, setActionDetailsData] = React.useState({})
+
+  const [actionDetailsData, setActionDetailsData] = React.useState<History>()
+
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
 
@@ -343,7 +346,7 @@ function RecordAuditBody({
   if (
     isDownloaded &&
     declaration.type !== Event.Marriage &&
-    userHasRegisterScope &&
+    (userHasRegisterScope || userHasValidateScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
@@ -636,7 +639,12 @@ function RecordAuditBody({
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
-      <ActionDetailsModal {...actionDetailsModalProps} />
+      {actionDetailsModalProps.actionDetailsData && (
+        <ActionDetailsModal
+          {...actionDetailsModalProps}
+          actionDetailsData={actionDetailsModalProps.actionDetailsData}
+        />
+      )}
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)

@@ -45,14 +45,17 @@ import {
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual, uniqueId } from 'lodash'
+import { merge, isEqual } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
+import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 import { Context } from '@gateway/graphql/context'
 import PatientAPI from '@gateway/features/fhir/patientAPI'
 import MinioAPI from '@gateway/features/fhir/minioAPI'
+import { getAuthHeader } from '@opencrvs/commons'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -174,6 +177,8 @@ export const getApolloConfig = (): Config<Context> => {
     schema,
     introspection: true,
     dataSources: (): Context['dataSources'] => ({
+      documentsAPI: new DocumentsAPI(),
+      paymentsAPI: new PaymentsAPI(),
       locationsAPI: new LocationsAPI(),
       practitionerRoleAPI: new PractitionerRoleAPI(),
       patientAPI: new PatientAPI(),
@@ -182,13 +187,7 @@ export const getApolloConfig = (): Config<Context> => {
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,
-        headers: {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
-          'x-real-ip':
-            request.headers['x-real-ip'] || request.info?.remoteAddress,
-          'x-real-user-agent': request.headers['user-agent']
-        }
+        headers: getAuthHeader(request)
       }
     }
   }

@@ -16,9 +16,9 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 
 interface IReviewHeaderProps {
   id?: string
-  logoSource: string
-  title: string
-  subject: string
+  logoSource?: string
+  title?: string
+  subject?: string
 }
 
 const HeaderContainer = styled.div`
@@ -50,15 +50,17 @@ export const ReviewHeader = (props: IReviewHeaderProps) => {
   return (
     <HeaderContainer>
       <HeaderContent id={id}>
-        <CountryLogo size="small" src={logoSource} />
+        {logoSource && <CountryLogo size="small" src={logoSource} />}
         <Stack
           direction="column"
           alignItems="flex-start"
           justify-content="flex-start"
           gap={6}
         >
-          <TitleContainer id={`${id}_title`}>{title}</TitleContainer>
-          <SubjectContainer id={`${id}_subject`}>{subject}</SubjectContainer>
+          {title && <TitleContainer id={`${id}_title`}>{title}</TitleContainer>}
+          {subject && (
+            <SubjectContainer id={`${id}_subject`}>{subject}</SubjectContainer>
+          )}
         </Stack>
       </HeaderContent>
     </HeaderContainer>

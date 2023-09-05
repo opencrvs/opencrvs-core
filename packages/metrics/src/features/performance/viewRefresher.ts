@@ -566,7 +566,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
           $match: {
             'meta.lastUpdated': { $gte: lastUpdatedAt },
             'extension.url':
-              'http://opencrvs.org/specs/extension/requestCorrection'
+              'http://opencrvs.org/specs/extension/makeCorrection'
           }
         },
         {

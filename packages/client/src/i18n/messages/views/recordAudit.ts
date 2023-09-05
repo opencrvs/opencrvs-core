@@ -238,13 +238,28 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   [RegAction.Reinstated]: {
     id: 'recordAudit.regAction.reinstated',
     defaultMessage:
-      'Reinstated to {regStatus, select, validated{ready for review} in_progress{in progress} declared{ready for review} rejected{requires updates} other{}}',
+      'Reinstated to {regStatus, select, registered{registered} validated{ready for review} in_progress{in progress} declared{ready for review} rejected{requires updates} other{}}',
     description: 'Reinstated action'
   },
   [RegAction.RequestedCorrection]: {
     id: 'recordAudit.regAction.requestedCorrection',
-    defaultMessage: 'Requested Correction',
+    defaultMessage: 'Correction requested',
     description: 'Requested Correction action'
+  },
+  [RegAction.ApprovedCorrection]: {
+    id: 'recordAudit.regAction.approvedCorrection',
+    defaultMessage: 'Correction approved',
+    description: 'Approved Correction action'
+  },
+  [RegAction.Corrected]: {
+    id: 'recordAudit.regAction.corrected',
+    defaultMessage: 'Record corrected',
+    description: 'Corrected action'
+  },
+  [RegAction.RejectedCorrection]: {
+    id: 'recordAudit.regAction.rejectedCorrection',
+    defaultMessage: 'Correction rejected',
+    description: 'Rejected Correction action'
   },
   [RegAction.Viewed]: {
     id: 'recordAudit.regAction.viewed',
@@ -319,6 +334,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Updated',
     description: 'Declaration has been updated',
     id: 'recordAudit.regStatus.updatedDeclaration'
+  },
+  [RegStatus.CorrectionRequested]: {
+    defaultMessage: 'Correction requested',
+    description: 'Label for when someone requested correction',
+    id: 'recordAudit.regStatus.correctionRequested'
   }
 }
 

@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IAuthHeader {
-  Authorization: string
-  'x-correlation-id'?: string
-  'x-real-ip'?: string
-  'x-real-user-agent'?: string
+
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
+  return db.collection('Task').updateMany({}, { $set: { status: 'ready' } })
+}
+
+export const down = async (db: Db, client: MongoClient) => {
+  return db.collection('Task').updateMany({}, { $set: { status: 'requested' } })
 }

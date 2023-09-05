@@ -181,7 +181,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -493,7 +493,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:c690e34b-6fd2-42e4-90d5-639946fc039f',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -749,7 +749,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -989,7 +989,7 @@ describe('When a new registration event is received', () => {
           fullUrl: 'urn:uuid:c690e34b-6fd2-42e4-90d5-639946fc039f',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -1411,78 +1411,5 @@ describe('When an in-progress declaration is received', () => {
       payload
     })
     expect(res.statusCode).toBe(500)
-  })
-})
-
-describe('When an existing declaration requested correction', () => {
-  let server: any
-
-  beforeEach(async () => {
-    server = await createServer()
-  })
-
-  it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
-    const influxClient = require('@metrics/influxdb/client')
-    const payload = require('./test-data/request-correction-birth-request.json')
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/request-correction',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      payload
-    })
-    const declarationEventPoint =
-      influxClient.writePoints.mock.calls[1][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'declaration_event_duration'
-      )
-
-    expect(res.statusCode).toBe(200)
-    expect(declarationEventPoint).toMatchSnapshot()
-  })
-  describe('a death declaration', () => {
-    it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
-      const influxClient = require('@metrics/influxdb/client')
-      const payload = require('./test-data/request-correction-death-request.json')
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/request-correction',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        payload
-      })
-      expect(res.statusCode).toBe(200)
-      const declarationEventPoint =
-        influxClient.writePoints.mock.calls[1][0].find(
-          ({ measurement }: { measurement: string }) =>
-            measurement === 'declaration_event_duration'
-        )
-
-      expect(declarationEventPoint).toMatchSnapshot()
-    })
-  })
-  describe('a birth declaration', () => {
-    it('writes the payment total to influxdb', async () => {
-      const influxClient = require('@metrics/influxdb/client')
-      const payload = require('./test-data/request-correction-birth-request.json')
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/birth/request-correction',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        payload
-      })
-      expect(res.statusCode).toBe(200)
-      const declarationEventPoint =
-        influxClient.writePoints.mock.calls[1][0].find(
-          ({ measurement }: { measurement: string }) =>
-            measurement === 'payment'
-        )
-
-      expect(declarationEventPoint).toMatchSnapshot()
-    })
   })
 })

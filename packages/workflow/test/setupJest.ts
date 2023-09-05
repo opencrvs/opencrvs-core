@@ -11,12 +11,12 @@
  */
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
-import {
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
+import { informantSMSNotificationMock } from '@workflow/test/utils'
 
 jest.mock('@workflow/features/registration/smsNotificationUtils', () => {
-  const actual = jest.requireActual('@workflow/features/registration/smsNotificationUtils')
+  const actual = jest.requireActual(
+    '@workflow/features/registration/smsNotificationUtils'
+  )
   return {
     ...actual,
     getInformantSMSNotification: jest
@@ -26,4 +26,4 @@ jest.mock('@workflow/features/registration/smsNotificationUtils', () => {
 })
 jest.setMock('node-fetch', { default: fetch })
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = 'test'

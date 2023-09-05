@@ -51,13 +51,13 @@ import {
   HEARTH_URL,
   DOCUMENTS_URL
 } from '@gateway/constants'
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
+  MAKE_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
@@ -1020,6 +1020,7 @@ export async function getCertificatesFromTask(
 }
 export function getActionFromTask(task: fhir.Task) {
   const extensions = task.extension || []
+
   if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
     return GQLRegAction.DOWNLOADED
   } else if (findExtension(ASSIGNED_EXTENSION_URL, extensions)) {
@@ -1028,8 +1029,6 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.UNASSIGNED
   } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VERIFIED
-  } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
-    return GQLRegAction.REQUESTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
@@ -1040,6 +1039,21 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.MARKED_AS_NOT_DUPLICATE
   } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
     return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
+  } else if (findExtension(MAKE_CORRECTION_EXTENSION_URL, extensions)) {
+    return GQLRegAction.CORRECTED
+  }
+  if (
+    task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) => coding.code === 'CORRECTION_REQUESTED'
+    )
+  ) {
+    if (task.status === 'requested') {
+      return GQLRegAction.REQUESTED_CORRECTION
+    } else if (task.status === 'accepted') {
+      return GQLRegAction.APPROVED_CORRECTION
+    } else if (task.status === 'rejected') {
+      return GQLRegAction.REJECTED_CORRECTION
+    }
   }
   return null
 }
@@ -1364,6 +1378,24 @@ export const getEventDurationsFromMetrics = async (
     })
 }
 
+export function getCompositionFromBundle(
+  bundle: fhir.Bundle
+): fhir.Composition {
+  const composition = bundle.entry
+    ?.map(({ resource }) => resource)
+    ?.filter((resource): resource is fhir.Resource => Boolean(resource))
+    .find(
+      (resource): resource is fhir.Composition =>
+        resource.resourceType === 'Composition'
+    )
+
+  if (!composition) {
+    throw new Error('Composition not found in bundle')
+  }
+
+  return composition
+}
+
 export async function getDeclarationIdsFromResponse(
   resBody: fhir.Bundle,
   authHeader: IAuthHeader,
@@ -1452,7 +1484,7 @@ export function setInformantReference(
 export function hasRequestCorrectionExtension(task: fhir.Task) {
   const extension =
     task.extension &&
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+    findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
 export const fetchDocuments = async <T = any>(

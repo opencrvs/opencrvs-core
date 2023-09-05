@@ -20,7 +20,6 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection,
   validateDeceasedDetails,
   makeTaskAnonymous,
   markBundleAsIssued
@@ -54,7 +53,7 @@ import fetch from 'node-fetch'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   INFORMANT_CODE,
-  getTaskResource
+  getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
@@ -63,6 +62,13 @@ import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
 } from '@workflow/features/events/utils'
+import {
+  Bundle,
+  BundleEntry,
+  Composition,
+  Patient,
+  Task
+} from '@opencrvs/commons/types'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -74,10 +80,7 @@ interface IEventRegistrationCallbackPayload {
   }[]
 }
 
-async function sendBundleToHearth(
-  payload: fhir.Bundle,
-  count = 1
-): Promise<fhir.Bundle> {
+async function sendBundleToHearth(payload: Bundle, count = 1): Promise<Bundle> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -100,23 +103,23 @@ async function sendBundleToHearth(
 }
 
 function getSectionFromResponse(
-  response: fhir.Bundle,
+  response: Bundle,
   reference: string
-): fhir.BundleEntry[] {
+): BundleEntry[] {
   return (response.entry &&
     response.entry.filter((o) => {
-      const res = o.response as fhir.BundleEntryResponse
-      return Object.keys(res).some((k) =>
-        res[k].toLowerCase().includes(reference.toLowerCase())
+      const res = o.response as fhir3.BundleEntryResponse
+      return Object.keys(res).some((k: keyof fhir3.BundleEntryResponse) =>
+        (res[k] as string).toLowerCase().includes(reference.toLowerCase())
       )
-    })) as fhir.BundleEntry[]
+    })) as BundleEntry[]
 }
 
 function getSectionIndex(
-  section: fhir.CompositionSection[]
+  section: fhir3.CompositionSection[]
 ): number | undefined {
   let index
-  section.filter((obj: fhir.CompositionSection, i: number) => {
+  section.filter((obj: fhir3.CompositionSection, i: number) => {
     if (
       obj.title &&
       ['Birth encounter', 'Death encounter', 'Marriage encounter'].includes(
@@ -129,10 +132,7 @@ function getSectionIndex(
   return index
 }
 
-export function populateCompositionWithID(
-  payload: fhir.Bundle,
-  response: fhir.Bundle
-) {
+export function populateCompositionWithID(payload: Bundle, response: Bundle) {
   if (
     payload &&
     payload.entry &&
@@ -143,7 +143,7 @@ export function populateCompositionWithID(
       response,
       'Encounter'
     )
-    const composition = payload.entry[0].resource as fhir.Composition
+    const composition = payload.entry[0].resource as fhir3.Composition
     if (composition.section) {
       const payloadEncounterSectionIndex = getSectionIndex(composition.section)
       if (
@@ -156,7 +156,7 @@ export function populateCompositionWithID(
         responseEncounterSection[0].response.location
       ) {
         const entry = composition.section[payloadEncounterSectionIndex]
-          .entry as fhir.Reference[]
+          .entry as fhir3.Reference[]
         entry[0].reference =
           responseEncounterSection[0].response.location.split('/')[3]
         composition.section[payloadEncounterSectionIndex].entry = entry
@@ -182,7 +182,7 @@ export async function createRegistrationHandler(
   try {
     const token = getToken(request)
     let payload = await modifyRegistrationBundle(
-      request.payload as fhir.Bundle,
+      request.payload as Bundle,
       token
     )
     if (
@@ -192,10 +192,7 @@ export async function createRegistrationHandler(
         Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
       ].includes(event)
     ) {
-      payload = await markBundleAsWaitingValidation(
-        payload as fhir.Bundle,
-        token
-      )
+      payload = await markBundleAsWaitingValidation(payload as Bundle, token)
     } else if (
       [
         Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
@@ -203,7 +200,7 @@ export async function createRegistrationHandler(
         Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION
       ].includes(event)
     ) {
-      payload = await markBundleAsValidated(payload as fhir.Bundle, token)
+      payload = await markBundleAsValidated(payload as Bundle, token)
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
@@ -243,16 +240,16 @@ export async function markEventAsValidatedHandler(
   event: Events
 ) {
   try {
-    let payload: fhir.Bundle & fhir.BundleEntry
+    let payload: Bundle
 
-    const taskResource = getTaskResource(
-      request.payload as fhir.Bundle & fhir.BundleEntry
+    const taskResource = getTaskResourceFromFhirBundle(
+      request.payload as Bundle
     )
 
     // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {
       payload = await markBundleAsDeclarationUpdated(
-        request.payload as fhir.Bundle & fhir.BundleEntry,
+        request.payload as Bundle,
         getToken(request)
       )
       await postToHearth(payload)
@@ -262,7 +259,7 @@ export async function markEventAsValidatedHandler(
     }
 
     payload = await markBundleAsValidated(
-      request.payload as fhir.Bundle & fhir.BundleEntry,
+      request.payload as Bundle,
       getToken(request)
     )
 
@@ -284,9 +281,7 @@ export async function markEventAsRegisteredCallbackHandler(
     throw new Error(`Callback triggered with an error: ${error}`)
   }
 
-  const taskBundle: fhir.Bundle = await getFromFhir(
-    `/Task?identifier=${trackingId}`
-  )
+  const taskBundle: Bundle = await getFromFhir(`/Task?identifier=${trackingId}`)
   if (
     !taskBundle ||
     !taskBundle.entry ||
@@ -298,13 +293,11 @@ export async function markEventAsRegisteredCallbackHandler(
     )
   }
 
-  const task = taskBundle.entry[0].resource as fhir.Task
+  const task = taskBundle.entry[0].resource as Task
   if (!task.focus || !task.focus.reference) {
     throw new Error(`Task ${task.id} doesn't have a focus reference`)
   }
-  const composition: fhir.Composition = await getFromFhir(
-    `/${task.focus.reference}`
-  )
+  const composition: Composition = await getFromFhir(`/${task.focus.reference}`)
   const event = getTaskEventType(task) as EVENT_TYPE
 
   try {
@@ -318,7 +311,7 @@ export async function markEventAsRegisteredCallbackHandler(
     /** pushing registrationNumber on related person's identifier
      *  taking patients as an array because MARRIAGE Event has two types of patient
      */
-    const patients: fhir.Patient[] = await updatePatientIdentifierWithRN(
+    const patients: Patient[] = await updatePatientIdentifierWithRN(
       composition,
       SECTION_CODE[event],
       REG_NUMBER_SYSTEM[event],
@@ -419,16 +412,16 @@ export async function markEventAsWaitingValidationHandler(
   event: Events
 ) {
   try {
-    let payload: fhir.Bundle & fhir.BundleEntry
+    let payload: Bundle
 
-    const taskResource = getTaskResource(
-      request.payload as fhir.Bundle & fhir.BundleEntry
+    const taskResource = getTaskResourceFromFhirBundle(
+      request.payload as Bundle
     )
 
     // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {
       payload = await markBundleAsDeclarationUpdated(
-        request.payload as fhir.Bundle & fhir.BundleEntry,
+        request.payload as Bundle,
         getToken(request)
       )
       await postToHearth(payload)
@@ -438,7 +431,7 @@ export async function markEventAsWaitingValidationHandler(
     }
 
     payload = await markBundleAsWaitingValidation(
-      request.payload as fhir.Bundle & fhir.BundleEntry,
+      request.payload as Bundle,
       getToken(request)
     )
     const resBundle = await postToHearth(payload)
@@ -459,7 +452,7 @@ export async function markEventAsCertifiedHandler(
 ) {
   try {
     const payload = await markBundleAsCertified(
-      request.payload as fhir.Bundle,
+      request.payload as Bundle,
       getToken(request)
     )
     await mergePatientIdentifier(payload)
@@ -478,7 +471,7 @@ export async function markEventAsIssuedHandler(
 ) {
   try {
     const payload = await markBundleAsIssued(
-      request.payload as fhir.Bundle,
+      request.payload as Bundle,
       getToken(request)
     )
     await mergePatientIdentifier(payload)
@@ -497,9 +490,9 @@ export async function actionEventHandler(
   event: Events
 ) {
   try {
-    let payload = request.payload as fhir.Bundle
+    let payload = request.payload as Bundle
     payload = await touchBundle(payload, getToken(request))
-    const taskResource = payload.entry?.[0].resource as fhir.Task
+    const taskResource = payload.entry?.[0].resource as fhir3.Task
     return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
       method: 'PUT',
       body: JSON.stringify(taskResource),
@@ -518,10 +511,10 @@ export async function anonymousActionEventHandler(
   event: Events
 ) {
   try {
-    const payload = request.payload as fhir.Bundle
+    const payload = request.payload as Bundle
     const anonymousPayload = makeTaskAnonymous(payload)
 
-    const taskResource = anonymousPayload.entry?.[0].resource as fhir.Task
+    const taskResource = anonymousPayload.entry?.[0].resource as fhir3.Task
     const res = await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
       method: 'PUT',
       body: JSON.stringify(taskResource),
@@ -532,24 +525,6 @@ export async function anonymousActionEventHandler(
     return res
   } catch (error) {
     logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-export async function markEventAsRequestedForCorrectionHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const payload = await markBundleAsRequestedForCorrection(
-      request.payload as fhir.Bundle,
-      getToken(request)
-    )
-    return await postToHearth(payload)
-  } catch (error) {
-    logger.error(
-      `Workflow/markEventAsRequestedForCorrectionHandler: error: ${error}`
-    )
     throw new Error(error)
   }
 }

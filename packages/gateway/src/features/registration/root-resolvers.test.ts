@@ -242,7 +242,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -348,7 +348,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -455,7 +455,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -737,7 +737,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -909,7 +909,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -1290,7 +1290,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -1643,7 +1643,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
