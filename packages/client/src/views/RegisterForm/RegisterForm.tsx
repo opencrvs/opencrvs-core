@@ -679,6 +679,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     // see https://github.com/opencrvs/opencrvs-core/issues/5820
     if (informantTypeChanged) {
       let informant
+      let modifiedDeclaration = declaration
 
       if (declaration?.data?.informant?.informantType === 'MOTHER') {
         informant = 'mother'
@@ -686,18 +687,39 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'father'
       }
 
-      if (informant) {
-        this.props.modifyDeclaration({
-          ...declaration,
+      // informant needs to be reset as the relationship changed
+      // see https://github.com/opencrvs/opencrvs-core/issues/5866
+      if (
+        ['MOTHER', 'FATHER', 'BRIDE', 'GROOM'].includes(
+          prevProps.declaration?.data?.informant?.informantType as string
+        )
+      ) {
+        const { _fhirIDPatient, ...informantWithoutFhirID } =
+          declaration.data.informant
+        modifiedDeclaration = {
+          ...modifiedDeclaration,
           data: {
-            ...declaration.data,
+            ...modifiedDeclaration.data,
+            informant: {
+              ...informantWithoutFhirID
+            }
+          }
+        }
+      }
+
+      if (informant) {
+        modifiedDeclaration = {
+          ...modifiedDeclaration,
+          data: {
+            ...modifiedDeclaration.data,
             [informant]: {
-              ...declaration.data[informant],
+              ...modifiedDeclaration.data[informant],
               detailsExist: true
             }
           }
-        })
+        }
       }
+      this.props.modifyDeclaration(modifiedDeclaration)
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
