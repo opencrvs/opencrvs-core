@@ -10,7 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { FHIR_URL } from '../../constants'
+import { FHIR_URL } from '@gateway/constants'
+import { Bundle, BundleEntry, DocumentReference } from '@opencrvs/commons/types'
+
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class LocationsAPI extends RESTDataSource {
@@ -32,12 +34,12 @@ export default class LocationsAPI extends RESTDataSource {
     return this.get(`/${id}`)
   }
   async findBySubject(reference: `${string}/${string}`) {
-    const bundle: fhir.Bundle = await this.get(`/?subject=${reference}`)
+    const bundle: Bundle = await this.get(`/?subject=${reference}`)
     if (!bundle.entry) {
       return []
     }
     return bundle.entry.map(
-      (entry: fhir.BundleEntry) => entry.resource as fhir.DocumentReference
+      (entry: BundleEntry) => entry.resource as DocumentReference
     )
   }
 }

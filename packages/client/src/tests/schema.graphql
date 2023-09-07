@@ -1,6 +1,10 @@
-"""Exposes a URL that specifies the behaviour of this scalar."""
+"""
+Exposes a URL that specifies the behaviour of this scalar.
+"""
 directive @specifiedBy(
-  """The URL that specifies the behaviour of this scalar."""
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
   url: String!
 ) on SCALAR
 
@@ -957,7 +961,10 @@ input MedicalPractitionerInput {
   lastVisitDate: Date
 }
 
-union MixedTotalMetricsResult = TotalMetricsByRegistrar | TotalMetricsByLocation | TotalMetricsByTime
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
 
 type MonthWiseEstimationMetric {
   total: Int!
@@ -974,59 +981,135 @@ type Mutation {
   voidNotification(id: ID!): Notification
   requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
-  approveBirthRegistrationCorrection(id: ID!, details: BirthRegistrationInput!): ID!
-  approveDeathRegistrationCorrection(id: ID!, details: DeathRegistrationInput!): ID!
-  approveMarriageRegistrationCorrection(id: ID!, details: MarriageRegistrationInput!): ID!
-  createBirthRegistrationCorrection(id: ID!, details: BirthRegistrationInput!): ID!
-  createDeathRegistrationCorrection(id: ID!, details: DeathRegistrationInput!): ID!
-  createMarriageRegistrationCorrection(id: ID!, details: MarriageRegistrationInput!): ID!
+  approveBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  approveDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  approveMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+  createBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  createDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  createMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
+  markBirthAsVerified(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
-  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): BirthRegistration!
+  markBirthAsRegistered(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
-  markEventAsArchived(id: String!, reason: String, comment: String, duplicateTrackingId: String): ID!
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
+  markDeathAsVerified(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
-  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput!): DeathRegistration!
+  markDeathAsRegistered(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   markEventAsUnassigned(id: String!): ID!
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
-  markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): MarriageRegistration!
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
-  markEventAsDuplicate(id: String!, reason: String!, comment: String, duplicateTrackingId: String): ID!
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
-  activateUser(userId: String!, password: String!, securityQNAs: [SecurityQuestionAnswer]!): String
-  changePassword(userId: String!, existingPassword: String!, password: String!): String
-  changePhone(userId: String!, phoneNumber: String!, nonce: String!, verifyCode: String!): String
-  changeEmail(userId: String!, email: String!, nonce: String!, verifyCode: String!): String
+  activateUser(
+    userId: String!
+    password: String!
+    securityQNAs: [SecurityQuestionAnswer]!
+  ): String
+  changePassword(
+    userId: String!
+    existingPassword: String!
+    password: String!
+  ): String
+  changePhone(
+    userId: String!
+    phoneNumber: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
+  changeEmail(
+    userId: String!
+    email: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
   changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
-  auditUser(userId: String!, action: String!, reason: String!, comment: String): String
+  auditUser(
+    userId: String!
+    action: String!
+    reason: String!
+    comment: String
+  ): String
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
   updateRole(systemRole: SystemRoleInput): Response!
-  createOrUpdateCertificateSVG(certificateSVG: CertificateSVGInput!): CertificateSVG
-  updateApplicationConfig(applicationConfig: ApplicationConfigurationInput): ApplicationConfiguration
+  createOrUpdateCertificateSVG(
+    certificateSVG: CertificateSVGInput!
+  ): CertificateSVG
+  updateApplicationConfig(
+    applicationConfig: ApplicationConfigurationInput
+  ): ApplicationConfiguration
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
   updatePermissions(setting: UpdatePermissionsInput!): System
   deleteSystem(clientId: ID!): System
-  bookmarkAdvancedSearch(bookmarkSearchInput: BookmarkSearchInput!): BookMarkedSearches
-  removeBookmarkedAdvancedSearch(removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!): BookMarkedSearches
-  toggleInformantSMSNotification(smsNotifications: [SMSNotificationInput!]): [SMSNotification!]
+  bookmarkAdvancedSearch(
+    bookmarkSearchInput: BookmarkSearchInput!
+  ): BookMarkedSearches
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
+  ): BookMarkedSearches
+  toggleInformantSMSNotification(
+    smsNotifications: [SMSNotificationInput!]
+  ): [SMSNotification!]
 }
 
 type Notification {
@@ -1177,19 +1260,37 @@ input PersonInput {
 }
 
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
   searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
   fetchRegistrationForViewing(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
-  fetchRegistrationCountByStatus(status: [String]!, locationId: String, event: String): RegistrationCountResult
+  fetchRegistrationCountByStatus(
+    status: [String]!
+    locationId: String
+    event: String
+  ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
   locationsByParent(parentId: String, type: String): [Location]
@@ -1198,28 +1299,126 @@ type Query {
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
-  searchUsers(username: String, mobile: String, email: String, status: String, systemRole: String, primaryOfficeId: String, locationId: String, count: Int, skip: Int, sort: String): SearchUserResult
-  searchFieldAgents(locationId: String, primaryOfficeId: String, status: String, language: String, timeStart: String!, timeEnd: String!, event: String, count: Int, skip: Int, sort: String): SearchFieldAgentResult
+  searchUsers(
+    username: String
+    mobile: String
+    email: String
+    status: String
+    systemRole: String
+    primaryOfficeId: String
+    locationId: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchUserResult
+  searchFieldAgents(
+    locationId: String
+    primaryOfficeId: String
+    status: String
+    language: String
+    timeStart: String!
+    timeEnd: String!
+    event: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchFieldAgentResult
   verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
-  getTotalMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): TotalMetricsResult
-  getRegistrationsListByFilter(timeStart: String!, timeEnd: String!, locationId: String, event: String!, filterBy: String!, skip: Int!, size: Int!): MixedTotalMetricsResult
+  getTotalMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
   getVSExports: TotalVSExport
-  getTotalPayments(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [PaymentMetric!]
-  getTotalCertifications(timeStart: String!, timeEnd: String!, locationId: String): [CertificationMetric!]
-  getTotalCorrections(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [CorrectionMetric!]
-  getLocationStatistics(locationId: String, populationYear: Int!): LocationStatisticsResponse
-  getDeclarationsStartedMetrics(timeStart: String!, timeEnd: String!, locationId: String!): DeclarationsStartedMetrics
-  fetchMonthWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [MonthWiseEstimationMetric!]
-  fetchLocationWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [LocationWiseEstimationMetric!]
-  getUserAuditLog(practitionerId: String!, skip: Int, count: Int!, timeStart: String, timeEnd: String): UserAuditLogResultSet
-  searchEvents(userId: String, advancedSearchParameters: AdvancedSearchParametersInput!, count: Int, skip: Int, sort: String, sortColumn: String, sortBy: [SortBy!]): EventSearchResultSet
-  getEventsWithProgress(declarationJurisdictionId: String, registrationStatuses: [String], compositionType: [String], count: Int, skip: Int, sort: String): EventProgressResultSet
-  getSystemRoles(title: String, value: ComparisonInput, role: String, active: Boolean, sortBy: String, sortOrder: String): [SystemRole!]
+  getTotalPayments(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [PaymentMetric!]
+  getTotalCertifications(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+  ): [CertificationMetric!]
+  getTotalCorrections(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
+  getDeclarationsStartedMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+  ): DeclarationsStartedMetrics
+  fetchMonthWiseEventMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [MonthWiseEstimationMetric!]
+  fetchLocationWiseEventMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [LocationWiseEstimationMetric!]
+  getUserAuditLog(
+    practitionerId: String!
+    skip: Int
+    count: Int!
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
+  searchEvents(
+    userId: String
+    advancedSearchParameters: AdvancedSearchParametersInput!
+    count: Int
+    skip: Int
+    sort: String
+    sortColumn: String
+  ): EventSearchResultSet
+  getEventsWithProgress(
+    declarationJurisdictionId: String
+    registrationStatuses: [String]
+    compositionType: [String]
+    count: Int
+    skip: Int
+    sort: String
+  ): EventProgressResultSet
+  getSystemRoles(
+    title: String
+    value: ComparisonInput
+    role: String
+    active: Boolean
+    sortBy: String
+    sortOrder: String
+  ): [SystemRole!]
   getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   informantSMSNotifications: [SMSNotification!]
-  getOIDPUserInfo(code: String!, clientId: String!, redirectUri: String!, grantType: String): UserInfo
+  getOIDPUserInfo(
+    code: String!
+    clientId: String!
+    redirectUri: String!
+    grantType: String
+  ): UserInfo
 }
 
 type QuestionnaireQuestion {
@@ -1420,7 +1619,7 @@ input RelatedPersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String
@@ -1676,7 +1875,9 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
   data: AdditionalIdWithCompositionId!
 }
 
-union UserAuditLogResultItem = UserAuditLogItemWithComposition | UserAuditLogItem
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 type UserAuditLogResultSet {
   total: Int!
@@ -1739,4 +1940,3 @@ type WebhookPermission {
   event: String!
   permissions: [String!]!
 }
-

@@ -19,6 +19,7 @@ import {
   updateStatisticalExtensions
 } from './utils'
 import { v4 as uuid } from 'uuid'
+import { Bundle, BundleEntry } from '@opencrvs/commons/types'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -143,9 +144,9 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth<fhir.Bundle>(`/Location/${locationId}`)
+    response = await fetchFromHearth<Bundle>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth<fhir.Bundle>(`/Location${searchParam}`)
+    response = await fetchFromHearth<Bundle>(`/Location${searchParam}`)
   }
 
   response.link = response.link?.map((link) => ({
@@ -184,7 +185,7 @@ function batchLocationsHandler(locations: Location[]) {
           location.partOf
       }))
       .map(
-        (location): fhir.BundleEntry => ({
+        (location): BundleEntry => ({
           fullUrl: locationsMap.get(location.statisticalID)!.uid,
           resource: {
             ...composeFhirLocation(location),
@@ -206,7 +207,7 @@ export async function createLocationHandler(
     return batchLocationsHandler(request.payload as Location[])
   }
   const payload = request.payload as Location | Facility
-  const newLocation: fhir.Location = composeFhirLocation(payload)
+  const newLocation = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
   const locations = [

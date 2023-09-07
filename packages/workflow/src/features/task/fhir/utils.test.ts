@@ -23,6 +23,7 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { cloneDeep } from 'lodash'
+import { Task } from '@opencrvs/commons/types'
 
 const task = testFhirTaskBundle.entry[0].resource
 
@@ -72,7 +73,10 @@ describe('hasExtension()', () => {
       ]
     }
     expect(
-      hasExtension(taskWithReinstatedExtension, REINSTATED_EXTENSION_URL)
+      hasExtension(
+        taskWithReinstatedExtension as unknown as Task,
+        REINSTATED_EXTENSION_URL
+      )
     ).toBeTruthy()
   })
 })

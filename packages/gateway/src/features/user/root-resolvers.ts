@@ -292,7 +292,11 @@ export const resolvers: GQLResolver = {
 
         throw new UserInputError(errorResponse.message, {
           duplicateNotificationMethodError:
-            duplicateDataErrorMap[errorResponse['errorThrowingProperty']]
+            duplicateDataErrorMap[
+              errorResponse[
+                'errorThrowingProperty'
+              ] as keyof typeof duplicateDataErrorMap
+            ]
         })
       } else if (res.status !== 201) {
         return await Promise.reject(

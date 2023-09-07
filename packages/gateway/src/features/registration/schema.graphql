@@ -186,8 +186,33 @@ interface EventRegistration {
   createdAt: Date
 }
 
+input ObservationFHIRIDS {
+  maleDependentsOfDeceased: String
+  femaleDependentsOfDeceased: String
+  mannerOfDeath: String
+  deathDescription: String
+  causeOfDeathEstablished: String
+  causeOfDeathMethod: String
+  causeOfDeath: String
+  birthType: String
+  typeOfMarriage: String
+  weightAtBirth: String
+  attendantAtBirth: String
+  childrenBornAliveToMother: String
+  foetalDeathsToMother: String
+  lastPreviousLiveBirth: String
+}
+
+input FHIRIDMap {
+  composition: String
+  encounter: String
+  eventLocation: String
+  questionnaireResponse: String
+  observation: ObservationFHIRIDS
+}
+
 input BirthRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -229,7 +254,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
 }
 
 input DeathRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
@@ -278,7 +303,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
 }
 
 input MarriageRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   informant: RelatedPersonInput
   bride: PersonInput
