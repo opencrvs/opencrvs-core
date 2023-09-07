@@ -162,7 +162,6 @@ export function getComposition(bundle: Bundle) {
   if (!composition) {
     throw new Error('Composition not found in bundle')
   }
-
   return composition
 }
 
