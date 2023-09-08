@@ -5,6 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
+    "localforage": "^1.7.2",
     "@opencrvs/components": "^1.3.0-beta",
     "@sentry/react": "^7.12.1",
     "@sentry/tracing": "^7.12.1",
@@ -31,6 +32,7 @@
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
+    "lodash-es": "^4.17.0",
     "logrocket": "^0.6.19",
     "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0",

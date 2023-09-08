@@ -23,6 +23,9 @@
     "build": "rimraf build && tsc"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/minio": "^7.0.13",
+    "@types/uuid": "^3.4.3",
     "@elastic/elasticsearch": "7.17.0",
     "bcryptjs": "^2.4.3",
     "file-type": "^16.5.3",
@@ -31,6 +34,7 @@
     "lodash-es": "^4.17.21",
     "migrate-mongo": "^9.0.0",
     "minio": "^7.0.30",
+    "@types/lodash-es": "^4.17.0",
     "mongoose": "^6.6.1",
     "uuid": "^3.2.1"
   },
