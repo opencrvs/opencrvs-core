@@ -121,7 +121,9 @@ import {
   Task,
   TaskIdentifierSystemType,
   findExtension,
-  getComposition
+  getComposition,
+  markSaved,
+  replaceFromBundle
 } from '@opencrvs/commons/types'
 
 type StringReplace<
@@ -1051,7 +1053,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       femaleDependentsOfDeceased: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1063,7 +1066,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       mannerOfDeath: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1075,7 +1079,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       deathDescription: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1087,7 +1092,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathEstablished: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1099,7 +1105,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathMethod: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1111,7 +1118,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeath: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1123,7 +1131,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1135,7 +1144,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       typeOfMarriage: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1147,7 +1157,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       weightAtBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1159,7 +1170,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       attendantAtBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1171,7 +1183,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       childrenBornAliveToMother: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1183,7 +1196,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       foetalDeathsToMother: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1195,7 +1209,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       lastPreviousLiveBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1207,7 +1222,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        observation.id = fieldValue as string
+        const savedObservation = markSaved(observation, fieldValue)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       }
     },
     questionnaireResponse: (fhirBundle, fieldValue, context) => {
@@ -2645,10 +2661,12 @@ export const builders: IFieldBuilders = {
           context,
           ATTACHMENT_CONTEXT_KEY
         )
-        if (!docRef.content) {
+        if (!docRef.content?.[0]) {
           docRef.content = [
             {
-              attachment: {}
+              attachment: {
+                contentType: fieldValue
+              }
             }
           ]
         }
@@ -2662,10 +2680,12 @@ export const builders: IFieldBuilders = {
           context,
           ATTACHMENT_CONTEXT_KEY
         )
-        if (!docRef.content) {
+        if (!docRef.content?.[0]) {
           docRef.content = [
             {
-              attachment: {}
+              attachment: {
+                contentType: fieldValue
+              }
             }
           ]
         }
@@ -2700,10 +2720,12 @@ export const builders: IFieldBuilders = {
           context,
           ATTACHMENT_CONTEXT_KEY
         )
-        if (!docRef.content) {
+        if (!docRef.content?.[0]) {
           docRef.content = [
             {
-              attachment: {}
+              attachment: {
+                contentType: fieldValue
+              }
             }
           ]
         }
@@ -3054,11 +3076,12 @@ export const builders: IFieldBuilders = {
           )
           fieldValue = docUploadResponse
         }
-        if (!certDocResource.content) {
+        if (!certDocResource.content?.[0]) {
           certDocResource.content = [
             {
               attachment: {
-                contentType: 'application/pdf'
+                contentType: 'application/pdf',
+                data: fieldValue
               }
             }
           ]
@@ -3414,7 +3437,7 @@ export async function buildFHIRBundle(
     | GQLMarriageRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
-) {
+): Promise<Bundle> {
   const ref = uuid()
   const context = {
     _index: {},
@@ -3423,8 +3446,8 @@ export async function buildFHIRBundle(
   }
   const composition = createCompositionTemplate(ref, context)
   const fhirBundle = {
-    resourceType: 'Bundle',
-    type: 'document',
+    resourceType: 'Bundle' as const,
+    type: 'document' as const,
     entry: [composition]
   }
 
