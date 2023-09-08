@@ -219,8 +219,10 @@ export function selectOrCreateObservationResource(
   observationDescription: string,
   fhirBundle: Bundle,
   context: any
-): Observation {
-  let observation = fhirBundle.entry
+): Observation | UnsavedResource<Observation> {
+  let observation: Observation | UnsavedResource<Observation> | undefined
+
+  observation = fhirBundle.entry
     .map(({ resource }) => resource)
     .filter(isObservation)
     .find((entry) => {
@@ -249,12 +251,12 @@ export function selectOrCreateObservationResource(
 }
 
 export function updateObservationInfo(
-  observation: Observation,
+  observation: UnsavedResource<Observation>,
   categoryCode: string,
   categoryDescription: string,
   observationCode: string,
   observationDescription: string
-): Observation {
+): UnsavedResource<Observation> {
   const categoryCoding = {
     coding: [
       {
@@ -336,7 +338,7 @@ export function createObservationResource(
   sectionCode: string,
   fhirBundle: Bundle,
   context: any
-): Observation {
+): UnsavedResource<Observation> | Observation {
   const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
@@ -548,7 +550,7 @@ export function selectOrCreateCertificateDocRefResource(
     context,
     certificate.indexKey
   )
-  if (!docRef.type) {
+  if (!docRef.type?.coding) {
     docRef.type = {
       coding: [
         {
@@ -1440,19 +1442,6 @@ export function getIDFromResponse(resBody: Bundle): string {
   }
   // return the Composition's id
   return resBody.entry[0].response.location.split('/')[3]
-}
-
-export function isTaskResponse(resBody: Bundle): boolean {
-  if (
-    !resBody ||
-    !resBody.entry ||
-    !resBody.entry[0] ||
-    !resBody.entry[0].response ||
-    !resBody.entry[0].response.location
-  ) {
-    throw new Error(`FHIR did not send a valid response`)
-  }
-  return resBody.entry[0].response.location.indexOf('Task') > -1
 }
 
 export function setInformantReference(

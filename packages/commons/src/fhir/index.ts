@@ -15,7 +15,11 @@ export type WithStrictExtensions<T extends Resource> = Omit<T, 'extension'> & {
   extension?: Array<Extension>
 }
 
+/*
+ * Unsaved resource is a resource that has just been created and does not have an id yet
+ */
 export type UnsavedResource<T extends Resource> = Omit<T, 'id'>
+
 export type Saved<T> = Omit<T, 'id'> & {
   id: string
 }
@@ -138,12 +142,12 @@ export function isObservation(resource: Resource): resource is Observation {
 export function getComposition(bundle: Bundle) {
   const composition = bundle.entry
     .map(({ resource }) => resource)
-    .filter(isComposition)
-    .find((resource) => resource.id)
+    .find(isComposition)
 
   if (!composition) {
     throw new Error('Composition not found in bundle')
   }
+
   return composition
 }
 
@@ -165,3 +169,13 @@ export type EncounterParticipant = fhir3.EncounterParticipant
 type ItemType<T> = T extends Array<infer U> ? U : never
 export type TelecomSystem = ItemType<Patient['telecom']>['system']
 export type CodeableConcept = fhir3.CodeableConcept
+
+export function markSaved<T extends Resource>(
+  resource: T,
+  id: string
+): Saved<T> {
+  return {
+    ...resource,
+    id
+  }
+}

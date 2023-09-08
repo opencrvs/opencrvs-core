@@ -13,6 +13,7 @@ import {
   EVENT_TYPE
 } from '@gateway/features/fhir/constants'
 import {
+  BundleEntry,
   CodeableConcept,
   Composition,
   DocumentReference,
@@ -25,6 +26,7 @@ import {
   Reference,
   RelatedPerson,
   Task,
+  Unsaved,
   UnsavedResource
 } from '@opencrvs/commons/types'
 
@@ -273,23 +275,32 @@ export function updateTaskTemplate(
   return task
 }
 
-export function createPersonEntryTemplate(refUuid: string) {
+export function createPersonEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Patient>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Patient',
-      active: true
-    } as Patient
+      extension: [],
+      active: true,
+      name: []
+    }
   }
 }
 
-export function createPractitionerEntryTemplate(refUuid: string) {
+export function createPractitionerEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Practitioner>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Practitioner',
-      active: true
-    } as Practitioner
+      extension: [],
+      active: true,
+      name: [],
+      telecom: []
+    }
   }
 }
 
@@ -312,7 +323,9 @@ export function createSupportingDocumentsSection(
   }
 }
 
-export function createDocRefTemplate(refUuid: string) {
+export function createDocRefTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<DocumentReference>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -321,18 +334,25 @@ export function createDocRefTemplate(refUuid: string) {
         system: 'urn:ietf:rfc:3986',
         value: refUuid
       },
+      extension: [],
+      type: {},
+      content: [],
       status: 'current'
-    } as DocumentReference
+    }
   }
 }
 
-export function createObservationEntryTemplate(refUuid: string) {
+export function createObservationEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Observation>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Observation',
-      status: 'final'
-    } as Observation
+      extension: [],
+      status: 'final',
+      code: {}
+    }
   }
 }
 
@@ -341,6 +361,7 @@ export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Task',
+      extension: [],
       status: 'ready',
       code: {
         coding: [
@@ -358,6 +379,7 @@ export function createQuestionnaireResponseTemplate(refUuid: string) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'QuestionnaireResponse',
+      extension: [],
       status: 'completed'
     } as QuestionnaireResponse
   }

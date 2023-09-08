@@ -11,6 +11,7 @@ import {
   PaymentReconciliation,
   Practitioner,
   RelatedPerson,
+  Resource,
   Task,
   getBusinessStatus,
   getTaskFromBundle,
@@ -129,4 +130,17 @@ export function getTrackingId(record: ValidRecord) {
   }
 
   return identifier.value
+}
+
+export function replaceFromBundle(
+  bundle: Bundle,
+  resource: Resource,
+  newResource: Resource
+) {
+  return {
+    ...bundle,
+    entry: bundle.entry.map((entry) =>
+      entry.resource === resource ? { ...entry, resource: newResource } : entry
+    )
+  }
 }
