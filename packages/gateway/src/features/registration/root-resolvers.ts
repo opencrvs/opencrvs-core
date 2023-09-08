@@ -63,7 +63,8 @@ import {
   Composition,
   Extension,
   Patient,
-  Task
+  Task,
+  isComposition
 } from '@opencrvs/commons/types'
 
 async function getAnonymousToken() {
@@ -760,8 +761,9 @@ async function createEventRegistration(
    */
   const hasDuplicates = Boolean(
     doc.entry
-      .find((entry) => entry.resource.resourceType === 'Composition')
-      ?.resource?.extension?.find(
+      .map((entry) => entry.resource)
+      .find(isComposition)
+      ?.extension?.find(
         (ext) =>
           ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
           ext.valueBoolean
