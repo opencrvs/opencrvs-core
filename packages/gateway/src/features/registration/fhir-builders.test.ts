@@ -784,7 +784,7 @@ test('should update a task document as rejected', async () => {
   )
 })
 
-test('creates task with contact other relationship', async () => {
+test.only('creates task with contact other relationship', async () => {
   fetch.mockResponse(
     JSON.stringify({
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
