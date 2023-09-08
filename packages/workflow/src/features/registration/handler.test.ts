@@ -1508,7 +1508,7 @@ describe('Register handler', () => {
 
 describe('populateCompositionWithID', () => {
   it('Populates payload with response ID and response encounter ID for DECLARED status', () => {
-    const payload = {
+    const payload: Bundle = {
       resourceType: 'Bundle',
       type: 'document',
       entry: [
@@ -1800,7 +1800,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad',
           resource: {
             resourceType: 'Observation',
-            status: 'final',
+            status: 'signed',
             context: {
               reference: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd'
             },
@@ -2546,7 +2546,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
-    } as Bundle
+    }
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2609,7 +2609,7 @@ describe('populateCompositionWithID', () => {
       ],
       type: 'transaction-response'
     } as Bundle
-    populateCompositionWithID(payload, response)
+    populateCompositionWithID(payload as any, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',
       type: 'document',

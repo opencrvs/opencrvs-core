@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { badRequest, conflict, notFound } from '@hapi/boom'
+import { badRequest, conflict } from '@hapi/boom'
 import {
   Bundle,
   CertifiedRecord,
@@ -44,7 +44,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { RecordNotFoundError, getRecordById } from '@workflow/records'
+import { getRecordById } from '@workflow/records'
 import { getAuthHeader } from '@opencrvs/commons'
 import { Request } from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -230,9 +230,11 @@ export const routes = [
       await createNewAuditEvent(recordInCorrectedState, token)
       await indexBundle(recordInCorrectedState, token)
 
-      const updatedRecord = await getRecordById(request.params.recordId, [
-        'REGISTERED'
-      ])
+      const updatedRecord = await getRecordById(
+        request.params.recordId,
+        request.headers.authorization,
+        ['REGISTERED']
+      )
 
       return updatedRecord
     }
@@ -310,9 +312,11 @@ export const routes = [
        * The reason we're just not returning recordWithOnlyTheNewTask is that it might contain new FHIR resources with temporary IDs
        */
 
-      const updatedRecord = await getRecordById(request.params.recordId, [
-        'REGISTERED'
-      ])
+      const updatedRecord = await getRecordById(
+        request.params.recordId,
+        request.headers.authorization,
+        ['REGISTERED']
+      )
 
       return updatedRecord
     }
@@ -327,19 +331,12 @@ if (process.env.NODE_ENV !== 'production') {
       auth: false
     },
     handler: async (request: Request): Promise<Bundle | void> => {
-      try {
-        const record = await getRecordById(request.params.recordId, [
-          'REGISTERED',
-          'CERTIFIED',
-          'ISSUED',
-          'CORRECTION_REQUESTED'
-        ])
-        return record
-      } catch (error) {
-        if (error instanceof RecordNotFoundError) {
-          throw notFound(error.message)
-        }
-      }
+      const record = await getRecordById(
+        request.params.recordId,
+        request.headers.authorization,
+        ['REGISTERED', 'CERTIFIED', 'ISSUED', 'CORRECTION_REQUESTED']
+      )
+      return record
     }
   })
 }

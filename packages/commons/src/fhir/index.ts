@@ -193,3 +193,22 @@ export function markSaved<T extends Resource>(
     id
   }
 }
+
+export function findFromBundleById(
+  bundle: Bundle,
+  id: string
+): BundleEntryWithFullUrl {
+  const resource = bundle.entry?.find((item) => item.resource?.id === id)
+
+  if (!resource) {
+    throw new Error('Resource not found in bundle with id ' + id)
+  }
+
+  if (!resource.fullUrl) {
+    throw new Error(
+      'A resource was found but it did not have a fullUrl. This should not happen.'
+    )
+  }
+
+  return resource as BundleEntryWithFullUrl
+}
