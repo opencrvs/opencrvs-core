@@ -30,6 +30,7 @@ import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
+/** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -175,6 +176,7 @@ export const userTransformer =
       } as IFormSectionData
     }
   }
+/** @deprecated Use userTransformer instead */
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
