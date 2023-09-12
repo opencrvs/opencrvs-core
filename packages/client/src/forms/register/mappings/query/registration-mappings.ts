@@ -290,3 +290,35 @@ export const QRCodeTransformer = async (
       )}`
     )
 }
+
+export const trackingIDTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  if (!_.registration?.trackingId) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'trackingId'
+  ] = !_.registration?.trackingId
+}
+
+export const commentsTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  if (!_.history) {
+    return
+  }
+
+  transformedData[targetSectionId || sectionId][targetFieldName || 'comments'] =
+    !_.history.reverse()[0].comments.toString()
+}
