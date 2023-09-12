@@ -145,7 +145,7 @@ const getUserSignature = (history: History): string => {
 }
 
 export const userTransformer =
-  (status: RegStatus) =>
+  (statuses: RegStatus[]) =>
   (
     transformedData: IFormData,
     _: any,
@@ -161,7 +161,7 @@ export const userTransformer =
       .reverse()
       .find(
         ({ action, regStatus }: History) =>
-          !action && regStatus && regStatus === status
+          !action && regStatus && statuses.includes(regStatus)
       )
 
     if (history) {
