@@ -370,12 +370,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       })
     }
-    searchTypeList.push({
-      label: intl.formatMessage(messages.email),
-      value: EMAIL,
-      icon: <Icon name="Envelope" size="small" />,
-      placeHolderText: intl.formatMessage(messages.placeHolderEmail)
-    })
+    if (fieldNames.includes('registrationEmail')) {
+      searchTypeList.push({
+        label: intl.formatMessage(messages.email),
+        value: EMAIL,
+        icon: <Icon name="Envelope" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
+      })
+    }
 
     const navigationList: INavigationType[] = [
       {
