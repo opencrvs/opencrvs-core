@@ -12,6 +12,7 @@
 
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -549,7 +550,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
 async function fetchDuplicateDeclarations(id: string) {
   return (
     client &&
-    client.query({
+    client.query<FetchViewRecordByCompositionQuery>({
       query: FETCH_VIEW_RECORD_BY_COMPOSITION,
       variables: { id },
       fetchPolicy: 'network-only'
