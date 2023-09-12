@@ -153,11 +153,68 @@ const transformRegistrationCorrection = (
     })
   }
 }
+
+export function addCorrectionDetails(
+  formDefinition: IForm,
+  declaration: IDeclaration,
+  transformedData: TransformedData,
+  offlineCountryConfig?: IOfflineData
+) {
+  const draftData = declaration.data
+  const originalDraftData = declaration.originalData || {}
+
+  if (!formDefinition.sections) {
+    throw new Error('Sections are missing in form definition')
+  }
+
+  formDefinition.sections.forEach((section) => {
+    if (!draftData[section.id]) {
+      return
+    }
+
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      draftData[section.id],
+      draftData
+    ).forEach((groupDef) => {
+      groupDef.fields.forEach((fieldDef) => {
+        const conditionalActions: string[] = getConditionalActionsForField(
+          fieldDef,
+          draftData[section.id],
+          offlineCountryConfig,
+          draftData
+        )
+
+        if (Object.keys(originalDraftData).length) {
+          if (
+            !conditionalActions.includes('hide') &&
+            !conditionalActions.includes('disable') &&
+            hasFieldChanged(
+              fieldDef,
+              draftData[section.id],
+              originalDraftData[section.id]
+            )
+          ) {
+            transformRegistrationCorrection(
+              section,
+              fieldDef,
+              draftData,
+              originalDraftData,
+              transformedData
+            )
+          }
+        }
+      })
+    })
+  })
+
+  return transformedData
+}
+
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {},
   offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
@@ -201,25 +258,6 @@ export const draftToGqlTransformer = (
             `${section.id}/${groupDef.id}/${fieldDef.name}`
           )
           return
-        }
-        if (Object.keys(originalDraftData).length) {
-          if (
-            !conditionalActions.includes('hide') &&
-            !conditionalActions.includes('disable') &&
-            hasFieldChanged(
-              fieldDef,
-              draftData[section.id],
-              originalDraftData[section.id]
-            )
-          ) {
-            transformRegistrationCorrection(
-              section,
-              fieldDef,
-              draftData,
-              originalDraftData,
-              transformedData
-            )
-          }
         }
 
         if (

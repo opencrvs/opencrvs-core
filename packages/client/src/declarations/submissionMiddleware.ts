@@ -27,6 +27,7 @@ import {
 } from '@client/notification/actions'
 import { IStoreState } from '@client/store'
 import {
+  addCorrectionDetails,
   appendGqlMetadataFromDraft,
   draftToGqlTransformer
 } from '@client/transformer'
@@ -83,7 +84,6 @@ function getGqlDetails(
     form,
     draft.data,
     draft.id,
-    draft.originalData,
     offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
@@ -104,6 +104,15 @@ function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
     systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
+}
+
+function isCorrectionAction(action: SubmissionAction) {
+  return [
+    SubmissionAction.REQUEST_CORRECTION,
+    SubmissionAction.MAKE_CORRECTION,
+    SubmissionAction.APPROVE_CORRECTION,
+    SubmissionAction.REJECT_CORRECTION
+  ].includes(action)
 }
 
 async function removeDuplicatesFromCompositionAndElastic(
@@ -153,11 +162,18 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       }
     }
 
-    const gqlDetails = getGqlDetails(
-      getRegisterForm(getState())[event],
-      declaration,
-      getOfflineData(getState())
-    )
+    const form = getRegisterForm(getState())[event]
+    const offlineData = getOfflineData(getState())
+    let graphqlPayload = getGqlDetails(form, declaration, offlineData)
+
+    if (isCorrectionAction(submissionAction)) {
+      graphqlPayload = addCorrectionDetails(
+        form,
+        declaration,
+        graphqlPayload,
+        offlineData
+      )
+    }
 
     //then add payment while issue declaration
     if (payments) {
@@ -184,7 +200,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         const response = await client.mutate({
           mutation,
           variables: {
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
 
@@ -209,7 +225,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails.registration.correction
+            details: graphqlPayload.registration.correction
           }
         })
       } else if (
@@ -244,7 +260,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
         //delete data from certificates to identify event in workflow for markEventAsIssued
@@ -265,7 +281,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
       }
