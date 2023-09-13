@@ -153,16 +153,16 @@ export const userTransformer =
   (...statuses: RegStatus[]) =>
   (
     transformedData: IFormData,
-    _: EventRegistration,
+    event: EventRegistration,
     sectionId: string,
     targetSectionId?: string,
     targetFieldName?: string,
-    __?: IOfflineData
+    offlineData?: IOfflineData
   ) => {
-    if (!_.history) {
+    if (!event.history) {
       return
     }
-    const history = [...(_.history as History[])]
+    const history = [...(event.history as History[])]
       .reverse()
       .find(
         ({ action, regStatus }: History) =>
@@ -171,13 +171,13 @@ export const userTransformer =
 
     if (history) {
       const district = history.location?.id
-        ? __?.locations?.[history.location.id]
+        ? offlineData?.locations?.[history.location.id]
         : null
       const state = district
-        ? __?.locations?.[district.partOf.split('/')[1]]
+        ? offlineData?.locations?.[district.partOf.split('/')[1]]
         : null
       const province = state
-        ? __?.locations?.[state.partOf.split('/')[1]]
+        ? offlineData?.locations?.[state.partOf.split('/')[1]]
         : null
       transformedData[targetSectionId || sectionId][
         targetFieldName || 'registrar'
@@ -185,6 +185,7 @@ export const userTransformer =
         name: getUserFullName(history),
         role: getUserRole(history),
         office: history.office,
+        date: history.date,
         district,
         state,
         province,
