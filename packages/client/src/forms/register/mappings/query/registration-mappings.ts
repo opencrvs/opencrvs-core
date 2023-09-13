@@ -188,7 +188,8 @@ export const userTransformer =
         district,
         state,
         province,
-        signature: getUserSignature(history)
+        signature: getUserSignature(history),
+        comments: history.comments?.toString()
       } as IFormSectionData
     }
   }
@@ -323,20 +324,4 @@ export const trackingIDTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'trackingId'
   ] = !_.registration?.trackingId
-}
-
-export const commentsTransformer = (
-  transformedData: IFormData,
-  _: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string,
-  __?: IOfflineData
-) => {
-  if (!_.history) {
-    return
-  }
-
-  transformedData[targetSectionId || sectionId][targetFieldName || 'comments'] =
-    !_.history.reverse()[0].comments.toString()
 }
