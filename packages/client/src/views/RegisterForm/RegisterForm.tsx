@@ -1072,6 +1072,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             nextSectionGroup && (
                               <Button
                                 id="next_section"
+                                key="next_section"
                                 type="primary"
                                 size="large"
                                 onClick={() => {
@@ -1093,6 +1094,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             declaration.review && (
                               <Button
                                 id="back-to-review-button"
+                                key="back-to-review-button"
                                 type="secondary"
                                 size="large"
                                 className="item"
