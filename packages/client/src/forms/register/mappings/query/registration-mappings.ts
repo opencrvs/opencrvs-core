@@ -150,7 +150,7 @@ const getUserSignature = (history: History): string => {
 }
 
 export const userTransformer =
-  (statuses: RegStatus[]) =>
+  (...statuses: RegStatus[]) =>
   (
     transformedData: IFormData,
     _: EventRegistration,
