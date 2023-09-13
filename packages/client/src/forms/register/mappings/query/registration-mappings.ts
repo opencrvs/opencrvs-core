@@ -22,7 +22,12 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { History, RegStatus } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLEventRegistration,
+  GQLHistory,
+  GQLRegStatus,
+  GQLRegWorkflow
+} from '@opencrvs/gateway/src/graphql/schema'
 import { get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
@@ -127,11 +132,11 @@ export const localPhoneTransformer =
     return transformedData
   }
 
-const getUserFullName = (history: History): string => {
+const getUserFullName = (history: GQLHistory): string => {
   return history?.user ? getUserName(history.user) : ''
 }
 
-const getUserRole = (history: History): MessageDescriptor => {
+const getUserRole = (history: GQLHistory): MessageDescriptor => {
   return (
     (history?.user && userMessages[history.user.systemRole]) || {
       defaultMessage: ' ',
@@ -141,15 +146,15 @@ const getUserRole = (history: History): MessageDescriptor => {
   )
 }
 
-const getUserSignature = (history: History): string => {
+const getUserSignature = (history: GQLHistory): string => {
   return history?.signature?.data as string
 }
 
 export const userTransformer =
-  (statuses: RegStatus[]) =>
+  (statuses: GQLRegStatus[]) =>
   (
     transformedData: IFormData,
-    _: any,
+    _: GQLEventRegistration,
     sectionId: string,
     targetSectionId?: string,
     targetFieldName?: string,
@@ -158,10 +163,10 @@ export const userTransformer =
     if (!_.history) {
       return
     }
-    const history: History = [..._.history]
+    const history = [...(_.history as GQLHistory[])]
       .reverse()
       .find(
-        ({ action, regStatus }: History) =>
+        ({ action, regStatus }: GQLHistory) =>
           !action && regStatus && statuses.includes(regStatus)
       )
 
