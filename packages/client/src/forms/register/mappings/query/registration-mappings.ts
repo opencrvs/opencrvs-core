@@ -166,12 +166,24 @@ export const userTransformer =
       )
 
     if (history) {
+      const district = history.location?.id
+        ? __?.locations?.[history.location.id]
+        : null
+      const state = district
+        ? __?.locations?.[district.partOf.split('/')[1]]
+        : null
+      const province = state
+        ? __?.locations?.[state.partOf.split('/')[1]]
+        : null
       transformedData[targetSectionId || sectionId][
         targetFieldName || 'registrar'
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
         office: history?.office,
+        district,
+        state,
+        province,
         signature: getUserSignature(history)
       } as IFormSectionData
     }
