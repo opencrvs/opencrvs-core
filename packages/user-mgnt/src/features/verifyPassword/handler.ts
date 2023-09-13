@@ -12,9 +12,8 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-
 import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
-import { generateHash } from '@user-mgnt/utils/hash'
+import { generateHash, generateOldHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   username: string
@@ -50,7 +49,7 @@ export default async function verifyPassHandler(
    * TODO: In OpenCRVS 1.4, remove this check and force any users without new password hash to reset their password via sys admin.
    */
   if (!user.passwordHash) {
-    if (generateHash(password, user.salt) !== user.oldPasswordHash) {
+    if (generateOldHash(password, user.salt) !== user.oldPasswordHash) {
       throw unauthorized()
     }
   } else if (generateHash(password, user.salt) !== user.passwordHash) {

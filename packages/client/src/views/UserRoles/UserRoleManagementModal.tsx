@@ -221,7 +221,7 @@ export function UserRoleManagementModal(props: IProps) {
                   setActives(new Array(userRoles.length).fill(true))
                 }
               />
-              {actives[index] && (
+              {actives[index] && !item._id && (
                 <Button
                   id="editButton"
                   type="icon"

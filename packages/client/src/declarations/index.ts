@@ -1048,10 +1048,24 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data)
       }
+      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
+        data.data
+      )
+
+      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
+        .map(
+          (declaration) =>
+            declaration.data.fetchRegistrationForViewing?.registration
+        )
+        .flatMap((registration) => registration?.attachments)
+        .map((attachment) => attachment?.data)
+        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
         ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data)
+        ...getProfileIconUrls(data.data),
+        ...allduplicateDeclarationsAttachments
       ]
 
       await Promise.all(
