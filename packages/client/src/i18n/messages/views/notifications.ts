@@ -35,6 +35,7 @@ interface INotificationsMessages
   statusWaitingToIssue: MessageDescriptor
   userAuditSuccess: MessageDescriptor
   userFormFail: MessageDescriptor
+  userFormFailForOffline: MessageDescriptor
   userFormSuccess: MessageDescriptor
   userFormUpdateSuccess: MessageDescriptor
   waitingToRetry: MessageDescriptor
@@ -174,6 +175,12 @@ const messagesToDefine: INotificationsMessages = {
     description:
       'The message that appears in notification when a new user creation fails',
     id: 'misc.notif.sorryError'
+  },
+  userFormFailForOffline: {
+    defaultMessage: 'Offline. Try again when reconnected',
+    description:
+      'The message that appears in notification when a new user creation fails in offline mode',
+    id: 'misc.notif.offlineError'
   },
   userFormSuccess: {
     defaultMessage: 'New user created',

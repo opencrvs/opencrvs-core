@@ -136,9 +136,16 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 const Title = styled.div<{ titleOverflow?: boolean }>`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
-  overflow: ${(props) => (props.titleOverflow ? 'auto' : 'hidden')};
-  overflow-y: ${(props) => (props.titleOverflow ? 'hidden' : '')};
-  text-overflow: ${(props) => (props.titleOverflow ? '' : 'ellipsis')};
+  ${({ titleOverflow }) =>
+    titleOverflow
+      ? `
+        overflow: auto;
+        overflow-y: hidden;
+      `
+      : `
+        overflow: hidden;
+        text-overflow: ellipsis;
+      `}
   white-space: nowrap;
 `
 const Icon = styled.div`

@@ -508,7 +508,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
-  customQuesstionMappingId?: string
+  customQuestionMappingId?: string
   ignoreMediaQuery?: boolean
 }
 

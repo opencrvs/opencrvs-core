@@ -234,6 +234,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.continueButtonLabel)}
                 </Button>
               ]}
+              showTitleOnMobile
             >
               <Actions id="phone-or-email-verification">
                 <InputField

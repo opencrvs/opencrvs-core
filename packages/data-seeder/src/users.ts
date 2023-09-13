@@ -17,38 +17,34 @@ import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
 
+const WithoutContact = z.object({
+  primaryOfficeId: z.string(),
+  givenNames: z.string(),
+  familyName: z.string(),
+  systemRole: z.enum([
+    'FIELD_AGENT',
+    'REGISTRATION_AGENT',
+    'LOCAL_REGISTRAR',
+    'LOCAL_SYSTEM_ADMIN',
+    'NATIONAL_SYSTEM_ADMIN',
+    'PERFORMANCE_MANAGEMENT',
+    'NATIONAL_REGISTRAR'
+  ]),
+  role: z.string(),
+  username: z.string(),
+  password: z.string()
+})
+
 const UserSchema = z.array(
-  z.object({
-    primaryOfficeId: z.string(),
-    givenNames: z.string(),
-    familyName: z.string(),
-    systemRole: z.enum([
-      'FIELD_AGENT',
-      'REGISTRATION_AGENT',
-      'LOCAL_REGISTRAR',
-      'LOCAL_SYSTEM_ADMIN',
-      'NATIONAL_SYSTEM_ADMIN',
-      'PERFORMANCE_MANAGEMENT',
-      'NATIONAL_REGISTRAR'
-    ]),
-    role: z.enum([
-      'Field Agent',
-      'Police Officer',
-      'Local Leader',
-      'Social Worker',
-      'Healthcare Worker',
-      'Registration Agent',
-      'Local Registrar',
-      'Local System Admin',
-      'National System Admin',
-      'Performance Manager',
-      'National Registrar'
-    ]),
-    username: z.string(),
+  WithoutContact.extend({
     mobile: z.string(),
-    email: z.string().email(),
-    password: z.string()
-  })
+    email: z.string().email().optional()
+  }).or(
+    WithoutContact.extend({
+      email: z.string().email(),
+      mobile: z.string().optional()
+    })
+  )
 )
 
 const searchUserQuery = print(gql`

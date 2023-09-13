@@ -370,6 +370,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             title={
               (formGroup.title && intl.formatMessage(formGroup.title)) || ''
             }
+            showTitleOnMobile
           >
             {showError && (
               <ErrorWrapper>
