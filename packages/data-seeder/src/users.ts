@@ -170,7 +170,8 @@ export async function seedUsers(
           }
         ],
         ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
-        primaryOffice
+        primaryOffice,
+        username
       }
       const res = await fetch(`${GATEWAY_HOST}/graphql`, {
         method: 'POST',
