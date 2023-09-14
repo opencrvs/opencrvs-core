@@ -70,6 +70,7 @@ import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
+import { UserDetails } from '@client/utils/userUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -285,12 +286,14 @@ export function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
     declaration.data[fromSection.id] || {},
-    declaration.data
+    declaration.data,
+    userDetails
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
@@ -303,7 +306,8 @@ export function getNextSectionIds(
         getVisibleSectionGroupsBasedOnConditions(
           section,
           declaration.data[fromSection.id] || {},
-          declaration.data
+          declaration.data,
+          userDetails
         ).length > 0
     )
 
@@ -547,7 +551,8 @@ export const getConditionalActionsForField = (
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
   sectionData: IFormSectionData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData

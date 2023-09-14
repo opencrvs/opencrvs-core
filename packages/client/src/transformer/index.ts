@@ -157,12 +157,14 @@ export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
+  userDetails?: UserDetails | null,
   originalDraftData: IFormData = {},
   offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
+
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
@@ -175,7 +177,8 @@ export const draftToGqlTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       draftData[section.id],
-      draftData
+      draftData,
+      userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
@@ -318,7 +321,8 @@ export const gqlToDraftTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       queryData[section.id] || {},
-      queryData
+      queryData,
+      userDetails
     )
   )
   visibleSections.forEach((section) => {

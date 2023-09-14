@@ -18,14 +18,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, {
-  isNull,
-  isUndefined,
-  merge,
-  flatten,
-  isEqual,
-  cloneDeep
-} from 'lodash'
+import _, { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -184,6 +177,7 @@ type Props = {
   activeSectionGroup: IFormSectionGroup
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
+  userDetails: UserDetails | null
   scope: Scope | null
 }
 
@@ -962,14 +956,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       duplicate,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      userDetails
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,
       activeSectionGroup,
-      declaration
+      declaration,
+      userDetails
     )
 
     const isErrorOccured = this.state.hasError
@@ -1010,6 +1006,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft={declaration}
                   submitClickEvent={this.confirmSubmission}
                   onChangeReviewForm={this.modifyDeclaration}
+                  userDetails={userDetails}
                 />
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
@@ -1029,6 +1026,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      userDetails={userDetails}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,
@@ -1271,12 +1269,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
 function firstVisibleGroup(
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
 ): IFormSectionGroup | undefined {
   return getVisibleSectionGroupsBasedOnConditions(
     section,
     declaration.data[section.id] || {},
-    declaration.data
+    declaration.data,
+    userDetails
   )[0]
 }
 
@@ -1284,7 +1284,8 @@ function getValidSectionGroup(
   sections: IFormSection[],
   declaration: IDeclaration,
   sectionId: string,
-  groupId?: string
+  groupId?: string,
+  userDetails?: UserDetails | null
 ): {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
@@ -1298,14 +1299,16 @@ function getValidSectionGroup(
 
   const currentGroup = groupId
     ? currentSection.groups.find((group) => group.id === groupId)
-    : firstVisibleGroup(currentSection, declaration)
+    : firstVisibleGroup(currentSection, declaration, userDetails)
 
   const sectionIndex = sections.findIndex((sec) => sec.id === currentSection.id)
   if (!currentGroup) {
     return getValidSectionGroup(
       sections,
       declaration,
-      sections[sectionIndex + 1].id
+      sections[sectionIndex + 1].id,
+      undefined,
+      userDetails
     )
   }
   return {
@@ -1360,13 +1363,14 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
   const sectionId =
     match.params.pageId || firstVisibleSection(registerForm.sections).id
-
+  const userDetails = getUserDetails(state)
   const groupId = match.params.groupId
   const { activeSection, activeSectionGroup } = getValidSectionGroup(
     registerForm.sections,
     declaration,
     sectionId,
-    groupId
+    groupId,
+    userDetails
   )
 
   if (!activeSectionGroup) {
@@ -1388,7 +1392,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     activeSectionGroup.fields,
     declaration.data[activeSection.id] || {},
     declaration.data,
-    getUserDetails(state)
+    userDetails
   )
 
   let updatedFields: IFormField[] = []
@@ -1407,7 +1411,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     },
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
-    scope: getScope(state)
+    scope: getScope(state),
+    userDetails
   }
 }
 

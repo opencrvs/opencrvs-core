@@ -94,8 +94,7 @@ export default async function createUser(
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
-
-    user.username = await generateUsername(user.name)
+    user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
