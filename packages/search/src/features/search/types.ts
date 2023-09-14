@@ -43,6 +43,7 @@ export interface IAdvancedSearchParam {
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  childIdentifier?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
