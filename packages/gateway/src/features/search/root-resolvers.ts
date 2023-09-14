@@ -128,8 +128,16 @@ export const resolvers: GQLResolver = {
         }
 
         return {
-          totalItems: searchResult.body.hits.total.value ?? 0,
-          results: searchResult.body.hits.hits ?? []
+          totalItems:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.total.value) ||
+            0,
+          results:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.hits) ||
+            []
         }
       } else {
         const hasAtLeastOneParam = Object.values(advancedSearchParameters).some(
