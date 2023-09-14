@@ -47,6 +47,7 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { UserDetails } from '@client/utils/userUtils'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -73,12 +74,14 @@ const STATUS_CHANGE_MAP = {
 function getGqlDetails(
   form: IForm,
   draft: IDeclaration,
-  offlineData: IOfflineData
+  offlineData: IOfflineData,
+  userDetails: UserDetails | null
 ) {
   const gqlDetails = draftToGqlTransformer(
     form,
     draft.data,
     draft.id,
+    userDetails,
     draft.originalData,
     offlineData
   )
@@ -152,7 +155,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
-      getOfflineData(getState())
+      getOfflineData(getState()),
+      getState().offline.userDetails as UserDetails
     )
 
     //then add payment while issue declaration
