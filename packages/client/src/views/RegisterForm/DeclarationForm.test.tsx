@@ -292,7 +292,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
-          await goToSection(app, 5)
+          await goToSection(app, 'preview')
           app
             .find('#btn_change_child_familyNameEng')
             .hostNodes()

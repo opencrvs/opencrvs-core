@@ -20,6 +20,7 @@ import {
 import { userMessages } from '@client/i18n/messages'
 import { HumanName } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
 export function getUserName(
   userDetails: Pick<

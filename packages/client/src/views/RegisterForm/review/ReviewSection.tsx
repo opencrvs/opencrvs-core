@@ -148,7 +148,6 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
-import { addSchemaLevelResolveFunction } from 'graphql-tools'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -299,6 +298,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  userDetails?: UserDetails | null
   viewRecord?: boolean
   reviewSummaryHeader?: React.ReactNode
 }
@@ -666,13 +666,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getVisibleSections = (formSections: IFormSection[]) => {
-    const { draft } = this.props
+    const { draft, userDetails } = this.props
+
     return formSections.filter(
       (section) =>
         getVisibleSectionGroupsBasedOnConditions(
           section,
           draft.data[section.id] || {},
-          draft.data
+          draft.data,
+          userDetails
         ).length > 0
     )
   }

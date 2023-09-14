@@ -1173,7 +1173,7 @@ export function questionnaireToTemplateFieldTransformer(
   const selectedQuestion: IQuestionnaireQuestion =
     queryData.questionnaire.filter(
       (question: IQuestionnaireQuestion) =>
-        question.fieldId === field.customQuesstionMappingId
+        question.fieldId === field.customQuestionMappingId
     )[0]
 
   /* transformedData[sectionId] is undefined when mapping templates */
@@ -1225,7 +1225,7 @@ export function questionnaireToCustomFieldTransformer(
     const selectedQuestion: IQuestionnaireQuestion =
       queryData.questionnaire.filter(
         (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
+          question.fieldId === field.customQuestionMappingId
       )[0]
     if (selectedQuestion) {
       /* transformedData[sectionId] is undefined when mapping templates */

@@ -9,29 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloClient } from '@apollo/client'
 import {
-  createTestComponent,
-  selectOption,
-  mockDeclarationData,
-  mockDeathDeclarationData,
-  mockMarriageDeclarationData,
-  getRegisterFormFromStore,
-  getReviewFormFromStore,
-  createTestStore,
-  flushPromises
-} from '@client/tests/util'
-import {
-  RegisterForm,
-  RegisterForm
-} from '@client/views/RegisterForm/RegisterForm'
-import { ReactWrapper, ReactWrapper } from 'enzyme'
-import {
-  SUBMISSION_STATUS,
   createDeclaration,
   createReviewDeclaration,
   setInitialDeclarations,
-  storeDeclaration
+  storeDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
+import { IForm } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import * as profileSelectors from '@client/profile/profileSelectors'
 import { AppStore } from '@client/store'
 import {
   createTestComponent,
@@ -40,11 +28,17 @@ import {
   getRegisterFormFromStore,
   getReviewFormFromStore,
   mockDeathDeclarationData,
-  mockDeathDeclarationDataWithoutFirstNames,
   mockDeclarationData,
   mockMarriageDeclarationData,
   selectOption
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { draftToGqlTransformer } from '@client/transformer'
+import { createClient } from '@client/utils/apolloClient'
+import { DECLARED } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
+import { IFormData } from '@opencrvs/client/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
@@ -53,23 +47,12 @@ import {
   HOME,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
-import * as React from 'react'
-import { v4 as uuid } from 'uuid'
-
-import { IForm } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { formMessages as messages } from '@client/i18n/messages'
-import * as profileSelectors from '@client/profile/profileSelectors'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { draftToGqlTransformer } from '@client/transformer'
-import { DECLARED } from '@client/utils/constants'
-import { Event } from '@client/utils/gateway'
-import { IFormData } from '@opencrvs/client/src/forms'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { clone, cloneDeep } from 'lodash'
+import * as React from 'react'
+import { v4 as uuid } from 'uuid'
 import { vi } from 'vitest'
-import { createClient } from '@client/utils/apolloClient'
-import { ApolloClient } from '@apollo/client'
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>

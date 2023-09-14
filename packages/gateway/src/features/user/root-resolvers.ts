@@ -631,7 +631,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     mobile: user.mobile as string,
     device: user.device as string,
     primaryFacilityId: user.primaryFacilityId,
-    signature: user.signature
+    signature: user.signature,
+    ...(user.username && { username: user.username })
   }
   if (user.id) {
     userPayload.id = user.id

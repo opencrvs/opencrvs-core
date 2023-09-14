@@ -1189,17 +1189,17 @@ export async function goToEndOfForm(component: ReactWrapper) {
 }
 
 export async function goToDocumentsSection(component: ReactWrapper) {
-  await goToSection(component, 4)
+  await goToSection(component, 'documents')
   await waitForElement(component, '#form_section_id_documents-view-group')
 }
 
 export async function goToFatherSection(component: ReactWrapper) {
-  await goToSection(component, 3)
+  await goToSection(component, 'father')
   await waitForElement(component, '#form_section_id_father-view-group')
 }
 
 export async function goToMotherSection(component: ReactWrapper) {
-  await goToSection(component, 2)
+  await goToSection(component, 'mother')
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
