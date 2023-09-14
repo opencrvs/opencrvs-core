@@ -24,5 +24,5 @@ export const Heading2 = styled.h2`
 export const Heading3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
-  padding-top: 16px;
+  padding-top: 20px;
 `
