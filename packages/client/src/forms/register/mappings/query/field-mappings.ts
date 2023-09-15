@@ -34,7 +34,8 @@ import {
   CHECKBOX,
   IQuestionnaireQuestion,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  SELECT_WITH_OPTIONS
+  SELECT_WITH_OPTIONS,
+  IFormFieldValue
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
@@ -1201,10 +1202,7 @@ export function questionnaireToTemplateFieldTransformer(
           ?.label.defaultMessage?.toString() || selectedQuestion.value
       break
     case SELECT_WITH_OPTIONS:
-      transformedData[sectionId][field.name] =
-        field.options
-          .find((option) => option.value === selectedQuestion.value)
-          ?.label.defaultMessage?.toString() || selectedQuestion.value
+      transformedData[sectionId][field.name] = selectedQuestion.value
       break
     case CHECKBOX:
       transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
