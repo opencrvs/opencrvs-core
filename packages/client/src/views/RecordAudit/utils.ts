@@ -174,11 +174,10 @@ const getLocation = (
       declaration.data?.deathEvent?.internationalStatePlaceofdeath?.toString() ||
       EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
-    const municipality =
-      resources.locations[
-        `${declaration.data?.child?.placeOfBirthMunicipality}`
-      ]
-
+    locationType =
+      declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
+    locationId =
+      declaration.data?.child?.birthLocation?.toString() || EMPTY_STRING
     district =
       declaration.data?.child?.districtPlaceofbirth?.toString() || EMPTY_STRING
     state =
