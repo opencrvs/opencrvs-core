@@ -224,6 +224,10 @@ class SentForReviewComponent extends React.Component<
         sentForApproval =
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
             RegStatus.Declared
           ) ||
           getPreviousOperationDateByOperationType(
