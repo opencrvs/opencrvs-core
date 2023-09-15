@@ -109,6 +109,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $inProgressSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -127,6 +128,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $healthSystemSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -140,6 +142,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $reviewSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -153,7 +156,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $rejectSkip
-      sortColumn: "createdAt.keyword"
+      sortColumn: "modifiedAt.keyword"
       sort: "asc"
     ) {
       totalItems
@@ -168,6 +171,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $approvalSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -181,6 +185,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $externalValidationSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -194,6 +199,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $printSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -207,6 +213,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $issueSkip
+      sort: "asc"
     ) {
       totalItems
       results {
@@ -253,7 +260,7 @@ export const FIELD_AGENT_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $rejectSkip
-      sortColumn: "createdAt.keyword"
+      sortColumn: "modifiedAt.keyword"
       sort: "asc"
     ) {
       totalItems
