@@ -138,7 +138,7 @@ class InProgressComponent extends React.Component<
         this.props.selectorId && this.props.selectorId !== SELECTOR_ID.ownDrafts
           ? COLUMNS.NOTIFICATION_SENT
           : COLUMNS.LAST_UPDATED,
-      sortOrder: SORT_ORDER.DESCENDING
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 

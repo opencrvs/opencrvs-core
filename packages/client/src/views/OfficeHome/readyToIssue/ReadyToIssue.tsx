@@ -75,8 +75,8 @@ export const ReadyToIssue = ({
   error
 }: IBasePrintTabProps) => {
   const [width, setWidth] = useState(window.innerWidth)
-  const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTRATION_NO)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
   const dispatch = useDispatch()
   const intl = useIntl()
   const data = queryData.data

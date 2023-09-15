@@ -91,7 +91,7 @@ class ReadyToPrintComponent extends React.Component<
     this.state = {
       width: window.innerWidth,
       sortedCol: COLUMNS.REGISTERED,
-      sortOrder: SORT_ORDER.DESCENDING
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 

@@ -95,7 +95,7 @@ class ReadyForReviewComponent extends React.Component<
     this.state = {
       width: window.innerWidth,
       sortedCol: COLUMNS.SENT_FOR_REVIEW,
-      sortOrder: SORT_ORDER.DESCENDING
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
