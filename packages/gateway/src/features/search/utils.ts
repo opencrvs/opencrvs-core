@@ -18,6 +18,7 @@ export interface ISearchCriteria {
   parameters: GQLAdvancedSearchParametersInput
   sort?: string
   sortColumn?: string
+  sortBy?: Array<Record<string, string>>
   size?: number
   from?: number
   createdBy?: string
