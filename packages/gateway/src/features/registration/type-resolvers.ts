@@ -1902,7 +1902,7 @@ export const typeResolvers: GQLResolver = {
 
       if (questionnaireResponse.item && questionnaireResponse.item.length) {
         questionnaireResponse.item.forEach((item) => {
-          if (item.answer && item.answer[0]) {
+          if (item?.answer && item?.answer[0]) {
             questionnaire.push({
               fieldId: item.text,
               value: item.answer[0].valueString
@@ -2173,7 +2173,7 @@ export const typeResolvers: GQLResolver = {
 
       if (questionnaireResponse.item && questionnaireResponse.item.length) {
         questionnaireResponse.item.forEach((item) => {
-          if (item.answer && item.answer[0]) {
+          if (item?.answer && item?.answer[0]) {
             questionnaire.push({
               fieldId: item.text,
               value: item.answer[0].valueString
@@ -2559,7 +2559,7 @@ export const typeResolvers: GQLResolver = {
 
       if (questionnaireResponse.item && questionnaireResponse.item.length) {
         questionnaireResponse.item.forEach((item) => {
-          if (item.answer && item.answer[0]) {
+          if (item?.answer && item?.answer[0]) {
             questionnaire.push({
               fieldId: item.text,
               value: item.answer[0].valueString
