@@ -122,7 +122,9 @@ export const validLength = (length: number) => (value: IFormFieldValue) => {
 }
 
 const isLessOrEqual = (value: string, max: number) => {
-  return value && value.toString().length <= max
+  return (
+    !(value === undefined || value === null) && value.toString().length <= max
+  )
 }
 
 export const maxLength: MaxLengthValidation =
