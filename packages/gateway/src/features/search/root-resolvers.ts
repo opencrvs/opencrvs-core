@@ -72,7 +72,8 @@ export const resolvers: GQLResolver = {
         count,
         skip,
         sortColumn,
-        sort = 'desc'
+        sort = 'desc',
+        sortBy
       },
       { headers: authHeader }
     ) {
@@ -159,6 +160,11 @@ export const resolvers: GQLResolver = {
         }
         if (sortColumn) {
           searchCriteria.sortColumn = sortColumn
+        }
+        if (sortBy) {
+          searchCriteria.sortBy = sortBy.map((sort) => ({
+            [sort.column]: sort.order
+          }))
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
