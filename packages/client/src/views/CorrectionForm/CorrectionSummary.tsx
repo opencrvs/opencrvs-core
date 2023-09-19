@@ -411,13 +411,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             </Button>
           ]}
         >
-          <p>
-            <Text element="p" variant="reg16">
-              {intl.formatMessage(
-                messages.correctionForApprovalDialogDescription
-              )}
-            </Text>
-          </p>
+          <Text element="p" variant="reg16">
+            {intl.formatMessage(
+              messages.correctionForApprovalDialogDescription
+            )}
+          </Text>
         </Dialog>
       </>
     )
