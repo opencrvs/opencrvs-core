@@ -488,6 +488,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.childIdentifier) {
+    must.push({
+      match: {
+        childIdentifier: params.childIdentifier
+      }
+    })
+  }
+
   if (params.motherIdentifier) {
     must.push({
       match: {
@@ -648,6 +656,11 @@ export function advancedQueryBuilder(
     must.push({
       bool: {
         should: [
+          {
+            match: {
+              childIdentifier: params.nationalId
+            }
+          },
           {
             match: {
               motherIdentifier: params.nationalId

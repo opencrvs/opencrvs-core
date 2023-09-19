@@ -629,7 +629,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
     mobile: user.mobile as string,
     device: user.device as string,
-    signature: user.signature
+    signature: user.signature,
+    ...(user.username && { username: user.username })
   }
   if (user.id) {
     userPayload.id = user.id

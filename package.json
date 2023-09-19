@@ -30,6 +30,7 @@
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
+    "db:clear:all": "bash development-environment/clear-all-data.sh",
     "build": "lerna run build --stream --concurrency=1 && lerna run build-storybook",
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",

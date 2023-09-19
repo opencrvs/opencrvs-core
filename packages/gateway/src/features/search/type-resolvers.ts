@@ -211,6 +211,9 @@ export const searchTypeResolvers: GQLResolver = {
     childGender(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.gender) || null
     },
+    childIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.childIdentifier) || null
+    },
     mothersFirstName(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.motherFirstNames) || null
     },

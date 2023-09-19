@@ -143,6 +143,7 @@ import {
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -279,6 +280,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  userDetails?: UserDetails | null
   viewRecord?: boolean
 }
 
@@ -654,13 +656,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getVisibleSections = (formSections: IFormSection[]) => {
-    const { draft } = this.props
+    const { draft, userDetails } = this.props
+
     return formSections.filter(
       (section) =>
         getVisibleSectionGroupsBasedOnConditions(
           section,
           draft.data[section.id] || {},
-          draft.data
+          draft.data,
+          userDetails
         ).length > 0
     )
   }

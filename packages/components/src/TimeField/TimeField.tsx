@@ -33,7 +33,7 @@ const Container = styled.div`
   width: 100%;
 `
 const Segment = styled(TextInput)`
-  width: 54px !important;
+  width: 58px !important;
   margin: 0 4px;
 
   &:first-of-type {
