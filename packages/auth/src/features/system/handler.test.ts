@@ -26,11 +26,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockReject(new Error())
       const res = await server.server.inject({
         method: 'POST',
-        url: '/authenticateSystemClient',
-        payload: {
-          client_id: '123',
-          client_secret: '456'
-        }
+        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
       })
 
       expect(res.statusCode).toBe(401)
@@ -50,14 +46,10 @@ describe('authenticate handler receives a request', () => {
       )
       const res = await server.server.inject({
         method: 'POST',
-        url: '/authenticateSystemClient',
-        payload: {
-          client_id: '123',
-          client_secret: '456'
-        }
+        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
       })
 
-      expect(JSON.parse(res.payload).token).toBe('789')
+      expect(JSON.parse(res.payload).access_token).toBe('789')
     })
   })
 })
