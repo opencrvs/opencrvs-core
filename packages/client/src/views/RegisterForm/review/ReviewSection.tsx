@@ -74,7 +74,8 @@ import {
   NID_VERIFICATION_BUTTON,
   WARNING,
   SUBSECTION_HEADER,
-  DIVIDER
+  DIVIDER,
+  HIDDEN
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -882,6 +883,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   isVisibleField(field: IFormField, section: IFormSection) {
     const { draft, offlineCountryConfiguration } = this.props
+
+    if (field.type === HIDDEN) {
+      return false
+    }
+
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},

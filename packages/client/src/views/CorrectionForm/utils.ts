@@ -39,7 +39,8 @@ import {
   CHECKBOX,
   ICheckboxFormField,
   SUBSECTION_HEADER,
-  DIVIDER
+  DIVIDER,
+  HIDDEN
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -626,6 +627,9 @@ export function isVisibleField(
   draft: IDeclaration,
   offlineResources: IOfflineData
 ) {
+  if (field.type === HIDDEN) {
+    return false
+  }
   const conditionalActions = getConditionalActionsForField(
     field,
     draft.data[section.id] || {},

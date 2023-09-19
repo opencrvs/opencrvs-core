@@ -45,6 +45,7 @@ export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
+export const HIDDEN = 'HIDDEN'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
@@ -569,6 +570,9 @@ export interface ITextFormField extends IFormFieldBase {
   maxLength?: number
   dependency?: string
 }
+export interface IHiddenFormField extends IFormFieldBase {
+  type: typeof HIDDEN
+}
 
 export interface ITelFormField extends IFormFieldBase {
   type: typeof TEL
@@ -714,6 +718,7 @@ export type IFormField =
   | ITelFormField
   | INumberFormField
   | IBigNumberFormField
+  | IHiddenFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IFormFieldWithDynamicDefinitions
@@ -1065,6 +1070,9 @@ export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
   maxLength?: number
 }
+export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
+  type: typeof HIDDEN
+}
 export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL
   isSmallSized?: boolean
@@ -1195,6 +1203,7 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
+  | Ii18nHiddenFormField
   | Ii18nNumberFormField
   | Ii18nBigNumberFormField
   | Ii18nSelectFormField
