@@ -87,8 +87,12 @@ export interface IAdvancedSearchParam {
 
 export interface ISearchCriteria {
   parameters: IAdvancedSearchParam
-  sort?: string
+  /** Sort direction */
+  sort?: SortOrder
+  /** Column to be sorted by */
   sortColumn?: string
+  /** Overrides sort & sortColumn if sorting by multiple attributes is requested */
+  sortBy?: Array<Record<string, SortOrder>>
   size?: number
   from?: number
   createdBy?: string
