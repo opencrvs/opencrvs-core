@@ -495,15 +495,19 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
-      const label = fieldDefinition.label as unknown as MessageDescriptor
+      const label = fieldDefinition.label as unknown as MessageDescriptor & {
+        values: Record<string, string>
+      }
+      const values = label.values || {}
 
       const message = intl.formatMessage(label, {
-        [fieldDefinition.name]: value as string
+        ...values,
+        [fieldDefinition.name]: value as any
       })
 
       return (
         <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
-          <span dangerouslySetInnerHTML={{ __html: message }}></span>
+          <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
       )
     }
