@@ -27,10 +27,12 @@ export function formatSearchParams(
     createdBy = '',
     from = 0,
     size = DEFAULT_SIZE,
-    sort = SortOrder.ASC,
     sortColumn = 'dateOfDeclaration',
+    sortBy,
     parameters
   } = searchPayload
+
+  const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
 
   return {
     index: OPENCRVS_INDEX_NAME,
@@ -39,7 +41,7 @@ export function formatSearchParams(
     size,
     body: {
       query: advancedQueryBuilder(parameters, createdBy, isExternalSearch),
-      sort: [{ [sortColumn]: sort }]
+      sort
     }
   }
 }

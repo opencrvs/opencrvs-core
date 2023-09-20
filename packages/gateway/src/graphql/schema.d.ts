@@ -475,6 +475,11 @@ export interface GQLAdvancedSearchParametersInput {
   compositionType?: Array<string | null>
 }
 
+export interface GQLSortBy {
+  column: string
+  order: string
+}
+
 export interface GQLEventProgressResultSet {
   results?: Array<GQLEventProgressSet | null>
   totalItems?: number
@@ -2543,6 +2548,7 @@ export interface QueryToSearchEventsArgs {
   skip?: number
   sort?: string
   sortColumn?: string
+  sortBy?: Array<GQLSortBy>
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
