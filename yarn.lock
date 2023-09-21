@@ -7482,13 +7482,13 @@
     "@types/serve-static" "*"
 
 "@types/fetch-mock@^7.3.0":
-  version "7.3.5"
-  resolved "https://registry.npmjs.org/@types/fetch-mock/-/fetch-mock-7.3.5.tgz"
-  integrity sha512-sLecm9ohBdGIpYUP9rWk5/XIKY2xHMYTBJIcJuBBM8IJWnYoQ1DAj8F4OVjnfD0API1drlkWEV0LPNk+ACuhsg==
+  version "7.3.6"
+  resolved "https://registry.yarnpkg.com/@types/fetch-mock/-/fetch-mock-7.3.6.tgz#ec4a72d320cb779f01348af975f786908a641245"
+  integrity sha512-vE4GcV+NzDKKiCtIHO+/+1osbr9sUe5fl1nGlEdwxOXNvJnnXCpC0y6lAqj3S/NlJMEKnGWeCFZWy79vQA4eNA==
 
 "@types/fhir@0.0.30", "@types/fhir@^0.0.30":
   version "0.0.30"
-  resolved "https://registry.npmjs.org/@types/fhir/-/fhir-0.0.30.tgz"
+  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.30.tgz#a0aec3b2d7dd2a7584474dac446ede5f9a4d7a13"
   integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
 
 "@types/fhir@^0.0.37":
@@ -7503,15 +7503,15 @@
 
 "@types/flat@^0.0.28":
   version "0.0.28"
-  resolved "https://registry.npmjs.org/@types/flat/-/flat-0.0.28.tgz"
+  resolved "https://registry.yarnpkg.com/@types/flat/-/flat-0.0.28.tgz#5c788149d85a6cf8ff5f5f000acdd912cdea4274"
   integrity sha512-2M3R9T8Wd9yGjE24I6/pxEeNR9CtU2oErPNfZbK9K+btKpoQVPsWayMx9VGv+jIuxa9yHiQ+T3nhFfW7IS2A3Q==
 
-"@types/glob@*":
-  version "8.0.0"
-  resolved "https://registry.npmjs.org/@types/glob/-/glob-8.0.0.tgz"
-  integrity sha512-l6NQsDDyQUVeoTynNpC9uRvCUint/gSUXQA2euwmTuWGvPY5LSDUu6tkCtJB2SvGQlJQzLaKqcGZP4//7EDveA==
+"@types/glob@*", "@types/glob@^8.0.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-8.1.0.tgz#b63e70155391b0584dce44e7ea25190bbc38f2fc"
+  integrity sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==
   dependencies:
-    "@types/minimatch" "*"
+    "@types/minimatch" "^5.1.2"
     "@types/node" "*"
 
 "@types/glob@^5.0.35":
@@ -7528,14 +7528,6 @@
   integrity sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==
   dependencies:
     "@types/minimatch" "*"
-    "@types/node" "*"
-
-"@types/glob@^8.0.0":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-8.1.0.tgz#b63e70155391b0584dce44e7ea25190bbc38f2fc"
-  integrity sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==
-  dependencies:
-    "@types/minimatch" "^5.1.2"
     "@types/node" "*"
 
 "@types/google-libphonenumber@^7.4.23":
