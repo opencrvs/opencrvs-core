@@ -19,6 +19,9 @@ import * as Inert from '@hapi/inert'
 import * as Vision from '@hapi/vision'
 import * as HapiSwagger from 'hapi-swagger'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const packageJson = require('../../package.json')
+
 export const getPlugins = () => {
   const plugins: any[] = []
 
@@ -29,7 +32,7 @@ export const getPlugins = () => {
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: '1.1.1'
+      version: packageJson.version
     },
     schemes: ['http', 'https']
   }
