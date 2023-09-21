@@ -971,6 +971,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
+    // the first section is registration
+    const introSection = registerForm.sections[1].id === activeSection.id
     return (
       <>
         <TimeMounted
@@ -1042,16 +1044,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <>
                   <Frame.LayoutForm>
                     <Frame.SectionFormBackAction>
-                      <BackButtonContainer>
-                        <Button
-                          type="tertiary"
-                          size="small"
-                          onClick={this.props.goBack}
-                        >
-                          <Icon name="ArrowLeft" size="medium" />
-                          {intl.formatMessage(buttonMessages.back)}
-                        </Button>
-                      </BackButtonContainer>
+                      {!introSection && (
+                        <BackButtonContainer>
+                          <Button
+                            type="tertiary"
+                            size="small"
+                            onClick={this.props.goBack}
+                          >
+                            <Icon name="ArrowLeft" size="medium" />
+                            {intl.formatMessage(buttonMessages.back)}
+                          </Button>
+                        </BackButtonContainer>
+                      )}
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
