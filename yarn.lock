@@ -7486,12 +7486,7 @@
   resolved "https://registry.npmjs.org/@types/fetch-mock/-/fetch-mock-7.3.5.tgz"
   integrity sha512-sLecm9ohBdGIpYUP9rWk5/XIKY2xHMYTBJIcJuBBM8IJWnYoQ1DAj8F4OVjnfD0API1drlkWEV0LPNk+ACuhsg==
 
-"@types/fhir@0.0.30", "@types/fhir@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.npmjs.org/@types/fhir/-/fhir-0.0.30.tgz"
-  integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
-
-"@types/fhir@^0.0.37":
+"@types/fhir@0.0.37", "@types/fhir@^0.0.37":
   version "0.0.37"
   resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.37.tgz#54835d905009b34360437ba014564299c530253c"
   integrity sha512-fR1y6tPfDmxYDWN4JkJhuI5F5QpbaFVSoNo3pu9A6nzuoojANqg0UBnNZTVegTz/MilV3PSjyvFe6/vO55geKA==

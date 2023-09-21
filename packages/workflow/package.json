@@ -38,7 +38,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@types/fhir": "^0.0.30",
+    "@types/fhir": "^0.0.37",
     "@types/hapi__boom": "^9.0.1",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
