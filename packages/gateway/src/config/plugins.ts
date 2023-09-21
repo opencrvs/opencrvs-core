@@ -17,9 +17,6 @@ import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
 import * as HapiSwagger from 'hapi-swagger'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const packageJson = require('../../package.json')
-
 export const getPlugins = () => {
   const plugins: any[] = []
 
@@ -30,7 +27,7 @@ export const getPlugins = () => {
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: packageJson.version
+      version: '1.3.0-beta'
     },
     schemes: ['http', 'https'],
     swaggerUI: false,
