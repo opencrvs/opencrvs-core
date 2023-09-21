@@ -4244,6 +4244,13 @@
   dependencies:
     "@hapi/hoek" "9.x.x"
 
+"@hapi/boom@^10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-10.0.1.tgz#ebb14688275ae150aa6af788dbe482e6a6062685"
+  integrity sha512-ERcCZaEjdH3OgSJlyjVk8pHIFeus91CjKP3v+MpgBNp5IvGzP2l/bRiD78nqYcKPaZdbKkK5vDBVPd2ohHBlsA==
+  dependencies:
+    "@hapi/hoek" "^11.0.2"
+
 "@hapi/bossy@5.x.x":
   version "5.1.1"
   resolved "https://registry.npmjs.org/@hapi/bossy/-/bossy-5.1.1.tgz"
@@ -4270,6 +4277,14 @@
   dependencies:
     "@hapi/boom" "^10.0.0"
     "@hapi/hoek" "^10.0.0"
+
+"@hapi/bounce@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@hapi/bounce/-/bounce-3.0.1.tgz#25a51bf95733749c557c6bf948048bffa66435e4"
+  integrity sha512-G+/Pp9c1Ha4FDP+3Sy/Xwg2O4Ahaw3lIZFSX+BL4uWi64CmiETuZPxhKDUD4xBMOUZbBlzvO8HjiK8ePnhBadA==
+  dependencies:
+    "@hapi/boom" "^10.0.1"
+    "@hapi/hoek" "^11.0.2"
 
 "@hapi/bourne@2.x.x", "@hapi/bourne@^2.0.0":
   version "2.1.0"
@@ -4368,6 +4383,11 @@
   version "9.3.0"
   resolved "https://registry.npmjs.org/@hapi/hoek/-/hoek-9.3.0.tgz"
   integrity sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==
+
+"@hapi/hoek@^11.0.2":
+  version "11.0.2"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-11.0.2.tgz#cb3ea547daac7de5c9cf1d960c3f35c34f065427"
+  integrity sha512-aKmlCO57XFZ26wso4rJsW4oTUnrgTFw2jh3io7CAtO9w4UltBNwRXvXIVzzyfkaaLRo3nluP/19msA8vDUUuKw==
 
 "@hapi/inert@^7.0.0":
   version "7.0.0"
@@ -4511,6 +4531,13 @@
   dependencies:
     "@hapi/hoek" "^10.0.0"
 
+"@hapi/topo@^6.0.1":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@hapi/topo/-/topo-6.0.2.tgz#f219c1c60da8430228af4c1f2e40c32a0d84bbb4"
+  integrity sha512-KR3rD5inZbGMrHmgPxsJ9dbi6zEK+C3ZwUwTa+eMwWLz7oijWUTWD2pMSNNYJAU6Qq+65NkxXjqHr/7LM2Xkqg==
+  dependencies:
+    "@hapi/hoek" "^11.0.2"
+
 "@hapi/validate@1.x.x", "@hapi/validate@^1.1.1":
   version "1.1.3"
   resolved "https://registry.npmjs.org/@hapi/validate/-/validate-1.1.3.tgz"
@@ -4527,6 +4554,14 @@
     "@hapi/hoek" "^10.0.0"
     "@hapi/topo" "^6.0.0"
 
+"@hapi/validate@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@hapi/validate/-/validate-2.0.1.tgz#45cf228c4c8cfc61ba2da7e0a5ba93ff3b9afff1"
+  integrity sha512-NZmXRnrSLK8MQ9y/CMqE9WSspgB9xA41/LlYR0k967aSZebWr4yNrpxIbov12ICwKy4APSlWXZga9jN5p6puPA==
+  dependencies:
+    "@hapi/hoek" "^11.0.2"
+    "@hapi/topo" "^6.0.1"
+
 "@hapi/vise@^4.0.0":
   version "4.0.0"
   resolved "https://registry.npmjs.org/@hapi/vise/-/vise-4.0.0.tgz"
@@ -4535,14 +4570,14 @@
     "@hapi/hoek" "9.x.x"
 
 "@hapi/vision@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/@hapi/vision/-/vision-7.0.0.tgz"
-  integrity sha512-GFKFQFMf9TdDB4BQyRf9PIcUjNCWW9LE19DtzbywXam6dC6qWPWHyNICevbwb3QY/Cvs0DxyVT4dzPfq314g1Q==
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@hapi/vision/-/vision-7.0.3.tgz#059d7aba353fcca36ca643c607483f47735e4601"
+  integrity sha512-1UM3Xej7HZQPaxzWkefvMfcuXoF9R8kIiDTl+Pfdv8f5mJwAv0zIB4R/UvNoQP1+JYgQT+QeUDxcGD8QdIUDyg==
   dependencies:
-    "@hapi/boom" "^10.0.0"
-    "@hapi/bounce" "^3.0.0"
-    "@hapi/hoek" "^10.0.0"
-    "@hapi/validate" "^2.0.0"
+    "@hapi/boom" "^10.0.1"
+    "@hapi/bounce" "^3.0.1"
+    "@hapi/hoek" "^11.0.2"
+    "@hapi/validate" "^2.0.1"
 
 "@hapi/wreck@17.x.x":
   version "17.2.0"
