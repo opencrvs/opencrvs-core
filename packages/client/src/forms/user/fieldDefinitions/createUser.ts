@@ -240,7 +240,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             action: 'hide',
             expression:
-              'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
+              'values.systemRole!=="REGISTRATION_AGENT" && values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
           }
         ],
         fields: [
