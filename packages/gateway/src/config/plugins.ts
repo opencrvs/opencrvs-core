@@ -15,8 +15,6 @@ import * as Pino from 'hapi-pino'
 import * as Sentry from '@sentry/node'
 import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
-import * as Inert from '@hapi/inert'
-import * as Vision from '@hapi/vision'
 import * as HapiSwagger from 'hapi-swagger'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,7 +32,9 @@ export const getPlugins = () => {
       title: 'Gateway API Documentation',
       version: packageJson.version
     },
-    schemes: ['http', 'https']
+    schemes: ['http', 'https'],
+    swaggerUI: false,
+    documentationPage: false
   }
 
   plugins.push(
@@ -46,12 +46,6 @@ export const getPlugins = () => {
         logPayload: false,
         instance: logger
       }
-    },
-    {
-      plugin: Inert
-    },
-    {
-      plugin: Vision
     },
     {
       plugin: HapiSwagger,
