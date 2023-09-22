@@ -67,7 +67,6 @@ import {
   VERIFIED_EXTENSION_URL,
   FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
-import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
@@ -1195,28 +1194,6 @@ export async function postAssignmentSearch(
     .catch((error) => {
       return Promise.reject(
         new Error(`Search assignment failed: ${error.message}`)
-      )
-    })
-}
-
-export const postAdvancedSearch = (
-  authHeader: IAuthHeader,
-  criteria: ISearchCriteria
-) => {
-  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
       )
     })
 }

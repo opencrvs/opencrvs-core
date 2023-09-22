@@ -17,7 +17,8 @@ import {
   requestSchema,
   updateLocationHandler,
   updateSchema,
-  fetchLocationHandler
+  fetchLocationHandler,
+  requestParamsSchema
 } from '@gateway/features/restLocation/locationHandler'
 import {
   eventNotificationHandler,
@@ -64,7 +65,10 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: false,
-        description: 'Get a single location'
+        description: 'Get a single location',
+        validate: {
+          params: requestParamsSchema
+        }
       }
     },
     // create Location/Facility
@@ -95,7 +99,8 @@ export const getRoutes = () => {
         },
         description: 'Update a location or facility',
         validate: {
-          payload: updateSchema
+          payload: updateSchema,
+          params: requestParamsSchema
         }
       }
     },

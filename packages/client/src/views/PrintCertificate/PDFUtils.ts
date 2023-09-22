@@ -36,6 +36,8 @@ import formatDate, { formatLongDate } from '@client/utils/date-formatting'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { constantsMessages } from '@client/i18n/messages'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { getOfflineData } from '@client/offline/selectors'
+import format from 'date-fns/format'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -339,6 +341,24 @@ export function executeHandlebarsTemplate(
       } else {
         return office.alias?.toString()
       }
+    }
+  )
+
+  Handlebars.registerHelper(
+    'formatDate',
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'location',
+    function (this: any, locationId: string, key: keyof ILocation) {
+      const locations = getOfflineData(state).locations
+      return locations[locationId]
+        ? locations[locationId][key]
+        : `Missing location for id: ${locationId}`
     }
   )
 

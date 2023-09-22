@@ -64,11 +64,7 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import {
-  authenticateSystemClientHandler,
-  requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema
-} from '@auth/features/system/handler'
+import { tokenHandler } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
@@ -378,17 +374,11 @@ export async function createServer() {
 
   server.route({
     method: 'POST',
-    path: '/authenticateSystemClient',
-    handler: authenticateSystemClientHandler,
+    path: '/token',
+    handler: tokenHandler,
     options: {
       tags: ['api'],
-      description: 'Authenticate system with client_id and client_secret',
-      validate: {
-        payload: reqSystemSchema
-      },
-      response: {
-        schema: resSystemSchema
-      }
+      description: 'Authenticate system with client_id and client_secret'
     }
   })
 

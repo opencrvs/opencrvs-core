@@ -131,6 +131,7 @@ type Query {
     skip: Int
     sort: String
     sortColumn: String
+    sortBy: [SortBy!]
   ): EventSearchResultSet
   getEventsWithProgress(
     declarationJurisdictionId: String
@@ -581,6 +582,7 @@ input AdvancedSearchParametersInput {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -620,6 +622,11 @@ input AdvancedSearchParametersInput {
   informantDoBEnd: String
   informantIdentifier: String
   compositionType: [String]
+}
+
+input SortBy {
+  column: String!
+  order: String!
 }
 
 type EventProgressResultSet {
@@ -1633,6 +1640,7 @@ type AdvancedSeachParameters {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -1738,6 +1746,7 @@ type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
+  childIdentifier: String
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
