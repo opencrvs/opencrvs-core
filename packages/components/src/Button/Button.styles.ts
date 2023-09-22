@@ -231,7 +231,3 @@ export const disabled = css`
   pointer-events: none;
   user-select: none;
 `
-
-export const cursor = css`
-  cursor: pointer;
-`

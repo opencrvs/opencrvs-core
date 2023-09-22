@@ -71,13 +71,11 @@ const StyledButton = styled.button.withConfig({
 
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}
-  ${(props) => props.cursor === 'pointer' && styles.cursor}
 `
 
 export const Button = ({
   size = 'medium',
   element = 'button',
-  cursor = 'default',
   type,
   loading,
   children,
@@ -89,7 +87,6 @@ export const Button = ({
       variant={type}
       loading={loading}
       as={element}
-      cursor={cursor}
       {...props}
     >
       {loading && (

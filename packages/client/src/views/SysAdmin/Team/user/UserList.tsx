@@ -644,7 +644,6 @@ function UserListComponent(props: IProps) {
           size="medium"
           key={`add-user-${locationId}`}
           onClick={onClickAddUser}
-          cursor="pointer"
         >
           <Icon name="UserPlus" />
         </Button>
