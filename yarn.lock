@@ -3850,24 +3850,13 @@
     tslib "^2.4.0"
     unixify "^1.0.0"
 
-"@graphql-tools/graphql-file-loader@^7.5.0":
+"@graphql-tools/graphql-file-loader@^7.5.0", "@graphql-tools/graphql-file-loader@^7.5.16":
   version "7.5.17"
   resolved "https://registry.yarnpkg.com/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.17.tgz#7c281617ea3ab4db4d42a2bdb49850f2b937f0f9"
   integrity sha512-hVwwxPf41zOYgm4gdaZILCYnKB9Zap7Ys9OhY1hbwuAuC4MMNY9GpUjoTU3CQc3zUiPoYStyRtUGkHSJZ3HxBw==
   dependencies:
     "@graphql-tools/import" "6.7.18"
     "@graphql-tools/utils" "^9.2.1"
-    globby "^11.0.3"
-    tslib "^2.4.0"
-    unixify "^1.0.0"
-
-"@graphql-tools/graphql-file-loader@^7.5.16":
-  version "7.5.16"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.16.tgz#d954b25ee14c6421ddcef43f4320a82e9800cb23"
-  integrity sha512-lK1N3Y2I634FS12nd4bu7oAJbai3bUc28yeX+boT+C83KTO4ujGHm+6hPC8X/FRGwhKOnZBxUM7I5nvb3HiUxw==
-  dependencies:
-    "@graphql-tools/import" "6.7.17"
-    "@graphql-tools/utils" "9.2.1"
     globby "^11.0.3"
     tslib "^2.4.0"
     unixify "^1.0.0"
@@ -3882,15 +3871,6 @@
     "@babel/traverse" "^7.16.8"
     "@babel/types" "^7.16.8"
     "@graphql-tools/utils" "^9.2.1"
-    tslib "^2.4.0"
-
-"@graphql-tools/import@6.7.17":
-  version "6.7.17"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/import/-/import-6.7.17.tgz#ab51ed08bcbf757f952abf3f40793ce3db42d4a3"
-  integrity sha512-bn9SgrECXq3WIasgNP7ful/uON51wBajPXtxdY+z/ce7jLWaFE6lzwTDB/GAgiZ+jo7nb0ravlxteSAz2qZmuA==
-  dependencies:
-    "@graphql-tools/utils" "9.2.1"
-    resolve-from "5.0.0"
     tslib "^2.4.0"
 
 "@graphql-tools/import@6.7.18":
