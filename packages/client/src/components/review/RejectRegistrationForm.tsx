@@ -20,7 +20,7 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Event } from '@client/utils/gateway'
 import {
   IRejectRegistrationForm,
@@ -145,6 +145,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
             <Button
+              key="submit_archive"
               id="submit_archive"
               size="medium"
               type="secondary_negative"
@@ -161,6 +162,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.archive)}
             </Button>,
             <Button
+              key="submit_reject_form"
               size="medium"
               type="negative"
               id="submit_reject_form"

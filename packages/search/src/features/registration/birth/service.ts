@@ -28,7 +28,9 @@ import {
   VALIDATED_STATUS,
   REGISTERED_STATUS,
   CERTIFIED_STATUS,
-  ARCHIVED_STATUS
+  ARCHIVED_STATUS,
+  DECLARED_STATUS,
+  IN_PROGRESS_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -43,7 +45,8 @@ import {
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate
+  addFlaggedAsPotentialDuplicate,
+  findPatient
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
@@ -60,12 +63,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -88,7 +92,14 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   )
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+  const patient = findPatient(bundle)
+
   const compositionId =
     task &&
     task.focus &&
@@ -133,6 +144,10 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
+  body.childIdentifier = patient?.identifier?.find(
+    (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+  )?.value
+
   if (
     [
       REJECTED_STATUS,
@@ -167,11 +182,8 @@ async function indexAndSearchComposition(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (
-    body.type !== 'IN_PROGRESS' &&
-    body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED'
-  ) {
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }
@@ -216,7 +228,6 @@ async function createChildIndex(
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
-  body.gender = child && child.gender
 }
 
 function createMotherIndex(
@@ -248,8 +259,9 @@ function createMotherIndex(
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
     mother.identifier &&
-    mother.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    mother.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createFatherIndex(
@@ -281,8 +293,9 @@ function createFatherIndex(
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
     father.identifier &&
-    father.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    father.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createInformantIndex(
@@ -327,8 +340,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
@@ -348,6 +362,10 @@ async function createDeclarationIndex(
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
   )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
@@ -386,6 +404,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

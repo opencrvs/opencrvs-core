@@ -56,12 +56,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -79,7 +80,12 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
   const compositionId =
     task &&
     task.focus &&
@@ -207,9 +213,11 @@ async function createBrideIndex(
   }
 
   body.brideIdentifier =
+    bride &&
     bride.identifier &&
-    bride.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    bride.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
   body.brideDoB = bride && bride.birthDate
 }
 
@@ -247,9 +255,11 @@ async function createGroomIndex(
   }
 
   body.groomIdentifier =
+    groom &&
     groom.identifier &&
-    groom.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    groom.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
   body.groomDoB = groom && groom.birthDate
 }
 
@@ -348,6 +358,10 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
   )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
+  )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
@@ -385,6 +399,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

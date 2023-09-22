@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
   UserAuditLogResultItem: {
@@ -39,6 +40,11 @@ export const typeResolvers: GQLResolver = {
   EventMetricsByLocation: {
     async location({ location }, _, { headers: authHeader }) {
       return await fetchFHIR(`/${location}`, authHeader)
+    }
+  },
+  VSExport: {
+    async url({ url: fileUri }: GQLVSExport, _, { headers: authHeader }) {
+      return getPresignedUrlFromUri(fileUri, authHeader)
     }
   },
   EventMetricsByRegistrar: {

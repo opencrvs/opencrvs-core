@@ -39,13 +39,13 @@ export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser & { password: string }
+  const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
 
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
-  let autoGenPassword = null
+  let password = null
 
   try {
     const practitioner = createFhirPractitioner(user, false)
@@ -75,7 +75,7 @@ export default async function createUser(
     ) {
       userScopes.push('demo')
     }
-    user.status = statuses.PENDING
+    user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
 
     if (
@@ -87,15 +87,14 @@ export default async function createUser(
       user.status = statuses.ACTIVE
     }
 
-    autoGenPassword = generateRandomPassword(hasDemoScope(request))
+    password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
-
-    user.username = await generateUsername(user.name)
+    user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
@@ -111,15 +110,25 @@ export default async function createUser(
     logger.error(err)
     await rollbackCreateUser(token, practitionerId, roleId)
     if (err.code === 11000) {
-      return h.response().code(403)
+      // check if phone or email has thrown unique constraint errors
+      const errorThrowingProperty =
+        err.keyPattern && Object.keys(err.keyPattern)[0]
+      return h.response({ errorThrowingProperty }).code(403)
     }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.name,
+    user.username,
+    password,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

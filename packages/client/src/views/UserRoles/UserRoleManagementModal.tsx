@@ -17,7 +17,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { useSelector } from 'react-redux'
 import { getLanguages } from '@client/i18n/selectors'
@@ -190,7 +190,10 @@ export function UserRoleManagementModal(props: IProps) {
         />
         {userRoles.map((item, index) => {
           return (
-            <Stack justifyContent="flex-start">
+            <Stack
+              key={item._id ?? `new-role-${index}`}
+              justifyContent="flex-start"
+            >
               <StyledTextInput
                 id="roleNameInput"
                 value={
@@ -218,7 +221,7 @@ export function UserRoleManagementModal(props: IProps) {
                   setActives(new Array(userRoles.length).fill(true))
                 }
               />
-              {actives[index] && (
+              {actives[index] && !item._id && (
                 <Button
                   id="editButton"
                   type="icon"

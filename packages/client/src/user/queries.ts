@@ -26,6 +26,7 @@ export const SEARCH_USERS = gql`
         username
         systemRole
         mobile
+        email
         role {
           _id
         }
@@ -91,6 +92,7 @@ export const GET_USER = gql`
       }
       username
       mobile
+      email
       identifier {
         system
         value
@@ -160,7 +162,7 @@ async function searchUsers(primaryOfficeId: string) {
   )
 }
 
-export const VERIFY_PASSWORD_BY_ID = gql`
+const VERIFY_PASSWORD_BY_ID = gql`
   query verifyPasswordById($id: String!, $password: String!) {
     verifyPasswordById(id: $id, password: $password) {
       id

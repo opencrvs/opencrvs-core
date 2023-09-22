@@ -43,6 +43,7 @@ type AdvancedSeachParameters {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -88,6 +89,7 @@ input AdvancedSearchParametersInput {
   nationalId: String
   registrationNumber: String
   trackingId: String
+  recordId: ID
   dateOfRegistration: String
   dateOfRegistrationStart: String
   dateOfRegistrationEnd: String
@@ -106,6 +108,7 @@ input AdvancedSearchParametersInput {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -113,6 +116,19 @@ input AdvancedSearchParametersInput {
   deceasedDoBStart: String
   deceasedDoBEnd: String
   deceasedIdentifier: String
+  groomFirstNames: String
+  groomFamilyName: String
+  groomDoB: String
+  groomDoBStart: String
+  groomDoBEnd: String
+  groomIdentifier: String
+  brideFirstNames: String
+  brideFamilyName: String
+  brideDoB: String
+  brideDoBStart: String
+  brideDoBEnd: String
+  brideIdentifier: String
+  dateOfMarriage: String
   motherFirstNames: String
   motherFamilyName: String
   motherDoB: String

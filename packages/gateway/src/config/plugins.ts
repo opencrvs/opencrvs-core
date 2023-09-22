@@ -15,23 +15,23 @@ import * as Pino from 'hapi-pino'
 import * as Sentry from '@sentry/node'
 import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
-import * as Inert from '@hapi/inert'
-import * as Vision from '@hapi/vision'
 import * as HapiSwagger from 'hapi-swagger'
 
 export const getPlugins = () => {
   const plugins: any[] = []
 
   if (SENTRY_DSN) {
-    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.NODE_ENV })
+    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.HOSTNAME })
   }
 
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: '1.1.1'
+      version: '1.3.0-beta'
     },
-    schemes: ['http', 'https']
+    schemes: ['http', 'https'],
+    swaggerUI: false,
+    documentationPage: false
   }
 
   plugins.push(
@@ -43,12 +43,6 @@ export const getPlugins = () => {
         logPayload: false,
         instance: logger
       }
-    },
-    {
-      plugin: Inert
-    },
-    {
-      plugin: Vision
     },
     {
       plugin: HapiSwagger,

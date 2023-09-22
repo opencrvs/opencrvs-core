@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -27,17 +28,21 @@ import {
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
+  fetchTaskByCompositionIdFromHearth,
   generateTrackingIdForEvents,
+  getComposition,
   getEventType,
   getMosipUINToken,
   isEventNotification,
-  isInProgressDeclaration
+  isInProgressDeclaration,
+  getVoidEvent
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef
+  getPractitionerRef,
+  getSystem
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import * as Hapi from '@hapi/hapi'
@@ -52,8 +57,8 @@ import {
   USER_SCOPE
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
-import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { triggerEvent } from '@workflow/features/events/handler'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -97,9 +102,6 @@ export async function modifyRegistrationBundle(
     await setupLastRegLocation(taskResource, practitioner)
   }
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
@@ -123,9 +125,6 @@ export async function markBundleAsValidated(
   await setupLastRegLocation(taskResource, practitioner)
 
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -158,18 +157,16 @@ export async function markBundleAsRequestedForCorrection(
     regStatusCode?.code
   )
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  headers: Record<string, string>
-) {
+  headers: Record<string, string>,
+  token: string
+): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -177,8 +174,61 @@ export async function invokeRegistrationValidation(
         ...headers
       }
     })
+    if (!res.ok) {
+      const errorData = await res.json()
+      throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
+    }
+    return { bundle }
   } catch (err) {
-    throw new Error(`Unable to send registration for validation: ${err}`)
+    const eventType = getEventType(bundle)
+    const composition = await getComposition(bundle)
+    if (!composition) {
+      throw new Error('Cant get composition in bundle')
+    }
+    const taskResource = await fetchTaskByCompositionIdFromHearth(
+      composition.id
+    )
+    const practitioner = await getLoggedInPractitionerResource(token)
+
+    if (
+      !taskResource ||
+      !taskResource.businessStatus ||
+      !taskResource.businessStatus.coding ||
+      !taskResource.businessStatus.coding[0] ||
+      !taskResource.businessStatus.coding[0].code
+    ) {
+      throw new Error('taskResource has no businessStatus code')
+    }
+    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
+
+    const statusReason: fhir.CodeableConcept = {
+      text: `${JSON.stringify(err)} - ${BIRTH_REG_NUMBER_GENERATION_FAILED}`
+    }
+    taskResource.statusReason = statusReason
+    taskResource.lastModified = new Date().toISOString()
+
+    /* setting registration workflow status here */
+    await setupRegistrationWorkflow(
+      taskResource,
+      getTokenPayload(token),
+      RegStatus.REJECTED
+    )
+
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+
+    /* setting lastRegUser here */
+    setupLastRegUser(taskResource, practitioner)
+
+    await updateResourceInHearth(taskResource)
+
+    await triggerEvent(
+      getVoidEvent(eventType),
+      { resourceType: 'Bundle', entry: [{ resource: taskResource }] },
+      headers
+    )
+
+    return { bundle, regValidationError: true }
   }
 }
 
@@ -203,9 +253,6 @@ export async function markBundleAsWaitingValidation(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -229,9 +276,6 @@ export async function markBundleAsDeclarationUpdated(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -283,9 +327,6 @@ export async function markBundleAsCertified(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -325,9 +366,6 @@ export async function markBundleAsIssued(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -347,9 +385,6 @@ export async function touchBundle(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -510,24 +545,36 @@ function isSystemInitiated(scopes: string[] | undefined) {
   return Boolean(scopes?.some((scope) => SYSTEM_SCOPES.includes(scope)))
 }
 
-export function setupSystemIdentifier(request: Hapi.Request) {
+export async function setupSystemIdentifier(request: Hapi.Request) {
   const token = getToken(request)
   const { sub: systemId } = getTokenPayload(token)
   const bundle = request.payload as fhir.Bundle
   const taskResource = getTaskResource(bundle)
   const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+
+  if (!isSystemInitiated(request.auth.credentials.scope)) {
+    return
+  }
+
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
+
   taskResource.identifier = taskResource.identifier.filter(
     ({ system }) => system != systemIdentifierUrl
   )
-  if (isSystemInitiated(request.auth.credentials.scope)) {
-    taskResource.identifier.push({
-      system: systemIdentifierUrl,
-      value: systemId
-    })
-  }
+
+  const systemInformation = await getSystem(systemId, {
+    Authorization: `Bearer ${token}`
+  })
+
+  const { name, username, type } = systemInformation
+  const systemInformationJSON = { name, username, type }
+
+  taskResource.identifier.push({
+    system: systemIdentifierUrl,
+    value: JSON.stringify(systemInformationJSON)
+  })
 }
 
 export function setupLastRegUser(
@@ -548,28 +595,6 @@ export function setupLastRegUser(
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
       valueReference: { reference: getPractitionerRef(practitioner) }
-    })
-  }
-  taskResource.lastModified =
-    taskResource.lastModified || new Date().toISOString()
-  return taskResource
-}
-
-export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  const testExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/configuration`
-    )
-  })
-  if (testExtension && testExtension.valueReference) {
-    testExtension.valueReference.reference = 'IN_CONFIGURATION'
-  } else {
-    taskResource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration`,
-      valueReference: { reference: 'IN_CONFIGURATION' }
     })
   }
   taskResource.lastModified =
@@ -633,17 +658,21 @@ export async function updatePatientIdentifierWithRN(
         patient.identifier = []
       }
       const rnIdentifier = patient.identifier.find(
-        (identifier: { type: string }) => identifier.type === identifierType
+        (identifier: fhir.Identifier) =>
+          identifier.type?.coding?.[0].code === identifierType
       )
       if (rnIdentifier) {
         rnIdentifier.value = registrationNumber
       } else {
         patient.identifier.push({
-          // @ts-ignore
-          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-          // type should have CodeableConcept instead of string
-          // Need to fix in both places together along with a script for legacy data update
-          type: identifierType,
+          type: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                code: identifierType
+              }
+            ]
+          },
           value: registrationNumber
         })
       }
@@ -655,6 +684,7 @@ export async function updatePatientIdentifierWithRN(
 interface Integration {
   name: string
   status: string
+  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
 }
 
 const statuses = {
@@ -702,7 +732,7 @@ export async function validateDeceasedDetails(
   )
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
-      return integration.name === 'MOSIP'
+      return integration.integratingSystemType === 'MOSIP'
     })[0]
     if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
@@ -747,7 +777,8 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.type?.coding?.[0].code ===
+                      'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )
@@ -766,13 +797,27 @@ export async function validateDeceasedDetails(
             // One should not overwrite the other
             birthPatient.deceasedBoolean = true
             birthPatient.identifier.push({
-              type: 'DECEASED_PATIENT_ENTRY',
+              type: {
+                coding: [
+                  {
+                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                    code: 'DECEASED_PATIENT_ENTRY'
+                  }
+                ]
+              },
               value: patient.id
             } as fhir.CodeableConcept)
             await updateResourceInHearth(birthPatient)
             // mark patient with link to the birth patient
             patient.identifier?.push({
-              type: 'BIRTH_PATIENT_ENTRY',
+              type: {
+                coding: [
+                  {
+                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                    code: 'BIRTH_PATIENT_ENTRY'
+                  }
+                ]
+              },
               value: birthPatient.id
             } as fhir.CodeableConcept)
           }

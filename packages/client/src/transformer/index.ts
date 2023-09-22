@@ -30,7 +30,7 @@ import {
 import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   EventRegistration,
@@ -62,7 +62,7 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const transformRegistrationCorrection = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
@@ -157,11 +157,14 @@ export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {}
+  userDetails?: UserDetails | null,
+  originalDraftData: IFormData = {},
+  offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
+
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
@@ -174,13 +177,14 @@ export const draftToGqlTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       draftData[section.id],
-      draftData
+      draftData,
+      userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
           draftData[section.id],
-          undefined,
+          offlineCountryConfig,
           draftData
         )
         if (
@@ -193,7 +197,7 @@ export const draftToGqlTransformer = (
           /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
-              `on section ${section.id}`
+              ` on section ${section.id}`
           )
           /* eslint-enable no-console */
           inCompleteFieldList.push(
@@ -313,15 +317,14 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData,
+      userDetails
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {

@@ -16,10 +16,8 @@ import {
   Navigation,
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
-  RotateLeft,
-  Archive,
   DeclarationIcon,
   Edit,
   BackArrow,
@@ -121,7 +119,7 @@ import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
@@ -220,9 +218,11 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
 const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
-  toggleDisplayDialog
+  toggleDisplayDialog,
+  refetchDeclarationInfo
 }: {
   toggleDisplayDialog: () => void
+  refetchDeclarationInfo?: () => void
 }) {
   const { declarationId } = useParams<{ declarationId: string }>()
   const intl = useIntl()
@@ -246,20 +246,15 @@ function ReinstateButton({
           ? REINSTATE_BIRTH_DECLARATION
           : REINSTATE_DEATH_DECLARATION
       }
-      refetchQueries={[
-        {
-          query: FETCH_DECLARATION_SHORT_INFO,
-          variables: { id: declaration.id }
-        }
-      ]}
-      onCompleted={() =>
+      onCompleted={() => {
+        refetchDeclarationInfo?.()
         dispatch(
           modifyDeclaration({
             ...declaration,
             submissionStatus: ''
           })
         )
-      }
+      }}
     >
       {(reinstateDeclaration) => (
         <PrimaryButton
@@ -298,6 +293,7 @@ function RecordAuditBody({
   goToPage,
   goToHomeTab,
   scope,
+  refetchDeclarationInfo,
   userDetails,
   registerForm,
   goToUserProfile,
@@ -313,6 +309,7 @@ function RecordAuditBody({
   userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
+  refetchDeclarationInfo?: () => void
   tab: IRecordAuditTabs
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
@@ -347,11 +344,11 @@ function RecordAuditBody({
     declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -567,7 +564,7 @@ function RecordAuditBody({
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
-      <BackButtonDiv>
+      <BackButtonDiv key="go-back">
         <BackButton onClick={() => goBack()}>
           <BackArrow />
         </BackButton>
@@ -658,7 +655,10 @@ function RecordAuditBody({
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           declaration.status && ARCHIVED.includes(declaration.status) ? (
-            <ReinstateButton toggleDisplayDialog={toggleDisplayDialog} />
+            <ReinstateButton
+              toggleDisplayDialog={toggleDisplayDialog}
+              refetchDeclarationInfo={refetchDeclarationInfo}
+            />
           ) : (
             <DangerButton
               id="archive_confirm"
@@ -701,7 +701,6 @@ const BodyContent = ({
   ...actionProps
 }: IFullProps) => {
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
-
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -714,7 +713,7 @@ const BodyContent = ({
           variables={{
             id: declarationId
           }}
-          fetchPolicy="cache-and-network"
+          fetchPolicy="no-cache"
         >
           {({ loading, error, data, refetch }) => {
             if (loading) {
@@ -766,6 +765,7 @@ const BodyContent = ({
                 tab={tab}
                 draft={draft}
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
+                refetchDeclarationInfo={refetch}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -781,9 +781,10 @@ const BodyContent = ({
       draft?.data?.registration?.trackingId?.toString() ||
       workqueueDeclaration?.registration?.trackingId ||
       ''
-
     let declaration =
-      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+      draft &&
+      (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+        draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
             assignment: workqueueDeclaration?.registration?.assignment
@@ -793,7 +794,6 @@ const BodyContent = ({
             language,
             trackingId
           )
-
     const wqStatus = workqueueDeclaration?.registration?.status
     const draftStatus =
       draft?.submissionStatus?.toString() ||

@@ -90,6 +90,7 @@ export type USER_ACTION =
   | 'LOGGED_IN'
   | 'LOGGED_OUT'
   | 'PHONE_NUMBER_CHANGED'
+  | 'EMAIL_ADDRESS_CHANGED'
   | 'PASSWORD_CHANGED'
   | 'DEACTIVATE'
   | 'REACTIVATE'
@@ -275,8 +276,13 @@ export function getDeclarationType(task: Task): DECLARATION_TYPE {
   return coding.code as DECLARATION_TYPE
 }
 
-export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
-  const allowedPreviousStates = ['DECLARED', 'IN_PROGRESS']
+export function getRecordInitiator(taskHistory: fhir.Bundle): string {
+  const allowedPreviousStates = [
+    'DECLARED',
+    'VALIDATED',
+    'IN_PROGRESS',
+    'WAITING_VALIDATION'
+  ]
   const previousTasks = findAllPreviousTasks(taskHistory)
 
   const task =

@@ -9,11 +9,11 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-HEARTH_CONFIG=./migrate-mongo-config-hearth.js
-OPENHIM_CONFIG=./migrate-mongo-config-openhim.js
-APP_CONFIG=./migrate-mongo-config-application-config.js
-USER_MGNT_CONFIG=./migrate-mongo-config-user-mgnt.js
-PERFORMANCE_CONFIG=./migrate-mongo-config-performance.js
+HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
+OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
+APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
+USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
+PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

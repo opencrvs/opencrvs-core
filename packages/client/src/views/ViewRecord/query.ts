@@ -12,6 +12,7 @@
 
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -25,6 +26,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         duplicates {
           compositionId
           trackingId
@@ -121,17 +123,15 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -152,32 +152,30 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            occupation
-            nationality
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         mother {
@@ -312,36 +310,34 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            nationality
-            occupation
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            telecom {
-              system
-              value
-            }
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          occupation
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          telecom {
+            system
+            value
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         father {
@@ -401,6 +397,37 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
       ... on MarriageRegistration {
         _fhirIDMap
         id
+        informant {
+          id
+          relationship
+          otherRelationship
+          _fhirIDPatient
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
         bride {
           id
           name {
@@ -471,36 +498,32 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
           }
         }
         witnessTwo {
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
           }
         }
         typeOfMarriage
@@ -527,7 +550,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
 async function fetchDuplicateDeclarations(id: string) {
   return (
     client &&
-    client.query({
+    client.query<FetchViewRecordByCompositionQuery>({
       query: FETCH_VIEW_RECORD_BY_COMPOSITION,
       variables: { id },
       fetchPolicy: 'network-only'

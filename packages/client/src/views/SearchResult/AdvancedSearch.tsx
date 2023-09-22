@@ -19,7 +19,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { Content, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -34,7 +34,6 @@ import { pick } from 'lodash'
 import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
-import { LocationType } from '@client/utils/gateway'
 import {
   getAccordionActiveStateMap,
   IBaseAdvancedSearchState,
@@ -44,8 +43,9 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { LocationType } from '@client/offline/reducer'
 
-export enum TabId {
+enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
@@ -111,7 +111,7 @@ const BirthSection = () => {
     )
   })
 
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -185,7 +185,7 @@ const BirthSection = () => {
           id={birthSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === LocationType.HEALTH_FACILITY
                 ? {
                     ...values,
                     eventCountry: '',
@@ -314,7 +314,7 @@ const DeathSection = () => {
       'death'
     )
   })
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -371,8 +371,7 @@ const DeathSection = () => {
             'deceasedDoB',
             'deceasedFirstNames',
             'deceasedFamilyName',
-            'deceasedGender',
-            'placeOfDeath'
+            'deceasedGender'
           ])}
         />
       </Accordion>
@@ -388,7 +387,7 @@ const DeathSection = () => {
           id={deathSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === LocationType.HEALTH_FACILITY
                 ? {
                     ...values,
                     eventCountry: '',

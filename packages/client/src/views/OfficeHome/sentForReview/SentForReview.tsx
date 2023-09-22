@@ -20,7 +20,8 @@ import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   Workqueue,
   COLUMNS,
@@ -33,7 +34,6 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
-import { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {

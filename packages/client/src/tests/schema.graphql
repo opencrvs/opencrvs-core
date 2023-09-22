@@ -218,8 +218,8 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -257,7 +257,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -514,7 +514,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
 }
 
 input BirthRegistrationInput {
@@ -525,7 +524,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -614,11 +613,9 @@ type ApplicationConfiguration {
   DEATH: Death
   MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   LOGIN_BACKGROUND: LoginBackground
 }
 
@@ -630,11 +627,9 @@ input ApplicationConfigurationInput {
   DEATH: DeathInput
   MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
@@ -664,7 +659,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   assignment: AssignmentData
   contact: String
@@ -685,14 +680,6 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
-}
-
-enum BirthType {
-  SINGLE
-  TWIN
-  TRIPLET
-  QUADRUPLET
-  HIGHER_MULTIPLE_DELIVERY
 }
 
 type QuestionnaireQuestion {
@@ -858,6 +845,30 @@ enum LocationType {
   OTHER
 }
 
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
+}
+
+input Operation {
+  operation: String!
+}
+
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 type LocalRegistrar {
   name: [HumanName]!
   role: String!
@@ -888,7 +899,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 
@@ -989,7 +999,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   contact: String
   contactRelationship: String
@@ -1129,34 +1139,23 @@ input QuestionInput {
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
   tooltip: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
+  initialValue: String
   maxLength: Int
+  inputWidth: Int
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!
+  validateEmpty: Boolean
   required: Boolean
   enabled: String
   custom: Boolean
-}
-
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
+  conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
+  validator: [ValidatorInput!]
+  mapping: MappingInput
 }
 
 type AssignmentData {
@@ -1164,6 +1163,7 @@ type AssignmentData {
   firstName: String
   lastName: String
   officeName: String
+  avatarURL: String!
 }
 
 type RegWorkflow {
@@ -1210,7 +1210,7 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UINTOKEN
+  MOSIP_PSUT_TOKEN_ID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE

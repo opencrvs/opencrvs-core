@@ -29,9 +29,8 @@ import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
   getIDFromResponse,
-  getRegistrationIdsFromResponse,
+  getCompositionIdFromResponse,
   removeDuplicatesFromComposition,
-  getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
   setCertificateCollector
@@ -738,12 +737,7 @@ async function createEventRegistration(
 
   if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
-      return await getRegistrationIds(
-        existingComposition,
-        event,
-        false,
-        authHeader
-      )
+      return { compositionId: existingComposition }
     } else {
       // return tracking-id
       return await getDeclarationIds(existingComposition, authHeader)
@@ -768,7 +762,7 @@ async function createEventRegistration(
 
   if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
-    return await getRegistrationIdsFromResponse(res, event, authHeader)
+    return await getCompositionIdFromResponse(res, event, authHeader)
   } else {
     // return tracking-id and potential duplicates
     const ids = await getDeclarationIdsFromResponse(res, authHeader)
@@ -880,6 +874,7 @@ const ACTION_EXTENSIONS = [
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
+  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
   const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${compositionId}`,
     authHeader
@@ -890,6 +885,9 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   }
   taskEntry.resource.extension = taskEntry.resource.extension?.filter(
     ({ url }) => !ACTION_EXTENSIONS.includes(url)
+  )
+  taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
+    ({ system }) => system != systemIdentifierUrl
   )
   return taskEntry
 }

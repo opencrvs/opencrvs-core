@@ -15,7 +15,10 @@ import { useIntl } from 'react-intl'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Mutation } from '@apollo/client/react/components'
-import { changePhoneMutation } from '@client/views/Settings/mutations'
+import {
+  changeEmailMutation,
+  changePhoneMutation
+} from '@client/views/Settings/mutations'
 import { convertToMSISDN } from '@client/forms/utils'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -26,7 +29,8 @@ import { modifyUserDetails } from '@client/profile/profileActions'
 import { Message } from '@client/views/Settings/items/components'
 import {
   ChangePhoneMutationVariables,
-  ChangePasswordMutation
+  ChangePasswordMutation,
+  ChangeEmailMutationVariables
 } from '@client/utils/gateway'
 
 interface IProps {
@@ -34,13 +38,14 @@ interface IProps {
   onSuccess: () => void
   onClose: () => void
   data: {
-    phoneNumber: string
+    phoneNumber?: string
+    email?: string
   }
 }
 
 export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
   const intl = useIntl()
-  const { phoneNumber } = data
+  const { phoneNumber, email } = data
   const userDetails = useSelector(getUserDetails)
   const nonce = useSelector(getUserNonce)
   const [verifyCode, setVerifyCode] = React.useState(EMPTY_STRING)
@@ -58,11 +63,23 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     setErrorOccured(false)
   }
   const phoneChangeCompleted = () => {
-    if (userDetails) {
+    if (userDetails && phoneNumber) {
       dispatch(
         modifyUserDetails({
           ...userDetails,
           mobile: convertToMSISDN(phoneNumber, window.config.COUNTRY)
+        })
+      )
+    }
+    onSuccess()
+  }
+
+  const emailChangeCompleted = () => {
+    if (userDetails) {
+      dispatch(
+        modifyUserDetails({
+          ...userDetails,
+          email: email
         })
       )
     }
@@ -83,29 +100,46 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <Mutation<ChangePasswordMutation, ChangePhoneMutationVariables>
-          mutation={changePhoneMutation}
-          onCompleted={phoneChangeCompleted}
+        <Mutation<
+          ChangePasswordMutation,
+          ChangePhoneMutationVariables | ChangeEmailMutationVariables
+        >
+          key="change-phone-mutation"
+          mutation={phoneNumber ? changePhoneMutation : changeEmailMutation}
+          onCompleted={
+            phoneNumber ? phoneChangeCompleted : emailChangeCompleted
+          }
           onError={() => setErrorOccured(true)}
         >
-          {(changePhone) => {
+          {(changePhoneOrEmail) => {
             return (
               <PrimaryButton
                 id="verify-button"
                 key="verify"
                 onClick={() => {
                   if (userDetails?.userMgntUserID) {
-                    changePhone({
-                      variables: {
-                        userId: userDetails.userMgntUserID,
-                        phoneNumber: convertToMSISDN(
-                          phoneNumber,
-                          window.config.COUNTRY
-                        ),
-                        nonce: nonce,
-                        verifyCode: verifyCode
-                      }
-                    })
+                    if (phoneNumber) {
+                      changePhoneOrEmail({
+                        variables: {
+                          userId: userDetails.userMgntUserID,
+                          phoneNumber: convertToMSISDN(
+                            phoneNumber,
+                            window.config.COUNTRY
+                          ),
+                          nonce: nonce,
+                          verifyCode: verifyCode
+                        }
+                      })
+                    } else if (email) {
+                      changePhoneOrEmail({
+                        variables: {
+                          userId: userDetails.userMgntUserID,
+                          email: email,
+                          nonce: nonce,
+                          verifyCode: verifyCode
+                        }
+                      })
+                    }
                   }
                 }}
                 disabled={!Boolean(verifyCode.length) || !isInvalidLength}
@@ -121,9 +155,13 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       contentScrollableY={true}
     >
       <Message>
-        {intl.formatMessage(messages.confirmationPhoneMsg, {
-          num: phoneNumber
-        })}
+        {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+          ? intl.formatMessage(messages.confirmationPhoneMsg, {
+              num: phoneNumber || userDetails?.mobile
+            })
+          : intl.formatMessage(messages.confirmationEmailMsg, {
+              email: email || userDetails?.email
+            })}
       </Message>
       <InputField
         id="verifyCode"

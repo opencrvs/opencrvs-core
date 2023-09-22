@@ -21,9 +21,11 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { convertToMSISDN } from '@client/forms/utils'
 import { queriesForUser } from '@client/views/Settings/queries'
-import { isNull } from 'lodash'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
+import { NotificationEvent } from '@client/profile/serviceApi'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getLanguage } from '@client/i18n/selectors'
 
 interface IProps {
   show: boolean
@@ -35,6 +37,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
+  const userDetails = useSelector(getUserDetails)
+  const language = useSelector(getLanguage)
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
@@ -44,6 +48,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
     setIsInvalidPhoneNumber(!isAValidPhoneNumberFormat(phoneNumber))
+    if (showDuplicateMobileErrorNotification) {
+      setShowDuplicateMobileErrorNotification(false)
+    }
   }
   const restoreState = () => {
     setPhoneNumber(EMPTY_STRING)
@@ -53,13 +60,27 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateMobileErrorNotification((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const userData = await queriesForUser.fetchUserDetails(
+    const userData = await queriesForUser.fetchUserDetailsByMobile(
       convertToMSISDN(phoneNumber, window.config.COUNTRY)
     )
-    const userDetails = userData.data.getUserByMobile
-    if (isNull(userDetails.id)) {
+    const mobileNumberExist = userData.data.getUserByMobile
+
+    if (!mobileNumberExist) {
+      const notificationEvent = NotificationEvent.CHANGE_PHONE_NUMBER
+
       dispatch(
-        sendVerifyCode(convertToMSISDN(phoneNumber, window.config.COUNTRY))
+        sendVerifyCode(
+          [
+            {
+              use: language,
+              family: String(userDetails?.name?.[0].familyName),
+              given: [String(userDetails?.name?.[0].firstNames)]
+            }
+          ],
+          notificationEvent,
+          convertToMSISDN(phoneNumber, window.config.COUNTRY),
+          String(userDetails?.email)
+        )
       )
       onSuccess(phoneNumber)
     } else {

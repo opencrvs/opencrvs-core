@@ -40,7 +40,7 @@ const fields: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'MOTHER', label: issueMessages.issueToMother },
       { value: 'FATHER', label: issueMessages.issueToFather },
@@ -58,7 +58,7 @@ const commonFieldsForBirthAndDeath: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'INFORMANT', label: issueMessages.issueToInformant },
       { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
@@ -75,7 +75,7 @@ const fieldsForMarriage: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'GROOM', label: issueMessages.issueToGroom },
       { value: 'BRIDE', label: issueMessages.issueToBride },
@@ -173,6 +173,7 @@ export function IssueCollectorForm({
       title={intl.formatMessage(issueMessages.issueCertificate)}
       bottomActionButtons={[
         <PrimaryButton
+          key="continue-button"
           id="continue-button"
           onClick={continueButtonHandler}
           disabled={groupHasError(
@@ -186,6 +187,7 @@ export function IssueCollectorForm({
     >
       <FormFieldGenerator
         id="collector"
+        key="collector"
         onChange={(values) => {
           handleChange(values, declaration)
         }}

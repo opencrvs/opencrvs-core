@@ -22,7 +22,6 @@ import {
   selectOption,
   goToSection
 } from '@client/tests/util'
-import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
 import {
   storeDeclaration,
   createDeclaration,
@@ -36,6 +35,7 @@ import { storage } from '@client/storage'
 import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
+import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 
 describe('when user has starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
@@ -73,7 +73,7 @@ describe('when user has starts a new declaration', () => {
 
     it('renders unlock screen', async () => {
       history.replace(
-        SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
+        DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
       )
       await waitForElement(app, '#unlockPage')
     })
@@ -89,73 +89,6 @@ describe('when user has starts a new declaration', () => {
       app = testApp.app
       history = testApp.history
       store = testApp.store
-    })
-
-    describe('when user tries to continue without providing contact-point datas', () => {
-      let draft: IDeclaration
-      beforeEach(async () => {
-        const data = {
-          registration: {
-            informantType: {
-              value: '',
-              nestedFields: { otherInformantType: '' }
-            }
-          }
-        }
-        draft = createDeclaration(Event.Birth, data)
-        store.dispatch(storeDeclaration(draft))
-        history.replace(
-          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
-        )
-        await waitForElement(app, '#register_form')
-      })
-      describe('when user clicks continue without choosing informantType', () => {
-        it('prevents from continuing and show radio button error', async () => {
-          app.find('#next_section').hostNodes().simulate('click')
-          await waitForElement(app, '#informantType_error')
-          expect(app.find('#informantType_error').hostNodes()).toHaveLength(1)
-        })
-      })
-      describe('when user enters informantType, clicks to contact page, then clicks continue without entering valid phone number of contact point ', () => {
-        it('prevents from continuing and shows phone inputfield error', async () => {
-          app
-            .find('#informantType_MOTHER')
-            .hostNodes()
-            .simulate('change', { target: { checked: true } })
-          app.find('#next_section').hostNodes().simulate('click')
-          app.update()
-          await waitForElement(app, '#contactPoint_MOTHER')
-          app
-            .find('#contactPoint_MOTHER')
-            .hostNodes()
-            .simulate('change', { target: { checked: true } })
-          await waitForElement(
-            app,
-            'input[name="contactPoint.nestedFields.registrationPhone"]'
-          )
-          app
-            .find('input[name="contactPoint.nestedFields.registrationPhone"]')
-            .simulate('change', {
-              target: {
-                name: 'contactPoint.nestedFields.registrationPhone',
-                value: '0'
-              }
-            })
-
-          app.find('#next_section').hostNodes().simulate('click')
-          await waitForElement(
-            app,
-            'div[id="contactPoint.nestedFields.registrationPhone_error"]'
-          )
-          expect(
-            app
-              .find(
-                'div[id="contactPoint.nestedFields.registrationPhone_error"]'
-              )
-              .hostNodes()
-          ).toHaveLength(1)
-        })
-      })
     })
 
     describe('when user is in birth registration by parent informant view', () => {
@@ -180,41 +113,20 @@ describe('when user has starts a new declaration', () => {
          * so offline declarations wouldn't override the dispatched ones
          */
         store.dispatch(storeDeclaration(draft))
+        // TODO: SELECT_BIRTH_INFORMANT has been removed
         history.replace(
-          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
+          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
         )
-        await waitForElement(app, '#register_form')
+        await waitForElement(app, '#content-name')
 
-        app
-          .find('#informantType_MOTHER')
-          .hostNodes()
-          .simulate('change', { target: { checked: true } })
         app.find('#next_section').hostNodes().simulate('click')
-        await waitForElement(app, '#contactPoint_MOTHER')
-        app
-          .find('#contactPoint_MOTHER')
-          .hostNodes()
-          .simulate('change', { target: { checked: true } })
-        await waitForElement(
-          app,
-          'input[name="contactPoint.nestedFields.registrationPhone"]'
-        )
-
-        app
-          .find('input[name="contactPoint.nestedFields.registrationPhone"]')
-          .simulate('change', {
-            target: {
-              name: 'contactPoint.nestedFields.registrationPhone',
-              value: '01999999999'
-            }
-          })
         app.find('#next_section').hostNodes().simulate('click')
         await waitForElement(app, '#form_section_id_child-view-group')
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
-          await waitForElement(app, '#informant_parent_view')
+          // await waitForElement(app, '#informant_parent_view')
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -225,19 +137,8 @@ describe('when user has starts a new declaration', () => {
           app.find('#next_section').hostNodes().simulate('click')
           await flushPromises()
         })
-        it('stores the value to a new draft and move to next section', () => {
-          const mockCalls = (storage.setItem as Mock).mock.calls
-          const userData = mockCalls[mockCalls.length - 1]
-          const storedDeclarations = JSON.parse(
-            userData[userData.length - 1]
-          )[0].declarations
-          expect(storedDeclarations[0].data.child.firstNamesEng).toEqual(
-            'hello'
-          )
-          expect(window.location.href).toContain('mother')
-        })
         it('redirect to home when pressed save and exit button', async () => {
-          app.find('#save_draft').hostNodes().simulate('click')
+          app.find('#save-exit-btn').hostNodes().simulate('click')
           await flushPromises()
           app.update()
           expect(window.location.href).toContain('/')
@@ -247,14 +148,19 @@ describe('when user has starts a new declaration', () => {
           await flushPromises()
           app.update()
           expect(
-            app.find('#eventToggleMenuSubMenu').hostNodes().length
+            app.find('#eventToggleMenuToggleButton').hostNodes().length
           ).toEqual(1)
         })
         it('check toggle menu item handler', async () => {
-          app.find('#eventToggleMenuToggleButton').hostNodes().simulate('click')
+          const menuLink = await waitForElement(
+            app,
+            '#eventToggleMenuToggleButton'
+          )
+          menuLink.hostNodes().simulate('click')
           await flushPromises()
           app.update()
 
+          await waitForElement(app, '#eventToggleMenuItem0')
           app.find('#eventToggleMenuItem0').hostNodes().simulate('click')
           await flushPromises()
           app.update()
@@ -298,6 +204,9 @@ describe('when user has starts a new declaration', () => {
             app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
             app.update()
+            app.find('#next_section').hostNodes().simulate('click')
+            await flushPromises()
+            app.update()
           })
           it('renders list of document upload field', async () => {
             const fileInputs = app
@@ -305,7 +214,7 @@ describe('when user has starts a new declaration', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
@@ -315,7 +224,7 @@ describe('when user has starts a new declaration', () => {
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('No error while uploading valid file', async () => {
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
@@ -371,7 +280,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
-          await goToSection(app, 4)
+          await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
             .hostNodes()
@@ -415,9 +324,7 @@ describe('when user has starts a new declaration', () => {
       describe('when user clicks the "mother" page', () => {
         beforeEach(() => goToMotherSection(app))
         it('changes to the mother details section', () => {
-          expect(
-            app.find('#form_section_title_mother-view-group').hostNodes()
-          ).toHaveLength(1)
+          expect(window.location.href).toContain('mother')
         })
         it('hides everything with pinpad if is page loses focus', async () => {
           setPageVisibility(false)
@@ -427,15 +334,13 @@ describe('when user has starts a new declaration', () => {
       describe('when user clicks the "father" page', () => {
         beforeEach(() => goToFatherSection(app))
         it('changes to the father details section', () => {
-          expect(
-            app.find('#form_section_title_father-view-group').hostNodes()
-          ).toHaveLength(1)
+          expect(window.location.href).toContain('father')
         })
       })
       describe('when user is in document page', () => {
         beforeEach(() => goToDocumentsSection(app))
         it('image upload field is rendered', () => {
-          expect(app.find('#upload_document').hostNodes()).toHaveLength(3)
+          expect(app.find('#upload_document').hostNodes()).toHaveLength(5)
         })
       })
     })

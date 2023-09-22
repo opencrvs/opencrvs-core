@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_MONGO_URL } from '@metrics/constants'
+import { HEARTH_MONGO_URL, PRODUCTION, QA_ENV } from '@metrics/constants'
 import { logger } from '@metrics/logger'
 import { subMinutes } from 'date-fns'
 import { MongoClient } from 'mongodb'
@@ -26,9 +26,23 @@ import { MongoClient } from 'mongodb'
  * - One that tracks whether an update is in progress
  * - One that tracks if an uodate has been requested after the first update run started
  */
+import * as Hapi from '@hapi/hapi'
 
 let updateInProgress = false
 let nextUpdateRequested = false
+
+export async function performanceDataRefreshHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  refresh().catch((error) => {
+    logger.error(`Error on performance data refresh triggered: ${error}`)
+  })
+  return h.response({
+    message: 'Successfully triggered performance data refresh',
+    statusCode: 200
+  })
+}
 
 export async function refresh() {
   if (updateInProgress) {
@@ -40,8 +54,8 @@ export async function refresh() {
   const client = new MongoClient(HEARTH_MONGO_URL)
   try {
     updateInProgress = true
-    await client.connect()
-    await refreshPerformanceMaterialisedViews(client)
+    const connectedClient = await client.connect()
+    await refreshPerformanceMaterialisedViews(connectedClient)
     logger.info('Performance materialised views refreshed')
   } catch (error) {
     logger.error(`Error refreshing performances materialised views ${error}`)
@@ -57,9 +71,12 @@ export async function refresh() {
 }
 
 async function refreshPerformanceMaterialisedViews(client: MongoClient) {
-  const db = client.db(client.options.dbName)
-
-  const lastUpdatedAt = subMinutes(new Date(), 5).toISOString()
+  const db = client.db()
+  const REFRESH_AFTER_IN_MINUTE = PRODUCTION && !QA_ENV ? 1440 : 5
+  const lastUpdatedAt = subMinutes(
+    new Date(),
+    REFRESH_AFTER_IN_MINUTE
+  ).toISOString()
   await db
     .collection('Task')
     .aggregate(
@@ -72,7 +89,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$businessStatus.coding' },
         {
           $match: {
-            'businessStatus.coding.code': { $in: ['CERTIFIED', 'REGISTERED'] }
+            'businessStatus.coding.code': {
+              $in: ['CERTIFIED', 'REGISTERED', 'ISSUED']
+            }
           }
         },
         {
@@ -189,9 +208,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                     cond: {
                       $eq: [
                         {
-                          $min: '$allTasks.meta.lastUpdated'
+                          $min: '$allTasks.lastModified'
                         },
-                        '$$this.meta.lastUpdated'
+                        '$$this.lastModified'
                       ]
                     }
                   }
@@ -301,40 +320,6 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             encounterIdForJoining: { $concat: ['Encounter/', '$encounter.id'] }
           }
         },
-        {
-          $lookup: {
-            from: 'Observation',
-            localField: 'encounterIdForJoining',
-            foreignField: 'context.reference',
-            as: 'observations'
-          }
-        },
-        {
-          $addFields: {
-            birthTypeObservation: {
-              $filter: {
-                input: '$observations',
-                as: 'element',
-                cond: {
-                  $eq: [
-                    {
-                      $let: {
-                        vars: {
-                          firstElement: {
-                            $arrayElemAt: ['$$element.code.coding', 0]
-                          }
-                        },
-                        in: '$$firstElement.code'
-                      }
-                    },
-                    '57722-1'
-                  ]
-                }
-              }
-            }
-          }
-        },
-        { $unwind: '$birthTypeObservation' },
         {
           $lookup: {
             from: 'Location',
@@ -468,12 +453,15 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
           }
         },
         { $unwind: '$practitionerRole' },
-        { $unwind: '$practitionerRole.code' },
-        { $unwind: '$practitionerRole.code.coding' },
+        {
+          $addFields: {
+            firstCode: { $slice: ['$practitionerRole.code', 1] }
+          }
+        },
+        { $unwind: '$firstCode' },
         {
           $match: {
-            'practitionerRole.code.coding.system':
-              'http://opencrvs.org/specs/titles'
+            'firstCode.coding.system': 'http://opencrvs.org/specs/roles'
           }
         },
         {
@@ -487,7 +475,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -495,23 +483,23 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -532,17 +520,19 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             birthOrder: '$child.multipleBirthInteger',
             createdBy: '$firstTask.extensionsObject.regLastUser',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
             },
+            registeredAt: {
+              $dateFromString: { dateString: '$registerTask.lastModified' }
+            },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
-            birthType: '$birthTypeObservation.valueQuantity.value',
             mothersAgeAtBirthOfChildInYears: '$mothersAgeAtBirthOfChild',
             placeOfBirthType: 1,
-            practitionerRole: '$practitionerRole.code.coding.code',
+            practitionerRole: { $arrayElemAt: ['$firstCode.coding.code', 0] },
             practitionerName: {
               $concat: [
                 '$practitionerFamilyname',
@@ -675,7 +665,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -683,23 +673,23 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -711,7 +701,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             reason: '$reason.text',
             extensions: '$extensions',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             event: 'Birth',
             createdAt: {
@@ -821,7 +811,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
+                  const date = new Date(row.cbr.year, 0, 1)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
@@ -830,7 +820,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                   }
                   const totalDays = daysInYear(year)
                   return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
+                    if(index !== 0){
+                      date.setDate(date.getDate() + 1)
+                    }
                     return {
                       date: date.toISOString(),
                       estimatedNumberOfBirths:

@@ -33,6 +33,8 @@ import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 import { Link } from '@client/../../components/lib'
 import { chunk, sortBy } from 'lodash'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Toast } from '@opencrvs/components/lib/Toast'
+
 const DEFAULT_LIST_SIZE = 12
 
 const UserTable = styled(BodyContent)`
@@ -59,72 +61,11 @@ async function downloadURI(uri: string, name: string) {
     })
 }
 
-function TabContent(props: VSExportProps) {
-  const intl = useIntl()
-  const items: VsExport[] = props.items
-  const totalItems = items.length
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const pages = chunk(items, DEFAULT_LIST_SIZE)
-  const getPage = (pageNumber: number) => pages[pageNumber - 1]
-
-  return (
-    <>
-      {sortBy(getPage(currentPageNumber), 'startDate').map((item: VsExport) => {
-        const fileName = intl.formatMessage(messages.vitalStatisticsExport, {
-          month: intl.formatDate(new Date(item.startDate), { month: 'long' }),
-          event: item.event,
-          fileSize: ''
-        })
-
-        const label = intl.formatMessage(messages.vitalStatisticsExport, {
-          month: intl.formatDate(new Date(item.startDate), { month: 'long' }),
-          event: item.event,
-          fileSize: item.fileSize
-        })
-        const downloadFilePath = `${window.config.MINIO_URL}${item.url}`
-
-        return (
-          <ListViewSimplified
-            key={`${item.createdOn}_${item.event}`}
-            bottomBorder
-          >
-            <ListViewItemSimplified
-              compactLabel
-              label={
-                <Label id={`${item.createdOn}_label`}>
-                  {new Date(item.startDate).getFullYear()}
-                </Label>
-              }
-              value={<Value id={`${item.createdOn}_value`}>{label}</Value>}
-              actions={
-                <DynamicHeightLinkButton
-                  id={`${item.createdOn}_export_button`}
-                  disabled={false}
-                  onClick={async () =>
-                    await downloadURI(downloadFilePath, fileName.trim())
-                  }
-                >
-                  {intl.formatMessage(messages.export)}
-                </DynamicHeightLinkButton>
-              }
-            />
-          </ListViewSimplified>
-        )
-      })}
-      {totalItems > 0 && (
-        <Pagination
-          currentPage={currentPageNumber}
-          totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-          onPageChange={(page: any) => setCurrentPageNumber(page)}
-        />
-      )}
-    </>
-  )
-}
-
 const VSExport = () => {
   const intl = useIntl()
   const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
+  const [documentDownloadError, setDocumentDownloadError] =
+    React.useState(false)
   const tabSections = [
     {
       id: Event.Birth,
@@ -136,6 +77,80 @@ const VSExport = () => {
     }
   ]
 
+  function TabContent(props: VSExportProps) {
+    const items: VsExport[] = props.items
+    const totalItems = items.length
+    const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+    const pages = chunk(items, DEFAULT_LIST_SIZE)
+    const getPage = (pageNumber: number) => pages[pageNumber - 1]
+
+    return (
+      <>
+        {sortBy(getPage(currentPageNumber), 'startDate').map(
+          (item: VsExport) => {
+            const fileName = intl.formatMessage(
+              messages.vitalStatisticsExport,
+              {
+                month: intl.formatDate(new Date(item.startDate), {
+                  month: 'long'
+                }),
+                event: item.event,
+                fileSize: ''
+              }
+            )
+
+            const label = intl.formatMessage(messages.vitalStatisticsExport, {
+              month: intl.formatDate(new Date(item.startDate), {
+                month: 'long'
+              }),
+              event: item.event,
+              fileSize: item.fileSize
+            })
+
+            return (
+              <ListViewSimplified
+                key={`${item.createdOn}_${item.event}`}
+                bottomBorder
+              >
+                <ListViewItemSimplified
+                  compactLabel
+                  label={
+                    <Label id={`${item.createdOn}_label`}>
+                      {new Date(item.startDate).getFullYear()}
+                    </Label>
+                  }
+                  value={<Value id={`${item.createdOn}_value`}>{label}</Value>}
+                  actions={
+                    <DynamicHeightLinkButton
+                      id={`${item.createdOn}_export_button`}
+                      disabled={false}
+                      onClick={async () => {
+                        try {
+                          await downloadURI(item.url, fileName.trim())
+                        } catch (error) {
+                          setDocumentDownloadError(true)
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.export)}
+                    </DynamicHeightLinkButton>
+                  }
+                />
+              </ListViewSimplified>
+            )
+          }
+        )}
+        {totalItems > 0 && (
+          <Pagination
+            currentPage={currentPageNumber}
+            totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
+            onPageChange={(page: any) => setCurrentPageNumber(page)}
+          />
+        )}
+      </>
+    )
+  }
+
   // TODO: Replace with Frame component */
 
   return (
@@ -144,6 +159,7 @@ const VSExport = () => {
         id="vsexport-wrapper"
         hideBackground={true}
         isCertificatesConfigPage={true}
+        headerTitle={intl.formatMessage(messages.vsexport)}
       >
         <UserTable id="vsexport_list">
           <Content
@@ -198,6 +214,17 @@ const VSExport = () => {
             </Query>
           </Content>
         </UserTable>
+        {documentDownloadError && (
+          <Toast
+            id={`document_download_error_notification`}
+            type={'error'}
+            onClose={() => {
+              setDocumentDownloadError(false)
+            }}
+          >
+            {intl.formatMessage(messages.vsExportDownloadFailed)}
+          </Toast>
+        )}
       </SysAdminContentWrapper>
     </>
   )

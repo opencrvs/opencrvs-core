@@ -273,6 +273,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: previewImage as IFileValue })
   }
 
+  getFormattedLabelForDocType = (docType: string) => {
+    const matchingOptionForDocType =
+      this.props.options &&
+      this.props.options.find((option) => option.value === docType)
+    return matchingOptionForDocType && matchingOptionForDocType.label
+  }
+
   renderDocumentUploaderWithDocumentTypeBlock = () => {
     const { name, intl } = this.props
     return this.props.splitView ? (
@@ -304,6 +311,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}
+          isDisabled={this.state.filesBeingProcessed.length > 0}
         />
 
         <ImageUploader
@@ -347,7 +355,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
-            title={intl.formatMessage(buttonMessages.preview)}
+            title={this.getFormattedLabelForDocType(
+              this.state.previewImage.optionValues[1] as string
+            )}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
           />

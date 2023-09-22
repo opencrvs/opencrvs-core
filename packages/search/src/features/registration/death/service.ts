@@ -18,12 +18,14 @@ import {
   ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
+  DECLARED_STATUS,
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
   ICompositionBody,
   IDeathCompositionBody,
+  IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
   REGISTERED_STATUS,
@@ -59,12 +61,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -82,7 +85,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+
   const compositionId =
     task &&
     task.focus &&
@@ -159,11 +168,8 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (
-    body.type !== 'IN_PROGRESS' &&
-    body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED'
-  ) {
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }
@@ -236,8 +242,9 @@ async function createDeceasedIndex(
   body.gender = deceased && deceased.gender
   body.deceasedIdentifier =
     deceased.identifier &&
-    deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    deceased.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
   body.deceasedDoB = deceased && deceased.birthDate
 }
 
@@ -367,8 +374,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
@@ -388,6 +396,10 @@ async function createDeclarationIndex(
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
   )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
@@ -426,6 +438,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

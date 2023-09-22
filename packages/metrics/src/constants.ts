@@ -25,6 +25,7 @@ export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const QA_ENV = process.env.QA_ENV || false
 export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/metrics'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
@@ -47,3 +48,6 @@ export const DEATH_REPORT_PATH =
     : join(__dirname, '../src/scripts/Death_Report.csv')
 export const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
+
+export const DASHBOARD_MONGO_URL =
+  process.env.DASHBOARD_MONGO_URL || 'mongodb://localhost/performance'

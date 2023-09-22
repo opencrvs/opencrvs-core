@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as bcrypt from 'bcryptjs'
 import { createHash } from 'crypto'
-import * as uuid from 'uuid/v4'
 
 interface ISaltedHash {
   hash: string
@@ -33,16 +33,25 @@ export function generateRandomPassword(demoUser?: boolean) {
 
   return randomPassword
 }
-
-export function generateHash(content: string, salt: string): string {
+/*
+ * In OCRVS-4979 we needed to change the hashing algorithm to conform latest security standards.
+ * We still need to support users logging in with the old password hash to allow them to change their passwords to the new hash.
+ *
+ * TODO: In OpenCRVS 1.4, remove this check and force any users without new password hash to reset their password via sys admin.
+ */
+export function generateOldHash(content: string, salt: string): string {
   const hash = createHash('sha512')
   hash.update(salt)
   hash.update(content)
   return hash.digest('hex')
 }
 
+export function generateHash(content: string, salt: string): string {
+  return bcrypt.hashSync(content, salt)
+}
+
 export function generateSaltedHash(password: string): ISaltedHash {
-  const salt = uuid()
+  const salt = bcrypt.genSaltSync(10)
   return {
     hash: generateHash(password, salt),
     salt

@@ -28,9 +28,7 @@ interface IRecordAuditMessages
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
   placeOfMarriage: MessageDescriptor
-  informant: MessageDescriptor
-  brn: MessageDescriptor
-  drn: MessageDescriptor
+  rn: MessageDescriptor
   noName: MessageDescriptor
   noStatus: MessageDescriptor
   noType: MessageDescriptor
@@ -39,7 +37,6 @@ interface IRecordAuditMessages
   noDateOfDeath: MessageDescriptor
   noPlaceOfBirth: MessageDescriptor
   noPlaceOfDeath: MessageDescriptor
-  noInformant: MessageDescriptor
   reinstateDeclarationDialogTitle: MessageDescriptor
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
@@ -48,6 +45,16 @@ interface IRecordAuditMessages
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  contact: {
+    id: 'recordAudit.contact',
+    defaultMessage: 'Contact',
+    description: 'Contact for record audit'
+  },
+  noContact: {
+    id: 'recordAudit.noContact',
+    defaultMessage: 'No contact details provided',
+    description: 'No contact for record audit'
+  },
   archived: {
     id: 'recordAudit.archive.status',
     defaultMessage: 'Archived',
@@ -119,20 +126,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Place of marriage',
     description: 'Label for place of marriage'
   },
-  informant: {
-    id: 'recordAudit.informant',
-    defaultMessage: 'Informant',
-    description: 'Label for informant'
-  },
-  brn: {
-    id: 'recordAudit.brn',
-    defaultMessage: 'BRN',
+  rn: {
+    id: 'recordAudit.rn',
+    defaultMessage: 'Registration no.',
     description: 'Label for Birth Registration Number'
-  },
-  drn: {
-    id: 'recordAudit.drn',
-    defaultMessage: 'DRN',
-    description: 'Label for Death Registration Number'
   },
   registrationNo: {
     id: 'recordAudit.registrationNo',
@@ -169,6 +166,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No date of death',
     description: 'Label for date of death not available'
   },
+  noDateOfMarriage: {
+    id: 'recordAudit.noDateOfMarriage',
+    defaultMessage: 'No date of marriage',
+    description: 'Label for date of marriage not available'
+  },
   noPlaceOfBirth: {
     id: 'recordAudit.noPlaceOfBirth',
     defaultMessage: 'No place of birth',
@@ -179,10 +181,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No place of death',
     description: 'Label for place of death not availale'
   },
-  noInformant: {
-    id: 'recordAudit.noInformant',
-    defaultMessage: 'No Informant',
-    description: 'Label for informant not available'
+  noPlaceOfMarriage: {
+    id: 'recordAudit.noPlaceOfMarriage',
+    defaultMessage: 'No place of marriage',
+    description: 'Label for place of marriage not availale'
   },
   reinstateDeclarationDialogTitle: {
     id: 'recordAudit.declaration.reinstateDialogTitle',

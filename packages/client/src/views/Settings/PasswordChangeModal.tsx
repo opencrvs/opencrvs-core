@@ -18,7 +18,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { gql } from '@apollo/client'
 import { get } from 'lodash'
@@ -104,7 +104,7 @@ const BoxedError = styled.div`
   margin-bottom: 10px;
   display: flex;
 `
-export const changePasswordMutation = gql`
+const changePasswordMutation = gql`
   mutation changePassword(
     $userId: String!
     $existingPassword: String!
@@ -235,6 +235,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         contentHeight={420}
         actions={[
           <Mutation
+            key="change-password-mutation"
             mutation={changePasswordMutation}
             variables={{
               userId: get(this.props, 'userDetails.userMgntUserID'),

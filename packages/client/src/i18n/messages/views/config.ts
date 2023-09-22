@@ -19,6 +19,7 @@ interface IConfigMessages
   vitalStatisticsExport: MessageDescriptor
   export: MessageDescriptor
   vsEmptyStateText: MessageDescriptor
+  vsExportDownloadFailed: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   applicationNameChangeNotification: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
@@ -166,6 +167,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.emptystate',
     defaultMessage:
       "The previous month's vital statistics data (based on vital event registrations occurring within that month) will become available for you to export as of the 1st of every month. Large CSV files cannot be opened in Excel and should therefore be opened in a statistical program such as {posit}.",
+    description: 'Vital Statistics Export Empty State Text'
+  },
+  vsExportDownloadFailed: {
+    id: 'config.application.vsExportDownloadFailed',
+    defaultMessage: 'Sorry! Something went wrong',
     description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {
@@ -645,7 +651,7 @@ const messagesToDefine: IConfigMessages = {
   informantNotificationSubtitle: {
     id: 'config.informantNotification.subtitle',
     defaultMessage:
-      'Select the SMS notification to send to the Informant to keep them informed of the progress to their declaration. SMS copy can be updated from.... ',
+      'Select the notifications to send to the informant to keep them informed of the progress to their declaration. Your system is configured to send {communicationType}.',
     description: 'Subtile for informant sms notification'
   },
   inProgressSMS: {

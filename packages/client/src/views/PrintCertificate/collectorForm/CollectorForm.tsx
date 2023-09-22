@@ -24,9 +24,7 @@ import {
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  DownloadAction,
   IForm,
-  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
@@ -38,7 +36,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -54,12 +52,8 @@ import {
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
-import { gqlToDraftTransformer } from '@client/transformer'
-import {
-  QueryContext,
-  QueryProvider
-} from '@client/views/DataProvider/QueryProvider'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   getEvent,
   getEventDate,
@@ -68,15 +62,11 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
@@ -372,7 +362,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         <ActionPageLight
           id="collector_form"
           hideBackground
-          title={intl.formatMessage(formSection.title)}
+          title={formSection.title && intl.formatMessage(formSection.title)}
           goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
@@ -391,6 +381,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             )}
             <FormFieldGenerator
               id={formGroup.id}
+              key={formGroup.id}
               onChange={(values) => {
                 if (values && values.affidavitFile) {
                   this.setState({

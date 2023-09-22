@@ -183,10 +183,8 @@ export const mockUser = {
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
-      {
-        lang: 'en',
-        label: 'CHAIRMAN'
-      }
+      { label: 'Field Agent', lang: 'en' },
+      { label: 'Agent de terrain', lang: 'fr' }
     ]
   },
   name: [
@@ -309,7 +307,7 @@ export const mockTaskDownloaded = {
     reference: 'Composition/123' // the composition encompassing this registration
   },
   authoredOn: '2016-10-31T08:25:05+10:00',
-  lastModified: '2016-10-31T09:45:05+10:00',
+  lastModified: '2023-01-31T09:45:05+10:00',
   statusReason: {
     text: 'Rejected reason'
   },
@@ -1205,31 +1203,6 @@ export const mockObservations = {
     ]
   },
   birthRegistration: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'birth-reg-type',
-                display: 'Birth registration type'
-              }
-            ]
-          },
-          effectiveDateTime: '2016-03-28', // same as birthdate
-          valueString: 'BOTH_PARENTS'
-        }
-      }
-    ]
-  },
-  birthRegistrationType: {
     entry: [
       {
         fullUrl: 'urn:uuid:<uuid>',

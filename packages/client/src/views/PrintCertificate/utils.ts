@@ -138,7 +138,7 @@ export function calculateDaysFromToday(doE: string) {
   return diffInDays
 }
 
-export function calculateDays(doE: string, regDate: string) {
+function calculateDays(doE: string, regDate: string) {
   const registeredDate = new Date(regDate)
   const eventDate = new Date(doE)
   const diffInDays = differenceInDays(registeredDate, eventDate)
@@ -298,9 +298,9 @@ export function getRegistrarSignatureHandlebarName(
 }
 
 export function filterPrintInAdvancedOption(collectionForm: IFormSectionGroup) {
-  const filtredCollectionForm = (
-    collectionForm.fields as unknown as IRadioGroupWithNestedFieldsFormField[]
-  ).map((field) => {
+  const filtredCollectionForm = collectionForm.fields.map((field) => {
+    if (field.type !== 'RADIO_GROUP') return field
+
     const filteredOption = field.options.filter(
       (option) => option.value !== 'PRINT_IN_ADVANCE'
     )

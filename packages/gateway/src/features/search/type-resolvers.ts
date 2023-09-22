@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  GQLAdvancedSearchParametersInput,
+  AVATAR_API,
+  NATIVE_LANGUAGE,
+  USER_MANAGEMENT_URL
+} from '@gateway/constants'
+import fetch from 'node-fetch'
+import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -20,6 +24,7 @@ import {
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -29,13 +34,17 @@ interface ISearchEventDataTemplate {
 interface ISearchDataTemplate {
   [key: string]: any
 }
-export interface ISearchCriteria {
-  parameters: GQLAdvancedSearchParametersInput
-  sort?: string
-  sortColumn?: string
-  size?: number
-  from?: number
-  createdBy?: string
+
+interface IAssignment {
+  officeName: string
+  firstName: string
+  lastName: string
+  userId: string
+}
+
+type IAvatarResponse = {
+  userName: string
+  avatarURI?: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -188,6 +197,46 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
+    },
+    placeOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (
+        (resultSet._source && resultSet._source.eventLocationId) ||
+        (resultSet._source &&
+          resultSet._source.eventJurisdictionIds[
+            resultSet._source.eventJurisdictionIds.length - 1
+          ]) ||
+        null
+      )
+    },
+    childGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
+    },
+    childIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.childIdentifier) || null
+    },
+    mothersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFirstNames) || null
+    },
+    mothersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFamilyName) || null
+    },
+    fathersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFirstNames) || null
+    },
+    fathersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFamilyName) || null
+    },
+    motherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherDoB) || null
+    },
+    fatherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherDoB) || null
+    },
+    motherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherIdentifier) || null
+    },
+    fatherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherIdentifier) || null
     }
   },
   DeathEventSearchSet: {
@@ -202,6 +251,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     operationHistories(resultSet: ISearchEventDataTemplate) {
       return resultSet._source.operationHistories
+    },
+    deceasedGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
@@ -226,8 +278,14 @@ export const searchTypeResolvers: GQLResolver = {
     brideName(resultSet: ISearchEventDataTemplate) {
       return getBrideName(resultSet._source)
     },
+    brideIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.brideIdentifier) || null
+    },
     groomName(resultSet: ISearchEventDataTemplate) {
       return getGroomName(resultSet._source)
+    },
+    groomIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.groomIdentifier) || null
     },
     dateOfMarriage(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.marriageDate) || null
@@ -373,6 +431,26 @@ export const searchTypeResolvers: GQLResolver = {
     },
     timeInReadyToPrint(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'REGISTERED')
+    }
+  },
+  AssignmentData: {
+    async avatarURL(assignmentData: IAssignment, _, { headers: authHeader }) {
+      const response = await fetch(
+        new URL(`users/${assignmentData.userId}/avatar`, USER_MANAGEMENT_URL),
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      const { userName, avatarURI }: IAvatarResponse = await response.json()
+
+      if (avatarURI) {
+        const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
+        return avatarURL
+      }
+      return `${AVATAR_API}${userName}`
     }
   }
 }

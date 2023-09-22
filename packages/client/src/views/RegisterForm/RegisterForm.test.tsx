@@ -16,7 +16,6 @@ import {
   mockDeclarationData,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
-  mockDeathDeclarationDataWithoutFirstNames,
   getRegisterFormFromStore,
   getReviewFormFromStore,
   createTestStore,
@@ -55,18 +54,22 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
 import { vi } from 'vitest'
+import { createClient } from '@client/utils/apolloClient'
+import { ApolloClient } from '@apollo/client'
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
 
   let store: AppStore
   let history: History
+  let client: ApolloClient<{}>
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
+      client = createClient(store)
 
       const draft = createDeclaration(Event.Birth)
       store.dispatch(storeDeclaration(draft))
@@ -95,29 +98,21 @@ describe('when user is in the register form for birth event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        { store, history, apolloClient: client }
       )
       component = testComponent
     })
-    it('renders the page', () => {
-      expect(
-        component.find('#form_section_title_mother-view-group').hostNodes()
-      ).toHaveLength(1)
-    })
-    it('changes the country select', async () => {
-      const select = selectOption(
-        component,
-        '#countryPrimary',
-        'United States of America'
-      )
-      expect(select.text()).toEqual('United States of America')
-    })
-    it('takes field agent to declaration submitted page when save button is clicked', async () => {
+    it('takes field agent to declaration submitted page when save & exit button is clicked', async () => {
       localStorage.getItem = vi.fn(
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
       )
-      component.find('#save_draft').hostNodes().simulate('click')
+      component.update()
+
+      component.find('#save-exit-btn').hostNodes().simulate('click')
+      component.update()
+      component.find('#confirm_save_exit').hostNodes().simulate('click')
+      component.update()
       await flushPromises()
       expect(history.location.pathname).toEqual('/registration-home/progress/')
     })
@@ -126,7 +121,10 @@ describe('when user is in the register form for birth event', () => {
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
       )
-      component.find('#save_draft').hostNodes().simulate('click')
+      component.find('#save-exit-btn').hostNodes().simulate('click')
+      component.update()
+      component.find('#confirm_save_exit').hostNodes().simulate('click')
+      component.update()
       await flushPromises()
       expect(
         history.location.pathname.includes('/registration-home/progress')
@@ -158,7 +156,8 @@ describe('when user is in the register form for death event', () => {
     beforeEach(async () => {
       const clonedForm = cloneDeep(form)
       clonedForm.sections[2].optional = true
-      clonedForm.sections[2].notice = messages.causeOfDeathNotice
+      // TODO: need to check if causeOfDeathNotice is needed or not
+      // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const mock: any = vi.fn()
       const testComponent = await createTestComponent(
@@ -190,61 +189,6 @@ describe('when user is in the register form for death event', () => {
       expect(
         component.find('#form_section_id_death-event-details').hostNodes()
       ).toHaveLength(1)
-    })
-  })
-  describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
-    })
-
-    it('after clicking exit, takes back home', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#crcl-btn').hostNodes().simulate('click')
-
-      component.update()
-
-      expect(history.location.pathname).toContain('/')
     })
   })
 })
@@ -305,61 +249,6 @@ describe('when user is in the register form for marriage event', () => {
       ).toHaveLength(1)
     })
   })
-  describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
-    })
-
-    it('after clicking exit, takes back home', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#crcl-btn').hostNodes().simulate('click')
-
-      component.update()
-
-      expect(history.location.pathname).toContain('/')
-    })
-  })
 })
 
 describe('when user is in the register form preview section', () => {
@@ -387,7 +276,13 @@ describe('when user is in the register form preview section', () => {
         imageUploader: { title: 'dummy', description: 'dummy', data: '' }
       },
       registration: {
-        commentsOrNotes: ''
+        commentsOrNotes: '',
+        contactPoint: {
+          nestedFields: {
+            registrationPhone: '01557394989'
+          },
+          value: 'MOTHER'
+        }
       }
     }
     store.dispatch(setInitialDeclarations())
@@ -585,20 +480,12 @@ describe('when user is in the register form from review edit', () => {
     component = testComponent
   })
 
-  it('should redirect to progress tab when close declaration button is clicked', async () => {
-    const menuButton = await waitForElement(
-      component,
-      '#eventToggleMenuToggleButton'
-    )
-    menuButton.hostNodes().simulate('click')
+  it('should redirect to review page when back button is clicked', async () => {
+    const backButton = await waitForElement(component, '#back-to-review-button')
+    backButton.hostNodes().simulate('click')
     component.update()
-    const closeDeclarationButton = await waitForElement(
-      component,
-      '#eventToggleMenuItem0'
-    )
-    closeDeclarationButton.hostNodes().simulate('click')
-    component.update()
-    expect(window.location.href).toContain('/progress')
+    await flushPromises()
+    expect(window.location.href).toContain('/review')
   })
 })
 
@@ -649,7 +536,7 @@ describe('when user is in the register form from sent for review edit', () => {
   })
 
   it('clicking on save draft opens modal', async () => {
-    const saveDraftButton = await waitForElement(component, '#save_draft')
+    const saveDraftButton = await waitForElement(component, '#save-exit-btn')
     saveDraftButton.hostNodes().simulate('click')
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
@@ -667,7 +554,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.find('input#iD').simulate('change', {
       target: { id: 'iD', value: '1234567898' }
     })
-    const saveDraftButton = await waitForElement(component, '#save_draft')
+    const saveDraftButton = await waitForElement(component, '#save-exit-btn')
     saveDraftButton.hostNodes().simulate('click')
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
@@ -676,11 +563,12 @@ describe('when user is in the register form from sent for review edit', () => {
     )
 
     saveDraftConfirmationModal
-      .find('#confirm_save')
+      .find('#confirm_save_exit')
       .hostNodes()
       .simulate('click')
     component.update()
 
+    await flushPromises()
     const modifyTime =
       testAppStore.getState().declarationsState.declarations[0].modifiedOn
 
@@ -840,7 +728,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathDeclarationDataWithoutFirstNames,
+      mockDeathDeclarationData,
       Event.Death
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]

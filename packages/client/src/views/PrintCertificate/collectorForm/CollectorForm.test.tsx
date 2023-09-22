@@ -673,8 +673,8 @@ describe('Certificate collector test for a birth registration without father and
       expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
     })
 
-    it('mother option will not be available', () => {
-      expect(component.find('#type_MOTHER').hostNodes()).toHaveLength(0)
+    it('mother option will be available', () => {
+      expect(component.find('#type_MOTHER').hostNodes()).toHaveLength(1)
     })
   })
 })

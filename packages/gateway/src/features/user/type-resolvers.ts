@@ -50,6 +50,7 @@ export interface IUserModelData {
   }[]
   scope?: string[]
   email: string
+  emailForNotification?: string
   mobile: string
   status: string
   systemRole: string
@@ -92,6 +93,9 @@ export interface IUserPayload
   id?: string
   identifiers: GQLUserIdentifierInput[]
   systemRole: string
+  status?: string
+  username?: string
+  password?: string
   role: string
   signature?: GQLSignatureInput
 }
@@ -170,6 +174,9 @@ export const userTypeResolvers: GQLResolver = {
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]
     },
+    email(userModel: IUserModelData) {
+      return userModel.emailForNotification
+    },
     async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
       return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },
@@ -242,6 +249,18 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    }
+  },
+
+  Avatar: {
+    data(avatar: IAvatar, _, { dataSources }) {
+      if (avatar.data) {
+        const staticData = dataSources.minioAPI.getStaticData(avatar.data)
+        return staticData.then((data) => {
+          return data.presignedURL
+        })
+      }
+      return null
     }
   }
 }

@@ -120,7 +120,7 @@ const mockUserDetails = {
   passwordHash:
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
   salt: '12345',
-  role: 'FIELD_AGENT',
+  role: { labels: [{ lang: 'en', label: 'FIELD_AGENT' }] },
   status: 'active',
   practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -580,11 +580,8 @@ describe('Registration root resolvers', () => {
       father: {
         name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
       },
-      informant: {
-        relationship: 'FATHER'
-      },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'FATHER',
         draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       }
     }
@@ -809,8 +806,7 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        registrationNumber: '2019123265B1234569'
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       })
     })
   })
@@ -826,10 +822,7 @@ describe('Registration root resolvers', () => {
       father: {
         name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
       },
-      informant: {
-        relationship: 'FATHER'
-      },
-      registration: { contact: 'MOTHER' }
+      registration: { informantType: 'MOTHER' }
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
@@ -989,8 +982,7 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        registrationNumber: '2019123265B1234569'
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       })
     })
 
@@ -1227,7 +1219,6 @@ describe('Registration root resolvers', () => {
           _fhirID: '276cbe01-c95a-4c07-9e97-cad2ecc07a25'
         },
         registration: {
-          contact: 'MOTHER',
           informantType: 'MOTHER',
           contactPhoneNumber: '01712121212',
           _fhirID: '75e734d8-47cf-47b4-9416-fa4c747e1b71',
@@ -1492,48 +1483,44 @@ describe('Registration root resolvers', () => {
           deceased: { deceased: true, deathDate: '2010-01-01' }
         },
         informant: {
-          individual: {
-            identifier: [{ type: 'PASSPORT', id: '222222222' }],
-            name: [
-              { use: 'bn', familyName: 'জুল' },
-              { use: 'en', familyName: 'Jul' }
-            ],
-            nationality: ['BGD'],
-            telecom: [{ system: 'phone', value: '01711111111' }],
-            address: [
-              {
-                type: 'SECONDARY_ADDRESS',
-                line: [
-                  '',
-                  '',
-                  '',
-                  '',
-                  '',
-                  'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                ],
-                country: 'BGD',
-                state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
-              },
-              {
-                type: 'PRIMARY_ADDRESS',
-                line: [
-                  '',
-                  '',
-                  '',
-                  '',
-                  '',
-                  'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                ],
-                country: 'BGD',
-                state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
-              }
-            ],
-            _fhirID: '33960f24-7be1-4db3-beb1-dae5d30a9e53'
-          },
-          relationship: 'DAUGHTER',
-          _fhirID: 'd51db81b-85b8-4670-9004-d7768177b65b'
+          identifier: [{ type: 'PASSPORT', id: '222222222' }],
+          name: [
+            { use: 'bn', familyName: 'জুল' },
+            { use: 'en', familyName: 'Jul' }
+          ],
+          nationality: ['BGD'],
+          telecom: [{ system: 'phone', value: '01711111111' }],
+          address: [
+            {
+              type: 'SECONDARY_ADDRESS',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            },
+            {
+              type: 'PRIMARY_ADDRESS',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            }
+          ],
+          _fhirID: '33960f24-7be1-4db3-beb1-dae5d30a9e53'
         },
         mannerOfDeath: 'NATURAL_CAUSES',
         eventLocation: {
@@ -2081,7 +2068,7 @@ describe('Registration root resolvers', () => {
         telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         draftId: 'cd168e0b-0817-4880-a67f-35de777460a5'
       }
     }
@@ -2148,7 +2135,7 @@ describe('Registration root resolvers', () => {
         telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         certificates: [
           {
             collector: {
@@ -2234,13 +2221,11 @@ describe('Registration root resolvers', () => {
         name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
       },
       informant: {
-        relationship: 'FATHER',
-        individual: {
-          name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
-          telecom: [{ system: 'phone', value: '+8801622688231' }]
-        }
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
+        informantType: 'FATHER',
         certificates: [
           {
             collector: {

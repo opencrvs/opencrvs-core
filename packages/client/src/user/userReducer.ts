@@ -17,10 +17,12 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { AnyFn, deserializeForm } from '@client/forms/deserializer/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  ShowCreateUserDuplicateEmailErrorToast,
   ShowCreateUserErrorToast,
+  showCreateUserDuplicateEmailErrorToast,
   showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -33,13 +35,14 @@ import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
-import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { validators, Validator } from '@client/forms/validators'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -140,7 +143,7 @@ interface ISubmitSuccessAction {
   }
 }
 
-export function submitSuccess(
+function submitSuccess(
   locationId: string,
   isUpdate = false
 ): ISubmitSuccessAction {
@@ -160,7 +163,7 @@ interface ISubmitFailedAction {
   }
 }
 
-export function submitFail(errorData: ApolloError): ISubmitFailedAction {
+function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
     type: SUBMIT_USER_FORM_DATA_FAIL,
     payload: {
@@ -173,14 +176,19 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
+    validators: Record<string, Validator>
   }
 }
 
-export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
+export function rolesLoaded(
+  systemRoles: SystemRole[],
+  validators: Record<string, Validator>
+): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
-      systemRoles
+      systemRoles,
+      validators
     }
   }
 }
@@ -216,7 +224,7 @@ interface IStoreUserFormDataAction {
   }
 }
 
-export function storeUserFormData(
+function storeUserFormData(
   queryData: ApolloQueryResult<GQLQuery>
 ): IStoreUserFormDataAction {
   return {
@@ -234,6 +242,7 @@ type UserFormAction =
   | ISubmitFailedAction
   | profileActions.Action
   | ShowCreateUserErrorToast
+  | ShowCreateUserDuplicateEmailErrorToast
   | IRoleLoadedAction
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
@@ -256,12 +265,12 @@ export interface IUserFormState {
   systemRoleMap: ISystemRolesMap
 }
 
-export const fetchRoles = async () => {
+const fetchRoles = async () => {
   const roles = await roleQueries.fetchRoles()
   return roles.data.getSystemRoles
 }
 
-export const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
+const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
   const roleMap: ISystemRolesMap = {}
   systemRoles.forEach((systemRole: SystemRole) => {
     systemRole.roles.forEach((role: Role) => {
@@ -319,6 +328,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
+          userAuditForm,
           loadingRoles: true
         },
         Cmd.run(fetchRoles, {
@@ -394,23 +404,45 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
-      if (errorData.message.includes('DUPLICATE_MOBILE')) {
-        const mobile = errorData.message.split('-')[1]
-        return loop(
-          { ...state, submitting: false, submissionError: false },
-          Cmd.action(showCreateUserErrorToast(TOAST_MESSAGES.FAIL, mobile))
-        )
-      } else {
-        return loop(
-          { ...state, submitting: false, submissionError: true },
-          Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
-        )
+      const duplicateErrorFromGQL = errorData?.graphQLErrors?.find(
+        (gqlErr) => gqlErr.extensions.duplicateNotificationMethodError
+      )
+
+      if (duplicateErrorFromGQL) {
+        const duplicateError =
+          duplicateErrorFromGQL.extensions.duplicateNotificationMethodError
+
+        if (duplicateError.field && duplicateError.field === 'email') {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserDuplicateEmailErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
+              )
+            )
+          )
+        } else if (duplicateError.field && duplicateError.field === 'mobile') {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
+              )
+            )
+          )
+        }
       }
+      return loop(
+        { ...state, submitting: false, submissionError: true },
+        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+      )
 
     case ROLES_LOADED:
       const { systemRoles } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm)
+      const form = deserializeForm(getCreateUserForm(), validators)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)

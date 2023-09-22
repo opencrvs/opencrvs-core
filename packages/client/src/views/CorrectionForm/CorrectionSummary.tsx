@@ -17,7 +17,7 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { connect } from 'react-redux'
-import { get } from 'lodash'
+import { get, propertyOf } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -81,7 +81,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Location } from '@client/utils/gateway'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -358,9 +357,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               fields={this.group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
-              requiredErrorMessage={
-                messages.correctionSummaryproofOfPaymentError
-              }
+              requiredErrorMessage={messages.correctionRequiredLabel}
             />
           </Content>
         </ActionPageLight>
@@ -903,10 +900,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     return (
       <div>
         {proofOfDoc &&
-          proofOfDoc.map((proof) => {
+          proofOfDoc.map((proof, i) => {
             const doc = proof.optionValues as IFormSectionData[]
             return (
-              <SupportingDocument>
+              <SupportingDocument key={`proof-${i}`}>
                 <PaperClip />
                 <span>{doc[1] as any}</span>
               </SupportingDocument>

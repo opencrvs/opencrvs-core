@@ -82,12 +82,10 @@ describe('Change phone modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetails = vi.fn(() =>
+    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready
@@ -106,12 +104,10 @@ describe('Change phone modal tests', () => {
   })
 
   it('should trigger onSuccess callback after change phone number', async () => {
-    queriesForUser.fetchUserDetails = vi.fn(() =>
+    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready

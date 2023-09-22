@@ -29,8 +29,14 @@ type userCreateDuplicateMobileFailedToastState = {
   mobile: string | null
 }
 
+type userCreateDuplicateEmailFailedToastState = {
+  visible: boolean
+  email: string | null
+}
+
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
+  configurationError: string | null
   configurationErrorVisible: boolean
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
@@ -45,11 +51,13 @@ export type NotificationState = {
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
+  userCreateDuplicateEmailFailedToast: userCreateDuplicateEmailFailedToastState
   userReconnectedToast: boolean
 }
 
-export const initialState: NotificationState = {
+const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
+  configurationError: null,
   configurationErrorVisible: false,
   waitingSW: null,
   sessionExpired: false,
@@ -67,6 +75,10 @@ export const initialState: NotificationState = {
     visible: false,
     mobile: null
   },
+  userCreateDuplicateEmailFailedToast: {
+    visible: false,
+    email: null
+  },
   userReconnectedToast: false
 }
 
@@ -82,6 +94,11 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         sessionExpired: true
+      }
+    case actions.CONFIGURATION_ERROR:
+      return {
+        ...state,
+        configurationError: action.payload
       }
     case actions.SHOW_CONFIG_ERROR:
       return {
@@ -122,6 +139,15 @@ export const notificationReducer: LoopReducer<
         ...state,
         userCreateDuplicateMobileFailedToast
       }
+    case actions.SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST:
+      const userCreateDuplicateEmailFailedToast = {
+        visible: true,
+        email: action.payload.email
+      }
+      return {
+        ...state,
+        userCreateDuplicateEmailFailedToast
+      }
     case actions.SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST:
       return {
         ...state,
@@ -143,6 +169,14 @@ export const notificationReducer: LoopReducer<
         userCreateDuplicateMobileFailedToast: {
           visible: false,
           mobile: null
+        }
+      }
+    case actions.HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST:
+      return {
+        ...state,
+        userCreateDuplicateEmailFailedToast: {
+          visible: false,
+          email: null
         }
       }
     case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:

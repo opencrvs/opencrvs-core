@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
@@ -43,7 +43,7 @@ import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
 
 const { useState, useCallback, useMemo } = React
@@ -242,7 +242,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     if (assignment) {
       unassignDeclaration(compositionId, client)
     } else {
-      deleteDeclaration(compositionId)
+      deleteDeclaration(compositionId, client)
     }
   }, [
     compositionId,
@@ -345,7 +345,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         ) : assignment && assignment.userId !== userId ? (
           <AvatarSmall
             avatar={{
-              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              data: assignment.avatarURL,
               type: 'image/jpeg'
             }}
           />
@@ -388,7 +388,8 @@ const mapDispatchToProps = (
     action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
-  deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
+  deleteDeclaration: (id: string, client: ApolloClient<any>) =>
+    dispatch(deleteDeclarationAction(id, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
       unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)

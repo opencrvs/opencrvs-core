@@ -16,13 +16,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  BirthSection,
-  DeathSection
-} from '@client/forms'
+import { IForm, IFormSection, IFormField } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -35,7 +29,6 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { isEmpty, find, flatten, values } from 'lodash'
 import {
   getFieldValue,
-  getFormattedDate,
   getStatusLabel,
   isSystemInitiated,
   isVerifiedAction
@@ -46,12 +39,12 @@ import {
   CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -180,7 +173,7 @@ const getReasonForRequest = (
   }
 }
 
-export const ActionDetailsModalListTable = ({
+const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
   registerForm,
@@ -232,7 +225,11 @@ export const ActionDetailsModalListTable = ({
       label: intl.formatMessage(messages.correctionSummaryOriginal),
       width: 33.33
     },
-    { key: 'edit', label: 'Edit', width: 33.33 }
+    {
+      key: 'edit',
+      label: intl.formatMessage(messages.correctionSummaryCorrection),
+      width: 33.33
+    }
   ]
   const certificateCollectorVerified = [
     {
@@ -295,10 +292,8 @@ export const ActionDetailsModalListTable = ({
         (section) => section.id === item?.valueCode
       ) as IFormSection
 
-      if (
-        section.id === BirthSection.Documents ||
-        section.id === DeathSection.DeathDocuments
-      ) {
+      if (section.id === 'documents') {
+        item.valueString = EMPTY_STRING
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )
@@ -378,9 +373,9 @@ export const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.individual?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.name,
           window.config.LANGUAGES
         )
       : {}
@@ -394,14 +389,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
-          : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
     }
@@ -632,7 +620,7 @@ export const ActionDetailsModal = ({
   } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null
@@ -658,7 +646,15 @@ export const ActionDetailsModal = ({
       <>
         <div>
           <>{userName}</>
-          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+          <span>
+            {' '}
+            —{' '}
+            {formatLongDate(
+              actionDetailsData.date.toLocaleString(),
+              intl.locale,
+              'MMMM dd, yyyy · hh.mm a'
+            )}
+          </span>
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}

@@ -33,6 +33,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
   locationId?: string
+  event?: string
   isAccessibleOffice: boolean
   timeStart: string
   timeEnd: string
@@ -41,12 +42,11 @@ interface IDispatchProps {
   goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesReport(
+function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
   const { data, isAccessibleOffice } = props
   const intl = useIntl()
-  const userDetails = useSelector(getUserDetails)
 
   return (
     <ListContainer>
@@ -105,7 +105,8 @@ export function ApplicationSourcesReport(
                   props.goToFieldAgentList(
                     props.timeStart,
                     props.timeEnd,
-                    props.locationId
+                    props.locationId,
+                    props.event
                   )
                 }
               >

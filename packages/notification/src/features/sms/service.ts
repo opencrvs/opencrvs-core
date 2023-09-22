@@ -15,20 +15,34 @@ import { COUNTRY_CONFIG_URL } from '@notification/constants'
 import { logger } from '@notification/logger'
 
 export async function notifyCountryConfig(
-  msisdn: string,
-  message: string,
+  templateName: {
+    email?: string
+    sms?: string
+  },
+  recipient: {
+    email?: string | null
+    sms?: string | null
+  },
+  type: 'user' | 'informant',
+  variables: Record<string, string>,
   token: string,
+  locale: string,
   convertUnicode?: boolean
 ) {
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
-    logger.info(`Sending the following message: "${message}" to ${msisdn}`)
+    logger.info(
+      `Sending the following message: "${templateName}" to ${recipient}`
+    )
     logger.info('Notifying the country config with above payload')
     return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        msisdn,
-        message,
+        templateName,
+        recipient,
+        type,
+        locale,
+        variables,
         convertUnicode
       }),
       headers: {

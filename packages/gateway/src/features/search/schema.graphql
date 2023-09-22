@@ -17,6 +17,7 @@ type AssignmentData {
   firstName: String
   lastName: String
   officeName: String
+  avatarURL: String!
 }
 
 interface EventSearchSet {
@@ -60,14 +61,26 @@ type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
+  childIdentifier: String
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+  placeOfBirth: String
+  childGender: String
+  mothersFirstName: String
+  mothersLastName: String
+  fathersFirstName: String
+  fathersLastName: String
+  motherDateOfBirth: String
+  fatherDateOfBirth: String
+  motherIdentifier: String
+  fatherIdentifier: String
 }
 
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
+  deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
@@ -79,6 +92,8 @@ type MarriageEventSearchSet implements EventSearchSet {
   type: String
   brideName: [HumanName]
   groomName: [HumanName]
+  brideIdentifier: String
+  groomIdentifier: String
   dateOfMarriage: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
@@ -110,6 +125,11 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
+input SortBy {
+  column: String!
+  order: String!
+}
+
 type Query {
   searchEvents(
     userId: String
@@ -118,6 +138,7 @@ type Query {
     skip: Int
     sort: String
     sortColumn: String
+    sortBy: [SortBy!]
   ): EventSearchResultSet
   getEventsWithProgress(
     declarationJurisdictionId: String

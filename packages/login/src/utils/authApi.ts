@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { resolve } from 'url'
 import * as Sentry from '@sentry/react'
 
 export interface ICodeVerifyData {
@@ -34,6 +33,8 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   LOGIN_BACKGROUND: ILoginBackground
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
 
 export interface IApplicationConfigResponse {
@@ -52,7 +53,8 @@ export const client = axios.create({
 export interface IAuthenticateResponse {
   nonce: string
   token?: string
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 export enum QUESTION_KEYS {
@@ -66,6 +68,10 @@ export enum QUESTION_KEYS {
   FIRST_CHILD_NAME = 'FIRST_CHILD_NAME'
 }
 
+export enum NotificationEvent {
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  PASSWORD_RESET = 'PASSWORD_RESET'
+}
 export interface ITokenResponse {
   token: string
 }
@@ -93,30 +99,37 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: resolve(window.config.CONFIG_API_URL, '/publicConfig'),
+    url: new URL('/publicConfig', window.config.CONFIG_API_URL).toString(),
     method: 'GET'
   })
 }
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: resolve(window.config.AUTH_API_URL, 'authenticate'),
+    url: new URL('authenticate', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data
   })
 }
 
-const resendSMS = (nonce: string, retrievalFlow = false) => {
+const resendAuthenticationCode = (
+  nonce: string,
+  notificationEvent: NotificationEvent,
+  retrievalFlow = false
+) => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, '/resendSms'),
+    url: new URL(
+      '/resendAuthenticationCode',
+      window.config.AUTH_API_URL
+    ).toString(),
     method: 'POST',
-    data: { nonce, retrievalFlow }
+    data: { nonce, notificationEvent, retrievalFlow }
   })
 }
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyCode'),
+    url: new URL('verifyCode', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data
   })
@@ -127,14 +140,19 @@ interface IUserVerifyResponse {
   securityQuestionKey?: string
 }
 
-const verifyUser = (
-  mobile: string,
+interface IUserVerificationDetails {
+  mobile?: string
+  email?: string
   retrieveFlow: string
+}
+
+const verifyUser = (
+  verificationDetails: IUserVerificationDetails
 ): Promise<IUserVerifyResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyUser'),
+    url: new URL('verifyUser', window.config.AUTH_API_URL).toString(),
     method: 'POST',
-    data: { mobile, retrieveFlow }
+    data: verificationDetails
   })
 }
 
@@ -148,7 +166,7 @@ const verifyNumber = (
   code: string
 ): Promise<IVerifyNumberResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyNumber'),
+    url: new URL('verifyNumber', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data: { nonce, code }
   })
@@ -167,7 +185,7 @@ const verifySecurityAnswer = (
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifySecurityAnswer'),
+    url: new URL('verifySecurityAnswer', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data: { nonce, answer }
   })
@@ -175,7 +193,7 @@ const verifySecurityAnswer = (
 
 const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'changePassword'),
+    url: new URL('changePassword', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data: { nonce, newPassword }
   })
@@ -183,7 +201,7 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
 
 const sendUserName = (nonce: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'sendUserName'),
+    url: new URL('sendUserName', window.config.AUTH_API_URL).toString(),
     method: 'POST',
     data: { nonce }
   })
@@ -193,7 +211,7 @@ export const authApi = {
   request,
   authenticate,
   verifyCode,
-  resendSMS,
+  resendAuthenticationCode,
   verifyNumber,
   verifyUser,
   verifySecurityAnswer,

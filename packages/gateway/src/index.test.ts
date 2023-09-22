@@ -95,9 +95,9 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('blocks requests signed with wrong algorithm (HS512)', async () => {
+  it('blocks requests signed with wrong algorithm (RS384)', async () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'HS512',
+      algorithm: 'RS384',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     })
@@ -181,7 +181,9 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping?service=nonsense'
     })
-    expect(res.result.message).toEqual('Invalid request query input')
+    expect(res.result.message).toEqual(
+      `"service" must be one of [auth, user-mgnt, metrics, notification, countryconfig, search, workflow, gateway]`
+    )
   })
   it('Fails the health check for a failed health check on a running service', async () => {
     fetch.mockResponse(

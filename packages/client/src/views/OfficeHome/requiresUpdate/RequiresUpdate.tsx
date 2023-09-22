@@ -14,7 +14,7 @@ import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,

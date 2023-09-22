@@ -12,22 +12,16 @@
 import * as React from 'react'
 import { IDeclaration } from '@client/declarations'
 import {
-  BirthSection,
-  DeathSection,
   DOCUMENT_UPLOADER_WITH_OPTION,
   IAttachmentValue,
   IDocumentUploaderWithOptionsFormField,
-  IFileValue,
-  IFormSection,
-  Section
+  IFileValue
 } from '@client/forms'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/'
-import { getVisibleSections } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@client/../../components/lib'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {
@@ -37,11 +31,7 @@ import {
 } from '@client/forms/register/declaration-selectors'
 import { Event } from '@client/utils/gateway'
 import { isArray } from 'lodash'
-import {
-  SECTION_MAPPING,
-  ZeroDocument
-} from '@client/views/RegisterForm/review/ReviewSection'
-import { isBase64FileString } from '@client/utils/commonUtils'
+import { ZeroDocument } from '@client/views/RegisterForm/review/ReviewSection'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
@@ -69,19 +59,12 @@ export const SupportingDocumentsView = (props: IProps) => {
   ).toLowerCase() as Event
   const documentsSection = useSelector((state: IStoreState) =>
     eventType.toLowerCase() === 'birth'
-      ? getBirthSection(state, BirthSection.Documents)
-      : getDeathSection(state, DeathSection.DeathDocuments)
+      ? getBirthSection(state, 'documents')
+      : getDeathSection(state, 'documents')
   )
   const [previewImage, setPreviewImage] = React.useState<IFileValue | null>(
     null
   )
-
-  const getDocumentSections = (): IFormSection[] => {
-    const sections = eventsRegisterForm[eventType].sections.filter(
-      ({ hasDocumentSection }) => hasDocumentSection
-    )
-    return getVisibleSections(sections, declaration)
-  }
 
   const getLabelForDoc = (docForWhom: string, docType: string) => {
     const documentSection = eventsRegisterForm[eventType].sections.find(
@@ -111,7 +94,7 @@ export const SupportingDocumentsView = (props: IProps) => {
   }
 
   const prepSectionDocuments = (
-    activeSection: Section
+    draft: IDeclaration
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
@@ -119,9 +102,9 @@ export const SupportingDocumentsView = (props: IProps) => {
 
     let uploadedDocuments: IFileValue[] = []
 
-    for (const index in declaration.data[draftItemName]) {
-      if (isArray(declaration.data[draftItemName][index])) {
-        const newDocuments = declaration.data[draftItemName][
+    for (const index in draft.data[draftItemName]) {
+      if (isArray(draft.data[draftItemName][index])) {
+        const newDocuments = draft.data[draftItemName][
           index
         ] as unknown as IFileValue[]
         uploadedDocuments = uploadedDocuments.concat(newDocuments)
@@ -129,42 +112,28 @@ export const SupportingDocumentsView = (props: IProps) => {
     }
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
-      const sectionMapping = SECTION_MAPPING[eventType]
+      const label =
+        getLabelForDoc(
+          document.optionValues[0] as string,
+          document.optionValues[1] as string
+        ) || (document.optionValues[1] as string)
 
-      const allowedDocumentType: string[] =
-        sectionMapping[activeSection as keyof typeof sectionMapping] || []
-
-      if (
-        allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
-      ) {
-        const label =
-          getLabelForDoc(
-            document.optionValues[0] as string,
-            document.optionValues[1] as string
-          ) || (document.optionValues[1] as string)
-
-        /**
-         * Skip insertion if the value already exist
-         */
-        if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
-          return true
-        }
-
-        const documentData = !isBase64FileString(document.data)
-          ? `${window.config.MINIO_URL}${document.data}`
-          : document.data
-
-        documentOptions.push({
-          value: documentData,
-          label
-        })
-        selectOptions.push({
-          value: label,
-          label
-        })
+      /**
+       * Skip insertion if the value already exist
+       */
+      if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
         return true
       }
-      return false
+
+      documentOptions.push({
+        value: document.data,
+        label
+      })
+      selectOptions.push({
+        value: label,
+        label
+      })
+      return true
     })
 
     return {
@@ -174,49 +143,33 @@ export const SupportingDocumentsView = (props: IProps) => {
     }
   }
 
-  const prepSectionDocsBasedOnScrollFlag = (
-    activeSection: Section
+  const prepSectionDocOptions = (
+    draft: IDeclaration
   ): IDocumentViewerOptions & {
     uploadedDocuments: IFileValue[]
   } => {
-    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
-      let selectOptions: SelectComponentOptions[] = []
-      let documentOptions: SelectComponentOptions[] = []
-      let uploadedDocuments: IFileValue[] = []
-      const docSections = getDocumentSections()
-      for (const section of docSections) {
-        const prepDocumentOption = prepSectionDocuments(section.id)
-        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
-        documentOptions = [
-          ...documentOptions,
-          ...prepDocumentOption.documentOptions
-        ]
-        uploadedDocuments = [
-          ...uploadedDocuments,
-          ...prepDocumentOption.uploadedDocuments
-        ]
-      }
-      return { selectOptions, documentOptions, uploadedDocuments }
-    } else {
-      return prepSectionDocuments(activeSection)
-    }
+    let selectOptions: SelectComponentOptions[] = []
+    let documentOptions: SelectComponentOptions[] = []
+    let uploadedDocuments: IFileValue[] = []
+    const prepDocumentOption = prepSectionDocuments(draft)
+    selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+    documentOptions = [
+      ...documentOptions,
+      ...prepDocumentOption.documentOptions
+    ]
+    uploadedDocuments = [
+      ...uploadedDocuments,
+      ...prepDocumentOption.uploadedDocuments
+    ]
+    return { selectOptions, documentOptions, uploadedDocuments }
   }
 
   const selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    previewImageTransformed.data = isBase64FileString(
-      previewImageTransformed.data
-    )
-      ? previewImageTransformed.data
-      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
-
-    setPreviewImage(previewImageTransformed as IFileValue)
+    setPreviewImage(previewImage as IFileValue)
   }
 
-  const getAllAttachmentInPreviewList = () => {
-    const docSections = getDocumentSections()
-    const options = prepSectionDocsBasedOnScrollFlag(docSections[0].id)
-    const sectionName = docSections[0].id
+  const getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
+    const options = prepSectionDocOptions(declaration)
     return (
       <>
         <DocumentListPreviewWrapper>
@@ -232,9 +185,9 @@ export const SupportingDocumentsView = (props: IProps) => {
         <DocumentViewer
           id={'document_section'}
           key={'Document_section'}
-          options={prepSectionDocsBasedOnScrollFlag(sectionName)}
+          options={prepSectionDocOptions(declaration)}
         >
-          <ZeroDocument id={`zero_document_${sectionName}`}>
+          <ZeroDocument id={`zero_document`}>
             {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
           </ZeroDocument>
         </DocumentViewer>
@@ -254,5 +207,5 @@ export const SupportingDocumentsView = (props: IProps) => {
     )
   }
 
-  return <>{getAllAttachmentInPreviewList()}</>
+  return <>{getAllAttachmentInPreviewList(props.declaration)}</>
 }
