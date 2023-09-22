@@ -190,7 +190,7 @@ export const userTransformer =
         state,
         province,
         signature: getUserSignature(history),
-        comments: history.comments?.toString()
+        comments: history.comments?.[0]?.comment
       } as IFormSectionData
     }
   }

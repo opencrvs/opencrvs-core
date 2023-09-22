@@ -1718,7 +1718,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         onChange: (value: string) => {
           this.props.onChangeReviewForm &&
             this.props.onChangeReviewForm(
-              { [sectionType]: value },
+              {
+                [sectionType]: value,
+                [sectionType + 'URI']: ''
+              },
               registrationSection,
               declaration
             )

@@ -36,19 +36,17 @@ export function findCompositionSection(
   )
 }
 
-export function findTask(
-  bundleEntries?: fhir.BundleEntry[]
-): fhir.Task | undefined {
-  const taskEntry: fhir.BundleEntry | undefined =
-    bundleEntries &&
-    bundleEntries.find((entry) => {
-      if (entry && entry.resource) {
-        return entry.resource.resourceType === 'Task'
-      } else {
-        return false
-      }
-    })
-  return taskEntry && (taskEntry.resource as fhir.Task)
+export function findTask(bundleEntries?: fhir.BundleEntry[]) {
+  const taskEntry = bundleEntries?.find(
+    (entry) => entry?.resource?.resourceType === 'Task'
+  )
+  return taskEntry?.resource as fhir.Task | undefined
+}
+
+export function findPatient(bundle: fhir.Bundle) {
+  return bundle.entry?.find(
+    (entry) => entry?.resource?.resourceType === 'Patient'
+  )?.resource as fhir.Patient | undefined
 }
 
 export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {

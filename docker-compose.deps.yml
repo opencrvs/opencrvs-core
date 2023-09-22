@@ -57,5 +57,5 @@ services:
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2022-11-11T03-44-20Z.fips
+    image: quay.io/minio/minio:RELEASE.2023-09-16T01-01-47Z.fips
     restart: unless-stopped
