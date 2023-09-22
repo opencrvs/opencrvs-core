@@ -7591,13 +7591,6 @@
     "@types/node" "*"
     joi "^17.3.0"
 
-"@types/hapi__inert@^5.2.3":
-  version "5.2.3"
-  resolved "https://registry.npmjs.org/@types/hapi__inert/-/hapi__inert-5.2.3.tgz"
-  integrity sha512-I1mWQrEc7oMqGtofT0rwBgRBCBurz0wNzbq8QZsHWR+aXM0bk1j9GA6zwyGIeO53PNl2C1c2kpXlc084xCV+Tg==
-  dependencies:
-    "@types/hapi__hapi" "*"
-
 "@types/hapi__mimos@*":
   version "4.1.4"
   resolved "https://registry.npmjs.org/@types/hapi__mimos/-/hapi__mimos-4.1.4.tgz"
@@ -7611,14 +7604,6 @@
   integrity sha512-8wWgLVP1TeGqgzZtCdt+F+k15DWQvLG1Yv6ZzPfb3D5WIo5/S+GGKtJBVo2uNEcqabP5Ifc71QnJTDnTmw1axA==
   dependencies:
     "@types/node" "*"
-
-"@types/hapi__vision@^5.5.3":
-  version "5.5.3"
-  resolved "https://registry.npmjs.org/@types/hapi__vision/-/hapi__vision-5.5.3.tgz"
-  integrity sha512-R4+r9345+5LCM8/0OQ1J8UVVPwnOwMdUVtPrtJE4oNbZ31+rLSy/bLoGpuZJwjROeC006YXbibnRF1hcVQFjGA==
-  dependencies:
-    "@types/hapi__hapi" "*"
-    handlebars "^4.1"
 
 "@types/history@^4.6.2", "@types/history@^4.7.11":
   version "4.7.11"
@@ -14469,7 +14454,7 @@ gunzip-maybe@^1.4.2:
     pumpify "^1.3.3"
     through2 "^2.0.3"
 
-handlebars@*, handlebars@4.x.x, handlebars@^4.1, handlebars@^4.7.6, handlebars@^4.7.7:
+handlebars@*, handlebars@4.x.x, handlebars@^4.7.6, handlebars@^4.7.7:
   version "4.7.7"
   resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.7.tgz"
   integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==
