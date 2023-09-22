@@ -7241,9 +7241,9 @@
     "@types/node" "*"
 
 "@types/boom@^7.3.1":
-  version "7.3.2"
-  resolved "https://registry.npmjs.org/@types/boom/-/boom-7.3.2.tgz"
-  integrity sha512-W8+6CANZz/BmgzATboKXvEDtO3SHSj86omcU/2pMCkUQhqhgucB8sgcmdRadXDEvXFRiRhME0rcyj1GIj3LC9w==
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.3.tgz#bc923339698b4528e0a5afacecfbebe788b5e7ce"
+  integrity sha512-PEYCW26A4hpu2SD9Dz+kd55WQg0HAGA1Uf4zTuNflIdZgMw/XGoOMPQKyjnbl7lVIRUmc+YpZHtwtgTwfPlF9g==
 
 "@types/bunyan@^1.8.4":
   version "1.8.9"
