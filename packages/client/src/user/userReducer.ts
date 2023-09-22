@@ -65,7 +65,7 @@ const initialState: IUserFormState = {
   userFormData: {},
   userDetailsStored: false,
   submitting: false,
-  loadingRoles: true,
+  loadingRoles: false,
   submissionError: false,
   userAuditForm,
   systemRoleMap: {}
