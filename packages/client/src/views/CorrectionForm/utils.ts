@@ -59,7 +59,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
+import { flattenDeep, get, clone, isEqual, isArray, camelCase } from 'lodash'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 
@@ -377,6 +377,21 @@ const getFormFieldValue = (
   return ''
 }
 
+export const addressFieldNames = [
+  'statePrimary',
+  'districtPrimary',
+  'cityUrbanOptionPrimary',
+  'internationalStatePrimary',
+  'internationalDistrictPrimary',
+  'internationalCityPrimary',
+  'stateSecondary',
+  'districtSecondary',
+  'cityUrbanOptionSecondary',
+  'internationalStateSecondary',
+  'internationalCitySecondary',
+  'internationalDistrictSecondary'
+]
+
 export const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -386,23 +401,11 @@ export const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const hasAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'cityUrbanOptionPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'internationalCityPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'cityUrbanOptionSecondary',
-      'internationalStateSecondary',
-      'internationalCitySecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name)
-  ) {
+  if (hasAddressField) {
     const sectionData = draftData[sectionId]
 
     if (sectionData.countryPrimary === window.config.COUNTRY) {
@@ -413,9 +416,9 @@ export const renderValue = (
       dynamicOption.dependency = [
         'internationalStatePrimary',
         'statePrimary'
-      ].includes(field.name)
-        ? 'countryPrimary'
-        : 'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -435,9 +438,9 @@ export const renderValue = (
       dynamicOption.dependency = [
         'internationalStateSecondary',
         'stateSecondary'
-      ].includes(field.name)
-        ? 'countrySecondary'
-        : 'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
