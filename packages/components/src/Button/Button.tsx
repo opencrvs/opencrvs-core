@@ -35,8 +35,6 @@ interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   element?: 'a' | 'button'
   /** Button type */
   type: ButtonType
-  /** Cursor */
-  cursor?: 'default' | 'pointer'
 }
 
 export type ButtonProps = ButtonCustomization & {
@@ -62,7 +60,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'secondary' && styles.secondary}
   ${(props) =>
     props.variant === 'secondary_negative' && styles.secondary_negative}
-  
+
   ${(props) => props.variant === 'tertiary' && styles.tertiary}
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}
