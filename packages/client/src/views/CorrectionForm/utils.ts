@@ -408,7 +408,10 @@ export const renderValue = (
   if (hasAddressField) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -430,7 +433,10 @@ export const renderValue = (
       )
     }
 
-    if (sectionData.countrySecondary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'

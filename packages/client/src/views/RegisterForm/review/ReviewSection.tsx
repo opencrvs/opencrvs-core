@@ -446,7 +446,10 @@ const renderValue = (
       )
     }
 
-    if (sectionData.countrySecondary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
