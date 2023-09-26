@@ -433,8 +433,11 @@ function RecordAuditBody({
   }
 
   if (
-    (declaration.status === SUBMISSION_STATUS.DECLARED ||
-      declaration.status === SUBMISSION_STATUS.VALIDATED) &&
+    [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.VALIDATED,
+      SUBMISSION_STATUS.CORRECTION_REQUESTED
+    ].includes(declaration.status as SUBMISSION_STATUS) &&
     userDetails?.systemRole &&
     !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
   ) {
