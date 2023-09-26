@@ -225,13 +225,13 @@ function FormAppBar({
   const [modal, openModal] = useModal()
 
   const isFormDataAltered = () => {
-    if (!declaration.originalData) {
-      // if there is no originalData property
+    if (!declaration.localData) {
+      // if there is no localData property
       // that means it's a draft and has unsaved changes
       return true
     }
 
-    return !isEqual(declaration.originalData, declaration.data)
+    return !isEqual(declaration.localData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
@@ -295,9 +295,9 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to original data
-      //so that we can revert changes back to data.originalData when users exits without saving
-      declaration.originalData = declaration.data
+      //saving current changes to localData
+      //so that we can revert changes back to data.localData when users exits without saving
+      declaration.localData = declaration.data
       //save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -366,12 +366,12 @@ function FormAppBar({
     ))
 
     if (exitConfirm) {
-      if (!declaration.originalData) {
+      if (!declaration.localData) {
         deleteDeclarationMethod(declaration)
       } else {
         modifyDeclarationMethod({
           ...declaration,
-          data: declaration.originalData
+          data: declaration.localData
         })
       }
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
