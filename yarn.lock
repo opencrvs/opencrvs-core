@@ -7658,28 +7658,28 @@
     pretty-format "^26.0.0"
 
 "@types/js-yaml@^3.12.1":
-  version "3.12.7"
-  resolved "https://registry.npmjs.org/@types/js-yaml/-/js-yaml-3.12.7.tgz"
-  integrity sha512-S6+8JAYTE1qdsc9HMVsfY7+SgSuUU/Tp6TYTmITW0PZxiyIMvol3Gy//y69Wkhs0ti4py5qgR3uZH6uz/DNzJQ==
+  version "3.12.8"
+  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.8.tgz#d47f0ceac930a644266001979d07d7b94808a5c8"
+  integrity sha512-6McoI148SFmiE2m2Y9lpzwN238grgzEn2J1mHoc8UWwDKvAUsjl100jjqoj5ORVqDwWuEmD+zlOES0+jI7fZCA==
 
 "@types/js-yaml@^4.0.0":
-  version "4.0.5"
-  resolved "https://registry.npmjs.org/@types/js-yaml/-/js-yaml-4.0.5.tgz"
-  integrity sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.6.tgz#4b3afd5158b8749095b1f096967b6d0f838d862f"
+  integrity sha512-ACTuifTSIIbyksx2HTon3aFtCKWcID7/h3XEmRpDYdMCXxPbl+m9GteOJeaAkiAta/NJaSFuA7ahZ0NkwajDSw==
 
 "@types/json-schema@*", "@types/json-schema@^7.0.6", "@types/json-schema@^7.0.7":
-  version "7.0.11"
-  resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.11.tgz"
-  integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
+  version "7.0.13"
+  resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.13.tgz#02c24f4363176d2d18fc8b70b9f3c54aba178a85"
+  integrity sha512-RbSSoHliUbnXj3ny0CNFOoxrIDV6SUGyStHsvDqosw6CkdPV8TtWGlfecuK4ToyMEAql6pzNxgCFKanovUzlgQ==
 
 "@types/json-stable-stringify@^1.0.32":
   version "1.0.34"
-  resolved "https://registry.npmjs.org/@types/json-stable-stringify/-/json-stable-stringify-1.0.34.tgz"
+  resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.34.tgz#c0fb25e4d957e0ee2e497c1f553d7f8bb668fd75"
   integrity sha512-s2cfwagOQAS8o06TcwKfr9Wx11dNGbH2E9vJz1cqV+a/LOyhWNLUNd6JSRYNzvB4d29UuJX2M0Dj9vE1T8fRXw==
 
 "@types/json2csv@^4.4.0":
   version "4.5.1"
-  resolved "https://registry.npmjs.org/@types/json2csv/-/json2csv-4.5.1.tgz"
+  resolved "https://registry.yarnpkg.com/@types/json2csv/-/json2csv-4.5.1.tgz#75b7e18f996f1c294de8641b3abf0f3214f0a9ca"
   integrity sha512-sZbRdrTddxYzhydkC5eMEbRXU8pjcV8Zyxf2If7YO3GVxWY18fs0P5YJyjRfkMKTAsA8ynTRQWhvWbHhBzBFVA==
   dependencies:
     "@types/node" "*"
