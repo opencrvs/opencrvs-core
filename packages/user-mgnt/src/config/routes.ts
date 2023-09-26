@@ -117,17 +117,31 @@ const enum RouteScope {
   VERIFY = 'verify'
 }
 
-export const getRoutes: () => Hapi.ServerRoute[] = () => {
-  return [
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:9200/_cluster/health', {
+      method: 'GET'
+    })
+    return response.json()
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
+
+export const getRoutes = () => {
+  const routes = [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
+
         return {
           git_hash: GIT_HASH,
-          status: 'ok'
+          status: 'ok',
+          dependencies: { MongoDB: dependencyStatus }
         }
       },
       config: {

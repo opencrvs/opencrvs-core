@@ -75,6 +75,19 @@ import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'
+import fetch from 'node-fetch'
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:9200/_cluster/health', {
+      method: 'GET'
+    })
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
@@ -99,12 +112,16 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    handler: (request: any, h: any) =>
+    handler: async (request: any, h: any) => {
       // Perform any health checks and return true or false for success prop
-      ({
+      const dependencyStatus = await dependencyHealth()
+
+      return {
         git_hash: GIT_HASH,
-        status: 'ok'
-      }),
+        status: 'ok',
+        dependencies: { Redis: dependencyStatus }
+      }
+    },
     options: {
       auth: false,
       tags: ['api'],

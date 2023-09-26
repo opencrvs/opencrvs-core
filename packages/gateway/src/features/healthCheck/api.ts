@@ -21,6 +21,7 @@ interface ServiceHealth extends Record<string, unknown> {
 }
 
 export type PingService = { name: string; url: URL }
+export type PingDependency = { name: string; url: string }
 
 export const getServiceHealth = async (
   service: PingService
@@ -30,4 +31,16 @@ export const getServiceHealth = async (
   })
 
   return response.json()
+}
+
+export const getDependencyHealth = async (dependecy: PingDependency) => {
+  try {
+    const response = await fetch(dependecy.url, {
+      method: 'GET'
+    })
+    if (response.status === 200) return { name: dependecy.name, status: 'ok' }
+    else return { name: dependecy.name, status: 'error' }
+  } catch (error) {
+    return { name: dependecy.name, status: 'error' }
+  }
 }

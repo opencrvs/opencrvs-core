@@ -80,6 +80,7 @@ import {
   refresh
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV, GIT_HASH } from '@metrics/constants'
+import fetch from 'node-fetch'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -106,6 +107,17 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
       refresh()
     }
     return handler(...params)
+  }
+}
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:9200/_cluster/health', {
+      method: 'GET'
+    })
+    return response.json()
+  } catch (error) {
+    return { status: 'error' }
   }
 }
 
@@ -731,11 +743,13 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
         return {
           git_hash: GIT_HASH,
-          status: 'ok'
+          status: 'ok',
+          dependencies: { InfluxDB: dependencyStatus }
         }
       },
       config: {

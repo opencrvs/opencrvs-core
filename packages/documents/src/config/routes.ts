@@ -15,6 +15,19 @@ import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { GIT_HASH } from '@documents/constants'
 import { MINIO_BUCKET } from '@documents/minio/constants'
+import fetch from 'node-fetch'
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:3535/minio/health/live', {
+      method: 'GET'
+    })
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
 
 export const getRoutes = () => {
   const routes = [
@@ -81,11 +94,13 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
         return {
           git_hash: GIT_HASH,
-          status: 'ok'
+          status: 'ok',
+          dependencies: { Minio: dependencyStatus }
         }
       },
       config: {

@@ -12,13 +12,32 @@
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { GIT_HASH } from '@search/constants'
+import fetch from 'node-fetch'
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:9200/_cluster/health', {
+      method: 'GET'
+    })
+    return response.json()
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
 
 export async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    return h.response({ git_hash: GIT_HASH, status: 'ok' }).code(200)
+    const dependencyStatus = await dependencyHealth()
+    return h
+      .response({
+        git_hash: GIT_HASH,
+        status: 'ok',
+        dependencies: { elasticsearch: dependencyStatus }
+      })
+      .code(200)
   } catch (err) {
     logger.error(err)
     return h.response({ status: 'error' }).code(500)
