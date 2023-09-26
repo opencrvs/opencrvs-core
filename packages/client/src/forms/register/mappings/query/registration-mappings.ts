@@ -21,8 +21,12 @@ import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
-import { History, RegStatus } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  EventRegistration,
+  History,
+  RegStatus,
+  RegWorkflow
+} from '@client/utils/gateway'
 import { get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
@@ -30,6 +34,7 @@ import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
+/** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -145,36 +150,51 @@ const getUserSignature = (history: History): string => {
 }
 
 export const userTransformer =
-  (status: RegStatus) =>
+  (...statuses: RegStatus[]) =>
   (
     transformedData: IFormData,
-    _: any,
+    event: EventRegistration,
     sectionId: string,
     targetSectionId?: string,
     targetFieldName?: string,
-    __?: IOfflineData
+    offlineData?: IOfflineData
   ) => {
-    if (!_.history) {
+    if (!event.history) {
       return
     }
-    const history: History = [..._.history]
+    const history = [...(event.history as History[])]
       .reverse()
       .find(
         ({ action, regStatus }: History) =>
-          !action && regStatus && regStatus === status
+          !action && regStatus && statuses.includes(regStatus)
       )
 
     if (history) {
+      const district = history.location?.id
+        ? offlineData?.locations?.[history.location.id]
+        : null
+      const state = district
+        ? offlineData?.locations?.[district.partOf.split('/')[1]]
+        : null
+      const province = state
+        ? offlineData?.locations?.[state.partOf.split('/')[1]]
+        : null
       transformedData[targetSectionId || sectionId][
         targetFieldName || 'registrar'
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
-        office: history?.office,
-        signature: getUserSignature(history)
+        office: history.office,
+        date: history.date,
+        district,
+        state,
+        province,
+        signature: getUserSignature(history),
+        comments: history.comments?.[0]?.comment
       } as IFormSectionData
     }
   }
+/** @deprecated Use userTransformer instead */
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -202,7 +222,7 @@ export const registrationLocationUserTransformer = (
   targetFieldName?: string,
   offlineData?: IOfflineData
 ) => {
-  const statusData: GQLRegWorkflow[] = queryData['registration'].status
+  const statusData: RegWorkflow[] = queryData['registration'].status
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
@@ -289,4 +309,20 @@ export const QRCodeTransformer = async (
         }
       )}`
     )
+}
+
+export const trackingIDTransformer = (
+  transformedData: IFormData,
+  _: EventRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  if (!_.registration?.trackingId) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'trackingId'
+  ] = !_.registration?.trackingId
 }

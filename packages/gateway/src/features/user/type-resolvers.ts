@@ -51,7 +51,7 @@ export interface IUserModelData {
   scope?: string[]
   email: string
   emailForNotification?: string
-  mobile: string
+  mobile?: string
   status: string
   systemRole: string
   role: IUserRole
@@ -93,6 +93,8 @@ export interface IUserPayload
   id?: string
   identifiers: GQLUserIdentifierInput[]
   systemRole: string
+  status?: string
+  username?: string
   password?: string
   role: string
   signature?: GQLSignatureInput

@@ -393,7 +393,11 @@ export async function markEventAsRegisteredCallbackHandler(
     // Trigger an event for the registration
     await triggerEvent(
       MARK_REG[event],
-      { resourceType: 'Bundle', entry: [{ resource: task }] },
+      {
+        resourceType: 'Bundle',
+        // Allow updating patients[0] as for example new-born child might get identifier updated
+        entry: [{ resource: task }, { resource: patients[0] }]
+      },
       request.headers
     )
   } catch (error) {

@@ -43,6 +43,7 @@ type AdvancedSeachParameters {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -107,6 +108,7 @@ input AdvancedSearchParametersInput {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String

@@ -438,6 +438,7 @@ export interface GQLAdvancedSearchParametersInput {
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  childIdentifier?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
@@ -477,6 +478,11 @@ export interface GQLAdvancedSearchParametersInput {
   informantDoBEnd?: string
   informantIdentifier?: string
   compositionType?: Array<string | null>
+}
+
+export interface GQLSortBy {
+  column: string
+  order: string
 }
 
 export interface GQLEventProgressResultSet {
@@ -1510,6 +1516,7 @@ export interface GQLAdvancedSeachParameters {
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  childIdentifier?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
@@ -1616,6 +1623,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   id: string
   type?: string
   childName?: Array<GQLHumanName | null>
+  childIdentifier?: string
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
@@ -2567,6 +2575,7 @@ export interface QueryToSearchEventsArgs {
   skip?: number
   sort?: string
   sortColumn?: string
+  sortBy?: Array<GQLSortBy>
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
@@ -9561,6 +9570,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   childDoBStart?: AdvancedSeachParametersToChildDoBStartResolver<TParent>
   childDoBEnd?: AdvancedSeachParametersToChildDoBEndResolver<TParent>
   childGender?: AdvancedSeachParametersToChildGenderResolver<TParent>
+  childIdentifier?: AdvancedSeachParametersToChildIdentifierResolver<TParent>
   deceasedFirstNames?: AdvancedSeachParametersToDeceasedFirstNamesResolver<TParent>
   deceasedFamilyName?: AdvancedSeachParametersToDeceasedFamilyNameResolver<TParent>
   deceasedGender?: AdvancedSeachParametersToDeceasedGenderResolver<TParent>
@@ -9914,6 +9924,18 @@ export interface AdvancedSeachParametersToChildDoBEndResolver<
 }
 
 export interface AdvancedSeachParametersToChildGenderResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToChildIdentifierResolver<
   TParent = any,
   TResult = any
 > {
@@ -10935,6 +10957,7 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   id?: BirthEventSearchSetToIdResolver<TParent>
   type?: BirthEventSearchSetToTypeResolver<TParent>
   childName?: BirthEventSearchSetToChildNameResolver<TParent>
+  childIdentifier?: BirthEventSearchSetToChildIdentifierResolver<TParent>
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
   operationHistories?: BirthEventSearchSetToOperationHistoriesResolver<TParent>
@@ -10972,6 +10995,18 @@ export interface BirthEventSearchSetToTypeResolver<
 }
 
 export interface BirthEventSearchSetToChildNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToChildIdentifierResolver<
   TParent = any,
   TResult = any
 > {

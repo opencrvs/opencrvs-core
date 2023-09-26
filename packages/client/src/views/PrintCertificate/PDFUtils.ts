@@ -17,7 +17,7 @@ import {
 } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -29,6 +29,9 @@ import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import isValid from 'date-fns/isValid'
+import format from 'date-fns/format'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -145,6 +148,25 @@ export function executeHandlebarsTemplate(
       }
     }
   )
+
+  Handlebars.registerHelper(
+    'formatDate',
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'location',
+    function (this: any, locationId: string, key: keyof ILocation) {
+      const locations = getOfflineData(state).locations
+      return locations[locationId]
+        ? locations[locationId][key]
+        : `Missing location for id: ${locationId}`
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)

@@ -61,7 +61,7 @@ export enum TOAST_MESSAGES {
 }
 
 const initialState: IUserFormState = {
-  userForm: null,
+  userForm: deserializeForm(getCreateUserForm(), validators),
   userFormData: {},
   userDetailsStored: false,
   submitting: false,
@@ -176,19 +176,14 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
-    validators: Record<string, Validator>
   }
 }
 
-export function rolesLoaded(
-  systemRoles: SystemRole[],
-  validators: Record<string, Validator>
-): IRoleLoadedAction {
+export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
-      systemRoles,
-      validators
+      systemRoles
     }
   }
 }
@@ -255,7 +250,7 @@ export interface ISystemRolesMap {
   [key: string]: string
 }
 export interface IUserFormState {
-  userForm: IForm | null
+  userForm: IForm
   userFormData: IFormSectionData
   userDetailsStored: boolean
   submitting: boolean

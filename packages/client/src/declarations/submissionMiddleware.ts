@@ -49,6 +49,7 @@ import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { MutationToRequestRegistrationCorrectionArgs } from '@opencrvs/gateway/src/graphql/schema'
+import { UserDetails } from '@client/utils/userUtils'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -78,12 +79,14 @@ const STATUS_CHANGE_MAP = {
 function getGqlDetails(
   form: IForm,
   draft: IDeclaration,
-  offlineData: IOfflineData
+  offlineData: IOfflineData,
+  userDetails: UserDetails | null
 ) {
   const gqlDetails = draftToGqlTransformer(
     form,
     draft.data,
     draft.id,
+    userDetails,
     offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
@@ -164,7 +167,12 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const form = getRegisterForm(getState())[event]
     const offlineData = getOfflineData(getState())
-    let graphqlPayload = getGqlDetails(form, declaration, offlineData)
+    let graphqlPayload = getGqlDetails(
+      getRegisterForm(getState())[event],
+      declaration,
+      getOfflineData(getState()),
+      getState().offline.userDetails as UserDetails
+    )
 
     if (isCorrectionAction(submissionAction)) {
       graphqlPayload = addCorrectionDetails(
