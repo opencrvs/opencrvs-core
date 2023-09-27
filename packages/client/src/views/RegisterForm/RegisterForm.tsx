@@ -673,7 +673,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       declaration?.data?.informant?.informantType
 
     // see https://github.com/opencrvs/opencrvs-core/issues/5820
-    if (informantTypeChanged && isCorrection(declaration)) {
+    if (informantTypeChanged) {
       let informant
       let modifiedDeclaration = declaration
 
