@@ -40,7 +40,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 20px;
+  padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
@@ -134,7 +134,7 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
+  ${({ theme }) => theme.fonts.h1}
   color: ${({ theme }) => theme.colors.copy};
   overflow: hidden;
   text-overflow: ellipsis;

@@ -91,8 +91,6 @@ import {
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
-import { SubSectionHeader } from '@client/components/form/SubSectionHeader'
-
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -144,7 +142,7 @@ import {
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
 import { BulletList, Divider } from '@opencrvs/components'
-import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
+import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -486,8 +484,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
         <>
-          <SubSectionHeader label={fieldDefinition.label} />
-          <Divider />
+          <Heading2>{fieldDefinition.label}</Heading2>
         </>
       )
     }
@@ -495,16 +492,19 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
-      const label = fieldDefinition.label as unknown as MessageDescriptor
+      const label = fieldDefinition.label as unknown as MessageDescriptor & {
+        values: Record<string, string>
+      }
+      const values = label.values || {}
+
+      const message = intl.formatMessage(label, {
+        ...values,
+        [fieldDefinition.name]: value as any
+      })
 
       return (
         <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
-          <FormattedMessage
-            {...label}
-            values={{
-              [fieldDefinition.name]: value as any
-            }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
       )
     }

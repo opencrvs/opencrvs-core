@@ -130,20 +130,21 @@ export const DuplicateForm = (props: IProps) => {
   )
   return (
     <>
-      <SubPageContent
-        title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
-          name: getName(),
-          trackingId: String(data.registration.trackingId)
-        })}
-        subtitle={intl.formatMessage(
-          duplicateMessages.duplicateContentSubtitle,
-
-          {
-            trackingIds
-          }
-        )}
-        bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
-      ></SubPageContent>
+      <div>
+        <SubPageContent
+          title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
+            name: getName(),
+            trackingId: String(data.registration.trackingId)
+          })}
+          subtitle={intl.formatMessage(
+            duplicateMessages.duplicateContentSubtitle,
+            {
+              trackingIds
+            }
+          )}
+          bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+        ></SubPageContent>
+      </div>
 
       <ResponsiveModal
         id="mark-as-duplicate-modal"
