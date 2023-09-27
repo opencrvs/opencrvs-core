@@ -45,6 +45,49 @@ const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
+const validStatusMapping = {
+  [ARCHIVED_STATUS]: [
+    DECLARED_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [IN_PROGRESS_STATUS]: [null] as const,
+  [DECLARED_STATUS]: [ARCHIVED_STATUS, null] as const,
+  [REJECTED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    WAITING_VALIDATION_STATUS,
+    VALIDATED_STATUS,
+    ARCHIVED_STATUS
+  ] as const,
+  [VALIDATED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    ARCHIVED_STATUS,
+    null
+  ] as const,
+  [WAITING_VALIDATION_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [REGISTERED_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS,
+    WAITING_VALIDATION_STATUS
+  ] as const,
+  [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS] as const,
+  [ISSUED_STATUS]: [CERTIFIED_STATUS] as const,
+  [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS] as const,
+  [REINSTATED_STATUS]: [ARCHIVED_STATUS] as const
+}
+
 export interface ICorrection {
   section: string
   fieldName: string
@@ -60,7 +103,7 @@ export interface IAssignment {
 }
 
 export interface IOperationHistory {
-  operationType: string
+  operationType: keyof typeof validStatusMapping
   operatedOn: string
   operatorRole: string
   operatorFirstNames: string
@@ -369,52 +412,12 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 }
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
-  const validStatusMapping = {
-    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
-    [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
-    [REJECTED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      WAITING_VALIDATION_STATUS,
-      VALIDATED_STATUS,
-      ARCHIVED_STATUS
-    ],
-    [VALIDATED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      ARCHIVED_STATUS,
-      null
-    ],
-    [WAITING_VALIDATION_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS
-    ],
-    [REGISTERED_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      WAITING_VALIDATION_STATUS
-    ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS],
-    [ISSUED_STATUS]: [CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REINSTATED_STATUS]: [ARCHIVED_STATUS]
-  }
-
   const previousStatus = getPreviousStatus(body)
   const currentStatus = body.type as keyof typeof validStatusMapping
 
   if (
     currentStatus &&
     validStatusMapping[currentStatus] &&
-    // @todo fix types
     !validStatusMapping[currentStatus].includes(previousStatus as never)
   ) {
     return false
