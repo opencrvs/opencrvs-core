@@ -709,9 +709,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       // this is to forcefully remount the component
       // to reset the initial values of formik
       this.setState({
-        formFieldKey: `${this.props.activeSection.id}-${
-          this.props.activeSectionGroup.id
-        }-${Date.now()}`
+        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
       })
     }
 
