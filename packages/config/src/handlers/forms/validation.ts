@@ -156,7 +156,6 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'detailsExist',
     'reasonNotApplying',
     'motherBirthDate',
-    'nationality',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
@@ -165,8 +164,6 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'detailsExist',
     'reasonNotApplying',
     'fatherBirthDate',
-    'nationality',
-    'primaryAddressSameAsOtherPrimary',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
@@ -174,7 +171,6 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'familyNameEng',
     'gender',
     'deceasedBirthDate',
-    'nationality',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   deathEvent: [
@@ -193,14 +189,12 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'firstNamesEng',
     'familyNameEng',
     'groomBirthDate',
-    'nationality',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
     'firstNamesEng',
     'familyNameEng',
     'brideBirthDate',
-    'nationality',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
@@ -208,8 +202,6 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'otherInformantType',
     'firstNamesEng',
     'familyNameEng',
-    'informantBirthDate',
-    'nationality',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
   witnessOne: [
@@ -243,6 +235,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'multipleBirth',
     'occupation',
     'educationalAttainment',
+    'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
@@ -254,6 +247,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'maritalStatus',
     'occupation',
     'educationalAttainment',
+    'nationality',
+    'primaryAddressSameAsOtherPrimary',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
@@ -262,6 +257,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'ageOfIndividualInYears',
     'deceasedID',
     'maritalStatus',
+    'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   deathEvent: [
@@ -281,6 +277,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'ageOfIndividualInYears',
     'iD',
     'marriedLastNameEng',
+    'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
@@ -289,6 +286,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'ageOfIndividualInYears',
     'iD',
     'marriedLastNameEng',
+    'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
@@ -300,6 +298,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'informantID',
     'informantNidVerification',
     'primaryAddressSameAsOtherPrimary',
+    'informantBirthDate',
+    'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
   witnessOne: [],
