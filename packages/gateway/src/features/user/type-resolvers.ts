@@ -51,7 +51,7 @@ export interface IUserModelData {
   scope?: string[]
   email: string
   emailForNotification?: string
-  mobile: string
+  mobile?: string
   status: string
   systemRole: string
   role: IUserRole
