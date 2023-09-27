@@ -288,14 +288,14 @@ describe('OfficeHome sent for update tab related tests', () => {
     const table = await waitForElement(testComponent, Workqueue)
     const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-      new Date(birthEventRejectedDate)
+      new Date('2021-10-20T11:03:20.660Z')
     )
 
     expect(data.length).toBe(2)
-    expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].contactNumber).toBe('01622688231')
     expect(data[1].sentForUpdates).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('Death')
+    expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
   })
 
