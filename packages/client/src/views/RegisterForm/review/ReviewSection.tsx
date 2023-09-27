@@ -113,7 +113,7 @@ import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
+import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
   injectIntl,
   IntlShape,
@@ -127,6 +127,7 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
+  addressFieldNames,
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
@@ -412,28 +413,18 @@ const renderValue = (
   isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const isAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
   // Showing State & District Name instead of their ID
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'cityUrbanOptionPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'internationalCityPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'cityUrbanOptionSecondary',
-      'internationalStateSecondary',
-      'internationalCitySecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name) &&
-    isOriginalData
-  ) {
+  if (isAddressField && isOriginalData) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -441,9 +432,9 @@ const renderValue = (
       dynamicOption.dependency = [
         'internationalStatePrimary',
         'statePrimary'
-      ].includes(field.name)
-        ? 'countryPrimary'
-        : 'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -455,7 +446,10 @@ const renderValue = (
       )
     }
 
-    if (sectionData.countrySecondary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -463,9 +457,9 @@ const renderValue = (
       dynamicOption.dependency = [
         'internationalStateSecondary',
         'stateSecondary'
-      ].includes(field.name)
-        ? 'countrySecondary'
-        : 'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
