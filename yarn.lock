@@ -7515,9 +7515,9 @@
     "@types/node" "*"
 
 "@types/glob@^5.0.35":
-  version "5.0.37"
-  resolved "https://registry.npmjs.org/@types/glob/-/glob-5.0.37.tgz"
-  integrity sha512-ATA/xrS7CZ3A2WCPVY4eKdNpybq56zqlTirnHhhyOztZM/lPxJzusOBI3BsaXbu6FrUluqzvMlI4sZ6BDYMlMg==
+  version "5.0.38"
+  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-5.0.38.tgz#20e29f3c6332f6b3329f34711ebb31a03dd74a51"
+  integrity sha512-rTtf75rwyP9G2qO5yRpYtdJ6aU1QqEhWbtW55qEgquEDa6bXW0s2TWZfDm02GuppjEozOWG/F2UnPq5hAQb+gw==
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
