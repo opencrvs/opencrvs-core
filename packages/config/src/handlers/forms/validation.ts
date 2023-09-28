@@ -173,6 +173,14 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'deceasedBirthDate',
     ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
+  spouse: [
+    'firstNamesEng',
+    'familyNameEng',
+    'detailsExist',
+    'reasonNotApplying',
+    'spouseBirthDate',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Spouse`)
+  ],
   deathEvent: [
     'deathDate',
     'placeOfDeathTitle',
@@ -259,6 +267,19 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'maritalStatus',
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
+  ],
+  spouse: [
+    'primaryAddress',
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'iD',
+    'spouseNidVerification',
+    'maritalStatus',
+    'occupation',
+    'educationalAttainment',
+    'nationality',
+    'primaryAddressSameAsOtherPrimary',
+    ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Spouse`)
   ],
   deathEvent: [
     'mannerOfDeath',
