@@ -197,6 +197,7 @@ type State = {
   startTime: number
   selectedDuplicateComId: string
   isDuplicateDeclarationLoading: boolean
+  formFieldKey: string
 }
 
 function getDeclarationIconColor(declaration: IDeclaration): string {
@@ -617,7 +618,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isFileUploading: false,
       startTime: 0,
       selectedDuplicateComId: props.declaration.id,
-      isDuplicateDeclarationLoading: false
+      isDuplicateDeclarationLoading: false,
+      formFieldKey: `${props.activeSection.id}-${props.activeSectionGroup.id}`
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -681,22 +683,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'father'
       }
 
-      // informant needs to be reset as the relationship changed
-      // see https://github.com/opencrvs/opencrvs-core/issues/5866
-      if (
-        ['MOTHER', 'FATHER', 'BRIDE', 'GROOM'].includes(
-          prevProps.declaration?.data?.informant?.informantType as string
-        )
-      ) {
-        const { _fhirIDPatient, ...informantWithoutFhirID } =
-          declaration.data.informant
-        modifiedDeclaration = {
-          ...modifiedDeclaration,
-          data: {
-            ...modifiedDeclaration.data,
-            informant: {
-              ...informantWithoutFhirID
-            }
+      modifiedDeclaration = {
+        ...modifiedDeclaration,
+        data: {
+          ...modifiedDeclaration.data,
+          informant: {
+            informantType: modifiedDeclaration.data.informant.informantType
           }
         }
       }
@@ -714,6 +706,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         }
       }
       this.props.modifyDeclaration(modifiedDeclaration)
+      // this is to forcefully remount the component
+      // to reset the initial values of formik
+      this.setState({
+        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
+      })
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
@@ -1161,7 +1158,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
-                                key={`${activeSection.id}-${activeSectionGroup.id}`}
+                                key={this.state.formFieldKey}
                                 onChange={(values) => {
                                   debouncedModifyDeclaration(
                                     values,
