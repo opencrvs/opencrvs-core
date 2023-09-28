@@ -26,18 +26,13 @@ import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
-import { useDispatch, useSelector } from 'react-redux'
-import { CorrectionInput, Event, History } from '@client/utils/gateway'
+import { useSelector } from 'react-redux'
+import { CorrectionInput, History } from '@client/utils/gateway'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { IStoreState } from '@client/store'
 
 import { merge } from 'lodash'
-import {
-  IDeclaration,
-  SUBMISSION_STATUS,
-  modifyDeclaration,
-  writeDeclaration
-} from '@client/declarations'
+import { IDeclaration } from '@client/declarations'
 import {
   IFormData,
   IFormField,
@@ -45,8 +40,7 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IPreviewGroup,
-  SubmissionAction
+  IPreviewGroup
 } from '@client/forms'
 import { Button } from '@opencrvs/components/src/Button'
 import { ReviewSectionCorrection } from '@opencrvs/client/src/views/RegisterForm/review/ReviewSectionCorrection'
@@ -60,7 +54,6 @@ import { Summary } from '@opencrvs/components/lib/Summary'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { messages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'
-import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import {
@@ -76,7 +69,6 @@ import { getLanguage } from '@client/i18n/selectors'
 import { getName } from '@opencrvs/client/src/views/RecordAudit/utils'
 import format from '@client/utils/date-formatting'
 import { IOfflineData } from '@client/offline/reducer'
-import { Size } from 'react-easy-crop/types'
 
 type URLParams = { declarationId: string }
 
@@ -128,7 +120,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   const intl = useIntl()
 
   const registerForm = useSelector((state: IStoreState) =>
-    getEventReviewForm(state, Event.Birth)
+    getEventReviewForm(state, declaration.event)
   )
 
   const offlineResources = useSelector((state: IStoreState) =>
@@ -693,12 +685,12 @@ export function ReviewCorrection() {
   const location = useLocation()
   const history = useHistory()
 
-  const registerForm = useSelector((state: IStoreState) =>
-    getEventReviewForm(state, Event.Birth)
-  )
-
   const records = useRecord()
   const record = records.findById(declarationId)
+
+  const registerForm = useSelector(
+    (state: IStoreState) => record && getEventReviewForm(state, record.event)
+  )
 
   if (!record) {
     return (
