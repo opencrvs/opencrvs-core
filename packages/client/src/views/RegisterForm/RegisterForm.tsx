@@ -122,7 +122,7 @@ const BackButtonContainer = styled.div`
   position: fixed;
   padding: 16px 0px;
   height: 64px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: relative;
     margin: 0 16px;
   }
