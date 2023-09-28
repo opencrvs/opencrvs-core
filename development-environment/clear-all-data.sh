@@ -33,7 +33,7 @@ PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
 if [ -d $PATH_TO_MINIO_DIR ] ; then
  # Locally, as this script is called from the country config repo, the path to core is unknown
  # So we delete the data from the running shared volume location
-  docker exec opencrvs_minio_1 rm -rf /data/minio/ocrvs
+  docker exec opencrvs_minio_1 sh -c 'rm -rf /data/ocrvs/*'
   docker exec opencrvs_minio_1 mkdir -p /data/minio/ocrvs
   echo "**** Removed minio data ****"
 fi
