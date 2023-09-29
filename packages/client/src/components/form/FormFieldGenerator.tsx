@@ -87,7 +87,8 @@ import {
   INidVerificationButton,
   DIVIDER,
   HEADING3,
-  SUBSECTION_HEADER
+  SUBSECTION_HEADER,
+  HIDDEN
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -634,6 +635,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
+    if (fieldDefinition.type === HIDDEN) {
+      return (
+        <input
+          type="hidden"
+          {...inputProps}
+          value={inputProps.value as string}
+        />
+      )
+    }
     return (
       <InputField {...inputFieldProps}>
         <TextInput
