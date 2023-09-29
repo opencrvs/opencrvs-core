@@ -32,7 +32,7 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
-    "mongoose": "^6.6.1",
+    "mongoose": "^6.11.3",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "redis": "^3.0.2",
