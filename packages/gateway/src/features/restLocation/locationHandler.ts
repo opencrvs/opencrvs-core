@@ -19,7 +19,14 @@ import {
   updateStatisticalExtensions
 } from './utils'
 import { v4 as uuid } from 'uuid'
-import { Bundle, BundleEntry } from '@opencrvs/commons/types'
+import {
+  Bundle,
+  BundleEntry,
+  Saved,
+  URLReference,
+  Location as FhirLocation,
+  URNReference
+} from '@opencrvs/commons/types'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -144,9 +151,9 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth<Bundle>(`/Location/${locationId}`)
+    response = await fetchFromHearth<Saved<Bundle>>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth<Bundle>(`/Location${searchParam}`)
+    response = await fetchFromHearth<Saved<Bundle>>(`/Location${searchParam}`)
   }
 
   response.link = response.link?.map((link) => ({
@@ -160,7 +167,7 @@ export async function fetchLocationHandler(
     ...entry,
     fullUrl: entry.fullUrl
       ?.replace(entry.fullUrl.split('/Location')[0], `${request.url.origin}`)
-      .replace('Location', 'location')
+      .replace('Location', 'location') as URLReference
   }))
 
   return response
@@ -170,7 +177,7 @@ function batchLocationsHandler(locations: Location[]) {
   const locationsMap = new Map(
     locations.map((location) => [
       location.statisticalID,
-      { ...location, uid: `urn:uuid:${uuid()}` }
+      { ...location, uid: `urn:uuid:${uuid()}` as URNReference }
     ])
   )
   const locationsBundle = {
@@ -185,7 +192,7 @@ function batchLocationsHandler(locations: Location[]) {
           location.partOf
       }))
       .map(
-        (location): BundleEntry => ({
+        (location): BundleEntry<FhirLocation> => ({
           fullUrl: locationsMap.get(location.statisticalID)!.uid,
           resource: {
             ...composeFhirLocation(location),

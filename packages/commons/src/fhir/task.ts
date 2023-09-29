@@ -1,5 +1,5 @@
 import { Nominal } from 'src/nominal'
-import { Bundle, BusinessStatus, Extension, Resource, Saved } from '.'
+import { Bundle, BusinessStatus, Extension, Resource, Saved, isSaved } from '.'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -45,6 +45,10 @@ type TaskIdentifier =
       system: 'http://opencrvs.org/specs/id/paper-form-id'
       value: string
     }
+  | {
+      system: 'http://opencrvs.org/specs/id/dhis2_event_identifier'
+      value: string
+    }
 
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
 type AllSystems = ExtractSystem<TaskIdentifier>
@@ -53,10 +57,9 @@ type AfterLastSlash<S extends string> =
 export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
-  Saved<fhir3.Task>,
+  fhir3.Task,
   'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier'
 > & {
-  id: string
   lastModified: string
   extension: Array<Extension>
   businessStatus: BusinessStatus
@@ -75,9 +78,11 @@ export type Task = Omit<
   encounter?: fhir3.Reference
 }
 
+export type TaskHistory = Task
+
 export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
   encounter: {
-    reference: string
+    reference: `${string}/${string}`
   }
   requester: {
     agent: { reference: `Practitioner/${string}` }
@@ -100,14 +105,26 @@ export function getBusinessStatus(task: Task) {
   return code.code
 }
 
-export function isTask(resource: Resource): resource is Task {
+export function isTask<T extends Resource>(resource: T): resource is T & Task {
   return resource.resourceType === 'Task'
 }
 
-export function getTaskFromBundle(bundle: Bundle): Task {
+export function isTaskHistory<T extends Resource>(
+  resource: T
+): resource is T & TaskHistory {
+  return resource.resourceType === 'TaskHistory'
+}
+
+export function isTaskOrTaskHistory<T extends Resource>(
+  resource: T
+): resource is (T & TaskHistory) | (T & Task) {
+  return ['TaskHistory', 'Task'].includes(resource.resourceType)
+}
+
+export function getTaskFromBundle(bundle: Bundle): Saved<Task> {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
-  if (!task) {
+  if (!task || !isSaved(task)) {
     throw new Error('No task found in bundle')
   }
   return task

@@ -5,6 +5,8 @@ export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
 }
 
 export type PractitionerRole = fhir3.PractitionerRole
+export type PractitionerRoleHistory = PractitionerRole
+
 export type Practitioner = WithStrictExtensions<
   Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
     name: Array<OpenCRVSPractitionerName>
@@ -14,6 +16,25 @@ export type Practitioner = WithStrictExtensions<
 
 export function isPractitioner(resource: Resource): resource is Practitioner {
   return resource.resourceType === 'Practitioner'
+}
+export function isPractitionerRole<T extends Resource>(
+  resource: T
+): resource is T & PractitionerRole {
+  return resource.resourceType === 'PractitionerRole'
+}
+
+export function isPractitionerRoleHistory<T extends Resource>(
+  resource: T
+): resource is T & PractitionerRoleHistory {
+  return resource.resourceType === 'PractitionerRoleHistory'
+}
+
+export function isPractitionerRoleOrPractitionerRoleHistory<T extends Resource>(
+  resource: T
+): resource is (T & PractitionerRoleHistory) | (T & PractitionerRole) {
+  return ['PractitionerRoleHistory', 'PractitionerRole'].includes(
+    resource.resourceType
+  )
 }
 
 export function getPractitioner(id: string, bundle: Bundle) {

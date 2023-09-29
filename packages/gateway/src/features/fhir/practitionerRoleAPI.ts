@@ -9,10 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
+import { Context } from '@gateway/graphql/context'
+import {
+  isPractitionerRole,
+  isPractitionerRoleOrPractitionerRoleHistory
+} from '@opencrvs/commons/types'
+import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { FHIR_URL } from '../../constants'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
-export default class PractitionerRoleAPI extends RESTDataSource {
+export default class PractitionerRoleAPI extends RESTDataSource<Context> {
   constructor() {
     super()
     this.baseURL = `${FHIR_URL}/PractitionerRole`
@@ -22,16 +27,37 @@ export default class PractitionerRoleAPI extends RESTDataSource {
     const { headers } = this.context
     const headerKeys = Object.keys(headers)
     for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
+      request.headers.set(each, headers[each as keyof typeof headers]!)
     }
     request.headers.set('Content-Type', 'application/fhir+json')
   }
 
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
+    if (this.context.record) {
+      const inBundle = this.context.record.entry
+        .map(({ resource }) => resource)
+        .filter(isPractitionerRole)
+        .find(
+          (resource) =>
+            resource.practitioner?.reference ===
+            `Practitioner/${practitionerId}`
+        )
+
+      if (inBundle) {
+        return { entry: [{ resource: inBundle }] }
+      }
+    }
+
     return this.get(`?practitioner=${practitionerId}`)
   }
 
   async getPractionerRoleHistory(id: string) {
-    return this.get(`/${id}/_history`)
+    if (!this.context.record) {
+      throw new Error('No record in context. This should never happen')
+    }
+    return this.context.record.entry
+      .map(({ resource }) => resource)
+      .filter(isPractitionerRoleOrPractitionerRoleHistory)
+      .filter((role) => role.id === id)
   }
 }

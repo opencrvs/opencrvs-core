@@ -19,16 +19,11 @@ import {
   LocationStatistic,
   Statistics
 } from './locationHandler'
-import {
-  Location,
-  Extension,
-  UnsavedResource,
-  Bundle
-} from '@opencrvs/commons/types'
+import { Location, Extension, Bundle } from '@opencrvs/commons/types'
 
 export const composeFhirLocation = (
   location: LocationInput | FacilityInput
-): UnsavedResource<Location> => {
+): Location => {
   if (location.code === 'ADMIN_STRUCTURE') {
     return {
       resourceType: 'Location',

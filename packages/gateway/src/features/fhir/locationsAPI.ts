@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
+import { getResourceFromBundleById } from '@opencrvs/commons/types'
 import { FHIR_URL } from '../../constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
@@ -28,6 +29,13 @@ export default class LocationsAPI extends RESTDataSource {
   }
 
   getLocation(id: string) {
+    if (this.context.record) {
+      const inBundle = getResourceFromBundleById(this.context.record, id)
+      if (inBundle) {
+        return inBundle
+      }
+    }
+
     return this.get(`/${id}`)
   }
 }

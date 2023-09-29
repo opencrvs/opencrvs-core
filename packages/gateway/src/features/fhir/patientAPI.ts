@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
+import { getResourceFromBundleById } from '@opencrvs/commons/types'
 import { FHIR_URL } from '../../constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
@@ -28,6 +29,12 @@ export default class PatientAPI extends RESTDataSource {
   }
 
   getPatient(id: string) {
+    const inBundle = getResourceFromBundleById(this.context.record, id)
+
+    if (inBundle) {
+      return { entry: [{ resource: inBundle }] }
+    }
+
     return this.get(`/${id}`)
   }
 }

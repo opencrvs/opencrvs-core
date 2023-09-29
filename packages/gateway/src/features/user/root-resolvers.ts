@@ -21,7 +21,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getFullName,
-  getUser,
   hasScope,
   inScope,
   isTokenOwner,
@@ -37,29 +36,22 @@ import {
 import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }, { headers: authHeader }) {
-      return await getUser({ userId }, authHeader)
+    async getUser(_, { userId }, { dataSources }) {
+      const user = await dataSources.usersAPI.getUserById(userId!)
+      return user
     },
 
-    async getUserByMobile(_, { mobile }, { headers: authHeader }) {
-      const res = await getUser({ mobile }, authHeader)
-      if (!res._id) {
-        return null
-      }
-      return res
+    async getUserByMobile(_, { mobile }, { dataSources }) {
+      return dataSources.usersAPI.getUserByMobile(mobile!)
     },
 
-    async getUserByEmail(_, { email }, { headers: authHeader }) {
-      const res = await getUser({ email }, authHeader)
-      if (!res._id) {
-        return null
-      }
-      return res
+    async getUserByEmail(_, { email }, { dataSources }) {
+      return dataSources.usersAPI.getUserByEmail(email!)
     },
 
     async searchUsers(

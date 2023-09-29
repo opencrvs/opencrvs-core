@@ -1,5 +1,5 @@
 import { StateIdenfitiers } from '@opencrvs/commons/types'
-import { SEARCH_SERVICE_URL } from '@workflow/constants'
+import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
@@ -7,7 +7,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   authorizationToken: string,
   allowedStates: T
 ): Promise<StateIdenfitiers[T[number]]> {
-  const url = new URL(`/records/${recordId}`, SEARCH_SERVICE_URL)
+  const url = new URL(`/records/${recordId}`, SEARCH_URL)
   url.searchParams.append('states', allowedStates.join(','))
 
   const res = await fetch(url.href, {

@@ -15,7 +15,7 @@ import { FHIR_URL } from '@gateway/constants'
 import { PaymentReconciliation } from '@opencrvs/commons/types'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
-export default class LocationsAPI extends RESTDataSource {
+export default class PaymentsAPI extends RESTDataSource {
   constructor() {
     super()
     this.baseURL = `${FHIR_URL}/PaymentReconciliation`

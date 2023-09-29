@@ -49,7 +49,7 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
@@ -60,12 +60,18 @@ import {
 } from '@gateway/utils/validators'
 import {
   Bundle,
+  BundleEntry,
   Composition,
   Extension,
   Patient,
+  Saved,
   Task,
-  isComposition
+  getTaskFromBundle,
+  isComposition,
+  isTask,
+  resourceToBundleEntry
 } from '@opencrvs/commons/types'
+import { getRecordById } from '@gateway/search'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -86,81 +92,127 @@ export const resolvers: GQLResolver = {
       _,
       { fromDate, toDate },
       { headers: authHeader }
-    ) {
+    ): Promise<Saved<Bundle>[]> {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('User does not have a sysadmin scope')
         )
       }
-      const res = await fetchFHIR(
+      const res = await fetchFHIR<Saved<Bundle<Composition>>>(
         `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
 
-      const compositions: Composition[] = res.entry.map(
-        ({ resource }: { resource: Composition }) => resource
-      )
+      const compositions = res.entry.map(({ resource }) => resource)
 
-      return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'birth-declaration')
+      return Promise.all(
+        compositions
+          .filter(({ type }) =>
+            type.coding?.some(({ code }) => code === 'birth-declaration')
+          )
+          .map((composition) =>
+            getRecordById(composition.id, authHeader.Authorization)
+          )
       )
     },
     async searchDeathRegistrations(
       _,
       { fromDate, toDate },
       { headers: authHeader }
-    ) {
+    ): Promise<Saved<Bundle>[]> {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('User does not have a sysadmin scope')
         )
       }
-      const res = await fetchFHIR(
+      const res = await fetchFHIR<Saved<Bundle<Composition>>>(
         `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
 
-      const compositions: Composition[] = res.entry.map(
-        ({ resource }: { resource: Composition }) => resource
-      )
+      const compositions = res.entry.map(({ resource }) => resource)
 
-      return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'death-declaration')
+      return Promise.all(
+        compositions
+          .filter(({ type }) =>
+            type.coding?.some(({ code }) => code === 'death-declaration')
+          )
+          .map((composition) =>
+            getRecordById(composition.id, authHeader.Authorization)
+          )
       )
     },
-    async fetchBirthRegistration(_, { id }, { headers: authHeader }) {
+    async fetchBirthRegistration(_, { id }, context): Promise<Saved<Bundle>> {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare')
+        hasScope(context.headers, 'register') ||
+        hasScope(context.headers, 'validate') ||
+        hasScope(context.headers, 'declare')
       ) {
-        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.time('getRecordById')
+        }
+        const record = await markRecordAsDownloadedOrAssigned(
+          id,
+          context.headers
+        )
+
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.timeEnd('getRecordById')
+          console.log(
+            record.entry
+              .map(({ resource }) => resource.resourceType)
+              .reduce<Record<string, number>>((acc, curr) => {
+                acc[curr] = (acc[curr] || 0) + 1
+                return acc
+              }, {})
+          )
+        }
+
+        context.record = record
+
+        return record
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
     },
-    async fetchDeathRegistration(_, { id }, { headers: authHeader }) {
+    async fetchDeathRegistration(_, { id }, context): Promise<Saved<Bundle>> {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare')
+        hasScope(context.headers, 'register') ||
+        hasScope(context.headers, 'validate') ||
+        hasScope(context.headers, 'declare')
       ) {
-        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+        const composition = await markRecordAsDownloadedOrAssigned(
+          id,
+          context.headers
+        )
+        context.record = composition
+
+        return composition
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
     },
-    async fetchMarriageRegistration(_, { id }, { headers: authHeader }) {
+    async fetchMarriageRegistration(
+      _,
+      { id },
+      context
+    ): Promise<Saved<Bundle>> {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare')
+        hasScope(context.headers, 'register') ||
+        hasScope(context.headers, 'validate') ||
+        hasScope(context.headers, 'declare')
       ) {
-        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+        context.record = await markRecordAsDownloadedOrAssigned(
+          id,
+          context.headers
+        )
+        return context.record
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -171,7 +223,7 @@ export const resolvers: GQLResolver = {
       _,
       { identifier },
       { headers: authHeader }
-    ) {
+    ): Promise<Saved<Bundle>> {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -197,18 +249,26 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRegistration(_, { id }, { headers: authHeader }) {
-      return await fetchFHIR(`/Composition/${id}`, authHeader)
+    async fetchRegistration(_, { id }, context): Promise<Saved<Bundle>> {
+      // todo add event registration fields to type-resolver
+      context.record = await getRecordById(id, context.headers.Authorization)
+      return context.record
     },
-    async fetchRegistrationForViewing(_, { id }, { headers: authHeader }) {
-      const taskEntry = await getTaskEntry(id, authHeader)
+    async fetchRegistrationForViewing(
+      _,
+      { id },
+      context
+    ): Promise<Saved<Bundle>> {
+      context.record = await getRecordById(id, context.headers.Authorization)
+      const taskEntry = resourceToBundleEntry(getTaskFromBundle(context.record))
 
       const taskBundle = taskBundleWithExtension(taskEntry, {
         url: VIEWED_EXTENSION_URL
       })
 
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
-      return fetchFHIR(`/Composition/${id}`, authHeader)
+      fetchFHIR('/Task', context.headers, 'PUT', JSON.stringify(taskBundle))
+
+      return context.record
     },
     async queryPersonByIdentifier(_, { identifier }, { headers: authHeader }) {
       if (
@@ -883,9 +943,11 @@ const ACTION_EXTENSIONS = [
   FLAGGED_AS_POTENTIAL_DUPLICATE
 ]
 
+type ACTION_EXTENSION_TYPE = typeof ACTION_EXTENSIONS
+
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
-  const taskBundle = await fetchFHIR<Bundle<Task>>(
+  const taskBundle = await fetchFHIR<Saved<Bundle<Task>>>(
     `/Task?focus=Composition/${compositionId}`,
     authHeader
   )
@@ -895,7 +957,9 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   }
   taskEntry.resource.extension = taskEntry.resource.extension?.filter(
     ({ url }) =>
-      !ACTION_EXTENSIONS.includes(url as unknown as typeof ACTION_EXTENSIONS[0])
+      !ACTION_EXTENSIONS.includes(
+        url as unknown as ACTION_EXTENSION_TYPE[number]
+      )
   )
   taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
     ({ system }) => system != systemIdentifierUrl
@@ -905,7 +969,7 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
-  status: string
+  status: GQLRegStatus
 ): Extension {
   if (
     inScope(authHeader, ['declare', 'recordsearch']) ||
@@ -947,16 +1011,30 @@ export async function markRecordAsDownloadedOrAssigned(
   id: string,
   authHeader: IAuthHeader
 ) {
-  const taskEntry = await getTaskEntry(id, authHeader)
+  const record = await getRecordById(id, authHeader.Authorization)
+  const task = record.entry.find((entry) => isTask(entry.resource)) as Saved<
+    BundleEntry<Task>
+  >
 
-  const businessStatus = getStatusFromTask(taskEntry.resource) as GQLRegStatus
+  if (!task) {
+    throw new Error('Task not found from record. This should never happen')
+  }
+
+  const businessStatus = getStatusFromTask(task.resource)
+
+  if (!businessStatus) {
+    throw new Error("Task didn't have any status. This should never happen")
+  }
 
   const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
 
-  const taskBundle = taskBundleWithExtension(taskEntry, extension)
+  /*
+   * This function call modifies the "task" object, so we don't need to explicitly
+   * update the task object inside the "record" object.
+   */
+  const taskBundle = taskBundleWithExtension(task, extension)
 
-  await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+  fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
-  // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  return record
 }

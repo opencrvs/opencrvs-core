@@ -66,6 +66,7 @@ import {
   BundleEntry,
   Composition,
   Patient,
+  Saved,
   Task
 } from '@opencrvs/commons/types'
 
@@ -79,7 +80,10 @@ interface IEventRegistrationCallbackPayload {
   }[]
 }
 
-async function sendBundleToHearth(payload: Bundle, count = 1): Promise<Bundle> {
+async function sendBundleToHearth(
+  payload: Bundle,
+  count = 1
+): Promise<Saved<Bundle>> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -181,7 +185,7 @@ export async function createRegistrationHandler(
   try {
     const token = getToken(request)
     let payload = await modifyRegistrationBundle(
-      request.payload as Bundle,
+      request.payload as Saved<Bundle>,
       token
     )
     if (
@@ -191,7 +195,7 @@ export async function createRegistrationHandler(
         Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
       ].includes(event)
     ) {
-      payload = await markBundleAsWaitingValidation(payload as Bundle, token)
+      payload = await markBundleAsWaitingValidation(payload, token)
     } else if (
       [
         Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
@@ -199,7 +203,7 @@ export async function createRegistrationHandler(
         Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION
       ].includes(event)
     ) {
-      payload = await markBundleAsValidated(payload as Bundle, token)
+      payload = await markBundleAsValidated(payload, token)
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
@@ -415,7 +419,7 @@ export async function markEventAsWaitingValidationHandler(
   event: Events
 ) {
   try {
-    let payload: Bundle
+    let payload: Saved<Bundle>
 
     const taskResource = getTaskResourceFromFhirBundle(
       request.payload as Bundle
@@ -424,7 +428,7 @@ export async function markEventAsWaitingValidationHandler(
     // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {
       payload = await markBundleAsDeclarationUpdated(
-        request.payload as Bundle,
+        request.payload as Saved<Bundle>,
         getToken(request)
       )
       await postToHearth(payload)
@@ -434,7 +438,7 @@ export async function markEventAsWaitingValidationHandler(
     }
 
     payload = await markBundleAsWaitingValidation(
-      request.payload as Bundle,
+      request.payload as Saved<Bundle>,
       getToken(request)
     )
     const resBundle = await postToHearth(payload)

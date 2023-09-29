@@ -1,3 +1,5 @@
+import { ResourceIdentifier, URNReference } from '.'
+
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
     url: 'http://opencrvs.org/specs/extension/makeCorrection'
@@ -129,13 +131,13 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/regLastUser': {
     url: 'http://opencrvs.org/specs/extension/regLastUser'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier
     }
   }
   'http://opencrvs.org/specs/extension/collector': {
     url: 'http://opencrvs.org/specs/extension/collector'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier | URNReference /* Unsaved */
     }
   }
   'http://opencrvs.org/specs/extension/payment': {

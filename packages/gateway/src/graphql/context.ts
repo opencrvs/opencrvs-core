@@ -17,12 +17,16 @@ import DocumentsAPI from '../features/fhir/documentsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
 import MinioAPI from '../features/fhir/minioAPI'
 import { Request } from '@hapi/hapi'
+import { Saved, ValidRecord } from '@opencrvs/commons/types'
+import { UsersAPI } from '@gateway/features/user/usersAPI'
 
 export interface Context {
   request: Request
+  record?: Saved<ValidRecord>
   dataSources: {
     locationsAPI: LocationsAPI
     documentsAPI: DocumentsAPI
+    usersAPI: UsersAPI
     paymentsAPI: PaymentsAPI
     practitionerRoleAPI: PractitionerRoleAPI
     patientAPI: PatientAPI

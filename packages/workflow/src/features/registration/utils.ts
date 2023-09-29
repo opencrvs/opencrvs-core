@@ -44,6 +44,7 @@ import {
   DocumentReference,
   Patient,
   Resource,
+  Saved,
   Task
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -608,8 +609,10 @@ export function getResourceByType<T = Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export function getComposition(bundle: Bundle) {
-  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+export function getComposition<T extends Bundle>(bundle: T) {
+  return getResourceByType<
+    T extends Saved<Bundle> ? Saved<Composition> : Composition
+  >(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
 }
 
 export function getPatientBySection(bundle: Bundle, section: fhir3.Reference) {

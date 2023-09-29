@@ -13,7 +13,7 @@ import {
   NATIVE_LANGUAGE,
   USER_MANAGEMENT_URL
 } from '@gateway/constants'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import {
   GQLOperationHistorySearchSet,
   GQLResolver
@@ -22,7 +22,6 @@ import {
   getEventDurationsFromMetrics,
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
-import { getUser } from '@gateway/features/user/utils'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 interface ISearchEventDataTemplate {
@@ -380,11 +379,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedBy: async (
       searchData: ISearchEventDataTemplate,
       _,
-      { headers: authHeader }
+      { dataSources }
     ) => {
-      const res = await getUser(
-        { practitionerId: searchData._source && searchData._source.createdBy },
-        authHeader
+      const res = await dataSources.usersAPI.getUserByPractitionerId(
+        searchData._source && searchData._source.createdBy
       )
       // declarations created by health facilities don't have user
       // associated with it, so it returns an error

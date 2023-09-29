@@ -66,10 +66,10 @@ export type StateIdenfitiers = {
   ISSUED: IssuedRecord
 }
 
-export function changeState<
-  R extends RecordBase,
-  A extends keyof StateIdenfitiers
->(record: R, nextState: A) {
+export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
+  record: R,
+  nextState: A
+) {
   return record as any as StateIdenfitiers[A]
 }
 

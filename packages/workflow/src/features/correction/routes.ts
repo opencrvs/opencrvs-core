@@ -72,6 +72,7 @@ export const routes = [
         CorrectionRequestInput,
         request.payload
       )
+
       const token = getToken(request)
 
       if (findActiveCorrectionRequest(record)) {

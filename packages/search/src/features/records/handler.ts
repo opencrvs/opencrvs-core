@@ -7,8 +7,22 @@ export async function getRecordByIdHandler(
 ) {
   const recordId = request.params.recordId
   const allowedStates = request.query.states?.split(',') || []
+  const includeHistoryResources =
+    request.query.includeHistoryResources !== undefined
   try {
-    const bundle = await getRecordById(recordId, allowedStates)
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.time('getRecordById')
+    }
+    const bundle = await getRecordById(
+      recordId,
+      allowedStates,
+      includeHistoryResources
+    )
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.timeEnd('getRecordById')
+    }
     return bundle
   } catch (error) {
     if (error instanceof RecordNotFoundError) {

@@ -1,8 +1,9 @@
 import {
   Bundle,
   BundleEntry,
+  FhirResource,
   StateIdenfitiers,
-  findFromBundleById,
+  getFromBundleById,
   isComposition,
   isEncounter,
   isRelatedPerson
@@ -53,7 +54,7 @@ function checkForUnresolvedReferences(bundle: Bundle) {
         if (collectionReference.test(value)) {
           const id = value.split('/')[1]
           try {
-            findFromBundleById(bundle, id)
+            getFromBundleById(bundle, id)
           } catch (error) {
             developmentTimeError(
               'Unresolved reference found: ' + value,
@@ -118,12 +119,16 @@ function autoJoinAllCollections(localField: string) {
   ])
 }
 
-function filterByType(resourceType: fhir3.FhirResource['resourceType']) {
+function filterByType(resourceTypes: Array<FhirResource>) {
   return {
     $filter: {
       input: '$bundle',
       as: 'item',
-      cond: { $eq: ['$$item.resourceType', resourceType] }
+      cond: {
+        $or: resourceTypes.map((resourceType) => ({
+          $eq: ['$$item.resourceType', resourceType]
+        }))
+      }
     }
   }
 }
@@ -131,7 +136,13 @@ function filterByType(resourceType: fhir3.FhirResource['resourceType']) {
 function flattenArray(nestedQuery: Record<string, any>) {
   return {
     $reduce: {
-      input: nestedQuery,
+      input: {
+        $filter: {
+          input: nestedQuery,
+          as: 'item',
+          cond: { $ne: ['$$item', null] }
+        }
+      },
       initialValue: [],
       in: {
         $concatArrays: ['$$value', '$$this']
@@ -142,7 +153,8 @@ function flattenArray(nestedQuery: Record<string, any>) {
 
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
-  allowedStates: T
+  allowedStates: T,
+  includeHistoryResources: boolean
 ): Promise<StateIdenfitiers[T[number]]> {
   const connectedClient = await client.connect()
 
@@ -223,14 +235,100 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         from: 'Task',
         localField: `compositionIdForJoining`,
         foreignField: 'focus.reference',
-        as: 'joinResult'
+        as: 'task'
       }
     },
     {
       $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+        bundle: { $concatArrays: ['$bundle', '$task'] }
       }
     },
+    // There should only be one task for each composition, so we can flatten it
+    { $unwind: '$task' },
+    /*
+     * Create task history
+     */
+    ...(includeHistoryResources
+      ? [
+          {
+            $lookup: {
+              from: 'Task_history',
+              localField: 'task.id',
+              foreignField: 'id',
+              as: 'taskHistory'
+            }
+          },
+          {
+            $set: {
+              taskHistory: {
+                $map: {
+                  input: '$taskHistory',
+                  as: 'task',
+                  in: {
+                    $mergeObjects: [
+                      '$$task',
+                      {
+                        /*
+                         * Custom resource type that forces history items
+                         * to be dealt with separately to avoid conflicts.
+                         * Each resource gets a new ID here.
+                         */
+                        resourceType: 'TaskHistory',
+                        id: {
+                          $function: {
+                            body: `function () {
+                        return UUID().toString().split('"')[1]
+                      }`,
+                            args: [],
+                            lang: 'js'
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              bundle: { $concatArrays: ['$bundle', '$taskHistory'] }
+            }
+          },
+          // Find all encounters that Task history items are referring to
+          {
+            $addFields: {
+              taskHistoryEncounterIds: {
+                $map: {
+                  input: '$taskHistory',
+                  as: 'taskHistory',
+                  in: {
+                    $arrayElemAt: [
+                      {
+                        $split: ['$$taskHistory.encounter.reference', '/']
+                      },
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'Encounter',
+              localField: `taskHistoryEncounterIds`,
+              foreignField: 'id',
+              as: 'joinResult'
+            }
+          },
+          {
+            $addFields: {
+              bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+            }
+          }
+        ]
+      : []),
     {
       $addFields: {
         /*
@@ -238,7 +336,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         relatedPersonPatientIds: {
           $map: {
-            input: filterByType('RelatedPerson'),
+            input: filterByType(['RelatedPerson']),
             as: 'relatedPerson',
             in: {
               $arrayElemAt: [
@@ -253,7 +351,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         encounterIds: {
           $map: {
-            input: filterByType('Encounter'),
+            input: filterByType(['Encounter']),
             as: 'encounter',
             in: { $concat: ['Encounter/', '$$encounter.id'] }
           }
@@ -263,7 +361,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         taskReferenceIds: flattenArray({
           $map: {
-            input: filterByType('Task'),
+            input: filterByType(['Task', 'TaskHistory']),
             as: 'task',
             in: {
               $map: {
@@ -292,7 +390,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         taskRequesterIds: {
           $map: {
-            input: filterByType('Task'),
+            input: filterByType(['Task', 'TaskHistory']),
             as: 'task',
             in: {
               $arrayElemAt: [
@@ -307,7 +405,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         taskEncounterIds: {
           $map: {
-            input: filterByType('Task'),
+            input: filterByType(['Task', 'TaskHistory']),
             as: 'task',
             in: {
               $arrayElemAt: [
@@ -324,7 +422,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         taskNoteAuthorIds: flattenArray({
           $map: {
-            input: filterByType('Task'),
+            input: filterByType(['Task', 'TaskHistory']),
             as: 'task',
             in: {
               $map: {
@@ -353,7 +451,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
          */
         encounterLocationIds: flattenArray({
           $map: {
-            input: filterByType('Encounter'),
+            input: filterByType(['Encounter']),
             as: 'encounter',
             in: {
               $map: {
@@ -450,11 +548,12 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    // Get document references by Encounter ids
     {
       $lookup: {
-        from: 'Observation',
+        from: 'DocumentReference',
         localField: `encounterIds`,
-        foreignField: 'context.reference',
+        foreignField: 'subject.reference',
         as: 'joinResult'
       }
     },
@@ -494,6 +593,58 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    ...(includeHistoryResources
+      ? [
+          // Get PractitionerRolesHistory for all found practitioners roles
+          {
+            $addFields: {
+              practitionerRoleIds: {
+                $map: {
+                  input: filterByType(['PractitionerRole']),
+                  as: 'practitionerRole',
+                  in: '$$practitionerRole.id'
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'PractitionerRole_history',
+              localField: 'practitionerRoleIds',
+              foreignField: 'id',
+              as: 'practitionerRoleHistory'
+            }
+          },
+          {
+            $set: {
+              practitionerRoleHistory: {
+                $map: {
+                  input: '$practitionerRoleHistory',
+                  as: 'practitionerRole',
+                  in: {
+                    $mergeObjects: [
+                      '$$practitionerRole',
+                      {
+                        /*
+                         * Custom resource type that forces history items
+                         * to be dealt with separately to avoid conflicts.
+                         */
+                        resourceType: 'PractitionerRoleHistory'
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              bundle: { $concatArrays: ['$bundle', '$practitionerRoleHistory'] }
+            }
+          }
+        ]
+      : []),
+
     // Get Locations for found PractitionerRoles
     {
       $addFields: {
@@ -626,7 +777,7 @@ function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
     if (isComposition(resource)) {
       resource.section?.forEach((section) => {
         section.entry?.forEach((entry) => {
-          entry.reference = findFromBundleById(
+          entry.reference = getFromBundleById(
             bundle,
             entry.reference!.split('/')[1]
           )?.fullUrl
@@ -635,7 +786,7 @@ function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
     }
     if (isEncounter(resource)) {
       resource.location?.forEach(({ location }) => {
-        location.reference = findFromBundleById(
+        location.reference = getFromBundleById(
           bundle,
           location.reference.split('/')[1]
         )?.fullUrl
@@ -643,7 +794,7 @@ function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
     }
 
     if (isRelatedPerson(resource) && resource.patient.reference) {
-      resource.patient.reference = findFromBundleById(
+      resource.patient.reference = getFromBundleById(
         bundle,
         resource.patient.reference.split('/')[1]
       ).fullUrl
