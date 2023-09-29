@@ -133,21 +133,11 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
-const Title = styled.div<{ titleOverflow?: boolean }>`
+const Title = styled.div`
   ${({ theme }) => theme.fonts.h1}
   color: ${({ theme }) => theme.colors.copy};
-  ${({ titleOverflow }) =>
-    titleOverflow
-      ? `
-        overflow: auto;
-        overflow-y: hidden;
-      `
-      : `
-        overflow: hidden;
-        text-overflow: ellipsis;
-      `}
-  white-space: nowrap;
 `
+
 const Icon = styled.div`
   height: 24px;
   background-color: ${({ theme }) => theme.colors.white};
@@ -176,7 +166,6 @@ interface IProps {
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
-  titleOverflow?: boolean
   noPadding?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
@@ -197,7 +186,6 @@ export class UnstyledContent extends React.Component<IProps> {
       title,
       titleColor,
       showTitleOnMobile,
-      titleOverflow,
       topActionButtons,
       tabBarContent,
       filterContent,
@@ -227,11 +215,7 @@ export class UnstyledContent extends React.Component<IProps> {
             <TopBar keepShowing={showTitleOnMobile}>
               <TitleContainer titleColor={titleColor}>
                 {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-                {title && (
-                  <Title id={`content-name`} titleOverflow={titleOverflow}>
-                    {title}
-                  </Title>
-                )}
+                {title && <Title id={`content-name`}>{title}</Title>}
               </TitleContainer>
               {topActionButtons && (
                 <TopActionBar>{topActionButtons}</TopActionBar>
