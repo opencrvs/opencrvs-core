@@ -11,7 +11,7 @@
  */
 import { IFormData } from '@client/forms'
 
-export function getSpouseSectionTransformer(
+export function emptySpouseSectionTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string
