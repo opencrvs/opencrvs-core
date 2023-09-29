@@ -170,6 +170,10 @@ export function addNidUserInfoToDeclaration(
     if (section === 'father') {
       declarationDataSection['primaryAddressSameAsOtherPrimary'] = false
     }
+
+    if (section === 'spouse') {
+      declarationDataSection['primaryAddressSameAsOtherPrimary'] = false
+    }
   }
 
   declarationDataSection['fieldsModifiedByNidUserInfo'] =
