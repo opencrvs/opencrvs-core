@@ -8,13 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+
 import styled from 'styled-components'
 
-const StyledH2 = styled.h2`
-  padding-bottom: 0px;
+// Form Heading 2
+export const Heading2 = styled.h2`
+  ${({ theme }) => theme.fonts.h2};
+  color: ${({ theme }) => theme.colors.grey600};
+  padding-bottom: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
-export const SubSectionHeader: React.FC<{ label: string }> = ({ label }) => {
-  return <StyledH2>{label}</StyledH2>
-}
+// Form Heading 3
+export const Heading3 = styled.h3`
+  ${({ theme }) => theme.fonts.h3};
+  color: ${({ theme }) => theme.colors.grey600};
+  padding-top: 20px;
+`

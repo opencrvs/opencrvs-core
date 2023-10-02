@@ -93,25 +93,25 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
       this.state.notificationMethod === 'sms' &&
       (!this.state.phone || this.state.error)
     ) {
-      this.setState({
+      this.setState((prevState) => ({
         touched: true,
         error: true,
-        errorMessage: this.props.intl.formatMessage(
-          validationMessages.phoneNumberFormat
-        )
-      })
+        errorMessage: !prevState.phone
+          ? this.props.intl.formatMessage(validationMessages.phoneNumberFormat)
+          : this.props.intl.formatMessage(messages.errorPhoneNumberNotFound)
+      }))
       return
     } else if (
       this.state.notificationMethod === 'email' &&
       (!this.state.email || this.state.error)
     ) {
-      this.setState({
+      this.setState((prevState) => ({
         touched: true,
         error: true,
-        errorMessage: this.props.intl.formatMessage(
-          validationMessages.emailAddressFormat
-        )
-      })
+        errorMessage: !prevState.email
+          ? this.props.intl.formatMessage(validationMessages.emailAddressFormat)
+          : this.props.intl.formatMessage(messages.errorEmailAddressNotFound)
+      }))
       return
     }
     try {
@@ -233,6 +233,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.continueButtonLabel)}
                 </Button>
               ]}
+              showTitleOnMobile
             >
               <Actions id="phone-or-email-verification">
                 <InputField

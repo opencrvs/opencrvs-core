@@ -8,11 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IFormData } from '@client/forms'
 
-import styled from 'styled-components'
-
-export const Heading3 = styled.div`
-  ${({ theme }) => theme.fonts.h3};
-  color: ${({ theme }) => theme.colors.grey600};
-  margin-top: 24px;
-`
+export function emptySpouseSectionTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string
+) {
+  if (!queryData[sectionId]) {
+    transformedData[sectionId] = {
+      detailsExist: false,
+      primaryAddressSameAsOtherPrimary: true
+    }
+  } else {
+    transformedData[sectionId] = {
+      detailsExist: true,
+      ...transformedData[sectionId]
+    }
+  }
+  return transformedData
+}

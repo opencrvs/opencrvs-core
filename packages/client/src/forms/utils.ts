@@ -43,7 +43,9 @@ import {
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
-  BULLET_LIST
+  BULLET_LIST,
+  HIDDEN,
+  Ii18nHiddenFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -120,6 +122,10 @@ export const internationaliseFieldObject = (
     unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
+  }
+
+  if (base.type === HIDDEN) {
+    return base as Ii18nHiddenFormField
   }
 
   if (

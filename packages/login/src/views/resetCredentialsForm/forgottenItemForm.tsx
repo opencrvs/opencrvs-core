@@ -126,6 +126,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.continueButtonLabel)}
                 </Button>
               ]}
+              showTitleOnMobile
             >
               <Actions id="forgotten-item-options">
                 {this.state.error && (

@@ -615,8 +615,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
-      family: name.familyName as string,
-      given: (name.firstNames || '').split(' ') as string[]
+      family: name.familyName?.trim() as string,
+      given: (name.firstNames || '')?.trim().split(' ') as string[]
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
@@ -625,8 +625,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
-    emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
-    mobile: user.mobile as string,
+    ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property
+    ...(user.mobile && { mobile: user.mobile as string }),
     device: user.device as string,
     signature: user.signature,
     ...(user.username && { username: user.username })

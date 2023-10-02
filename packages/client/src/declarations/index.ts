@@ -217,6 +217,7 @@ export interface IDeclaration {
   data: IFormData
   duplicates?: IDuplicates[]
   originalData?: IFormData
+  localData?: IFormData
   savedOn?: number
   createdAt?: string
   modifiedOn?: number
@@ -523,6 +524,7 @@ export function createReviewDeclaration(
     data: formData,
     duplicates,
     originalData: formData,
+    localData: formData,
     review: true,
     event,
     registrationStatus: status

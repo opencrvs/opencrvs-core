@@ -331,7 +331,7 @@ class UserReviewFormComponent extends React.Component<
         }
         hideBackground={true}
       >
-        <Content title={intl.formatMessage(section.name)}>
+        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
           <Container>
             {this.transformSectionData().map((sec, index) => {
               return (

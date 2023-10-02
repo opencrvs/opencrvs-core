@@ -183,6 +183,7 @@ export function IssueCollectorForm({
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
+      showTitleOnMobile
     >
       <FormFieldGenerator
         id="collector"

@@ -59,7 +59,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'secondary' && styles.secondary}
   ${(props) =>
     props.variant === 'secondary_negative' && styles.secondary_negative}
-  
+
   ${(props) => props.variant === 'tertiary' && styles.tertiary}
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}

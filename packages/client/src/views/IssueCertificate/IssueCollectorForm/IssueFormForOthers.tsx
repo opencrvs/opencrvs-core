@@ -102,6 +102,7 @@ export const IssueCollectorFormForOthers = ({
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
+      showTitleOnMobile
     >
       <FormFieldGenerator
         id="otherCollector"

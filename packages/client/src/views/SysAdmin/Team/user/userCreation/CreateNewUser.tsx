@@ -140,19 +140,9 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   }
 
   render() {
-    const {
-      section,
-      submitting,
-      userDetailsStored,
-      loadingRoles,
-      userId,
-      match
-    } = this.props
-    if (
-      submitting ||
-      (userId && !userDetailsStored) ||
-      (match.params.locationId && loadingRoles)
-    ) {
+    const { section, submitting, userDetailsStored, loadingRoles, userId } =
+      this.props
+    if (submitting || loadingRoles || (userId && !userDetailsStored)) {
       return this.renderLoadingPage()
     }
 
@@ -211,7 +201,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
     props.match.params.sectionId || state.userForm.userForm!.sections[0].id
 
-  const section = state.userForm.userForm!.sections.find(
+  const section = state.userForm.userForm.sections.find(
     (section) => section.id === sectionId
   ) as IFormSection
 

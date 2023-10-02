@@ -22,7 +22,7 @@ const LocationSchema = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    alias: z.string(),
+    alias: z.string().optional(),
     partOf: z.string(),
     locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
     jurisdictionType: z
