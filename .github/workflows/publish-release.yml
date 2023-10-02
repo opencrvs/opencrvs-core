@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Publish images to Dockerhub from any branch
+name: Publish release
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
       - name: Set version
         id: set-version
         run: |
-          export VERSION=`git log -1 --pretty=format:%h`
+          export VERSION=`git describe --tags --abbrev=0`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Get list of services
@@ -74,6 +74,6 @@ jobs:
       - name: Build ${{ matrix.service }}
         run: |
           echo ${{ matrix.service }}
-          export VERSION=`git log -1 --pretty=format:%h`
+          export VERSION=`git describe --tags --abbrev=0`
           docker-compose build ${{ matrix.service }}
           docker-compose push ${{ matrix.service }}
