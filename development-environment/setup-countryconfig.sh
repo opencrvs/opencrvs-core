@@ -60,7 +60,7 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 
 echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
 echo
-yarn db:clear:all --path_to_core=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY
+bash $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/development-environment/clear-all-data.sh
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
