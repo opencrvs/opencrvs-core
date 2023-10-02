@@ -27,7 +27,7 @@ export const getPlugins = () => {
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: '1.3.0-beta'
+      version: '1.3.0'
     },
     schemes: ['http', 'https'],
     swaggerUI: false,

@@ -28,9 +28,7 @@
 
 ## Important! Please read
 
-To proceed, refer to our documentation.
-
-Read review our [documentation](http://documentation.opencrvs.org) for all the information you need.
+To proceed, refer to our [documentation](http://documentation.opencrvs.org). It contains all the information you need.
 
 ## Become part of the OpenCRVS Community
 
