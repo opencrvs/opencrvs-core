@@ -84,7 +84,8 @@ export async function checkServiceHealth(service: PingService) {
     return {
       ...service,
       ...serviceHealth,
-      ping: timeEnd - timeStart
+      ping: timeEnd - timeStart,
+      url: service.url.href
     }
   } catch (e) {
     logger.error(e)
@@ -177,7 +178,7 @@ export default async function healthCheckHandler(
 export const serviceHealthSchema = Joi.array().items(
   Joi.object({
     name: Joi.string(),
-    url: Joi.object(),
+    url: Joi.string(),
     status: Joi.string().valid('error', 'ok')
   }).unknown()
 )
