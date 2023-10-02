@@ -58,13 +58,14 @@ echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::
 echo
 echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a config ::::::::\033[0m"
 
-echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
+echo -e "\033[32m:::::::::::::::::: Preparing database ::::::::::::::::::\033[0m"
 echo
-bash $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/development-environment/clear-all-data.sh
+cd ../opencrvs-core
+yarn db:clear:all
+
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
 cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY
-cd ../
-cd opencrvs-countryconfig
+cd ../opencrvs-countryconfig
 yarn start
