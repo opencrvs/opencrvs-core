@@ -882,6 +882,32 @@ async function createInformantType(
         context
       )
     }
+  } else if (context.event === EVENT_TYPE.DEATH) {
+    if (fieldValue === 'MOTHER') {
+      setInformantReference(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'FATHER') {
+      setInformantReference(
+        FATHER_CODE,
+        FATHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'SPOUSE') {
+      setInformantReference(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    }
   } else if (context.event === EVENT_TYPE.MARRIAGE) {
     if (fieldValue === 'BRIDE') {
       setInformantReference(
