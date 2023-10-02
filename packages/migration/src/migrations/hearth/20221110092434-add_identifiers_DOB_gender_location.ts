@@ -33,8 +33,8 @@ export const up = async (db: Db, client: MongoClient) => {
     await session.withTransaction(async () => {
       // rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on elasticSearch
       await renameField(
-        'declarationJurisdictionIds',
-        'declarationLocationHirarchyIds'
+        'declarationLocationHirarchyIds',
+        'declarationJurisdictionIds'
       )
       const totalCompositionCount = await getTotalDocCountByCollectionName(
         db,
