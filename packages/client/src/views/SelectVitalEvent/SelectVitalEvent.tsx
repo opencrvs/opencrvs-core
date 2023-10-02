@@ -197,7 +197,13 @@ class SelectVitalEventView extends React.Component<
   }
 }
 
-export const SelectVitalEvent = connect(null, {
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    user: getUserDetails(store)
+  }
+}
+
+export const SelectVitalEvent = connect(mapStateToProps, {
   goBack,
   goToHome,
   storeDeclaration,
