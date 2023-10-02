@@ -26,7 +26,7 @@ jobs:
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: euanmillar
+          approvers: euanmillar,rikukissa
           minimum-approvals: 1
           issue-title: 'Release: ${{ github.event.inputs.release_version }}'
           issue-body: 'Please approve or deny the publishing of release: ${{ github.event.inputs.release_version }} to Dockerhub'
