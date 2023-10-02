@@ -8024,9 +8024,9 @@
     csstype "^3.0.2"
 
 "@types/recharts@^1.1.1":
-  version "1.8.23"
-  resolved "https://registry.npmjs.org/@types/recharts/-/recharts-1.8.23.tgz"
-  integrity sha512-O/mIPm9f6dwRWfenOI3GQwsGta3x1YWjwqXOCZqC0MATQ6C+A+Jc8VxFnSUr4N3uYv64zkq90RwXFaMNbhJKvg==
+  version "1.8.25"
+  resolved "https://registry.yarnpkg.com/@types/recharts/-/recharts-1.8.25.tgz#8016786a2d23e95d4e87a0749411480bc5012325"
+  integrity sha512-n00qkrMF77KJ3yaxXlomOv/dIgLKvkI84Js6AoZzhqz2F+RRJAIrLYU6gDnOUM1JsgT2+dMNmnOQ2kgdqTX7fA==
   dependencies:
     "@types/d3-shape" "^1"
     "@types/react" "*"
