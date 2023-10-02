@@ -166,8 +166,15 @@ class UserReviewFormComponent extends React.Component<
 
             if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
               fieldValue = (
-                //@ts-ignore
-                <SignatureImage src={this.props.formData[field.name]?.data} />
+                <SignatureImage
+                  src={
+                    (
+                      this.props.formData[field.name] as
+                        | IAttachmentValue
+                        | undefined
+                    )?.data
+                  }
+                />
               )
             }
 
