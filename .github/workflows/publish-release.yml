@@ -15,9 +15,9 @@ on:
         description: Branch to build from
         default: develop
         required: true
-  push:
-    branches:
-      - 'develop'
+      release_version:
+        description: Release version number
+        required: true
 
 jobs:
   base:
@@ -34,7 +34,7 @@ jobs:
       - name: Set version
         id: set-version
         run: |
-          export VERSION=`git describe --tags --abbrev=0`
+          export VERSION=${{ github.event.inputs.release_version }}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Get list of services
@@ -74,6 +74,6 @@ jobs:
       - name: Build ${{ matrix.service }}
         run: |
           echo ${{ matrix.service }}
-          export VERSION=`git describe --tags --abbrev=0`
+          export VERSION=${{ github.event.inputs.release_version }}
           docker-compose build ${{ matrix.service }}
           docker-compose push ${{ matrix.service }}
