@@ -24,7 +24,7 @@ interface Backup {
   // Add other backup fields as needed
 }
 
-export default function backups() {
+export default function Backups() {
   type ButtonType = 'primary' | 'secondary'
 
   const [backups, setBackups] = useState<Backup[]>([
