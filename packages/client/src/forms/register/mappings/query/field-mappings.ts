@@ -292,7 +292,7 @@ export const addressQueryTransformer =
       return transformedData
     }
 
-    if (config.lineNumber) {
+    if (config.lineNumber || config.lineNumber === 0) {
       transformedData[sectionId][field.name] =
         (address.line && address.line[config.lineNumber]) || ''
     }
@@ -1167,7 +1167,7 @@ export function questionnaireToTemplateFieldTransformer(
   const selectedQuestion: IQuestionnaireQuestion =
     queryData.questionnaire.filter(
       (question: IQuestionnaireQuestion) =>
-        question.fieldId === field.customQuesstionMappingId
+        question.fieldId === field.customQuestionMappingId
     )[0]
 
   /* transformedData[sectionId] is undefined when mapping templates */
@@ -1219,7 +1219,7 @@ export function questionnaireToCustomFieldTransformer(
     const selectedQuestion: IQuestionnaireQuestion =
       queryData.questionnaire.filter(
         (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
+          question.fieldId === field.customQuestionMappingId
       )[0]
     if (selectedQuestion) {
       /* transformedData[sectionId] is undefined when mapping templates */

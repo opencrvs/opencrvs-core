@@ -71,33 +71,20 @@ async function extractMessages() {
       const englishTranslations = login.data.find(
         (obj: ILanguage) => obj.lang === 'en-US' || obj.lang === 'en'
       )?.messages
-      let missingKeys = false
 
-      Object.keys(reactIntlDescriptions).forEach((key) => {
-        if (!englishTranslations?.hasOwnProperty(key)) {
-          missingKeys = true
-          // eslint-disable-line no-console
-          console.log(
-            `${chalk.red(
-              `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
-                key
-              )} in ${chalk.white(
-                `${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`
-              )}`
-            )}`
-          )
-        }
-      })
+      const missingKeys = Object.keys(reactIntlDescriptions).filter(
+        (key) => !englishTranslations?.hasOwnProperty(key)
+      )
 
-      if (missingKeys) {
+      if (missingKeys.length > 0) {
         // eslint-disable-line no-console
-        console.log(
-          `${chalk.red('WARNING: ')}${chalk.yellow(
-            'Fix missing keys in locale files first.'
-          )}`
-        )
+        console.log(chalk.red.bold('Missing translations'))
+        console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(missingKeys.join('\n'))}\n
+Translate the keys and add them to this file:
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`)}`)
+
         process.exit(1)
-        return
       }
 
       fs.writeFileSync(
@@ -109,7 +96,6 @@ async function extractMessages() {
     // eslint-disable-line no-console
     console.log(err)
     process.exit(1)
-    return
   }
 }
 

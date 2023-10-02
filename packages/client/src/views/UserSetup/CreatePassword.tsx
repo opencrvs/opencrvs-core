@@ -139,6 +139,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
       >
         <Content
           title={intl.formatMessage(messages.header)}
+          showTitleOnMobile
           subtitle={intl.formatMessage(messages.instruction)}
           bottomActionButtons={[continueActionButton]}
         >

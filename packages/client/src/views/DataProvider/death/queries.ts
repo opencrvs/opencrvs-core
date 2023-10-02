@@ -91,6 +91,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
       mother {
         id
@@ -99,6 +128,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
       spouse {
         id
@@ -106,6 +164,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           use
           firstNames
           familyName
+        }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
         }
       }
       medicalPractitioner {

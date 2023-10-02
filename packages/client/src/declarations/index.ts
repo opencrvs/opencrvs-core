@@ -218,6 +218,7 @@ export interface IDeclaration {
   data: IFormData
   duplicates?: IDuplicates[]
   originalData?: IFormData
+  localData?: IFormData
   savedOn?: number
   createdAt?: string
   modifiedOn?: number
@@ -524,6 +525,7 @@ export function createReviewDeclaration(
     data: formData,
     duplicates,
     originalData: formData,
+    localData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -1045,10 +1047,24 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data)
       }
+      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
+        data.data
+      )
+
+      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
+        .map(
+          (declaration) =>
+            declaration.data.fetchRegistrationForViewing?.registration
+        )
+        .flatMap((registration) => registration?.attachments)
+        .map((attachment) => attachment?.data)
+        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
         ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data)
+        ...getProfileIconUrls(data.data),
+        ...allduplicateDeclarationsAttachments
       ]
 
       await Promise.all(

@@ -24,7 +24,10 @@ import {
   mockUserGraphqlOperation
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { modifyUserFormData } from '@client/user/userReducer'
+import {
+  modifyUserFormData,
+  rolesMessageAddData
+} from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -131,6 +134,7 @@ describe('signature upload tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+      store.dispatch(rolesMessageAddData())
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -156,17 +160,17 @@ describe('signature upload tests', () => {
     })
 
     it('renders review header', () => {
+      testComponent.update()
       expect(testComponent.find('#content-name').hostNodes().text()).toBe(
         'Please review the new users details'
       )
     })
 
     it('clicking submit button submits the form data', async () => {
+      testComponent.update()
       testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
-      await flushPromises()
-
-      expect(store.getState().userForm.submitting).toBe(false)
+      expect(store.getState().userForm.submitting).toBe(true)
     })
   })
 })

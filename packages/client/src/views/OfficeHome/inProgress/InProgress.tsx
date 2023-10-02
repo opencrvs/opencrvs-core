@@ -298,6 +298,7 @@ class InProgressComponent extends React.Component<
           <IconWithName
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         iconWithNameEvent: (
@@ -305,6 +306,7 @@ class InProgressComponent extends React.Component<
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
             event={event}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         dateOfEvent,

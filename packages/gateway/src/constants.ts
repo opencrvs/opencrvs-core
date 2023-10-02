@@ -24,7 +24,7 @@ export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:2525/'
+export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
 export const APPLICATION_CONFIG_URL =
   process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 export const NOTIFICATION_URL =

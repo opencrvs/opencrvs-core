@@ -330,6 +330,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
           subtitle={intl.formatMessage(
             messages.userFormSecurityQuestionsDescription
           )}
+          showTitleOnMobile
         >
           {this.showQuestionnaire()}
         </Content>

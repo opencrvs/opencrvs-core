@@ -17,7 +17,8 @@ import {
   flushPromises,
   mockDeathDeclarationData,
   getRegisterFormFromStore,
-  mockOfflineData
+  mockOfflineData,
+  userDetails
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -200,6 +201,7 @@ describe('Correction summary', () => {
                   form,
                   birthDeclaration.data,
                   birthDeclaration.id,
+                  userDetails,
                   birthDeclaration.originalData
                 )
               },

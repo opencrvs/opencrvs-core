@@ -77,8 +77,10 @@ export async function populateBundleFromPayload(
   if (payload.resourceType === 'Bundle') {
     bundle = payload as fhir.Bundle
 
-    if (bundle.entry && bundle.entry.length > 1) {
-      // assume that if there are more than one entries then the bundle is already populated
+    const composition = getComposition(bundle)
+    const hasBundleBeenPopulated = composition !== undefined
+    if (hasBundleBeenPopulated) {
+      // Assume that if the bundle already has a fhir.Composition, it has already been populated
       return bundle
     }
   }

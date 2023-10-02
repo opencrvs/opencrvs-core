@@ -18,14 +18,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, {
-  isNull,
-  isUndefined,
-  merge,
-  flatten,
-  isEqual,
-  cloneDeep
-} from 'lodash'
+import _, { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -129,7 +122,7 @@ const BackButtonContainer = styled.div`
   position: fixed;
   padding: 16px 0px;
   height: 64px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: relative;
     margin: 0 16px;
   }
@@ -184,6 +177,7 @@ type Props = {
   activeSectionGroup: IFormSectionGroup
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
+  userDetails: UserDetails | null
   scope: Scope | null
 }
 
@@ -203,6 +197,7 @@ type State = {
   startTime: number
   selectedDuplicateComId: string
   isDuplicateDeclarationLoading: boolean
+  formFieldKey: string
 }
 
 function getDeclarationIconColor(declaration: IDeclaration): string {
@@ -231,13 +226,13 @@ function FormAppBar({
   const [modal, openModal] = useModal()
 
   const isFormDataAltered = () => {
-    if (!declaration.originalData) {
-      // if there is no originalData property
+    if (!declaration.localData) {
+      // if there is no localData property
       // that means it's a draft and has unsaved changes
       return true
     }
 
-    return !isEqual(declaration.originalData, declaration.data)
+    return !isEqual(declaration.localData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
@@ -301,9 +296,9 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to original data
-      //so that we can revert changes back to data.originalData when users exits without saving
-      declaration.originalData = declaration.data
+      //saving current changes to localData
+      //so that we can revert changes back to data.localData when users exits without saving
+      declaration.localData = declaration.data
       //save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -372,12 +367,12 @@ function FormAppBar({
     ))
 
     if (exitConfirm) {
-      if (!declaration.originalData) {
+      if (!declaration.localData) {
         deleteDeclarationMethod(declaration)
       } else {
         modifyDeclarationMethod({
           ...declaration,
-          data: declaration.originalData
+          data: declaration.localData
         })
       }
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -623,7 +618,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isFileUploading: false,
       startTime: 0,
       selectedDuplicateComId: props.declaration.id,
-      isDuplicateDeclarationLoading: false
+      isDuplicateDeclarationLoading: false,
+      formFieldKey: `${props.activeSection.id}-${props.activeSectionGroup.id}`
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -679,6 +675,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     // see https://github.com/opencrvs/opencrvs-core/issues/5820
     if (informantTypeChanged) {
       let informant
+      let modifiedDeclaration = declaration
 
       if (declaration?.data?.informant?.informantType === 'MOTHER') {
         informant = 'mother'
@@ -686,18 +683,34 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'father'
       }
 
+      modifiedDeclaration = {
+        ...modifiedDeclaration,
+        data: {
+          ...modifiedDeclaration.data,
+          informant: {
+            informantType: modifiedDeclaration.data.informant.informantType
+          }
+        }
+      }
+
       if (informant) {
-        this.props.modifyDeclaration({
-          ...declaration,
+        modifiedDeclaration = {
+          ...modifiedDeclaration,
           data: {
-            ...declaration.data,
+            ...modifiedDeclaration.data,
             [informant]: {
-              ...declaration.data[informant],
+              ...modifiedDeclaration.data[informant],
               detailsExist: true
             }
           }
-        })
+        }
       }
+      this.props.modifyDeclaration(modifiedDeclaration)
+      // this is to forcefully remount the component
+      // to reset the initial values of formik
+      this.setState({
+        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
+      })
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
@@ -940,19 +953,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       duplicate,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      userDetails
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,
       activeSectionGroup,
-      declaration
+      declaration,
+      userDetails
     )
 
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
+    const introSection =
+      findFirstVisibleSection(registerForm.sections).id === activeSection.id
     return (
       <>
         <TimeMounted
@@ -988,6 +1005,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft={declaration}
                   submitClickEvent={this.confirmSubmission}
                   onChangeReviewForm={this.modifyDeclaration}
+                  userDetails={userDetails}
                 />
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
@@ -1007,6 +1025,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      userDetails={userDetails}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,
@@ -1022,16 +1041,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <>
                   <Frame.LayoutForm>
                     <Frame.SectionFormBackAction>
-                      <BackButtonContainer>
-                        <Button
-                          type="tertiary"
-                          size="small"
-                          onClick={this.props.goBack}
-                        >
-                          <Icon name="ArrowLeft" size="medium" />
-                          {intl.formatMessage(buttonMessages.back)}
-                        </Button>
-                      </BackButtonContainer>
+                      {!introSection && (
+                        <BackButtonContainer>
+                          <Button
+                            type="tertiary"
+                            size="small"
+                            onClick={this.props.goBack}
+                          >
+                            <Icon name="ArrowLeft" size="medium" />
+                            {intl.formatMessage(buttonMessages.back)}
+                          </Button>
+                        </BackButtonContainer>
+                      )}
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
@@ -1050,6 +1071,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             nextSectionGroup && (
                               <Button
                                 id="next_section"
+                                key="next_section"
                                 type="primary"
                                 size="large"
                                 onClick={() => {
@@ -1071,6 +1093,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             declaration.review && (
                               <Button
                                 id="back-to-review-button"
+                                key="back-to-review-button"
                                 type="secondary"
                                 size="large"
                                 className="item"
@@ -1135,7 +1158,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
-                                key={`${activeSection.id}-${activeSectionGroup.id}`}
+                                key={this.state.formFieldKey}
                                 onChange={(values) => {
                                   debouncedModifyDeclaration(
                                     values,
@@ -1247,12 +1270,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
 function firstVisibleGroup(
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
 ): IFormSectionGroup | undefined {
   return getVisibleSectionGroupsBasedOnConditions(
     section,
     declaration.data[section.id] || {},
-    declaration.data
+    declaration.data,
+    userDetails
   )[0]
 }
 
@@ -1260,28 +1285,31 @@ function getValidSectionGroup(
   sections: IFormSection[],
   declaration: IDeclaration,
   sectionId: string,
-  groupId?: string
+  groupId?: string,
+  userDetails?: UserDetails | null
 ): {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
 } {
   const currentSection = sectionId
     ? sections.find((sec) => sec.id === sectionId)
-    : firstVisibleSection(sections)
+    : findFirstVisibleSection(sections)
   if (!currentSection) {
     throw new Error(`Section with id "${sectionId}" not found `)
   }
 
   const currentGroup = groupId
     ? currentSection.groups.find((group) => group.id === groupId)
-    : firstVisibleGroup(currentSection, declaration)
+    : firstVisibleGroup(currentSection, declaration, userDetails)
 
   const sectionIndex = sections.findIndex((sec) => sec.id === currentSection.id)
   if (!currentGroup) {
     return getValidSectionGroup(
       sections,
       declaration,
-      sections[sectionIndex + 1].id
+      sections[sectionIndex + 1].id,
+      undefined,
+      userDetails
     )
   }
   return {
@@ -1328,21 +1356,22 @@ export function replaceInitialValues(
   }))
 }
 
-function firstVisibleSection(sections: IFormSection[]) {
+function findFirstVisibleSection(sections: IFormSection[]) {
   return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
   const sectionId =
-    match.params.pageId || firstVisibleSection(registerForm.sections).id
-
+    match.params.pageId || findFirstVisibleSection(registerForm.sections).id
+  const userDetails = getUserDetails(state)
   const groupId = match.params.groupId
   const { activeSection, activeSectionGroup } = getValidSectionGroup(
     registerForm.sections,
     declaration,
     sectionId,
-    groupId
+    groupId,
+    userDetails
   )
 
   if (!activeSectionGroup) {
@@ -1364,7 +1393,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     activeSectionGroup.fields,
     declaration.data[activeSection.id] || {},
     declaration.data,
-    getUserDetails(state)
+    userDetails
   )
 
   let updatedFields: IFormField[] = []
@@ -1383,7 +1412,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     },
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
-    scope: getScope(state)
+    scope: getScope(state),
+    userDetails
   }
 }
 

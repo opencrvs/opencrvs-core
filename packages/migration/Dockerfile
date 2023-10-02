@@ -1,25 +1,22 @@
 FROM node:gallium-alpine
-WORKDIR /usr/src/app
+WORKDIR /app
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
-RUN chmod +x /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /app/wait
+RUN chmod +x /app/wait
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Install npm dependencies first (so they may be cached if dependencies don't change)
-COPY package.json package.json
-COPY packages/migration/package.json packages/migration/package.json
-COPY yarn.lock yarn.lock
-RUN yarn install --production
+COPY . .
 
-# Copy package build
-COPY --from=opencrvs-build /packages/migration packages/migration
+RUN rm -rf /app/packages/*
 
-# Copy the starting script
-COPY packages/migration/runMigrations.sh packages/migration/runMigrations.sh
+COPY packages/migration /app/packages/migration
 
-WORKDIR /usr/src/app/packages/migration
+RUN yarn install
+RUN yarn build
 
-CMD /wait && yarn start:prod
+WORKDIR /app/packages/migration
+
+CMD /app/wait && yarn start:prod

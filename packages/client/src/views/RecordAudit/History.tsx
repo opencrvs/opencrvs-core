@@ -17,7 +17,6 @@ import styled from 'styled-components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import {
-  getFormattedDate,
   getPageItems,
   getStatusLabel,
   isFlaggedAsPotentialDuplicate,
@@ -80,7 +79,9 @@ function SystemUser({ name }: { name?: string }) {
   return (
     <NameAvatar>
       <HealthSystemLogo />
-      <span>{name ?? intl.formatMessage(userMessages.system)}</span>
+      <span>
+        {Boolean(name) ? name : intl.formatMessage(userMessages.system)}
+      </span>
     </NameAvatar>
   )
 }
@@ -98,7 +99,6 @@ function HealthSystemUser({ name }: { name?: string }) {
 }
 
 const GetNameWithAvatar = ({
-  id,
   nameObject,
   avatar,
   language
@@ -295,22 +295,28 @@ export const GetHistory = ({
       getUserRole(currentLanguage, item.user?.role)
     ),
 
-    location: isVerifiedAction(item) ? (
-      <div />
-    ) : isSystemInitiated(item) ? null : isFieldAgent ? (
-      <>{item.office?.name}</>
-    ) : (
-      <Link
-        font="bold14"
-        onClick={() => {
-          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-        }}
-      >
-        {item.office
-          ? getLocalizedLocationName(intl, item.office as unknown as ILocation)
-          : ''}
-      </Link>
-    )
+    location:
+      isFlaggedAsPotentialDuplicate(item) ||
+      isVerifiedAction(item) ||
+      isSystemInitiated(item) ? (
+        <div />
+      ) : isFieldAgent ? (
+        <>{item.office?.name}</>
+      ) : (
+        <Link
+          font="bold14"
+          onClick={() => {
+            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+          }}
+        >
+          {item.office
+            ? getLocalizedLocationName(
+                intl,
+                item.office as unknown as ILocation
+              )
+            : ''}
+        </Link>
+      )
   }))
 
   const columns = [

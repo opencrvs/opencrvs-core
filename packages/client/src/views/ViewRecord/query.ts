@@ -12,6 +12,7 @@
 
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -346,6 +347,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             firstNames
             familyName
           }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
         }
         mother {
           id
@@ -354,6 +384,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             firstNames
             familyName
           }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
         }
         spouse {
           id
@@ -361,6 +420,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             use
             firstNames
             familyName
+          }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
           }
         }
         medicalPractitioner {
@@ -549,7 +637,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
 async function fetchDuplicateDeclarations(id: string) {
   return (
     client &&
-    client.query({
+    client.query<FetchViewRecordByCompositionQuery>({
       query: FETCH_VIEW_RECORD_BY_COMPOSITION,
       variables: { id },
       fetchPolicy: 'network-only'

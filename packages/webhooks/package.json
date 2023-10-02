@@ -48,6 +48,7 @@
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.135",
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/node-fetch": "^2.5.12",
     "@types/redis": "^2.8.26",
     "@types/uuid": "^3.4.3",

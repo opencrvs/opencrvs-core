@@ -62,6 +62,7 @@ type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
+  childIdentifier: String
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
@@ -125,6 +126,11 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
+input SortBy {
+  column: String!
+  order: String!
+}
+
 type Query {
   searchEvents(
     userId: String
@@ -133,6 +139,7 @@ type Query {
     skip: Int
     sort: String
     sortColumn: String
+    sortBy: [SortBy!]
   ): EventSearchResultSet
   getEventsWithProgress(
     declarationJurisdictionId: String

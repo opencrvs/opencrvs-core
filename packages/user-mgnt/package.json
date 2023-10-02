@@ -36,11 +36,13 @@
     "pino": "^6.0.0",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1"
   },
   "devDependencies": {
     "@types/fhir": "^0.0.30",
     "@types/hapi__boom": "^9.0.1",
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",

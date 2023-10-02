@@ -104,6 +104,7 @@ export interface ICompositionBody {
   motherDoB?: string
   motherIdentifier?: string
   childDoB?: string
+  childIdentifier?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -118,6 +119,7 @@ export interface IBirthCompositionBody extends ICompositionBody {
   childFirstNamesLocal?: string
   childFamilyNameLocal?: string
   childDoB?: string
+  childIdentifier?: string
   gender?: string
   motherFirstNames?: string
   motherFamilyName?: string

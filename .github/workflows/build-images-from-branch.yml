@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - 'develop'
+      - 'docker-image-optimizing'
       - 'release-v1.4.0'
 
 jobs:
@@ -38,6 +39,7 @@ jobs:
         run: |
           export VERSION=`git log -1 --pretty=format:%h`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Get list of services
         id: get-services
         run: |
@@ -46,19 +48,6 @@ jobs:
           # Set the list of service names as an output variable
           echo "services=$services_json" >> $GITHUB_OUTPUT
           echo "services=$services_json"
-      - name: Build base image
-        id: base-image
-        run: |
-          yarn build:image
-
-      - name: Tag image with version
-        run: |
-          docker image tag opencrvs-build:latest opencrvs-build:${{ steps.set-version.outputs.version }}
-
-      - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
-        with:
-          image: 'opencrvs-build:${{ steps.set-version.outputs.version }}'
 
     outputs:
       services: ${{ steps.get-services.outputs.services }}
@@ -84,15 +73,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Download image
-        uses: ishworkh/docker-image-artifact-download@v1
-        with:
-          image: 'opencrvs-build:${{ needs.base.outputs.version }}'
-
-      - name: Rename image to latest
-        run: |
-          docker image tag opencrvs-build:${{ needs.base.outputs.version }} opencrvs-build:latest
 
       - name: Build ${{ matrix.service }}
         run: |

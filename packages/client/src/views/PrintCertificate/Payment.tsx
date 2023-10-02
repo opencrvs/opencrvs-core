@@ -141,7 +141,10 @@ class PaymentComponent extends React.Component<IFullProps> {
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
-          <Content title={intl.formatMessage(messages.payment)}>
+          <Content
+            title={intl.formatMessage(messages.payment)}
+            showTitleOnMobile
+          >
             <Summary id="summary">
               <Summary.Row
                 id="service"
