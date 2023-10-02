@@ -26,7 +26,6 @@
     "@elastic/elasticsearch": "7.17.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",
-    "@types/minio": "^7.0.13",
     "@types/uuid": "^3.4.3",
     "bcryptjs": "^2.4.3",
     "file-type": "^16.5.3",
