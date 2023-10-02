@@ -164,7 +164,7 @@ export const IssuePayment = () => {
         hideBackground
         goHome={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
       >
-        <Content title={titleMessage}>
+        <Content title={titleMessage} showTitleOnMobile>
           <Summary id="summary">
             <Summary.Row
               id="service"

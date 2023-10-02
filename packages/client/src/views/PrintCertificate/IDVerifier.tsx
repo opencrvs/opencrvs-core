@@ -157,7 +157,7 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <div id={id}>
-        <Content title={this.props.title}>
+        <Content title={this.props.title} showTitleOnMobile>
           <Container>{this.renderLabelValue()}</Container>
           <ActionContainer>
             <SuccessButton

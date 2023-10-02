@@ -136,10 +136,8 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h1}
   color: ${({ theme }) => theme.colors.copy};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `
+
 const Icon = styled.div`
   height: 24px;
   background-color: ${({ theme }) => theme.colors.white};
