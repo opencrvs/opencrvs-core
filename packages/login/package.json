@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/login",
-  "version": "1.3.0-beta",
+  "version": "1.3.0",
   "description": "OpenCRVS login client application",
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "localforage": "^1.7.2",
-    "@opencrvs/components": "^1.3.0-beta",
+    "@opencrvs/components": "^1.3.0",
     "@sentry/react": "^7.12.1",
     "@sentry/tracing": "^7.12.1",
     "@types/history": "^4.6.2",

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as yaml from 'js-yaml'
@@ -73,7 +72,7 @@ async function ignoreFromBuild(packages: string[]) {
   pkg.scripts['build'] =
     pkg.scripts['build'] +
     ' ' +
-    packages.map(directory => `--ignore @opencrvs/${directory}`).join(' ')
+    packages.map((directory) => `--ignore @opencrvs/${directory}`).join(' ')
   writeFileSync('./package.json', JSON.stringify(pkg))
 }
 async function isDependencyOf(dependency: string, packageName: string) {
@@ -93,9 +92,9 @@ async function run() {
   const token = await getToken()
 
   // Not sure why but docker hub's API sometimes fails if you query it right after getting a token
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  const toPackageName = serviceName => {
+  const toPackageName = (serviceName) => {
     const service = compose.services[serviceName]
     const { image } = service
     const repository = image.split(':')[0]
@@ -112,9 +111,11 @@ async function run() {
     const repository = image.split(':')[0]
     const packageName = toPackageName(serviceName)
 
-    const latestGitHash = (await exec(
-      `git --no-pager log -n 1 --format="%h" -- "packages/${packageName}"`
-    )).trim()
+    const latestGitHash = (
+      await exec(
+        `git --no-pager log -n 1 --format="%h" -- "packages/${packageName}"`
+      )
+    ).trim()
 
     const latestTag = await getLatestTag(token, repository)
     if (!latestTag) {
@@ -143,7 +144,7 @@ async function run() {
   writeFileSync('./docker-compose.yml', yaml.safeDump(compose))
 
   const packagesThatNeedRebuilding = allPackages.filter(
-    packageName => !packagesThatDontNeedRebuilding.includes(packageName)
+    (packageName) => !packagesThatDontNeedRebuilding.includes(packageName)
   )
   if (packagesThatNeedRebuilding.length === 0) {
     console.log('No packages to rebuild. Removing build image creation step.')
@@ -153,12 +154,12 @@ async function run() {
      * Rebuild also packages that other rebuilt packages are dependant of
      * For example if client needs to be rebuilt, then components also needs to be part of the build image
      */
-    const packagesThatRebuiltPackagesArentDependendOn = packagesThatDontNeedRebuilding.filter(
-      packageName =>
-        packagesThatNeedRebuilding.some(rebuiltPackage =>
+    const packagesThatRebuiltPackagesArentDependendOn =
+      packagesThatDontNeedRebuilding.filter((packageName) =>
+        packagesThatNeedRebuilding.some((rebuiltPackage) =>
           isDependencyOf(packageName, rebuiltPackage)
         )
-    )
+      )
     console.log(
       'Following packages ignored from build image building',
       packagesThatRebuiltPackagesArentDependendOn
