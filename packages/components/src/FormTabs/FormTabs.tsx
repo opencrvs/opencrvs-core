@@ -6,16 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { Tab, Tabs } from './components/Tabs'
+import { colors } from '../colors'
+import { Text } from '../Text'
+import { Stack } from '../Stack'
 
+export type ITabColor = keyof typeof colors
 export interface IFormTabs<T extends string | number = string> {
   id: T
   title: string
   disabled?: boolean
+  icon?: React.ReactNode
+  color?: ITabColor
 }
 export interface IFormTabProps<T extends string | number = string> {
   sections: Array<IFormTabs<T>>
@@ -30,15 +35,22 @@ function FormTabsComponent<T extends string | number = string>({
 }: IFormTabProps<T>) {
   return (
     <Tabs>
-      {sections.map(({ title, id, disabled }) => (
+      {sections.map(({ title, id, disabled, icon, color }) => (
         <Tab
           id={`tab_${id}`}
+          color={color}
           onClick={() => onTabClick(id)}
           key={id}
           active={activeTabId === id}
           disabled={disabled}
+          activeColor={color}
         >
-          {title}
+          <Stack>
+            {icon}
+            <Text variant="bold14" element="span" color={color ?? 'primary'}>
+              {title}
+            </Text>
+          </Stack>
         </Tab>
       ))}
     </Tabs>

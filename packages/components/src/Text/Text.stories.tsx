@@ -6,15 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Text } from './Text'
 import { Stack } from '../Stack'
-import { UserIcon } from '../icons/User.stories'
+import { User } from '../icons'
 import { Box } from '../Box'
 import styled from 'styled-components'
 
@@ -34,14 +33,14 @@ Default.args = {
 }
 
 export const Heading = () => (
-  <Text variant="h1" element="h1">
+  <Text variant="h1" element="h1" align="center">
     The gold standard for digital civil registration
   </Text>
 )
 
 export const HeadingWithIcon = () => (
   <Stack>
-    <UserIcon />
+    <User />
     <Text variant="h4" element="span">
       Profile page
     </Text>
@@ -55,7 +54,7 @@ export const HeadingWithColour = () => (
 )
 
 export const Body = () => (
-  <Text variant="reg16" element="p">
+  <Text variant="reg16" element="p" align="center">
     OpenCRVS is highly configurable, interoperable and scalable, making it
     ideally suited for use in low resource settings. It uses standards-based and
     proven technologies to provide effective digital civil registration services

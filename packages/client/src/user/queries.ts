@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
@@ -24,9 +23,12 @@ export const SEARCH_USERS = gql`
           familyName
         }
         username
-        role
+        systemRole
         mobile
-        type
+        email
+        role {
+          _id
+        }
         status
         underInvestigation
         avatar {
@@ -89,12 +91,19 @@ export const GET_USER = gql`
       }
       username
       mobile
+      email
       identifier {
         system
         value
       }
-      role
-      type
+      systemRole
+      role {
+        _id
+        labels {
+          lang
+          label
+        }
+      }
       status
       underInvestigation
       practitionerId
@@ -152,7 +161,7 @@ async function searchUsers(primaryOfficeId: string) {
   )
 }
 
-export const VERIFY_PASSWORD_BY_ID = gql`
+const VERIFY_PASSWORD_BY_ID = gql`
   query verifyPasswordById($id: String!, $password: String!) {
     verifyPasswordById(id: $id, password: $password) {
       id

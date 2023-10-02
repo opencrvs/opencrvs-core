@@ -6,42 +6,44 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import {
-  getFormattedDate,
   getPageItems,
   getStatusLabel,
-  isSystemInitiated
+  isFlaggedAsPotentialDuplicate,
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus, SystemType } from '@client/utils/gateway'
+import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { useSelector } from 'react-redux'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { ILocation } from '@client/offline/reducer'
 
 const TableDiv = styled.div`
   overflow: auto;
-`
-
-const Heading = styled.h3`
-  ${({ theme }) => theme.fonts.h3}
-  margin-bottom: 0px !important;
 `
 
 const LargeGreyedInfo = styled.div`
@@ -71,6 +73,18 @@ const HealthSystemLogo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
 `
 
+function SystemUser({ name }: { name?: string }) {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo />
+      <span>
+        {Boolean(name) ? name : intl.formatMessage(userMessages.system)}
+      </span>
+    </NameAvatar>
+  )
+}
+
 function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
@@ -84,14 +98,13 @@ function HealthSystemUser({ name }: { name?: string }) {
 }
 
 const GetNameWithAvatar = ({
-  id,
   nameObject,
   avatar,
   language
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
-  avatar: IAvatar
+  avatar: Avatar
   language: string
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
@@ -116,6 +129,13 @@ function getSystemType(type: string | undefined) {
 
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
+  if (
+    newHistories[index].action ||
+    !['ISSUED', 'CERTIFIED'].includes(newHistories[index].regStatus)
+  ) {
+    return -1
+  }
+
   newHistories.map((item) => {
     item.uuid = uuid()
     return item
@@ -123,7 +143,11 @@ const getIndexByAction = (histories: any, index: number): number => {
 
   const uid = newHistories[index].uuid
   const actionIndex = newHistories
-    .filter((item) => item.action === newHistories[index].action)
+    .filter(
+      (item) =>
+        item.action === newHistories[index].action &&
+        (item.regStatus === 'ISSUED' || item.regStatus === 'CERTIFIED')
+    )
     .reverse()
     .findIndex((item) => item.uuid === uid)
 
@@ -143,10 +167,13 @@ export const GetHistory = ({
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+  const currentLanguage = useSelector(getLanguage)
+
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
   if (
@@ -156,7 +183,9 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
         <LargeGreyedInfo />
       </>
     )
@@ -165,12 +194,13 @@ export const GetHistory = ({
   }[]
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
-      date: new Date(draft.savedOn || Date.now()).toString(),
+      date: new Date(draft.savedOn || Date.now()).toISOString(),
       regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
+        systemRole: userDetails.systemRole,
         role: userDetails.role
       },
       office: userDetails.primaryOffice,
@@ -197,12 +227,20 @@ export const GetHistory = ({
     sortedHistory
   )
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
-    date: getFormattedDate(item?.date),
+    date: formatLongDate(
+      item?.date.toLocaleString(),
+      intl.locale,
+      'MMMM dd, yyyy · hh.mm a'
+    ),
+
     action: (
       <Link
         font="bold14"
         onClick={() => {
-          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          const actionIndex = getIndexByAction(
+            sortedHistory,
+            index + (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE
+          )
           toggleActionDetails(item, actionIndex)
         }}
       >
@@ -217,13 +255,17 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isSystemInitiated(item) ? (
-          <HealthSystemUser name={item.system?.name} />
+        {isFlaggedAsPotentialDuplicate(item) ? (
+          <SystemUser name={item.system?.name || ''} />
+        ) : isVerifiedAction(item) ? (
+          <div />
+        ) : isSystemInitiated(item) ? (
+          <HealthSystemUser name={item.system?.name || ''} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
             nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as IAvatar}
+            avatar={item.user?.avatar as Avatar}
             language={window.config.LANGUAGES}
           />
         ) : (
@@ -235,30 +277,45 @@ export const GetHistory = ({
             <GetNameWithAvatar
               id={item?.user?.id as string}
               nameObject={item?.user?.name as (GQLHumanName | null)[]}
-              avatar={item.user?.avatar as IAvatar}
+              avatar={item.user?.avatar as Avatar}
               language={window.config.LANGUAGES}
             />
           </Link>
         )}
       </>
     ),
-    type: intl.formatMessage(
-      isSystemInitiated(item) || !item.user?.role
-        ? getSystemType(item.system?.type)
-        : userMessages[item.user.role]
-    ),
-    location: isSystemInitiated(item) ? null : isFieldAgent ? (
-      <>{item.office?.name}</>
+    role: isFlaggedAsPotentialDuplicate(item) ? (
+      <div />
+    ) : isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
+      intl.formatMessage(getSystemType(item.system?.type || ''))
     ) : (
-      <Link
-        font="bold14"
-        onClick={() => {
-          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-        }}
-      >
-        {item.office?.name as string}
-      </Link>
-    )
+      getUserRole(currentLanguage, item.user?.role)
+    ),
+
+    location:
+      isFlaggedAsPotentialDuplicate(item) ||
+      isVerifiedAction(item) ||
+      isSystemInitiated(item) ? (
+        <div />
+      ) : isFieldAgent ? (
+        <>{item.office?.name}</>
+      ) : (
+        <Link
+          font="bold14"
+          onClick={() => {
+            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+          }}
+        >
+          {item.office
+            ? getLocalizedLocationName(
+                intl,
+                item.office as unknown as ILocation
+              )
+            : ''}
+        </Link>
+      )
   }))
 
   const columns = [
@@ -280,9 +337,9 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
-      key: 'type'
+      key: 'role'
     },
     {
       label: intl.formatMessage(constantsMessages.location),
@@ -293,7 +350,9 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <Text variant="h3" element="h3" color="copy">
+        {intl.formatMessage(constantsMessages.history)}
+      </Text>
       <TableDiv>
         <Table
           id="task-history"

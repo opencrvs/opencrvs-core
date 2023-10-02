@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,19 +20,16 @@ import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
 
-type IProps = {
-  children: React.ReactNode
-}
-
 const SelectContainer = styled.div`
-  display: flex;
-  justify-content: end;
+  ${({ theme }) => theme.colors.primary};
+  position: absolute;
+  top: 0;
+  right: 0;
   padding: 24px 24px 8px;
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
-  const applicationLangauges = window.config.LANGUAGES.split(',')
+  const applicationLanguages = window.config.LANGUAGES.split(',')
   const history = useHistory()
   const location = useLocation()
   const dispatch = useDispatch()
@@ -41,7 +37,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
 
   const languageOptions: ISelect2Option[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
-    .filter(({ value }) => applicationLangauges.includes(value))
+    .filter(({ value }) => applicationLanguages.includes(value))
 
   const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {
@@ -55,9 +51,10 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   return [languageOptions, onChange] as const
 }
 
-export function LanguageSelect({ children }: IProps) {
+export function LanguageSelect() {
   const paramLanguage = useSearchQuery('lang')
   const selectedLanguage = useSelector(getLanguage)
+
   const [languageOptions, onLanguageChange] = useLanguage(
     selectedLanguage,
     paramLanguage
@@ -74,7 +71,6 @@ export function LanguageSelect({ children }: IProps) {
           />
         </SelectContainer>
       )}
-      {children}
     </>
   )
 }

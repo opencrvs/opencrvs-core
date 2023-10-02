@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -15,6 +14,7 @@ import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
+import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 import { Query } from '@client/components/Query'
 import { WatchQueryFetchPolicy } from '@apollo/client'
 
@@ -23,12 +23,14 @@ interface IQueryProviderProps {
   action: Action
   payload?: any
   fetchPolicy?: WatchQueryFetchPolicy
+  children?: React.ReactNode
 }
 type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const QueryMapper = {
   [Event.Birth]: getBirthQueryMappings,
-  [Event.Death]: getDeathQueryMappings
+  [Event.Death]: getDeathQueryMappings,
+  [Event.Marriage]: getMarriageQueryMappings
 }
 export const getQueryMapping = (event: Event, action: Action) => {
   return QueryMapper[event] && QueryMapper[event](action)

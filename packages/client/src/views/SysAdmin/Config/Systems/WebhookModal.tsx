@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useIntl } from 'react-intl'
 
@@ -52,10 +51,15 @@ export function WebhookModal({
     <>
       <ResponsiveModal
         actions={[
-          <Button onClick={closeModal} type="secondary">
+          <Button key="close-modal" onClick={closeModal} type="secondary">
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
-          <Button onClick={updatePermissions} type="primary" loading={loading}>
+          <Button
+            key="update-permissions"
+            onClick={updatePermissions}
+            type="primary"
+            loading={loading}
+          >
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}

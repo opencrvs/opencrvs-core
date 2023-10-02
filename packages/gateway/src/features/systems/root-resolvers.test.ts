@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/systems/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -64,7 +63,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -86,7 +85,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -113,7 +112,7 @@ describe('Integrations root resolvers', () => {
           {
             clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError('Deactivate user is only allowed for natlsysadmin')
     })
@@ -138,7 +137,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
     ).rejects.toThrowError('Activate user is only allowed for natlsysadmin')
   })
@@ -194,7 +193,7 @@ describe('generate refresh token', () => {
     const response = await resolvers.Mutation.refreshSystemSecret(
       {},
       { clientId: '1231234' },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual(responsePayload)
@@ -206,7 +205,7 @@ describe('generate refresh token', () => {
     const response = resolvers.Mutation.refreshSystemSecret(
       {},
       { clientId: '1231234' },
-      authHeaderRegister
+      { headers: authHeaderRegister }
     )
     await expect(response).rejects.toThrowError(
       'Only system user can update refresh client secret'
@@ -263,7 +262,7 @@ describe('delete system integration', () => {
     const response = await resolvers.Mutation.deleteSystem(
       {},
       { clientId: '1231234' },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual(responsePayload)
@@ -275,7 +274,7 @@ describe('delete system integration', () => {
     const response = resolvers.Mutation.deleteSystem(
       {},
       { clientId: '1231234' },
-      authHeaderRegister
+      { headers: authHeaderRegister }
     )
     await expect(response).rejects.toThrowError(
       'Only system user can delete the system'

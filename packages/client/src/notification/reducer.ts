@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
@@ -29,8 +28,14 @@ type userCreateDuplicateMobileFailedToastState = {
   mobile: string | null
 }
 
+type userCreateDuplicateEmailFailedToastState = {
+  visible: boolean
+  email: string | null
+}
+
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
+  configurationError: string | null
   configurationErrorVisible: boolean
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
@@ -39,14 +44,19 @@ export type NotificationState = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
+  showDuplicateRecordsToast: boolean
+  duplicateCompositionId: string | null
+  duplicateTrackingId: string | null
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
+  userCreateDuplicateEmailFailedToast: userCreateDuplicateEmailFailedToastState
   userReconnectedToast: boolean
 }
 
-export const initialState: NotificationState = {
+const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
+  configurationError: null,
   configurationErrorVisible: false,
   waitingSW: null,
   sessionExpired: false,
@@ -55,11 +65,18 @@ export const initialState: NotificationState = {
   submitFormErrorToast: null,
   userAuditSuccessToast: { visible: false },
   showPINUpdateSuccess: false,
+  showDuplicateRecordsToast: false,
+  duplicateCompositionId: null,
+  duplicateTrackingId: null,
   downloadDeclarationFailedToast: false,
   unassignedModal: null,
   userCreateDuplicateMobileFailedToast: {
     visible: false,
     mobile: null
+  },
+  userCreateDuplicateEmailFailedToast: {
+    visible: false,
+    email: null
   },
   userReconnectedToast: false
 }
@@ -76,6 +93,11 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         sessionExpired: true
+      }
+    case actions.CONFIGURATION_ERROR:
+      return {
+        ...state,
+        configurationError: action.payload
       }
     case actions.SHOW_CONFIG_ERROR:
       return {
@@ -116,6 +138,15 @@ export const notificationReducer: LoopReducer<
         ...state,
         userCreateDuplicateMobileFailedToast
       }
+    case actions.SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST:
+      const userCreateDuplicateEmailFailedToast = {
+        visible: true,
+        email: action.payload.email
+      }
+      return {
+        ...state,
+        userCreateDuplicateEmailFailedToast
+      }
     case actions.SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST:
       return {
         ...state,
@@ -137,6 +168,14 @@ export const notificationReducer: LoopReducer<
         userCreateDuplicateMobileFailedToast: {
           visible: false,
           mobile: null
+        }
+      }
+    case actions.HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST:
+      return {
+        ...state,
+        userCreateDuplicateEmailFailedToast: {
+          visible: false,
+          email: null
         }
       }
     case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:
@@ -169,6 +208,20 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         showPINUpdateSuccess: false
+      }
+    case actions.SHOW_DUPLICATE_RECORDS_TOAST:
+      return {
+        ...state,
+        showDuplicateRecordsToast: true,
+        duplicateTrackingId: action.payload.trackingId,
+        duplicateCompositionId: action.payload.compositionId
+      }
+    case actions.HIDE_DUPLICATE_RECORDS_TOAST:
+      return {
+        ...state,
+        showDuplicateRecordsToast: false,
+        duplicateTrackingId: null,
+        duplicateCompositionId: null
       }
     case actions.SHOW_UNASSIGNED:
       return {

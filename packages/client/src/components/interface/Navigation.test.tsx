@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -46,7 +45,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'REGISTRATION_AGENT'
+      systemRole: 'REGISTRATION_AGENT'
     }
   }
 }
@@ -63,7 +62,7 @@ const nameObjNatlSysAdmin = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'NATIONAL_SYSTEM_ADMIN'
+      systemRole: 'NATIONAL_SYSTEM_ADMIN'
     }
   }
 }
@@ -107,7 +106,6 @@ describe('Navigation for national system admin related tests', () => {
 
   it('Tabs loaded successfully including config tab', async () => {
     expect(testComponent.exists('#navigation_team')).toBeTruthy()
-    expect(testComponent.exists('#navigation_performance')).toBeTruthy()
     expect(testComponent.exists('#navigation_config_main')).toBeTruthy()
     testComponent.find('#navigation_config_main').hostNodes().simulate('click')
     testComponent.update()

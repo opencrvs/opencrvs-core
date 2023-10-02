@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -25,6 +24,16 @@ const Container = styled.div`
     overflow-x: scroll;
     align-items: start;
   }
+`
+
+const SpinnerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.colors.white};
+  width: 595px;
+  height: 841px;
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -59,11 +68,22 @@ class PDFViewer extends React.Component<IPDFViewerProps, IPDFViewerState> {
     return (
       <Container {...otherProps}>
         <Document
-          loading={<Spinner id="pdf-loader-spinner" />}
+          loading={
+            <SpinnerWrapper>
+              <Spinner id="pdf-loader-spinner" />
+            </SpinnerWrapper>
+          }
           file={pdfSource}
           onLoadSuccess={this.onDocumentLoadSuccess}
         >
-          <Page pageNumber={currentPage} />
+          <Page
+            pageNumber={currentPage}
+            loading={
+              <SpinnerWrapper>
+                <Spinner id="pdf-loader-spinner" />
+              </SpinnerWrapper>
+            }
+          />
         </Document>
         {this.state.numPages > 1 && (
           <Pagination

@@ -6,17 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
-import { IUserDetails } from '@client/utils/userUtils'
-import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
 
-export const getOfflineState = (store: IStoreState): IOfflineDataState =>
-  store.offline
+const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
 function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
   return getOfflineState(store)[key]
@@ -29,29 +25,13 @@ export function isOfflineDataLoaded(
     state.facilities &&
     state.locations &&
     state.config &&
-    state.formConfig &&
+    state.forms &&
     state.templates &&
     state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
-}
-
-export function isSystemAdmin(userDetails: IUserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.role &&
-    SYS_ADMIN_ROLES.includes(userDetails.role)
-  )
-}
-
-export function isNationalSystemAdmin(userDetails: IUserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.role &&
-    NATL_ADMIN_ROLES.includes(userDetails.role)
-  )
 }
 
 export const getOfflineDataLoaded = (
@@ -64,6 +44,34 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
     throw new Error('Offline data is not yet loaded. This should never happen')
   }
   return data
+}
+
+export const selectCountryBackground = (store: IStoreState) => {
+  const countryBackground = getKey(store, 'offlineData').config
+    ?.LOGIN_BACKGROUND
+  if (countryBackground?.backgroundImage) {
+    return {
+      backgroundImage: countryBackground.backgroundImage,
+      imageFit: countryBackground.imageFit
+    }
+  }
+  return {
+    backgroundColor: countryBackground?.backgroundColor ?? '36304E'
+  }
+}
+
+export const selectCountryLogo = (store: IStoreState) => {
+  return (
+    getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file ||
+    getKey(store, 'offlineData').anonymousConfig?.COUNTRY_LOGO?.file
+  )
+}
+
+export function selectApplicationName(store: IStoreState) {
+  return (
+    getKey(store, 'offlineData').config?.APPLICATION_NAME ||
+    getKey(store, 'offlineData').anonymousConfig?.APPLICATION_NAME
+  )
 }
 
 export const getOfflineLoadingError = (

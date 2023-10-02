@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
@@ -28,6 +27,7 @@ interface IFormMessages
   informantError: MessageDescriptor
   SPOUSE: MessageDescriptor
   SON: MessageDescriptor
+  OTHER: MessageDescriptor
   SON_IN_LAW: MessageDescriptor
   GRANDSON: MessageDescriptor
   DAUGHTER: MessageDescriptor
@@ -38,6 +38,7 @@ interface IFormMessages
   OTHER_FAMILY_MEMBER: MessageDescriptor
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
+  marriageInformantTitle: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -75,6 +76,21 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Father',
     description: 'Label for option father',
     id: 'form.field.label.informantRelation.father'
+  },
+  GROOM: {
+    defaultMessage: 'Groom',
+    description: 'Label for option groom',
+    id: 'form.field.label.informantRelation.groom'
+  },
+  BRIDE: {
+    defaultMessage: 'Bride',
+    description: 'Label for option bride',
+    id: 'form.field.label.informantRelation.bride'
+  },
+  groomAndBride: {
+    defaultMessage: 'Groom & Bride',
+    description: 'Label for option Groom & Bride',
+    id: 'form.field.label.informantRelation.groomAndBride'
   },
   GRANDFATHER: {
     defaultMessage: 'Grandfather',
@@ -115,6 +131,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is applying for death registration?',
     description: 'Who is applying for death registration',
     id: 'register.selectInformant.deathInformantTitle'
+  },
+  marriageInformantTitle: {
+    defaultMessage: 'Who is applying for marriage registration?',
+    description: 'Who is applying for marriage registration',
+    id: 'register.selectInformant.marriageInformantTitle'
   },
   SPOUSE: {
     defaultMessage: 'Spouse',

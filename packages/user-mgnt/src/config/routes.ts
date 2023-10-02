@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import activateUser, {
   requestSchema as activateUserRequestSchema
@@ -19,7 +18,7 @@ import changeAvatarHandler, {
   changeAvatarRequestSchema
 } from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
-import getRoles, {
+import getSystemRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
 import getUser, {
@@ -61,7 +60,6 @@ import {
   getSystemRequestSchema,
   getSystemResponseSchema,
   getSystemHandler,
-  getAllSystemsHandler,
   updatePermissions,
   reqUpdateSystemSchema,
   refreshSystemSecretHandler,
@@ -75,11 +73,11 @@ import verifyUserHandler, {
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
 import * as Hapi from '@hapi/hapi'
-import resendSMSInviteHandler, {
-  requestSchema as resendSMSRequestSchema
-} from '@user-mgnt/features/resendSMSInvite/handler'
-import usernameSMSReminderHandler, {
-  requestSchema as usernameSMSReminderRequestSchema
+import resendInviteHandler, {
+  requestSchema as resendInviteRequestSchema
+} from '@user-mgnt/features/resendInvite/handler'
+import usernameReminderHandler, {
+  requestSchema as usernameReminderRequestSchema
 } from '@user-mgnt/features/usernameSMSReminderInvite/handler'
 import changePhoneHandler, {
   changePhoneRequestSchema
@@ -93,9 +91,17 @@ import {
   createSearchrequestSchema,
   removeSearchrequestSchema
 } from '@user-mgnt/features/userSearchRecord/handler'
-import resetPasswordSMSHandler, {
+import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
+import updateRole, {
+  systemRoleResponseSchema,
+  systemRolesRequestSchema
+} from '@user-mgnt/features/updateRole/handler'
+import changeEmailHandler, {
+  changeEmailRequestSchema
+} from '@user-mgnt/features/changeEmail/handler'
+import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -105,11 +111,12 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin',
   NATLSYSADMIN = 'natlsysadmin',
   VALIDATE = 'validate',
-  RECORDSEARCH = 'recordsearch'
+  RECORDSEARCH = 'recordsearch',
+  VERIFY = 'verify'
 }
 
-export const getRoutes = () => {
-  const routes = [
+export const getRoutes: () => Hapi.ServerRoute[] = () => {
+  return [
     // add ping route by default for health check
     {
       method: 'GET',
@@ -252,6 +259,31 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/changeUserEmail',
+      handler: changeEmailHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes email for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changeEmailRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/changeUserAvatar',
       handler: changeAvatarHandler,
       config: {
@@ -346,6 +378,7 @@ export const getRoutes = () => {
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
+            RouteScope.VERIFY,
             RouteScope.RECORDSEARCH
           ]
         },
@@ -402,11 +435,18 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/getRoles',
-      handler: getRoles,
+      path: '/getSystemRoles',
+      handler: getSystemRoles,
       config: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: searchRoleSchema
@@ -491,14 +531,14 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/resendSMSInvite',
-      handler: resendSMSInviteHandler,
+      path: '/resendInvite',
+      handler: resendInviteHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: resendSMSRequestSchema
+          payload: resendInviteRequestSchema
         },
         description:
           'Resend sms for given mobile number and make the corresponding user pending'
@@ -506,14 +546,14 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/usernameSMSReminder',
-      handler: usernameSMSReminderHandler,
+      path: '/usernameReminder',
+      handler: usernameReminderHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: usernameSMSReminderRequestSchema
+          payload: usernameReminderRequestSchema
         },
         description:
           'Resend sms for given username and make the corresponding user pending'
@@ -521,8 +561,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/resetPasswordSMS',
-      handler: resetPasswordSMSHandler,
+      path: '/resetPasswordInvite',
+      handler: resetPasswordInviteHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
@@ -648,7 +688,7 @@ export const getRoutes = () => {
     },
 
     {
-      method: 'GET',
+      method: 'POST',
       path: '/countUsersByLocation',
       handler: countUsersByLocationHandler,
       config: {
@@ -664,8 +704,9 @@ export const getRoutes = () => {
           ]
         },
         validate: {
-          query: Joi.object({
-            role: Joi.string().required()
+          payload: Joi.object({
+            systemRole: Joi.string().required(),
+            locationId: Joi.string()
           })
         }
       }
@@ -707,7 +748,25 @@ export const getRoutes = () => {
           schema: SystemSchema
         }
       }
+    },
+    {
+      method: 'POST',
+      path: '/updateRole',
+      handler: updateRole,
+      options: {
+        tags: ['api'],
+        description: 'Update user role for particular system role',
+        notes: 'This is responsible for update userRole',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: systemRolesRequestSchema
+        },
+        response: {
+          schema: systemRoleResponseSchema
+        }
+      }
     }
   ]
-  return routes
 }

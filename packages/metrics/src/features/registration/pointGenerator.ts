@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IBirthRegistrationFields,
@@ -32,7 +31,9 @@ import {
   IRejectedPoints,
   ICorrectionPoint,
   IUserAuditTags,
-  IUserAuditFields
+  IUserAuditFields,
+  IMarriageRegistrationFields,
+  IMarriageRegistrationTags
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -44,7 +45,7 @@ import {
   getDeclarationStatus,
   getTimeLoggedFromTask,
   getDeclarationType,
-  getStartedByFieldAgent,
+  getRecordInitiator,
   getPaymentReconciliation,
   getObservationValueByCode,
   isNotification,
@@ -63,7 +64,8 @@ import {
   getDurationInSeconds,
   getDurationInDays,
   getTimeLabel,
-  getAgeLabel
+  getAgeLabel,
+  getdaysAfterEvent
 } from '@metrics/features/registration/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -613,7 +615,7 @@ export async function generateRejectedPoints(
 
   const tags = {
     eventType: getDeclarationType(task),
-    startedBy: getStartedByFieldAgent(taskHistory),
+    startedBy: getRecordInitiator(taskHistory),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
@@ -624,6 +626,77 @@ export async function generateRejectedPoints(
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
   }
+}
+
+export async function generateMarriageRegPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader,
+  regStatus: string
+): Promise<IRejectedPoints> {
+  const person: fhir.Patient = getSectionBySectionCode(payload, 'bride-details')
+
+  if (!person) {
+    throw new Error('No bride found!')
+  }
+
+  const marriageExtension = person.extension?.find(
+    (extension) =>
+      extension.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`
+  )
+
+  if (!marriageExtension) {
+    throw new Error('No marriage extension is found')
+  }
+
+  const composition = getComposition(payload)
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  const practitionerRole = await fetchDeclarationsBeginnerRole(
+    payload,
+    authHeader
+  )
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
+
+  const fields: IMarriageRegistrationFields = {
+    compositionId: composition.id,
+    daysAfterEvent: marriageExtension.valueDateTime
+      ? getdaysAfterEvent(
+          marriageExtension.valueDateTime,
+          new Date(composition.date)
+        )
+      : undefined
+  }
+  const compositionDate = new Date(composition.date)
+  const tags: IMarriageRegistrationTags = {
+    regStatus: regStatus,
+    registrarPractitionerId,
+    practitionerRole,
+    dateLabel: !Number.isNaN(compositionDate.getTime())
+      ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
+      : undefined,
+    timeLabel:
+      (marriageExtension.valueString &&
+        (await getTimeLabel(
+          Number(marriageExtension?.valueString),
+          EVENT_TYPE.MARRIAGE,
+          authHeader.Authorization
+        ))) ||
+      undefined,
+    officeLocation: getRegLastOffice(payload),
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  const point = {
+    measurement: 'marriage_registration',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(composition.date)
+  }
+
+  return point
 }
 
 export const generateAuditPoint = (

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import {
@@ -21,6 +20,7 @@ import {
   formatUrl,
   goBack,
   goToHomeTab,
+  goToIssueCertificatePayment,
   goToPrintCertificatePayment,
   goToReviewCertificate
 } from '@client/navigation'
@@ -38,10 +38,11 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   IVerifyIDCertificateCollectorField,
-  verifyIDOnBirthCertificateCollectorDefinition
+  verifyIDOnDeclarationCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IMatchParams {
   registrationId: string
@@ -60,6 +61,7 @@ interface IDispatchProps {
   writeDeclaration: typeof writeDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
+  goToIssueCertificatePayment: typeof goToIssueCertificatePayment
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
@@ -67,7 +69,8 @@ type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
-  handleVerification = () => {
+  handleVerification = (hasShowedVerifiedDocument: boolean) => {
+    const isIssueUrl = window.location.href.includes('issue')
     const event = this.props.declaration.event
     const eventDate = getEventDate(this.props.declaration.data, event)
     const registeredDate = getRegisteredDate(this.props.declaration.data)
@@ -76,7 +79,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const declaration = { ...this.props.declaration }
     if (declaration.data.registration.certificates.length) {
       declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
-        true
+        hasShowedVerifiedDocument
     }
 
     this.props.modifyDeclaration(declaration)
@@ -90,44 +93,40 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         offlineCountryConfiguration
       )
     ) {
-      this.props.goToReviewCertificate(
-        this.props.match.params.registrationId,
-        event
-      )
+      if (!isIssueUrl) {
+        this.props.goToReviewCertificate(
+          this.props.match.params.registrationId,
+          event
+        )
+      } else {
+        this.props.goToIssueCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      }
     } else {
-      this.props.goToPrintCertificatePayment(
-        this.props.match.params.registrationId,
-        event
-      )
+      if (!isIssueUrl) {
+        this.props.goToPrintCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      } else {
+        this.props.goToIssueCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      }
     }
   }
 
-  handleNegativeVerification = () => {
-    const { declaration } = this.props
-    const certificates = declaration.data.registration.certificates
-
-    const certificate = (certificates && certificates[0]) || {}
-
-    this.props.modifyDeclaration({
-      ...declaration,
-      data: {
-        ...declaration.data,
-        registration: {
-          ...declaration.data.registration,
-          certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
-        }
-      }
-    })
-
-    this.handleVerification()
-  }
-
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
-    const { intl, declaration, offlineCountryConfiguration } = this.props
+    const { intl, declaration } = this.props
     const info = declaration.data[collector]
-    const fields = verifyIDOnBirthCertificateCollectorDefinition[
+
+    const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
+
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||
       info[fields.identifierOtherTypeField]) as string
@@ -143,9 +142,13 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const firstNames = info[firstNameIndex] as string
     const familyName = info[familyNameIndex] as string
 
-    const birthDate = fields.birthDateField
-      ? (info[fields.birthDateField] as string)
-      : ''
+    const isExactDobUnknownForIdVerifier =
+      !!declaration?.data[collector]?.exactDateOfBirthUnknown
+
+    const birthDate =
+      fields.birthDateField && !isExactDobUnknownForIdVerifier
+        ? (info[fields.birthDateField] as string)
+        : ''
     const nationality = info[fields.nationalityField] as string
 
     return {
@@ -161,6 +164,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   render() {
     const { collector } = this.props.match.params
     const { intl } = this.props
+    const isIssueUrl = window.location.href.includes('issue')
+    const titleMessage = isIssueUrl
+      ? intl.formatMessage(issueMessages.issueCertificate)
+      : intl.formatMessage(messages.certificateCollectionTitle)
+
     if (!this.props.declaration) {
       return (
         <Redirect
@@ -171,12 +179,26 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         />
       )
     }
+    if (!this.props.declaration && isIssueUrl) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToIssue,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     return (
       <ActionPageLight
         goBack={this.props.goBack}
         hideBackground
-        title={intl.formatMessage(messages.certificateCollectionTitle)}
-        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        title={titleMessage}
+        goHome={() =>
+          isIssueUrl
+            ? this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+            : this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+        }
       >
         <IDVerifier
           id="idVerifier"
@@ -185,11 +207,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
-              handler: this.handleVerification
+              handler: () => this.handleVerification(true)
             },
             negativeAction: {
               label: intl.formatMessage(messages.idCheckWithoutVerify),
-              handler: this.handleNegativeVerification
+              handler: () => this.handleVerification(false)
             }
           }}
         />
@@ -220,5 +242,6 @@ export const VerifyCollector = connect(mapStateToProps, {
   modifyDeclaration,
   writeDeclaration,
   goToReviewCertificate,
-  goToPrintCertificatePayment
+  goToPrintCertificatePayment,
+  goToIssueCertificatePayment
 })(injectIntl(VerifyCollectorComponent))

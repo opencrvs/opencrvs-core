@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 
@@ -41,6 +40,9 @@ type UserAuditAction =
   | 'REINSTATED_REJECTED'
   | 'SENT_FOR_APPROVAL'
   | 'CERTIFIED'
+  | 'ISSUED'
+  | 'MARKED_AS_DUPLICATE'
+  | 'MARKED_AS_NOT_DUPLICATE'
 
 type RawUserAuditDataPoint = {
   practitionerId: number
@@ -81,6 +83,9 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'REINSTATED_REJECTED'>
   | UserAuditDataPointWithComposition<'SENT_FOR_APPROVAL'>
   | UserAuditDataPointWithComposition<'CERTIFIED'>
+  | UserAuditDataPointWithComposition<'ISSUED'>
+  | UserAuditDataPointWithComposition<'MARKED_AS_DUPLICATE'>
+  | UserAuditDataPointWithComposition<'MARKED_AS_NOT_DUPLICATE'>
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,

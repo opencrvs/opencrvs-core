@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -40,7 +39,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -51,6 +53,7 @@ describe('Verify death handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
+
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -67,7 +70,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -81,7 +87,7 @@ describe('Verify death handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -99,7 +105,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -130,9 +139,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -141,6 +155,7 @@ describe('Verify death handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
+
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -157,9 +172,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
-          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -171,7 +191,7 @@ describe('Verify death handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -189,9 +209,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -220,10 +245,15 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'D123456',
-          registrationNumber: '20196816020000129'
+          registrationNumber: '20196816020000129',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -248,7 +278,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823'
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          }
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -260,7 +293,7 @@ describe('Verify death handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -278,10 +311,15 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'D123456',
-          registrationNumber: '20196816020000129'
+          registrationNumber: '20196816020000129',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -310,9 +348,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -337,9 +380,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
-          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -351,7 +399,7 @@ describe('Verify death handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -369,9 +417,14 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`

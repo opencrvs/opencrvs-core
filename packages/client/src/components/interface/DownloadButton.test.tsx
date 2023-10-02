@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { DownloadButton } from './DownloadButton'
@@ -18,13 +17,16 @@ import { DownloadAction } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
 import * as declarationReducer from '@client/declarations'
 import { vi, SpyInstance } from 'vitest'
+import { ApolloClient } from '@apollo/client'
+import { createClient } from '@client/utils/apolloClient'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 
 function getAssignmentModal(
   testComponent: ReactWrapper<{}, {}>
 ): ReactWrapper<{}, {}> {
-  testComponent.simulate('click')
+  const button = testComponent.find('button')
+  button.simulate('click')
   testComponent.update()
   return testComponent.find('#assignment').hostNodes()
 }
@@ -45,6 +47,7 @@ describe('download button tests', () => {
   let testComponent: ReactWrapper<{}, {}>
   let deleteSpy: SpyInstance
   let unassignSpy: SpyInstance
+  let client: ApolloClient<{}>
 
   describe('for download status downloaded', () => {
     describe('when assignment object is undefined in props', () => {
@@ -53,6 +56,7 @@ describe('download button tests', () => {
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
+        client = createClient(store)
         testComponent = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
@@ -64,7 +68,7 @@ describe('download button tests', () => {
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
-          { store, history }
+          { store, history, apolloClient: client }
         )
       })
 
@@ -79,7 +83,7 @@ describe('download button tests', () => {
 
       it('clicking on unassign button triggers deleteDeclaration action', () => {
         clickOnModalAction(testComponent, '#unassign')
-        expect(deleteSpy).toBeCalledWith('123')
+        expect(deleteSpy).toBeCalledWith('123', client)
       })
     })
     describe('when assignment object is defined in props', () => {
@@ -88,6 +92,7 @@ describe('download button tests', () => {
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
+        client = createClient(store)
         testComponent = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
@@ -98,13 +103,14 @@ describe('download button tests', () => {
                 firstName: 'Kennedy',
                 lastName: 'Mweene',
                 officeName: 'Ibombo District Office',
-                userId: '456'
+                userId: '456',
+                avatarURL: '/ocrvs/4c3645fc-f3f9-4c89-b109-05daa8f49b3b.jpg'
               },
               declarationStatus: ''
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
-          { store, history }
+          { store, history, apolloClient: client }
         )
       })
 

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -66,6 +65,7 @@ const Header = styled.div<{
   responsive?: boolean
   hideBoxShadow?: boolean
   titleHeightAuto?: boolean
+  showHeaderBorder?: boolean
 }>`
   height: ${({ titleHeightAuto }) => (titleHeightAuto ? 'auto' : '64px')};
   display: flex;
@@ -73,6 +73,18 @@ const Header = styled.div<{
   justify-content: space-between;
   align-items: center;
   padding: 24px 24px;
+
+  @media (min-width: ${({ theme, responsive }) =>
+      responsive && theme.grid.breakpoints.lg}px) {
+    ${({ theme, showHeaderBorder }) =>
+      showHeaderBorder &&
+      `
+          border-bottom: solid 1px ${theme.colors.grey300};
+          margin-bottom: 20px;
+          padding: 20px
+        `}
+  }
+
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
     ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
@@ -153,6 +165,8 @@ interface IProps {
   handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
   preventClickOnParent?: boolean
+  showHeaderBorder?: boolean
+  children?: React.ReactNode
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
@@ -182,7 +196,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       autoHeight,
       contentScrollableY,
       hideHeaderBoxShadow,
-      preventClickOnParent
+      preventClickOnParent,
+      showHeaderBorder
     } = this.props
 
     this.toggleScroll()
@@ -205,6 +220,7 @@ export class ResponsiveModal extends React.Component<IProps> {
             responsive={responsive}
             hideBoxShadow={hideHeaderBoxShadow}
             titleHeightAuto={titleHeightAuto}
+            showHeaderBorder={showHeaderBorder}
           >
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>

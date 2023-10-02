@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   getValueWithPercentageString,
@@ -45,6 +44,7 @@ describe('reports utils tests', () => {
         name: 'Barisal',
         alias: 'বরিশাল',
         physicalType: 'Jurisdiction',
+        statisticalId: '123',
         jurisdictionType: 'DIVISION',
         type: 'ADMIN_STRUCTURE',
         status: 'active',
@@ -62,6 +62,7 @@ describe('reports utils tests', () => {
         name: 'Moktarpur Union Parishad',
         alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
         physicalType: 'Building',
+        statisticalId: '123',
         type: 'CRVS_OFFICE',
         status: 'active',
         partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'

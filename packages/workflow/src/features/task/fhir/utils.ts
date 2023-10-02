@@ -6,14 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  RegStatus,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
+import { RegStatus } from '@workflow/features/registration/fhir/constants'
 
 export function isRejectedTask(taskResource: fhir.Task) {
   return getTaskBusinessStatus(taskResource) === RegStatus.REJECTED
@@ -41,12 +37,7 @@ export function taskHasInput(taskResource: fhir.Task) {
 
 export function getTaskEventType(task: fhir.Task) {
   const eventType = task?.code?.coding?.[0].code
-
-  if (eventType === EVENT_TYPE.DEATH) {
-    return EVENT_TYPE.DEATH
-  } else {
-    return EVENT_TYPE.BIRTH
-  }
+  return eventType
 }
 
 export function filterTaskExtensions(

@@ -6,21 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
+import { UserSection, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  DRAFT_BIRTH_INFORMANT_FORM,
-  DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
-  EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
@@ -33,11 +29,8 @@ import {
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
-  SELECT_BIRTH_INFORMANT,
-  SELECT_DEATH_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
-  SYS_ADMIN_HOME_TAB,
   TEAM_SEARCH,
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
@@ -48,14 +41,25 @@ import {
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
-  FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
   SYSTEM_LIST,
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS,
+  PERFORMANCE_DASHBOARD,
+  USER_ROLES_CONFIG,
+  ORGANISATIONS_INDEX,
+  INFORMANT_NOTIFICATION,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
+  ISSUE_CERTIFICATE_PAYMENT,
+  SELECT_DEATH_INFORMANT,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_MARRIAGE_FORM,
+  SELECT_MARRIAGE_INFORMANT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -64,7 +68,6 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -80,6 +83,7 @@ import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -106,7 +110,7 @@ type GoToPageAction = {
   }
 }
 
-export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
+const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
   payload: {
@@ -114,7 +118,7 @@ type GoToReviewUserDetails = {
   }
 }
 
-export const GO_TO_USER_PROFILE = 'navigation/GO_TO_USER_PROFILE'
+const GO_TO_USER_PROFILE = 'navigation/GO_TO_USER_PROFILE'
 type GoToUserProfile = {
   type: typeof GO_TO_USER_PROFILE
   payload: {
@@ -122,37 +126,22 @@ type GoToUserProfile = {
   }
 }
 
-export type Action =
-  | GoToPageAction
-  | GoToSysAdminHome
-  | GoToReviewUserDetails
-  | GoToUserProfile
-export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
-type GoToSysAdminHome = {
-  type: typeof GO_TO_SYS_ADMIN_HOME
-  payload: {
-    tabId: string
-  }
-}
-
-export function goToBirthInformant(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_INFORMANT, {
-      declarationId
-    })
-  )
-}
+export type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
 
 export function goToDeathInformant(declarationId: string) {
   return push(
-    formatUrl(SELECT_DEATH_INFORMANT, {
-      declarationId
+    formatUrl(DRAFT_DEATH_FORM, {
+      declarationId: declarationId.toString()
     })
   )
 }
 
-export function goToEventInfo(eventType: Event) {
-  return push(formatUrl(EVENT_INFO, { eventType }))
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_MARRIAGE_FORM, {
+      declarationId: declarationId.toString()
+    })
+  )
 }
 
 export function goToEvents() {
@@ -174,16 +163,31 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+
+export function goToUserRolesConfig() {
+  return push(USER_ROLES_CONFIG)
+}
+
+export function goToInformantNotification() {
+  return push(INFORMANT_NOTIFICATION)
+}
+
 export function goToVSExport() {
   return push(VS_EXPORTS)
 }
 
-export function goToAdvancedSearch() {
-  return push(ADVANCED_SEARCH)
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS, { isNavigatedInsideApp: true })
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS, { isNavigatedInsideApp: true })
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD, { isNavigatedInsideApp: true })
 }
 
-export function goToFormConfigHome() {
-  return push(FORM_CONFIG_HOME)
+export function goToAdvancedSearch() {
+  return push(ADVANCED_SEARCH)
 }
 
 export function goToApplicationConfig() {
@@ -223,8 +227,10 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 }
 
 export function goToPerformanceHome(
-  timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
-  timeEnd: Date = new Date(Date.now()),
+  timeStart: Date = new Date(
+    startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+  ),
+  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
   event?: Event,
   locationId?: string
 ) {
@@ -246,6 +252,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToOrganizationList(locationId?: string | undefined | null) {
+  return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
 export function goToSystemList() {
@@ -294,13 +304,6 @@ export function goToBirthRegistrationAsParent(declarationId: string) {
     })
   )
 }
-export function goToDeclarationContact(informant: string) {
-  return push(
-    formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
-      informant: informant.toString()
-    })
-  )
-}
 
 export function goToPrintCertificate(
   registrationId: string,
@@ -312,6 +315,32 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToIssueCertificate(
+  registrationId: string,
+  pageId = 'collector'
+) {
+  return push(
+    formatUrl(ISSUE_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      pageId: pageId
+    })
+  )
+}
+
+export function goToVerifyIssueCollector(
+  registrationId: string,
+  event: string,
+  collector: string
+) {
+  return push(
+    formatUrl(ISSUE_VERIFY_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString(),
+      collector: collector.toLowerCase().toString()
     })
   )
 }
@@ -381,26 +410,22 @@ export function goToPrintCertificatePayment(
   )
 }
 
-export function goToDeathRegistration(declarationId: string) {
+export function goToIssueCertificatePayment(
+  registrationId: string,
+  event: Event
+) {
   return push(
-    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
-  )
-}
-
-export function goToFormConfigWizard(event: Event, section: WizardSection) {
-  return push(
-    formatUrl(FORM_CONFIG_WIZARD, {
-      event: event,
-      section: section
+    formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
+      registrationId: registrationId.toString(),
+      eventType: event
     })
   )
 }
 
-export function goToSysAdminHomeTab(tabId: string) {
-  return {
-    type: GO_TO_SYS_ADMIN_HOME,
-    payload: { tabId }
-  }
+export function goToDeathRegistration(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
+  )
 }
 
 export function goToSettings() {
@@ -444,11 +469,13 @@ export function goToCompletenessRates(
 export function goToFieldAgentList(
   timeStart: string,
   timeEnd: string,
-  locationId?: string
+  locationId?: string,
+  event?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
     search: stringify({
+      event,
       locationId,
       timeStart,
       timeEnd
@@ -515,7 +542,7 @@ export function goToUserProfile(userId: string): GoToUserProfile {
   }
 }
 
-export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
+const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
@@ -526,7 +553,7 @@ type GoToCreateUserSection = {
   }
 }
 
-export const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
+const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
 type GoToUserReviewForm = {
   type: typeof GO_TO_USER_REVIEW_FORM
   payload: {
@@ -618,8 +645,8 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
-  const role = userDetails?.role
+export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
+  const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
@@ -637,7 +664,7 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   )
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
+export function goToPerformanceView(userDetails: UserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
@@ -646,12 +673,16 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   )
 }
 
-export function goToTeamView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
+export function goToTeamView(userDetails: UserDetails) {
+  if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
+}
+
+export function goToOrganisationView(userDetails: UserDetails) {
+  return goToOrganizationList()
 }
 
 export type INavigationState = undefined
@@ -680,14 +711,6 @@ export function navigationReducer(state: INavigationState, action: any) {
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
           )
-        )
-      )
-    case GO_TO_SYS_ADMIN_HOME:
-      const { tabId: SysAdminHomeTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
         )
       )
     case GO_TO_CREATE_USER_SECTION:

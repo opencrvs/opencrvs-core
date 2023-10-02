@@ -6,17 +6,31 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 
-export const getRolesQuery = gql`
-  query getRoles($value: ComparisonInput) {
-    getRoles(active: true, value: $value) {
+export const getSystemRolesQuery = gql`
+  query getSystemRoles($value: ComparisonInput) {
+    getSystemRoles(active: true, value: $value) {
+      id
       value
-      types
+      roles {
+        _id
+        labels {
+          lang
+          label
+        }
+      }
+    }
+  }
+`
+
+export const updateRoleQuery = gql`
+  mutation updateRole($systemRole: SystemRoleInput) {
+    updateRole(systemRole: $systemRole) {
+      roleIdMap
     }
   }
 `
@@ -24,7 +38,7 @@ async function fetchRoles(criteria = {}) {
   return (
     client &&
     client.query({
-      query: getRolesQuery,
+      query: getSystemRolesQuery,
       variables: criteria,
       fetchPolicy: 'no-cache'
     })

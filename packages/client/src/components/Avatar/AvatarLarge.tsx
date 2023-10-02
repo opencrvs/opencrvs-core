@@ -6,18 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { AvatarLarge as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
-import { IAvatar } from '@client/utils/userUtils'
-import styled from '@client/styledComponents'
+import { Avatar } from '@client/utils/gateway'
+import styled from 'styled-components'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: IAvatar | undefined
+  avatar?: Avatar | undefined | null
 }
 
 const AvatarImage = styled.img`
@@ -33,8 +32,8 @@ export function AvatarLarge({ name, avatar, ...props }: IProps) {
   if (!error && (name || avatar)) {
     return (
       <AvatarImage
-        width={132}
-        height={132}
+        width={104}
+        height={104}
         src={
           avatar
             ? avatar.data

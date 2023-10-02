@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -16,7 +15,6 @@ import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import {
   ProtectedAccoutStep,
@@ -25,9 +23,11 @@ import {
 } from '@client/components/ProtectedAccount'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { getUserName, IUserDetails } from '@client/utils/userUtils'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
+import {
+  SubmitActivateUserMutation,
+  SubmitActivateUserMutationVariables
+} from '@client/utils/gateway'
 import { Mutation } from '@apollo/client/react/components'
 import {
   userMessages,
@@ -39,10 +39,9 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SubmitActivateUserMutation,
-  SubmitActivateUserMutationVariables
-} from '@client/utils/gateway'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { ErrorText } from '@opencrvs/components/lib/'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -54,19 +53,6 @@ const ConfirmButton = styled(PrimaryButton)`
   }
 `
 
-const LoaderOverlay = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`
 interface IProps {
   setupData: IProtectedAccountSetupData
   goToStep: (
@@ -78,22 +64,14 @@ interface IProps {
 export function UserSetupReview({ setupData, goToStep }: IProps) {
   const intl = useIntl()
   const [submitError, setSubmitError] = React.useState(false)
-  const userDetails = useSelector<IStoreState, IUserDetails | null>(
+  const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
-
-  const typeRole =
-    (userDetails &&
-      userDetails.role &&
-      (userDetails.type
-        ? `${intl.formatMessage(
-            userMessages[userDetails.role as string]
-          )} / ${intl.formatMessage(userMessages[userDetails.type as string])}`
-        : `${intl.formatMessage(userMessages[userDetails.role as string])}`)) ||
-    ''
-
+  const email = (userDetails && (userDetails.email as string)) || ''
+  const language = useSelector(getLanguage)
+  const role = userDetails && getUserRole(language, userDetails.role)
   const primaryOffice =
     (userDetails &&
       userDetails.primaryOffice &&
@@ -135,16 +113,23 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       }
     },
     {
+      id: 'Email',
+      label: intl.formatMessage(constantsMessages.labelEmail),
+      value: email,
+      action: {
+        label: intl.formatMessage(buttonMessages.change),
+        disabled: true
+      }
+    },
+    {
       id: 'RegisterOffice',
       label: intl.formatMessage(messages.labelAssignedOffice),
       value: primaryOffice
     },
     {
-      id: 'RoleType',
-      label: `${intl.formatMessage(
-        constantsMessages.labelRole
-      )} / ${intl.formatMessage(constantsMessages.type)}`,
-      value: typeRole
+      id: 'Role',
+      label: `${intl.formatMessage(constantsMessages.labelRole)}`,
+      value: role
     },
     ...answeredQuestions
   ]
@@ -188,6 +173,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 title={intl.formatMessage(messages.userSetupReviewHeader)}
                 bottomActionButtons={[
                   <ConfirmButton
+                    key="confirm"
                     id="Confirm"
                     onClick={() => submitActivateUser()}
                   >
@@ -198,9 +184,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
               >
                 <GlobalError id="GlobalError">
                   {submitError && (
-                    <WarningMessage>
+                    <ErrorText>
                       {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                    </WarningMessage>
+                    </ErrorText>
                   )}
                 </GlobalError>
                 <div id="UserSetupData">

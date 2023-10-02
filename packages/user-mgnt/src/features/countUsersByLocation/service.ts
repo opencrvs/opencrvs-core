@@ -6,27 +6,36 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import User from '@user-mgnt/model/user'
 
 export async function countUsersByLocation(
-  searchCriteria: Record<string, unknown>
+  systemRole: string,
+  locationId: string | undefined
 ) {
-  const queryResult = await User.aggregate([
-    { $match: searchCriteria },
-    {
-      $group: {
-        _id: '$primaryOfficeId',
-        total: {
-          $sum: 1
+  // For the whole country
+  if (!locationId) {
+    const resArray = await User.aggregate([
+      {
+        $match: {
+          systemRole
         }
+      },
+      { $count: 'registrars' }
+    ])
+    return resArray[0] ?? { registrars: 0 }
+  }
+  const resArray = await User.aggregate([
+    {
+      $match: {
+        catchmentAreaIds: locationId,
+        systemRole
       }
-    }
-  ]).exec()
-  return queryResult.map(({ _id, total }: { _id: string; total: number }) => ({
-    locationId: _id,
-    total
-  }))
+    },
+    { $unwind: '$catchmentAreaIds' },
+    { $group: { _id: '$catchmentAreaIds', registrars: { $sum: 1 } } },
+    { $match: { _id: locationId } }
+  ])
+  return resArray[0] ?? { registrars: 0 }
 }

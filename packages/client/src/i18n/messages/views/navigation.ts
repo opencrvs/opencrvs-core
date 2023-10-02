@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -22,6 +21,7 @@ interface INavigationMessages
   print: MessageDescriptor
   application: MessageDescriptor
   performance: MessageDescriptor
+  organisation: MessageDescriptor
   team: MessageDescriptor
   vsexports: MessageDescriptor
   config: MessageDescriptor
@@ -29,6 +29,10 @@ interface INavigationMessages
   completenessRates: MessageDescriptor
   form: MessageDescriptor
   integration: MessageDescriptor
+  communications: MessageDescriptor
+  userroles: MessageDescriptor
+  informantnotification: MessageDescriptor
+  outbox: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -97,6 +101,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Reports label in navigation',
     id: 'navigation.reports'
   },
+  organisation: {
+    defaultMessage: 'Organisation',
+    description: 'Organisations label in navigation',
+    id: 'navigation.organisation'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
@@ -112,10 +121,55 @@ const messagesToDefine: INavigationMessages = {
     description: 'Integration forms label in navigation',
     id: 'navigation.integration'
   },
+  communications: {
+    defaultMessage: 'Communications',
+    description: 'Communications label in navigation',
+    id: 'navigation.communications'
+  },
+  userroles: {
+    defaultMessage: 'User roles',
+    description: 'User roles label in navigation',
+    id: 'navigation.userroles'
+  },
+  informantnotification: {
+    defaultMessage: 'Informant notifications',
+    description: 'Informant notifications label in navigation',
+    id: 'navigation.informantNotification'
+  },
   outbox: {
     defaultMessage: 'Outbox',
     description: 'Label for navigation item outbox',
     id: 'navigation.outbox'
+  },
+  readyToIssue: {
+    defaultMessage: 'Ready to issue',
+    description: 'Ready to issue label in navigation',
+    id: 'navigation.readyToIssue'
+  },
+  analytic: {
+    defaultMessage: 'Analytics',
+    description: 'Analytic Group',
+    id: 'navigation.analytic'
+  },
+  statistics: {
+    defaultMessage: 'Statistics',
+    description: 'Statistics Dashboard Section',
+    id: 'navigation.performanceStatistics'
+  },
+  leaderboards: {
+    defaultMessage: 'Leaderboards',
+    description: 'Leaderboards Dashboard Section',
+    id: 'navigation.leaderboards'
+  },
+  dashboard: {
+    defaultMessage: 'Dashboard',
+    description: 'Dashboard Section',
+    id: 'navigation.dashboard'
+  },
+  report: {
+    defaultMessage: 'Report',
+    description: 'Report Dashboard Section',
+    id: 'navigation.report'
   }
 }
 

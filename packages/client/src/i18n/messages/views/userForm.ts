@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const messages = {
   user: {
@@ -65,6 +64,11 @@ export const messages = {
     description: 'Input label for phone input',
     id: 'form.field.label.phoneNumber'
   },
+  email: {
+    defaultMessage: 'Email',
+    description: 'Input label for email address',
+    id: 'form.field.label.email'
+  },
   NID: {
     defaultMessage: 'NID',
     description: 'National ID',
@@ -84,6 +88,16 @@ export const messages = {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item',
     id: 'constants.type'
+  },
+  systemRole: {
+    defaultMessage: 'System Role',
+    description: 'Label for system role input in user creation',
+    id: 'constants.user.systemRole'
+  },
+  role: {
+    defaultMessage: 'Role',
+    description: 'Label for role input in user creation',
+    id: 'constants.user.role'
   },
   userDevice: {
     defaultMessage: 'Device',

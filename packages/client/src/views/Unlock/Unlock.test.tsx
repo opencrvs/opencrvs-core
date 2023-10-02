@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
@@ -22,12 +21,21 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 
 const clearPassword = (component: ReactWrapper) => {
-  const backSpaceElem = component.find('#keypad-backspace').hostNodes()
-  backSpaceElem.update()
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
+  const pinInput = component.find('#pin-input').hostNodes().first()
+
+  pinInput.simulate('keypress', { key: 'Backspace' })
+  pinInput.simulate('keypress', { key: 'Backspace' })
+  pinInput.simulate('keypress', { key: 'Backspace' })
+  pinInput.simulate('keypress', { key: 'Backspace' })
+  component.update()
+}
+const pressPin = (component: ReactWrapper, keyCode: number) => {
+  component
+    .find('#pin-input')
+    .hostNodes()
+    .first()
+    .simulate('keyDown', { keyCode })
+  component.update()
 }
 
 describe('Unlock page loads Properly', () => {
@@ -74,14 +82,13 @@ describe('Unlock page loads Properly', () => {
     expect(elem).toBe(1)
   })
 
-  it('There should be no error message after providing successfull Pin', () => {
+  it('There should be no error message after providing successfully Pin', () => {
     clearPassword(testComponent)
-    const numberElem = testComponent.find('#keypad-0').hostNodes()
+    pressPin(testComponent, 48)
+    pressPin(testComponent, 48)
+    pressPin(testComponent, 48)
+    pressPin(testComponent, 48)
 
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
     testComponent.update()
 
     expect(testComponent.find('#errorMsg').hostNodes()).toHaveLength(0)
@@ -111,11 +118,11 @@ describe('For wrong inputs', () => {
     pinValidator.isValidPin = vi.fn(async (pin) => Promise.resolve(false))
   })
   it('Should Display Incorrect error message', async () => {
-    const numberElem = testComponent.find('#keypad-1').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+
     testComponent.update()
 
     const errorMsg = await waitForElement(testComponent, '#errorMsg')
@@ -126,11 +133,10 @@ describe('For wrong inputs', () => {
   it('Should display the Last try message', async () => {
     testComponent.find('UnlockView').instance().setState({ attempt: 2 })
 
-    const numberElem = testComponent.find('#keypad-1').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
 
     const errorMsg = await waitForElement(testComponent, '#errorMsg')
 
@@ -182,11 +188,10 @@ describe('Pin locked session', () => {
   it('Should not accept correct pin while the account is locked', async () => {
     testComponent.find('UnlockView').instance().setState({ attempt: 4 })
 
-    const numberElem = testComponent.find('#keypad-0').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
+    pressPin(testComponent, 54)
 
     const errorMsg = await waitForElement(testComponent, '#errorMsg')
 

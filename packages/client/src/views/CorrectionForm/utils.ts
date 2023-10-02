@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CHECKBOX_GROUP,
@@ -26,23 +25,24 @@ import {
   IFormSectionGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  Section,
   CHECKBOX,
-  ICheckboxFormField
+  ICheckboxFormField,
+  SUBSECTION_HEADER,
+  DIVIDER,
+  HIDDEN
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
+import { getValidationErrorsForForm } from '@client/forms/validation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
   ILocation,
@@ -59,9 +59,9 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { IGQLLocation } from '@client/utils/userUtils'
+import { flattenDeep, get, clone, isEqual, isArray, camelCase } from 'lodash'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -98,13 +98,14 @@ export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED
+    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
+    registrationStatus === SUBMISSION_STATUS.ISSUED
   )
 }
 
 export function bytesToSize(bytes: number) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  if (bytes == 0) return '0 Byte'
+  if (bytes === 0) return '0 Byte'
 
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
   return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
@@ -119,16 +120,17 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
     if (!isArray(documents[index])) {
       continue
     }
-    ;(documents[index] as IFileValue[]).forEach((fieldValue) => {
-      totalFileSize += fieldValue.fileSize || 0
-    })
+    totalFileSize = (documents[index] as IFileValue[]).reduce(
+      (total, fieldValue) => (total += fieldValue.fileSize || 0),
+      totalFileSize
+    )
   }
   return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
 export function updateDeclarationRegistrationWithCorrection(
   declaration: IDeclaration,
-  meta?: { userPrimaryOffice?: IGQLLocation }
+  meta?: { userPrimaryOffice?: UserDetails['primaryOffice'] }
 ): void {
   let correctionValues: Record<string, any> = {}
   const { data } = declaration
@@ -271,16 +273,16 @@ export function sectionHasError(
   return false
 }
 
-export function renderSelectOrRadioLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? option.label && intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
@@ -303,8 +305,12 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId] || {
+          name: locationId,
+          alias: locationId
+        }
       } else {
         selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
       }
@@ -337,7 +343,7 @@ const getCheckboxFieldValue = (
   )
 }
 
-export const getCheckBoxGroupFieldValue = (
+const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
   intl: IntlShape
@@ -351,7 +357,7 @@ export const getCheckBoxGroupFieldValue = (
   return ''
 }
 
-export const getFormFieldValue = (
+const getFormFieldValue = (
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -371,6 +377,21 @@ export const getFormFieldValue = (
   return ''
 }
 
+export const addressFieldNames = [
+  'statePrimary',
+  'districtPrimary',
+  'cityUrbanOptionPrimary',
+  'internationalStatePrimary',
+  'internationalDistrictPrimary',
+  'internationalCityPrimary',
+  'stateSecondary',
+  'districtSecondary',
+  'cityUrbanOptionSecondary',
+  'internationalStateSecondary',
+  'internationalCitySecondary',
+  'internationalDistrictSecondary'
+]
+
 export const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -380,42 +401,52 @@ export const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const hasAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'internationalStateSecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name)
-  ) {
+  if (hasAddressField) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
-      if (field.name.includes('Secondary')) {
-        dynamicOption.dependency = [
-          'internationalStateSecondary',
-          'stateSecondary'
-        ].includes(field.name)
-          ? 'countrySecondary'
-          : 'stateSecondary'
-      } else {
-        dynamicOption.dependency = [
-          'internationalStatePrimary',
-          'statePrimary'
-        ].includes(field.name)
-          ? 'countryPrimary'
-          : 'statePrimary'
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineResources,
+        language
+      )
+    }
+
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStateSecondary',
+        'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -533,7 +564,7 @@ export function hasFieldChanged(
   return data[field.name] !== originalData[field.name]
 }
 
-export function hasNestedDataChanged(
+function hasNestedDataChanged(
   nestedFieldData: IFormData,
   previousNestedFieldData: IFormData
 ) {
@@ -581,6 +612,9 @@ export function isVisibleField(
   draft: IDeclaration,
   offlineResources: IOfflineData
 ) {
+  if (field.type === HIDDEN) {
+    return false
+  }
   const conditionalActions = getConditionalActionsForField(
     field,
     draft.data[section.id] || {},
@@ -633,9 +667,15 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
-    (type) => type === field.type
-  )
+  return [
+    BULLET_LIST,
+    PARAGRAPH,
+    WARNING,
+    TEXTAREA,
+    SUBSECTION_HEADER,
+    FETCH_BUTTON,
+    DIVIDER
+  ].find((type) => type === field.type)
 }
 
 export const getNestedFieldValue = (

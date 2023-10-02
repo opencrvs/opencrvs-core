@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
@@ -50,7 +49,7 @@ export const fetchLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ) => {
-  return await fetchFHIR<fhir.Location>(
+  return await fetchFHIR<fhir.Location & { id: string }>(
     locationId.startsWith('Location/') ? locationId : `Location/${locationId}`,
     authHeader
   )
@@ -59,7 +58,7 @@ export const fetchLocation = async (
 export async function fetchLocationsByType(
   type: string,
   authHeader: IAuthHeader
-): Promise<fhir.Location[]> {
+): Promise<(fhir.Location & { id: string })[]> {
   const bundle = await fetchFHIR(`Location?_count=0&type=${type}`, authHeader)
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
@@ -86,6 +85,14 @@ export async function fetchTaskIdByCompositionID(
   return taskBundle.entry[0].resource.id
 }
 
+export async function totalOfficesInCountry(authHeader: IAuthHeader) {
+  const bundle: fhir.Bundle = await fetchFHIR(
+    'Location?type=CRVS_OFFICE',
+    authHeader
+  )
+  return bundle.total ?? 0
+}
+
 export async function fetchChildLocationsByParentId(
   locationId: string,
   authHeader: IAuthHeader
@@ -100,7 +107,7 @@ export async function fetchChildLocationsByParentId(
 export async function fetchAllChildLocationsByParentId(
   locationId: string,
   authHeader: IAuthHeader
-): Promise<fhir.Location[]> {
+): Promise<(fhir.Location & { id: string })[]> {
   const bundle = await fetchFHIR(
     `Location?_count=0&partof=${locationId}`,
     authHeader
@@ -191,30 +198,26 @@ export const fetchPractitionerRole = async (
   }
 }
 
-interface IUserCountSearchCriteria {
-  role: string
-}
-
 export interface ICountByLocation {
   total: number
   locationId: string
 }
 
-export async function countUsersByLocation(
-  searchCriteria: Partial<IUserCountSearchCriteria>,
-  authHeader: IAuthHeader
-): Promise<ICountByLocation[]> {
-  const { role } = searchCriteria
-  const res = await fetch(
-    `${USER_MANAGEMENT_URL}/countUsersByLocation?role=${role}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    }
-  )
+export async function countRegistrarsByLocation(
+  authHeader: IAuthHeader,
+  locationId?: string
+): Promise<{ registrars: number }> {
+  const res = await fetch(`${USER_MANAGEMENT_URL}/countUsersByLocation`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({
+      systemRole: 'LOCAL_REGISTRAR',
+      locationId
+    })
+  })
   return res.json()
 }
 

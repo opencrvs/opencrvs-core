@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -23,6 +22,7 @@ interface IStepOneFormMessages
   optionalLabel: MessageDescriptor
   fieldMissing: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
+  stepOneLoginText: MessageDescriptor
 }
 
 const messagesToDefine: IStepOneFormMessages = {
@@ -40,6 +40,12 @@ const messagesToDefine: IStepOneFormMessages = {
     id: 'login.stepOneInstruction',
     defaultMessage: 'Please enter your mobile number and password.',
     description: 'The instruction that appears in step one of the form'
+  },
+
+  stepOneLoginText: {
+    id: 'login.stepOneText',
+    defaultMessage: 'Login to Farajaland CRVS',
+    description: 'The instruction that appears in step one of the login form'
   },
   submit: {
     id: 'login.submit',

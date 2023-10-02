@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
@@ -19,7 +18,7 @@ import {
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
 import { validationMessages } from '@client/i18n/messages'
 
@@ -44,7 +43,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       required: true,
       hideHeader: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         {
           value: CorrectionReason.CLERICAL_ERROR,
@@ -75,7 +74,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
             label: messages.reasonForChange,
             required: true,
             initialValue: '',
-            validate: [
+            validator: [
               requiredValidation(validationMessages.requiredReasonForCorrection)
             ],
             mapping: {}
@@ -91,7 +90,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       type: TEXTAREA,
       label: messages.additionalComment,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: false,
       maxLength: 500,
       mapping: {

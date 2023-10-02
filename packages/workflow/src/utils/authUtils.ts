@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
@@ -17,7 +16,8 @@ export enum USER_SCOPE {
   VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
-  RECORD_SEARCH = 'recordsearch'
+  RECORD_SEARCH = 'recordsearch',
+  VERIFY = 'verify'
 }
 
 export interface ITokenPayload {

@@ -2,8 +2,6 @@
 
 # dependencies
 node_modules
-opencrvs-farajaland
-opencrvs-farajaland
 package-lock.json
 
 # testing
@@ -28,3 +26,5 @@ grafana
 .vscode/launch.json
 .history
 deploy_key
+.lh
+.vscode

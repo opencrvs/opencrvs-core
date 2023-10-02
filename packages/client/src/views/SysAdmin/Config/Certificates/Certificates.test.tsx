@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
@@ -25,7 +24,8 @@ import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
-export const validImageB64String =
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
@@ -66,7 +66,28 @@ describe('ConfigHome page when already has uploaded certificate template', async
   await loginAsFieldAgent(store)
   let testComponent: ReactWrapper
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
+
   beforeEach(async () => {
+    vi.resetAllMocks()
+    configApplicationMutations.mutateApplicationConfig = vi.fn(
+      () =>
+        new Promise((resolve) =>
+          resolve({
+            data: {
+              updateApplicationConfig: {
+                BIRTH: {
+                  PRINT_IN_ADVANCE: true
+                },
+                DEATH: {
+                  PRINT_IN_ADVANCE: true
+                }
+              }
+            }
+          })
+        )
+    )
+    const { store, history } = createStore()
+
     testComponent = await createTestComponent(
       <CertificatesConfig></CertificatesConfig>,
       { store, history }
@@ -78,33 +99,62 @@ describe('ConfigHome page when already has uploaded certificate template', async
     spy.mockReset()
   })
 
-  it('shows default birth certificate template text', () => {
-    expect(
-      testComponent.find('#birth_value').hostNodes().first().text()
-    ).toContain('Default birth certificate template')
-  })
+  describe('certificate page test', () => {
+    it('should show birth, death and marriage tab button', async () => {
+      expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Births')
+      expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Deaths')
+      expect(testComponent.find('#tab_marriage').hostNodes().text()).toBe(
+        'Marriages'
+      )
+    })
 
-  it('shows default death certificate template text', () => {
-    expect(
-      testComponent.find('#death_value').hostNodes().first().text()
-    ).toContain('Default death certificate template')
-  })
+    it('shows default birth certificate template text', () => {
+      expect(
+        testComponent.find('#birth_value').hostNodes().first().text()
+      ).toContain('farajaland-birth-certificate-v3.svg')
+    })
 
-  it('shows sub menu link when VerticalThreeDots is clicked', async () => {
-    await waitForElement(
-      testComponent,
-      '#template-birth-action-menuToggleButton'
-    )
-    testComponent
-      .find('#template-birth-action-menuToggleButton')
-      .hostNodes()
-      .first()
-      .simulate('click')
+    it('shows sub menu link when VerticalThreeDots is clicked', async () => {
+      await waitForElement(
+        testComponent,
+        '#template-birth-action-menuToggleButton'
+      )
+      testComponent
+        .find('#template-birth-action-menuToggleButton')
+        .hostNodes()
+        .first()
+        .simulate('click')
 
-    testComponent.update()
-    expect(
-      testComponent.find('#template-birth-action-menuItem0').hostNodes()
-    ).toHaveLength(1)
+      testComponent.update()
+      expect(
+        testComponent.find('#template-birth-action-menuItem0').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('should toggle allow printing for birth', async () => {
+      testComponent
+        .find('#allow-printing-toggle')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+
+      testComponent.update()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+
+      await waitForElement(testComponent, '#allow-printing-notification')
+
+      expect(
+        testComponent
+          .find('#allow-printing-notification')
+          .hostNodes()
+          .first()
+          .text()
+      ).toBe('Allow printing in advance of issuance updated')
+    })
   })
 
   describe('Testing sub menu item on config page', () => {
@@ -183,6 +233,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
     it('should render preview certificate template when clicked on preview', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+
       await waitForElement(testComponent, '#preview_image_field')
 
       expect(
@@ -193,7 +244,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
     it('should go back from preview page if click on back arrow', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
       await waitForElement(testComponent, '#preview_image_field')
-      testComponent.find('#preview_back').hostNodes().simulate('click')
+      testComponent.find('#preview_close').hostNodes().simulate('click')
       testComponent.update()
 
       expect(
@@ -207,6 +258,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
+
       expect(printCertificateSpy).toBeCalledTimes(1)
     })
 

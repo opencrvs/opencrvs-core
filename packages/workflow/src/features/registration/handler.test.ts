@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
@@ -39,7 +38,8 @@ import {
   relatedPersonMock,
   hearthResponseMock,
   userResponseMock,
-  wrapInBundle
+  wrapInBundle,
+  informantSMSNotificationMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
@@ -172,13 +172,6 @@ describe('Verify handler', () => {
       )
       jest
         .spyOn(require('./utils'), 'sendEventNotification')
-        .mockReturnValue('')
-
-      jest
-        .spyOn(
-          require('../../utils/formDraftUtils'),
-          'checkFormDraftStatusToAddTestExtension'
-        )
         .mockReturnValue('')
 
       const token = jwt.sign(
@@ -917,7 +910,7 @@ describe('markEventAsRegisteredHandler handler', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/specs/types',
-                  code: 'birth-registration'
+                  code: 'BIRTH'
                 }
               ]
             },
@@ -1031,7 +1024,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             },
             identifier: [
               {
-                system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                system: 'http://opencrvs.org/specs/id/death-tracking-id',
                 value: 'D5WGYJE'
               }
             ],
@@ -1068,6 +1061,10 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     )
     fetch.resetMocks()
     server = await createServer()
+
+    jest
+      .spyOn(require('./fhir/fhir-utils'), 'getInformantName')
+      .mockReturnValue('informant name')
   })
 
   it('returns error', async () => {
@@ -1097,7 +1094,8 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }]
+      [motherMock, { status: 200 }],
+      [JSON.stringify(informantSMSNotificationMock), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
@@ -1312,7 +1310,8 @@ describe('markEventAsWaitingValidationHandler', () => {
       // For triggering DECLARATION_UPDATED event
       [JSON.stringify({}), { status: 200 }],
       // This is needed only for the bundle with input output
-      ...getMarkBundleAndPostToHearthMockResponses
+      ...getMarkBundleAndPostToHearthMockResponses,
+      [hearthResponseMock, { status: 200 }]
     )
   })
 

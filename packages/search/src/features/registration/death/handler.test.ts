@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -29,10 +28,12 @@ import {
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
+import { searchForDeathDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any
@@ -40,6 +41,9 @@ describe('Verify handlers', () => {
   describe('deathEventHandler', () => {
     beforeEach(async () => {
       server = await createServer()
+      const mockedsearchForDuplicates =
+        searchForDeathDuplicates as jest.Mocked<any>
+      mockedsearchForDuplicates.mockReturnValue([])
     })
 
     it('should return status code 500 if invalid payload received', async () => {
@@ -88,6 +92,7 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -96,9 +101,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
@@ -129,6 +133,7 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -137,9 +142,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
@@ -172,6 +176,7 @@ describe('Verify handlers', () => {
       )
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -180,9 +185,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 

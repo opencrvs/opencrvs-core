@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -20,7 +19,10 @@ const StyledInputDescriptor = styled.p`
   display: inline-block;
 `
 
-export class InputDescriptor extends React.Component<{}, {}> {
+export class InputDescriptor extends React.Component<
+  { children?: React.ReactNode },
+  {}
+> {
   render() {
     return <StyledInputDescriptor>{this.props.children}</StyledInputDescriptor>
   }

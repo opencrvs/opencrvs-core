@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useIntl } from 'react-intl'
 
@@ -17,7 +16,7 @@ import { System } from '@client/utils/gateway'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Text } from '@opencrvs/components/lib/Text'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 interface ISystemProps {
   system: System
@@ -68,7 +67,7 @@ export function DeleteSystemModal({
       >
         <Text variant="reg16" element="span">
           {intl.formatMessage(integrationMessages.deleteSystemText, {
-            b: (chunks) => <strong>{chunks}</strong>
+            b: (chunks: ReactNode) => <strong>{chunks}</strong>
           })}
         </Text>
       </ResponsiveModal>

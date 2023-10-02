@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
 import {
@@ -90,22 +89,6 @@ function createTaskRefTemplate(event: EVENT_TYPE) {
     }
   }
 }
-export async function findInformantEntry(
-  fhirBundle: fhir.Bundle
-): Promise<fhir.Patient | undefined> {
-  const informantEntry = selectInformantResource(fhirBundle)
-  if (informantEntry) {
-    return informantEntry
-  }
-  const informantRelatedPersonEntry = (await findPersonEntry(
-    INFORMANT_CODE,
-    fhirBundle
-  )) as fhir.RelatedPerson
-  if (!informantRelatedPersonEntry) {
-    return undefined
-  }
-  return await getFromFhir(`/${informantRelatedPersonEntry.patient.reference}`)
-}
 
 export async function findPersonEntry(
   sectionCode: string,
@@ -121,6 +104,24 @@ export async function findPersonEntry(
       return findPersonEntryByComposition(sectionCode, fhirBundle)
     case 'Task':
       return findPersonEntryByTask(sectionCode, fhirBundle)
+    default:
+      return undefined
+  }
+}
+export async function findRelatedPersonEntry(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
+  const resource =
+    fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
+  if (!resource) {
+    throw new Error('No resource found')
+  }
+  switch (resource.resourceType) {
+    case 'Composition':
+      return findRelatedPersonEntryByComposition(sectionCode, fhirBundle)
+    case 'Task':
+      return findRelatedPersonEntryByTask(sectionCode, fhirBundle)
     default:
       return undefined
   }
@@ -153,6 +154,48 @@ export async function findPersonEntryByComposition(
   return personEntry.resource as fhir.Patient
 }
 
+export async function findRelatedPersonEntryByComposition(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
+  const composition =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Composition)
+
+  const personSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  const relatedPersonEntry =
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      (entry) => entry.fullUrl === personSectionEntry.reference
+    )
+
+  if (!relatedPersonEntry) {
+    throw new Error(
+      'RelatedPersonEntry referenced from composition section not found in FHIR bundle'
+    )
+  }
+
+  const personEntry =
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      (entry) =>
+        entry.fullUrl ===
+        (relatedPersonEntry.resource as fhir.RelatedPerson).patient.reference
+    )
+
+  if (!personEntry) {
+    throw new Error(
+      'PersonEntry referenced from composition section not found in FHIR bundle'
+    )
+  }
+
+  return personEntry.resource as fhir.Patient
+}
+
 export async function findPersonEntryByTask(
   sectionCode: string,
   fhirBundle: fhir.Bundle
@@ -171,6 +214,31 @@ export async function findPersonEntryByTask(
     sectionCode
   )
   return await getFromFhir(`/${personSectionEntry.reference}`)
+}
+
+export async function findRelatedPersonEntryByTask(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
+  const task =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Task)
+  const compositionRef = task && task.focus && task.focus.reference
+  if (!compositionRef) {
+    throw new Error(`No composition reference found`)
+  }
+  const composition: fhir.Composition = await getFromFhir(`/${compositionRef}`)
+  const relatedPersonSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  const relatedPerson = (await getFromFhir(
+    `/${relatedPersonSectionEntry.reference}`
+  )) as fhir.RelatedPerson
+  return (await getFromFhir(
+    `/${relatedPerson.patient.reference}`
+  )) as fhir.Patient
 }
 
 export function getSectionEntryBySectionCode(

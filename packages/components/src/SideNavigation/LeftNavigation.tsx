@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -33,7 +32,7 @@ const LeftNavigationContainer = styled.div<{
   display: flex;
   flex-direction: column;
   width: ${({ navigationWidth }) =>
-    navigationWidth ? navigationWidth : 249}px;
+    navigationWidth ? navigationWidth : 282}px;
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};
@@ -66,12 +65,12 @@ const ApplicationNameContainer = styled.div`
   height: 56px;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  box-sizing: border-box;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 const ApplicationName = styled.div`
-  color: ${({ theme }) => theme.colors.grey};
   ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;
@@ -119,9 +118,11 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
           <ApplicationName>{props.applicationName}</ApplicationName>
         </ApplicationNameContainer>
         <UserInfo>
-          {props.avatar && props.avatar()}
-          <UserName>{props.name && props.name}</UserName>
-          <Role>{props.role && props.role}</Role>
+          <>
+            {props.avatar && props.avatar()}
+            <UserName>{props.name && props.name}</UserName>
+            <Role>{props.role && props.role}</Role>
+          </>
         </UserInfo>
       </Container>
       <MenuItem>{props.children && props.children}</MenuItem>

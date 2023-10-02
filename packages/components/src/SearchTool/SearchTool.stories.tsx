@@ -6,11 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Story } from '@storybook/react'
-import { BRN, TrackingID } from '../icons'
+import { Icon } from '../Icon'
 import { SearchTool, ISearchType } from './SearchTool'
 import React from 'react'
 
@@ -41,18 +40,22 @@ export const SearchToolView = Template.bind({})
 SearchToolView.args = {
   searchTypeList: [
     {
+      icon: <Icon name="Target" size="small" />,
       label: 'Tracking ID',
-      value: 'Tracking ID',
-      icon: <TrackingID />,
-      invertIcon: <TrackingID />,
-      placeHolderText: 'Search for Tracking ID'
+      placeHolderText: 'Search',
+      value: 'Tracking ID'
     },
     {
-      label: 'BRN/DRN',
-      value: 'BRN/DRN',
-      icon: <BRN />,
-      invertIcon: <BRN />,
-      placeHolderText: 'Search for BRN/DRN'
+      icon: <Icon name="Medal" size="small" />,
+      label: 'Registration No.',
+      placeHolderText: 'Search',
+      value: 'Registration No.'
+    },
+    {
+      icon: <Icon name="Phone" size="small" />,
+      label: 'Phone no.',
+      placeHolderText: 'Search',
+      value: 'Phone no.'
     }
   ],
   searchHandler: (searchText: string, searchType: string) => alert(searchText),

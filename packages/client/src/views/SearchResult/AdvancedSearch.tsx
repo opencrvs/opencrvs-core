@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React, { useState } from 'react'
@@ -19,12 +18,12 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { Content, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { ICON_ALIGNMENT, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
@@ -34,7 +33,6 @@ import { pick } from 'lodash'
 import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
-import { LocationType } from '@client/utils/gateway'
 import {
   getAccordionActiveStateMap,
   IBaseAdvancedSearchState,
@@ -43,13 +41,15 @@ import {
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { LocationType } from '@client/offline/reducer'
 
-export enum TabId {
+enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-const StyledPrimaryButton = styled(PrimaryButton)`
+const SearchButton = styled(Button)`
   margin-top: 32px;
 `
 
@@ -110,7 +110,7 @@ const BirthSection = () => {
     )
   })
 
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -126,9 +126,6 @@ const BirthSection = () => {
 
   return (
     <>
-      <Text element={'p'} variant={'reg18'}>
-        {intl.formatMessage(messages.advancedSearchInstruction)}
-      </Text>
       <Accordion
         name={birthSearchRegistrationSection.id}
         label={intl.formatMessage(
@@ -187,7 +184,7 @@ const BirthSection = () => {
           id={birthSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === LocationType.HEALTH_FACILITY
                 ? {
                     ...values,
                     eventCountry: '',
@@ -278,11 +275,11 @@ const BirthSection = () => {
         />
       </Accordion>
 
-      <StyledPrimaryButton
-        icon={() => <Icon name={'Search'} />}
-        align={ICON_ALIGNMENT.LEFT}
+      <SearchButton
         id="search"
         key="search"
+        type="primary"
+        size="large"
         disabled={isDisabled}
         onClick={() => {
           dispatch(
@@ -297,8 +294,10 @@ const BirthSection = () => {
           dispatch(goToAdvancedSearchResult())
         }}
       >
+        {' '}
+        <Icon name={'MagnifyingGlass'} />
         {intl.formatMessage(buttonMessages.search)}
-      </StyledPrimaryButton>
+      </SearchButton>
     </>
   )
 }
@@ -314,7 +313,7 @@ const DeathSection = () => {
       'death'
     )
   })
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -329,9 +328,6 @@ const DeathSection = () => {
 
   return (
     <>
-      <Text element={'p'} variant={'reg18'}>
-        {intl.formatMessage(messages.advancedSearchInstruction)}
-      </Text>
       <Accordion
         name={deathSearchRegistrationSection.id}
         label={intl.formatMessage(
@@ -374,8 +370,7 @@ const DeathSection = () => {
             'deceasedDoB',
             'deceasedFirstNames',
             'deceasedFamilyName',
-            'deceasedGender',
-            'placeOfDeath'
+            'deceasedGender'
           ])}
         />
       </Accordion>
@@ -391,7 +386,7 @@ const DeathSection = () => {
           id={deathSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === LocationType.HEALTH_FACILITY
                 ? {
                     ...values,
                     eventCountry: '',
@@ -438,11 +433,11 @@ const DeathSection = () => {
         />
       </Accordion>
 
-      <StyledPrimaryButton
-        icon={() => <Icon name={'Search'} />}
-        align={ICON_ALIGNMENT.LEFT}
+      <SearchButton
         id="search"
         key="search"
+        type="primary"
+        size="large"
         disabled={isDisable}
         onClick={() => {
           dispatch(
@@ -457,8 +452,10 @@ const DeathSection = () => {
           dispatch(goToAdvancedSearchResult())
         }}
       >
+        {' '}
+        <Icon name={'MagnifyingGlass'} />
         {intl.formatMessage(buttonMessages.search)}
-      </StyledPrimaryButton>
+      </SearchButton>
     </>
   )
 }
@@ -495,13 +492,14 @@ const AdvancedSearch = () => {
               onTabClick={(id: TabId) => {
                 dispatch(
                   setAdvancedSearchParam({
-                    ...advancedSearchParamState,
+                    ...advancedSearchInitialState,
                     event: id
                   })
                 )
               }}
             />
           }
+          subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
         >
           {activeTabId === TabId.BIRTH && <BirthSection />}
           {activeTabId === TabId.DEATH && <DeathSection />}

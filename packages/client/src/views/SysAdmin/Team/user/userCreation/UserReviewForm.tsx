@@ -6,20 +6,19 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
+  DIVIDER,
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
-  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER,
-  SUBSECTION
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
@@ -47,15 +46,11 @@ import {
   modifyUserFormData,
   submitUserFormData
 } from '@client/user/userReducer'
-import {
-  Action,
-  FormTitle
-} from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
+import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT,
-  LinkButton
+  ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -68,7 +63,7 @@ import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   ListViewSimplified,
   ListViewItemSimplified,
@@ -76,8 +71,10 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Link } from '@opencrvs/components'
 
-export interface IUserReviewFormProps {
+interface IUserReviewFormProps {
   userId?: string
   section: IFormSection
   formData: IFormSectionData
@@ -93,7 +90,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }
 
 interface ISectionData {
@@ -111,10 +108,6 @@ const Container = styled.div`
   }
 `
 
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 16px;
-`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;
@@ -143,7 +136,9 @@ class UserReviewFormComponent extends React.Component<
       this.props.formData
     ).forEach((group) => {
       group.fields.forEach((field: IFormField, idx) => {
-        if (field.type == SUBSECTION) {
+        if (field.hideValueInPreview) {
+          return
+        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -193,9 +188,9 @@ class UserReviewFormComponent extends React.Component<
               actions:
                 !(
                   field.name === 'registrationOffice' &&
-                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                  this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
-                  <LinkButton
+                  <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
                       this.props.userId
@@ -213,7 +208,7 @@ class UserReviewFormComponent extends React.Component<
                     }}
                   >
                     {intl.formatMessage(messages.change)}
-                  </LinkButton>
+                  </Link>
                 ) : (
                   <></>
                 )
@@ -249,10 +244,12 @@ class UserReviewFormComponent extends React.Component<
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
-        ? field.name === 'role'
-          ? intl.formatMessage(userMessages[formData.role as string])
-          : field.name === 'type'
-          ? intl.formatMessage(userMessages[formData.type as string])
+        ? field.name === 'systemRole'
+          ? intl.formatMessage(userMessages[formData.systemRole as string])
+          : field.name === 'role'
+          ? intl.formatMessage({
+              id: getUserRoleIntlKey(formData.role as string)
+            })
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
@@ -282,7 +279,7 @@ class UserReviewFormComponent extends React.Component<
       userDetails,
       offlineCountryConfiguration
     } = this.props
-    let title: string
+    let title: string | undefined
     let actionComponent: JSX.Element
     const locationId = formData['registrationOffice']
     const locationDetails =
@@ -295,8 +292,8 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -307,13 +304,13 @@ class UserReviewFormComponent extends React.Component<
         </SuccessButton>
       )
     } else {
-      title = intl.formatMessage(section.title)
+      title = section.title && intl.formatMessage(section.title)
       actionComponent = (
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -334,11 +331,11 @@ class UserReviewFormComponent extends React.Component<
         }
         hideBackground={true}
       >
-        <Content title={intl.formatMessage(section.name)}>
+        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
           <Container>
             {this.transformSectionData().map((sec, index) => {
               return (
-                <>
+                <React.Fragment key={index}>
                   <ListViewSimplified>
                     {sec.items.map((item, index) => {
                       return (
@@ -351,7 +348,7 @@ class UserReviewFormComponent extends React.Component<
                       )
                     })}
                   </ListViewSimplified>
-                </>
+                </React.Fragment>
               )
             })}
             <Action>{actionComponent}</Action>

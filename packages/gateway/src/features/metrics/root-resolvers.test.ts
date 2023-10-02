@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/metrics/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -26,7 +25,6 @@ describe('get total metrics', () => {
           maleEstimation: 127633,
           femaleEstimation: 136838,
           locationId: 'Location/0',
-          estimationYear: 2022,
           locationLevel: 'COUNTRY'
         },
         results: [
@@ -47,7 +45,8 @@ describe('get total metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         event: 'BIRTH'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -71,7 +70,8 @@ describe('get declarations started metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -110,7 +110,8 @@ describe('get month wise event estimation metrics', () => {
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
         event: 'BIRTH'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -150,7 +151,8 @@ describe('get location wise event estimation metrics', () => {
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
         event: 'birth'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()

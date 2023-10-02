@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@metrics/server'
 
@@ -107,8 +106,7 @@ describe('verify metrics handler', () => {
       .mockReturnValue({
         estimation: 100,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
 
     const res = await server.server.inject({
@@ -171,8 +169,7 @@ describe('verify metrics handler', () => {
       .mockReturnValue({
         estimation: 100,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
 
     const res = await server.server.inject({

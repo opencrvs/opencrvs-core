@@ -6,15 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  getBirthRegistrationNumber,
+  getRegistrationNumber,
   getEntryId,
-  getInformantName,
+  getSubjectName,
   getCRVSOfficeName,
   getPaperFormID,
   getRegStatusCode,
@@ -23,6 +25,8 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   testFhirBundle,
+  testDeathFhirBundle,
+  testMarriageFhirBundle,
   testFhirTaskBundle,
   officeMock
 } from '@workflow/test/utils'
@@ -45,7 +49,7 @@ describe('Verify getSharedContactMsisdn', () => {
     ).rejects.toThrow('Invalid FHIR bundle found for declaration')
   })
 
-  it('Returns false when phonenumber is missing for shared contact', async () => {
+  it('Returns null when phonenumber is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     if (
       fhirBundle &&
@@ -57,22 +61,22 @@ describe('Verify getSharedContactMsisdn', () => {
       fhirBundle.entry[1].resource.extension[1].url
     ) {
       fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
-      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
+      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(null)
     } else {
       throw new Error('Failed')
     }
   })
 })
 
-describe('Verify getInformantName', () => {
+describe('Verify getSubjectName', () => {
   it('Returned informant name properly', async () => {
-    const informantName = await getInformantName(testFhirBundle)
+    const informantName = await getSubjectName(testFhirBundle)
     expect(informantName).toEqual('অনিক অনিক')
   })
 
   it('Throws error when invalid fhir bundle is sent', async () => {
     await expect(
-      getInformantName({
+      getSubjectName({
         resourceType: 'Bundle',
         type: 'document'
       })
@@ -82,15 +86,15 @@ describe('Verify getInformantName', () => {
   it('Throws error when child name section is missing', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
-    await expect(getInformantName(fhirBundle)).rejects.toThrow(
-      "Didn't find informant's name information"
+    await expect(getSubjectName(fhirBundle)).rejects.toThrow(
+      "Didn't find subject's name information"
     )
   })
 
   it("Throws error when child's bn name block is missing", async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
-    await expect(getInformantName(fhirBundle)).rejects.toThrow(
+    await expect(getSubjectName(fhirBundle)).rejects.toThrow(
       "Didn't found informant's bn name"
     )
   })
@@ -124,10 +128,30 @@ describe('Verify getCRVSOfficeName', () => {
 })
 
 describe('Verify getTrackingId', () => {
-  it('Returned tracking id properly', () => {
+  it('Returned tracking id properly for birth', () => {
     const trackingid = getTrackingId(setTrackingId(testFhirBundle))
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
+  })
+
+  it('Returned tracking id properly for death', () => {
+    const trackingid = getTrackingId(setTrackingId(testDeathFhirBundle))
+    if (trackingid) {
+      expect(trackingid).toMatch(/^D/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
+  })
+
+  it('Returned tracking id properly for marriage', () => {
+    const trackingid = getTrackingId(setTrackingId(testMarriageFhirBundle))
+    if (trackingid) {
+      expect(trackingid).toMatch(/^M/)
       expect(trackingid.length).toBe(7)
     } else {
       throw new Error('Failed')
@@ -144,7 +168,7 @@ describe('Verify getTrackingId', () => {
   })
 })
 
-describe('Verify getBirthRegistrationNumber', () => {
+describe('Verify getRegistrationNumber', () => {
   it('Returned birth registration number properly', async () => {
     const taskResource: fhir.Task = {
       identifier: [
@@ -156,10 +180,44 @@ describe('Verify getBirthRegistrationNumber', () => {
       status: '',
       intent: ''
     }
-    const brn = getBirthRegistrationNumber(taskResource)
+    const brn = getRegistrationNumber(taskResource, EVENT_TYPE.BIRTH)
 
     expect(brn).toBeDefined()
     expect(brn).toEqual('2019333436B5WGYJE8')
+  })
+
+  it('Returned death registration number properly', async () => {
+    const taskResource: fhir.Task = {
+      identifier: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`,
+          value: '2019333436DE5WGRT8'
+        }
+      ],
+      status: '',
+      intent: ''
+    }
+    const drn = getRegistrationNumber(taskResource, EVENT_TYPE.DEATH)
+
+    expect(drn).toBeDefined()
+    expect(drn).toEqual('2019333436DE5WGRT8')
+  })
+
+  it('Returned marriage registration number properly', async () => {
+    const taskResource: fhir.Task = {
+      identifier: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}id/marriage-registration-number`,
+          value: '2019333436MA5WGRT8'
+        }
+      ],
+      status: '',
+      intent: ''
+    }
+    const mrn = getRegistrationNumber(taskResource, EVENT_TYPE.MARRIAGE)
+
+    expect(mrn).toBeDefined()
+    expect(mrn).toEqual('2019333436MA5WGRT8')
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {
@@ -192,7 +250,7 @@ describe('Verify getBirthRegistrationNumber', () => {
     }
 
     expect(() =>
-      getBirthRegistrationNumber(testTask as fhir.Task)
+      getRegistrationNumber(testTask as fhir.Task, EVENT_TYPE.BIRTH)
     ).toThrowError("Didn't find any identifier for birth registration number")
   })
 })

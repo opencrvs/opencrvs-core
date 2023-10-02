@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -53,7 +52,7 @@ describe('Correction root resolvers', () => {
         telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         correction: {
           location: {
             _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
@@ -86,15 +85,11 @@ describe('Correction root resolvers', () => {
         name: [{ use: 'en', firstNames: 'Khaby', familyName: 'Lame Corrected' }]
       },
       informant: {
-        individual: {
-          name: [
-            { use: 'en', firstNames: 'Mother', familyName: 'Family Name' }
-          ],
-          telecom: [{ system: 'phone', value: '+8801622688231' }]
-        }
+        name: [{ use: 'en', firstNames: 'Mother', familyName: 'Family Name' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         correction: {
           location: {
             _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
@@ -139,7 +134,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
-          authHeaderDeclare
+          { headers: authHeaderDeclare }
         )
       } catch (e) {
         expect(e.message).toBe('User does not have a register scope')
@@ -148,7 +143,7 @@ describe('Correction root resolvers', () => {
 
     it('posts a fhir bundle', async () => {
       fetch.mockResponses([JSON.stringify({ userId: '121223' })])
-
+      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -167,7 +162,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
-          authHeaderRegCert
+          { headers: authHeaderRegCert }
         )
 
       expect(result).toBeDefined()
@@ -181,7 +176,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
-          authHeaderDeclare
+          { headers: authHeaderDeclare }
         )
       } catch (e) {
         expect(e.message).toBe('User does not have a register scope')
@@ -222,7 +217,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
-          authHeaderRegCert
+          { headers: authHeaderRegCert }
         )
 
       expect(result).toBeDefined()

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -16,7 +15,7 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectDuplicates,
+  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -27,7 +26,10 @@ import {
   REJECTED_STATUS,
   VALIDATED_STATUS,
   REGISTERED_STATUS,
-  CERTIFIED_STATUS
+  CERTIFIED_STATUS,
+  ARCHIVED_STATUS,
+  DECLARED_STATUS,
+  IN_PROGRESS_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -41,10 +43,13 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  addFlaggedAsPotentialDuplicate,
+  findPatient
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -57,12 +62,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -85,7 +91,14 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   )
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+  const patient = findPatient(bundle)
+
   const compositionId =
     task &&
     task.focus &&
@@ -130,18 +143,23 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
+  body.childIdentifier = patient?.identifier?.find(
+    (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+  )?.value
+
   if (
     [
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexAndSearchComposition(
@@ -150,7 +168,7 @@ async function indexAndSearchComposition(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
     createdAt:
@@ -162,9 +180,10 @@ async function indexAndSearchComposition(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
-  if (body.type !== 'IN_PROGRESS') {
-    await detectAndUpdateDuplicates(compositionId, composition, body)
+  await indexComposition(compositionId, body, client)
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
+    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }
 
@@ -208,7 +227,6 @@ async function createChildIndex(
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
-  body.gender = child && child.gender
 }
 
 function createMotherIndex(
@@ -240,8 +258,9 @@ function createMotherIndex(
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
     mother.identifier &&
-    mother.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    mother.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createFatherIndex(
@@ -273,8 +292,9 @@ function createFatherIndex(
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
     father.identifier &&
-    father.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    father.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createInformantIndex(
@@ -319,8 +339,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
@@ -340,6 +361,10 @@ async function createDeclarationIndex(
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
   )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
@@ -378,6 +403,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&
@@ -404,23 +430,29 @@ async function createDeclarationIndex(
   body.updatedBy = regLastUser
 }
 
-async function detectAndUpdateDuplicates(
+async function detectAndUpdateBirthDuplicates(
   compositionId: string,
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionId, body)
+  const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }
   logger.info(
-    `Search/service: ${duplicates.length} duplicate composition(s) found`
+    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
-async function updateCompositionWithDuplicates(
+export async function updateCompositionWithDuplicates(
   composition: fhir.Composition,
   duplicates: string[]
 ) {
@@ -435,12 +467,15 @@ async function updateCompositionWithDuplicates(
   if (composition && composition.id) {
     const body: ICompositionBody = {}
     body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body)
+    await updateComposition(composition.id, body, client)
   }
   const compositionFromFhir = (await getCompositionById(
     composition.id as string
   )) as fhir.Composition
   addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
 
-  return updateInHearth(compositionFromFhir, compositionFromFhir.id)
+  return updateInHearth(
+    `/Composition/${compositionFromFhir.id}`,
+    compositionFromFhir
+  )
 }

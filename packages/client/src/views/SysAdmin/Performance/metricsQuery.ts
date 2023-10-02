@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 
@@ -23,7 +22,7 @@ export const CORRECTION_TOTALS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
       event: $event
-    ) {
+    ) @persist {
       total
       reason
     }
@@ -41,13 +40,12 @@ export const PERFORMANCE_METRICS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
       event: $event
-    ) {
+    ) @persist {
       estimated {
         totalEstimation
         maleEstimation
         femaleEstimation
         locationId
-        estimationYear
         locationLevel
       }
       results {
@@ -72,7 +70,7 @@ export const PERFORMANCE_STATS = gql`
     getLocationStatistics(
       locationId: $locationId
       populationYear: $populationYear
-    ) @skip(if: $officeSelected) {
+    ) @persist @skip(if: $officeSelected) {
       population
       offices
       registrars
@@ -82,7 +80,7 @@ export const PERFORMANCE_STATS = gql`
       locationId: $locationId
       status: $status
       event: $event
-    ) {
+    ) @persist {
       results {
         status
         count

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServerWithEnvironment } from '@auth/tests/util'
 
@@ -40,13 +39,13 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
-      const smsCode = codeSpy.mock.calls[0][1]
+      const authCode = codeSpy.mock.calls[0][0]
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: smsCode
+          code: authCode
         }
       })
 

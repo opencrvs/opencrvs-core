@@ -6,19 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { Event } from '@client/utils/gateway'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death
@@ -28,6 +27,8 @@ export enum CorrectorRelationship {
   FATHER = 'FATHER',
   CHILD = 'CHILD',
   LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  BRIDE = 'BRIDE',
+  GROOM = 'GROOM',
   //common
   ANOTHER_AGENT = 'ANOTHER_AGENT',
   REGISTRAR = 'REGISTRAR',
@@ -88,7 +89,9 @@ export const CollectorRelationLabelArray = [
   {
     value: CorrectorRelationship.OTHER,
     label: messages.others
-  }
+  },
+  { value: CorrectorRelationship.BRIDE, label: messages.bride },
+  { value: CorrectorRelationship.GROOM, label: messages.groom }
 ]
 
 const birthCorrectorRelationGroup: IFormSectionGroup = {
@@ -104,8 +107,32 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
-      options: CollectorRelationLabelArray,
+      validator: [],
+      options: [
+        { value: CorrectorRelationship.MOTHER, label: messages.mother },
+        { value: CorrectorRelationship.FATHER, label: messages.father },
+        { value: CorrectorRelationship.CHILD, label: messages.child },
+        {
+          value: CorrectorRelationship.LEGAL_GUARDIAN,
+          label: messages.legalGuardian
+        },
+        {
+          value: CorrectorRelationship.ANOTHER_AGENT,
+          label: messages.anotherRegOrFieldAgent
+        },
+        {
+          value: CorrectorRelationship.REGISTRAR,
+          label: messages.me
+        },
+        {
+          value: CorrectorRelationship.COURT,
+          label: messages.court
+        },
+        {
+          value: CorrectorRelationship.OTHER,
+          label: messages.others
+        }
+      ],
       nestedFields: {
         MOTHER: [],
         FATHER: [],
@@ -129,7 +156,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]
@@ -157,7 +184,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         { value: 'INFORMANT', label: messages.informant },
         { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
@@ -194,7 +221,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]

@@ -6,12 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -42,7 +40,7 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  role: 'LOCAL_REGISTRAR',
+  systemRole: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -169,7 +167,6 @@ describe('updateUser handler', () => {
   })
 
   it('update fhir resources and update user using mongoose', async () => {
-    mockingoose(User).toReturn(mockUser, 'findOne')
     fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
     fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
@@ -192,10 +189,14 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
+      if (query.getQuery()._id === '12345') {
+        return mockUser
+      }
+      return null
+    }
 
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'update')
+    mockingoose(User).toReturn(finderMock, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -212,8 +213,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'REGISTRATION_AGENT',
-        type: '',
+        systemRole: 'REGISTRATION_AGENT',
+        role: '',
         primaryOfficeId: '322',
         catchmentAreaIds: [],
         deviceId: 'D444'
@@ -250,9 +251,13 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
 
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'update')
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
+      if (query.getQuery()._id === '12345') {
+        return mockUser
+      }
+      return null
+    }
+    mockingoose(User).toReturn(finderMock, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -269,8 +274,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
-        role: 'FIELD_AGENT',
-        type: 'POLICE_OFFICER',
+        systemRole: 'FIELD_AGENT',
+        role: 'POLICE_OFFICER',
         primaryOfficeId: '323',
         catchmentAreaIds: [],
         deviceId: 'D444'
@@ -334,10 +339,7 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
-    mockingoose(UsernameRecord).toReturn(
-      new Error('Failed to update'),
-      'update'
-    )
+    mockingoose(User).toReturn(new Error('Failed to update'), 'update')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -375,9 +377,14 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
+      if (query.getQuery()._id === '12345') {
+        return mockUser
+      }
+      return null
+    }
 
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
+    mockingoose(User).toReturn(finderMock, 'findOne')
     mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
@@ -399,8 +406,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'FIELD_AGENT',
-        type: 'SOCIAL_WORKER',
+        systemRole: 'FIELD_AGENT',
+        role: 'SOCIAL_WORKER',
         primaryOfficeId: '322',
         catchmentAreaIds: [],
         deviceId: 'D444'

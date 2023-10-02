@@ -6,41 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IDynamicValues,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/Workqueue'
+import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-export interface IQueryData {
-  inProgressTab: GQLEventSearchResultSet
-  notificationTab: GQLEventSearchResultSet
-  reviewTab: GQLEventSearchResultSet
-  rejectTab: GQLEventSearchResultSet
-  approvalTab: GQLEventSearchResultSet
-  printTab: GQLEventSearchResultSet
-  externalValidationTab: GQLEventSearchResultSet
-}
 
-export const EVENT_STATUS = {
-  IN_PROGRESS: 'IN_PROGRESS',
-  DECLARED: 'DECLARED',
-  VALIDATED: 'VALIDATED',
-  REGISTERED: 'REGISTERED',
-  REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION'
-}
-
-export const getSortedItems = (
-  items: IDynamicValues[],
+export const getSortedItems = <T = any>(
+  items: T[],
   sortedCol: COLUMNS,
   sortOrder: SORT_ORDER
-): IDynamicValues[] => {
+) => {
   return orderBy(items, [sortedCol], [sortOrder])
 }
 
@@ -86,6 +62,12 @@ export const changeSortedColumn = (
     case COLUMNS.LAST_UPDATED:
       newSortedCol = COLUMNS.LAST_UPDATED
       break
+    case COLUMNS.TRACKING_ID:
+      newSortedCol = COLUMNS.TRACKING_ID
+      break
+    case COLUMNS.REGISTRATION_NO:
+      newSortedCol = COLUMNS.REGISTRATION_NO
+      break
     default:
       newSortedCol = COLUMNS.NAME
   }
@@ -110,6 +92,8 @@ export const getStatusWiseWQTab = (status: string) => {
       return 'printTab'
     case 'VALIDATED':
       return 'approvalTab'
+    case 'ISSUED':
+      return 'issueTab'
     default:
       return 'reviewTab'
   }

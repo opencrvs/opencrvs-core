@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -36,7 +35,7 @@ export function HistoryNavigator({
   const history = useHistory()
   const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const role = userDetails && userDetails.role
+  const role = userDetails && userDetails.systemRole
   const location = history.location.pathname
   const isLandingPage = () => {
     if (
@@ -58,7 +57,7 @@ export function HistoryNavigator({
       <Button
         id="header-go-back-button"
         type="icon"
-        size="large"
+        size="medium"
         disabled={
           (history.action === 'POP' || history.action === 'REPLACE') &&
           isLandingPage()
@@ -70,7 +69,7 @@ export function HistoryNavigator({
       {!hideForward && (
         <Button
           type="icon"
-          size="large"
+          size="medium"
           disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
           onClick={() => dispatch(goForward())}
         >

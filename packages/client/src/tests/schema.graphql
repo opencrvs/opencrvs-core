@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # source: http://localhost:7070/graphql
 # timestamp: Fri Jun 07 2019 20:35:09 GMT+0100 (British Summer Time)
 
@@ -176,7 +175,7 @@ type Mutation {
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsArchived(id: String!): ID!
-  notADuplicate(id: String!, duplicateId: String!): ID!
+  markEventAsNotDuplicate(id: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
@@ -218,8 +217,8 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -257,7 +256,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -308,6 +307,7 @@ type Person {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -513,7 +513,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
 }
 
 input BirthRegistrationInput {
@@ -524,7 +523,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -611,13 +610,12 @@ type ApplicationConfiguration {
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   DEATH: Death
+  MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
-  ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -626,13 +624,12 @@ input ApplicationConfigurationInput {
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   DEATH: DeathInput
+  MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
-  ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -661,7 +658,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   assignment: AssignmentData
   contact: String
@@ -682,14 +679,6 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
-}
-
-enum BirthType {
-  SINGLE
-  TWIN
-  TRIPLET
-  QUADRUPLET
-  HIGHER_MULTIPLE_DELIVERY
 }
 
 type QuestionnaireQuestion {
@@ -855,6 +844,30 @@ enum LocationType {
   OTHER
 }
 
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
+}
+
+input Operation {
+  operation: String!
+}
+
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 type LocalRegistrar {
   name: [HumanName]!
   role: String!
@@ -885,7 +898,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 
@@ -951,6 +963,7 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
@@ -985,7 +998,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   contact: String
   contactRelationship: String
@@ -1071,6 +1084,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Marriage {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFee
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1080,6 +1098,23 @@ input BirthInput {
 input CountryLogoInput {
   fileName: String
   file: String
+}
+
+enum ImageFit {
+  FILL
+  TILE
+}
+
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input CurrencyInput {
@@ -1092,40 +1127,34 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
+input MarriageInput {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFeeInput
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
   tooltip: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
+  initialValue: String
   maxLength: Int
+  inputWidth: Int
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!
+  validateEmpty: Boolean
   required: Boolean
   enabled: String
   custom: Boolean
-}
-
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
+  conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
+  validator: [ValidatorInput!]
+  mapping: MappingInput
 }
 
 type AssignmentData {
@@ -1133,6 +1162,7 @@ type AssignmentData {
   firstName: String
   lastName: String
   officeName: String
+  avatarURL: String!
 }
 
 type RegWorkflow {
@@ -1179,7 +1209,7 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UINTOKEN
+  MOSIP_PSUT_TOKEN_ID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
@@ -1396,6 +1426,11 @@ type DeathFee {
   DELAYED: Float
 }
 
+type MarriageFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
 input BirthFeeInput {
   ON_TIME: Float
   LATE: Float
@@ -1403,6 +1438,11 @@ input BirthFeeInput {
 }
 
 input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input MarriageFeeInput {
   ON_TIME: Float
   DELAYED: Float
 }

@@ -6,20 +6,19 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL } from '@gateway/constants'
+
 import { GQLResolver } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async locationsByParent(_, { parentId }, authHeader) {
+    async locationsByParent(_, { parentId }, { headers: authHeader }) {
       const bundle = await fetchFHIR(`/Location?partof=${parentId}`, authHeader)
       return bundle.entry.map((entry: { resource: {} }) => entry.resource)
     },
-    async hasChildLocation(_, { parentId }, authHeader) {
+    async hasChildLocation(_, { parentId }, { headers: authHeader }) {
       const bundle = await fetchFHIR(
         `/Location?_count=1&partof=${parentId}`,
         authHeader
@@ -29,8 +28,8 @@ export const resolvers: GQLResolver = {
       )
       return childLocation
     },
-    async locationById(_, { locationId }, authHeader) {
-      return fetchFHIR(`${FHIR_URL}/Location/${locationId}`, authHeader)
+    async locationById(_, { locationId }, { headers: authHeader }) {
+      return fetchFHIR(`/Location/${locationId}`, authHeader)
     }
   }
 }

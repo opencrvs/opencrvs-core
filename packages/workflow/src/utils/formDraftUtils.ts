@@ -6,13 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 export enum DraftStatus {
@@ -39,22 +37,5 @@ export async function getFormDraft(token: string) {
   } catch (err) {
     logger.error(`Unable to check form draft status for error : ${err}`)
     throw err
-  }
-}
-
-export async function checkFormDraftStatusToAddTestExtension(
-  taskResource: fhir.Task,
-  token: string
-) {
-  const formDraft: IDraft[] = await getFormDraft(token)
-  // Array.prototype.every returns true for an empty array
-  const isPublished =
-    formDraft.length === Object.values(EVENT_TYPE).length &&
-    Object.values(formDraft).every(
-      (draft) => draft.status === DraftStatus.PUBLISHED
-    )
-
-  if (!isPublished) {
-    setupTestExtension(taskResource)
   }
 }

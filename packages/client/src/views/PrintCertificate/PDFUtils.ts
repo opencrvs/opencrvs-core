@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IntlShape,
@@ -17,7 +16,7 @@ import {
 } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -25,9 +24,13 @@ import {
 import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
+import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
-import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import isValid from 'date-fns/isValid'
+import format from 'date-fns/format'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -144,6 +147,25 @@ export function executeHandlebarsTemplate(
       }
     }
   )
+
+  Handlebars.registerHelper(
+    'formatDate',
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'location',
+    function (this: any, locationId: string, key: keyof ILocation) {
+      const locations = getOfflineData(state).locations
+      return locations[locationId]
+        ? locations[locationId][key]
+        : `Missing location for id: ${locationId}`
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
@@ -153,7 +175,7 @@ export function executeHandlebarsTemplate(
 export async function previewCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
   state: IStoreState,
@@ -164,8 +186,8 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
+  createPDF(
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -176,10 +198,10 @@ export async function previewCertificate(
   })
 }
 
-export function printCertificate(
+export async function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   state: IStoreState,
   optionalData?: OptionalData,
@@ -189,7 +211,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -198,20 +220,39 @@ export function printCertificate(
   )
 }
 
-function getPDFTemplateWithSVG(
+async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
   pageSize: PageSize,
   state: IStoreState
-): IPDFTemplate {
+): Promise<IPDFTemplate> {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
+
+  const resolvedSignatures = await Promise.all(
+    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
+      signatureKey: k,
+      url: declaration.data.template[k]
+    }))
+      .filter(({ url }) => Boolean(url))
+      .map(({ signatureKey, url }) =>
+        fetchImageAsBase64(url as string).then((value) => ({
+          [signatureKey]: value
+        }))
+      )
+  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
+
+  const declarationTemplate = {
+    ...declaration.data.template,
+    ...resolvedSignatures
+  }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
-    declaration.data.template,
+    declarationTemplate,
     state
   )
+
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)

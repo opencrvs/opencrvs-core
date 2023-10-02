@@ -6,14 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
+import { Types } from 'mongoose'
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
@@ -38,7 +38,8 @@ const mockUser: IUser & { _id: string } = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+8801234567890',
-  role: 'LOCAL_REGISTRAR',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   status: 'pending',
   primaryOfficeId: '321',
   practitionerId: '123',
@@ -65,7 +66,13 @@ const mockUser: IUser & { _id: string } = {
   device: 'D444',
   passwordHash:
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345'
+  salt: '12345',
+  securityQuestionAnswers: [
+    {
+      questionKey: 'Question?',
+      answerHash: 'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077'
+    }
+  ]
 }
 
 describe('usernameSMSReminderInvite handler', () => {
@@ -80,7 +87,7 @@ describe('usernameSMSReminderInvite handler', () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/usernameReminder',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },
@@ -97,7 +104,7 @@ describe('usernameSMSReminderInvite handler', () => {
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/usernameReminder',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },

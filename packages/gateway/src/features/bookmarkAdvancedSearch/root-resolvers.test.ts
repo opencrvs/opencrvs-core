@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -69,7 +68,7 @@ describe('Advanced search resolvers', () => {
             }
           }
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
 
       expect(response.searchList.length).toEqual(3)
@@ -110,7 +109,7 @@ describe('Advanced search resolvers', () => {
               }
             }
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         "Something went wrong on user management service. Couldn't bookmark advanced search."
@@ -160,7 +159,7 @@ describe('Advanced search resolvers', () => {
             searchId: '62b99cd234vs4700cc19a1a'
           }
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
 
       expect(response.searchList.length).toEqual(2)
@@ -195,7 +194,7 @@ describe('Advanced search resolvers', () => {
               searchId: '62b99cd234vs4700cc19a1a'
             }
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         "Something went wrong on user management service. Couldn't unbookmarked advanced search."

@@ -1,19 +1,22 @@
-FROM node:fermium-alpine
-WORKDIR /usr/src/app
+FROM node:gallium-alpine
+WORKDIR /app
 
 ## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
-RUN chmod +x /wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /app/wait
+RUN chmod +x /app/wait
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Install npm dependencies first (so they may be cached if dependencies don't change)
-COPY package.json package.json
-COPY packages/migration packages/migration
-COPY yarn.lock yarn.lock
-RUN yarn install --production
+COPY . .
 
-WORKDIR /usr/src/app/packages/migration
+RUN rm -rf /app/packages/*
 
-CMD /wait && yarn start:prod
+COPY packages/migration /app/packages/migration
+
+RUN yarn install
+RUN yarn build
+
+WORKDIR /app/packages/migration
+
+CMD /app/wait && yarn start:prod

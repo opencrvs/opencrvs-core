@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@gateway/common-types'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
@@ -32,6 +31,14 @@ interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -42,10 +49,11 @@ export interface IUserModelData {
   }[]
   scope?: string[]
   email: string
-  mobile: string
+  emailForNotification?: string
+  mobile?: string
   status: string
-  role: string
-  type: string
+  systemRole: string
+  role: IUserRole
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -79,11 +87,15 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'identifiers'
+    | 'role'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
+  systemRole: string
+  status?: string
+  username?: string
+  password?: string
   role: string
-  type: string
   signature?: GQLSignatureInput
 }
 
@@ -91,7 +103,7 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -161,20 +173,24 @@ export const userTypeResolvers: GQLResolver = {
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]
     },
-    async primaryOffice(userModel: IUserModelData, _, authHeader) {
-      return await fetchFHIR(
-        `/Location/${userModel.primaryOfficeId}`,
-        authHeader
-      )
+    email(userModel: IUserModelData) {
+      return userModel.emailForNotification
     },
-    async catchmentArea(userModel: IUserModelData, _, authHeader) {
+    async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
+      return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
+    },
+    async catchmentArea(userModel: IUserModelData, _, { dataSources }) {
       return await Promise.all(
         userModel.catchmentAreaIds.map((areaId: string) => {
-          return fetchFHIR(`/Location/${areaId}`, authHeader)
+          return dataSources.locationsAPI.getLocation(areaId)
         })
       )
     },
-    async localRegistrar(userModel: IUserModelData, _, authHeader) {
+    async localRegistrar(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader }
+    ) {
       const scope = userModel.scope
 
       if (!scope) {
@@ -185,7 +201,7 @@ export const userTypeResolvers: GQLResolver = {
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${userModel.practitionerId}`,
-            practitionerRole: userModel.role
+            practitionerRole: userModel.systemRole
           }
 
       if (!practitionerId) {
@@ -204,7 +220,7 @@ export const userTypeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
       const signature =
-        userModel.role === 'FIELD_AGENT'
+        userModel.systemRole === 'FIELD_AGENT'
           ? null
           : signatureExtension && signatureExtension.valueSignature
 
@@ -217,7 +233,7 @@ export const userTypeResolvers: GQLResolver = {
         }
       }
     },
-    async signature(userModel: IUserModelData, _, authHeader) {
+    async signature(userModel: IUserModelData, _, { headers: authHeader }) {
       const practitioner: fhir.Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader
@@ -232,6 +248,18 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    }
+  },
+
+  Avatar: {
+    data(avatar: IAvatar, _, { dataSources }) {
+      if (avatar.data) {
+        const staticData = dataSources.minioAPI.getStaticData(avatar.data)
+        return staticData.then((data) => {
+          return data.presignedURL
+        })
+      }
+      return null
     }
   }
 }

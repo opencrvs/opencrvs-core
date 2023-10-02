@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const testFhirBundle = {
   resourceType: 'Bundle',
@@ -95,6 +94,23 @@ export const testFhirBundle = {
                 reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
               }
             ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'informant-details'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7'
+              }
+            ]
           }
         ]
       }
@@ -165,7 +181,8 @@ export const testFhirBundle = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -189,6 +206,16 @@ export const testFhirBundle = {
           }
         ],
         gender: 'male'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7',
+      resource: {
+        resourceType: 'RelatedPerson',
+        active: true,
+        patient: {
+          reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
+        }
       }
     }
   ]
@@ -281,6 +308,23 @@ export const testFhirBundleWithIds = {
                 reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
               }
             ]
+          },
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221'
+              }
+            ]
           }
         ]
       }
@@ -368,6 +412,21 @@ export const testFhirBundleWithIds = {
         ],
         gender: 'male'
       }
+    },
+    {
+      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221',
+      resource: {
+        id: '555',
+        resourceType: 'DocumentReference',
+        content: [
+          {
+            attachment: {
+              contentType: 'application/pdf',
+              data: '/ocrvs/1a1af870-3e2a-4ec6-a879-085c4ad033ce.pdf'
+            }
+          }
+        ]
+      }
     }
   ]
 }
@@ -440,6 +499,23 @@ export const testFhirBundleWithIdsForDeath = {
             entry: [
               {
                 reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc'
+              }
+            ]
+          },
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221'
               }
             ]
           }
@@ -524,7 +600,8 @@ export const testFhirBundleWithIdsForDeath = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -532,6 +609,21 @@ export const testFhirBundleWithIdsForDeath = {
           {
             system: 'phone',
             value: '+8801622688231'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221',
+      resource: {
+        id: '555',
+        resourceType: 'DocumentReference',
+        content: [
+          {
+            attachment: {
+              contentType: 'application/pdf',
+              data: '/ocrvs/1a1af870-3e2a-4ec6-a879-085c4ad033ce.pdf'
+            }
           }
         ]
       }
@@ -609,7 +701,7 @@ export const testDeathFhirTaskBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'death-registration'
+              code: 'DEATH'
             }
           ]
         },
@@ -647,6 +739,10 @@ export const taskResouceMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: { reference: 'DUMMY' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   note: [
@@ -872,6 +968,65 @@ export const officeMock = JSON.stringify({
   }
 })
 
+export const informantSMSNotificationMock = [
+  {
+    _id: '63a30240ee4b270dc91f53d0',
+    name: 'birthInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d1',
+    name: 'birthDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d2',
+    name: 'birthRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d3',
+    name: 'birthRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d4',
+    name: 'deathInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d5',
+    name: 'deathDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d6',
+    name: 'deathRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d7',
+    name: 'deathRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  }
+]
+
 export const compositionMock = JSON.stringify({
   identifier: {
     system: 'urn:ietf:rfc:3986',
@@ -1058,7 +1213,14 @@ export const motherMock = JSON.stringify({
   identifier: [
     {
       id: '12341234123412341',
-      type: 'NATIONAL_ID'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'NATIONAL_ID'
+          }
+        ]
+      }
     }
   ],
   name: [
@@ -1522,6 +1684,145 @@ export const testDeathFhirBundle = {
   meta: { lastUpdated: '2019-02-11' }
 }
 
+export const testMarriageFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: `urn:uuid:888`,
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '0ab5e4cd-a49b-4bf3-b03a-08b2e65e642a'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'marriage-declaration'
+            }
+          ],
+          text: 'Marriage Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        subject: {},
+        date: '2018-05-23T14:44:58+02:00',
+        author: [],
+        title: 'Marriage Declaration',
+        section: [
+          {
+            title: 'Groom details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'groom-details'
+                }
+              ],
+              text: 'Groom details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+              }
+            ]
+          },
+          {
+            title: 'Bride details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'bride-details'
+                }
+              ],
+              text: 'Bride details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        intent: '',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'marriage-registration'
+            }
+          ]
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/paper-form-id',
+            value: '12345678'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/marriage-tracking-id',
+            value: 'MYEHHN3'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            given: ['Jane'],
+            family: ['Doe']
+          }
+        ],
+        gender: 'female',
+        telecom: [
+          {
+            system: 'phone',
+            value: '+8801622688231'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            given: ['Jack'],
+            family: ['Doe']
+          }
+        ],
+        gender: 'male'
+      }
+    }
+  ]
+}
+
 export const testInProgressFhirBundle = {
   resourceType: 'Bundle',
   type: 'document',
@@ -1688,6 +1989,10 @@ export const deathTaskMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
@@ -1818,27 +2123,62 @@ export const mockFormDraft = [
   }
 ]
 const drnIdentifier = {
-  type: 'DEATH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'DEATH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022DSNEYUG'
 } as fhir.CodeableConcept
 
 const nidIdentifier = {
   value: '654654666',
-  type: 'NATIONAL_ID'
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'NATIONAL_ID'
+      }
+    ]
+  }
 } as fhir.CodeableConcept
 
 const brnIdentifier = {
-  type: 'BIRTH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022BSNEYUG'
 } as fhir.CodeableConcept
 
-const mosipUinIdentifier = {
-  type: 'MOSIP_UINTOKEN',
+const mosipPsutTokenIdentifier = {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'MOSIP_PSUT_TOKEN_ID'
+      }
+    ]
+  },
   value: '257803821990055124230310596669133515'
 } as fhir.CodeableConcept
 
 const birthPatientIdentifier = {
-  type: 'BIRTH_PATIENT_ENTRY',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_PATIENT_ENTRY'
+      }
+    ]
+  },
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
 } as fhir.CodeableConcept
 
@@ -1890,7 +2230,7 @@ export const mosipBirthPatientMock = {
   gender: 'male',
   birthDate: '1990-09-01',
   multipleBirthInteger: 1,
-  identifier: [brnIdentifier, mosipUinIdentifier]
+  identifier: [brnIdentifier, mosipPsutTokenIdentifier]
 }
 
 export const mosipBirthPatientBundleMock = JSON.stringify({
@@ -1933,5 +2273,5 @@ export const mosipSuccessMock = JSON.stringify({
   }
 })
 export const mosipConfigMock = JSON.stringify([
-  { status: 'active', name: 'MOSIP' }
+  { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
 ])

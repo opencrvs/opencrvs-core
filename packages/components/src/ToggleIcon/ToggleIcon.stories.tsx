@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
@@ -35,7 +34,7 @@ const Template: ComponentStory<typeof ToggleIcon> = () => {
       onClick={() => setSelected(!selected)}
       name={'Star'}
       color={selected ? 'yellow' : 'blue'}
-      fill={'yellow'}
+      weight={'fill'}
     />
   )
 }

@@ -6,30 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as queryString from 'querystring'
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { IUserDetails } from '@client/utils/userUtils'
+import { SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from './userUtils'
 
-export enum Roles {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
-}
-export interface IURLParams {
-  [key: string]: string | string[] | undefined
-}
 export type Scope = string[]
+
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -42,12 +30,8 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
 }
 
 export function getToken(): string {
-  return (
-    (queryString.parse(window.location.search.replace(/^\?/, ''))
-      .token as string) ||
-    localStorage.getItem('opencrvs') ||
-    ''
-  )
+  const params = new URLSearchParams(window.location.search)
+  return params.get('token') || localStorage.getItem('opencrvs') || ''
 }
 
 export function storeToken(token: string) {
@@ -93,10 +77,10 @@ export function isTokenAboutToExpire(token: string) {
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
 }
 
-export function refreshToken() {
+export async function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    const res = await fetch(`${window.config.AUTH_URL}/refreshToken`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -105,12 +89,16 @@ export function refreshToken() {
         token
       })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        removeToken()
-        storeToken(data.token)
-      })
+
+    if (!res.ok) {
+      return false
+    } else {
+      const data = await res.json()
+      removeToken()
+      storeToken(data.token)
+    }
   }
+  return true
 }
 
 export const enum AuthScope {
@@ -145,10 +133,10 @@ export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
 }
 
 export const hasAccessToRoute = (
-  roles: Roles[],
-  userDetails: IUserDetails
+  roles: SystemRoleType[],
+  userDetails: UserDetails
 ): boolean => {
-  const userRole = userDetails.role as Roles
+  const userRole = userDetails.systemRole
   if (roles.includes(userRole)) {
     return true
   }

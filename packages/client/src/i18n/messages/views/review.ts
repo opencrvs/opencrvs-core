@@ -6,50 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IReviewMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  additionalComments: MessageDescriptor
-  backToPreview: MessageDescriptor
-  editDeclarationConfirmationTitle: MessageDescriptor
-  editDeclarationConfirmation: MessageDescriptor
-  editDocuments: MessageDescriptor
-  headerSubjectWithName: MessageDescriptor
-  headerSubjectWithoutName: MessageDescriptor
-  previewName: MessageDescriptor
-  previewTitle: MessageDescriptor
-  registerActionDescription: MessageDescriptor
-  registerActionDescriptionComplete: MessageDescriptor
-  registerActionDescriptionIncomplete: MessageDescriptor
-  registerActionTitle: MessageDescriptor
-  registerConfirmationTitle: MessageDescriptor
-  approvalActionDescriptionComplete: MessageDescriptor
-  approvalActionDescriptionIncomplete: MessageDescriptor
-  approvalActionTitle: MessageDescriptor
-  reviewActionDescriptionComplete: MessageDescriptor
-  reviewActionDescriptionIncomplete: MessageDescriptor
-  reviewActionTitle: MessageDescriptor
-  reviewName: MessageDescriptor
-  reviewTitle: MessageDescriptor
-  submitConfirmationDesc: MessageDescriptor
-  submitConfirmationTitle: MessageDescriptor
-  validateConfirmationDesc: MessageDescriptor
-  validateConfirmationTitle: MessageDescriptor
-  valueApprove: MessageDescriptor
-  zeroDocumentsText: MessageDescriptor
-  zeroDocumentsTextForAnySection: MessageDescriptor
-  validateCompleteDeclarationActionTitle: MessageDescriptor
-  validateCompleteDeclarationActionDescription: MessageDescriptor
-  validateDeclarationActionModalTitle: MessageDescriptor
-  validateDeclarationActionModalDescription: MessageDescriptor
-  govtName: MessageDescriptor
-}
-
-const messagesToDefine: IReviewMessages = {
+const messagesToDefine = {
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Button to hide section',
+    id: 'form.field.hideLabel'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Button to show section',
+    id: 'form.field.showLabel'
+  },
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
@@ -67,6 +38,60 @@ const messagesToDefine: IReviewMessages = {
     id: 'validate.declaration.action.modal.description',
     defaultMessage:
       'This declaration will be sent to the registrar for them to register'
+  },
+  informantsSignature: {
+    defaultMessage: 'Signature of informant',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.informantsSignature'
+  },
+  brideSignature: {
+    defaultMessage: 'Signature of Bride',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.brideSignature'
+  },
+  groomSignature: {
+    defaultMessage: 'Signature of Groom',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.groomSignature'
+  },
+  witnessOneSignature: {
+    defaultMessage: 'Signature of Witness 1',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.witnessOneSignature'
+  },
+  witnessTwoSignature: {
+    defaultMessage: 'Signature of Witness 2',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.witnessTwoSignature'
+  },
+
+  terms: {
+    defaultMessage:
+      'We, the undersigned declare under penalty of perjury under the laws of Farajaland that the forgoing information is true and correct to the best of our knowledge and belief. We further declare that no legal objections to the marriage is known and hereby apply for a certificate of marriage',
+    description: 'Label for signature terms',
+    id: 'review.inputs.terms'
+  },
+  signatureDescription: {
+    defaultMessage:
+      'I, the undersigned, hereby declare that the particulars in this form are true and correct to the best of my knowledge.',
+    description: 'Label awknowledging the correctness of the declaration',
+    id: 'review.signature.description'
+  },
+  signatureInputDescription: {
+    defaultMessage:
+      'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.',
+    description: 'Description awknowledging the correctness of the declaration',
+    id: 'review.signature.input.description'
+  },
+  signatureOpenSignatureInput: {
+    defaultMessage: 'Sign',
+    description: 'Label for button that opens the signature input',
+    id: 'review.signature.open'
+  },
+  signatureDelete: {
+    defaultMessage: 'Delete',
+    description: 'Label for button that deletes signature',
+    id: 'review.signature.delete'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
@@ -95,14 +120,14 @@ const messagesToDefine: IReviewMessages = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {birth} death {death} other {birth}} declaration',
+      '{name} {eventType, select, birth {Birth} death {Death} other {Marriage} } declaration',
     description:
       'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'
   },
   headerSubjectWithoutName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death}} Declaration',
+      '{eventType, select, birth {Birth} death {Death} other {Marriage}} declaration',
     description: 'Header subject that shows which declaration type to review',
     id: 'review.header.subject.subjectWithoutName'
   },
@@ -160,14 +185,14 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
+      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an {deliveryMethod} with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
       'Description for review action component when complete declaration',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an SMS with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
+      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an {deliveryMethod} with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
     description:
       'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'
@@ -200,6 +225,11 @@ const messagesToDefine: IReviewMessages = {
     description: 'Submit title text on modal',
     id: 'review.modal.title.submitConfirmation'
   },
+  supportingDocuments: {
+    defaultMessage: 'Supporting documents',
+    description: 'Section heading title for supporting documents',
+    id: 'review.inputs.supportingDocuments'
+  },
   validateConfirmationDesc: {
     defaultMessage:
       'This declaration will be sent to the registrar for them to approve.',
@@ -231,7 +261,12 @@ const messagesToDefine: IReviewMessages = {
     id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
+  },
+  clear: {
+    defaultMessage: 'Clear',
+    description: 'Label for button that clear signature input',
+    id: 'review.signature.clear'
   }
 }
 
-export const messages: IReviewMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)

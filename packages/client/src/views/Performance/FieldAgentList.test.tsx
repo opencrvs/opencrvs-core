@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AppStore } from '@client/store'
 import {
@@ -42,7 +41,8 @@ describe('Field agent list tests', () => {
         search: {
           locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
           timeEnd: new Date(1487076708000).toISOString(),
-          timeStart: new Date(1455454308000).toISOString()
+          timeStart: new Date(1455454308000).toISOString(),
+          event: 'birth'
         }
       }
     )
@@ -68,7 +68,7 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '1',
                   fullName: 'Sakib Al Hasan',
-                  type: 'HA',
+                  role: 'HA',
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1488076708000',
@@ -80,7 +80,7 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '2',
                   fullName: 'Naeem Hossain',
-                  type: 'HA',
+                  role: 'HA',
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1487076708000',

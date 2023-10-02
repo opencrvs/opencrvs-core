@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { logger } from '@notification/logger'
 import { notifyCountryConfig } from '@notification/features/sms/service'
@@ -19,7 +18,22 @@ describe('.sendSMS()', () => {
   it('should check it the message has been initiated or not', async () => {
     const logSpy = jest.spyOn(logger, 'info')
     fetch.once('Success')
-    await expect(notifyCountryConfig('+27845555555', 'test', 'Bearer token...'))
+    await expect(
+      notifyCountryConfig(
+        {
+          email: 'templateName',
+          sms: 'templateName'
+        },
+        {
+          email: 'email@mail.com',
+          sms: '27845555555'
+        },
+        'informant',
+        { test: 'test' },
+        'Bearer token...',
+        'en'
+      )
+    )
     expect(logSpy).toBeCalledTimes(2)
   })
 
@@ -27,7 +41,20 @@ describe('.sendSMS()', () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockRejectOnce(new Error('something broke :('))
     await expect(
-      notifyCountryConfig('+27845555555', 'test', 'Bearer token...')
+      notifyCountryConfig(
+        {
+          email: 'templateName',
+          sms: 'templateName'
+        },
+        {
+          email: 'email@mail.com',
+          sms: '27845555555'
+        },
+        'informant',
+        { test: 'test' },
+        'Bearer token...',
+        'en'
+      )
     ).rejects.toThrow()
     expect(logSpy).toHaveBeenLastCalledWith(new Error('something broke :('))
   })

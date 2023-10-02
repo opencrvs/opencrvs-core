@@ -6,12 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
-import { updatePatientRegistrationNumberHandler } from '@workflow/features/legacy/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -50,16 +48,6 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Register event based on tracking id and registration number.'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateLegacyRegistrationNumbers',
-      handler: updatePatientRegistrationNumberHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Updates existing patient identifier with registration number'
       }
     },
     {

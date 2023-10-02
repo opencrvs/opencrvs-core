@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import {
@@ -16,12 +15,8 @@ import {
   IRegistrationPayload,
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
-import {
-  buildAndSendSMS,
-  getTranslations
-} from '@notification/features/sms/utils'
+import { sendNotification } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
 
 export async function sendDeathInProgressConfirmation(
@@ -34,19 +29,18 @@ export async function sendDeathInProgressConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathInProgressNotification,
+  const templateName = messageKeys.deathInProgressNotification
+  await sendNotification(
+    request,
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
-    },
-    getDefaultLanguage()
+      crvsOffice: payload.crvsOffice,
+      informantName: payload.informantName
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -60,19 +54,19 @@ export async function sendDeathDeclarationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathDeclarationNotification,
+  const templateName = messageKeys.deathDeclarationNotification
+  await sendNotification(
+    request,
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
-      trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
+      trackingId: payload.trackingId,
+      crvsOffice: payload.crvsOffice,
+      informantName: payload.informantName
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -86,20 +80,20 @@ export async function sendDeathRegistrationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathRegistrationNotification,
+  const templateName = messageKeys.deathRegistrationNotification
+  await sendNotification(
+    request,
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
-    },
-    getDefaultLanguage()
+      registrationNumber: payload.registrationNumber,
+      crvsOffice: payload.crvsOffice
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -113,18 +107,18 @@ export async function sendDeathRejectionConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathRejectionNotification,
+  const templateName = messageKeys.deathRejectionNotification
+  await sendNotification(
+    request,
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
-      trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
+      informantName: payload.informantName,
+      trackingId: payload.trackingId,
+      crvsOffice: payload.crvsOffice
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }

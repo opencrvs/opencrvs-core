@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -49,7 +48,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -65,7 +64,8 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import register from '@client/registerServiceWorker'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -153,6 +153,10 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  },
+  ISSUED: {
+    labelDescriptor: statusMessages.issued,
+    color: colors.blue
   }
 }
 
@@ -218,6 +222,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
+  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
@@ -496,23 +501,22 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           let starterPractitionerName = ''
           let starterPractitionerRole = ''
 
+          const user = eventProgress.startedBy
+          starterPractitionerName =
+            (user &&
+              user.name &&
+              ((createNamesMap(user.name as GQLHumanName[])[
+                intl.locale
+              ] as string) ||
+                (createNamesMap(user.name as GQLHumanName[])[
+                  LANG_EN
+                ] as string))) ||
+            eventProgress.startedByFacility ||
+            ''
           if (eventProgress.startedBy != null) {
             const user = eventProgress.startedBy
-            starterPractitionerName =
-              (user &&
-                user.name &&
-                ((createNamesMap(user.name as GQLHumanName[])[
-                  intl.locale
-                ] as string) ||
-                  (createNamesMap(user.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string))) ||
-              eventProgress.startedByFacility ||
-              ''
             starterPractitionerRole =
-              (user.role &&
-                intl.formatMessage(userMessages[user.role as string])) ||
-              ''
+              (user.role && getUserRole(language, user.role)) || ''
           }
 
           const event =

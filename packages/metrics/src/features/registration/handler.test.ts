@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { createServer } from '@metrics/server'
@@ -1315,7 +1314,7 @@ describe('When an existing declaration is marked certified', () => {
     })
   })
   describe('a birth declaration', () => {
-    it('writes the payment total to influxdb', async () => {
+    it('writes the declaration_event_duration to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-certified-request.json')
       const res = await server.server.inject({
@@ -1327,13 +1326,14 @@ describe('When an existing declaration is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const declarationEventPoint =
+      const declarationEventDurationPoint =
         influxClient.writePoints.mock.calls[1][0].find(
-          ({ measurement }: { measurement: string }) =>
-            measurement === 'payment'
+          ({ measurement }: { measurement: string }) => {
+            return measurement === 'declaration_event_duration'
+          }
         )
 
-      expect(declarationEventPoint).toMatchSnapshot()
+      expect(declarationEventDurationPoint).toMatchSnapshot()
     })
   })
 })

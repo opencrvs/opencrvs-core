@@ -6,16 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import User, { IUser } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import User, { IUser, UserRole } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
+import { Types } from 'mongoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -41,7 +40,8 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  role: 'LOCAL_REGISTRAR',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -79,7 +79,7 @@ describe('createUser handler', () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        JSON.stringify({ id: '321', partOf: { reference: 'Location/22' } }),
         { status: 200 }
       ],
       [
@@ -98,9 +98,24 @@ describe('createUser handler', () => {
       ['', { status: 200 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'save')
+    mockingoose(UserRole).toReturn(
+      {
+        _id: '6348acd2e1a47ca32e79f46f',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de terrain'
+          }
+        ],
+        createdAt: '1685959052687',
+        updatedAt: '1685959052687'
+      },
+      'findOne'
+    )
 
     const res = await server.server.inject({
       method: 'POST',
@@ -117,8 +132,8 @@ describe('createUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'FIELD_AGENT',
-        type: 'HEALTHCARE_WORKER',
+        systemRole: 'FIELD_AGENT',
+        role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -155,14 +170,13 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'HEALTHCARE_WORKER'
+              code: '[{"lang":"en","label":"Field Agent"},{"lang":"fr","label":"Agent de terrain"}]'
             }
           ]
         }
       ],
       location: [
         { reference: 'Location/321' },
-        { reference: 'Location/11' },
         { reference: 'Location/22' },
         { reference: 'Location/33' },
         { reference: 'Location/44' }
@@ -255,18 +269,12 @@ describe('createUser handler', () => {
   it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 202 }],
+      ['', { status: 202 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(
-      { username: 'jw.doe', count: 1 },
-      'findOne'
-    )
-    mockingoose(UsernameRecord).toReturn(
-      new Error('Failed to update'),
-      'update'
-    )
-
+    mockingoose(User).toReturn(new Error(), 'findOne')
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',

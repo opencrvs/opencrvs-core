@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AxiosError } from 'axios'
 import { RouterAction, push, goBack as back } from 'connected-react-router'
@@ -16,7 +15,8 @@ import {
   IApplicationConfig,
   IAuthenticateResponse,
   IAuthenticationData,
-  ITokenResponse
+  ITokenResponse,
+  NotificationEvent
 } from '@login/utils/authApi'
 import {
   PHONE_NUMBER_VERIFICATION,
@@ -40,11 +40,16 @@ export const VERIFY_CODE = 'login/VERIFY_CODE'
 export const VERIFY_CODE_COMPLETED = 'login/VERIFY_CODE_COMPLETED'
 export const VERIFY_CODE_FAILED = 'login/VERIFY_CODE_FAILED'
 
-export const RESEND_SMS = 'login/RESEND_SMS'
-export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
-export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
+export const RESEND_AUTHENTICATION_CODE = 'login/RESEND_AUTHENTICATION_CODE'
+export const RESEND_AUTHENTICATION_CODE_COMPLETED =
+  'login/RESEND_AUTHENTICATION_CODE_COMPLETED'
+export const RESEND_AUTHENTICATION_CODE_FAILED =
+  'login/RESEND_AUTHENTICATION_CODE_FAILED'
 export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
+export const AUTHENTICATE_RESET = 'login/AUTHENTICATE_RESET'
 export const GOTO_APP = 'login/GOTO_APP'
+
+export const CLIENT_REDIRECT_ROUTE = 'login/CLIENT_REDIRECT_ROUTE'
 
 export enum FORGOTTEN_ITEMS {
   USERNAME = 'username',
@@ -74,6 +79,10 @@ export type AuthenticationFieldValidationAction = {
   payload: number
 }
 
+export type AuthenticationResetAction = {
+  type: typeof AUTHENTICATE_RESET
+}
+
 export type AuthenticateResponseAction = {
   type: typeof AUTHENTICATION_COMPLETED
   payload: IAuthenticateResponse
@@ -84,18 +93,24 @@ export type AuthenticationFailedAction = {
   payload: AxiosError
 }
 
-export type ResendSMSAction = {
-  type: typeof RESEND_SMS
+export type ResendAuthenticationCodeAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE
+  payload: NotificationEvent
 }
 
-export type ResendSMSCompleteAction = {
-  type: typeof RESEND_SMS_COMPLETED
+export type ResendAuthenticationCodeCompleteAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE_COMPLETED
   payload: IAuthenticateResponse
 }
 
-export type ResendSMSFailedAction = {
-  type: typeof RESEND_SMS_FAILED
+export type ResendAuthenticationCodeFailedAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE_FAILED
   payload: Error
+}
+
+export type StoreClientRedirectRouteAction = {
+  type: typeof CLIENT_REDIRECT_ROUTE
+  payload: { url: string }
 }
 
 export type VerifyCodeAction = {
@@ -126,19 +141,26 @@ export type Action =
   | AuthenticationDataAction
   | AuthenticateResponseAction
   | AuthenticationFailedAction
-  | ResendSMSAction
-  | ResendSMSCompleteAction
-  | ResendSMSFailedAction
+  | ResendAuthenticationCodeAction
+  | ResendAuthenticationCodeCompleteAction
+  | ResendAuthenticationCodeFailedAction
   | VerifyCodeAction
   | VerifyCodeCompleteAction
   | VerifyCodeFailedAction
   | GoToAppAction
   | AuthenticationFieldValidationAction
+  | AuthenticationResetAction
+  | StoreClientRedirectRouteAction
 
 export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
   type: CONFIG_LOAD
 })
 
+export const resetSubmissionError = (): AuthenticationResetAction => {
+  return {
+    type: AUTHENTICATE_RESET
+  }
+}
 export const applicationConfigLoadedAction = (
   response: IApplicationConfigResponse
 ): ApplicationConfigLoaded => ({
@@ -187,25 +209,40 @@ export const failAuthentication = (
   payload: error
 })
 
-export const resendSMS = (): ResendSMSAction => ({
-  type: RESEND_SMS
+export const resendAuthenticationCode = (
+  notificationEvent: NotificationEvent
+): ResendAuthenticationCodeAction => ({
+  type: RESEND_AUTHENTICATION_CODE,
+  payload: notificationEvent
 })
 
 export interface IVerifyCodeNumbers {
   code: string
 }
 
-export const completeSMSResend = (
+export const completeAuthenticationCodeResend = (
   response: IAuthenticateResponse
-): ResendSMSCompleteAction => ({
-  type: RESEND_SMS_COMPLETED,
+): ResendAuthenticationCodeCompleteAction => ({
+  type: RESEND_AUTHENTICATION_CODE_COMPLETED,
   payload: response
 })
 
-export const failSMSResend = (error: AxiosError): ResendSMSFailedAction => ({
-  type: RESEND_SMS_FAILED,
+export const failAuthenticationCodeResend = (
+  error: AxiosError
+): ResendAuthenticationCodeFailedAction => ({
+  type: RESEND_AUTHENTICATION_CODE_FAILED,
   payload: error
 })
+
+export const storeClientRedirectRoute = (
+  redirectUrlRoute: string
+): StoreClientRedirectRouteAction => {
+  const url = redirectUrlRoute
+  return {
+    type: CLIENT_REDIRECT_ROUTE,
+    payload: { url }
+  }
+}
 
 export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')
@@ -241,12 +278,14 @@ export function goToPhoneNumberVerificationForm(forgottenItem: string) {
 }
 export function goToRecoveryCodeEntryForm(
   nonce: string,
-  mobile: string,
-  forgottenItem: string
+  forgottenItem: string,
+  mobile?: string,
+  email?: string
 ) {
   return push(RECOVERY_CODE_ENTRY, {
     nonce,
     mobile,
+    email,
     forgottenItem
   })
 }

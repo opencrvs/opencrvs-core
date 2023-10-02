@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import {
   collectBirthCertificateFormSection,
-  collectDeathCertificateFormSection
+  collectDeathCertificateFormSection,
+  collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Action } from 'redux'
 import { IFormSection } from '@client/forms'
@@ -21,11 +21,13 @@ import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/p
 const initialState: IPrintFormState = {
   collectBirthCertificateForm: collectBirthCertificateFormSection,
   collectDeathCertificateForm: collectDeathCertificateFormSection,
+  collectMarriageCertificateForm: collectMarriageCertificateFormSection,
   paymentForm: paymentFormSection
 }
 export interface IPrintFormState {
   collectBirthCertificateForm: IFormSection
   collectDeathCertificateForm: IFormSection
+  collectMarriageCertificateForm: IFormSection
   paymentForm: IFormSection
 }
 

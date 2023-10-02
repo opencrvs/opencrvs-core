@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -622,7 +621,7 @@ describe('Search type resolvers', () => {
       fetch.resetMocks()
       fetch.mockResponse(
         JSON.stringify({
-          id: 'dummy_user_id'
+          _id: 'dummy_user_id'
         })
       )
       const userModelData =
@@ -638,7 +637,7 @@ describe('Search type resolvers', () => {
           }
         )
       expect(userModelData).toEqual({
-        id: 'dummy_user_id'
+        _id: 'dummy_user_id'
       })
     })
     it('return progress report', async () => {

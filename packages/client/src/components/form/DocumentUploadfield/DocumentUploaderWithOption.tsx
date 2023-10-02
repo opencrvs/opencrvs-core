@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
@@ -273,6 +272,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: previewImage as IFileValue })
   }
 
+  getFormattedLabelForDocType = (docType: string) => {
+    const matchingOptionForDocType =
+      this.props.options &&
+      this.props.options.find((option) => option.value === docType)
+    return matchingOptionForDocType && matchingOptionForDocType.label
+  }
+
   renderDocumentUploaderWithDocumentTypeBlock = () => {
     const { name, intl } = this.props
     return this.props.splitView ? (
@@ -304,6 +310,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}
+          isDisabled={this.state.filesBeingProcessed.length > 0}
         />
 
         <ImageUploader
@@ -347,7 +354,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
-            title={intl.formatMessage(buttonMessages.preview)}
+            title={this.getFormattedLabelForDocType(
+              this.state.previewImage.optionValues[1] as string
+            )}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
           />

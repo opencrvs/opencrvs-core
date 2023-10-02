@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   advancedSearch,
@@ -19,7 +18,7 @@ import { SortOrder } from '@search/features/search/types'
 describe('elasticsearch db helper', () => {
   it('should index a composition with proper configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    advancedSearch(false, {
+    await advancedSearch(false, {
       parameters: {
         trackingId: 'dummy',
         contactNumber: 'dummy',
@@ -192,7 +191,15 @@ describe('elasticsearch params formatter', () => {
                     'deceasedFirstNames',
                     'deceasedFamilyName',
                     'spouseFirstNames',
-                    'spouseFamilyName'
+                    'spouseFamilyName',
+                    'brideFirstNames',
+                    'brideFamilyName',
+                    'groomFirstNames',
+                    'groomFamilyName',
+                    'witnessOneFirstNames',
+                    'witnessOneFamilyName',
+                    'witnessTwoFirstNames',
+                    'witnessTwoFamilyName'
                   ],
                   fuzziness: 'AUTO'
                 }

@@ -6,19 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
 
-const ROLE = 'role'
+type Payload = {
+  systemRole: string
+  locationId?: string
+}
 
-export async function countUsersByLocationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const role = request.query[ROLE]
-
-  return countUsersByLocation({ role })
+export async function countUsersByLocationHandler(request: Hapi.Request) {
+  const { locationId, systemRole } = request.payload as Payload
+  return countUsersByLocation(systemRole, locationId)
 }

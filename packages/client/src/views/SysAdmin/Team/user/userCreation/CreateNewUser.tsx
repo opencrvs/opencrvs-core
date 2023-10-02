@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormSection,
@@ -19,13 +18,11 @@ import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
-  fetchAndStoreUserData,
-  storeUserFormData,
-  processRoles
+  fetchAndStoreUserData
 } from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
@@ -39,8 +36,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 
 interface IMatchParams {
   userId?: string
@@ -63,13 +60,11 @@ type IUserProps = {
 
 interface IDispatchProps {
   goBack: typeof goBack
-  storeUserFormData: typeof storeUserFormData
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
-  processRoles: typeof processRoles
 }
 
-export type Props = RouteComponentProps<IMatchParams> &
+type Props = RouteComponentProps<IMatchParams> &
   IUserProps &
   IDispatchProps &
   IntlShapeProps
@@ -108,9 +103,10 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
         userId
       })
     }
-    if (this.props.match.params.locationId) {
-      this.props.processRoles(this.props.match.params.locationId)
-    }
+  }
+
+  async componentWillUnmount() {
+    this.props.clearUserFormData()
   }
 
   renderLoadingPage = () => {
@@ -144,19 +140,9 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   }
 
   render() {
-    const {
-      section,
-      submitting,
-      userDetailsStored,
-      loadingRoles,
-      userId,
-      match
-    } = this.props
-    if (
-      submitting ||
-      (userId && !userDetailsStored) ||
-      (match.params.locationId && loadingRoles)
-    ) {
+    const { section, submitting, userDetailsStored, loadingRoles, userId } =
+      this.props
+    if (submitting || loadingRoles || (userId && !userDetailsStored)) {
       return this.renderLoadingPage()
     }
 
@@ -215,7 +201,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
     props.match.params.sectionId || state.userForm.userForm!.sections[0].id
 
-  const section = state.userForm.userForm!.sections.find(
+  const section = state.userForm.userForm.sections.find(
     (section) => section.id === sectionId
   ) as IFormSection
 
@@ -277,8 +263,6 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(mapStateToProps, {
   goBack,
-  storeUserFormData,
   clearUserFormData,
-  fetchAndStoreUserData,
-  processRoles
+  fetchAndStoreUserData
 })(injectIntl(withApollo<Props>(CreateNewUserComponent)))

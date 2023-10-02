@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
@@ -18,16 +17,14 @@ import {
   getUserData,
   IDeclaration,
   SUBMISSION_STATUS,
-  updateWorkqueueData
+  updateWorkqueueData,
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -50,6 +47,7 @@ export interface IQueryData {
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
+  issueTab: GQLEventSearchResultSet
   externalValidationTab: GQLEventSearchResultSet
 }
 
@@ -85,6 +83,7 @@ export const workqueueInitialState: WorkqueueState = {
       rejectTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
       printTab: { totalItems: 0, results: [] },
+      issueTab: { totalItems: 0, results: [] },
       externalValidationTab: { totalItems: 0, results: [] }
     },
     initialSyncDone: false
@@ -96,7 +95,8 @@ export const workqueueInitialState: WorkqueueState = {
     rejectTab: 1,
     approvalTab: 1,
     externalValidationTab: 1,
-    printTab: 1
+    printTab: 1,
+    issueTab: 1
   }
 }
 
@@ -111,6 +111,7 @@ interface IWorkqueuePaginationParams {
   approvalSkip: number
   externalValidationSkip: number
   printSkip: number
+  issueSkip: number
 }
 
 export function updateRegistrarWorkqueue(
@@ -128,7 +129,7 @@ export function updateRegistrarWorkqueue(
   }
 }
 
-export async function getWorkqueueOfCurrentUser(): Promise<string> {
+async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
 
@@ -152,6 +153,7 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   const currentUserWorkqueue: IWorkqueue =
     (currentUserData && currentUserData.workqueue) ||
     workqueueInitialState.workqueue
+
   return JSON.stringify(currentUserWorkqueue)
 }
 
@@ -173,9 +175,7 @@ function mergeWorkQueueData(
     ) {
       return
     }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
+    destinationWorkQueue.data[workQueueId].results?.forEach((declaration) => {
       if (declaration == null) {
         return
       }
@@ -187,7 +187,11 @@ function mergeWorkQueueData(
           currentApplications[declarationIndex].submissionStatus ===
             SUBMISSION_STATUS.FAILED_NETWORK ||
           currentApplications[declarationIndex].submissionStatus ===
-            SUBMISSION_STATUS.FAILED
+            SUBMISSION_STATUS.FAILED ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED
 
         if (!isDownloadFailed) {
           updateWorkqueueData(
@@ -205,7 +209,7 @@ function mergeWorkQueueData(
 
 async function getWorkqueueData(
   state: IStoreState,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ) {
   const registrationLocationId =
@@ -227,7 +231,8 @@ async function getWorkqueueData(
     rejectSkip,
     approvalSkip,
     externalValidationSkip,
-    printSkip
+    printSkip,
+    issueSkip
   } = workqueuePaginationParams
 
   const result = await syncRegistrarWorkqueue(
@@ -242,6 +247,7 @@ async function getWorkqueueData(
     approvalSkip,
     externalValidationSkip,
     printSkip,
+    issueSkip,
     userId
   )
   let workqueue
@@ -284,12 +290,12 @@ async function getWorkqueueData(
   )
 }
 
-export async function writeRegistrarWorkqueueByUser(
+async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {
   const state = getState()
-  const userDetails = getUserDetails(state) as IUserDetails
+  const userDetails = getUserDetails(state) as UserDetails
 
   const workqueue = await getWorkqueueData(
     state,
@@ -331,7 +337,8 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         inProgressTab,
         externalValidationTab,
         rejectTab,
-        notificationTab
+        notificationTab,
+        issueTab
       } = state.pagination
 
       const { pageSize } = action.payload
@@ -345,7 +352,8 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         approvalSkip: Math.max(approvalTab - 1, 0) * pageSize,
         externalValidationSkip:
           Math.max(externalValidationTab - 1, 0) * pageSize,
-        printSkip: Math.max(printTab - 1, 0) * pageSize
+        printSkip: Math.max(printTab - 1, 0) * pageSize,
+        issueSkip: Math.max(issueTab - 1, 0) * pageSize
       }
 
       return loop(

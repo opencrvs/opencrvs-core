@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Location } from '../icons'
+import { Icon } from '../Icon'
 import { PrimaryButton } from '../buttons'
 import { InputError } from '../InputField/InputError'
 
@@ -30,6 +29,7 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   width: 344px;
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
@@ -43,9 +43,9 @@ const Wrapper = styled.div`
 const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   ${({ theme }) => theme.fonts.reg18};
-  padding-left: 36px;
+  padding-left: 32px;
   border: 2px solid
     ${({ theme, error, touched }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -269,14 +269,20 @@ export class LocationSearch extends React.Component<IProps, IState> {
       <>
         <LocationSearchContainer>
           <Wrapper className={this.props.className}>
-            <Location id="locationSearchIcon" />
+            <Icon name="MapPin" size="medium" />
             <SearchTextInput
               id={this.props.id ? this.props.id : 'locationSearchInput'}
               type="text"
               autoComplete="off"
               onFocus={this.onFocus}
               onBlur={this.onBlurHandler}
-              onClick={() => document.addEventListener('click', this.handler)}
+              onClick={() =>
+                //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+                setTimeout(
+                  () => document.addEventListener('click', this.handler),
+                  0
+                )
+              }
               value={this.state.selectedText || ''}
               onChange={this.onChangeHandler}
               error={this.props.error}

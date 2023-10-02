@@ -6,21 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION } from '@client/profile/mutations'
 import {
   RemoveBookmarkedAdvancedSearchMutation,
-  RemoveBookmarkedAdvancedSearchMutationVariables
+  RemoveBookmarkedAdvancedSearchMutationVariables,
+  BookmarkedSeachItem
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { GQLBookmarkedSeachItem } from '@opencrvs/gateway/src/graphql/schema'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -30,7 +29,7 @@ import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/adva
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 interface IRemoveBookmarkModalProps {
   showRemoveBookmarkModal: boolean
@@ -87,7 +86,7 @@ export function RemoveBookmarkAdvancedSearchModal({
         modifyUserDetails({
           ...userDetails,
           searches: mutatedData.data.removeBookmarkedAdvancedSearch
-            .searchList as GQLBookmarkedSeachItem[]
+            .searchList as BookmarkedSeachItem[]
         })
       )
       dispatch(setAdvancedSearchParam({ searchId: EMPTY_STRING, ...rest }))
@@ -112,6 +111,7 @@ export function RemoveBookmarkAdvancedSearchModal({
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button
+            key="remove-advanced-search-bookmark"
             type="primary"
             id="remove_advanced_search_bookmark"
             onClick={async () => {

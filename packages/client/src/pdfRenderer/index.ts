@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { commonVFS } from '@client/pdfRenderer/common_vfs'
@@ -19,9 +18,9 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IOfflineData } from '@client/offline/reducer'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 /*
   Converts template definition into actual PDF using defined transformers, declarationData and userDetails
@@ -29,7 +28,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 export function createPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData
@@ -75,7 +74,7 @@ export function createPDF(
 export function createSVG(
   template: ISVGTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData
@@ -114,7 +113,7 @@ export function createSVG(
 export function printPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData

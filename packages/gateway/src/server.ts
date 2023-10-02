@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -32,6 +31,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
 import { logger } from '@gateway/logger'
+import { badRequest, Boom } from '@hapi/boom'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -46,6 +46,19 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: whitelist },
+      validate: {
+        failAction: async (_, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`ValidationError: ${err.message}`)
+            throw badRequest(`Invalid request payload input`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(err.message)
+            throw err
+          }
+        }
+      },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
@@ -93,6 +106,11 @@ export async function createServer() {
     await database.start()
     await apolloServer.applyMiddleware({
       app,
+      route: {
+        auth: {
+          mode: 'try'
+        }
+      },
       cors: {
         origin: whitelist
       }

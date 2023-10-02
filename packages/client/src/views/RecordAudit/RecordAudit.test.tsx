@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -19,6 +18,7 @@ import {
   getItem,
   flushPromises,
   mockDeathDeclarationData,
+  mockMarriageDeclarationData,
   userDetails
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
@@ -57,14 +57,15 @@ declaration.data.registration = {
   }
 }
 
-// @ts-ignore
 declaration.data.history = [
+  // @ts-ignore
   {
     date: new Date().toString(),
     regStatus: 'STARTED',
     user: {
       id: userDetails.userMgntUserID,
       name: userDetails.name,
+      systemRole: userDetails.systemRole,
       role: userDetails.role
     },
     office: userDetails.primaryOffice,
@@ -86,6 +87,7 @@ const workqueue: IWorkqueue = {
     rejectTab: {},
     approvalTab: {},
     printTab: {},
+    issueTab: {},
     externalValidationTab: {}
   },
   initialSyncDone: true
@@ -180,6 +182,55 @@ describe('Record audit summary for a draft death declaration', () => {
     expect(component.exists({ 'data-testid': 'drn-value' })).toBeFalsy()
     expect(
       component.find({ 'data-testid': 'placeOfDeath-value' }).hostNodes()
+    ).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for a draft marriage declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    const marriageDeclaration = createDeclaration(
+      Event.Marriage,
+      mockMarriageDeclarationData
+    )
+
+    store.dispatch(storeDeclaration(marriageDeclaration))
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
+            declarationId: marriageDeclaration.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'inProgressTab',
+              declarationId: marriageDeclaration.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('Record Audit page loads properly', async () => {
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
+  })
+
+  it('Check values for saved declarations', async () => {
+    expect(
+      component.find({ 'data-testid': 'status-value' }).hostNodes().text()
+    ).toBe('Draft')
+    expect(
+      component.find({ 'data-testid': 'type-value' }).hostNodes().text()
+    ).toBe('Marriage')
+    expect(component.exists({ 'data-testid': 'drn-value' })).toBeFalsy()
+    expect(
+      component.find({ 'data-testid': 'placeOfMarriage-value' }).hostNodes()
     ).toHaveLength(1)
   })
 })

@@ -6,27 +6,34 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MINIO_BUCKET } from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
-  attachments: Array<{ data: string }>
+  attachments: Array<{ data?: string; uri?: string }>
 ) {
   for (const file of attachments) {
     const isMinioUrl =
-      file.data.split('/').length > 1 &&
-      file.data.split('/')[1] === MINIO_BUCKET
+      file.uri &&
+      file.uri.split('/').length > 1 &&
+      file.uri.split('/')[1] === MINIO_BUCKET
+
     if (isMinioUrl) {
       continue
     }
+
+    if (!file.data) {
+      throw new Error(`No attachment file found!`)
+    }
+
     const data = file.data.split('base64,')?.[1] || ''
     const mime = file.data.split(';')[0].replace('data:', '')
 
@@ -72,6 +79,20 @@ export function validateDeathDeclarationAttachments(
     details.father?.photo,
     details.deceased?.photo,
     details.spouse?.photo
+  ]
+    .flat()
+    .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+  return validateAttachments(attachments)
+}
+
+export function validateMarriageDeclarationAttachments(
+  details: GQLMarriageRegistrationInput
+) {
+  const attachments = [
+    details.registration?.attachments,
+    details.bride?.photo,
+    details.groom?.photo
   ]
     .flat()
     .filter((x): x is GQLAttachmentInput => x !== undefined)

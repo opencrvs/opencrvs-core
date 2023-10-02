@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   FORGOTTEN_ITEMS,
@@ -15,31 +14,22 @@ import {
   goToSuccessPage
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Content } from '@opencrvs/components/lib/Content'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
-
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.black};
-  margin: 0px;
-`
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-  margin: 13px 64px 27px 0px;
-`
-const Action = styled.div`
-  margin-top: 58px;
-`
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -169,122 +159,168 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
 
     return (
       <>
-        <ActionPageLight
-          title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem
-          })}
-          goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+              desktopTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+            />
+          }
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="password-update-form" onSubmit={this.whatNext}>
-            <Header>
-              {intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
-            </Header>
-            <Instruction>
-              {intl.formatMessage(messages.passwordUpdateFormBodySubheader)}
-            </Instruction>
-            <GlobalError id="GlobalError">
-              {this.state.continuePressed && this.state.passwordMismatched && (
-                <WarningMessage>
-                  {intl.formatMessage(messages.mismatchedPasswordMsg)}
-                </WarningMessage>
+            <Content
+              title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
+              subtitle={intl.formatMessage(
+                messages.passwordUpdateFormBodySubheader
               )}
-              {this.state.continuePressed &&
-                this.state.newPassword.length === 0 && (
-                  <WarningMessage>
-                    {intl.formatMessage(messages.passwordRequiredMsg)}
-                  </WarningMessage>
-                )}
-            </GlobalError>
-            <PasswordContents>
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.newPasswordLabel)}
-                touched={true}
-                required={false}
-                optionalLabel=""
-              >
-                <TextInput
-                  id="NewPassword"
-                  type="password"
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue-button"
+                  onClick={this.whatNext}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.confirmButtonLabel)}
+                </Button>
+              ]}
+            >
+              <GlobalError id="GlobalError">
+                {this.state.continuePressed &&
+                  this.state.passwordMismatched && (
+                    <WarningMessage>
+                      {intl.formatMessage(messages.mismatchedPasswordMsg)}
+                    </WarningMessage>
+                  )}
+                {this.state.continuePressed &&
+                  this.state.newPassword.length === 0 && (
+                    <WarningMessage>
+                      {intl.formatMessage(messages.passwordRequiredMsg)}
+                    </WarningMessage>
+                  )}
+              </GlobalError>
+              <PasswordContents>
+                <InputField
+                  id="newPassword"
+                  label={intl.formatMessage(messages.newPasswordLabel)}
                   touched={true}
-                  value={this.state.newPassword}
-                  onChange={this.checkPasswordStrength}
-                  error={
-                    this.state.continuePressed &&
-                    this.state.newPassword.length === 0
-                  }
-                />
-              </InputField>
-              <ValidationRulesSection>
-                <div>
-                  {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
-                </div>
-                <div>
-                  {this.state.validLength && <TickOn />}
-                  {!this.state.validLength && <TickOff />}
-                  <span>
+                  required={false}
+                  optionalLabel=""
+                >
+                  <TextInput
+                    id="NewPassword"
+                    type="password"
+                    touched={true}
+                    value={this.state.newPassword}
+                    onChange={this.checkPasswordStrength}
+                    error={
+                      this.state.continuePressed &&
+                      this.state.newPassword.length === 0
+                    }
+                  />
+                </InputField>
+                <ValidationRulesSection>
+                  <div>
                     {intl.formatMessage(
-                      messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                      { min: 8 }
+                      messages.passwordUpdateFormValidationMsg
                     )}
-                  </span>
-                </div>
-                <div>
-                  {this.state.hasCases && <TickOn />}
-                  {!this.state.hasCases && <TickOff />}
-                  <span>
-                    {intl.formatMessage(
-                      messages.passwordCaseCharacteristicsForPasswordUpdateForm
-                    )}
-                  </span>
-                </div>
-                <div>
-                  {this.state.hasNumber && <TickOn />}
-                  {!this.state.hasNumber && <TickOff />}
-                  <span>
-                    {intl.formatMessage(
-                      messages.passwordNumberCharacteristicsForPasswordUpdateForm
-                    )}
-                  </span>
-                </div>
-              </ValidationRulesSection>
+                  </div>
+                  <div>
+                    {this.state.validLength && <TickOn />}
+                    {!this.state.validLength && <TickOff />}
+                    <span>
+                      {intl.formatMessage(
+                        messages.passwordLengthCharacteristicsForPasswordUpdateForm,
+                        { min: 8 }
+                      )}
+                    </span>
+                  </div>
+                  <div>
+                    {this.state.hasCases && <TickOn />}
+                    {!this.state.hasCases && <TickOff />}
+                    <span>
+                      {intl.formatMessage(
+                        messages.passwordCaseCharacteristicsForPasswordUpdateForm
+                      )}
+                    </span>
+                  </div>
+                  <div>
+                    {this.state.hasNumber && <TickOn />}
+                    {!this.state.hasNumber && <TickOff />}
+                    <span>
+                      {intl.formatMessage(
+                        messages.passwordNumberCharacteristicsForPasswordUpdateForm
+                      )}
+                    </span>
+                  </div>
+                </ValidationRulesSection>
 
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.confirmPasswordLabel)}
-                touched={true}
-                required={false}
-                optionalLabel=""
-              >
-                <TextInput
-                  id="ConfirmPassword"
-                  type="password"
+                <InputField
+                  id="newPassword"
+                  label={intl.formatMessage(messages.confirmPasswordLabel)}
                   touched={true}
-                  error={
-                    this.state.continuePressed && this.state.passwordMismatched
-                  }
-                  value={this.state.confirmPassword}
-                  onChange={this.matchPassword}
-                />
-              </InputField>
-              {this.state.passwordMismatched && (
-                <PasswordMismatch>
-                  {intl.formatMessage(messages.mismatchedPasswordMsg)}
-                </PasswordMismatch>
-              )}
-              {this.state.passwordMatched && (
-                <PasswordMatch>
-                  {intl.formatMessage(messages.matchedPasswordMsg)}
-                </PasswordMatch>
-              )}
-            </PasswordContents>
-            <Action>
-              <PrimaryButton id="continue-button">
-                {intl.formatMessage(messages.confirmButtonLabel)}
-              </PrimaryButton>
-            </Action>
+                  required={false}
+                  optionalLabel=""
+                >
+                  <TextInput
+                    id="ConfirmPassword"
+                    type="password"
+                    touched={true}
+                    error={
+                      this.state.continuePressed &&
+                      this.state.passwordMismatched
+                    }
+                    value={this.state.confirmPassword}
+                    onChange={this.matchPassword}
+                  />
+                </InputField>
+                {this.state.passwordMismatched && (
+                  <PasswordMismatch>
+                    {intl.formatMessage(messages.mismatchedPasswordMsg)}
+                  </PasswordMismatch>
+                )}
+                {this.state.passwordMatched && (
+                  <PasswordMatch>
+                    {intl.formatMessage(messages.matchedPasswordMsg)}
+                  </PasswordMatch>
+                )}
+              </PasswordContents>
+            </Content>
           </form>
-        </ActionPageLight>
+        </Frame>
       </>
     )
   }

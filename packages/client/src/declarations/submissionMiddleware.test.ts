@@ -6,25 +6,24 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  submissionMiddleware,
-  declarationReadyForStatusChange
-} from './submissionMiddleware'
-import {
-  mockDeclarationData,
-  createTestStore,
-  ACTION_STATUS_MAP
-} from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
-import { SubmissionAction } from '@client/forms'
-import { SUBMISSION_STATUS } from '.'
-import { client } from '@client/utils/apolloClient'
 import { ApolloError } from '@apollo/client'
+import { SubmissionAction } from '@client/forms'
+import {
+  ACTION_STATUS_MAP,
+  createTestStore,
+  mockDeclarationData
+} from '@client/tests/util'
+import { createClient } from '@client/utils/apolloClient'
+import { Event } from '@client/utils/gateway'
 import { GraphQLError } from 'graphql'
-import { vi, SpyInstance } from 'vitest'
+import { SpyInstance, vi } from 'vitest'
+import { SUBMISSION_STATUS } from '.'
+import {
+  declarationReadyForStatusChange,
+  submissionMiddleware
+} from './submissionMiddleware'
 
 describe('Submission middleware', () => {
   const dispatch = vi.fn()
@@ -39,10 +38,12 @@ describe('Submission middleware', () => {
 
   beforeEach(async () => {
     const { store } = await createTestStore()
+    const client = createClient(store)
     getState.mockImplementation(() => store.getState())
     mutateSpy = vi
       .spyOn(client, 'mutate')
-      .mockImplementation(() => Promise.resolve())
+      .mockImplementation(() => Promise.resolve({}))
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
@@ -124,6 +125,31 @@ describe('Submission middleware', () => {
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
+        mockDeclarationData.registration.certificates[0] = {
+          collector: {
+            relationship: 'OTHER',
+            affidavit: {
+              contentType: 'image/jpg',
+              data: 'data:image/png;base64,2324256'
+            },
+            individual: {
+              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+              identifier: [{ id: '123456', type: 'PASSPORT' }]
+            }
+          },
+          hasShowedVerifiedDocument: true,
+          payments: [
+            {
+              paymentId: '1234',
+              type: 'MANUAL',
+              total: 50,
+              amount: 50,
+              outcome: 'COMPLETED',
+              date: '2018-10-22'
+            }
+          ],
+          data: 'data:image/png;base64,2324256'
+        }
         const action = declarationReadyForStatusChange({
           id: 'mockDeclaration',
           data: mockDeclarationData,
@@ -132,9 +158,24 @@ describe('Submission middleware', () => {
           submissionStatus: ACTION_STATUS_MAP[submissionAction]
         })
         await middleware(action)
+        vi.runAllTimers()
         expect(mutateSpy.mock.calls.length).toBe(1)
         expect(dispatch.mock.calls.length).toBe(4)
-        expect(dispatch.mock.calls[3][0].type).toContain('DELETE')
+        if (
+          submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+        ) {
+          expect(
+            dispatch.mock.calls[3][0].payload.declaration.data.registration
+              .certificates
+          ).not.toHaveProperty('data')
+          expect(
+            dispatch.mock.calls[3][0].payload.declaration.data.registration
+              .certificates
+          ).not.toHaveProperty('payments')
+          expect(dispatch.mock.calls[3][0].type).toContain('WRITE_DRAFT')
+        } else {
+          expect(dispatch.mock.calls[3][0].type).toContain('DELETE')
+        }
       })
     })
   })

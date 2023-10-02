@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -19,56 +18,70 @@ export interface INavigationItemProps
   count?: number
   isSelected?: boolean
   expandableIcon?: () => React.ReactNode
-  isSubItem?: boolean
   children?: React.ReactNode
 }
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
+  margin-top: 2px;
   width: 100%;
-  min-height: 40px;
+  height: 34px;
   cursor: pointer;
   border: 0;
   outline: none;
-  background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.white : theme.colors.white};
-  :hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
-  }
-
-  &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${({ theme }) => theme.colors.yellow};
-  }
-`
-const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  padding: 8px 16px 8px 14px;
-  color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey600 : theme.colors.grey500};
-`
-const LabelContainer = styled.span<{
-  isSelected?: boolean
-  isSubItem?: boolean
-}>`
+  border-radius: 4px;
+  padding: 0 8px;
+  background-color: ${({ theme, isSelected }) =>
+    isSelected ? theme.colors.grey200 : theme.colors.white};
   ${({ theme }) => theme.fonts.bold14};
-  margin-left: 13px;
-  margin-right: 4px;
-  text-align: left;
-  color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey600 : theme.colors.grey500};
+  color: ${({ theme, isSelected }) =>
+    isSelected ? theme.colors.copy : theme.colors.grey500};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.grey600};
+  }
+
+  &:active {
+    background-color: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.grey600};
+  }
+  &:focus-visible {
+    ${({ theme }) => theme.fonts.bold14};
+    background-color: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
+    svg {
+      color: ${({ theme }) => theme.colors.grey600};
+    }
+  }
+`
+const ItemContentContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+`
+const LabelContainer = styled.span`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
-const ValueContainer = styled.span<{ isSelected?: boolean }>`
+const ValueContainer = styled.span`
   margin-left: auto;
   ${({ theme }) => theme.fonts.bold12};
-  padding-top: 3px;
-  color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey600 : theme.colors.grey500};
+`
+
+const ExpandContainer = styled.span`
+  display: flex;
+  width: 12px;
+  justify-content: center;
 `
 
 const IconContainer = styled.div`
   width: 24px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
 `
 
 export const NavigationItem = ({
@@ -77,22 +90,20 @@ export const NavigationItem = ({
   count,
   isSelected,
   expandableIcon,
-  isSubItem,
   children,
   ...otherProps
 }: INavigationItemProps) => {
   return (
     <ItemContainer isSelected={isSelected} {...otherProps}>
-      <ItemContentContainer isSelected={isSelected}>
-        {icon && <IconContainer>{icon()}</IconContainer>}
-        <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
-          {label}
-        </LabelContainer>
-        <ValueContainer isSelected={isSelected}>
-          {count && count !== 0 ? count : expandableIcon && expandableIcon()}
-        </ValueContainer>
+      <ItemContentContainer>
+        <IconContainer>{icon && icon()}</IconContainer>
+        <LabelContainer>{label}</LabelContainer>
+        <ValueContainer>{count && count !== 0 ? count : null}</ValueContainer>
+        {expandableIcon && (
+          <ExpandContainer>{expandableIcon()}</ExpandContainer>
+        )}
       </ItemContentContainer>
-      {isSelected && children}
+      {children}
     </ItemContainer>
   )
 }

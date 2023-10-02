@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -22,7 +21,8 @@ import {
   Currency,
   GovtLogo,
   NIDNumPattern,
-  PhoneNumPattern
+  PhoneNumPattern,
+  LoginBackground
 } from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
 import {
   BirthDelayedFee,
@@ -38,6 +38,12 @@ import {
   DeathFeeOnTime,
   DeathRegistrationTarget
 } from '@client/views/SysAdmin/Config/Application/Tabs/DeathProperties'
+import {
+  MarriageDelayedFee,
+  MarriageDelayedRegistrationTarget,
+  MarriageFeeOnTime,
+  MarriageRegistrationTarget
+} from '@client/views/SysAdmin/Config/Application/Tabs/MarriageProperties'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
@@ -50,10 +56,11 @@ const ListGroupTitle = styled.div`
   align-items: center;
 `
 
-export enum TabId {
+enum TabId {
   GENERAL = 'general',
   BIRTH = 'birth',
-  DEATH = 'death'
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 
 export enum GeneralActionId {
@@ -61,7 +68,8 @@ export enum GeneralActionId {
   COUNTRY_LOGO = 'COUNTRY_LOGO',
   NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
   CURRENCY = 'CURRENCY',
-  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN'
+  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN',
+  LOGIN_BACKGROUND = 'LOGIN_BACKGROUND'
 }
 
 export enum BirthActionId {
@@ -80,8 +88,11 @@ export enum DeathActionId {
   DEATH_DELAYED_FEE = 'DEATH_DELAYED_FEE'
 }
 
-interface ISection {
-  title: React.ReactNode
+export enum MarriageActionId {
+  MARRIAGE_REGISTRATION_TARGET = 'MARRIAGE_REGISTRATION_TARGET',
+  MARRIAGE_REGISTRATION_DELAYED_TARGET = 'MARRIAGE_REGISTRATION_DELAYED_TARGET',
+  MARRIAGE_ON_TIME_FEE = 'MARRIAGE_ON_TIME_FEE',
+  MARRIAGE_DELAYED_FEE = 'MARRIAGE_DELAYED_FEE'
 }
 
 function GeneralTabContent() {
@@ -89,6 +100,7 @@ function GeneralTabContent() {
     <ListViewSimplified>
       <ApplicationName />
       <GovtLogo />
+      <LoginBackground />
       <Currency />
       <PhoneNumPattern />
       <NIDNumPattern />
@@ -144,6 +156,29 @@ function DeathTabContent() {
   )
 }
 
+function MarriageTabContent() {
+  const intl = useIntl()
+
+  return (
+    <>
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <MarriageRegistrationTarget />
+        <MarriageDelayedRegistrationTarget />
+      </ListViewSimplified>
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationFeesGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <MarriageFeeOnTime />
+        <MarriageDelayedFee />
+      </ListViewSimplified>
+    </>
+  )
+}
+
 export function ApplicationConfig() {
   const intl = useIntl()
   const [activeTabId, setActiveTabId] = React.useState(TabId.GENERAL)
@@ -160,6 +195,10 @@ export function ApplicationConfig() {
     {
       id: TabId.DEATH,
       title: intl.formatMessage(messages.deathTabTitle)
+    },
+    {
+      id: TabId.MARRIAGE,
+      title: intl.formatMessage(messages.marriageTabTitle)
     }
   ]
 
@@ -182,6 +221,7 @@ export function ApplicationConfig() {
         {activeTabId === TabId.GENERAL && <GeneralTabContent />}
         {activeTabId === TabId.BIRTH && <BirthTabContent />}
         {activeTabId === TabId.DEATH && <DeathTabContent />}
+        {activeTabId === TabId.MARRIAGE && <MarriageTabContent />}
       </Content>
     </SysAdminContentWrapper>
   )

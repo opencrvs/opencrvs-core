@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -16,27 +15,22 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  BirthSection,
-  DeathSection
-} from '@client/forms'
+import { IForm, IFormSection, IFormField } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
+import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
+import { History, RegAction, RegStatus } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
 import {
   getFieldValue,
-  getFormattedDate,
   getStatusLabel,
-  isSystemInitiated
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import {
   CollectorRelationLabelArray,
@@ -44,11 +38,12 @@ import {
   CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { History, RegAction, RegStatus } from '@client/utils/gateway'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -125,7 +120,11 @@ function prepareComments(
       ? currentHistoryItemIndex
       : currentHistoryItemIndex - 1
 
-  if (actionDetailsData.regStatus === RegStatus.Rejected) {
+  if (
+    [RegStatus.Rejected, RegStatus.Archived].includes(
+      actionDetailsData.regStatus as RegStatus
+    )
+  ) {
     return actionDetailsData.statusReason?.text
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
@@ -173,7 +172,7 @@ const getReasonForRequest = (
   }
 }
 
-export const ActionDetailsModalListTable = ({
+const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
   registerForm,
@@ -225,7 +224,11 @@ export const ActionDetailsModalListTable = ({
       label: intl.formatMessage(messages.correctionSummaryOriginal),
       width: 33.33
     },
-    { key: 'edit', label: 'Edit', width: 33.33 }
+    {
+      key: 'edit',
+      label: intl.formatMessage(messages.correctionSummaryCorrection),
+      width: 33.33
+    }
   ]
   const certificateCollectorVerified = [
     {
@@ -234,6 +237,31 @@ export const ActionDetailsModalListTable = ({
       width: 100
     }
   ]
+  const duplicateOfColumn = [
+    {
+      key: 'duplicateOf',
+      label: intl.formatMessage(constantsMessages.duplicateOf),
+      width: 100
+    }
+  ]
+
+  const matchedToColumn = [
+    {
+      key: 'potentialDuplicates',
+      label: intl.formatMessage(constantsMessages.matchedTo),
+      width: 100
+    }
+  ]
+
+  const potentialDuplicatesTransformer = (items: string[]) => {
+    return (
+      <>
+        {items.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </>
+    )
+  }
 
   const getItemName = (
     sectionName: MessageDescriptor,
@@ -263,10 +291,8 @@ export const ActionDetailsModalListTable = ({
         (section) => section.id === item?.valueCode
       ) as IFormSection
 
-      if (
-        section.id === BirthSection.Documents ||
-        section.id === DeathSection.DeathDocuments
-      ) {
+      if (section.id === 'documents') {
+        item.valueString = EMPTY_STRING
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )
@@ -346,9 +372,9 @@ export const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.individual?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.name,
           window.config.LANGUAGES
         )
       : {}
@@ -362,14 +388,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
-          : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
     }
@@ -476,10 +495,32 @@ export const ActionDetailsModalListTable = ({
           />
         )}
 
+      {/* Duplicate of */}
+      {actionDetailsData.duplicateOf && (
+        <Table
+          noResultText=" "
+          columns={duplicateOfColumn}
+          content={[{ duplicateOf: actionDetailsData.duplicateOf }]}
+        />
+      )}
+
       {/* For Comments */}
       {content.length > 0 && (
         <Table noResultText=" " columns={commentsColumn} content={content} />
       )}
+
+      {/* Show Duplicate pill for Archived declarations */}
+      {actionDetailsData.reason === 'duplicate' &&
+        !actionDetailsData.action &&
+        actionDetailsData.regStatus === RegStatus.Archived && (
+          <p>
+            <Pill
+              label={intl.formatMessage(recordAuditMessages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
@@ -519,6 +560,22 @@ export const ActionDetailsModalListTable = ({
           onPageChange={pageChangeHandler}
         />
       )}
+
+      {/* Matched to */}
+      {actionDetailsData.potentialDuplicates &&
+        actionDetailsData.action === RegAction.FlaggedAsPotentialDuplicate && (
+          <Table
+            noResultText=" "
+            columns={matchedToColumn}
+            content={[
+              {
+                potentialDuplicates: potentialDuplicatesTransformer(
+                  actionDetailsData.potentialDuplicates
+                )
+              }
+            ]}
+          />
+        )}
     </>
   )
 }
@@ -540,7 +597,7 @@ export const ActionDetailsModal = ({
   actionDetailsIndex: number
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   goToUser: typeof goToUserProfile
   registerForm: IForm
   offlineData: Partial<IOfflineData>
@@ -557,11 +614,12 @@ export const ActionDetailsModal = ({
   )
 
   let userName = ''
-
-  if (!isSystemInitiated(actionDetailsData)) {
+  if (isVerifiedAction(actionDetailsData) && actionDetailsData.ipAddress) {
+    userName = actionDetailsData.ipAddress
+  } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null
@@ -587,7 +645,15 @@ export const ActionDetailsModal = ({
       <>
         <div>
           <>{userName}</>
-          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+          <span>
+            {' '}
+            —{' '}
+            {formatLongDate(
+              actionDetailsData.date.toLocaleString(),
+              intl.locale,
+              'MMMM dd, yyyy · hh.mm a'
+            )}
+          </span>
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}

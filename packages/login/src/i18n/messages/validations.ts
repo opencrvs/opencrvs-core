@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor, defineMessages } from 'react-intl'
 
@@ -17,6 +16,7 @@ interface IValidationMessages
   minLength: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
+  emailAddressFormat: MessageDescriptor
   mobilePhoneRegex: MessageDescriptor
   mobileNumberFormat: MessageDescriptor
   requiredSymbol: MessageDescriptor
@@ -45,6 +45,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
+  },
+  emailAddressFormat: {
+    id: 'validations.emailAddressFormat',
+    defaultMessage: 'Must be a valid email address',
+    description: 'The error message that appears on email address'
   },
   mobilePhoneRegex: {
     id: 'validations.mobilePhoneRegex',

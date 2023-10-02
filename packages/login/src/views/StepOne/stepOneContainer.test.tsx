@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
@@ -43,8 +42,16 @@ describe('Login app step one', () => {
               fileName: 'dummy-file-name',
               file: 'dummy-logo'
             },
+
+            LOGIN_BACKGROUND: {
+              backgroundColor: 'FFF',
+              backgroundImage: '',
+              imageFit: 'FILL'
+            },
             SENTRY: '',
-            LOGROCKET: ''
+            LOGROCKET: '',
+            USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
+            INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'
           }
         })
       )

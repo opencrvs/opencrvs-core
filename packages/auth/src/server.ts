@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -21,6 +20,10 @@ import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@auth/features/authenticate/handler'
+import authenticateSuperUserHandler, {
+  requestSchema as reqAuthSupSchema,
+  responseSchema as resAuthSupSchema
+} from '@auth/features/authenticateSuperUser/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
@@ -29,9 +32,9 @@ import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
 } from '@auth/features/refresh/handler'
-import resendSmsHandler, {
-  requestSchema as reqResendSmsSchema,
-  responseSchma as resResendSmsSchema
+import resendNotificationHandler, {
+  requestSchema as reqResendAuthenticationCodeSchema,
+  responseSchma as resResendAuthenticationCodeSchema
 } from '@auth/features/resend/handler'
 import getPlugins from '@auth/config/plugins'
 import * as database from '@auth/database'
@@ -60,13 +63,12 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import {
-  authenticateSystemClientHandler,
-  requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema
-} from '@auth/features/system/handler'
+import { tokenHandler } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
+import anonymousTokenHandler, {
+  responseSchema
+} from './features/anonymousToken/handler'
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
@@ -111,6 +113,21 @@ export async function createServer() {
     }
   })
 
+  // curl -H 'Content-Type: application/json' http://localhost:4040/anonymous-token
+  server.route({
+    method: 'GET',
+    path: '/anonymous-token',
+    handler: anonymousTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Authenticate an anonymous user',
+      notes:
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
+      response: {
+        schema: responseSchema
+      }
+    }
+  })
   // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate
   server.route({
     method: 'POST',
@@ -131,21 +148,41 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"nonce": ""}' http://localhost:4040/resendSms
+  // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate-super-user
   server.route({
     method: 'POST',
-    path: '/resendSms',
-    handler: resendSmsHandler,
+    path: '/authenticate-super-user',
+    handler: authenticateSuperUserHandler,
     options: {
       tags: ['api'],
-      description: 'Resend another SMS code',
+      description: 'Authenticate with username and password',
       notes:
-        'Sends a new SMS code to the user based on the phone number associated with the nonce',
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
       validate: {
-        payload: reqResendSmsSchema
+        payload: reqAuthSupSchema
       },
       response: {
-        schema: resResendSmsSchema
+        schema: resAuthSupSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"nonce": ""}' http://localhost:4040/resendAuthenticationCode
+  server.route({
+    method: 'POST',
+    path: '/resendAuthenticationCode',
+    handler: resendNotificationHandler,
+    options: {
+      tags: ['api'],
+      description: 'Resend another authentication code',
+      notes:
+        'Sends a new authentication code to the user based on the phone number or email associated with the nonce',
+      validate: {
+        payload: reqResendAuthenticationCodeSchema
+      },
+      response: {
+        schema: resResendAuthenticationCodeSchema
       }
     }
   })
@@ -336,17 +373,11 @@ export async function createServer() {
 
   server.route({
     method: 'POST',
-    path: '/authenticateSystemClient',
-    handler: authenticateSystemClientHandler,
+    path: '/token',
+    handler: tokenHandler,
     options: {
       tags: ['api'],
-      description: 'Authenticate system with client_id and client_secret',
-      validate: {
-        payload: reqSystemSchema
-      },
-      response: {
-        schema: resSystemSchema
-      }
+      description: 'Authenticate system with client_id and client_secret'
     }
   })
 

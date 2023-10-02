@@ -6,22 +6,35 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 import { ADVANCED_SEARCH_PARAM_FIELDS } from './mutations'
 
-export const FETCH_USER = gql`
+/*
+ * id and userMgntUserID return the same value
+ * we should refactor this to just keep one of them
+ */
+const FETCH_USER = gql`
   ${ADVANCED_SEARCH_PARAM_FIELDS}
   query fetchUser($userId: String!) {
     getUser(userId: $userId) {
+      id
       userMgntUserID
+      creationDate
+      username
       practitionerId
       mobile
-      role
-      type
+      email
+      systemRole
+      role {
+        _id
+        labels {
+          lang
+          label
+        }
+      }
       status
       name {
         use

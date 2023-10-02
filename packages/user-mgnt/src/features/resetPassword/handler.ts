@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import {
   generateRandomPassword,
@@ -23,17 +22,16 @@ import { logger } from '@user-mgnt/logger'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import fetch from 'node-fetch'
 
-interface IResendSMSPayload {
-  applicationName: string
+interface IResendPasswordInvitePayload {
   userId: string
 }
 
-export default async function resetPasswordSMSHandler(
+export default async function resetPasswordInviteHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   let randomPassword = null
-  const { userId, applicationName } = request.payload as IResendSMSPayload
+  const { userId } = request.payload as IResendPasswordInvitePayload
 
   const user = await User.findById(userId)
 
@@ -77,27 +75,35 @@ export default async function resetPasswordSMSHandler(
     return h.response().code(400)
   }
 
-  sendPasswordNotification(user.mobile, applicationName, randomPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendPasswordNotification(
+    randomPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.name,
+    user.mobile,
+    user.emailForNotification
+  )
 
   return h.response().code(200)
 }
 
 export async function sendPasswordNotification(
-  msisdn: string,
-  applicationName: string,
   password: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  userFullName: IUserName[],
+  msisdn?: string,
+  email?: string
 ) {
-  const url = `${NOTIFICATION_SERVICE_URL}resetPasswordSMS`
+  const url = `${NOTIFICATION_SERVICE_URL}resetPasswordInvite`
   try {
     await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        applicationName,
-        password
+        email,
+        password,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -110,6 +116,5 @@ export async function sendPasswordNotification(
 }
 
 export const requestSchema = Joi.object({
-  userId: Joi.string().required(),
-  applicationName: Joi.string().required()
+  userId: Joi.string().required()
 })

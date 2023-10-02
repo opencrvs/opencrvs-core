@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { createTestComponent, createTestStore } from '@client/tests/util'
@@ -93,7 +92,15 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    role: 'LOCAL_REGISTRAR'
+                    role: {
+                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+                      labels: [
+                        {
+                          lang: 'en',
+                          label: 'LOCAL_REGISTRAR'
+                        }
+                      ]
+                    }
                   },
                   startedByFacility: null,
                   progressReport: {
@@ -140,7 +147,15 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    role: 'LOCAL_REGISTRAR'
+                    role: {
+                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+                      labels: [
+                        {
+                          lang: 'en',
+                          label: 'LOCAL_REGISTRAR'
+                        }
+                      ]
+                    }
                   },
                   progressReport: {
                     timeInProgress: 123,
@@ -186,7 +201,15 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    role: 'LOCAL_REGISTRAR'
+                    role: {
+                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+                      labels: [
+                        {
+                          lang: 'en',
+                          label: 'LOCAL_REGISTRAR'
+                        }
+                      ]
+                    }
                   },
                   progressReport: {
                     timeInProgress: null,

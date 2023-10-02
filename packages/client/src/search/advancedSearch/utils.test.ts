@@ -6,19 +6,16 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IBaseAdvancedSearchState,
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
-
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { LocationType } from '@client/utils/gateway'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-
+import { LocationType } from '@client/offline/reducer'
 describe('Transforms advancedSearch local state to advancedSearch store state properly', () => {
   const mockLocalState: IBaseAdvancedSearchState = {
     event: 'birth',
@@ -28,7 +25,7 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
       mockOfflineData.facilities['627fc0cc-e0e2-4c09-804d-38a9fa1807ee'].id,
     placeOfRegistration:
       mockOfflineData.offices['0d8474da-0361-4d32-979e-af91f012340a'].id,
-    eventLocationType: LocationType.HealthFacility,
+    eventLocationType: LocationType.HEALTH_FACILITY,
     dateOfRegistration: {
       exact: '1995-09-19',
       isDateRangeActive: false,
@@ -50,7 +47,7 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
     transformAdvancedSearchLocalStateToStoreData(
       {
         ...mockLocalState,
-        eventLocationType: LocationType.AdminStructure,
+        eventLocationType: LocationType.ADMIN_STRUCTURE,
         placeOfRegistration:
           mockOfflineData.locations['65cf62cb-864c-45e3-9c0d-5c70f0074cb4'].id
       },

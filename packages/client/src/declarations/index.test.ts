@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createDeclaration,
@@ -18,12 +17,12 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
-import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
 import { vi } from 'vitest'
+import { UserDetails } from '@client/utils/userUtils'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {
@@ -119,6 +118,16 @@ describe('query result filtering tests', () => {
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
+        },
+        issueTab: {
+          results: [
+            { id: 'READY_TO_ISSUE' },
+            { id: 'ISSUING' },
+            { id: 'ISSUED' },
+            { id: 'FAILED' },
+            { id: 'ISSUING' }
+          ],
+          totalItems: 5
         }
       }
 
@@ -194,6 +203,26 @@ describe('query result filtering tests', () => {
         {
           id: 'FAILED_NETWORK',
           submissionStatus: 'FAILED_NETWORK'
+        },
+        {
+          id: 'READY_TO_ISSUE',
+          submissionStatus: 'READY_TO_ISSUE'
+        },
+        {
+          id: 'ISSUING',
+          submissionStatus: 'ISSUING'
+        },
+        {
+          id: 'ISSUED',
+          submissionStatus: 'ISSUED'
+        },
+        {
+          id: 'FAILED',
+          submissionStatus: 'FAILED'
+        },
+        {
+          id: 'FAILED_NETWORK',
+          submissionStatus: 'FAILED_NETWORK'
         }
       ]
 
@@ -231,6 +260,10 @@ describe('query result filtering tests', () => {
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
+        },
+        issueTab: {
+          results: [{ id: 'ISSUED' }, { id: 'FAILED' }],
+          totalItems: 2
         }
       })
     })
@@ -283,9 +316,24 @@ describe('archiveDeclaration tests', () => {
       declarations: [declaration]
     }
 
-    const currentUserDetails: IUserDetails = {
+    const currentUserDetails: Partial<UserDetails> = {
       userMgntUserID: '123',
-      localRegistrar: { name: [] }
+      id: '123',
+      practitionerId: '123',
+      status: 'active' as Status,
+      creationDate: '2133213212',
+      mobile: '09123433',
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          }
+        ]
+      },
+      name: [],
+      localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
     }
 
     indexedDB = {

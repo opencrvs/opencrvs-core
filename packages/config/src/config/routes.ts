@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createCertificateHandler,
@@ -24,33 +23,15 @@ import configHandler, {
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
-import createQuestionHandler, {
-  formDatasetSchema,
-  requestSchema as createQuestionReqSchema
-} from '@config/handlers/question/createQuestion/handler'
-import updateQuestionHandler, {
-  requestSchema as updateQuestionReqSchema
-} from '@config/handlers/question/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
-import {
-  createFormDraftHandler,
-  requestSchema as createFormDraftReqSchema
-} from '@config/handlers/formDraft/createFormDraft/handler'
-import {
-  modifyDraftStatusHandler,
-  requestSchema as modifyFormDraftReqSchema
-} from '@config/handlers/formDraft/updateFormDraft/handler'
-
-import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
-import {
-  deleteFormDraftHandler,
-  requestSchema as deleteFormDraftReqSchema
-} from '@config/handlers/formDraft/deleteFormDraft/handler'
+import createInformantSMSNotificationHandler, {
+  requestSchema as createInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
+import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
+import updateInformantSMSNotificationHandler, {
+  requestSchema as updateInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
-import {
-  createFormDatasetHandler,
-  getFormDatasetHandler
-} from '@config/handlers/formDataset/handler'
+import getForms from '@config/handlers/forms/formsHandler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -102,7 +83,7 @@ export default function getRoutes() {
     },
     {
       method: 'GET',
-      path: '/loginConfig',
+      path: '/publicConfig',
       handler: getLoginConfigHandler,
       config: {
         auth: false,
@@ -117,6 +98,15 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Retrieve Application integrations'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/forms',
+      handler: getForms,
+      config: {
+        tags: ['api'],
+        description: 'Retrieve forms'
       }
     },
     {
@@ -202,71 +192,6 @@ export default function getRoutes() {
       }
     },
     {
-      method: 'GET',
-      path: '/formDraft',
-      handler: getFormDrafts,
-      config: {
-        tags: ['api'],
-        description: 'Get form draft',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        }
-      }
-    },
-    {
-      method: 'PUT',
-      path: '/formDraft',
-      handler: modifyDraftStatusHandler,
-      config: {
-        tags: ['api'],
-        description: 'Change form draft status',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: modifyFormDraftReqSchema
-        }
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/formDraft',
-      handler: deleteFormDraftHandler,
-      config: {
-        tags: ['api'],
-        description: 'Delete form draft',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: deleteFormDraftReqSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/formDraft',
-      handler: createFormDraftHandler,
-      config: {
-        tags: ['api'],
-        description: 'Create form draft & update questions',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: createFormDraftReqSchema
-        }
-      }
-    },
-    {
       method: 'POST',
       path: '/updateApplicationConfig',
       handler: updateApplicationConfigHandler,
@@ -283,70 +208,49 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/question',
-      handler: createQuestionHandler,
+      path: '/informantSMSNotification',
+      handler: createInformantSMSNotificationHandler,
       config: {
         tags: ['api'],
-        description: 'Create question',
+        description: 'Creates informantSMSNotifications',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: createQuestionReqSchema
+          payload: createInformantSMSNotificationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/informantSMSNotification',
+      handler: getInformantSMSNotificationsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Get informantSMSNotifications',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
         }
       }
     },
     {
       method: 'PUT',
-      path: '/question',
-      handler: updateQuestionHandler,
+      path: '/informantSMSNotification',
+      handler: updateInformantSMSNotificationHandler,
       config: {
         tags: ['api'],
-        description: 'Update question',
+        description: 'Update informantSMSNotification',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: updateQuestionReqSchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/questions',
-      handler: getQuestionsHandler,
-      config: {
-        tags: ['api'],
-        description: 'Get question',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/getFormDataset',
-      handler: getFormDatasetHandler,
-      config: {
-        tags: ['api'],
-        description: 'fetch form dataset',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/createFormDataset',
-      handler: createFormDatasetHandler,
-      config: {
-        tags: ['api'],
-        description: 'Create form dataset',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: formDatasetSchema
+          payload: updateInformantSMSNotificationReqSchema
         }
       }
     }

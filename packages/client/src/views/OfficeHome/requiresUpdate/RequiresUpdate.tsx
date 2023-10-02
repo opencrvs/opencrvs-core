@@ -6,15 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
@@ -51,8 +50,6 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { RegStatus } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
@@ -88,7 +85,7 @@ class RequiresUpdateComponent extends React.Component<
     this.state = {
       width: window.innerWidth,
       sortedCol: COLUMNS.SENT_FOR_UPDATES,
-      sortOrder: SORT_ORDER.DESCENDING
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 

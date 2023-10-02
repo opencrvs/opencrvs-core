@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createTestApp,
@@ -17,17 +16,12 @@ import {
   waitForReady,
   validateScopeToken,
   registerScopeToken,
-  primaryAddressData,
-  primaryInternationalAddressLines,
-  secondaryAddressData,
-  secondaryInternationalAddressLines,
-  eventAddressData,
   flushPromises
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_PAGE,
-  HOME
+  REGISTRAR_HOME
 } from '@client/navigation/routes'
 import {
   storeDeclaration,
@@ -47,7 +41,8 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
   birthReviewDraftData,
-  deathReviewDraftData
+  deathReviewDraftData,
+  marriageReviewDraftData
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
 
@@ -68,256 +63,8 @@ describe('when user is previewing the form data', () => {
     await waitForReady(app)
   })
 
-  describe('when user is in the preview section', () => {
-    let customDraft: IDeclaration
-
-    beforeEach(async () => {
-      const data = birthDraftData
-
-      customDraft = {
-        id: uuid(),
-        data,
-        event: Event.Birth,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      }
-      store.dispatch(storeDeclaration(customDraft))
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(
-          ':declarationId',
-          customDraft.id.toString()
-        )
-      )
-
-      await waitForElement(app, '#readyDeclaration')
-    })
-
-    describe('when user clicks the "submit" button', () => {
-      beforeEach(async () => {
-        await goToEndOfForm(app)
-      })
-
-      it('check whether submit button is enabled or not', async () => {
-        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-          false
-        )
-      })
-      describe('All sections visited', () => {
-        it('Should be able to click SEND FOR REVIEW Button', () => {
-          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-            false
-          )
-        })
-        describe('button clicked', () => {
-          beforeEach(async () => {
-            app.find('#submit_form').hostNodes().simulate('click')
-          })
-
-          it('confirmation screen should show up', () => {
-            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
-          })
-          it('should redirect to home page', () => {
-            app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(history.location.pathname).toBe(HOME)
-          })
-        })
-      })
-    })
-  })
-  describe('when user is in the birth review section', () => {
-    let customDraft: IDeclaration
-
-    const childDetails: IPersonDetails = {
-      attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'নাইম',
-      firstNamesEng: 'Naim',
-      gender: 'male',
-      multipleBirth: '2',
-      birthType: 'SINGLE',
-      weightAtBirth: '6',
-      _fhirID: '1'
-    }
-
-    const fatherDetails: IPersonDetails = {
-      detailsExist: true,
-      iD: '432432432',
-      iDType: 'NATIONAL_ID',
-      primaryAddressSameAsOtherPrimary: true,
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      fatherBirthDate: '1999-10-10',
-      dateOfMarriage: '2010-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'আনোয়ার',
-      firstNamesEng: 'Anwar',
-      maritalStatus: 'MARRIED',
-      nationality: 'FAR',
-      _fhirID: '2'
-    }
-
-    const motherDetails: IPersonDetails = {
-      iD: '765987987',
-      iDType: 'NATIONAL_ID',
-      nationality: 'FAR',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'রোকেয়া',
-      firstNamesEng: 'Rokeya',
-      maritalStatus: 'MARRIED',
-      dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirID: '3'
-    }
-
-    const registrationDetails = {
-      contactPoint: {
-        value: 'DAUGHTER',
-        nestedFields: { registrationPhone: '0787878787' }
-      },
-      trackingId: 'B123456',
-      registrationNumber: '2019121525B1234568',
-      _fhirID: '4'
-    }
-
-    beforeEach(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
-      await flushPromises()
-      const data = birthReviewDraftData
-
-      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
-      store.dispatch(storeDeclaration(customDraft))
-      history.replace(
-        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':declarationId',
-          customDraft.id.toString()
-        )
-          .replace(':event', 'birth')
-          .replace(':pageId', 'review')
-      )
-      await waitForElement(app, '#readyDeclaration')
-    })
-
-    it('rejecting declaration redirects to home screen', async () => {
-      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
-
-      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
-
-      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
-
-      app
-        .find('#rejectionCommentForHealthWorker')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            id: 'rejectionCommentForHealthWorker',
-            value: 'reject reason'
-          }
-        })
-
-      app.find('#submit_reject_form').hostNodes().simulate('click')
-
-      expect(history.location.pathname).toEqual('/')
-    })
-  })
   describe('when user is in the death review section', () => {
     let customDraft: IDeclaration
-
-    const deceasedDetails = {
-      iD: '987987987',
-      iDType: 'NATIONAL_ID',
-      socialSecurityNo: 'hghjkh',
-      firstNames: 'অনিক',
-      familyName: 'অনিক',
-      firstNamesEng: 'Anik',
-      familyNameEng: 'anik',
-      nationality: 'FAR',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      birthDate: '1983-01-01',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
-    }
-
-    const informantDetails = {
-      iDType: 'PASSPORT',
-      informantID: '123456789',
-      socialSecurityNo: 'hghjkh',
-      informantFirstNames: 'অনিক',
-      informantFamilyName: 'অনিক',
-      informantFirstNamesEng: 'Anik',
-      informantFamilyNameEng: 'Anik',
-      nationality: 'FAR',
-      informantBirthDate: '1996-01-01',
-      informantPhone: '0787777676',
-      relationship: 'OTHER',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirIDMap: {
-        relatedPerson: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
-        individual: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1'
-      }
-    }
-
-    const fatherDetails = {
-      fatherFirstNames: 'মোক্তার',
-      fatherFamilyName: 'আলী',
-      fatherFirstNamesEng: 'Moktar',
-      fatherFamilyNameEng: 'Ali'
-    }
-
-    const motherDetails = {
-      motherFirstNames: 'মরিউম',
-      motherFamilyName: 'আলী',
-      motherFirstNamesEng: 'Morium',
-      motherFamilyNameEng: 'Ali'
-    }
-
-    const spouseDetails = {
-      hasDetails: {
-        value: 'Yes',
-        nestedFields: {
-          spouseFirstNames: 'রেহানা',
-          spouseFamilyName: 'আলী',
-          spouseFirstNamesEng: 'Rehana',
-          spouseFamilyNameEng: 'Ali'
-        }
-      }
-    }
-
-    const deathEventDetails = {
-      deathDate: '2017-01-01',
-      manner: 'ACCIDENT',
-      placeOfDeath: 'PRIMARY_ADDRESS',
-      ...eventAddressData
-    }
-    const causeOfDeathDetails = { causeOfDeathEstablished: false }
-
-    const registrationDetails = {
-      _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
-      trackingId: 'DS8QZ0Z',
-      relationship: { value: 'GRANDSON', nestedFields: {} },
-      contactPoint: {
-        value: 'DAUGHTER',
-        nestedFields: { registrationPhone: '0787878787' }
-      }
-    }
 
     const registerScopeToken =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -353,7 +100,104 @@ describe('when user is previewing the form data', () => {
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
-      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
+      app
+        .find('#rejectionCommentForHealthWorker')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'rejectionCommentForHealthWorker',
+            value: 'reject reason'
+          }
+        })
+
+      app.find('#submit_reject_form').hostNodes().simulate('click')
+
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+    })
+  })
+
+  describe('when user is in the preview section', () => {
+    let customDraft: IDeclaration
+
+    beforeEach(async () => {
+      const data = birthDraftData
+
+      customDraft = {
+        id: uuid(),
+        data,
+        event: Event.Birth,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        DRAFT_BIRTH_PARENT_FORM.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+      )
+
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    describe('when user clicks the "submit" button', () => {
+      beforeEach(async () => {
+        await goToEndOfForm(app)
+      })
+
+      it('check whether submit button is enabled or not', () => {
+        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+          false
+        )
+      })
+      describe('All sections visited', () => {
+        it('Should be able to click SEND FOR REVIEW Button', () => {
+          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+            false
+          )
+        })
+        describe('button clicked', () => {
+          beforeEach(async () => {
+            app.find('#submit_form').hostNodes().simulate('click')
+          })
+
+          it('confirmation screen should show up', () => {
+            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+          })
+          it('should redirect to home page', () => {
+            app.find('#submit_confirm').hostNodes().simulate('click')
+            expect(history.location.pathname).toBe(REGISTRAR_HOME)
+          })
+        })
+      })
+    })
+  })
+
+  describe('when user is in the birth review section', () => {
+    let customDraft: IDeclaration
+
+    beforeEach(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      await store.dispatch(checkAuth())
+      await flushPromises()
+      const data = birthReviewDraftData
+
+      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+          .replace(':event', 'birth')
+          .replace(':pageId', 'review')
+      )
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    it('rejecting declaration redirects to home screen', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
       app
         .find('#rejectionCommentForHealthWorker')
@@ -367,7 +211,54 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+    })
+  })
+
+  describe('when user is in the marriage review section', () => {
+    let customDraft: IDeclaration
+
+    const registerScopeToken =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
+
+    beforeEach(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      store.dispatch(checkAuth())
+      await flushPromises()
+      const data = marriageReviewDraftData
+
+      customDraft = { id: uuid(), data, review: true, event: Event.Marriage }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+          .replace(':event', 'marriage')
+          .replace(':pageId', 'review')
+      )
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    it('rejecting declaration redirects to reject confirmation screen', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
+
+      // app.find('#rejectionReasonduplicate').hostNodes().simulate('change')
+
+      app
+        .find('#rejectionCommentForHealthWorker')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'rejectionCommentForHealthWorker',
+            value: 'reject reason'
+          }
+        })
+      app.find('#submit_reject_form').hostNodes().simulate('click')
+
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -400,10 +291,7 @@ describe('when user is previewing the form data', () => {
 
     it('shows send for review button', async () => {
       await waitForElement(app, '#readyDeclaration')
-
-      expect(
-        app.update().find('#validateDeclarationBtn').hostNodes().text()
-      ).toBe('Send For Approval')
+      expect(app.update().contains('#validateDeclarationBtn')).toBeFalsy()
     })
   })
 })

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { COMPOSITION_ID } from '@metrics/features/getTimeLogged/constants'
 import { query } from '@metrics/influxdb/client'
@@ -21,7 +20,12 @@ export async function getEventDurationHandler(
   const eventDurationData = await query(
     `SELECT previousStatus as status, durationInSeconds
           FROM declaration_event_duration
-        WHERE compositionId = '${compositionId}'`
+        WHERE compositionId = $compositionId`,
+    {
+      placeholders: {
+        compositionId
+      }
+    }
   )
   return eventDurationData && eventDurationData.length > 0
     ? eventDurationData

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@gateway/common-types'
 import {
@@ -24,14 +23,19 @@ import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 import {
   validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments
+  validateDeathDeclarationAttachments,
+  validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import { UnassignError } from '@gateway/utils/unassignError'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
+    async requestBirthRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -52,7 +56,11 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have a register scope')
       }
     },
-    async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
+    async requestDeathRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -68,6 +76,31 @@ export const resolvers: GQLResolver = {
           authHeader,
           details,
           EVENT_TYPE.DEATH
+        )
+      } else {
+        throw new Error('User does not have a register scope')
+      }
+    },
+    async requestMarriageRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      if (hasScope(authHeader, 'register')) {
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
+        try {
+          await validateMarriageDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
+        return await requestEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.MARRIAGE
         )
       } else {
         throw new Error('User does not have a register scope')

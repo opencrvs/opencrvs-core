@@ -6,20 +6,34 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
 import * as fetch from 'jest-fetch-mock'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+
+const mockGet = jest.fn()
+jest.mock('apollo-datasource-rest', () => {
+  class MockRESTDataSource {
+    get = mockGet
+  }
+  return {
+    RESTDataSource: MockRESTDataSource
+  }
+})
 
 beforeEach(() => {
   fetch.resetMocks()
 })
 
 describe('User type resolvers', () => {
+  afterEach(() => {
+    mockGet.mockReset()
+  })
+
   const mockResponse: IUserModelData = {
     _id: 'ba7022f0ff4822',
     name: [
@@ -33,7 +47,7 @@ describe('User type resolvers', () => {
     mobile: '+8801711111111',
     email: 'test@test.org',
     identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
-    role: 'REGISTRATION_AGENT',
+    systemRole: 'REGISTRATION_AGENT',
     scope: ['certify'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -45,7 +59,14 @@ describe('User type resolvers', () => {
       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     ],
     creationDate: '1559054406433',
-    type: 'MAYOR',
+    role: {
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     device: ''
   }
   it('return id type', () => {
@@ -109,8 +130,12 @@ describe('User type resolvers', () => {
       },
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
-    fetch.mockResponseOnce(JSON.stringify(mockOffice))
-    const res = await userTypeResolvers.User.primaryOffice(mockResponse)
+    mockGet.mockResolvedValueOnce(mockOffice)
+    const res = await userTypeResolvers.User.primaryOffice(
+      mockResponse,
+      undefined,
+      { dataSources: { locationsAPI: new LocationsAPI() } }
+    )
     expect(res).toEqual(mockOffice)
   })
   it('return catchmentArea type', async () => {
@@ -280,13 +305,19 @@ describe('User type resolvers', () => {
         id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
       }
     ]
-    fetch.mockResponses(
-      [JSON.stringify(mockLocations[0]), { status: 200 }],
-      [JSON.stringify(mockLocations[1]), { status: 200 }],
-      [JSON.stringify(mockLocations[2]), { status: 200 }],
-      [JSON.stringify(mockLocations[3]), { status: 200 }]
+    mockGet
+      .mockResolvedValueOnce(mockLocations[0])
+      .mockResolvedValueOnce(mockLocations[1])
+      .mockResolvedValueOnce(mockLocations[2])
+      .mockResolvedValueOnce(mockLocations[3])
+
+    const res = await userTypeResolvers.User.catchmentArea(
+      mockResponse,
+      undefined,
+      {
+        dataSources: { locationsAPI: new LocationsAPI() }
+      }
     )
-    const res = await userTypeResolvers.User.catchmentArea(mockResponse)
     expect(res).toEqual(mockLocations)
   })
 
@@ -353,7 +384,11 @@ describe('User type resolvers', () => {
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
-    const response = await userTypeResolvers.User.localRegistrar(mockResponse)
+    const response = await userTypeResolvers.User.localRegistrar(
+      mockResponse,
+      undefined,
+      { headers: undefined }
+    )
 
     expect(response).toEqual({
       role: 'LOCAL_REGISTRAR',
@@ -392,7 +427,11 @@ describe('User type resolvers', () => {
     const userResponse = mockResponse
     userResponse.scope.push('register')
 
-    const response = await userTypeResolvers.User.localRegistrar(userResponse)
+    const response = await userTypeResolvers.User.localRegistrar(
+      userResponse,
+      undefined,
+      { headers: undefined }
+    )
 
     expect(response).toEqual({
       role: 'REGISTRATION_AGENT',

@@ -6,11 +6,9 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Hamburger } from '../../icons/Hamburger'
 import styled from 'styled-components'
 import { CircleButton } from '../../buttons'
 import { IDomProps } from '../AppHeader'
@@ -40,7 +38,6 @@ const HeaderContainer = styled.div`
 
 const Title = styled.span`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ theme }) => theme.colors.grey800};
   align-self: center;
   white-space: nowrap;
   overflow: hidden;

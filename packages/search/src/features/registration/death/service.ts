@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -15,13 +14,17 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
+  DECLARED_STATUS,
+  detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
   ICompositionBody,
   IDeathCompositionBody,
+  IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
   REGISTERED_STATUS,
@@ -29,17 +32,21 @@ import {
   VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
+  addEventLocation,
+  addFlaggedAsPotentialDuplicate,
   findEntry,
+  findEntryResourceByUrl,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
-  getdeclarationJurisdictionIds,
-  addEventLocation
+  getdeclarationJurisdictionIds
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
+import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -53,12 +60,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -76,7 +84,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+
   const compositionId =
     task &&
     task.focus &&
@@ -124,13 +138,14 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
@@ -139,7 +154,7 @@ async function indexDeclaration(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
     event: EVENT.DEATH,
     createdAt:
@@ -151,7 +166,33 @@ async function indexDeclaration(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
+  await indexComposition(compositionId, body, client)
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
+    await detectAndUpdateDeathDuplicates(compositionId, composition, body)
+  }
+}
+
+async function detectAndUpdateDeathDuplicates(
+  compositionId: string,
+  composition: fhir.Composition,
+  body: IDeathCompositionBody
+) {
+  const duplicates = await detectDeathDuplicates(compositionId, body)
+  if (!duplicates.length) {
+    return
+  }
+  logger.info(
+    `Search/service:death: ${duplicates.length} duplicate composition(s) found`
+  )
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
 async function createIndexBody(
@@ -200,8 +241,9 @@ async function createDeceasedIndex(
   body.gender = deceased && deceased.gender
   body.deceasedIdentifier =
     deceased.identifier &&
-    deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    deceased.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
   body.deceasedDoB = deceased && deceased.birthDate
 }
 
@@ -331,8 +373,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
@@ -352,6 +395,10 @@ async function createDeclarationIndex(
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
   )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
@@ -390,6 +437,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -31,8 +30,12 @@ import {
   goToUserReviewForm
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
-import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import styled from 'styled-components'
+import {
+  clearUserFormData,
+  ISystemRolesMap,
+  modifyUserFormData
+} from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormikTouched, FormikValues } from 'formik'
@@ -43,15 +46,8 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { selectSystemRoleMap } from '@client/user/selectors'
 
-export const FormTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1};
-  height: 72px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
 export const Action = styled.div`
   margin-top: 32px;
 `
@@ -64,6 +60,7 @@ type IProps = {
   nextSectionId: string
   nextGroupId: string
   offlineCountryConfig: IOfflineData
+  systemRoleMap: ISystemRolesMap
 }
 
 type IState = {
@@ -134,6 +131,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
     ) {
+      if (values.role) {
+        const getSystemRoles = this.props.systemRoleMap
+        values.systemRole = getSystemRoles[values.role]
+      }
       this.props.modifyUserFormData({ ...formData, ...values })
       this.setState({
         disableContinueOnLocation: false
@@ -158,7 +159,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           title={
             userId
               ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-              : intl.formatMessage(section.title)
+              : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}
@@ -198,8 +199,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (
   state: IStoreState
-): { offlineCountryConfig: IOfflineData } => {
+): { offlineCountryConfig: IOfflineData; systemRoleMap: ISystemRolesMap } => {
   return {
+    systemRoleMap: selectSystemRoleMap(state),
     offlineCountryConfig: getOfflineData(state)
   }
 }

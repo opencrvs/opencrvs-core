@@ -6,14 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
 import {
   createReviewDeclaration,
   IDeclaration,
+  IDuplicates,
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
@@ -21,15 +21,15 @@ import { useParams } from 'react-router'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
-import { Event } from '@client/utils/gateway'
-import styled from '@client/styledComponents'
+import { Event, FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
+import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { AppBar, Frame, Icon, Spinner } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/review'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -95,20 +95,17 @@ const LoadingState = () => {
         <AppBar
           desktopRight={
             <Button
-              size="large"
-              type="tertiary"
+              type="secondary"
+              size="small"
               onClick={() => dispatch(goBack())}
             >
+              <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
           }
           mobileRight={
-            <Button
-              size="large"
-              type="tertiary"
-              onClick={() => dispatch(goBack())}
-            >
-              {intl.formatMessage(buttonMessages.exitButton)}
+            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+              <Icon name="X" />
             </Button>
           }
         />
@@ -137,18 +134,22 @@ export const ViewRecord = () => {
   const offlineData = useSelector(getOfflineData)
   const { declarationId } = useParams<{ declarationId: string }>()
 
-  const { loading, error, data } = useQuery(FETCH_VIEW_RECORD_BY_COMPOSITION, {
-    variables: { id: declarationId },
-    fetchPolicy: 'network-only'
-  })
+  const { loading, error, data } = useQuery<FetchViewRecordByCompositionQuery>(
+    FETCH_VIEW_RECORD_BY_COMPOSITION,
+    {
+      variables: { id: declarationId },
+      fetchPolicy: 'network-only'
+    }
+  )
 
   if (loading) return <LoadingState />
 
   if (error) return <GenericErrorToast />
 
   const eventData = data?.fetchRegistrationForViewing
-  const eventType =
-    data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+  const eventType = ((data?.fetchRegistrationForViewing?.registration?.type &&
+    data.fetchRegistrationForViewing.registration.type.toLowerCase()) ||
+    '') as Event
 
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
@@ -172,31 +173,37 @@ export const ViewRecord = () => {
     eventType: eventType
   })
   const iconColor = getDeclarationIconColor(declaration)
+  const isDuplicate =
+    (
+      data?.fetchRegistrationForViewing?.registration
+        ?.duplicates as IDuplicates[]
+    )?.length > 0
 
   return (
     <Frame
       header={
         <AppBar
           desktopTitle={headerTitle}
-          desktopLeft={<DeclarationIcon color={iconColor} />}
+          desktopLeft={
+            isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
+          }
           desktopRight={
             <Button
-              size="large"
-              type="tertiary"
+              type="secondary"
+              size="small"
               onClick={() => dispatch(goBack())}
             >
+              <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
           }
           mobileTitle={headerTitle}
-          mobileLeft={<DeclarationIcon color={iconColor} />}
+          mobileLeft={
+            isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
+          }
           mobileRight={
-            <Button
-              size="large"
-              type="tertiary"
-              onClick={() => dispatch(goBack())}
-            >
-              {intl.formatMessage(buttonMessages.exitButton)}
+            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+              <Icon name="X" />
             </Button>
           }
         />

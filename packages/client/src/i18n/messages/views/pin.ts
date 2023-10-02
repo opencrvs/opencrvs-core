@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -23,6 +22,7 @@ interface IPinMessages
   incorrect: MessageDescriptor
   lastTry: MessageDescriptor
   locked: MessageDescriptor
+  confirmPinTitle: MessageDescriptor
 }
 
 const messagesToDefine: IPinMessages = {
@@ -40,7 +40,7 @@ const messagesToDefine: IPinMessages = {
   locked: {
     id: 'unlockApp.locked',
     defaultMessage:
-      'Your account has been locked. Please try again in 1 minute.',
+      'Your account has been locked. Please try again in 1 minute',
     description: 'The title displayed while creating a PIN'
   },
   createTitle: {
@@ -51,7 +51,7 @@ const messagesToDefine: IPinMessages = {
   createDescription: {
     id: 'misc.createDescription',
     defaultMessage:
-      "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
+      "Choose a PIN that doesn't have 4 repeating digits or sequential numbers",
     description: 'The description displayed while creating a PIN'
   },
   pinSameDigitsError: {
@@ -66,7 +66,7 @@ const messagesToDefine: IPinMessages = {
   },
   pinMatchError: {
     id: 'misc.pinMatchError',
-    defaultMessage: 'PIN code did not match. Please try again.',
+    defaultMessage: 'PIN code did not match. Please try again',
     description: "The error displayed if PINs don't match"
   },
   reEnterTitle: {
@@ -74,9 +74,14 @@ const messagesToDefine: IPinMessages = {
     defaultMessage: 'Re-enter your new PIN',
     description: 'The title displayed while creating a PIN'
   },
+  confirmPinTitle: {
+    id: 'misc.confirmPinTitle',
+    defaultMessage: 'Confirm PIN',
+    description: 'The title displayed while creating a PIN'
+  },
   reEnterDescription: {
     id: 'misc.reEnterDescription',
-    defaultMessage: "Let's make sure we collected your PIN correctly.",
+    defaultMessage: "Let's make sure we collected your PIN correctly",
     description: ''
   }
 }

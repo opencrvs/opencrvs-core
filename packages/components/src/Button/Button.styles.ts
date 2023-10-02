@@ -6,15 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { css } from 'styled-components'
 
 export const base = css`
   ${({ theme }) => theme.fonts.bold16};
-
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -82,6 +80,26 @@ export const secondary = css`
   }
 `
 
+export const secondary_negative = css`
+  border: 2px solid ${({ theme }) => theme.colors.negative};
+  color: ${({ theme }) => theme.colors.negative};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.negativeDark};
+    color: ${({ theme }) => theme.colors.negativeDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.negativeDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.negativeDarker};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.negativeDarker};
+  }
+`
+
 export const tertiary = css`
   color: ${({ theme }) => theme.colors.primary};
 
@@ -135,9 +153,26 @@ export const icon = css`
   }
 `
 
+export const iconPrimary = css`
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.primary};
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+
+  &:hover:not(:focus-visible) {
+    background: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  svg {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+`
+
 export const small = ({ loading }: { loading?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
-
   height: 32px;
   padding: 8px;
 
@@ -158,6 +193,7 @@ export const small = ({ loading }: { loading?: boolean }) => css`
 `
 
 export const medium = css`
+  ${({ theme }) => theme.fonts.bold16};
   height: 40px;
   padding: 0 12px;
 
@@ -168,6 +204,7 @@ export const medium = css`
 `
 
 export const large = css`
+  ${({ theme }) => theme.fonts.bold18};
   height: 48px;
   padding: 0 16px;
 

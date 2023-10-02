@@ -6,34 +6,33 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
-import { SecureAccount } from '@client/views/SecureAccount/SecureAccountView'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS, IUserDetails } from '@client/utils/userUtils'
+import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import * as LogRocket from 'logrocket'
 import { refreshToken } from '@client/utils/authUtils'
 import {
   DESKTOP_TIME_OUT_MILLISECONDS,
-  LOADER_MIN_DISPLAY_TIME,
   REFRESH_TOKEN_CHECK_MILLIS
 } from '@client/utils/constants'
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { CreatePin } from '@client/views/PIN/CreatePin'
+import { redirectToAuthentication } from '@client/profile/profileActions'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -43,6 +42,7 @@ type OwnProps = PropsWithChildren<{
 type DispatchProps = {
   onNumPadVisible: () => void
   showPINUpdateSuccessToast: typeof showPINUpdateSuccessToast
+  redirectToAuthentication: typeof redirectToAuthentication
 }
 interface IProtectPageState {
   loading: boolean
@@ -51,7 +51,6 @@ interface IProtectPageState {
   pendingUser: boolean
   forgotPin: boolean
   passwordVerified: boolean
-  loadingTimeout?: boolean
 }
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
@@ -60,7 +59,14 @@ const SpinnerBackground = styled.div`
   background: ${({ theme }) => theme.colors.white};
   min-height: 100vh;
 `
+
+const spinnerAppearAnimation = keyframes`
+  85% { opacity: 0; }
+  100% {  opacity: 1; }
+`
+
 const StyledSpinner = styled(Spinner)`
+  opacity: 0;
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
@@ -68,6 +74,8 @@ const StyledSpinner = styled(Spinner)`
   left: 50%;
   width: 40px;
   height: 40px;
+  /** Show spinner after 2 seconds */
+  animation: ${spinnerAppearAnimation} 2s forwards;
 `
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
@@ -78,8 +86,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       pinExists: true,
       pendingUser: false,
       forgotPin: false,
-      passwordVerified: false,
-      loadingTimeout: false
+      passwordVerified: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -87,10 +94,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   async componentDidMount() {
-    setTimeout(this.setLoadingTimeOut, LOADER_MIN_DISPLAY_TIME)
-
-    const { loadingTimeout, ...stateWithoutLoadingTimeout } = this.state
-    const newState = { ...stateWithoutLoadingTimeout }
+    const newState = { ...this.state }
 
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false
@@ -102,7 +106,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     } else {
       newState.pinExists = false
     }
-    const userDetails: IUserDetails = JSON.parse(
+    const userDetails: UserDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
     if (userDetails && userDetails.status && userDetails.status === 'pending') {
@@ -115,13 +119,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     newState.loading = false
     this.setState(newState)
 
-    setInterval(() => {
-      refreshToken()
+    setInterval(async () => {
+      if (!(await refreshToken())) this.props.redirectToAuthentication()
     }, REFRESH_TOKEN_CHECK_MILLIS)
-  }
-
-  setLoadingTimeOut = () => {
-    this.setState({ loadingTimeout: true })
   }
 
   async handleVisibilityChange(isVisible: boolean) {
@@ -192,9 +192,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   conditionalRenderUponSecuredState() {
-    const { secured, loading, forgotPin, loadingTimeout } = this.state
+    const { secured, loading, forgotPin } = this.state
 
-    if (loading || !loadingTimeout) {
+    if (loading) {
       return this.renderLoadingScreen()
     }
 
@@ -232,14 +232,13 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     if (!pinExists || passwordVerified) {
       return (
-        <SecureAccount
+        <CreatePin
           onComplete={() => {
             if (passwordVerified) {
               this.props.showPINUpdateSuccessToast()
             }
             this.markAsSecured()
           }}
-          collectPin={passwordVerified}
         />
       )
     }
@@ -252,6 +251,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       )
     }
     return (
+      // TODO: IdleTimer doesn't have children in it's type definition, due to React 18 starting to require it
+      // We would need to update IdleTimer to it's 5 version, which changed its API
+      // @ts-ignore
       <IdleTimer onIdle={this.onIdle} timeout={DESKTOP_TIME_OUT_MILLISECONDS}>
         {this.conditionalRenderUponSecuredState()}
       </IdleTimer>
@@ -260,5 +262,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 }
 export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
   onNumPadVisible: refreshOfflineData,
-  showPINUpdateSuccessToast
+  showPINUpdateSuccessToast,
+  redirectToAuthentication
 })(withRouter(ProtectedPageComponent))

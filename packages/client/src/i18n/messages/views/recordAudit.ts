@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { RegAction, RegStatus } from '@client/utils/gateway'
 import { defineMessages, MessageDescriptor } from 'react-intl'
@@ -24,11 +23,11 @@ interface IRecordAuditMessages
   trackingId: MessageDescriptor
   dateOfBirth: MessageDescriptor
   dateOfDeath: MessageDescriptor
+  dateOfMarriage: MessageDescriptor
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
-  informant: MessageDescriptor
-  brn: MessageDescriptor
-  drn: MessageDescriptor
+  placeOfMarriage: MessageDescriptor
+  rn: MessageDescriptor
   noName: MessageDescriptor
   noStatus: MessageDescriptor
   noType: MessageDescriptor
@@ -37,14 +36,24 @@ interface IRecordAuditMessages
   noDateOfDeath: MessageDescriptor
   noPlaceOfBirth: MessageDescriptor
   noPlaceOfDeath: MessageDescriptor
-  noInformant: MessageDescriptor
   reinstateDeclarationDialogTitle: MessageDescriptor
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
   reinstateDeclarationDialogDescription: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  contact: {
+    id: 'recordAudit.contact',
+    defaultMessage: 'Contact',
+    description: 'Contact for record audit'
+  },
+  noContact: {
+    id: 'recordAudit.noContact',
+    defaultMessage: 'No contact details provided',
+    description: 'No contact for record audit'
+  },
   archived: {
     id: 'recordAudit.archive.status',
     defaultMessage: 'Archived',
@@ -96,6 +105,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Date of death',
     description: 'Label for date of death'
   },
+  dateOfMarriage: {
+    id: 'recordAudit.dateOfMarriage',
+    defaultMessage: 'Date of marriage',
+    description: 'Label for date of marriage'
+  },
   placeOfBirth: {
     id: 'recordAudit.placeOfBirth',
     defaultMessage: 'Place of birth',
@@ -106,20 +120,20 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Place of death',
     description: 'Label for place of death'
   },
-  informant: {
-    id: 'recordAudit.informant',
-    defaultMessage: 'Informant',
-    description: 'Label for informant'
+  placeOfMarriage: {
+    id: 'recordAudit.placeOfMarriage',
+    defaultMessage: 'Place of marriage',
+    description: 'Label for place of marriage'
   },
-  brn: {
-    id: 'recordAudit.brn',
-    defaultMessage: 'BRN',
+  rn: {
+    id: 'recordAudit.rn',
+    defaultMessage: 'Registration no.',
     description: 'Label for Birth Registration Number'
   },
-  drn: {
-    id: 'recordAudit.drn',
-    defaultMessage: 'DRN',
-    description: 'Label for Death Registration Number'
+  registrationNo: {
+    id: 'recordAudit.registrationNo',
+    defaultMessage: 'Registration No',
+    description: 'Label for Event Registration Number'
   },
   noStatus: {
     id: 'recordAudit.noStatus',
@@ -151,6 +165,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No date of death',
     description: 'Label for date of death not available'
   },
+  noDateOfMarriage: {
+    id: 'recordAudit.noDateOfMarriage',
+    defaultMessage: 'No date of marriage',
+    description: 'Label for date of marriage not available'
+  },
   noPlaceOfBirth: {
     id: 'recordAudit.noPlaceOfBirth',
     defaultMessage: 'No place of birth',
@@ -161,10 +180,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No place of death',
     description: 'Label for place of death not availale'
   },
-  noInformant: {
-    id: 'recordAudit.noInformant',
-    defaultMessage: 'No Informant',
-    description: 'Label for informant not available'
+  noPlaceOfMarriage: {
+    id: 'recordAudit.noPlaceOfMarriage',
+    defaultMessage: 'No place of marriage',
+    description: 'Label for place of marriage not availale'
   },
   reinstateDeclarationDialogTitle: {
     id: 'recordAudit.declaration.reinstateDialogTitle',
@@ -187,6 +206,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage:
       'This will revert the application back to its original status and add it to your workqueue.',
     description: 'Description for the dialog when reinstate declaration'
+  },
+  markAsDuplicate: {
+    id: 'recordAudit.declaration.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 }
 
@@ -200,6 +223,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.assigned',
     defaultMessage: 'Assigned',
     description: 'Assigned action'
+  },
+  [RegAction.Verified]: {
+    id: 'recordAudit.regAction.verified',
+    defaultMessage: 'Certificate verified',
+    description: 'Verified action'
   },
   [RegAction.Unassigned]: {
     id: 'recordAudit.regAction.unassigned',
@@ -221,6 +249,22 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.viewed',
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
+  },
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
+  },
+  MARKED_AS_NOT_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsNotDuplicate',
+    defaultMessage: 'Marked not a duplicate',
+    description: 'Marked not a duplicate status message for record audit'
+  },
+  FLAGGED_AS_POTENTIAL_DUPLICATE: {
+    id: 'recordAudit.regAction.flaggedAsPotentialDuplicate',
+    defaultMessage: 'Flagged as potential duplicate',
+    description:
+      'Flagged as potential duplicate status message for record audit'
   }
 }
 
@@ -259,6 +303,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'recordAudit.regStatus.certified'
+  },
+  [RegStatus.Issued]: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status Issued',
+    id: 'recordAudit.regStatus.issued'
   },
   [RegStatus.Rejected]: {
     defaultMessage: 'Rejected',

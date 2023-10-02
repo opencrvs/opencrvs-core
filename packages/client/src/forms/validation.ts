@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { required, IValidationResult } from '@client/utils/validate'
 import {
@@ -47,7 +46,6 @@ const getValidationErrors = {
       field.nestedFields && values[field.name]
         ? (values[field.name] as IFormSectionData).value
         : values[field.name]
-
     const conditionalActions = getConditionalActionsForField(
       field,
       values,
@@ -64,13 +62,14 @@ const getValidationErrors = {
       }
     }
 
-    let validators = Array.from(field.validate)
+    let validators = field.validator ? Array.from(field.validator) : []
 
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
     if (field.required) {
       validators.push(required(requiredErrorMessage))
-    } else if (!value) {
+    } else if (field.validateEmpty) {
+    } else if (!value && value !== 0) {
       validators = []
     }
 

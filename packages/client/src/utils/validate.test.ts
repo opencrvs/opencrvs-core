@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   isAValidPhoneNumberFormat,
@@ -489,12 +488,6 @@ describe('validate', () => {
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
-    it('should error when an English number is given', () => {
-      const badValue = 'John1'
-      expect(englishOnlyNameFormat(badValue)).toEqual({
-        message: messages.englishOnlyNameFormat
-      })
-    })
     it('should error when a Bengali number is given', () => {
       const badValue = 'John১'
       expect(englishOnlyNameFormat(badValue)).toEqual({
@@ -537,6 +530,26 @@ describe('validate', () => {
 
       it('should pass when brackets are with last part', () => {
         const goodValue = 'John (Doe)'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with underscore', () => {
+        const goodValue = 'John_Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with number', () => {
+        const goodValue = 'John 3rd'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with number at first', () => {
+        const goodValue = "10th John The Alex'ander"
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with apostrophe', () => {
+        const goodValue = "John O'conor"
         expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
       })
 
@@ -620,67 +633,6 @@ describe('validate', () => {
       const marriageDate = '2101-02-23'
       const validDate = '2003-02-23'
       expect(checkBirthDate(marriageDate)(validDate)).toEqual(undefined)
-    })
-  })
-
-  describe('checkMarriageDate. Used for validation of date of birth.', () => {
-    // When birthDate = 'falsy'
-
-    it('should fail for invalid format', () => {
-      const birthDate = ''
-      const invalidDate = '1901-+2-2e'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for invalid number input', () => {
-      const birthDate = ''
-      const invalidDate = '190-2-21'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for invalid date', () => {
-      const birthDate = ''
-      const invalidDate = '2015-2-29'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for dates in the future', () => {
-      const birthDate = ''
-      const invalidDate = '2125-2-27'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should pass for one-digit figures for day and month', () => {
-      const birthDate = ''
-      const validDate = '2012-2-2'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
-    })
-    it('should pass for valid dates', () => {
-      const birthDate = ''
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
-    })
-
-    // When the marriage date is before the birth date
-
-    it('should fail for marriage dates before the birth date', () => {
-      const birthDate = '2101-02-23'
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual({
-        message: messages.domLaterThanDob
-      })
-    })
-
-    // When the marriage date is after the birth date
-
-    it('should pass for marriage dates after the birth date', () => {
-      const birthDate = '1801-02-23'
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
     })
   })
 

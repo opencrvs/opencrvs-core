@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 
@@ -113,7 +112,14 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
             firstNames
             familyName
           }
-          role
+          systemRole
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
         }
         startedByFacility
         startedAt
@@ -158,7 +164,14 @@ export const FETCH_REGISTRATIONS = gql`
           delayed
           registrarPractitioner {
             id
-            role
+            systemRole
+            role {
+              _id
+              labels {
+                lang
+                label
+              }
+            }
             primaryOffice {
               name
               id
@@ -167,6 +180,10 @@ export const FETCH_REGISTRATIONS = gql`
               firstNames
               familyName
               use
+            }
+            avatar {
+              type
+              data
             }
           }
         }
@@ -229,7 +246,12 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       results {
         practitionerId
         fullName
-        type
+        role {
+          labels {
+            label
+            lang
+          }
+        }
         status
         avatar {
           type

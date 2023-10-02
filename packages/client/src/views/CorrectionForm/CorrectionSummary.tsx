@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -17,7 +16,7 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { connect } from 'react-redux'
-import { get } from 'lodash'
+import { get, propertyOf } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -81,10 +80,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -94,7 +93,7 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
-  userPrimaryOffice?: IGQLLocation
+  userPrimaryOffice?: UserDetails['primaryOffice']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -357,9 +356,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               fields={this.group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
-              requiredErrorMessage={
-                messages.correctionSummaryproofOfPaymentError
-              }
+              requiredErrorMessage={messages.correctionRequiredLabel}
             />
           </Content>
         </ActionPageLight>
@@ -902,12 +899,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     return (
       <div>
         {proofOfDoc &&
-          proofOfDoc.map((proof) => {
+          proofOfDoc.map((proof, i) => {
             const doc = proof.optionValues as IFormSectionData[]
             return (
-              <SupportingDocument>
+              <SupportingDocument key={`proof-${i}`}>
                 <PaperClip />
-                <span>{doc[1]}</span>
+                <span>{doc[1] as any}</span>
               </SupportingDocument>
             )
           })}

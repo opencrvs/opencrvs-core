@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   PrimaryButton,
@@ -29,7 +28,6 @@ import {
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
@@ -39,7 +37,7 @@ import {
   formatUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -60,7 +58,7 @@ import {
   getRegistrarSignatureHandlebarName
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
@@ -87,7 +85,10 @@ const PdfWrapper = styled.div`
   display: flex;
   margin-top: 24px;
   margin-bottom: 56px;
-  height: 100%;
+  width: 595px;
+  height: 841px;
+  margin-inline: auto;
+  background: ${({ theme }) => theme.colors.white};
   align-items: center;
   justify-content: center;
 `
@@ -139,32 +140,18 @@ class ReviewCertificateActionComponent extends React.Component<
     })
   }
 
-  readyToCertify = () => {
+  readyToCertifyAndIssueOrCertify = () => {
     const { draft } = this.props
+    const isPrintInAdvanced = isCertificateForPrintInAdvance(draft)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = SubmissionAction.COLLECT_CERTIFICATE
+    draft.action = isPrintInAdvanced
+      ? SubmissionAction.CERTIFY_DECLARATION
+      : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
-    let submittableCertificate
-    if (isCertificateForPrintInAdvance(draft)) {
-      const paymentAmount = calculatePrice(
-        draft.event,
-        eventDate,
-        registeredDate,
-        this.props.offlineCountryConfig
-      )
-      submittableCertificate = {
-        payments: {
-          type: 'MANUAL' as const,
-          total: Number(paymentAmount),
-          amount: Number(paymentAmount),
-          outcome: 'COMPLETED' as const,
-          date: Date.now()
-        }
-      }
-    } else {
+    if (!isPrintInAdvanced) {
       if (
         isFreeOfCost(
           draft.event,
@@ -180,16 +167,29 @@ class ReviewCertificateActionComponent extends React.Component<
           outcome: 'COMPLETED' as const,
           date: Date.now()
         }
+      } else {
+        const paymentAmount = calculatePrice(
+          draft.event,
+          eventDate,
+          registeredDate,
+          this.props.offlineCountryConfig
+        )
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
       }
-      submittableCertificate = certificate
     }
+
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
-          ...submittableCertificate,
-          data:
-            this.state.certificatePdf === null ? '' : this.state.certificatePdf
+          ...certificate,
+          data: this.state.certificatePdf || ''
         }
       ]
     }
@@ -208,26 +208,6 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
-  getTitle = () => {
-    const { intl, event } = this.props
-    let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
-    switch (event) {
-      case Event.Birth:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-      case Event.Death:
-        eventName = intl.formatMessage(constantsMessages.death).toLowerCase()
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-      default:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-    }
-  }
-
   goBack = () => {
     const historyState = this.props.location.state
     const navigatedFromInsideApp = Boolean(
@@ -243,6 +223,8 @@ class ReviewCertificateActionComponent extends React.Component<
 
   render = () => {
     const { intl, scope } = this.props
+    const isPrintInAdvanced = isCertificateForPrintInAdvance(this.props.draft)
+    const isEventMarriage = this.props.draft.event === Event.Marriage
 
     /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
@@ -266,8 +248,13 @@ class ReviewCertificateActionComponent extends React.Component<
         goBack={this.goBack}
         goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
+        <PdfWrapper id="pdfwrapper">
+          {this.state.certificatePdf && (
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          )}
+        </PdfWrapper>
         <Content
-          title={this.getTitle()}
+          title={intl.formatMessage(certificateMessages.reviewTitle)}
           subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
         >
           <ButtonWrapper>
@@ -279,7 +266,7 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            {hasRegisterScope(scope) && (
+            {!isEventMarriage && hasRegisterScope(scope) && (
               <DangerButton
                 onClick={() =>
                   this.props.goToCertificateCorrection(
@@ -293,20 +280,26 @@ class ReviewCertificateActionComponent extends React.Component<
             )}
           </ButtonWrapper>
         </Content>
-        {this.state.certificatePdf && (
-          <PdfWrapper id="pdfwrapper">
-            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-          </PdfWrapper>
-        )}
-
         <ResponsiveModal
           id="confirm-print-modal"
-          title={intl.formatMessage(certificateMessages.modalTitle)}
+          title={
+            isPrintInAdvanced
+              ? intl.formatMessage(certificateMessages.printModalTitle)
+              : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
+          }
           actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+            <CustomTertiaryButton
+              key="close-modal"
+              onClick={this.toggleModal}
+              id="close-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
-            <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
+            <PrimaryButton
+              key="print-certificate"
+              onClick={this.readyToCertifyAndIssueOrCertify}
+              id="print-certificate"
+            >
               {intl.formatMessage(buttonMessages.print)}
             </PrimaryButton>
           ]}
@@ -314,7 +307,9 @@ class ReviewCertificateActionComponent extends React.Component<
           handleClose={this.toggleModal}
           contentHeight={100}
         >
-          {intl.formatMessage(certificateMessages.modalBody)}
+          {isPrintInAdvanced
+            ? intl.formatMessage(certificateMessages.printModalBody)
+            : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
         </ResponsiveModal>
       </ActionPageLight>
     )
@@ -328,10 +323,12 @@ const getEvent = (eventType: string | undefined) => {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }
 
-const getDraft = (
+export const getDraft = (
   drafts: IPrintableDeclaration[],
   registrationId: string,
   eventType: string

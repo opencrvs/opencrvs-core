@@ -6,19 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
   subscribeWebhooksHandler,
   reqSubscribeWebhookSchema,
   listWebhooksHandler,
-  deleteWebhookHandler
+  deleteWebhookHandler,
+  deleteWebhookByClientIdHandler
 } from '@webhooks/features/manage/handler'
 import {
   birthRegisteredHandler,
-  deathRegisteredHandler
+  deathRegisteredHandler,
+  marriageRegisteredHandler
 } from '@webhooks/features/event/handler'
 
 export const getRoutes = () => {
@@ -71,6 +72,15 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/deleteWebhooksByClientId', // Used when deleting a system through the admin UI
+      handler: deleteWebhookByClientIdHandler,
+      config: {
+        tags: ['api'],
+        description: 'Delete webhooks by client id'
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/mark-registered',
       handler: birthRegisteredHandler,
       config: {
@@ -85,6 +95,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Dispatches a webhook for the death registration event'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/marriage/mark-registered',
+      handler: marriageRegisteredHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the marriage registration event'
       }
     }
   ]

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -32,15 +31,15 @@ const StyledInput = styled.input<ITextInputProps>`
     inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
-  ${({ hideBorder, error, touched, isDisabled, theme }) =>
+  ${({ hideBorder, error, touched, disabled, theme }) =>
     hideBorder
       ? `
       border:none;
@@ -59,8 +58,8 @@ const StyledInput = styled.input<ITextInputProps>`
       border: 2px solid ${
         error && touched
           ? theme.colors.negative
-          : isDisabled
-          ? theme.colors.greyGrey
+          : disabled
+          ? theme.colors.grey300
           : theme.colors.copy
       };
       &:focus {

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -18,9 +17,6 @@ import {
   mockAggregationSearchResult
 } from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'
-// import * as fetchMock from 'jest-fetch-mock'
-
-// const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('./service.ts')
 
@@ -54,29 +50,6 @@ describe('Verify handlers', () => {
       })
 
       expect(res.statusCode).toBe(403)
-    })
-    it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
-      const token = jwt.sign(
-        {
-          scope: ['register', 'validate', 'declare']
-        },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:search-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/advancedRecordSearch',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
     })
     it('should return status code 400', async () => {
       ;(advancedSearch as jest.Mock).mockImplementation(() => {
@@ -179,6 +152,36 @@ describe('Verify handlers', () => {
     })
     afterAll(async () => {
       jest.clearAllMocks()
+    })
+  })
+
+  describe('Check with token', function () {
+    let token: string
+    beforeEach(async () => {
+      ;(advancedSearch as jest.Mock).mockReturnValue(mockSearchResult)
+      server = await createServer()
+      token = jwt.sign(
+        {
+          scope: ['register', 'validate', 'declare']
+        },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:search-user'
+        }
+      )
+    })
+    it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/advancedRecordSearch',
+        payload: {},
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
     })
   })
 })

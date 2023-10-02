@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
 import { colors } from '../colors'
 import * as icons from './all-icons'
+import { IconWeight } from 'phosphor-react'
 
 enum IconSize {
   small = 16,
@@ -26,29 +26,22 @@ export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
-  fill?: IconColor | 'none'
+  weight?: IconWeight
 }
 
 export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  fill = 'none',
+  weight = 'bold',
   ...rest
 }: IconProps) {
   const IconComponent = icons[name]
-
   return (
     <IconComponent
-      size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
-      fill={
-        fill === 'none'
-          ? 'none'
-          : fill === 'currentColor'
-          ? 'currentColor'
-          : colors[fill]
-      }
+      size={IconSize[size]}
+      weight={weight}
       {...rest}
     />
   )

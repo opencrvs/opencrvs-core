@@ -6,19 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
   updateComposition,
-  searchComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
+import { client } from '@search/elasticsearch/client'
 
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
@@ -32,7 +31,7 @@ describe('elasticsearch db helper', () => {
 
     it('should index a composition with proper configuration', async () => {
       indexSpy = jest.spyOn(client, 'index')
-      indexComposition('testId', mockCompositionBody)
+      indexComposition('testId', mockCompositionBody, client)
 
       expect(indexSpy).toBeCalled()
       expect(indexSpy).toBeCalledWith({
@@ -49,7 +48,7 @@ describe('elasticsearch db helper', () => {
         childFirstNames: 'testValue'
       }
       updateSpy = jest.spyOn(client, 'update')
-      updateComposition('testId', body)
+      updateComposition('testId', body, client)
       expect(updateSpy).toBeCalled()
       expect(updateSpy).toBeCalledWith({
         index: 'ocrvs',
@@ -64,7 +63,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      searchComposition(mockCompositionBody)
+      searchForBirthDuplicates(mockCompositionBody, client)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&
@@ -77,15 +76,10 @@ describe('elasticsearch db helper', () => {
       expect(searchSpy).toBeCalled()
     })
 
-    it('should perform search by compostion id', async () => {
-      searchByCompositionId('r1324-sd6k2-12121-1212')
+    it('should perform search by composition id', async () => {
+      searchByCompositionId('r1324-sd6k2-12121-1212', client)
       expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
       expect(searchSpy).toBeCalled()
-    })
-
-    afterAll(() => {
-      indexSpy.mockRestore()
-      searchSpy.mockRestore()
     })
   })
 })

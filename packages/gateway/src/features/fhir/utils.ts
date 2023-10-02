@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
 import {
@@ -35,7 +34,9 @@ import {
   DEATH_CORRECTION_ENCOUNTER_CODE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
   CORRECTION_CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -54,22 +55,24 @@ import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
-  BIRTH_REG_NO,
-  DEATH_REG_NO,
   DOWNLOADED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  VERIFIED_EXTENSION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
-import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
@@ -122,7 +125,7 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry.push(personEntry)
   } else {
     if (!section.entry || !section.entry[0]) {
-      throw new Error('Expected person section ot have an entry')
+      throw new Error('Expected person section to have an entry')
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
@@ -153,6 +156,10 @@ export function selectOrCreateEncounterResource(
     sectionCode = isCorrection
       ? DEATH_CORRECTION_ENCOUNTER_CODE
       : DEATH_ENCOUNTER_CODE
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    sectionCode = isCorrection
+      ? MARRIAGE_CORRECTION_ENCOUNTER_CODE
+      : MARRIAGE_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -605,6 +612,38 @@ export function selectOrCreateInformantResource(
   }
 }
 
+export function selectOrCreateWitnessResource(
+  fhirBundle: ITemplatedBundle,
+  code: string,
+  title: string
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateInformantSection(
+    code,
+    title,
+    fhirBundle
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      (entry) => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related informant person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
+}
+
 export function selectOrCreateRelatedPersonResource(
   fhirBundle: ITemplatedBundle,
   context: any,
@@ -841,7 +880,18 @@ export function setObjectPropInResourceArray(
     if (!resource[label][context._index[label]]) {
       resource[label][context._index[label]] = {}
     }
-    resource[label][context._index[label]][propName] = value
+    if (label === 'identifier' && propName === 'type') {
+      resource[label][context._index[label]][propName] = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+            code: value
+          }
+        ]
+      }
+    } else {
+      resource[label][context._index[label]][propName] = value
+    }
   }
 }
 
@@ -883,7 +933,7 @@ export function setArrayPropInResourceObject(
 
 export function findExtension(
   url: string,
-  extensions: fhir.Extension[]
+  extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   const extension =
     extensions &&
@@ -899,7 +949,10 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
   return extension?.valueString
 }
 export async function setCertificateCollector(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
@@ -910,13 +963,15 @@ export async function setCertificateCollector(
     familyName: nameItem.family,
     firstNames: nameItem.given.join(' ')
   }))
+  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
 
-  ;(details?.registration?.certificates || []).map((certificate: any) => {
-    if (!certificate?.collector) {
+  details?.registration?.certificates?.forEach((certificate) => {
+    if (!certificate) return
+    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
       certificate.collector = {
-        individual: { name },
+        name,
         relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: userDetails.role
+        otherRelationship: role
       }
     }
     return certificate
@@ -969,12 +1024,20 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.ASSIGNED
   } else if (findExtension(UNASSIGNED_EXTENSION_URL, extensions)) {
     return GQLRegAction.UNASSIGNED
+  } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.VERIFIED
   } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
     return GQLRegAction.REQUESTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VIEWED
+  } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_DUPLICATE
+  } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_NOT_DUPLICATE
+  } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
+    return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
   }
   return null
 }
@@ -1004,24 +1067,30 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function removeDuplicatesFromComposition(
+export async function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
-  duplicateId: string
+  duplicateId?: string
 ) {
-  const removeAllDuplicates = compositionId === duplicateId
-  const updatedRelatesTo =
-    composition.relatesTo &&
-    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
-      return (
-        relatesTo.code !== 'duplicate' ||
-        (!removeAllDuplicates &&
-          relatesTo.targetReference &&
-          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
-      )
-    })
-  composition.relatesTo = updatedRelatesTo
-  return composition
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
 }
 
 export const fetchFHIR = <T = any>(
@@ -1114,11 +1183,50 @@ export async function postAssignmentSearch(
     })
 }
 
-export const postAdvancedSearch = (
+type BirthDuplicateSearchBody = {
+  childFirstNames?: string
+  childFamilyName?: string
+  childDoB?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+}
+
+export const findBirthDuplicates = (
   authHeader: IAuthHeader,
-  criteria: ISearchCriteria
+  criteria: BirthDuplicateSearchBody
 ) => {
-  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
+  return fetch(`${SEARCH_URL}search/duplicates/birth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type DeathDuplicateSearchBody = {
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedIdentifier?: string
+  deceasedDoB?: string
+  deathDate?: string
+}
+export const findDeathDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: DeathDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/death`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1257,60 +1365,12 @@ export async function getDeclarationIds(
   return { trackingId: compositionBundle.identifier.value, compositionId }
 }
 
-export async function getRegistrationIdsFromResponse(
+export async function getCompositionIdFromResponse(
   resBody: fhir.Bundle,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const compositionId = getIDFromResponse(resBody)
-  return getRegistrationIds(
-    compositionId,
-    eventType,
-    isTaskResponse(resBody),
-    authHeader
-  )
-}
-
-export async function getRegistrationIds(
-  compositionId: string,
-  eventType: EVENT_TYPE,
-  isTask: boolean,
-  authHeader: IAuthHeader
-) {
-  let registrationNumber: string
-  if (eventType === EVENT_TYPE.BIRTH) {
-    registrationNumber = BIRTH_REG_NO
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    registrationNumber = DEATH_REG_NO
-  }
-  let path
-  if (isTask) {
-    path = `/Task/${compositionId}`
-  } else {
-    path = `/Task?focus=Composition/${compositionId}`
-  }
-  const taskBundle = await fetchFHIR(path, authHeader)
-  let taskResource
-  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
-    taskResource = taskBundle.entry[0].resource
-  } else if (taskBundle.resourceType === 'Task') {
-    taskResource = taskBundle
-  } else {
-    throw new Error('getRegistrationIds: Invalid task found')
-  }
-  const regIdentifier =
-    taskResource.identifier &&
-    taskResource.identifier.find(
-      (identifier: fhir.Identifier) =>
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/${registrationNumber}`
-    )
-  if (!regIdentifier || !regIdentifier.value) {
-    throw new Error(
-      'getRegistrationIds: Task does not have any registration identifier'
-    )
-  }
-  return { registrationNumber: regIdentifier.value, compositionId }
+  return { compositionId: getIDFromResponse(resBody) }
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {
@@ -1340,37 +1400,28 @@ export function isTaskResponse(resBody: fhir.Bundle): boolean {
   return resBody.entry[0].response.location.indexOf('Task') > -1
 }
 
-export async function setInformantReference(
+export function setInformantReference(
   sectionCode: string,
+  sectionTitle: string,
   relatedPerson: fhir.RelatedPerson,
   fhirBundle: ITemplatedBundle,
   context: any
 ) {
+  selectOrCreatePersonResource(sectionCode, sectionTitle, fhirBundle)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      logger.error('Expected person entry not found on the bundle')
-      return
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = await fetchFHIR(
-      `/Composition/${fhirBundle.entry[0].resource.id}`,
-      context.authHeader
-    )
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
+  if (!section?.entry) {
+    throw new Error(`${sectionCode} not found in composition!`)
+  }
+  const personSectionEntry = section.entry[0]
+  const personEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === personSectionEntry.reference
+  )
+  if (!personEntry) {
+    logger.error('Expected person entry not found on the bundle')
+    return
+  }
+  relatedPerson.patient = {
+    reference: personEntry.fullUrl
   }
 }
 
@@ -1395,7 +1446,7 @@ export const fetchDocuments = async <T = any>(
     body
   })
   const res = await result.json()
-  return await res
+  return res
 }
 
 export async function uploadBase64ToMinio(
@@ -1418,4 +1469,9 @@ export function isBase64FileString(str: string) {
   }
   const strSplit = str.split(':')
   return strSplit.length > 0 && strSplit[0] === 'data'
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }

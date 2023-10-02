@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -41,8 +40,8 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function GovtLogo() {
   const intl = useIntl()
@@ -130,9 +129,9 @@ export function GovtLogo() {
           />
         }
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
       <ResponsiveModal

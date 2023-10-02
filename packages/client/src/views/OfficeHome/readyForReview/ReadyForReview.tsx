@@ -6,22 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   Workqueue,
   COLUMNS,
   SORT_ORDER,
-  IDynamicValues,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -42,7 +40,7 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -134,7 +132,7 @@ class ReadyForReviewComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    const items: IDynamicValues[] = transformedData.map((reg, index) => {
+    const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -265,7 +263,7 @@ class ReadyForReviewComponent extends React.Component<
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
         sentForReview:
-          item.sentForReview && formattedDuration(item.sentForReview as number)
+          item.sentForReview && formattedDuration(item.sentForReview as any)
       }
     })
   }

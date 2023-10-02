@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -39,6 +38,7 @@ interface IButtonsMessages
   no: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
+  issue: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
   rejectDeclaration: MessageDescriptor
@@ -46,6 +46,7 @@ interface IButtonsMessages
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
+  saving: MessageDescriptor
   refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
@@ -73,6 +74,7 @@ interface IButtonsMessages
   copy: MessageDescriptor
   copied: MessageDescriptor
   exactDateUnknown: MessageDescriptor
+  sendForUpdates: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -173,7 +175,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgotPassword'
   },
   forgottenPIN: {
-    defaultMessage: 'Forgotten pin',
+    defaultMessage: 'Forgotten PIN',
     description: 'The label for forgotten pin button',
     id: 'buttons.forgottenPIN'
   },
@@ -212,6 +214,11 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Print button text',
     id: 'buttons.print'
   },
+  issue: {
+    id: 'buttons.issue',
+    defaultMessage: 'Issue',
+    description: 'Button for issuing'
+  },
   reinstate: {
     defaultMessage: 'Reinstate',
     description: 'Label for reinstate button',
@@ -228,7 +235,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.reject'
   },
   rejectDeclaration: {
-    defaultMessage: 'Reject Declaration',
+    defaultMessage: 'Reject declaration',
     description: 'Reject declaration button text',
     id: 'buttons.rejectDeclaration'
   },
@@ -253,24 +260,28 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Refresh button',
     id: 'buttons.refresh'
   },
-
   save: {
     defaultMessage: 'Save',
     description: 'Save Button Text',
     id: 'buttons.save'
   },
+  saving: {
+    defaultMessage: 'Saving...',
+    description: 'Saving Button Text',
+    id: 'buttons.saving'
+  },
   saveExitButton: {
-    defaultMessage: 'Save & Exit',
-    description: 'Save & Exit Button Text',
+    defaultMessage: 'Save & exit',
+    description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
   },
   deleteDeclaration: {
-    defaultMessage: 'Delete Declaration',
+    defaultMessage: 'Delete declaration',
     description: 'Delete declaration button text',
     id: 'buttons.deleteDeclaration'
   },
   closeDeclaration: {
-    defaultMessage: 'Close Declaration',
+    defaultMessage: 'Close declaration',
     description: 'Close declaration button text',
     id: 'buttons.closeDeclaration'
   },
@@ -295,7 +306,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.send'
   },
   sendForReview: {
-    defaultMessage: 'Send For Review',
+    defaultMessage: 'Send For review',
     description: 'Submit Button Text',
     id: 'buttons.sendForReview'
   },
@@ -305,7 +316,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendIncomplete'
   },
   sendForApproval: {
-    defaultMessage: 'Send For Approval',
+    defaultMessage: 'Send For approval',
     description: 'Title for complete submit button',
     id: 'buttons.sendForApproval'
   },
@@ -351,7 +362,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Correct record',
+    defaultMessage: 'No, make correction',
     description: 'Correct record button text on review certificate'
   },
   makeCorrection: {
@@ -389,6 +400,10 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Exact date unknown',
     description:
       'Label for DateRangePickerForFormField components daterangepicker toggle button'
+  },
+  sendForUpdates: {
+    id: 'buttons.sendForUpdates',
+    defaultMessage: 'Send for updates'
   }
 }
 

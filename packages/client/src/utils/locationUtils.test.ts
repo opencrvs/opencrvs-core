@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   mockOfflineData,
@@ -33,6 +32,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -42,6 +42,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
@@ -51,6 +52,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -76,6 +78,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -85,6 +88,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/321'
@@ -94,6 +98,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -163,8 +168,8 @@ describe('locationUtil tests', () => {
 
       const map = getLocationNameMapOfFacility(facilityLocation, locations)
       expect(map).toEqual({
-        DISTRICT: 'Abwe',
-        STATE: 'Central',
+        district: 'Abwe',
+        state: 'Central',
         country: {
           defaultMessage: 'Bangladesh',
           description: 'ISO Country: BGD',

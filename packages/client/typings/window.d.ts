@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 interface Window {
@@ -22,6 +21,7 @@ interface Window {
         LATE: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
     COUNTRY: string
@@ -39,15 +39,26 @@ interface Window {
         ON_TIME: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
+    MARRIAGE: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+      PRINT_IN_ADVANCE: boolean
+    }
+    MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
-    MINIO_URL: string
+    MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
-    HIDE_EVENT_REGISTER_INFORMATION: boolean
+    USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
@@ -55,8 +66,13 @@ interface Window {
     DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
-    ADDRESSES: number
-    ADMIN_LEVELS: number
+    DATE_OF_BIRTH_UNKNOWN: boolean
+    INFORMANT_SIGNATURE: boolean
+    INFORMANT_SIGNATURE_REQUIRED: boolean
+    REGISTRATIONS_DASHBOARD_URL: string
+    STATISTICS_DASHBOARD_URL: string
+    LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
+  __WB_MANIFEST: Array<{ url: string; revision: string }>
 }

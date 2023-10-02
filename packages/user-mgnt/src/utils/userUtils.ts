@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
@@ -18,13 +17,6 @@ export const statuses = {
   ACTIVE: 'active',
   DISABLED: 'disabled',
   DEACTIVATED: 'deactivated'
-}
-
-export const types = {
-  NATIONAL_ID: 'NATIONAL_ID',
-  HEALTH: 'HEALTH',
-  RECORD_SEARCH: 'RECORD_SEARCH',
-  WEBHOOK: 'WEBHOOK'
 }
 
 interface IRoleScopeMapping {

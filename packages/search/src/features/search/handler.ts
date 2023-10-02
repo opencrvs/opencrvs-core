@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
@@ -15,12 +14,21 @@ import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
-import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
+import {
+  ICompositionBody,
+  EVENT,
+  IBirthCompositionBody,
+  IDeathCompositionBody
+} from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
+import {
+  searchForDeathDuplicates,
+  searchForBirthDuplicates
+} from '@search/features/registration/deduplicate/service'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -32,7 +40,7 @@ export async function searchAssignment(
 ) {
   const payload = request.payload as IAssignmentPayload
   try {
-    const results = await searchByCompositionId(payload.compositionId)
+    const results = await searchByCompositionId(payload.compositionId, client)
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined
@@ -184,9 +192,45 @@ export async function advancedRecordSearch(
       isExternalSearch,
       request.payload as ISearchCriteria
     )
+    if (!result) {
+      return h.response({}).code(404)
+    }
+
     return h.response(result).code(200)
   } catch (err) {
     logger.error(`Search/searchDeclarationHandler: error: ${err}`)
     return badRequest(err.message)
+  }
+}
+
+export async function searchForBirthDeDuplication(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const result = await searchForBirthDuplicates(
+      request.payload as IBirthCompositionBody,
+      client
+    )
+    return h.response(result).code(200)
+  } catch (error) {
+    logger.error(`Search/searchForDuplicates: error: ${error}`)
+    return internal(error)
+  }
+}
+
+export async function searchForDeathDeDuplication(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const result = await searchForDeathDuplicates(
+      request.payload as IDeathCompositionBody,
+      client
+    )
+    return h.response(result).code(200)
+  } catch (err) {
+    logger.error(`Search for death duplications : error : ${err}`)
+    return internal(err)
   }
 }

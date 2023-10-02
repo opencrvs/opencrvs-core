@@ -6,16 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
   Ii18nFormField,
   ISelectOption,
-  IConditionals,
   IFormSectionData,
-  IConditional,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
@@ -43,8 +40,12 @@ import {
   IFormFieldValue,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
-  IInformant,
-  IContactPoint
+  ISelectFormFieldWithOptions,
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton,
+  BULLET_LIST,
+  HIDDEN,
+  Ii18nHiddenFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -68,8 +69,9 @@ import { IDynamicValues } from '@client/navigation'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-import _ from 'lodash'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
+import { Conditional } from './conditionals'
+import { UserDetails } from '@client/utils/userUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -100,6 +102,13 @@ export const internationaliseOptions = (
   })
 }
 
+export const internationaliseListFieldObject = (
+  intl: IntlShape,
+  options: MessageDescriptor[]
+) => {
+  return options.map((opt) => intl.formatMessage(opt))
+}
+
 export const internationaliseFieldObject = (
   intl: IntlShape,
   field: IFormField
@@ -110,8 +119,13 @@ export const internationaliseFieldObject = (
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
+    unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
+  }
+
+  if (base.type === HIDDEN) {
+    return base as Ii18nHiddenFormField
   }
 
   if (
@@ -121,6 +135,10 @@ export const internationaliseFieldObject = (
     base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+
+  if (base.type === BULLET_LIST) {
+    ;(base as any).items = internationaliseListFieldObject(intl, base.items)
   }
 
   if (
@@ -152,6 +170,18 @@ export const internationaliseFieldObject = (
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
+    )
+  }
+
+  if (base.type === NID_VERIFICATION_BUTTON) {
+    ;(base as any).labelForVerified = intl.formatMessage(
+      (field as INidVerificationButton).labelForVerified
+    )
+    ;(base as any).labelForUnverified = intl.formatMessage(
+      (field as INidVerificationButton).labelForUnverified
+    )
+    ;(base as any).labelForOffline = intl.formatMessage(
+      (field as INidVerificationButton).labelForOffline
     )
   }
 
@@ -235,38 +265,40 @@ export const getFieldValidation = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): Validation[] => {
-  const validate: Validation[] = []
+  const validator: Validation[] = []
   if (
     field.dynamicDefinitions &&
-    field.dynamicDefinitions.validate &&
-    field.dynamicDefinitions.validate.length > 0
+    field.dynamicDefinitions.validator &&
+    field.dynamicDefinitions.validator.length > 0
   ) {
-    field.dynamicDefinitions.validate.map(
+    field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
         )
         const fun = element.validator(...params)
-        validate.push(fun)
+        validator.push(fun)
         return element
       }
     )
   }
 
-  return validate
+  return validator
 }
 
 export function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
     declaration.data[fromSection.id] || {},
-    declaration.data
+    declaration.data,
+    userDetails
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
@@ -279,7 +311,8 @@ export function getNextSectionIds(
         getVisibleSectionGroupsBasedOnConditions(
           section,
           declaration.data[fromSection.id] || {},
-          declaration.data
+          declaration.data,
+          userDetails
         ).length > 0
     )
 
@@ -305,10 +338,20 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithDynamicOptions,
+  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData
 ) => {
+  if (field.type === SELECT_WITH_OPTIONS) {
+    if (field.optionCondition) {
+      // eslint-disable-next-line no-eval
+      const conditionEvaluator = eval(field.optionCondition!)
+      return field.options.filter(conditionEvaluator)
+    }
+
+    return field.options
+  }
+
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   if (!field.dynamicOptions.dependency) {
     throw new Error(
@@ -490,33 +533,6 @@ export function getQueryData(
   return queryData
 }
 
-export function getSelectedInformantAndContactType(draftData?: IFormData) {
-  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
-  // informantType is a special case where both the nested field and the selected parent are required
-  // this means an object was required for the fieldValue
-  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
-  // creating selectedInformantType to be a value which will be used in the conditional
-  let selectedInformantType = ''
-  let selectedContactType = ''
-  if (
-    draftData &&
-    draftData.registration &&
-    draftData.registration.informantType
-  ) {
-    const informantType = draftData.registration.informantType as IInformant
-    selectedInformantType = informantType.value
-  }
-  if (
-    draftData &&
-    draftData.registration &&
-    draftData.registration.contactPoint
-  ) {
-    const contactPoint = draftData.registration.contactPoint as IContactPoint
-    selectedContactType = contactPoint.value
-  }
-  return { selectedInformantType, selectedContactType }
-}
-
 export const getConditionalActionsForField = (
   field: IFormField,
   /*
@@ -526,21 +542,6 @@ export const getConditionalActionsForField = (
   offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
-  // set some constants that are used in conditionals
-  const selectedInformantAndContactType =
-    getSelectedInformantAndContactType(draftData)
-  // eslint-disable-next-line no-unused-vars
-  const mothersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
-    selectedInformantAndContactType.selectedContactType === 'MOTHER'
-      ? true
-      : false
-  // eslint-disable-next-line no-unused-vars
-  const fathersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
-    selectedInformantAndContactType.selectedContactType === 'FATHER'
-      ? true
-      : false
   if (!field.conditionals) {
     return []
   }
@@ -548,32 +549,19 @@ export const getConditionalActionsForField = (
     field.conditionals
       // eslint-disable-next-line no-eval
       .filter((conditional) => eval(conditional.expression))
-      .map((conditional: IConditional) => conditional.action)
+      .map((conditional: Conditional) => conditional.action)
   )
 }
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
   sectionData: IFormSectionData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
-  // set some constants that are used in conditionals
-  const selectedInformantAndContactType =
-    getSelectedInformantAndContactType(draftData)
-  // eslint-disable-next-line no-unused-vars
-  const mothersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
-    selectedInformantAndContactType.selectedContactType === 'MOTHER'
-      ? true
-      : false
-  // eslint-disable-next-line no-unused-vars
-  const fathersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
-    selectedInformantAndContactType.selectedContactType === 'FATHER'
-      ? true
-      : false
+
   // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {
@@ -583,7 +571,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
       group.conditionals
         // eslint-disable-next-line no-eval
         .filter((conditional) => eval(conditional.expression))
-        .map((conditional: IConditional) => conditional.action)
+        .map((conditional: Conditional) => conditional.action)
         .includes('hide') !== true
     )
   })
@@ -601,7 +589,7 @@ export const getVisibleOptions = (
       option.conditionals
         // eslint-disable-next-line no-eval
         .filter((conditional) => eval(conditional.expression))
-        .map((conditional: IConditional) => conditional.action)
+        .map((conditional: Conditional) => conditional.action)
         .includes('hide') !== true
     )
   })
@@ -654,15 +642,19 @@ export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
       : callingCountries[alpha3CountryCode].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
-  const number = phoneUtil.parse(phone, countryCode)
 
-  return (
-    phoneUtil
-      .format(number, PhoneNumberFormat.INTERNATIONAL)
-      // libphonenumber adds spaces and dashes to phone numbers,
-      // which we do not want to keep for now
-      .replace(/[\s-]/g, '')
-  )
+  try {
+    const number = phoneUtil.parse(phone, countryCode)
+    return (
+      phoneUtil
+        .format(number, PhoneNumberFormat.INTERNATIONAL)
+        // libphonenumber adds spaces and dashes to phone numbers,
+        // which we do not want to keep for now
+        .replace(/[\s-]/g, '')
+    )
+  } catch (error) {
+    return phone
+  }
 }
 
 export const isRadioGroupWithNestedField = (
@@ -721,222 +713,4 @@ export function getSelectedOption(
   }
 
   return null
-}
-
-export const conditionals: IConditionals = {
-  informantType: {
-    action: 'hide',
-    expression:
-      '(!draftData || !draftData.registration || draftData.registration.informantType !== "OTHER" || draftData.registration.informantType === "BOTH_PARENTS" )'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
-  },
-  isOfficePreSelected: {
-    action: 'hide',
-    expression: 'values.skippedOfficeSelction && values.registrationOffice'
-  },
-  iDType: {
-    action: 'hide',
-    expression: "!values.iDType || (values.iDType !== 'OTHER')"
-  },
-  fathersDetailsExist: {
-    action: 'hide',
-    expression: '!values.detailsExist'
-  },
-  primaryAddressSameAsOtherPrimary: {
-    action: 'hide',
-    expression: 'values.primaryAddressSameAsOtherPrimary'
-  },
-  countryPrimary: {
-    action: 'hide',
-    expression: '!values.countryPrimary'
-  },
-  isDefaultCountryPrimary: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.countryPrimary)'
-  },
-  statePrimary: {
-    action: 'hide',
-    expression: '!values.statePrimary'
-  },
-  districtPrimary: {
-    action: 'hide',
-    expression: '!values.districtPrimary'
-  },
-  addressLine4Primary: {
-    action: 'hide',
-    expression: '!values.addressLine4Primary'
-  },
-  addressLine3Primary: {
-    action: 'hide',
-    expression: '!values.addressLine3Primary'
-  },
-  country: {
-    action: 'hide',
-    expression: '!values.country'
-  },
-  isDefaultCountry: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.country)'
-  },
-  state: {
-    action: 'hide',
-    expression: '!values.state'
-  },
-  district: {
-    action: 'hide',
-    expression: '!values.district'
-  },
-  addressLine4: {
-    action: 'hide',
-    expression: '!values.addressLine4'
-  },
-  addressLine3: {
-    action: 'hide',
-    expression: '!values.addressLine3'
-  },
-  uploadDocForWhom: {
-    action: 'hide',
-    expression: '!values.uploadDocForWhom'
-  },
-  motherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="MOTHER"'
-  },
-  fatherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="FATHER"'
-  },
-  informantCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="INFORMANT"'
-  },
-  otherPersonCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="OTHER"'
-  },
-  birthCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  deathCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="INFORMANT" && values.informantDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  placeOfBirthHospital: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
-  },
-  placeOfDeathTypeHeathInstitue: {
-    action: 'hide',
-    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
-  },
-  otherBirthEventLocation: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
-  },
-  isNotCityLocation: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isCityLocation: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isNotCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  isCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  iDAvailable: {
-    action: 'hide',
-    expression: '!values.iDType || values.iDType === "NO_ID"'
-  },
-  informantPrimaryAddressSameAsCurrent: {
-    action: 'hide',
-    expression: 'values.informantPrimaryAddressSameAsCurrent'
-  },
-  deathPlaceOther: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  deathPlaceAtPrivateHome: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
-  },
-  deathPlaceAtOtherLocation: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  causeOfDeathEstablished: {
-    action: 'hide',
-    expression: '!values.causeOfDeathEstablished'
-  },
-  isMarried: {
-    action: 'hide',
-    expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
-  },
-  identifierIDSelected: {
-    action: 'hide',
-    expression:
-      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
-  },
-  fatherContactDetailsRequired: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
-  },
-  withInTargetDays: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  between46daysTo5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  after5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")  || !draftData.child || !draftData.child.childBirthDate'
-  },
-  deceasedNationIdSelected: {
-    action: 'hide',
-    expression:
-      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  certCollectorOther: {
-    action: 'hide',
-    expression: 'values.type !== "OTHER"'
-  },
-  userAuditReasonSpecified: {
-    action: 'hide',
-    expression: 'values.reason === "OTHER"'
-  },
-  userAuditReasonOther: {
-    action: 'hide',
-    expression: 'values.reason !== "OTHER"'
-  },
-  isAuditActionDeactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "DEACTIVATE"'
-  },
-  isAuditActionReactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "REACTIVATE"'
-  }
 }

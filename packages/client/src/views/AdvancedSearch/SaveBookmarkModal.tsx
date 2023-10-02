@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -17,24 +16,24 @@ import { BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION } from '@client/profile/mutati
 import {
   AdvancedSearchParametersInput,
   BookmarkAdvancedSearchMutation,
-  BookmarkAdvancedSearchMutationVariables
+  BookmarkAdvancedSearchMutationVariables,
+  BookmarkedSeachItem
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { GQLBookmarkedSeachItem } from '@opencrvs/gateway/src/graphql/schema'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { omitBy } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -120,7 +119,7 @@ export function BookmarkAdvancedSearchModal({
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          searches: filteredSearchListData as GQLBookmarkedSeachItem[]
+          searches: filteredSearchListData as BookmarkedSeachItem[]
         })
       )
       dispatch(
@@ -155,6 +154,7 @@ export function BookmarkAdvancedSearchModal({
           </Button>,
           <Button
             type="primary"
+            key="bookmark-advanced-search-result"
             id="bookmark_advanced_search_result"
             onClick={async () => {
               setNotificationMessages(

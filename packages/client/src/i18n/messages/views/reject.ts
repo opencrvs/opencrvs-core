@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -23,6 +22,7 @@ interface IRejectMessages
   rejectionReasonOther: MessageDescriptor
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRejectMessages = {
@@ -34,7 +34,7 @@ const messagesToDefine: IRejectMessages = {
   rejectionFormInstruction: {
     id: 'review.rejection.form.instruction',
     defaultMessage:
-      'Please document specific details of required updates for follow up action.',
+      'Please describe the updates required to this record for follow up action.',
     description: 'Rejection form instruction'
   },
   rejectionReasonSubmit: {
@@ -55,6 +55,11 @@ const messagesToDefine: IRejectMessages = {
   rejectionReasonDuplicate: {
     id: 'review.rejection.form.reasons.duplicate',
     defaultMessage: 'Duplicate declaration',
+    description: 'Label for rejection option duplicate'
+  },
+  markAsDuplicate: {
+    id: 'review.rejection.form.reasons.markDuplicate',
+    defaultMessage: 'Mark as a duplicate',
     description: 'Label for rejection option duplicate'
   },
   rejectionReasonMisspelling: {

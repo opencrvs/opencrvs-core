@@ -6,15 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
-import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
 import { BrowserTracing } from '@sentry/tracing'
@@ -35,7 +33,7 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      environment: process.env.NODE_ENV,
+      environment: process.env.HOSTNAME,
       dsn: window.config.SENTRY,
       integrations: [new BrowserTracing()],
       tracesSampleRate: 1.0
@@ -66,8 +64,7 @@ if (
   }
 }
 const { store, history } = createStore()
-ReactDOM.render(
-  <App store={store} history={history} />,
-  document.getElementById('root')
-)
-registerServiceWorker()
+
+const container = document.getElementById('root')
+const root = createRoot(container!)
+root.render(<App store={store} history={history} />)

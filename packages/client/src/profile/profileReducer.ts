@@ -6,18 +6,16 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { LoopReducer, Loop, loop, Cmd, RunCmd, ActionCmd } from 'redux-loop'
+import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
   USER_DETAILS,
-  IUserDetails,
-  getUserDetails,
   storeUserDetails,
-  removeUserDetails
+  removeUserDetails,
+  UserDetails
 } from '@client/utils/userUtils'
 import {
   getTokenPayload,
@@ -27,9 +25,6 @@ import {
   isTokenStillValid,
   removeToken
 } from '@client/utils/authUtils'
-
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { ApolloQueryResult } from '@apollo/client'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
@@ -40,7 +35,7 @@ export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   nonce: string
 }
 
@@ -63,6 +58,7 @@ export const profileReducer: LoopReducer<
   | Loop<ProfileState, actions.Action | changeLanguageActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
+      const shouldRedirectBack = action.payload.redirectBack
       return loop(
         {
           ...state,
@@ -80,9 +76,22 @@ export const profileReducer: LoopReducer<
           }),
           Cmd.run(
             (getState: () => IStoreState) => {
-              window.location.assign(
-                `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
-              )
+              if (shouldRedirectBack) {
+                const baseUrl = window.location.origin
+                const restUrl = window.location.href.replace(baseUrl, '')
+                const redirectToURL = new URL(
+                  restUrl === '/'
+                    ? `?lang=${getState().i18n.language}`
+                    : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
+                  window.config.LOGIN_URL
+                ).toString()
+
+                window.location.assign(redirectToURL)
+              } else {
+                window.location.assign(
+                  `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                )
+              }
             },
             { args: [Cmd.getState] }
           )
@@ -104,7 +113,7 @@ export const profileReducer: LoopReducer<
             ...state,
             authenticated: false
           },
-          Cmd.action(actions.redirectToAuthentication())
+          Cmd.action(actions.redirectToAuthentication(true))
         )
       }
 
@@ -124,11 +133,11 @@ export const profileReducer: LoopReducer<
         ])
       )
     case actions.SET_USER_DETAILS:
-      const result: ApolloQueryResult<GQLQuery> = action.payload
-      const data: GQLQuery = result && result.data
+      const result = action.payload
+      const data = result && result.data
 
       if (data && data.getUser) {
-        const userDetails = getUserDetails(data.getUser)
+        const userDetails = data.getUser
 
         return loop(
           {
@@ -148,15 +157,15 @@ export const profileReducer: LoopReducer<
         }
       }
     case actions.MODIFY_USER_DETAILS:
-      const details: IUserDetails = action.payload
-      if (details) {
+      const modifiedDetails = action.payload
+      if (state.userDetails) {
         return loop(
           {
             ...state,
-            userDetails: { ...state.userDetails, ...details }
+            userDetails: { ...state.userDetails, ...modifiedDetails }
           },
           Cmd.run(storeUserDetails, {
-            args: [{ ...state.userDetails, ...details }]
+            args: [{ ...state.userDetails, ...modifiedDetails }]
           })
         )
       } else {
@@ -181,7 +190,7 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
-      const userDetailsCollection: IUserDetails | null = JSON.parse(
+      const userDetailsCollection: UserDetails | null = JSON.parse(
         userDetailsString ? userDetailsString : 'null'
       )
       // if the user detail cannot be found or they don't match the user specified in the token
@@ -210,8 +219,8 @@ export const profileReducer: LoopReducer<
         )
       }
     case actions.SEND_VERIFY_CODE:
-      const sendVerifyCodeDetails = action.payload
-      if (state.tokenPayload && sendVerifyCodeDetails) {
+      const { notificationEvent, phoneNumber, email } = action.payload
+      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
         return loop(
           {
             ...state

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
@@ -84,6 +83,9 @@ export async function birthRegisteredHandler(
               context: [transformedBundle]
             }
           }
+          logger.info(
+            `DISPATCHING BIRTH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+          )
           const hmac = createRequestSignature(
             'sha256',
             webhookToNotify.sha_secret,
@@ -172,6 +174,9 @@ export async function deathRegisteredHandler(
               context: [transformedBundle]
             }
           }
+          logger.info(
+            `DISPATCHING DEATH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+          )
           const hmac = createRequestSignature(
             'sha256',
             webhookToNotify.sha_secret,
@@ -203,6 +208,13 @@ export async function deathRegisteredHandler(
     return internal(error)
   }
 
+  return h.response().code(200)
+}
+
+export async function marriageRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
   return h.response().code(200)
 }
 

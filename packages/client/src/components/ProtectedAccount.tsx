@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
@@ -15,7 +14,6 @@ import { CreatePassword } from '@client/views/UserSetup/CreatePassword'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
 import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
-export const SCREEN_LOCK = 'screenLock'
 
 export enum ProtectedAccoutStep {
   LANDING,

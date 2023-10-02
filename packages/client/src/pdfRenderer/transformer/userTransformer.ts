@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IntlShape } from 'react-intl'
 import {
@@ -18,16 +17,21 @@ import {
   ILocationPayload
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from '@client/utils/userUtils'
+import { HumanName } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
-export function getUserName(userDetails: Pick<IUserDetails, 'name'>) {
+export function getUserName(
+  userDetails: Pick<
+    UserDetails | NonNullable<UserDetails['localRegistrar']>,
+    'name'
+  >
+) {
   const nameObj =
     userDetails.name &&
-    (userDetails.name.find((storedName: GQLHumanName | null) => {
-      const name = storedName as GQLHumanName
+    userDetails.name.find((storedName: HumanName | null) => {
+      const name = storedName as HumanName
       return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
-    }) as GQLHumanName)
+    })
 
   return nameObj
     ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
@@ -91,8 +95,8 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.userDetails.role
-      ? intl.formatMessage(userMessages[templateData.userDetails.role])
+    return templateData.userDetails.systemRole
+      ? intl.formatMessage(userMessages[templateData.userDetails.systemRole])
       : ''
   },
 
@@ -146,10 +150,10 @@ export const userTransformers: IFunctionTransformer = {
       templateData.userDetails.catchmentArea &&
       templateData.userDetails.catchmentArea.find((cArea) => {
         return (
-          (cArea.identifier &&
+          (cArea?.identifier &&
             cArea.identifier.find(
               (identifier) =>
-                identifier.system ===
+                identifier?.system ===
                   'http://opencrvs.org/specs/id/jurisdiction-type' &&
                 identifier.value === key.jurisdictionType
             )) ||

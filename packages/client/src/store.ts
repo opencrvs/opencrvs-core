@@ -6,64 +6,56 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  compose,
-  createStore as createReduxStore,
-  applyMiddleware,
-  AnyAction,
-  Store,
-  StoreEnhancer
-} from 'redux'
-import { createBrowserHistory, History } from 'history'
-import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
   connectRouter,
   routerMiddleware,
   RouterState
 } from 'connected-react-router'
+import { createBrowserHistory, History } from 'history'
+import {
+  AnyAction,
+  applyMiddleware,
+  compose,
+  createStore as createReduxStore,
+  Store,
+  StoreEnhancer
+} from 'redux'
+import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
 
-import { profileReducer, ProfileState } from '@client/profile/profileReducer'
-import { offlineDataReducer, IOfflineDataState } from '@client/offline/reducer'
-import { intlReducer, IntlState } from '@client/i18n/reducer'
 import { declarationsReducer, IDeclarationsState } from '@client/declarations'
-import {
-  reviewReducer,
-  IReviewFormState
-} from '@opencrvs/client/src/forms/register/reviewReducer'
-import {
-  registerFormReducer,
-  IRegisterFormState
-} from '@client/forms/register/reducer'
-import { navigationReducer, INavigationState } from '@client/navigation'
-import {
-  notificationReducer,
-  NotificationState
-} from '@client/notification/reducer'
-import {
-  IRejectState,
-  rejectReducer
-} from '@opencrvs/client/src/review/reducer'
 import {
   IPrintFormState,
   printReducer
 } from '@client/forms/certificate/printReducer'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
-import createSentryMiddleware from 'redux-sentry-middleware'
-import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
-  formConfigReducer,
-  IFormConfigState
-} from './forms/configuration/formConfig/reducer'
-import { submissionMiddleware } from './declarations/submissionMiddleware'
-import { workqueueReducer, WorkqueueState } from './workqueue'
+  IRegisterFormState,
+  registerFormReducer
+} from '@client/forms/register/reducer'
+import { intlReducer, IntlState } from '@client/i18n/reducer'
+import { INavigationState, navigationReducer } from '@client/navigation'
+import {
+  notificationReducer,
+  NotificationState
+} from '@client/notification/reducer'
+import { IOfflineDataState, offlineDataReducer } from '@client/offline/reducer'
+import { profileReducer, ProfileState } from '@client/profile/profileReducer'
+import {
+  IReviewFormState,
+  reviewReducer
+} from '@opencrvs/client/src/forms/register/reviewReducer'
+// eslint-disable-next-line no-restricted-imports
 import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState
 } from '@client/search/advancedSearch/reducer'
+import { IUserFormState, userFormReducer } from '@client/user/userReducer'
+import * as Sentry from '@sentry/react'
+import createSentryMiddleware from 'redux-sentry-middleware'
+import { submissionMiddleware } from './declarations/submissionMiddleware'
+import { workqueueReducer, WorkqueueState } from './workqueue'
+import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
 export interface IStoreState {
   profile: ProfileState
@@ -75,11 +67,9 @@ export interface IStoreState {
   notification: NotificationState
   reviewForm: IReviewFormState
   printCertificateForm: IPrintFormState
-  reject: IRejectState
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
-  formConfig: IFormConfigState
   advancedSearch: IAdvancedSearchParamState
 }
 
@@ -102,18 +92,17 @@ export const createStore = <T>(
     navigation: navigationReducer,
     notification: notificationReducer,
     reviewForm: reviewReducer,
-    reject: rejectReducer,
     printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
-    formConfig: formConfigReducer,
     advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore
   const enhancer = compose(
     applyMiddleware(submissionMiddleware),
     install(config),
+    applyMiddleware(persistenceMiddleware),
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),

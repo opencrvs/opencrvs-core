@@ -6,25 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IDeclaration,
   SUBMISSION_STATUS,
   IPrintableDeclaration
 } from '@client/declarations'
-import {
-  BirthSection,
-  DeathSection,
-  IForm,
-  IFormSectionData
-} from '@client/forms'
+import { IFormSectionData } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLEventSearchSet
+  GQLEventSearchSet,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
@@ -90,6 +85,22 @@ export const getDraftInformantFullName = (
       return getInformantFullName(draft.data.child, language, lastNameFirst)
     case Event.Death:
       return getInformantFullName(draft.data.deceased, language, lastNameFirst)
+    case Event.Marriage:
+      const brideName = getInformantFullName(
+        draft.data.bride,
+        language,
+        lastNameFirst
+      )
+      const groomName = getInformantFullName(
+        draft.data.groom,
+        language,
+        lastNameFirst
+      )
+      if (brideName && groomName) {
+        return `${groomName} & ${brideName}`
+      } else {
+        return brideName || groomName || EMPTY_STRING
+      }
   }
 }
 
@@ -159,6 +170,67 @@ const transformDeathSearchQueryDataToDraft = (
   }
 }
 
+const transformMarriageSearchQueryDataToDraft = (
+  data: GQLMarriageEventSearchSet,
+  declaration: IDeclaration
+) => {
+  declaration.data.bride = {
+    brideFirstNamesEng:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    brideFamilyNameEng:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    brideFirstNames:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    brideFamilyName:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    marriageDate: data.dateOfMarriage && data.dateOfMarriage
+  }
+
+  declaration.data.groom = {
+    groomFirstNamesEng:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    groomFamilyNameEng:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    groomFirstNames:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    groomFamilyName:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    marriageDate: data.dateOfMarriage && data.dateOfMarriage
+  }
+}
+
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
 ): IDeclaration => {
@@ -192,19 +264,12 @@ export const transformSearchQueryDataToDraft = (
     case Event.Death:
       transformDeathSearchQueryDataToDraft(data, declaration)
       break
+    case Event.Marriage:
+      transformMarriageSearchQueryDataToDraft(data, declaration)
+      break
   }
 
   return declaration
-}
-
-export const getAttachmentSectionKey = (declarationEvent: Event): string => {
-  switch (declarationEvent) {
-    case Event.Death:
-      return DeathSection.DeathDocuments
-    case Event.Birth:
-    default:
-      return BirthSection.Documents
-  }
 }
 
 export function isDeclarationInReadyToReviewStatus(

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
@@ -15,17 +14,17 @@ import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { getIndividualNameObj } from '@client/utils/userUtils'
-import { userMessages } from '@client/i18n/messages'
 import { Avatar } from '@client/components/Avatar'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { Role } from '@client/utils/gateway'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)
-  const intl = useIntl()
   const language = useSelector(getLanguage)
   const toggleMenu = () => {
     setShowMenu((prevState) => !prevState)
@@ -38,10 +37,9 @@ export function Hamburger() {
       : ''
   }
 
+  // let's remove this type assertion after #4458 merges in
   const role =
-    userDetails && userDetails.role
-      ? intl.formatMessage(userMessages[userDetails.role])
-      : ''
+    (userDetails?.role && getUserRole(language, userDetails.role as Role)) ?? ''
 
   const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 
@@ -49,8 +47,8 @@ export function Hamburger() {
 
   return (
     <>
-      <Button type="icon" onClick={toggleMenu}>
-        <Icon name="Menu"></Icon>
+      <Button type="icon" size="medium" onClick={toggleMenu}>
+        <Icon name="List" size="medium" color="primary" />
       </Button>
       <ExpandingMenu
         showMenu={showMenu}

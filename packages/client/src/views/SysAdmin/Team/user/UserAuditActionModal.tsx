@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -18,7 +17,6 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { LANG_EN } from '@client/utils/constants'
@@ -26,7 +24,7 @@ import { IUserAuditForm } from '@client/user/user-audit'
 import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { FormFieldGenerator } from '@client/components/form'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -39,12 +37,12 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import { User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const { useState, useEffect } = React
 
 interface ConnectProps {
-  form: IUserAuditForm
+  form: IUserAuditForm | null
 }
 
 interface DispatchProps {
@@ -56,7 +54,7 @@ interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
     ConnectProps,
     DispatchProps {
-  user: User | null
+  user: UserDetails | null
   show: boolean
   onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void
@@ -105,18 +103,20 @@ function UserAuditActionModalComponent(
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
-    <TertiaryButton id="modal-cancel" onClick={onClose}>
+    <TertiaryButton key="modal-cancel" id="modal-cancel" onClick={onClose}>
       {intl.formatMessage(buttonMessages.cancel)}
     </TertiaryButton>
   ]
 
   if (user) {
     name =
-      (createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-      (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string)
+      (createNamesMap(user.name)[intl.locale] as string) ||
+      (createNamesMap(user.name)[LANG_EN] as string)
   }
 
   useEffect(() => {
+    if (!props.form?.fields) return
+
     if (
       hasFormError(props.form.fields, formValues, undefined, { formValues })
     ) {
@@ -130,7 +130,7 @@ function UserAuditActionModalComponent(
     } else {
       setFormError(null)
     }
-  }, [props.form.fields, formValues, intl, user])
+  }, [props.form?.fields, formValues, intl, user])
 
   useEffect(() => {
     function cleanUpFormState() {
@@ -155,7 +155,7 @@ function UserAuditActionModalComponent(
 
   function handleConfirm() {
     if (makeAllFieldsDirty) {
-      const touched = props.form.fields.reduce(
+      const touched = props.form?.fields.reduce(
         (memo: any, field: { name: any }) => ({ ...memo, [field.name]: true }),
         {}
       )
@@ -230,7 +230,7 @@ function UserAuditActionModalComponent(
       )}
       <FormFieldGenerator
         id="user-audit-form"
-        fields={form.fields}
+        fields={form?.fields ?? []}
         onChange={(values) => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         draftData={{ formValues }}

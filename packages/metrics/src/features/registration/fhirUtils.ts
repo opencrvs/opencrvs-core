@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@metrics/features/registration'
 import {
@@ -84,11 +83,13 @@ export type DECLARATION_STATUS =
   | 'REJECTED'
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
+  | 'ISSUED'
 
 export type USER_ACTION =
   | 'LOGGED_IN'
   | 'LOGGED_OUT'
   | 'PHONE_NUMBER_CHANGED'
+  | 'EMAIL_ADDRESS_CHANGED'
   | 'PASSWORD_CHANGED'
   | 'DEACTIVATE'
   | 'REACTIVATE'
@@ -99,7 +100,7 @@ export type USER_ACTION =
   | 'USERNAME_REMINDER_BY_ADMIN'
   | 'PASSWORD_RESET_BY_ADMIN'
 
-export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
+export type DECLARATION_TYPE = 'BIRTH' | 'DEATH' | 'MARRIAGE'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
@@ -254,7 +255,8 @@ export function getTrackingId(task: Task) {
   const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
-      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
+      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id` ||
+      identifier.system === `http://opencrvs.org/specs/id/marriage-tracking-id`
     )
   })
   if (!trackingIdentifier || !trackingIdentifier.value) {
@@ -273,8 +275,13 @@ export function getDeclarationType(task: Task): DECLARATION_TYPE {
   return coding.code as DECLARATION_TYPE
 }
 
-export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
-  const allowedPreviousStates = ['DECLARED', 'IN_PROGRESS']
+export function getRecordInitiator(taskHistory: fhir.Bundle): string {
+  const allowedPreviousStates = [
+    'DECLARED',
+    'VALIDATED',
+    'IN_PROGRESS',
+    'WAITING_VALIDATION'
+  ]
   const previousTasks = findAllPreviousTasks(taskHistory)
 
   const task =

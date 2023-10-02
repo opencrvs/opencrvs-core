@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -33,9 +32,15 @@ interface IOfficeHomeMessages
   validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
   waitingForExternalValidation: MessageDescriptor
   archived: MessageDescriptor
+  issued: MessageDescriptor
 }
 
 const messagesToDefine: IOfficeHomeMessages = {
+  issued: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status issued',
+    id: 'regHome.issued'
+  },
   certified: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',

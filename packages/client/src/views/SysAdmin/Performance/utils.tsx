@@ -6,20 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import styled from '@client/styledComponents'
+import React from 'react'
+
+import styled from 'styled-components'
 import {
   GQLLocation,
   GQLIdentifier,
   GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
-import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber, IntlShape } from 'react-intl'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -33,7 +34,6 @@ import {
   PERFORMANCE_STATS,
   CORRECTION_TOTALS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
-import { Event } from '@client/utils/gateway'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
@@ -176,7 +176,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 
   const jurisdictionTypeIdentifier =
     location.identifier &&
-    (location.identifier as GQLIdentifier[]).find(
+    location.identifier.find(
       ({ system }: GQLIdentifier) =>
         system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
     )
@@ -191,7 +191,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 export function isUnderJurisdictionOfUser(
   locations: { [key: string]: ILocation },
   locationId: string,
-  jurisdictionLocation: string | undefined
+  jurisdictionLocation: string | undefined | null
 ) {
   if (!jurisdictionLocation) return false
 
@@ -216,16 +216,16 @@ export function getPrimaryLocationIdOfOffice(
 }
 
 export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: IUserDetails
+  userDetails: UserDetails
 ) {
   const location =
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {
       const jurisdictionTypeIdentifier =
-        location.identifier &&
-        location.identifier.find(
+        location?.identifier &&
+        location?.identifier.find(
           (identifier) =>
-            identifier.system ===
+            identifier?.system ===
             'http://opencrvs.org/specs/id/jurisdiction-type'
         )
       return (
@@ -295,6 +295,10 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  },
+  MARKED_AS_DUPLICATE: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
   }
 }
 
@@ -316,7 +320,6 @@ export const mockPerformanceMetricsRequest = {
           maleEstimation: 0,
           femaleEstimation: 0,
           locationId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
-          estimationYear: 2022,
           locationLevel: '',
           __typename: 'Estimation'
         },

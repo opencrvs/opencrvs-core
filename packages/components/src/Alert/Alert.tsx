@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import styled from 'styled-components'
@@ -82,6 +81,7 @@ export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
+  customIcon?: React.ReactNode
 }
 
 /**
@@ -93,20 +93,27 @@ export const Alert = ({
   onActionClick,
   actionText,
   children,
+  customIcon,
   ...props
 }: IAlertProps) => (
   <Container $type={type} {...props}>
     <IconContainer>
-      {type === 'success' && <Check />}
-      {type === 'warning' && <Help />}
-      {type === 'error' && <NotificationError />}
-      {type === 'info' && <Notification />}
-      {type === 'loading' && (
-        <Spinner
-          id="in-progress-floating-notification"
-          baseColor={colors.white}
-          size={20}
-        />
+      {!customIcon ? (
+        <>
+          {type === 'success' && <Check />}
+          {type === 'warning' && <Help />}
+          {type === 'error' && <NotificationError />}
+          {type === 'info' && <Notification />}
+          {type === 'loading' && (
+            <Spinner
+              id="in-progress-floating-notification"
+              baseColor={colors.white}
+              size={20}
+            />
+          )}
+        </>
+      ) : (
+        <>{customIcon}</>
       )}
     </IconContainer>
 

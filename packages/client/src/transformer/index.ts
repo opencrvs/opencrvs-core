@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IForm,
@@ -27,13 +26,17 @@ import {
   isRadioGroupWithNestedField,
   getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
-import { EventRegistration, EventSearchSet } from '@client/utils/gateway'
+import {
+  EventRegistration,
+  EventSearchSet,
+  DuplicatesInfo
+} from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -58,7 +61,7 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const transformRegistrationCorrection = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
@@ -153,11 +156,14 @@ export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {}
+  userDetails?: UserDetails | null,
+  originalDraftData: IFormData = {},
+  offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
+
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
@@ -170,13 +176,14 @@ export const draftToGqlTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       draftData[section.id],
-      draftData
+      draftData,
+      userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
           draftData[section.id],
-          undefined,
+          offlineCountryConfig,
           draftData
         )
         if (
@@ -189,7 +196,7 @@ export const draftToGqlTransformer = (
           /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
-              `on section ${section.id}`
+              ` on section ${section.id}`
           )
           /* eslint-enable no-console */
           inCompleteFieldList.push(
@@ -299,7 +306,7 @@ export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any,
   offlineData?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: UserDetails
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -309,15 +316,14 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData,
+      userDetails
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {
@@ -399,13 +405,27 @@ export const gqlToDraftTransformer = (
   if (queryData.history) {
     transformedData.history = queryData.history
   }
+
+  if (queryData.user?.role) {
+    transformedData.user.role = queryData.user.role._id
+  }
+
   return transformedData
 }
 
 export function getPotentialDuplicateIds(
   eventRegistration: EventRegistration | EventSearchSet | null
 ) {
-  return eventRegistration?.registration?.duplicates?.filter(
-    (duplicate): duplicate is string => !!duplicate
-  )
+  const duplicates = eventRegistration?.registration?.duplicates
+  if (duplicates && duplicates[0] && typeof duplicates[0] === 'object') {
+    return (eventRegistration?.registration?.duplicates as DuplicatesInfo[])
+      .filter(
+        (duplicate): duplicate is IDuplicates => !!duplicate.compositionId
+      )
+      .map(({ compositionId }) => compositionId)
+  } else if (duplicates && typeof duplicates[0] === 'string') {
+    return (eventRegistration?.registration?.duplicates as string[]).filter(
+      (duplicate): duplicate is string => !!duplicate
+    )
+  }
 }

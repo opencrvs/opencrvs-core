@@ -6,23 +6,25 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Content } from '@opencrvs/components/lib/Content'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Title } from './commons'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
-  padding: 32px 0;
   & > div {
     margin-bottom: 16px;
   }
@@ -79,48 +81,83 @@ class ForgottenItemComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <ActionPageLight
-          title={intl.formatMessage(messages.forgottenItemFormTitle)}
-          goBack={goToHome}
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={goToHome}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={goToHome}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
+              desktopTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
+            />
+          }
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="forgotten-item-form" onSubmit={this.handleContinue}>
-            <Title>
-              {intl.formatMessage(messages.forgottenItemFormBodyHeader)}
-            </Title>
-
-            <Actions id="forgotten-item-options">
-              {this.state.error && (
-                <ErrorText id="error-text">
-                  {intl.formatMessage(messages.error)}
-                </ErrorText>
-              )}
-              {forgottenItems.map((item) => {
-                return (
-                  <RadioButton
-                    id={item.id}
-                    size="large"
-                    key={item.id}
-                    name="forgottenItemOptions"
-                    label={item.option.label}
-                    value={item.option.value}
-                    selected={
-                      this.state.forgottenItem === item.option.value
-                        ? item.option.value
-                        : ''
-                    }
-                    onChange={() =>
-                      this.setState({ forgottenItem: item.option.value })
-                    }
-                  />
-                )
-              })}
-            </Actions>
-
-            <PrimaryButton id="continue">
-              {intl.formatMessage(messages.continueButtonLabel)}
-            </PrimaryButton>
+            <Content
+              title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue"
+                  onClick={this.handleContinue}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.continueButtonLabel)}
+                </Button>
+              ]}
+              showTitleOnMobile
+            >
+              <Actions id="forgotten-item-options">
+                {this.state.error && (
+                  <ErrorText id="error-text">
+                    {intl.formatMessage(messages.error)}
+                  </ErrorText>
+                )}
+                {forgottenItems.map((item) => {
+                  return (
+                    <RadioButton
+                      id={item.id}
+                      size="large"
+                      key={item.id}
+                      name="forgottenItemOptions"
+                      label={item.option.label}
+                      value={item.option.value}
+                      selected={
+                        this.state.forgottenItem === item.option.value
+                          ? item.option.value
+                          : ''
+                      }
+                      onChange={() =>
+                        this.setState({ forgottenItem: item.option.value })
+                      }
+                    />
+                  )
+                })}
+              </Actions>
+            </Content>
           </form>
-        </ActionPageLight>
+        </Frame>
       </>
     )
   }

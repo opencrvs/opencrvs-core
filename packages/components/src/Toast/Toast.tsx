@@ -6,22 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Cross } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Link } from '../Link'
 import { colors } from '../colors'
 import { useToastVisibility } from './useToastVisibility'
+import { Icon } from '../Icon'
 
 const TOAST_DEFAULT_DURATION_MS = 8000
 
-type ToastType = 'success' | 'warning' | 'loading' | 'error'
+type ToastType = 'success' | 'warning' | 'loading' | 'error' | 'info'
 
 const deepToast = keyframes`
   from { bottom: -10px; }
@@ -38,7 +37,7 @@ const Container = styled.div<{
 }>`
   --color: ${({ $type, theme }) => `
     ${$type === 'success' ? theme.colors.positiveDark : ''}
-    ${$type === 'loading' ? theme.colors.primaryDark : ''}
+    ${$type === 'loading' || $type === 'info' ? theme.colors.primaryDark : ''}
     ${$type === 'error' ? theme.colors.negativeDark : ''}
     ${$type === 'warning' ? theme.colors.orangeDark : ''}
     ${$type === undefined ? theme.colors.positiveDark : ''}
@@ -151,7 +150,7 @@ export function Toast({
           data-testid={props['data-testid'] && `${props['data-testid']}-close`}
           onClick={onClose}
         >
-          <Cross color="currentColor" />
+          <Icon color="currentColor" name="X" size="large" />
         </Close>
       )}
     </Container>

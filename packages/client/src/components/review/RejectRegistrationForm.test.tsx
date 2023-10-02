@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
@@ -50,9 +49,9 @@ describe('reject registration form', () => {
 
   it('enables submit button when form is complete', () => {
     component
-      .find('#rejectionReasonother')
+      .find('#rejectionReasonduplicate')
       .hostNodes()
-      .simulate('change', { checked: true })
+      .simulate('change', { checked: false })
 
     component
       .find('#rejectionCommentForHealthWorker')

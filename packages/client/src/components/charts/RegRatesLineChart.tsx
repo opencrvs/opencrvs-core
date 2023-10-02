@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
@@ -18,7 +17,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
-import type { LayoutType } from 'recharts'
+import type { LegendProps } from 'recharts'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -40,7 +39,7 @@ interface IState {
   chartBottom: number
   chartLeft: number
   maximizeXAxisInterval?: boolean
-  legendLayout: LayoutType
+  legendLayout: LegendProps['layout']
   activeLabel: string
   activeRegisteredInTargetDays: IActiveState
   activeTotalRegistered: IActiveState
@@ -59,7 +58,6 @@ const CustomLegendContainer = styled.div<{
 const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
   ${({ theme }) => theme.fonts.bold16};
 `
 

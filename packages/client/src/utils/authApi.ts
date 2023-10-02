@@ -6,15 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { resolve } from 'url'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 
-export const client = axios.create({
+const client = axios.create({
   baseURL: window.config.AUTH_URL
 })
 
@@ -40,7 +38,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const invalidateToken = (token: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_URL, 'invalidateToken'),
+    url: new URL('invalidateToken', window.config.AUTH_URL).toString(),
     method: 'POST',
     data: { token }
   })

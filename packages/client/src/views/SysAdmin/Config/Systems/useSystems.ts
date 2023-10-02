@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useMutation } from '@apollo/client'
 import { updateOfflineSystems } from '@client/offline/actions'
@@ -29,7 +28,8 @@ import {
   WebhookPermission,
   Event,
   DeleteSystemMutation,
-  DeleteSystemMutationVariables
+  DeleteSystemMutationVariables,
+  IntegratingSystemType
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -42,6 +42,8 @@ function useNewSystemDraft() {
   const [newSystemType, setNewSystemType] = useState<SystemType>(
     SystemType.Health
   )
+  const [newIntegratingSystemType, setNewIntegratingSystemType] =
+    useState<IntegratingSystemType>(IntegratingSystemType.Mosip)
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
@@ -58,13 +60,15 @@ function useNewSystemDraft() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   }
 }
 
 /** Handles communication with global state management */
-export function useSystemsGlobalState() {
+function useSystemsGlobalState() {
   const { systems: existingSystems } = useSelector(getOfflineData)
   const doesNationalIdAlreadyExist = existingSystems.some(
     (system) => system.type === SystemType.NationalId
@@ -117,6 +121,8 @@ export function useSystems() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
@@ -295,7 +301,11 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          ...(newSystemType === 'WEBHOOK' && {
+          integratingSystemType:
+            newSystemType === SystemType.NationalId
+              ? newIntegratingSystemType
+              : undefined,
+          ...(newSystemType === SystemType.Webhook && {
             settings: {
               dailyQuota: 0,
               webhook: [birthPermissions, deathPermissions]
@@ -381,6 +391,8 @@ export function useSystems() {
     refreshTokenError,
     resetRefreshTokenData,
     resetData,
-    shouldWarnAboutNationalId
+    shouldWarnAboutNationalId,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType
   }
 }

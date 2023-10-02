@@ -6,14 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
   UserAuditLogResultItem: {
@@ -37,12 +37,21 @@ export const typeResolvers: GQLResolver = {
     }
   },
   EventMetricsByLocation: {
-    async location({ location }, _, authHeader) {
+    async location({ location }, _, { headers: authHeader }) {
       return await fetchFHIR(`/${location}`, authHeader)
     }
   },
+  VSExport: {
+    async url({ url: fileUri }: GQLVSExport, _, { headers: authHeader }) {
+      return getPresignedUrlFromUri(fileUri, authHeader)
+    }
+  },
   EventMetricsByRegistrar: {
-    async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
+    async registrarPractitioner(
+      { registrarPractitioner },
+      _,
+      { headers: authHeader }
+    ) {
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({

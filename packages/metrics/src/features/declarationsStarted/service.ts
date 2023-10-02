@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { query } from '@metrics/influxdb/client'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
@@ -25,43 +24,64 @@ export async function fetchLocationWiseDeclarationsStarted(
   const fieldAgent = await query(
     `SELECT COUNT(role)
           FROM declarations_started
-        WHERE time > '${timeFrom}'
-          AND time <= '${timeTo}'
-          AND ( officeLocation = '${locationId}'
-              OR locationLevel1 = '${locationId}'
-              OR locationLevel2 = '${locationId}'
-              OR locationLevel3 = '${locationId}'
-              OR locationLevel4 = '${locationId}'
-              OR locationLevel5 = '${locationId}' )
-          AND role = 'FIELD_AGENT'`
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND ( officeLocation = $locationId'
+              OR locationLevel1 = $locationId
+              OR locationLevel2 = $locationId
+              OR locationLevel3 = $locationId
+              OR locationLevel4 = $locationId
+              OR locationLevel5 = $locationId )
+          AND role = 'FIELD_AGENT'`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId
+      }
+    }
   )
 
   const office = await query(
     `SELECT COUNT(role)
           FROM declarations_started
-        WHERE time > '${timeFrom}'
-          AND time <= '${timeTo}'
-          AND ( officeLocation = '${locationId}'
-              OR locationLevel1 = '${locationId}'
-              OR locationLevel2 = '${locationId}'
-              OR locationLevel3 = '${locationId}'
-              OR locationLevel4 = '${locationId}'
-              OR locationLevel5 = '${locationId}' )
-          AND ( role = 'REGISTRAR' OR role = 'REGISTRATION_AGENT' )`
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND ( officeLocation = $locationId
+              OR locationLevel1 = $locationId
+              OR locationLevel2 = $locationId
+              OR locationLevel3 = $locationId
+              OR locationLevel4 = $locationId
+              OR locationLevel5 = $locationId )
+          AND ( role = 'REGISTRAR' OR role = 'REGISTRATION_AGENT' )`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId
+      }
+    }
   )
 
   const hospital = await query(
     `SELECT COUNT(role)
           FROM declarations_started
-        WHERE time > '${timeFrom}'
-          AND time <= '${timeTo}'
-          AND ( officeLocation = '${locationId}'
-              OR locationLevel1 = '${locationId}'
-              OR locationLevel2 = '${locationId}'
-              OR locationLevel3 = '${locationId}'
-              OR locationLevel4 = '${locationId}'
-              OR locationLevel5 = '${locationId}' )
-          AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND ( officeLocation = $locationId
+              OR locationLevel1 = $locationId
+              OR locationLevel2 = $locationId
+              OR locationLevel3 = $locationId
+              OR locationLevel4 = $locationId
+              OR locationLevel5 = $locationId )
+          AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId
+      }
+    }
   )
 
   return {
@@ -85,25 +105,34 @@ export async function getNumberOfAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
-  const eventClause = (event && `AND eventType = '${event}' `) || ''
-  const statusClause = (status && `AND status = '${status}' `) || ''
+  const eventClause = (event && `AND eventType = $event`) || ''
+  const statusClause = (status && `AND status = $status`) || ''
   const totalDeclarationStarted: {
     practitionerId: string
     totalStarted: number
   }[] = await query(
     `SELECT COUNT(compositionId) as totalStarted
             FROM declarations_started
-            WHERE time > '${timeFrom}'
-              AND time <= '${timeTo}'
-              AND ( officeLocation = '${locationId}'
-                  OR locationLevel1 = '${locationId}'
-                  OR locationLevel2 = '${locationId}'
-                  OR locationLevel3 = '${locationId}'
-                  OR locationLevel4 = '${locationId}'
-                  OR locationLevel5 = '${locationId}' ) 
+            WHERE time > $timeFrom
+              AND time <= $timeTo
+              AND ( officeLocation = $locationId
+                  OR locationLevel1 = $locationId
+                  OR locationLevel2 = $locationId
+                  OR locationLevel3 = $locationId
+                  OR locationLevel4 = $locationId
+                  OR locationLevel5 = $locationId ) 
               ${eventClause}
               ${statusClause}    
-              GROUP BY practitionerId`
+              GROUP BY practitionerId`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId,
+        event,
+        status
+      }
+    }
   )
   return totalDeclarationStarted
 }
@@ -119,23 +148,31 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
-  const eventClause = (event && `AND eventType = '${event}' `) || ''
+  const eventClause = (event && `AND eventType = $event`) || ''
   const totalRejectedAppStarted: {
     startedBy: string
     totalStarted: number
   }[] = await query(
     `SELECT COUNT(compositionId) as totalStarted
               FROM declarations_rejected
-              WHERE time > '${timeFrom}'
-                AND time <= '${timeTo}'
-                AND ( officeLocation = '${locationId}'
-                    OR locationLevel1 = '${locationId}'
-                    OR locationLevel2 = '${locationId}'
-                    OR locationLevel3 = '${locationId}'
-                    OR locationLevel4 = '${locationId}'
-                    OR locationLevel5 = '${locationId}' ) 
+              WHERE time > $timeFrom
+                AND time <= $timeTo
+                AND ( officeLocation = $locationId
+                    OR locationLevel1 = $locationId
+                    OR locationLevel2 = $locationId
+                    OR locationLevel3 = $locationId
+                    OR locationLevel4 = $locationId
+                    OR locationLevel5 = $locationId ) 
                 ${eventClause}
-                GROUP BY startedBy`
+                GROUP BY startedBy`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId,
+        event
+      }
+    }
   )
   return totalRejectedAppStarted
 }
@@ -153,7 +190,7 @@ export async function getAvgTimeSpentOnAppByPractitioners(
     totalTimeSpent: number
   }[]
 > {
-  const eventClause = (event && `AND eventType = '${event}' `) || ''
+  const eventClause = (event && `AND eventType = '${event}'`) || ''
   const averageTimeForDeclarations: {
     practitionerId: string
     totalDeclarations: number
@@ -162,17 +199,26 @@ export async function getAvgTimeSpentOnAppByPractitioners(
     `SELECT SUM(timeSpentEditing) as totalTimeSpent, 
                 COUNT(compositionId) as totalDeclarations
                 FROM declaration_time_logged
-                WHERE time > '${timeFrom}'
-                    AND time <= '${timeTo}'
-                    AND currentStatus = '${status}'
-                    AND ( officeLocation = '${locationId}'
-                        OR locationLevel1 = '${locationId}'
-                        OR locationLevel2 = '${locationId}'
-                        OR locationLevel3 = '${locationId}'
-                        OR locationLevel4 = '${locationId}'
-                        OR locationLevel5 = '${locationId}' ) 
+                WHERE time > $timeFrom
+                    AND time <= $timeTo
+                    AND currentStatus = $status
+                    AND ( officeLocation = $locationId
+                        OR locationLevel1 = $locationId
+                        OR locationLevel2 = $locationId
+                        OR locationLevel3 = $locationId
+                        OR locationLevel4 = $locationId
+                        OR locationLevel5 = $locationId ) 
                     ${eventClause}
-                    GROUP BY practitionerId`
+                    GROUP BY practitionerId`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        locationId,
+        event,
+        status
+      }
+    }
   )
   return averageTimeForDeclarations
 }

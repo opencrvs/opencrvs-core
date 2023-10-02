@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { AppStore } from '@client/store'
@@ -32,6 +31,7 @@ export const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_REJECT,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   SUBMISSION_STATUS.READY_TO_CERTIFY,
+  SUBMISSION_STATUS.READY_TO_ISSUE,
   SUBMISSION_STATUS.READY_TO_ARCHIVE,
   SUBMISSION_STATUS.FAILED_NETWORK
 ] as const
@@ -43,6 +43,7 @@ export const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.REJECTING,
   SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.CERTIFYING,
+  SUBMISSION_STATUS.ISSUING,
   SUBMISSION_STATUS.REQUESTING_CORRECTION
 ] as const
 

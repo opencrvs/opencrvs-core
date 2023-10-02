@@ -6,22 +6,40 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
+  GQLMarriageEventSearchSet,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { SearchEventsQuery } from '@client/utils/gateway'
-import { LANG_EN } from '@client/utils/constants'
+import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
+
+export const isBirthEvent = (
+  req: GQLEventSearchSet
+): req is GQLBirthEventSearchSet => {
+  return req.type === 'Birth'
+}
+
+export const isDeathEvent = (
+  req: GQLEventSearchSet
+): req is GQLDeathEventSearchSet => {
+  return req.type === 'Death'
+}
+
+export const isMarriageEvent = (
+  reg: GQLEventSearchSet
+): reg is GQLMarriageEventSearchSet => {
+  return reg.type === 'Marriage'
+}
 
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
@@ -37,17 +55,44 @@ export const transformData = (
     .map((reg: GQLEventSearchSet) => {
       let birthReg
       let deathReg
+      let marriageReg
       let names
+      let groomNames
+      let brideNames
       let dateOfEvent
-      const assignedReg = reg as GQLEventSearchSet
-      if (assignedReg.registration && assignedReg.type === 'Birth') {
-        birthReg = reg as GQLBirthEventSearchSet
-        names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
-        dateOfEvent = birthReg && birthReg.dateOfBirth
-      } else {
-        deathReg = reg as GQLDeathEventSearchSet
-        names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
-        dateOfEvent = deathReg && deathReg.dateOfDeath
+      let mergedMarriageName
+      const assignedReg = reg
+
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          birthReg = reg
+          names = (birthReg.childName as GQLHumanName[]) || []
+          dateOfEvent = birthReg.dateOfBirth
+        } else if (isDeathEvent(reg)) {
+          deathReg = reg
+          names = (deathReg.deceasedName as GQLHumanName[]) || []
+          dateOfEvent = deathReg && deathReg.dateOfDeath
+        } else if (isMarriageEvent(reg)) {
+          marriageReg = reg
+          groomNames =
+            (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
+          brideNames =
+            (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
+
+          const groomName =
+            (createNamesMap(groomNames as HumanName[])[locale] as string) ||
+            (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
+          const brideName =
+            (createNamesMap(brideNames as HumanName[])[locale] as string) ||
+            (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
+
+          mergedMarriageName =
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
+
+          dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+        }
       }
       const status =
         assignedReg.registration &&
@@ -56,9 +101,11 @@ export const transformData = (
       return {
         id: assignedReg.id,
         name:
-          (createNamesMap(names)[locale] as string) ||
-          (createNamesMap(names)[LANG_EN] as string) ||
-          '',
+          assignedReg.type === 'Marriage'
+            ? mergedMarriageName
+            : (createNamesMap(names as HumanName[])[locale] as string) ||
+              (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
+              '',
         dob:
           (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
@@ -95,10 +142,7 @@ export const transformData = (
             assignedReg.registration.comment) ||
           '',
         createdAt: assignedReg?.registration?.createdAt,
-        assignment: assignedReg?.registration?.assignment as Record<
-          string,
-          unknown
-        >,
+        assignment: assignedReg?.registration?.assignment,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

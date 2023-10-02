@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -32,6 +31,7 @@ interface IPasswordInputState {
 export type IPasswordInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 const StyledField = styled.div<IPasswordInputProps>`
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -40,7 +40,7 @@ const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;

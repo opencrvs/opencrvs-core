@@ -6,27 +6,27 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
-export const SUBMIT_DEATH_DECLARATION = gql`
+const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `
-export const APPROVE_DEATH_DECLARATION = gql`
+const APPROVE_DEATH_DECLARATION = gql`
   mutation markDeathAsValidated($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_DEATH_DECLARATION = gql`
+const REGISTER_DEATH_DECLARATION = gql`
   mutation markDeathAsRegistered($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
@@ -41,7 +41,7 @@ export const REGISTER_DEATH_DECLARATION = gql`
               firstNames
               familyName
             }
-            role
+            systemRole
           }
           location {
             id
@@ -66,7 +66,7 @@ export const REGISTER_DEATH_DECLARATION = gql`
     }
   }
 `
-export const REJECT_DEATH_DECLARATION = gql`
+const REJECT_DEATH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -76,15 +76,31 @@ export const REJECT_DEATH_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_DEATH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+const ARCHIVE_DEATH_DECLARATION = gql`
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
-export const COLLECT_DEATH_CERTIFICATE = gql`
+const COLLECT_DEATH_CERTIFICATE = gql`
   mutation markDeathAsCertified($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
+  }
+`
+
+const ISSUE_DEATH_CERTIFICATE = gql`
+  mutation markDeathAsIssued($id: ID!, $details: DeathRegistrationInput!) {
+    markDeathAsIssued(id: $id, details: $details)
   }
 `
 
@@ -100,8 +116,11 @@ export function getDeathMutation(action: SubmissionAction) {
       return REJECT_DEATH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_DEATH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_DEATH_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_DEATH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_DEATH_REG_CORRECTION
   }

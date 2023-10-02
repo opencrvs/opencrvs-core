@@ -6,22 +6,22 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { writePoints } from '@metrics/influxdb/client'
 import {
-  generateInCompleteFieldPoints,
   generateBirthRegPoint,
-  generateDeathRegPoint,
-  generateEventDurationPoint,
-  generatePaymentPoint,
-  generateDeclarationStartedPoint,
-  generateTimeLoggedPoint,
-  generateRejectedPoints,
+  generateCertificationPoint,
   generateCorrectionReasonPoint,
-  generateCertificationPoint
+  generateDeathRegPoint,
+  generateDeclarationStartedPoint,
+  generateEventDurationPoint,
+  generateInCompleteFieldPoints,
+  generateMarriageRegPoint,
+  generatePaymentPoint,
+  generateRejectedPoints,
+  generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
@@ -32,6 +32,7 @@ import {
   getActionFromTask,
   getTask
 } from '@metrics/features/registration/fhirUtils'
+import { EventType } from '@metrics/config/routes'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -61,6 +62,22 @@ export async function waitingExternalValidationHandler(
     return internal(err)
   }
 
+  return h.response().code(200)
+}
+
+export async function markedAsDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_DUPLICATE', request)
+  return h.response().code(200)
+}
+
+export async function markedAsNotDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_NOT_DUPLICATE', request)
   return h.response().code(200)
 }
 
@@ -225,7 +242,7 @@ export async function markRejectedHandler(
     points.push(
       await generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
@@ -236,6 +253,22 @@ export async function markRejectedHandler(
     await writePoints(points)
   } catch (err) {
     return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function newEventRegistrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.params.event as EventType
+  if (event === EventType.BIRTH) {
+    return newBirthRegistrationHandler(request, h)
+  } else if (event === EventType.DEATH) {
+    return newDeathRegistrationHandler(request, h)
+  } else if (event === EventType.MARRIAGE) {
+    return newMarriageRegistrationHandler(request, h)
   }
 
   return h.response().code(200)
@@ -268,6 +301,21 @@ export async function newBirthRegistrationHandler(
     return internal(err)
   }
 
+  return h.response().code(200)
+}
+
+export async function markEventRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.params.event as EventType
+  if (event === EventType.BIRTH) {
+    return markBirthRegisteredHandler(request, h)
+  } else if (event === EventType.DEATH) {
+    return markDeathRegisteredHandler(request, h)
+  } else if (event === EventType.MARRIAGE) {
+    return markMarriageRegisteredHandler(request, h)
+  }
   return h.response().code(200)
 }
 
@@ -308,6 +356,7 @@ export async function markBirthRegisteredHandler(
 
   return h.response().code(200)
 }
+
 export async function newDeathRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -337,6 +386,7 @@ export async function newDeathRegistrationHandler(
 
   return h.response().code(200)
 }
+
 export async function markDeathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -382,11 +432,30 @@ export async function markCertifiedHandler(
 ) {
   await createUserAuditPointFromFHIR('CERTIFIED', request)
   try {
-    const points = await Promise.all([
-      generateCertificationPoint(request.payload as fhir.Bundle, {
+    const points = await generateEventDurationPoint(
+      request.payload as fhir.Bundle,
+      ['REGISTERED'],
+      {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
-      }),
+      }
+    )
+
+    await writePoints([points])
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markIssuedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ISSUED', request)
+  try {
+    const points = await Promise.all([
       generatePaymentPoint(
         request.payload as fhir.Bundle,
         {
@@ -395,16 +464,19 @@ export async function markCertifiedHandler(
         },
         'certification'
       ),
+      generateCertificationPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['REGISTERED'],
+        ['CERTIFIED'],
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         }
       )
     ])
-
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -485,6 +557,7 @@ export async function declarationAssignedHandler(
   await createUserAuditPointFromFHIR('ASSIGNED', request)
   return h.response().code(200)
 }
+
 export async function declarationUnassignedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -492,6 +565,7 @@ export async function declarationUnassignedHandler(
   await createUserAuditPointFromFHIR('UNASSIGNED', request)
   return h.response().code(200)
 }
+
 export async function declarationDownloadedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -499,6 +573,7 @@ export async function declarationDownloadedHandler(
   await createUserAuditPointFromFHIR('RETRIEVED', request)
   return h.response().code(200)
 }
+
 export async function declarationViewedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -506,40 +581,16 @@ export async function declarationViewedHandler(
   await createUserAuditPointFromFHIR('VIEWED', request)
   return h.response().code(200)
 }
-export async function birthDeclarationArchivedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  await createUserAuditPointFromFHIR('ARCHIVED', request)
-  return h.response().code(200)
-}
-export async function deathDeclarationArchivedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  await createUserAuditPointFromFHIR('ARCHIVED', request)
-  return h.response().code(200)
-}
-export async function birthDeclarationReinstatedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const bundle = request.payload as fhir.Bundle
-  const task = getTask(bundle)
-  const previousAction = getActionFromTask(task!)
-  if (previousAction === 'IN_PROGRESS') {
-    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
-  }
-  if (previousAction === 'DECLARED') {
-    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
-  }
-  if (previousAction === 'REJECTED') {
-    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
-  }
 
+export async function declarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
   return h.response().code(200)
 }
-export async function deathDeclarationReinstatedHandler(
+
+export async function declarationReinstatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -557,10 +608,100 @@ export async function deathDeclarationReinstatedHandler(
   }
   return h.response().code(200)
 }
+
 export async function declarationUpdatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('DECLARATION_UPDATED', request)
+  return h.response().code(200)
+}
+
+export async function newMarriageRegistrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+
+  await createUserAuditPointFromFHIR('DECLARED', request)
+
+  try {
+    points.push(
+      await generateMarriageRegPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        Events.NEW_DEC
+      )
+    )
+
+    points.push(
+      await generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      )
+    )
+
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    )
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markMarriageRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
+
+  try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
+    const points = await Promise.all([
+      generateEventDurationPoint(
+        bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      ),
+      generateMarriageRegPoint(
+        bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'mark-existing-declaration-registered'
+      ),
+      generateTimeLoggedPoint(bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
   return h.response().code(200)
 }

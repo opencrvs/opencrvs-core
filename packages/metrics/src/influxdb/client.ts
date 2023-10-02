@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Influx from 'influx'
 import {
@@ -219,6 +218,27 @@ export const influx = new Influx.InfluxDB({
         userAgent: Influx.FieldType.STRING
       },
       tags: ['action', 'practitionerId']
+    },
+    {
+      measurement: 'marriage_registration',
+      fields: {
+        compositionId: Influx.FieldType.STRING,
+        currentStatus: Influx.FieldType.STRING,
+        daysAfterEvent: Influx.FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'timeLabel',
+        'dateLabel',
+        'registrarPractitionerId',
+        'practitionerRole',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2',
+        'locationLevel1'
+      ]
     }
   ]
 })
@@ -249,8 +269,6 @@ export const query = <T = any>(
 export async function deleteMeasurements() {
   try {
     await Promise.all([
-      influx.dropMeasurement('birth_reg', INFLUX_DB),
-      influx.dropMeasurement('death_reg', INFLUX_DB),
       influx.dropMeasurement('in_complete_fields', INFLUX_DB),
       influx.dropMeasurement('declaration_time_logged', INFLUX_DB),
       influx.dropMeasurement('declaration_event_duration', INFLUX_DB),
@@ -258,7 +276,10 @@ export async function deleteMeasurements() {
       influx.dropMeasurement('correction_payment', INFLUX_DB),
       influx.dropMeasurement('declarations_started', INFLUX_DB),
       influx.dropMeasurement('declarations_rejected', INFLUX_DB),
-      influx.dropMeasurement('user_audit_event', INFLUX_DB)
+      influx.dropMeasurement('user_audit_event', INFLUX_DB),
+      influx.dropMeasurement('marriage_registration', INFLUX_DB),
+      influx.dropMeasurement('death_registration', INFLUX_DB),
+      influx.dropMeasurement('birth_registration', INFLUX_DB)
     ])
     return {
       status: `Successfully deleted all the measurements form ${INFLUX_DB} database`

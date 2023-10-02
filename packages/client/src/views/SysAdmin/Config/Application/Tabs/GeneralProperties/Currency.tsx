@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -37,10 +36,10 @@ import {
   getCurrencySelectOptions,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function Currency() {
   const intl = useIntl()
@@ -92,9 +91,9 @@ export function Currency() {
         }
         value={<Value id={`${id}_value`}>{countryCurrencyName[0].name}</Value>}
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
 

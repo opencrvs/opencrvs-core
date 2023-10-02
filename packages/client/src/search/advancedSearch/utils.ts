@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
@@ -17,6 +16,7 @@ import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advan
 import { constantsMessages, formMessages } from '@client/i18n/messages'
 import {
   IOfflineData,
+  LocationType,
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
@@ -25,7 +25,7 @@ import {
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { IntlShape } from 'react-intl'
-import { LocationType, RegStatus } from '@client/utils/gateway'
+import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
@@ -155,7 +155,9 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     localState.registrationStatuses.length > 0
   ) {
     transformedStoreState.registrationStatuses =
-      localState.registrationStatuses === 'IN_REVIEW'
+      localState.registrationStatuses === RegStatus.Registered
+        ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
+        : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
@@ -179,7 +181,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     }
   }
 
-  if (localState.eventLocationType === LocationType.HealthFacility) {
+  if (localState.eventLocationType === LocationType.HEALTH_FACILITY) {
     eventLocationId = localState.eventLocationId
     eventCountry = ''
     eventLocationLevel1 = ''
@@ -289,7 +291,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
       reduxState.registrationStatuses.length === 1
         ? reduxState.registrationStatuses[0]
         : isEqual(
-            reduxState.registrationStatuses.sort(),
+            [...reduxState.registrationStatuses].sort(),
             [
               RegStatus.WaitingValidation,
               RegStatus.Validated,
@@ -297,6 +299,11 @@ export const transformStoreDataToAdvancedSearchLocalState = (
             ].sort()
           )
         ? 'IN_REVIEW'
+        : isEqual(
+            [...reduxState.registrationStatuses].sort(),
+            [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued].sort()
+          )
+        ? 'REGISTERED'
         : 'ALL'
   } else {
     localState.registrationStatuses = ''
@@ -322,12 +329,12 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   localState.eventCountry = ''
   localState.eventLocationType = ''
   if (reduxState.eventLocationId) {
-    localState.eventLocationType = LocationType.HealthFacility
+    localState.eventLocationType = LocationType.HEALTH_FACILITY
     localState.eventLocationId = reduxState.eventLocationId
   }
 
   if (reduxState.eventCountry) {
-    localState.eventLocationType = LocationType.PrivateHome
+    localState.eventLocationType = LocationType.PRIVATE_HOME
     localState.eventCountry = reduxState.eventCountry
     localState.eventLocationLevel1 = reduxState.eventLocationLevel1 || ''
     localState.eventLocationLevel2 = reduxState.eventLocationLevel2 || ''
@@ -449,7 +456,7 @@ export const getAccordionActiveStateMap = (
   }
 }
 
-export const determineDateFromDateRangePickerVal = (
+const determineDateFromDateRangePickerVal = (
   dateRangePickerValue?: IDateRangePickerValue
 ): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
   if (!dateRangePickerValue) {
@@ -471,7 +478,7 @@ export const determineDateFromDateRangePickerVal = (
   return value
 }
 
-export const convertDateValuesToDateRangePicker = (
+const convertDateValuesToDateRangePicker = (
   exact?: string,
   rangeStart?: string,
   rangeEnd?: string
@@ -550,7 +557,8 @@ const getLabelForRegistrationStatus = (
       RegStatus.Registered,
       RegStatus.Rejected,
       RegStatus.Validated,
-      RegStatus.WaitingValidation
+      RegStatus.WaitingValidation,
+      RegStatus.Issued
     ],
     IN_REVIEW: [
       RegStatus.WaitingValidation,
@@ -569,7 +577,7 @@ const getLabelForRegistrationStatus = (
   }
 
   const statusType = Object.keys(statusLabelMapping).find((key, i) => {
-    if (isEqual(statusList.sort(), statusLabelMapping[key].sort())) {
+    if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
     return false

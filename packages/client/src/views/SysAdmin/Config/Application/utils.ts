@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { countries as countryList, lookup } from 'country-data'
@@ -15,20 +14,20 @@ import { orderBy, uniqBy } from 'lodash'
 import {
   BirthActionId,
   DeathActionId,
-  GeneralActionId
+  GeneralActionId,
+  MarriageActionId
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { IOfflineData } from '@client/offline/reducer'
-import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
-export type IActionType =
+type IActionType =
   | keyof typeof GeneralActionId
   | keyof typeof BirthActionId
   | keyof typeof DeathActionId
+  | keyof typeof MarriageActionId
 interface ICurrencyOptions {
   [key: string]: string
 }
@@ -82,11 +81,6 @@ export const getCurrencyObject = (value: string) => {
   }
 }
 
-export const getCountryName = (isoCode: string) => {
-  const countryName = lookup.countries({ alpha3: isoCode })[0]
-  return countryName && countryName.name
-}
-
 export function isValidRegEx(pattern: string): boolean {
   try {
     const value = ''
@@ -95,6 +89,27 @@ export function isValidRegEx(pattern: string): boolean {
     return false
   }
   if (pattern === '') return false
+  return true
+}
+export function isValidHexColorCode(value: string): boolean {
+  const pattern = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
+  return true
+}
+export function isValidHexColorCodeEntry(value: string): boolean {
+  const pattern = /^[A-Fa-f0-9]{0,6}$/
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
   return true
 }
 
@@ -162,25 +177,19 @@ export const getFormattedFee = (value: string) => {
 }
 
 export const isWithinFileLength = (base64data: string) => {
-  const baseStr = base64data.substring(22)
+  const baseStr = base64data.split(',')[1]
   const decoded = window.atob(baseStr)
-  if (decoded.length >= 2000000) {
-    return false
-  }
-  return true
+  return decoded.length < 2000000
 }
 
 const isGeneralOrConfigAction = (
-  configProperty: IActionType | ConfigActionType
-): configProperty is GeneralActionId | ConfigActionType => {
-  return (
-    Object.keys(GeneralActionId).includes(configProperty) ||
-    Object.keys(ConfigActionType).includes(configProperty)
-  )
+  configProperty: IActionType
+): configProperty is GeneralActionId => {
+  return Object.keys(GeneralActionId).includes(configProperty)
 }
 
 export async function callApplicationConfigMutation(
-  configProperty: IActionType | ConfigActionType,
+  configProperty: IActionType,
   appConfig: IApplicationConfig,
   dispatch: Dispatch,
   setNotificationStatus: (status: NOTIFICATION_STATUS) => void
@@ -189,12 +198,12 @@ export async function callApplicationConfigMutation(
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
       isGeneralOrConfigAction(configProperty)
-        ? {
-            [configProperty]: appConfig[configProperty]
-          }
+        ? { [configProperty]: appConfig[configProperty] }
         : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
-        : { DEATH: appConfig.DEATH }
+        : configProperty in DeathActionId
+        ? { DEATH: appConfig.DEATH }
+        : { MARRIAGE: appConfig.MARRIAGE }
     )
     if (res && res.data) {
       const updatedConfigs = res.data.updateApplicationConfig

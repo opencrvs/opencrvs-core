@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -15,12 +14,13 @@ import { HEARTH_URL } from '@workflow/constants'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import {
   getEntryId,
+  getSharedContactEmail,
   getSharedContactMsisdn
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
@@ -28,9 +28,10 @@ export default async function updateTaskHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     const payload = await modifyTaskBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     const taskId = getEntryId(payload)
     const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
@@ -51,13 +52,19 @@ export default async function updateTaskHandler(
         }] body: ${await res.text()}`
       )
     }
-    const msisdn = await getSharedContactMsisdn(payload)
+    const sms = await getSharedContactMsisdn(payload)
+    const email = await getSharedContactEmail(payload)
     /* sending notification to the contact */
-    if (msisdn) {
+    if (sms || email) {
       logger.info(`updateTaskHandler(${event}) sending event notification`)
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      sendEventNotification(
+        payload,
+        event,
+        { sms, email },
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     } else {
       logger.info(
         'updateTaskHandler(reject declaration) could not send event notification'

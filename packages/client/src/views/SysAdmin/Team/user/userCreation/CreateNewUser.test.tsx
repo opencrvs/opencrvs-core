@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/query/queries'
@@ -21,9 +20,12 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
-  mockOfflineDataDispatch
+  mockRoles,
+  mockOfflineDataDispatch,
+  getFileFromBase64String,
+  validImageB64String
 } from '@client/tests/util'
-import { modifyUserFormData, processRoles } from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -31,47 +33,13 @@ import {
   REVIEW_USER_FORM,
   REVIEW_USER_DETAILS
 } from '@client/navigation/routes'
-import { UserSection } from '@client/forms'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
+import { vi, Mock, describe, expect } from 'vitest'
 
-export const mockRoles = {
-  data: {
-    getRoles: [
-      { value: 'FIELD_AGENT', types: ['HOSPITAL', 'CHA'], __typename: 'Role' },
-      {
-        value: 'REGISTRATION_AGENT',
-        types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
-        __typename: 'Role'
-      },
-      {
-        value: 'LOCAL_REGISTRAR',
-        types: ['SECRETARY', 'CHAIRMAN', 'MAYOR'],
-        __typename: 'Role'
-      },
-      {
-        value: 'LOCAL_SYSTEM_ADMIN',
-        types: ['LOCAL_SYSTEM_ADMIN'],
-        __typename: 'Role'
-      },
-      {
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        types: ['NATIONAL_SYSTEM_ADMIN'],
-        __typename: 'Role'
-      },
-      {
-        value: 'PERFORMANCE_MANAGEMENT',
-        types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
-        __typename: 'Role'
-      },
-      { value: 'API_USER', types: ['API_USER'], __typename: 'Role' }
-    ]
-  }
-}
-
-export const mockUsers = {
+const mockUsers = {
   data: {
     searchUsers: {
       totalItems: 8,
@@ -87,8 +55,16 @@ export const mockUsers = {
             }
           ],
           username: 'api.user',
-          role: 'API_USER',
-          type: 'API_USER',
+          systemRole: 'NATIONAL_REGISTRAR',
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'API_USER'
+              }
+            ]
+          },
           status: 'active',
           __typename: 'User'
         },
@@ -103,8 +79,8 @@ export const mockUsers = {
             }
           ],
           username: 'shahriar.nafis',
+          systemRole: 'LOCAL_SYSTEM_ADMIN',
           role: 'LOCAL_SYSTEM_ADMIN',
-          type: 'LOCAL_SYSTEM_ADMIN',
           status: 'active',
           __typename: 'User'
         },
@@ -119,8 +95,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohamed.abu',
-          role: 'NATIONAL_REGISTRAR',
-          type: 'SECRETARY',
+          systemRole: 'NATIONAL_REGISTRAR',
+          role: 'SECRETARY',
           status: 'active',
           __typename: 'User'
         },
@@ -135,8 +111,8 @@ export const mockUsers = {
             }
           ],
           username: 'nasreen.pervin',
-          role: 'STATE_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'STATE_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -151,8 +127,8 @@ export const mockUsers = {
             }
           ],
           username: 'muid.khan',
-          role: 'DISTRICT_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'DISTRICT_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -167,8 +143,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohammad.ashraful',
-          role: 'LOCAL_REGISTRAR',
-          type: 'CHAIRMAN',
+          systemRole: 'LOCAL_REGISTRAR',
+          role: 'CHAIRMAN',
           status: 'active',
           __typename: 'User'
         },
@@ -183,8 +159,8 @@ export const mockUsers = {
             }
           ],
           username: 'tamim.iqbal',
-          role: 'REGISTRATION_AGENT',
-          type: 'ENTREPENEUR',
+          systemRole: 'REGISTRATION_AGENT',
+          role: 'ENTREPENEUR',
           status: 'active',
           __typename: 'User'
         },
@@ -199,8 +175,8 @@ export const mockUsers = {
             }
           ],
           username: 'sakibal.hasan',
-          role: 'FIELD_AGENT',
-          type: 'CHA',
+          systemRole: 'FIELD_AGENT',
+          role: 'CHA',
           status: 'active',
           __typename: 'User'
         }
@@ -221,6 +197,7 @@ describe('create new user tests', () => {
     const s = createStore()
     store = s.store
     history = s.history
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in create new user form', () => {
@@ -231,7 +208,7 @@ describe('create new user tests', () => {
             // @ts-ignore
             params: {
               locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.forms.userForm.sections[0].id
+              sectionId: mockOfflineData.userForms.sections[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -251,23 +228,23 @@ describe('create new user tests', () => {
 
       await flushPromises()
       testComponent.update()
-
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#phoneNumber_error')
+          .find('#familyNameEng_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
     })
 
-    it('clicking on confirm button with complete data takes user to preview page', async () => {
+    it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-
-      expect(history.location.pathname).toContain('preview')
+      expect(history.location.pathname).toContain(
+        'preview/preview-registration-office'
+      )
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
@@ -284,15 +261,15 @@ describe('create new user tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
+      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[1].id,
-              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+              sectionId: mockOfflineData.userForms.sections[1].id,
+              groupId: mockOfflineData.userForms.sections[1].groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -361,13 +338,14 @@ describe('edit user tests', () => {
             ],
             username: 'shakib1',
             mobile: '+8801662132163',
+            email: 'jeff@gmail.com',
             identifier: {
               system: 'NATIONAL_ID',
               value: '101488192',
               __typename: 'Identifier'
             },
-            role: 'API_USER',
-            type: 'API_USER',
+            systemRole: 'NATIONAL_REGISTRAR',
+            role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
@@ -399,6 +377,19 @@ describe('edit user tests', () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
+  it('check user role update', async () => {
+    const section = store
+      .getState()
+      .userForm.userForm?.sections.find((section) => section.id === 'user')
+    const group = section!.groups.find(
+      (group) => group.id === 'user-view-group'
+    )!
+    const field = group.fields.find(
+      (field) => field.name === 'role'
+    ) as ISelectFormFieldWithOptions
+    expect(field.options).not.toEqual([])
+  })
+
   describe('when user is in update form page', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
@@ -421,7 +412,7 @@ describe('edit user tests', () => {
       component = testComponent
     })
 
-    it('clicking on continue button takes user review details page', async () => {
+    it('clicking on continue button takes user signature attachment page', async () => {
       const continueButtonElement = await waitForElement(
         component,
         '#confirm_form'
@@ -430,9 +421,8 @@ describe('edit user tests', () => {
       continueButtonElement.hostNodes().simulate('click')
       component.update()
       await flushPromises()
-      expect(history.location.pathname).toContain(
-        '/user/5e835e4d81fbf01e4dc554db/preview/'
-      )
+
+      expect(history.location.pathname).toContain('signature-attachment')
     })
   })
 
@@ -486,11 +476,29 @@ describe('edit user tests', () => {
     })
 
     it('clicking confirm button starts submitting the form', async () => {
+      await waitForElement(component, '#image_file_uploader_field')
+      component.update()
+      const file = new File(['(⌐□_□)'], 'chucknorris.png', {
+        type: 'image/png'
+      })
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { files: [file] } })
+
+      await flushPromises()
+      component.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
       submitButton.hostNodes().simulate('click')
+      await flushPromises()
+      component.update()
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })

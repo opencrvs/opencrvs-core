@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { colors, gradients, shadows } from './colors'
 import { fonts, family as fontFamily } from './fonts'
@@ -23,3 +22,7 @@ export const getTheme = () => ({
 })
 
 export type ITheme = ReturnType<typeof getTheme>
+
+declare module 'styled-components' {
+  export interface DefaultTheme extends ITheme {}
+}

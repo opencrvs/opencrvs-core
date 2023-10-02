@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import ReactSelect, { components } from 'react-select'
@@ -34,7 +33,7 @@ const StyledSelect = styled(ReactSelect)<{
   withLightTheme: boolean
 }>`
   .react-select__container {
-    border-radius: 2px;
+    border-radius: 4px;
     ${({ theme }) => theme.fonts.reg14};
   }
 

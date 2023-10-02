@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -24,7 +23,6 @@ const Container = styled.div`
   }
 `
 const DataContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBody};
   display: flex;
   flex-grow: 1;
   max-width: 90%;
@@ -35,7 +33,6 @@ const DataContainer = styled.div`
   }
 `
 const ValueContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBody};
   width: 100%;
 `
 const Label = styled.label`

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as redis from 'redis'
 import { REDIS_HOST } from '@gateway/constants'
@@ -33,7 +32,7 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(REDIS_HOST)}`)
   redisClient = redis.createClient({
     host: REDIS_HOST,
-    retry_strategy: (options) => {
+    retry_strategy: () => {
       return 1000
     }
   })

@@ -6,29 +6,24 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { connect } from 'react-redux'
-import { Page, IPage } from '@login/common/Page'
-import { IStoreState } from '@login/store'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { DarkPage } from '@login/common/DarkPage/DarkPage'
+import React from 'react'
+import styled from 'styled-components'
 
-const mapStateToProps = (store: IStoreState): IPage => {
-  return {
-    submitting: store.login.submitting
+export const PageContainer = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-export const PageContainer = withRouter(
-  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
-    mapStateToProps
-  )(Page)
-) as any
-
-export const DarkPageContainer = withRouter(
-  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
-    mapStateToProps
-  )(DarkPage)
-) as any
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+`

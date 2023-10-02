@@ -6,18 +6,19 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useEffect, useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   goToAdvancedSearch,
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
+  goToIssueCertificate as goToIssueCertificateAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
@@ -32,7 +33,6 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
-  ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
   EMPTY_STRING,
   NAME_TEXT,
@@ -48,7 +48,8 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -62,7 +63,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
@@ -79,7 +79,6 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
-import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,
@@ -88,7 +87,7 @@ import {
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 
-const SearchParamPillsContainer = styled.div`
+const SearchParamContainer = styled.div`
   margin: 16px 0px;
   display: flex;
   gap: 10px;
@@ -108,10 +107,11 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToIssueCertificate: typeof goToIssueCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
@@ -247,6 +247,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           reg.declarationStatus === RegStatus.Validated
         const declarationIsInProgress =
           reg.declarationStatus === RegStatus.InProgress
+        const declarationIsIssued = reg.declarationStatus === RegStatus.Issued
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -256,7 +257,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
-            (declarationIsRegistered || declarationIsCertified) &&
+            (declarationIsRegistered || declarationIsIssued) &&
             userHasCertifyScope()
           ) {
             actions.push({
@@ -266,6 +267,17 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               ) => {
                 e && e.stopPropagation()
                 props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (declarationIsCertified && userHasCertifyScope()) {
+            actions.push({
+              label: intl.formatMessage(buttonMessages.issue),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                props.goToIssueCertificate(reg.id)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -431,7 +443,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
                 onPageChange={(page: any) => setCurrentPageNumber(page)}
-                topActionButtons={[<BookmarkAdvancedSearchResult />]}
+                topActionButtons={[
+                  <BookmarkAdvancedSearchResult key="bookmark-advanced-search-result" />
+                ]}
                 showTitleOnMobile={true}
               >
                 {loading ? (
@@ -481,26 +495,28 @@ const SearchModifierComponent = () => {
 
   return (
     <>
-      <SearchParamPillsContainer>
+      <SearchParamContainer>
         {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
+              key={pillKey}
               label={`${intl.formatMessage(
                 advancedSearchResultMessages[pillKey as advancedSearchPillKey]
               )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
               type="default"
-              size="medium"
+              size="small"
             ></Pill>
           )
         })}
         <Link
+          font="bold14"
           onClick={() => {
             dispatch(goToAdvancedSearch())
           }}
         >
           {intl.formatMessage(buttonMessages.edit)}
         </Link>
-      </SearchParamPillsContainer>
+      </SearchParamContainer>
     </>
   )
 }
@@ -516,6 +532,7 @@ export const AdvancedSearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToPrintCertificate: goToPrintCertificateAction,
+    goToIssueCertificate: goToIssueCertificateAction,
     goToDeclarationRecordAudit
   }
 )(withTheme(AdvancedSearchResultComp))

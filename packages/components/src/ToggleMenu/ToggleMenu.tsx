@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
 import React from 'react'
-import { CircleButton } from '../buttons'
+import { Button } from '../Button'
 import { noop } from 'lodash'
 
 const ToggleMenuContainer = styled.nav`
@@ -29,7 +28,7 @@ const MenuContainer = styled.ul`
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.light};
   text-align: left;
-  min-width: 240px;
+  min-width: 200px;
   width: auto;
   white-space: nowrap;
   position: absolute;
@@ -44,28 +43,31 @@ const MenuContainer = styled.ul`
 `
 
 const MenuHeader = styled.li`
-  ${({ theme }) => theme.fonts.bodyStyle};
   padding: 8px 16px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  font-feature-settings: 'pnum' on, 'lnum' on;
 `
 const MenuItem = styled.li`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.grey500};
   display: flex;
-  flex-direction: row;
-  cursor: pointer;
   align-items: center;
-  font-feature-settings: 'pnum' on, 'lnum' on;
-  padding: 16px 16px;
-  height: 40px;
-  gap: 12px;
+  gap: 8px;
+  outline: none;
+  cursor: pointer;
+  margin: 0 6px;
+  border-radius: 4px;
+  padding: 8px 12px;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
+    background: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.grey600};
   }
-  &:last-child {
-    border: 0;
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.grey600};
+  }
+  &:focus-visible {
+    background-color: ${({ theme }) => theme.colors.yellow};
   }
 `
 
@@ -93,22 +95,29 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     this.state = {
       showSubmenu: false
     }
-    this.showMenu = this.showMenu.bind(this)
+    this.toggleMenu = this.toggleMenu.bind(this)
     this.closeMenu = this.closeMenu.bind(this)
     this.closeMenuOnEscape = this.closeMenuOnEscape.bind(this)
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeMenu)
-    document.removeEventListener('click', this.showMenu)
+    document.removeEventListener('click', this.toggleMenu)
     document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
-  showMenu() {
+  toggleMenu() {
     this.setState(() => ({
-      showSubmenu: true
+      showSubmenu: !this.state.showSubmenu
     }))
-    document.addEventListener('click', this.closeMenu)
-    document.addEventListener('keyup', this.closeMenuOnEscape)
+
+    if (!this.state.showSubmenu) {
+      //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+      setTimeout(() => document.addEventListener('click', this.closeMenu), 0)
+      setTimeout(
+        () => document.addEventListener('keyup', this.closeMenuOnEscape),
+        0
+      )
+    }
   }
 
   closeMenu() {
@@ -133,9 +142,14 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer aria-expanded={this.state.showSubmenu}>
-          <CircleButton id={`${id}ToggleButton`} onClick={this.showMenu}>
+          <Button
+            type="icon"
+            size="large"
+            id={`${id}ToggleButton`}
+            onClick={this.toggleMenu}
+          >
             {toggleButton}
-          </CircleButton>
+          </Button>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}

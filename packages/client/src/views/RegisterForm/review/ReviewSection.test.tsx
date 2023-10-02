@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createDeclaration,
@@ -15,15 +14,16 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  BirthSection,
+  // BirthSection,
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
-  DeathSection,
+  // DeathSection,
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION
+  // MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
@@ -89,6 +89,12 @@ const rejectedDraftDeath = createReviewDeclaration(
   DeclarationEvent.Death,
   REJECTED
 )
+const rejectedDraftMarriage = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.Marriage,
+  REJECTED
+)
 
 describe('when in device of large viewport', () => {
   let userAgentMock: SpyInstance
@@ -122,12 +128,12 @@ describe('when in device of large viewport', () => {
 
     it('Goes to child document while scroll to child section', async () => {
       window.dispatchEvent(new Event('scroll'))
-      await waitForElement(reviewSectionComponent, '#document_section_child')
+      await waitForElement(reviewSectionComponent, '#child-accordion')
     })
 
     it('shows zero document error if no document is uploaded', async () => {
       window.dispatchEvent(new Event('scroll'))
-      await waitForElement(reviewSectionComponent, '#zero_document_child')
+      await waitForElement(reviewSectionComponent, '#zero_document')
     })
 
     describe('when user clicks on change link', () => {
@@ -264,10 +270,33 @@ describe('when in device of large viewport', () => {
     })
   })
 
+  describe('when user is in the review page for rejected marriage declaration', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={rejectedDraftMarriage}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('Should not click the Reject Declaration', async () => {
+      const rejectButton = reviewSectionComponent.find(
+        '#rejectDeclarationBtn'
+      ).length
+      expect(rejectButton).toEqual(0)
+    })
+  })
+
   describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -280,18 +309,18 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should click the Validate Declaration Button', async () => {
-      const validateButton = reviewSectionComponent
-        .find('#validateDeclarationBtn')
-        .hostNodes().length
-      expect(validateButton).toEqual(1)
+    it('Should click the validator Declaration Button', async () => {
+      const validatorButton = reviewSectionComponent.contains(
+        '#validatorDeclarationBtn'
+      )
+      expect(validatorButton).toBeFalsy()
     })
 
     it('Should click the Reject Declaration Button', async () => {
-      const rejectButton = reviewSectionComponent
-        .find('#rejectDeclarationBtn')
-        .hostNodes().length
-      expect(rejectButton).toEqual(1)
+      const rejectButton = reviewSectionComponent.contains(
+        '#rejectDeclarationBtn'
+      )
+      expect(rejectButton).toBeFalsy()
     })
 
     describe('when user clicks on change link', () => {
@@ -335,8 +364,7 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Registration,
-              hasDocumentSection: true,
+              id: 'registration',
               viewType: 'form' as ViewType,
               title: {
                 defaultMessage: 'Informant',
@@ -362,7 +390,7 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       options: [
                         {
                           value: 'FATHER',
@@ -393,7 +421,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ],
                         MOTHER: [
@@ -407,7 +435,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ]
                       }
@@ -421,7 +449,7 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               viewType: 'form' as ViewType,
               name: {
                 defaultMessage: 'What are the deceased details?',
@@ -447,12 +475,23 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       conditionals: []
                     }
                   ]
                 }
               ]
+            }
+          ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: 'groom',
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
+              viewType: 'form' as ViewType,
+              groups: []
             }
           ]
         }
@@ -466,7 +505,8 @@ describe('when in device of large viewport', () => {
               informantPhoneMother: '011123456789'
             }
           }
-        }
+        },
+        documents: {}
       }
 
       const simpleDraft = createReviewDeclaration(
@@ -504,10 +544,10 @@ describe('when in device of large viewport', () => {
 
     it('renders validation error if wrong value given', () => {
       expect(
-        reviewSectionComponent
-          .find('#required_label_registration_informant')
-          .hostNodes()
-      ).toHaveLength(2)
+        reviewSectionComponent.contains(
+          '#required_label_registration_informant'
+        )
+      ).toBeFalsy()
     })
   })
 
@@ -524,11 +564,10 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Child,
+              id: 'child',
               viewType: 'form' as ViewType,
               title: formMessages.childTitle,
               name: formMessages.childTitle,
-              hasDocumentSection: true,
               groups: [
                 {
                   id: 'child-view-group',
@@ -540,7 +579,7 @@ describe('when in device of large viewport', () => {
                       searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
-                      validate: [],
+                      validator: [],
                       label: formMessages.birthLocation
                     }
                   ]
@@ -552,9 +591,20 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               name: formMessages.deceasedTitle,
               title: formMessages.deceasedTitle,
+              viewType: 'form' as ViewType,
+              groups: []
+            }
+          ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: 'groom',
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
               groups: []
             }
@@ -565,7 +615,8 @@ describe('when in device of large viewport', () => {
       const data = {
         child: {
           birthLocation: '0d8474da-0361-4d32-979e-af91f012340a'
-        }
+        },
+        documents: {}
       }
 
       const simpleDraft = createReviewDeclaration(
@@ -610,9 +661,8 @@ describe('when in device of small viewport', () => {
       birth: {
         sections: [
           {
-            id: BirthSection.Mother,
+            id: 'mother',
             name: formMessages.motherTitle,
-            hasDocumentSection: true,
             title: formMessages.motherTitle,
             viewType: 'form' as ViewType,
             groups: [
@@ -624,7 +674,7 @@ describe('when in device of small viewport', () => {
                     type: DATE,
                     label: formMessages.dateOfBirth,
                     required: true,
-                    validate: [],
+                    validator: [],
                     initialValue: ''
                   }
                 ]
@@ -632,7 +682,7 @@ describe('when in device of small viewport', () => {
             ]
           },
           {
-            id: BirthSection.Documents,
+            id: 'documents',
             name: formMessages.documentsName,
             title: formMessages.documentsTitle,
             viewType: 'form' as ViewType,
@@ -646,7 +696,7 @@ describe('when in device of small viewport', () => {
                     type: DOCUMENT_UPLOADER_WITH_OPTION,
                     label: formMessages.uploadDocForMother,
                     required: true,
-                    validate: [],
+                    validator: [],
                     options: [
                       {
                         label: formMessages.docTypeBirthCert,
@@ -663,9 +713,20 @@ describe('when in device of small viewport', () => {
       death: {
         sections: [
           {
-            id: DeathSection.Deceased,
+            id: 'deceased',
             name: formMessages.deceasedTitle,
             title: formMessages.deceasedTitle,
+            viewType: 'form' as ViewType,
+            groups: []
+          }
+        ]
+      },
+      marriage: {
+        sections: [
+          {
+            id: 'groom',
+            name: formMessages.groomName,
+            title: formMessages.groomTitle,
             viewType: 'form' as ViewType,
             groups: []
           }
@@ -678,7 +739,14 @@ describe('when in device of small viewport', () => {
       documents: {
         uploadDocForMother: [
           {
-            optionValues: ['MOTHER', 'Birth Registration'],
+            optionValues: ['MOTHER', 'NATIONAL_ID'],
+            type: 'image/png',
+            data: 'data:image/png;base64,abcd'
+          }
+        ],
+        uploadDocForChildDOB: [
+          {
+            optionValues: ['CHILD', 'NOTIFICATION_OF_BIRTH'],
             type: 'image/png',
             data: 'data:image/png;base64,abcd'
           }
@@ -706,18 +774,18 @@ describe('when in device of small viewport', () => {
     reviewSectionComponent = testComponent
   })
 
-  it('renders without preview list of documents', () => {
+  it('renders preview list of documents', () => {
     expect(
-      reviewSectionComponent.find('#preview-list-mother').hostNodes()
+      reviewSectionComponent
+        .find('#preview-list-all_attachment_list')
+        .hostNodes()
     ).toHaveLength(1)
   })
 
   describe('clicking on preview list item...', () => {
     beforeEach(() => {
       reviewSectionComponent
-        .find('#preview-list-mother')
-        .hostNodes()
-        .find('#document_BirthRegistration_link')
+        .find('#document_NOTIFICATION_OF_BIRTH_link')
         .hostNodes()
         .simulate('click')
 
@@ -732,9 +800,7 @@ describe('when in device of small viewport', () => {
 
     it('clicking on back button closes image preview', () => {
       reviewSectionComponent
-        .find('#preview_image_field')
-        .hostNodes()
-        .find('#preview_back')
+        .find('#preview_close')
         .hostNodes()
         .simulate('click')
 

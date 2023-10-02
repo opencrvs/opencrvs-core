@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
@@ -66,7 +65,7 @@ describe('verifyUser handler receives a request', () => {
 
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
-    it('generates a mobile verification code and sends it to sms gateway', async () => {
+    it('generates a mobile verification code and sends it to notification gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -93,8 +92,8 @@ describe('verifyUser handler receives a request', () => {
       })
 
       expect(spy).toHaveBeenCalled()
-      expect(spy.mock.calls[0]).toHaveLength(2)
-      expect(spy.mock.calls[0][0]).toBe('+8801711111111')
+      expect(spy.mock.calls[0]).toHaveLength(5)
+      expect(spy.mock.calls[0][3]).toBe('+8801711111111')
     })
   })
 })

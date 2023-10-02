@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   DOWNLOAD_STATUS,
@@ -62,7 +61,15 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'DISTRICT_REGISTRAR'
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'DISTRICT_REGISTRAR'
+          }
+        ]
+      }
     }
   }
 }
@@ -280,14 +287,14 @@ describe('OfficeHome sent for update tab related tests', () => {
     const table = await waitForElement(testComponent, Workqueue)
     const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-      new Date(birthEventRejectedDate)
+      new Date('2021-10-20T11:03:20.660Z')
     )
 
     expect(data.length).toBe(2)
-    expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].contactNumber).toBe('01622688231')
     expect(data[1].sentForUpdates).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('Death')
+    expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
   })
 

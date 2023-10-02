@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ComponentStory, Meta } from '@storybook/react'
 import { Button } from '../Button'
@@ -48,14 +47,14 @@ ResponsiveModalView.args = {
 }
 
 export default {
-  title: 'Layout/Dialog',
+  title: 'Deprecated/ResponsiveModal',
   component: ResponsiveModal,
   parameters: {
     docs: {
       description: {
-        component: `
-\`<Dialog>\` is a modal component which requests an action from a user.
-`
+        component: `<b>Note! Deprecated in favor of Dialog component.</b>
+
+\`<ResponsiveModal>\` is a modal component which requests an action from a user.`
       }
     }
   }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -47,9 +46,14 @@ describe('Route authorization', () => {
       method: 'POST',
       url: '/birthDeclarationSMS',
       payload: {
-        msisdn: '+447789778865',
+        recipient: {
+          sms: '+447789778865',
+          email: 'email@email.com'
+        },
         name: 'test',
-        trackingId: 'B123456'
+        trackingId: 'B123456',
+        crvsOffice: 'ALASKA',
+        informantName: 'SADMAN ANIK'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -72,7 +76,10 @@ describe('Route authorization', () => {
       method: 'POST',
       url: '/birthDeclarationSMS',
       payload: {
-        msisdn: '+447789778865',
+        recipient: {
+          sms: '+447789778865',
+          email: 'email@email.com'
+        },
         name: 'test',
         trackingId: 'B123456'
       },

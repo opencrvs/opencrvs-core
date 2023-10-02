@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -146,6 +145,9 @@ const ValueWrapper = styled.span<{
   totalWidth: number
   alignment?: string
   color?: string
+  // TODO: The children can be passed a `IDynamicValues` value, which is a very flexible / any-like type.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children?: any
 }>`
   width: ${({ width, totalWidth }) =>
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;

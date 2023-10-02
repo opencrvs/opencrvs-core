@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   DOWNLOAD_STATUS,
@@ -303,7 +302,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const workqueue = await waitForElement(testComponent, Workqueue)
 
-    const data = workqueue.prop('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       new Date(mockDeclarationDateStr)
     )
@@ -339,7 +338,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     )
 
     const workqueue = await waitForElement(testComponent, Workqueue)
-    const data = workqueue.prop('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     expect(data.length).toBe(0)
   })
 

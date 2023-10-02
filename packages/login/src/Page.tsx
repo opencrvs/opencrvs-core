@@ -6,12 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { applicationConfigLoadAction } from './login/actions'
+import {
+  applicationConfigLoadAction,
+  storeClientRedirectRoute
+} from './login/actions'
 import { changeLanguage, loadLanguages } from './i18n/actions'
 import {
   getDefaultLanguage,
@@ -41,6 +43,16 @@ function useLoadConfigurations() {
   }, [dispatch])
 }
 
+function useStoreClientRedirectRoute() {
+  const dispatch = useDispatch()
+  const paramRedirectTo = useSearchQuery('redirectTo')
+  React.useEffect(() => {
+    if (!!paramRedirectTo) {
+      dispatch(storeClientRedirectRoute(paramRedirectTo))
+    }
+  }, [dispatch])
+}
+
 function useSyncLanguage() {
   const dispatch = useDispatch()
   const paramLanguage = useSearchQuery('lang')
@@ -59,6 +71,6 @@ export function Page({ children }: IProps) {
   useLoadConfigurations()
   useSyncLanguage()
   useDocumentTitle()
-
+  useStoreClientRedirectRoute()
   return <>{children}</>
 }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -24,9 +23,7 @@ import {
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  DownloadAction,
   IForm,
-  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
@@ -38,7 +35,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -54,28 +51,21 @@ import {
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
-import { gqlToDraftTransformer } from '@client/transformer'
-import {
-  QueryContext,
-  QueryProvider
-} from '@client/views/DataProvider/QueryProvider'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   getEvent,
   getEventDate,
   getRegisteredDate,
   isFreeOfCost,
-  isCertificateForPrintInAdvance
+  isCertificateForPrintInAdvance,
+  filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
@@ -371,7 +361,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         <ActionPageLight
           id="collector_form"
           hideBackground
-          title={intl.formatMessage(formSection.title)}
+          title={formSection.title && intl.formatMessage(formSection.title)}
           goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
@@ -379,6 +369,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             title={
               (formGroup.title && intl.formatMessage(formGroup.title)) || ''
             }
+            showTitleOnMobile
           >
             {showError && (
               <ErrorWrapper>
@@ -390,6 +381,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             )}
             <FormFieldGenerator
               id={formGroup.id}
+              key={formGroup.id}
               onChange={(values) => {
                 if (values && values.affidavitFile) {
                   this.setState({
@@ -472,6 +464,8 @@ const getCollectCertificateForm = (event: Event, state: IStoreState) => {
       return state.printCertificateForm.collectBirthCertificateForm
     case Event.Death:
       return state.printCertificateForm.collectDeathCertificateForm
+    case Event.Marriage:
+      return state.printCertificateForm.collectMarriageCertificateForm
   }
 }
 
@@ -495,6 +489,13 @@ const mapStateToProps = (
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const clonedFormSection = cloneDeep(formSection)
+  const isAllowPrintInAdvance =
+    event === Event.Birth
+      ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
+      : event === Event.Death
+      ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
+      : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
+
   if (event === Event.Birth && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data
     let motherDataExist: boolean | undefined
@@ -538,9 +539,13 @@ const mapStateToProps = (
       )
     }
   }
-  const formGroup =
-    clonedFormSection.groups.find((group) => group.id === groupId) ||
-    clonedFormSection.groups[0]
+  const formGroup = isAllowPrintInAdvance
+    ? clonedFormSection.groups.find((group) => group.id === groupId) ||
+      clonedFormSection.groups[0]
+    : filterPrintInAdvancedOption(
+        clonedFormSection.groups.find((group) => group.id === groupId) ||
+          clonedFormSection.groups[0]
+      )
 
   /**
    * As the field defintions are hard-coded in core, finding

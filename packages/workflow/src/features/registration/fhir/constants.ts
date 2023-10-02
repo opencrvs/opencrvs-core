@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const MOTHER_SECTION_CODE = 'mother-details'
 export const FATHER_SECTION_CODE = 'father-details'
 export const CHILD_SECTION_CODE = 'child-details'
+export const INFORMANT_SECTION_CODE = 'informant-details'
 export const BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE =
   'birth-correction-encounters'
 export const DECEASED_SECTION_CODE = 'deceased-details'
@@ -20,6 +20,11 @@ export const DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE =
   'death-correction-encounters'
 export const BIRTH_REG_NUMBER_SYSTEM = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REG_NUMBER_SYSTEM = 'DEATH_REGISTRATION_NUMBER'
+export const GROOM_SECTION_CODE = 'groom-details'
+export const BRIDE_SECTION_CODE = 'bride-details'
+export const MARRIAGE_REG_NUMBER_SYSTEM = 'MARRIAGE_REGISTRATION_NUMBER'
+export const MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE =
+  'marriage-correction-encounters'
 export enum RegStatus {
   ARCHIVED = 'ARCHIVED',
   IN_PROGRESS = 'IN_PROGRESS',
@@ -30,10 +35,15 @@ export enum RegStatus {
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION'
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  ISSUED = 'ISSUED'
 }
 export const DOWNLOADED = 'DOWNLOADED'
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
+
+export const BIRTH_REG_NUMBER_GENERATION_FAILED =
+  'Birth registration number generation failed'

@@ -6,13 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormField, RADIO_GROUP, TEXTAREA } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
-import { conditionals } from '@client/forms/utils'
+import { builtInConditionals as conditionals } from '@client/forms/conditionals'
 
 export interface IUserAuditForm {
   fields: IFormField[]
@@ -24,7 +23,7 @@ export const userAuditForm: IUserAuditForm = {
       name: 'reason',
       type: RADIO_GROUP,
       required: true,
-      validate: [],
+      validator: [],
       initialValue: '',
       label: messages.auditReason,
       size: RadioSize.LARGE,
@@ -42,7 +41,7 @@ export const userAuditForm: IUserAuditForm = {
       name: 'reason',
       type: RADIO_GROUP,
       required: true,
-      validate: [],
+      validator: [],
       initialValue: '',
       label: messages.auditReason,
       size: RadioSize.LARGE,
@@ -64,7 +63,7 @@ export const userAuditForm: IUserAuditForm = {
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: false,
       conditionals: [conditionals.userAuditReasonSpecified]
     },
@@ -73,7 +72,7 @@ export const userAuditForm: IUserAuditForm = {
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: true,
       conditionals: [conditionals.userAuditReasonOther]
     }

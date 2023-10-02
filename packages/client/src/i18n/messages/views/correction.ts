@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -19,6 +18,8 @@ interface ICorrectionMessages
   correctorError: MessageDescriptor
   mother: MessageDescriptor
   father: MessageDescriptor
+  bride: MessageDescriptor
+  groom: MessageDescriptor
   child: MessageDescriptor
   legalGuardian: MessageDescriptor
   anotherRegOrFieldAgent: MessageDescriptor
@@ -62,8 +63,8 @@ interface ICorrectionMessages
   correctionSummaryFeesRequiredNegative: MessageDescriptor
   correctionSummaryProofOfPaymentRequired: MessageDescriptor
   correctionSummaryProofOfPayment: MessageDescriptor
-  correctionSummaryproofOfPaymentError: MessageDescriptor
   correctionSummaryTotalPaymentLabel: MessageDescriptor
+  correctionRequiredLabel: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -101,6 +102,16 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.father',
     defaultMessage: 'Father',
     description: 'Label for father option in certificate correction form'
+  },
+  bride: {
+    id: 'correction.corrector.bride',
+    defaultMessage: 'Bride',
+    description: 'Label for bride option in certificate correction form'
+  },
+  groom: {
+    id: 'correction.corrector.groom',
+    defaultMessage: 'Groom',
+    description: 'Label for groom option in certificate correction form'
   },
   child: {
     id: 'correction.corrector.child',
@@ -204,7 +215,7 @@ const messagesToDefine: ICorrectionMessages = {
   birthCorrectionNote: {
     id: 'correction.corrector.birth.note',
     defaultMessage:
-      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
+      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to their birth record.',
     description: 'Birth correction note'
   },
   proofOfLegalDocuments: {
@@ -343,15 +354,15 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'Proof of payment',
     description: 'Proof of payment label fees payment document'
   },
-  correctionSummaryproofOfPaymentError: {
-    id: 'correction.summary.proofOfPaymentError',
-    defaultMessage: 'Proof of payment is required for correction',
-    description: 'Proof of payment document upload error'
-  },
   correctionSummaryTotalPaymentLabel: {
     id: 'correction.summary.totalPaymentLabel',
     defaultMessage: 'Total {currency}',
     description: 'Label of total payment in correction summary'
+  },
+  correctionRequiredLabel: {
+    id: 'correction.summary.required',
+    defaultMessage: 'Required for correction',
+    description: 'Payment and proof of payment input error'
   }
 }
 

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/application/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -69,7 +68,7 @@ describe('Application config root resolvers', () => {
     const response = await resolvers.Mutation.updateApplicationConfig(
       {},
       { applicationConfig },
-      authHeaderNatlSYSAdmin
+      { headers: authHeaderNatlSYSAdmin }
     )
 
     expect(response).toEqual({
@@ -90,7 +89,7 @@ describe('Application config root resolvers', () => {
       resolvers.Mutation.updateApplicationConfig(
         {},
         { applicationConfig },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
     ).rejects.toThrowError(
       'Update application config is only allowed for natlsysadmin'
@@ -109,7 +108,7 @@ describe('Application config root resolvers', () => {
       resolvers.Mutation.updateApplicationConfig(
         {},
         { applicationConfig },
-        authHeaderNatlSYSAdmin
+        { headers: authHeaderNatlSYSAdmin }
       )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't update application config"

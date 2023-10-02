@@ -6,32 +6,31 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormField
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_ALPHA_NUMERIC,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE
+  INFORMANT_MINIMUM_AGE,
+  NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
-import { isArray } from 'util'
-import {
-  NATIONAL_ID,
-  BIRTH_REGISTRATION_NUMBER,
-  DEATH_REGISTRATION_NUMBER,
-  PASSPORT,
-  DRIVING_LICENSE
-} from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _ from 'lodash'
-import format from '@client/utils/date-formatting'
+import _, { get } from 'lodash'
+import format, { convertAgeToDate } from '@client/utils/date-formatting'
+
+/**
+ * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
+ */
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -100,7 +99,7 @@ export const required =
     if (typeof value === 'string') {
       return value !== '' ? undefined : { message }
     }
-    if (isArray(value)) {
+    if (Array.isArray(value)) {
       return value.length > 0 ? undefined : { message }
     }
     return value !== undefined && value !== null ? undefined : { message }
@@ -201,6 +200,10 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
 
 export const emailAddressFormat: Validation = (value: IFormFieldValue) => {
   const cast = value as string
+  if (cast === '') {
+    return
+  }
+
   return cast && isAValidEmailAddressFormat(cast)
     ? undefined
     : {
@@ -256,7 +259,6 @@ export const minAgeGapExist = (
     (new Date(first).getTime() - new Date(second).getTime()) /
     (1000 * 60 * 60 * 24) /
     365
-
   return diff >= minAgeGap
 }
 
@@ -293,9 +295,11 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
 }
 
 export const isValidParentsBirthDate =
-  (minAgeGap: number): Validation =>
+  (minAgeGap: number, isAge?: boolean): Validation =>
   (value: IFormFieldValue, drafts) => {
-    const parentsBirthDate = value as string
+    const parentsBirthDate = isAge
+      ? convertAgeToDate(value as string)
+      : (value as string)
     const childBirthDate =
       drafts && drafts.child && (drafts.child.childBirthDate as string)
 
@@ -343,9 +347,15 @@ export const checkBirthDate =
         }
   }
 
+const getBirthDate = (
+  isExactDateOfBirthUnknown: boolean,
+  date: string,
+  age: string
+) => (isExactDateOfBirthUnknown ? convertAgeToDate(age) : date)
+
 export const checkMarriageDate =
-  (birthDate: string): Validation =>
-  (value: IFormFieldValue) => {
+  (minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
     const cast = value as string
     if (!isAValidDateFormat(cast)) {
       return {
@@ -361,15 +371,74 @@ export const checkMarriageDate =
       }
     }
 
-    if (!birthDate || !isAValidDateFormat(birthDate)) {
-      return undefined
-    }
+    const groomDOB =
+      drafts &&
+      drafts.groom &&
+      getBirthDate(
+        Boolean(drafts.groom.exactDateOfBirthUnknown),
+        String(drafts.groom.groomBirthDate),
+        String(drafts.groom.ageOfIndividualInYears)
+      )
+    const brideDOB =
+      drafts &&
+      drafts.bride &&
+      getBirthDate(
+        Boolean(drafts.bride.exactDateOfBirthUnknown),
+        String(drafts.bride.brideBirthDate),
+        String(drafts.bride.ageOfIndividualInYears)
+      )
 
-    return mDate > new Date(birthDate)
-      ? undefined
-      : {
+    if (!groomDOB || !brideDOB) {
+      return undefined
+    } else {
+      if (
+        !minAgeGapExist(cast, groomDOB, minAge) ||
+        !minAgeGapExist(cast, brideDOB, minAge)
+      ) {
+        return {
+          message: messages.illegalMarriageAge
+        }
+      } else if (mDate < new Date(groomDOB) && mDate < new Date(brideDOB)) {
+        return {
           message: messages.domLaterThanDob
         }
+      } else {
+        return undefined
+      }
+    }
+  }
+
+export const isValidDateOfBirthForMarriage =
+  (sectionName: string, minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const isExactDateOfBirthUnknown =
+      drafts &&
+      drafts[sectionName] &&
+      drafts[sectionName].exactDateOfBirthUnknown
+    const cast = isExactDateOfBirthUnknown
+      ? convertAgeToDate(value as string)
+      : (value as string)
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
+      }
+    } else if (!isDateNotInFuture(cast)) {
+      return { message: messages.isValidBirthDate }
+    }
+
+    if (
+      !minAgeGapExist(
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
+        String(value),
+        minAge
+      )
+    ) {
+      return {
+        message: messages.illegalMarriageAge
+      }
+    } else {
+      return undefined
+    }
   }
 
 export const dateGreaterThan =
@@ -430,7 +499,7 @@ export const dateInPast = (): Validation => (value: IFormFieldValue) =>
   isDateInPast(value)
 
 export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
-  dateFormat(value)
+  dateFormat(value as string)
 
 /*
  * TODO: The name validation functions should be refactored out.
@@ -469,10 +538,9 @@ export const isValidBengaliWord = (value: string): boolean => {
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
   const englishRe = XRegExp.cache(
-    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)',
+    `(^[\\p{Latin}0-9'._-]*\\([\\p{Latin}0-9'._-]+\\)[\\p{Latin}0-9'._-]*$)|(^[\\p{Latin}0-9'._-]+$)`,
     ''
   )
-
   return englishRe.test(value)
 }
 
@@ -530,6 +598,21 @@ export const range: RangeValidation =
       ? undefined
       : { message: messages.range, props: { min, max } }
   }
+
+export const oneOf = (
+  fields: string[],
+  errorMessage: MessageDescriptor
+): Validation => {
+  return (_value, fieldValues) => {
+    const someFilled = fields.some((field) => get(fieldValues, field))
+
+    if (someFilled) {
+      return undefined
+    }
+
+    return { message: errorMessage }
+  }
+}
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
   const pattern = window.config.NID_NUMBER_PATTERN

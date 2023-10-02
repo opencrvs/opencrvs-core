@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
@@ -18,7 +17,8 @@ import {
   ListContainer,
   calculateTotal,
   ReportContainer,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  PerformanceListSubHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -32,6 +32,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
   locationId?: string
+  event?: string
   isAccessibleOffice: boolean
   timeStart: string
   timeEnd: string
@@ -40,21 +41,29 @@ interface IDispatchProps {
   goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesReport(
+function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
   const { data, isAccessibleOffice } = props
   const intl = useIntl()
-  const userDetails = useSelector(getUserDetails)
 
   return (
     <ListContainer>
       <ReportContainer>
         <ListViewItemSimplified
           label={
-            <PerformanceListHeader>
-              {intl.formatMessage(messages.performanceApplicationSourcesHeader)}
-            </PerformanceListHeader>
+            <div>
+              <PerformanceListHeader>
+                {intl.formatMessage(
+                  messages.performanceApplicationSourcesHeader
+                )}
+              </PerformanceListHeader>
+              <PerformanceListSubHeader>
+                {intl.formatMessage(
+                  messages.performanceApplicationSourcesSubHeader
+                )}
+              </PerformanceListSubHeader>
+            </div>
           }
         />
         <ListViewItemSimplified
@@ -95,7 +104,8 @@ export function ApplicationSourcesReport(
                   props.goToFieldAgentList(
                     props.timeStart,
                     props.timeEnd,
-                    props.locationId
+                    props.locationId,
+                    props.event
                   )
                 }
               >

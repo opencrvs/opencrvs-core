@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -18,9 +17,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
-  GQLEventSearchResultSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   IDeclaration,
@@ -36,10 +33,12 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { ITheme, withTheme } from '@client/styledComponents'
-import { LANG_EN } from '@client/utils/constants'
+import { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -76,6 +75,11 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  isMarriageEvent,
+  isBirthEvent,
+  isDeathEvent
+} from '@client/search/transformer'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -121,7 +125,7 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-export class InProgressComponent extends React.Component<
+class InProgressComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
@@ -187,21 +191,35 @@ export class InProgressComponent extends React.Component<
 
       let name
       let eventDate = ''
-      if (reg.registration && reg.type === 'Birth') {
-        const birthReg = reg as GQLBirthEventSearchSet
-        const names = birthReg && (birthReg.childName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLBirthEventSearchSet).dateOfBirth
-        eventDate = date && date
-      } else {
-        const deathReg = reg as GQLDeathEventSearchSet
-        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLDeathEventSearchSet).dateOfDeath
-        eventDate = date && date
+
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          const names = reg.childName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          eventDate = reg.dateOfBirth
+        } else if (isDeathEvent(reg)) {
+          const names = reg.deceasedName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          const date = reg.dateOfDeath
+          eventDate = date && date
+        } else if (isMarriageEvent(reg)) {
+          const groomNames = reg.groomName as GQLHumanName[]
+          const groomNamesMap = createNamesMap(groomNames)
+          const brideNames = reg.brideName as GQLHumanName[]
+          const brideNamesMap = createNamesMap(brideNames)
+          const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
+          const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
+          name =
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
+          const date = reg.dateOfMarriage
+          eventDate = date && date
+        }
       }
+
       const dateOfEvent =
         eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
       const actions: IAction[] = []
@@ -279,6 +297,7 @@ export class InProgressComponent extends React.Component<
           <IconWithName
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         iconWithNameEvent: (
@@ -286,6 +305,7 @@ export class InProgressComponent extends React.Component<
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
             event={event}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         dateOfEvent,
@@ -303,7 +323,7 @@ export class InProgressComponent extends React.Component<
         ...item,
         notificationSent:
           item.notificationSent &&
-          formattedDuration(item.notificationSent as number),
+          formattedDuration(item.notificationSent as any),
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
       }
@@ -333,6 +353,8 @@ export class InProgressComponent extends React.Component<
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (draft.event && draft.event.toString() === 'death') {
         pageRoute = DRAFT_DEATH_FORM_PAGE
+      } else if (draft.event && draft.event.toString() === 'marriage') {
+        pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
       const name = getDraftInformantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
@@ -363,10 +385,13 @@ export class InProgressComponent extends React.Component<
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
+
       const eventTime =
         draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.data.deathEvent?.deathDate || ''
+          : draft.event === Event.Death
+          ? draft.data.deathEvent?.deathDate || ''
+          : draft.data.marriageEvent?.marriageDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
         <NameContainer

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { inScope } from '@gateway/features/user/utils'
@@ -16,7 +15,11 @@ import { USER_MANAGEMENT_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async bookmarkAdvancedSearch(_, { bookmarkSearchInput }, authHeader) {
+    async bookmarkAdvancedSearch(
+      _,
+      { bookmarkSearchInput },
+      { headers: authHeader }
+    ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
@@ -48,7 +51,7 @@ export const resolvers: GQLResolver = {
     async removeBookmarkedAdvancedSearch(
       _,
       { removeBookmarkedSearchInput },
-      authHeader
+      { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {

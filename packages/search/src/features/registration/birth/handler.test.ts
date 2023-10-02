@@ -6,14 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchComposition,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/server'
@@ -30,10 +28,12 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any
@@ -111,7 +111,9 @@ describe('Verify handlers', () => {
 
     it('should return status code 500 when composition has no ID', async () => {
       ;(indexComposition as jest.Mock).mockReturnValue({})
-      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
+      ;(searchForBirthDuplicates as jest.Mock).mockReturnValue(
+        mockSearchResponse.body.hits.hits
+      )
       ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse), { status: 200 }],

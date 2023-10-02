@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -25,7 +24,7 @@ import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { IUserDetails, useUserName } from '@client/utils/userUtils'
+import { UserDetails, useUserName } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
 
@@ -56,7 +55,7 @@ export function ProfileImage() {
 
   const englishName = useUserName()
 
-  const userDetails = useSelector<IStoreState, IUserDetails | null>(
+  const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
   const dispatch = useDispatch()

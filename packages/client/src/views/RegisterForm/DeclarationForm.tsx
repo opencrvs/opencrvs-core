@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -17,6 +16,7 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
+  DRAFT_MARRIAGE_FORM_PAGE_GROUP,
   HOME
 } from '@opencrvs/client/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
@@ -36,12 +36,11 @@ interface IFormProps {
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  death: DRAFT_DEATH_FORM_PAGE_GROUP
+  death: DRAFT_DEATH_FORM_PAGE_GROUP,
+  marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-export class DeclarationFormView extends React.Component<
-  IFormProps & RouteProps
-> {
+class DeclarationFormView extends React.Component<IFormProps & RouteProps> {
   render() {
     const { declaration, ...rest } = this.props
     if (!declaration) {
