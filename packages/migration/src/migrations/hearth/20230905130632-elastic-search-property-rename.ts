@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { updateFieldNameByCompositionId } from '../../utils/elasticsearch-helper.js'
+import { renameField } from '../../utils/elasticsearch-helper.js'
 
 export const up = async () => {
   // rename field name contactRelationship to informantType on elasticSearch
-  await updateFieldNameByCompositionId('contactRelationship', 'informantType')
+  await renameField('contactRelationship', 'informantType')
 }
 
 export const down = async () => {
   // rename field name informantType to contactRelationship on elasticSearch
-  await updateFieldNameByCompositionId('informantType', 'contactRelationship')
+  await renameField('informantType', 'contactRelationship')
 }

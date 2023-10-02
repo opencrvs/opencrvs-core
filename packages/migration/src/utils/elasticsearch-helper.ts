@@ -42,7 +42,7 @@ export const updateComposition = async (
   return response
 }
 
-export const updateFieldNameByCompositionId = async (
+export const renameField = async (
   newFieldName: string,
   oldFieldName: string
 ) => {
