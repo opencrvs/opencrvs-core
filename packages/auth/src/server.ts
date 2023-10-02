@@ -115,11 +115,14 @@ export async function createServer() {
     handler: async (request: any, h: any) => {
       // Perform any health checks and return true or false for success prop
       const dependencyStatus = await dependencyHealth()
-
-      return {
-        git_hash: GIT_HASH,
-        status: 'ok',
-        dependencies: { Redis: dependencyStatus }
+      try {
+        return {
+          git_hash: GIT_HASH,
+          status: 'ok',
+          dependencies: { Redis: dependencyStatus }
+        }
+      } catch (error) {
+        return { status: 'An internal server error occurred' }
       }
     },
     options: {
