@@ -16,6 +16,44 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
+const mockPingResponse = [
+  {
+    name: 'auth',
+    url: 'http://localhost:4040/ping',
+    status: 'ok'
+  },
+  {
+    name: 'user-mgnt',
+    url: 'http://localhost:3030/ping',
+    status: 'ok'
+  },
+  {
+    name: 'metrics',
+    url: 'http://localhost:1050/ping',
+    status: 'ok'
+  },
+  {
+    name: 'notification',
+    url: 'http://localhost:2020/ping',
+    status: 'ok'
+  },
+  {
+    name: 'countryconfig',
+    url: 'http://localhost:3040/ping',
+    status: 'ok'
+  },
+  {
+    name: 'search',
+    url: 'http://localhost:9090/ping',
+    status: 'ok'
+  },
+  {
+    name: 'workflow',
+    url: 'http://localhost:5050/ping',
+    status: 'ok'
+  }
+]
+
 describe('Route authorization', () => {
   let server: any
   beforeEach(async () => {
@@ -145,77 +183,129 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it('Tests the health check with a valid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
+
+  it('Tests the health check for all service', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ]
     )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=search'
-    })
-    expect(res.result).toEqual({
-      success: true
-    })
-  })
-  it('Fails the health check with a missing parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
+
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-    expect(res.statusCode).toBe(400)
-  })
-  it('Rejects the health check with an invalid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=nonsense'
-    })
-    expect(res.result.message).toEqual(
-      `"service" must be one of [auth, user-mgnt, metrics, notification, countryconfig, search, workflow, gateway]`
-    )
-  })
-  it('Fails the health check for a failed health check on a running service', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: false
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
-  })
-  it('Fails the health check for a failed and not running service', async () => {
-    fetch.mockReject(new Error('An internal server error occurred'))
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
-  })
-  it.todo('Tests the health check with multiple services', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        status: 'ok'
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth&service=search'
-    })
 
-    expect(res.result.message).toEqual({ auth: true, search: true })
+    expect(res.result).toMatchObject(mockPingResponse)
   })
+
+  // TODO: after implementing the query parameter, this can be fixed to test the health check
+  // it('Tests the health check with a valid parameter', async () => {
+  //   fetch.mockResponse(
+  //     JSON.stringify({
+  //       success: true
+  //     })
+  //   )
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping?service=search'
+  //   })
+  //   expect(res.result).toEqual({
+  //     success: true
+  //   })
+  // })
+
+  // TODO: after implementing the query parameter, this can be fixed to test the health check
+  // it('Rejects the health check with an invalid parameter', async () => {
+  //   fetch.mockResponse(
+  //     JSON.stringify({
+  //       success: true
+  //     })
+  //   )
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping?service=nonsense'
+  //   })
+  //   expect(res.result.message).toEqual(
+  //     `"service" must be one of [auth, user-mgnt, metrics, notification, countryconfig, search, workflow, gateway]`
+  //   )
+  // })
+
+  // TODO: after implementing the query parameter, this can be fixed to test the health check
+  // it('Fails the health check for a failed health check on a running service', async () => {
+  //   fetch.mockResponse(
+  //     JSON.stringify({
+  //       success: false
+  //     })
+  //   )
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping?service=auth'
+  //   })
+  //   expect(res.result.message).toEqual('An internal server error occurred')
+  // })
+
+  // TODO: after implementing the query parameter, this can be fixed to test the health check
+  // it('Fails the health check for a failed and not running service', async () => {
+  //   fetch.mockReject(new Error('An internal server error occurred'))
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping?service=auth'
+  //   })
+  //   expect(res.result.message).toEqual('An internal server error occurred')
+  // })
+
+  // TODO: after implementing the query parameter, this can be fixed to test the health check
+  // it.todo('Tests the health check with multiple services', async () => {
+  //   fetch.mockResponse(
+  //     JSON.stringify({
+  //       status: 'ok'
+  //     })
+  //   )
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping?service=auth&service=search'
+  //   })
+
+  //   expect(res.result.message).toEqual({ auth: true, search: true })
+  // })
 })
