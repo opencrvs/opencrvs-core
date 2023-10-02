@@ -93,6 +93,29 @@ export default function Sidebar() {
           onClick={() => router.push('/report')}
         />
       </NavigationGroup>
+
+      <Text
+        variant="bold14"
+        element="span"
+        style={{ display: 'flex', marginLeft: 25, marginTop: 20 }}
+      >
+        Backup Server
+      </Text>
+      {/* </Span> */}
+
+      <NavigationGroup>
+        <NavigationItem
+          // icon={function noRefCheck() {}}
+          label="Backups"
+          onClick={() => router.push('/backups')}
+        />
+        <NavigationItem
+          // count={23}
+          // icon={function noRefCheck() {}}
+          label="Backup Health"
+          onClick={() => router.push('/report')}
+        />
+      </NavigationGroup>
     </LeftNavigation>
   )
 }

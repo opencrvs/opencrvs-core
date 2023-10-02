@@ -51,7 +51,7 @@ export default function performance() {
           style={{ border: '0px' }}
         />
         <iframe
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=5"
+          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&tab=transform&refresh=1s&panelId=5"
           width="240"
           height="205"
           style={{ border: '0px' }}

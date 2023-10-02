@@ -37,7 +37,7 @@ export default function Microservices() {
   const [services, setServices] = useState({
     auth: {
       name: 'auth',
-      port: 304,
+      port: 4040,
       label: 'Auth',
       url: `${pingUrl}=auth`,
       status: 'LOADING',
@@ -46,7 +46,7 @@ export default function Microservices() {
     },
     user: {
       name: 'user',
-      port: 304,
+      port: 3030,
       label: 'User',
       url: `${pingUrl}=user-mgnt`,
       status: 'LOADING',
@@ -55,7 +55,7 @@ export default function Microservices() {
     },
     webhooks: {
       name: 'webhooks',
-      port: 304,
+      port: 2525,
       label: 'Webhooks',
       url: `${pingUrl}=webhooks`,
       status: 'LOADING',
@@ -64,7 +64,7 @@ export default function Microservices() {
     },
     documents: {
       name: 'documents',
-      port: 304,
+      port: 9050,
       label: 'Documents',
       url: `${pingUrl}=documents`,
       status: 'LOADING',
@@ -73,7 +73,7 @@ export default function Microservices() {
     },
     notification: {
       name: 'notification',
-      port: 304,
+      port: 2020,
       label: 'Notification',
       url: `${pingUrl}=notification`,
       status: 'LOADING',
@@ -82,7 +82,7 @@ export default function Microservices() {
     },
     gateway: {
       name: 'gateway',
-      port: 304,
+      port: 7070,
       label: 'Gateway',
       url: `${pingUrl}=gateway`,
       status: 'LOADING',
@@ -91,7 +91,7 @@ export default function Microservices() {
     },
     workflow: {
       name: 'workflow',
-      port: 304,
+      port: 5050,
       label: 'Workflow',
       url: `${pingUrl}=workflow`,
       status: 'LOADING',
@@ -100,7 +100,7 @@ export default function Microservices() {
     },
     search: {
       name: 'search',
-      port: 304,
+      port: 9090,
       label: 'Search',
       url: `${pingUrl}=search`,
       status: 'LOADING',
@@ -109,7 +109,7 @@ export default function Microservices() {
     },
     countryconfig: {
       name: 'countryconfig',
-      port: 304,
+      port: 3040,
       label: 'Countryconfig',
       url: `${pingUrl}=countryconfig`,
       status: 'LOADING',
@@ -118,7 +118,7 @@ export default function Microservices() {
     },
     metrics: {
       name: 'metrics',
-      port: 304,
+      port: 1050,
       label: 'Webhooks',
       url: `${pingUrl}=metrics`,
       status: 'LOADING',
@@ -127,7 +127,7 @@ export default function Microservices() {
     },
     client: {
       name: 'client',
-      port: 304,
+      port: 3000,
       label: 'Client',
       url: `${pingUrl}=client`,
       status: 'LOADING',
@@ -289,7 +289,7 @@ export default function Microservices() {
           .filter((s) => s.type === 'service')
           .map((service) => ({
             service: service.label,
-            port: '3002',
+            port: service.port,
             status: service.icon,
             span: '3 min',
             action:
