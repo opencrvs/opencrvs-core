@@ -247,7 +247,7 @@ export function userSectionFormType(): ISerializedFormSection {
             description: userFormMessages.userSignatureAttachmentDesc,
             allowedDocType: ['image/png'],
             initialValue: '',
-            required: true,
+            required: false,
             validator: []
           }
         ]
