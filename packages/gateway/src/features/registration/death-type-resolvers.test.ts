@@ -28,7 +28,7 @@ beforeEach(() => {
 describe('Registration type resolvers', () => {
   it('returns createdAt date', () => {
     // @ts-ignore
-    const createdAt = typeResolvers.DeathRegistration.createdAt({
+    const createdAt = typeResolvers.DeathRegistration!.createdAt({
       date: '2018-10-05'
     })
     expect(createdAt).toBe('2018-10-05')
@@ -37,7 +37,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.DeathRegistration.deceased(
+    const patient = await typeResolvers.DeathRegistration!.deceased(
       {
         section: [
           {
@@ -74,7 +74,7 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.DeathRegistration.registration(
+      const registration = await typeResolvers.DeathRegistration!.registration(
         {
           id: 123
         },
@@ -102,7 +102,7 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.DeathRegistration.registration(
+      const registration = await typeResolvers.DeathRegistration!.registration(
         {
           id: 123
         },
@@ -144,22 +144,24 @@ describe('Registration type resolvers', () => {
         [JSON.stringify(mockLocation), { status: 200 }]
       )
       // @ts-ignore
-      const eventLocation = await typeResolvers.DeathRegistration.eventLocation(
-        mockDeathComposition,
-        undefined,
-        { headers: undefined }
-      )
+      const eventLocation =
+        await typeResolvers.DeathRegistration!.eventLocation(
+          mockDeathComposition,
+          undefined,
+          { headers: undefined }
+        )
       expect(eventLocation).toBeDefined()
       expect(eventLocation).toEqual(mockLocation)
     })
     it('returns mannerOfDeath', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))
       // @ts-ignore
-      const mannerOfDeath = await typeResolvers.DeathRegistration.mannerOfDeath(
-        mockDeathComposition,
-        undefined,
-        { headers: undefined }
-      )
+      const mannerOfDeath =
+        await typeResolvers.DeathRegistration!.mannerOfDeath(
+          mockDeathComposition,
+          undefined,
+          { headers: undefined }
+        )
       expect(mannerOfDeath).toBeDefined()
       expect(mannerOfDeath).toEqual('NATURAL_CAUSES')
     })
@@ -169,7 +171,7 @@ describe('Registration type resolvers', () => {
       )
       // @ts-ignore
       const causeOfDeathMethod =
-        await typeResolvers.DeathRegistration.causeOfDeathMethod(
+        await typeResolvers.DeathRegistration!.causeOfDeathMethod(
           mockDeathComposition,
           undefined,
           { headers: undefined }
@@ -180,7 +182,7 @@ describe('Registration type resolvers', () => {
     it('returns causeOfDeath', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.causeOfDeath))
       // @ts-ignore
-      const causeOfDeath = await typeResolvers.DeathRegistration.causeOfDeath(
+      const causeOfDeath = await typeResolvers.DeathRegistration!.causeOfDeath(
         mockDeathComposition,
         undefined,
         { headers: undefined }
@@ -192,7 +194,7 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
 
       // @ts-ignore
-      const informant = await typeResolvers.DeathRegistration.informant(
+      const informant = await typeResolvers.DeathRegistration!.informant(
         mockDeathComposition,
         undefined,
         { headers: undefined }
@@ -205,7 +207,7 @@ describe('Registration type resolvers', () => {
     it('returns mother', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const mother = await typeResolvers.DeathRegistration.mother(
+      const mother = await typeResolvers.DeathRegistration!.mother(
         mockDeathComposition,
         undefined,
         { headers: undefined }
@@ -216,7 +218,7 @@ describe('Registration type resolvers', () => {
     it('returns null as mother if mother section is not available', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const mother = await typeResolvers.DeathRegistration.mother(
+      const mother = await typeResolvers.DeathRegistration!.mother(
         {
           section: []
         },
@@ -228,7 +230,7 @@ describe('Registration type resolvers', () => {
     it('returns father', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const father = await typeResolvers.DeathRegistration.father(
+      const father = await typeResolvers.DeathRegistration!.father(
         mockDeathComposition,
         undefined,
         { headers: undefined }
@@ -239,7 +241,7 @@ describe('Registration type resolvers', () => {
     it('returns null as father if father section is not available', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const father = await typeResolvers.DeathRegistration.father(
+      const father = await typeResolvers.DeathRegistration!.father(
         {
           section: []
         },
@@ -251,7 +253,7 @@ describe('Registration type resolvers', () => {
     it('returns spouse', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const spouse = await typeResolvers.DeathRegistration.spouse(
+      const spouse = await typeResolvers.DeathRegistration!.spouse(
         mockDeathComposition,
         undefined,
         { headers: undefined }
@@ -262,7 +264,7 @@ describe('Registration type resolvers', () => {
     it('returns null as spouse if spouse section is not available', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
-      const spouse = await typeResolvers.DeathRegistration.spouse(
+      const spouse = await typeResolvers.DeathRegistration!.spouse(
         {
           section: []
         },
@@ -272,7 +274,7 @@ describe('Registration type resolvers', () => {
       expect(spouse).toEqual(null)
     })
     it('returns RelatedPerson id', async () => {
-      const resourceID = await typeResolvers.RelatedPerson.id(
+      const resourceID = await typeResolvers.RelatedPerson!.id(
         {
           id: '1',
           relationship: {
@@ -306,7 +308,7 @@ describe('Registration type resolvers', () => {
         })
       )
       // @ts-ignore
-      const relationship = await typeResolvers.RelatedPerson.relationship(
+      const relationship = await typeResolvers.RelatedPerson!.relationship(
         {
           relationship: {
             coding: [
@@ -332,7 +334,7 @@ describe('Registration type resolvers', () => {
         })
       )
       // @ts-ignore
-      const relationship = await typeResolvers.RelatedPerson.otherRelationship(
+      const relationship = await typeResolvers.RelatedPerson!.otherRelationship(
         {
           relationship: {
             text: 'Nephew'
@@ -351,7 +353,7 @@ describe('Registration type resolvers', () => {
       })
       console.log('mock', mock)
       // @ts-ignore
-      const person = await typeResolvers.RelatedPerson.name(
+      const person = await typeResolvers.RelatedPerson!.name(
         {
           patient: {
             reference: 'Patient/123' // reference to deceased
@@ -372,32 +374,34 @@ describe('Registration type resolvers', () => {
 
     it('returns deathDate', () => {
       // @ts-ignore
-      const deathDate = typeResolvers.Deceased.deathDate(mockPatient)
+      const deathDate = typeResolvers.Deceased!.deathDate(mockPatient)
       expect(deathDate).toBe('2010-01-01')
     })
 
     it('eventLocation is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.eventLocation))
       // @ts-ignore
-      const eventLocation = await typeResolvers.DeathRegistration.eventLocation(
-        {
-          section: []
-        },
-        undefined,
-        { headers: undefined }
-      )
+      const eventLocation =
+        await typeResolvers.DeathRegistration!.eventLocation(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(eventLocation).toBeNull()
     })
     it('mannerOfDeath is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))
       // @ts-ignore
-      const mannerOfDeath = await typeResolvers.DeathRegistration.mannerOfDeath(
-        {
-          section: []
-        },
-        undefined,
-        { headers: undefined }
-      )
+      const mannerOfDeath =
+        await typeResolvers.DeathRegistration!.mannerOfDeath(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(mannerOfDeath).toBeNull()
     })
     it('causeOfDeathMethod is null when section does not exist', async () => {
@@ -406,7 +410,7 @@ describe('Registration type resolvers', () => {
       )
       // @ts-ignore
       const causeOfDeathMethod =
-        await typeResolvers.DeathRegistration.causeOfDeathMethod(
+        await typeResolvers.DeathRegistration!.causeOfDeathMethod(
           {
             section: []
           },
@@ -418,7 +422,7 @@ describe('Registration type resolvers', () => {
     it('causeOfDeath is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.causeOfDeath))
       // @ts-ignore
-      const causeOfDeath = await typeResolvers.DeathRegistration.causeOfDeath(
+      const causeOfDeath = await typeResolvers.DeathRegistration!.causeOfDeath(
         {
           section: []
         },
@@ -431,7 +435,7 @@ describe('Registration type resolvers', () => {
     it('informant is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.informant))
       // @ts-ignore
-      const informant = await typeResolvers.DeathRegistration.informant(
+      const informant = await typeResolvers.DeathRegistration!.informant(
         {
           section: []
         },

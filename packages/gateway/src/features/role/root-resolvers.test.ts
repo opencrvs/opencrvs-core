@@ -202,7 +202,7 @@ describe('Role root resolvers', () => {
     it('returns full role list', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyRoleList))
 
-      const response = await resolvers.Query.getSystemRoles(
+      const response = await resolvers.Query!.getSystemRoles(
         {},
         {},
         { headers: undefined }
@@ -213,7 +213,7 @@ describe('Role root resolvers', () => {
     it('returns filtered role list', async () => {
       fetch.mockResponseOnce(JSON.stringify([dummyRoleList[2]]))
 
-      const response = await resolvers.Query.getSystemRoles(
+      const response = await resolvers.Query!.getSystemRoles(
         {},
         {
           sortBy: '_id',
@@ -285,7 +285,7 @@ describe('system role update', () => {
       status: 200
     })
 
-    const response = await resolvers.Mutation.updateRole(
+    const response = await resolvers.Mutation!.updateRole(
       {},
       mockUpdateRoleRequest,
       { headers: authHeaderSysAdmin }

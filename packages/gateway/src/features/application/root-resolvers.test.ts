@@ -65,7 +65,7 @@ describe('Application config root resolvers', () => {
       { status: 201 }
     )
 
-    const response = await resolvers.Mutation.updateApplicationConfig(
+    const response = await resolvers.Mutation!.updateApplicationConfig(
       {},
       { applicationConfig },
       { headers: authHeaderNatlSYSAdmin }
@@ -86,7 +86,7 @@ describe('Application config root resolvers', () => {
     )
 
     expect(
-      resolvers.Mutation.updateApplicationConfig(
+      resolvers.Mutation!.updateApplicationConfig(
         {},
         { applicationConfig },
         { headers: authHeaderRegister }
@@ -105,7 +105,7 @@ describe('Application config root resolvers', () => {
     )
 
     expect(
-      resolvers.Mutation.updateApplicationConfig(
+      resolvers.Mutation!.updateApplicationConfig(
         {},
         { applicationConfig },
         { headers: authHeaderNatlSYSAdmin }

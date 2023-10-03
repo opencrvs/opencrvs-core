@@ -97,7 +97,7 @@ describe('Fhir util function testing', () => {
         '123',
         'abc'
       )
-      expect(composition.relatesTo.length).toEqual(1)
+      expect(composition.relatesTo!.length).toEqual(1)
     })
 
     it('should remove all duplicates', async () => {
@@ -107,7 +107,7 @@ describe('Fhir util function testing', () => {
         mockCompositionCloned,
         '123'
       )
-      expect(composition.relatesTo.length).toEqual(0)
+      expect(composition.relatesTo!.length).toEqual(0)
     })
   })
   describe('setInformantReference()', () => {
