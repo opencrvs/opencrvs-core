@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { presignSignatureV4 } from 'minio/dist/main/signing'
+import { presignSignatureV4 } from 'minio/dist/main/signing.js'
 import {
   MINIO_ACCESS_KEY,
   MINIO_BUCKET_REGION,
