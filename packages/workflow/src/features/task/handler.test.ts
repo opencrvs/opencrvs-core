@@ -229,7 +229,7 @@ describe('Verify handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(500)
+    expect(res.statusCode).toBe(400)
   })
   it('updateTaskHandler throws error if fhir returns an error', async () => {
     fetch.mockImplementation(() => new Error('boom'))

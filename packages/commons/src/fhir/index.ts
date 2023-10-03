@@ -43,6 +43,20 @@ export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
   fullUrl: string
 }
 
+/*
+ * A placeholder until someone writes better with Zod
+ */
+export function validateBundle(bundle: unknown): bundle is Bundle {
+  if (typeof bundle !== 'object' || bundle === null) {
+    throw new Error('Bundle must be an object')
+  }
+  if (!('entry' in bundle) || !Array.isArray(bundle.entry)) {
+    throw new Error('Bundle must have an entry list')
+  }
+
+  return true
+}
+
 export type Unsaved<T extends BundleEntry> = Omit<T, 'fullUrl' | 'resource'> & {
   fullUrl: `urn:uuid:${UUID}`
   resource: UnsavedResource<T['resource']>
