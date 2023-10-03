@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import transformObj, {
-  Context,
-  IFieldBuilders
-} from '@gateway/features/transformation'
-import { v4 as uuid } from 'uuid'
+import {
+  EVENT_TYPE,
+  FHIR_SPECIFICATION_URL,
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  OPENCRVS_SPECIFICATION_URL
+} from '@gateway/features/fhir/constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
   ATTACHMENT_DOCS_CODE,
@@ -21,12 +22,13 @@ import {
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
+  BRIDE_CODE,
+  BRIDE_TITLE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
   CHILD_CODE,
   CHILD_TITLE,
-  createCompositionTemplate,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
   DECEASED_CODE,
@@ -34,11 +36,15 @@ import {
   FATHER_CODE,
   FATHER_TITLE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  GROOM_CODE,
+  GROOM_TITLE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
+  MARRIAGE_ENCOUNTER_CODE,
+  MARRIAGE_TYPE_CODE,
   MOTHER_CODE,
   MOTHER_TITLE,
   NUMBER_BORN_ALIVE_CODE,
@@ -49,16 +55,11 @@ import {
   OBSERVATION_CATEGORY_VSIGN_DESC,
   SPOUSE_CODE,
   SPOUSE_TITLE,
-  MARRIAGE_ENCOUNTER_CODE,
-  MARRIAGE_TYPE_CODE,
-  BRIDE_CODE,
-  BRIDE_TITLE,
-  GROOM_CODE,
-  GROOM_TITLE,
   WITNESS_ONE_CODE,
   WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
   WITNESS_TWO_TITLE,
+  createCompositionTemplate,
   updateTaskTemplate
 } from '@gateway/features/fhir/templates'
 import {
@@ -83,20 +84,17 @@ import {
   selectOrCreateQuestionnaireResource,
   selectOrCreateRelatedPersonResource,
   selectOrCreateTaskRefResource,
+  selectOrCreateWitnessResource,
   setCertificateCollectorReference,
   setInformantReference,
   setObjectPropInResourceArray,
   setQuestionnaireItem,
-  selectOrCreateWitnessResource,
   uploadBase64ToMinio
 } from '@gateway/features/fhir/utils'
-import {
-  EVENT_TYPE,
-  FHIR_SPECIFICATION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  OPENCRVS_SPECIFICATION_URL
-} from '@gateway/features/fhir/constants'
-import { IAuthHeader } from '@opencrvs/commons'
+import transformObj, {
+  Context,
+  IFieldBuilders
+} from '@gateway/features/transformation'
 import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLAddressInput,
@@ -109,6 +107,7 @@ import {
   GQLMarriageRegistrationInput,
   GQLQuestionnaireQuestionInput
 } from '@gateway/graphql/schema'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
   BundleEntry,
@@ -125,6 +124,7 @@ import {
   markSaved,
   replaceFromBundle
 } from '@opencrvs/commons/types'
+import { v4 as uuid } from 'uuid'
 
 type StringReplace<
   T extends string,
@@ -756,7 +756,11 @@ function setExtension<T extends keyof StringExtensionType>(
   url: T,
   value: StringExtensionType[T]['valueString']
 ) {
-  const existingExtension = findExtension(url, extensions)
+  const existingExtension = findExtension(
+    url as StringExtensionType[keyof StringExtensionType]['url'],
+    extensions
+  )
+
   if (existingExtension) {
     existingExtension.valueString = value
   } else {

@@ -215,33 +215,28 @@ export type KnownExtensionType = StringExtensionType & {
         }
     >
   }
-  code: {
-    url: 'code'
-    valueCodeableConcept: {
-      coding: [{ system: string; code: string }]
-    }
-  }
-  period: {
-    url: 'period'
-    valuePeriod: {
-      start: string
-      end: string
-    }
-  }
 }
 export type StringExtension = { url: string; valueString: string }
 export type Extension = KnownExtensionType[keyof KnownExtensionType]
+
+type NestedExtensionTypes = Extract<
+  Extension,
+  { extension: any }
+>['extension'][number]
+
+type AllExtensions =
+  | KnownExtensionType[keyof KnownExtensionType]
+  | NestedExtensionTypes
+
 export type StringValueExtension =
   StringExtensionType[keyof StringExtensionType]
 
-export function findExtension<
-  T extends keyof ExtensionSet,
-  ExtensionSet extends Record<string, any> = KnownExtensionType
->(
-  url: T,
-  extensions: Array<ExtensionSet[keyof ExtensionSet]>
-): ExtensionSet[T] | undefined {
-  return extensions.find((obj: Extension): obj is ExtensionSet[T] => {
-    return obj.url === url
-  })
+export function findExtension<URL extends AllExtensions['url']>(
+  url: URL,
+  listOfExtensions: AllExtensions[]
+): Extract<AllExtensions, { url: URL }> | undefined {
+  return listOfExtensions.find(
+    (extension): extension is Extract<AllExtensions, { url: URL }> =>
+      extension.url === url
+  )
 }
