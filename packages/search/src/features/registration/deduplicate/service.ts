@@ -43,7 +43,10 @@ export const removeDuplicate = async (
     throw new Error('No Composition ID found')
   }
   const composition = await searchByCompositionId(compositionId, client)
-  const body = get(composition, 'body.hits.hits[0]._source') as ICompositionBody
+  const body = get(
+    composition,
+    'body.hits.hits[0]._source'
+  ) as unknown as ICompositionBody
   body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body, client)
 }
