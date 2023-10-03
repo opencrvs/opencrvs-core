@@ -227,7 +227,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             action: 'hide',
             expression:
-              'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
+              '!window.config.SIGNATURE_REQUIRED_FOR_ROLES.includes(values.systemRole)'
           }
         ],
         fields: [
