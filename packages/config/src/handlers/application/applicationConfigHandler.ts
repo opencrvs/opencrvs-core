@@ -22,6 +22,16 @@ import { getDocumentUrl } from '@config/services/documents'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 
+export enum SystemRoleType {
+  'FIELD_AGENT',
+  'LOCAL_REGISTRAR',
+  'LOCAL_SYSTEM_ADMIN',
+  'NATIONAL_REGISTRAR',
+  'NATIONAL_SYSTEM_ADMIN',
+  'PERFORMANCE_MANAGEMENT',
+  'REGISTRATION_AGENT'
+}
+
 export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -265,5 +275,8 @@ const applicationConfigResponseValidation = Joi.object({
   INFORMANT_SIGNATURE: Joi.boolean().required(),
   INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required(),
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional()
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
+  SIGNATURE_REQUIRED_FOR_ROLES: Joi.array()
+    .items(Joi.string().valid(...Object.values(SystemRoleType)))
+    .optional()
 })
