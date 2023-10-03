@@ -97,7 +97,7 @@ import {
   isQuestionnaireResponse,
   isSavedObservation,
   isTaskOrTaskHistory,
-  resourceIdentifierToId,
+  resourceIdentifierToUUID,
   urlReferenceToID
 } from '@opencrvs/commons/types'
 
@@ -1027,7 +1027,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return context.dataSources.usersAPI.getUserByPractitionerId(
-        resourceIdentifierToId(user.valueReference.reference)
+        resourceIdentifierToUUID(user.valueReference.reference)
       )
     },
     reason: (task: Task) => (task.reason && task.reason.text) || null,
@@ -1074,7 +1074,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return context.dataSources.usersAPI.getUserByPractitionerId(
-        resourceIdentifierToId(comment.authorString)
+        resourceIdentifierToUUID(comment.authorString)
       )
     },
     comment: (comment) => comment.text,
@@ -1142,7 +1142,7 @@ export const typeResolvers: GQLResolver = {
 
       return getResourceFromBundleById<RelatedPerson>(
         context.record!,
-        resourceIdentifierToId(
+        resourceIdentifierToUUID(
           relatedPersonRef.valueReference.reference as ResourceIdentifier
         )
       )
@@ -1199,7 +1199,7 @@ export const typeResolvers: GQLResolver = {
 
       const practitioner = getResourceFromBundleById(
         context.record!,
-        resourceIdentifierToId(
+        resourceIdentifierToUUID(
           encounterParticipant.individual.reference as ResourceIdentifier
         )
       ) as Practitioner
@@ -1223,7 +1223,7 @@ export const typeResolvers: GQLResolver = {
 
       const practitioner = getResourceFromBundleById(
         context.record!,
-        resourceIdentifierToId(encounterParticipant.individual.reference)
+        resourceIdentifierToUUID(encounterParticipant.individual.reference)
       ) as Practitioner
       return (
         (practitioner &&
@@ -1416,7 +1416,7 @@ export const typeResolvers: GQLResolver = {
       const role = targetCode?.coding?.[0].code
 
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
-        resourceIdentifierToId(user.valueReference.reference)
+        resourceIdentifierToUUID(user.valueReference.reference)
       )
 
       if (role) {
@@ -1489,7 +1489,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
 
-      const practitionerId = resourceIdentifierToId(
+      const practitionerId = resourceIdentifierToUUID(
         user.valueReference.reference
       )
       const practitioner = getResourceFromBundleById<Practitioner>(

@@ -33,9 +33,11 @@ export function urlReferenceToID(reference: URLReference) {
   return urlParts[urlParts.length - 2]
 }
 
-export function resourceIdentifierToId(resourceIdentifier: ResourceIdentifier) {
+export function resourceIdentifierToUUID(
+  resourceIdentifier: ResourceIdentifier
+) {
   const urlParts = resourceIdentifier.split('/')
-  return urlParts[urlParts.length - 1]
+  return urlParts[urlParts.length - 1] as UUID
 }
 
 export type WithStrictExtensions<T extends Resource> = Omit<T, 'extension'> & {
