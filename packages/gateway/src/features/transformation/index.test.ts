@@ -27,7 +27,7 @@ describe('Object transformation module', () => {
       }
     }
 
-    const initialObject = { id: '123' }
+    const initialObject = { entry: [] }
     await transformObj(
       { gender: 'm', name: 'John Smith' },
       // transformObj is now strictly typed as a FHIR bundle
