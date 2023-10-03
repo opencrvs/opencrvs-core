@@ -115,7 +115,7 @@ export type StringExtensionType = {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'
     valueReference: { reference: string }
     /**
-     * @deprecated The field should not be used!
+     * Human readable office name
      */
     valueString?: string
   }
