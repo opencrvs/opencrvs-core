@@ -28,9 +28,9 @@ export type ResourceIdentifier = `${FhirResource}/${UUID}`
 // http://localhost:3447/fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
 
-export function urlReferenceToID(reference: URLReference) {
+export function urlReferenceToUUID(reference: URLReference) {
   const urlParts = reference.split('/')
-  return urlParts[urlParts.length - 2]
+  return urlParts[urlParts.length - 2] as UUID
 }
 
 export function resourceIdentifierToUUID(

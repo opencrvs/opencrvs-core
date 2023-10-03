@@ -7,7 +7,7 @@ import {
   findCompositionSection,
   getComposition,
   getResourceFromBundleById,
-  urlReferenceToID
+  urlReferenceToUUID
 } from '.'
 import { UUID } from '..'
 
@@ -65,7 +65,7 @@ export function getEncounterFromRecord(
 
   const encounter = getResourceFromBundleById<Encounter>(
     record,
-    urlReferenceToID(encounterReference)
+    urlReferenceToUUID(encounterReference)
   )
 
   if (!encounter) {

@@ -98,7 +98,7 @@ import {
   isSavedObservation,
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
-  urlReferenceToID
+  urlReferenceToUUID
 } from '@opencrvs/commons/types'
 
 import * as validateUUID from 'uuid-validate'
@@ -118,7 +118,7 @@ function findRelatedPerson(
     }
     return getResourceFromBundleById<RelatedPerson>(
       record,
-      urlReferenceToID(patientSection.entry![0].reference)
+      urlReferenceToUUID(patientSection.entry![0].reference)
     )
   }
 }
@@ -145,7 +145,7 @@ function findPatient(
 
     const patientOrRelatedPerson = getResourceFromBundleById<
       Patient | RelatedPerson
-    >(record, urlReferenceToID(patientSection.entry![0].reference))
+    >(record, urlReferenceToUUID(patientSection.entry![0].reference))
 
     if (isPatient(patientOrRelatedPerson)) {
       return patientOrRelatedPerson
@@ -153,7 +153,7 @@ function findPatient(
 
     return getResourceFromBundleById(
       record,
-      urlReferenceToID(patientOrRelatedPerson.patient.reference)
+      urlReferenceToUUID(patientOrRelatedPerson.patient.reference)
     )
   }
 }
@@ -381,7 +381,7 @@ export const typeResolvers: GQLResolver = {
       return relatedPerson && relatedPerson.id
     },
     _fhirIDPatient: async (relatedPerson: Saved<RelatedPerson>) => {
-      return urlReferenceToID(relatedPerson.patient.reference)
+      return urlReferenceToUUID(relatedPerson.patient.reference)
     },
     relationship: (relatedPerson) => {
       return (
@@ -401,14 +401,14 @@ export const typeResolvers: GQLResolver = {
     name: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.name) || null
     },
     dateOfMarriage: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
@@ -419,7 +419,7 @@ export const typeResolvers: GQLResolver = {
     age: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
@@ -436,28 +436,28 @@ export const typeResolvers: GQLResolver = {
     birthDate: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.birthDate) || null
     },
     identifier: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.identifier) || null
     },
     maritalStatus: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
@@ -468,7 +468,7 @@ export const typeResolvers: GQLResolver = {
     reasonNotApplying: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
@@ -483,7 +483,7 @@ export const typeResolvers: GQLResolver = {
     ageOfIndividualInYears: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
@@ -498,7 +498,7 @@ export const typeResolvers: GQLResolver = {
     exactDateOfBirthUnknown: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
@@ -513,28 +513,28 @@ export const typeResolvers: GQLResolver = {
     detailsExist: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.active
     },
     multipleBirth: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.multipleBirthInteger
     },
     deceased: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person
     },
     nationality: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
 
       const nationalityExtension = findExtension(
@@ -566,7 +566,7 @@ export const typeResolvers: GQLResolver = {
     educationalAttainment: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
@@ -581,7 +581,7 @@ export const typeResolvers: GQLResolver = {
     address: async (relatedPerson, _, context) => {
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToID(relatedPerson.patient.reference)
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.address
     }
@@ -697,7 +697,7 @@ export const typeResolvers: GQLResolver = {
       return docRefReferences.map(async (docRefReference) =>
         getResourceFromBundleById(
           context.record!,
-          urlReferenceToID(docRefReference)
+          urlReferenceToUUID(docRefReference)
         )
       )
     },
@@ -713,7 +713,7 @@ export const typeResolvers: GQLResolver = {
 
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
         context.record!,
-        urlReferenceToID(patientSection.entry[0].reference)
+        urlReferenceToUUID(patientSection.entry[0].reference)
       )
 
       if (
@@ -738,7 +738,7 @@ export const typeResolvers: GQLResolver = {
       }
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
         context.record!,
-        urlReferenceToID(patientSection.entry[0].reference)
+        urlReferenceToUUID(patientSection.entry[0].reference)
       )
 
       if (
@@ -1576,7 +1576,7 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToID(
+        eventLocation: urlReferenceToUUID(
           encounter.location[0].location.reference
         ),
         observation,
@@ -1601,7 +1601,7 @@ export const typeResolvers: GQLResolver = {
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToID(encounter.location[0].location.reference)
+        urlReferenceToUUID(encounter.location[0].location.reference)
       )
     },
     async deathDescription(record: Saved<Bundle>) {
@@ -1740,7 +1740,7 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToID(
+        eventLocation: urlReferenceToUUID(
           encounter.location[0].location.reference
         ),
         observation,
@@ -1817,7 +1817,7 @@ export const typeResolvers: GQLResolver = {
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToID(encounter.location[0].location.reference)
+        urlReferenceToUUID(encounter.location[0].location.reference)
       )
     },
     async history(record: Saved<Bundle>) {
@@ -1878,7 +1878,7 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToID(
+        eventLocation: urlReferenceToUUID(
           encounter.location[0].location.reference
         ),
         observation,
@@ -1940,7 +1940,7 @@ export const typeResolvers: GQLResolver = {
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToID(encounter.location[0].location.reference)
+        urlReferenceToUUID(encounter.location[0].location.reference)
       )
     },
     async history(record: Saved<Bundle>) {
