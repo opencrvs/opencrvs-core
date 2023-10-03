@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 set -e
 
 print_usage_and_exit () {
@@ -48,7 +47,7 @@ get_docker_tags_from_compose_files() {
    | grep image: \
    `# Only keep the image version` \
    | sed "s/image://")
-   
+
    IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST_WITH_VERSION | sed s/':${VERSION:-latest}'//g)
    echo $IMAGE_TAG_LIST
 }

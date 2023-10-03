@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
@@ -877,6 +876,32 @@ async function createInformantType(
       setInformantReference(
         FATHER_CODE,
         FATHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    }
+  } else if (context.event === EVENT_TYPE.DEATH) {
+    if (fieldValue === 'MOTHER') {
+      setInformantReference(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'FATHER') {
+      setInformantReference(
+        FATHER_CODE,
+        FATHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'SPOUSE') {
+      setInformantReference(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
         relatedPersonResource,
         fhirBundle,
         context

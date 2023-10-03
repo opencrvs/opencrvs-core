@@ -1,7 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.3.0-beta",
+  "version": "1.3.0",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -24,10 +24,6 @@
     "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
     "compose:deps:detached": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
     "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
-    "compose:build": "yarn build:image && docker-compose build",
-    "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
-    "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
-    "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
     "db:clear:all": "bash development-environment/clear-all-data.sh",

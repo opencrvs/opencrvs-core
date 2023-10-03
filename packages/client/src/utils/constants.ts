@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const REGISTERED = 'registered'
 export const CERTIFIED = 'certified'
@@ -84,5 +83,5 @@ export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
-export const APPLICATION_VERSION = 'v1.3.0-beta'
+export const APPLICATION_VERSION = 'v1.3.0'
 export const IS_PROD_ENVIRONMENT = import.meta.env.PROD
