@@ -624,8 +624,7 @@ function createAgeBuilder(resource: Patient, fieldValue: number) {
   }
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/age`,
-    // @todo in reality this value is an integer. We should use valueInteger here.
-    valueString: fieldValue as unknown as string
+    valueInteger: fieldValue
   })
 }
 

@@ -13,7 +13,11 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/age': {
     url: 'http://opencrvs.org/specs/extension/age'
-    valueString: string
+    /**
+     * @deprecated The field should not be used!
+     */
+    valueString?: string
+    valueInteger: number
   }
   'http://opencrvs.org/specs/extension/patient-occupation': {
     url: 'http://opencrvs.org/specs/extension/patient-occupation'

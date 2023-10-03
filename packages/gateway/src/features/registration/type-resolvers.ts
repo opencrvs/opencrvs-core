@@ -184,7 +184,13 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
         person.extension
       )
-      return (marriageExtension && marriageExtension.valueString) || null
+      if (!marriageExtension) {
+        return null
+      }
+      if (marriageExtension.valueInteger) {
+        return marriageExtension.valueInteger
+      }
+      return marriageExtension.valueString
     },
     maritalStatus: (person) => {
       return person && person.maritalStatus && person.maritalStatus.text
@@ -342,7 +348,13 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
         person?.extension || []
       )
-      return (marriageExtension && marriageExtension.valueString) || null
+      if (!marriageExtension) {
+        return null
+      }
+      if (marriageExtension.valueInteger) {
+        return marriageExtension.valueInteger
+      }
+      return marriageExtension.valueString
     },
     birthDate: async (
       relatedPerson,
