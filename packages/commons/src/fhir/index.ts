@@ -78,8 +78,9 @@ export type Composition = Omit<
 }
 
 export type DocumentReference = WithStrictExtensions<
-  Saved<Omit<fhir3.DocumentReference, 'indexed'>> & {
+  Saved<Omit<fhir3.DocumentReference, 'indexed' | 'docStatus'>> & {
     indexed?: string
+    docStatus?: 'validated' | 'approved' | 'deleted'
   }
 >
 

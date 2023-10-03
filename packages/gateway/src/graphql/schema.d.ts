@@ -1188,7 +1188,7 @@ export interface GQLAttachmentInput {
   contentType?: string
   data?: string
   uri?: string
-  status?: string
+  status?: GQLAttachmentInputStatus
   originalFileName?: string
   systemFileName?: string
   type?: string
@@ -1730,6 +1730,12 @@ export interface GQLAddressInput {
 export interface GQLDeceasedInput {
   deceased?: boolean
   deathDate?: string
+}
+
+export const enum GQLAttachmentInputStatus {
+  approved = 'approved',
+  validated = 'validated',
+  deleted = 'deleted'
 }
 
 export const enum GQLPaymentType {

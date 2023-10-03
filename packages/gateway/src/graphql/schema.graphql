@@ -1306,7 +1306,7 @@ input AttachmentInput {
   contentType: String
   data: String
   uri: String
-  status: String
+  status: AttachmentInputStatus
   originalFileName: String
   systemFileName: String
   type: String
@@ -1847,6 +1847,12 @@ input AddressInput {
 input DeceasedInput {
   deceased: Boolean
   deathDate: String
+}
+
+enum AttachmentInputStatus {
+  approved
+  validated
+  deleted
 }
 
 enum PaymentType {
