@@ -29,7 +29,7 @@ export type IFieldBuilderFunction<
   accumulatedObj: Bundle,
   fieldValue: NonNullable<FieldType>,
   context: Context<Key>
-) => Promise<Bundle | void> | Bundle | void
+) => Promise<Bundle | void | boolean> | Bundle | void | boolean
 
 type AllInputs = GQLBirthRegistrationInput &
   GQLDeathRegistrationInput &

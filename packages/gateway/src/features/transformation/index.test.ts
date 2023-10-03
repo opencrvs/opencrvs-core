@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
-
+import { Bundle } from '@opencrvs/commons/types'
 const mockContext = { authHeader: { Authorization: '' } }
 
 describe('Object transformation module', () => {
@@ -27,10 +27,16 @@ describe('Object transformation module', () => {
       }
     }
 
-    const initialObject = { id: '123' }
+    const initialObject = { entry: [] }
     await transformObj(
       { gender: 'm', name: 'John Smith' },
-      initialObject,
+      // transformObj is now strictly typed as a FHIR bundle
+      // as in reality, that's what it's solely used for. These tests were
+      // written before that change, so we need to cast the initialObject.
+      //
+      // If these tests start failing one day because new restrictions are added to
+      // the transformObject function consider a complete rewrite of these tests.
+      initialObject as any as Bundle,
       fieldBuilders,
       mockContext as any
     )
@@ -66,7 +72,13 @@ describe('Object transformation module', () => {
     const initialObject = { id: '123' }
     await transformObj(
       { gender: 'm', name: 'John Smith' },
-      initialObject,
+      // transformObj is now strictly typed as a FHIR bundle
+      // as in reality, that's what it's solely used for. These tests were
+      // written before that change, so we need to cast the initialObject.
+      //
+      // If these tests start failing one day because new restrictions are added to
+      // the transformObject function consider a complete rewrite of these tests.
+      initialObject as any as Bundle,
       fieldBuilders as any,
       mockContext as any
     )
@@ -95,7 +107,13 @@ describe('Object transformation module', () => {
     const initialObject = { id: '123' }
     await transformObj(
       { gender: 'm', name: ['John Smith', 'John D Smith'] },
-      initialObject,
+      // transformObj is now strictly typed as a FHIR bundle
+      // as in reality, that's what it's solely used for. These tests were
+      // written before that change, so we need to cast the initialObject.
+      //
+      // If these tests start failing one day because new restrictions are added to
+      // the transformObject function consider a complete rewrite of these tests.
+      initialObject as any as Bundle,
       fieldBuilders as any,
       mockContext as any
     )
@@ -140,7 +158,13 @@ describe('Object transformation module', () => {
           }
         }
       },
-      initialObject,
+      // transformObj is now strictly typed as a FHIR bundle
+      // as in reality, that's what it's solely used for. These tests were
+      // written before that change, so we need to cast the initialObject.
+      //
+      // If these tests start failing one day because new restrictions are added to
+      // the transformObject function consider a complete rewrite of these tests.
+      initialObject as any as Bundle,
       fieldBuilders as any,
       mockContext as any
     )
@@ -165,7 +189,13 @@ describe('Object transformation module', () => {
         {
           name: ''
         },
-        initialObject,
+        // transformObj is now strictly typed as a FHIR bundle
+        // as in reality, that's what it's solely used for. These tests were
+        // written before that change, so we need to cast the initialObject.
+        //
+        // If these tests start failing one day because new restrictions are added to
+        // the transformObject function consider a complete rewrite of these tests.
+        initialObject as any as Bundle,
         fieldBuilders,
         mockContext as any
       )
@@ -185,7 +215,13 @@ describe('Object transformation module', () => {
             given: 'John'
           }
         },
-        initialObject,
+        // transformObj is now strictly typed as a FHIR bundle
+        // as in reality, that's what it's solely used for. These tests were
+        // written before that change, so we need to cast the initialObject.
+        //
+        // If these tests start failing one day because new restrictions are added to
+        // the transformObject function consider a complete rewrite of these tests.
+        initialObject as any as Bundle,
         fieldBuilders,
         mockContext as any
       )
@@ -203,7 +239,13 @@ describe('Object transformation module', () => {
             given: 'John'
           }
         },
-        initialObject,
+        // transformObj is now strictly typed as a FHIR bundle
+        // as in reality, that's what it's solely used for. These tests were
+        // written before that change, so we need to cast the initialObject.
+        //
+        // If these tests start failing one day because new restrictions are added to
+        // the transformObject function consider a complete rewrite of these tests.
+        initialObject as any as Bundle,
         fieldBuilders,
         mockContext as any
       )
