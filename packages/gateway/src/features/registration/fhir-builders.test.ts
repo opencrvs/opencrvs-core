@@ -39,7 +39,7 @@ import { IAuthHeader } from '@opencrvs/commons'
 import * as fetchMock from 'jest-fetch-mock'
 import { Extension, isTask } from '@opencrvs/commons/types'
 import {
-  GQLAttachmentStatus,
+  GQLAttachmentInputStatus,
   GQLBirthRegistrationInput
 } from '@gateway/graphql/schema'
 
@@ -162,7 +162,7 @@ test('should build a minimal FHIR registration document without error', async ()
             _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
             contentType: 'image/png',
             data: 'ExampleData',
-            status: GQLAttachmentStatus.AMENDED,
+            status: 'amended' as GQLAttachmentInputStatus,
             originalFileName: 'original.png',
             systemFileName: 'system.png',
             type: 'PASSPORT',
@@ -784,7 +784,7 @@ test('should update a task document as rejected', async () => {
   )
 })
 
-test.only('creates task with contact other relationship', async () => {
+test('creates task with contact other relationship', async () => {
   fetch.mockResponse(
     JSON.stringify({
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'

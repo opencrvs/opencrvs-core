@@ -29,7 +29,7 @@ export type IFieldBuilderFunction<
   accumulatedObj: Bundle,
   fieldValue: NonNullable<FieldType>,
   context: Context<Key>
-) => void
+) => Promise<Bundle | void> | Bundle | void
 
 type AllInputs = GQLBirthRegistrationInput &
   GQLDeathRegistrationInput &
@@ -81,13 +81,16 @@ async function transformField(
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      await transformObj(
+      const result = await transformObj(
         sourceVal,
         targetObj,
         fieldBuilderForVal,
         context,
         currentPropNamePath
       )
+      if (result) {
+        targetObj = result
+      }
       return targetObj
     }
 
@@ -101,7 +104,10 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    await fieldBuilderForVal(targetObj, sourceVal, context)
+    const result = await fieldBuilderForVal(targetObj, sourceVal, context)
+    if (result) {
+      targetObj = result
+    }
     return targetObj
   }
 
@@ -116,7 +122,7 @@ async function transformField(
 
 export default async function transformObj(
   sourceObj: Record<string, unknown>,
-  bundle: Record<string, unknown>,
+  bundle: Bundle,
   fieldBuilders: IFieldBuilders,
   context: Context<any>,
   currentPropNamePath: string[] = []

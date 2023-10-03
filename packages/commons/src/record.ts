@@ -139,8 +139,11 @@ export function replaceFromBundle(
 ) {
   return {
     ...bundle,
-    entry: bundle.entry.map((entry) =>
-      entry.resource === resource ? { ...entry, resource: newResource } : entry
-    )
+    entry: bundle.entry.map((entry) => {
+      const shouldUpdate =
+        entry.resource === resource ||
+        (entry.resource.id && resource.id && entry.resource.id === resource.id)
+      return shouldUpdate ? { ...entry, resource: newResource } : entry
+    })
   }
 }
