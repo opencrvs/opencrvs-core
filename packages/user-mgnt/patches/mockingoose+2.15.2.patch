@@ -1,0 +1,31 @@
+diff --git a/node_modules/mockingoose/lib/index.js b/node_modules/mockingoose/lib/index.js
+index 0556b51..9137cba 100644
+--- a/node_modules/mockingoose/lib/index.js
++++ b/node_modules/mockingoose/lib/index.js
+@@ -31,7 +31,7 @@ mongoose.createConnection = jest.fn().mockReturnValue({
+   }
+ 
+ });
+-const ops = ['find', 'findOne', 'count', 'countDocuments', 'estimatedDocumentCount', 'distinct', 'findOneAndUpdate', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'remove', 'update', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany', 'save', 'aggregate'];
++const ops = ['find', 'findOne', 'count', 'countDocuments', 'estimatedDocumentCount', 'distinct', 'findOneAndUpdate', 'findOneAndDelete', 'findOneAndRemove', 'findOneAndReplace', 'remove', 'update', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany', 'save', 'aggregate', '$save'];
+ 
+ const mockedReturn = /*#__PURE__*/function () {
+   var _ref = _asyncToGenerator(function* (cb) {
+@@ -52,7 +52,7 @@ const mockedReturn = /*#__PURE__*/function () {
+       mock = yield mock(this);
+     }
+ 
+-    if (!mock && op === 'save') {
++    if (!mock && op.includes('save')) {
+       mock = this;
+     }
+ 
+@@ -203,7 +203,7 @@ mongoose.Model.insertMany = jest.fn().mockImplementation(function (arr, options,
+   });
+   return mockedReturn.call(this, cb);
+ });
+-const instance = ['remove', 'save'];
++const instance = ['remove', 'save', '$save'];
+ instance.forEach(methodName => {
+   mongoose.Model.prototype[methodName] = jest.fn().mockImplementation(function (options, cb) {
+     const op = methodName;
