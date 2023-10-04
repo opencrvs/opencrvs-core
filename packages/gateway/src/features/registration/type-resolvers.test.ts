@@ -222,8 +222,8 @@ jest.mock('@gateway/features/registration/utils', () => {
   }
 })
 
-jest.mock('@gateway/features/fhir/utils', () => {
-  const originalModule = jest.requireActual('@gateway/features/fhir/utils')
+jest.mock('@gateway/features/fhir/service', () => {
+  const originalModule = jest.requireActual('@gateway/features/fhir/service')
   return {
     ...originalModule,
     fetchFHIR: (url: string, headers: Headers, method: 'PUT' | 'GET') => {

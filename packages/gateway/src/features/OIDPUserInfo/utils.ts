@@ -16,10 +16,11 @@ import {
   OIDP_CLIENT_PRIVATE_KEY,
   OIDP_JWT_AUD_CLAIM
 } from '@gateway/constants'
-import { fetchFromHearth } from '@gateway/features/fhir/utils'
+
 import { logger } from '@gateway/logger'
 import { OIDPUserInfo } from './oidp-types'
 import { Bundle, Location } from '@opencrvs/commons/types'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 
 const TOKEN_GRANT_TYPE = 'authorization_code'
 const CLIENT_ASSERTION_TYPE =

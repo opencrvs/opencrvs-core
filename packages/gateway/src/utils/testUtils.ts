@@ -17,6 +17,28 @@ import {
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { GQLResolver } from '@gateway/graphql/schema'
+
+type IsResolver<T> = T extends (...args: any[]) => any ? true : false
+
+type MakeAllButFirstParamUndefined<F> = F extends (
+  arg1: infer A,
+  ...args: Array<any>
+) => infer R
+  ? ((arg1: A) => R) & ((arg1: A, ...args: any[]) => R)
+  : F
+
+type DeepRequired<T> = Required<{
+  [P in keyof T]: IsResolver<NonNullable<T[P]>> extends true
+    ? MakeAllButFirstParamUndefined<NonNullable<T[P]>>
+    : NonNullable<T[P]> extends Record<any, any>
+    ? DeepRequired<T[P]>
+    : never
+}>
+
+export type TestResolvers = DeepRequired<GQLResolver>
+
 export const mockPatient = {
   resourceType: 'Patient',
   active: true,

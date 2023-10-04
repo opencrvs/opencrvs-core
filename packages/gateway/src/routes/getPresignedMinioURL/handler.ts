@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { fetchDocuments } from '@gateway/features/fhir/utils'
+import { fetchDocuments } from '@gateway/features/documents/service'
 
 export async function getPresignedMinioURLHandler(
   request: Hapi.Request,

@@ -38,6 +38,12 @@ export enum EVENT_TYPE {
   MARRIAGE = 'MARRIAGE'
 }
 
+type RecordBase = Bundle
+export type WaitingForValidationRecord = Nominal<
+  RecordBase,
+  'WaitingForValidation'
+>
+
 export function getEventLabelFromBundle(bundle: Bundle) {
   const composition = getComposition(bundle)
   if (
@@ -55,11 +61,6 @@ export function getEventLabelFromBundle(bundle: Bundle) {
   }
 }
 
-type RecordBase = Bundle
-export type WaitingForValidationRecord = Nominal<
-  RecordBase,
-  'WaitingForValidation'
->
 export type ValidatedRecord = Nominal<RecordBase, 'Validated'>
 export type RegisteredRecord = Nominal<
   Bundle<

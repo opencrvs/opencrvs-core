@@ -23,3 +23,11 @@ export type NestedNominal<
   readonly [__nominal__type]: Identifier
   readonly [__nominal__type__2]: K[typeof __nominal__type]
 }
+
+export type IsNominal<T> = typeof __nominal__type extends keyof NonNullable<T>
+  ? true
+  : false
+
+export type IfNominalType<Value, Output> = IsNominal<Value> extends true
+  ? Output
+  : never

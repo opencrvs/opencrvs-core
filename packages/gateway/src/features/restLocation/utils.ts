@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { fetchFromHearth } from '@gateway/features/fhir/utils'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 import {
   ExtensionUrl,
   Facility as FacilityInput,

@@ -16,12 +16,7 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { inScope } from '@gateway/features/user/utils'
-import {
-  updateFHIRBundle,
-  checkUserAssignment
-} from '@gateway/features/registration/fhir-builders'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
-import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
+
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
@@ -35,6 +30,9 @@ import {
   rejectRegistrationCorrection,
   requestRegistrationCorrection
 } from '@gateway/workflow'
+import { checkUserAssignment } from '@gateway/authorisation'
+import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
+import { EVENT_TYPE, updateFHIRBundle } from '@opencrvs/commons/types'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -266,7 +264,6 @@ async function createEventRegistrationCorrection(
     JSON.stringify(fhirBundle)
   )
 
-  // return composition-id
   return getIDFromResponse(res)
 }
 

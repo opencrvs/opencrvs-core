@@ -8,6 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { Nominal } from '../nominal'
 import {
   Bundle,
   BundleEntry,
@@ -34,7 +36,6 @@ import {
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL
 } from './constants'
-import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
@@ -86,17 +87,22 @@ export type TaskIdentifier =
       value: string
     }
 
+export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
+
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
 type AllSystems = ExtractSystem<TaskIdentifier>
+
 type AfterLastSlash<S extends string> =
   S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
+
 export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
   fhir3.Task,
-  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier'
+  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier' | 'status'
 > & {
   lastModified: string
+  status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
   extension: Array<Extension>
   businessStatus: BusinessStatus
   intent?: fhir3.Task['intent']
@@ -266,7 +272,6 @@ export function getActionFromTask(task: Task) {
       return TaskAction.REJECTED_CORRECTION
     }
   }
-
   return null
 }
 

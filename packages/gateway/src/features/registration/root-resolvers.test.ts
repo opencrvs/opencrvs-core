@@ -12,20 +12,22 @@ import {
   resolvers as appResolvers,
   lookForComposition
 } from '@gateway/features/registration/root-resolvers'
+import { mockTaskBundle } from '@gateway/utils/testUtils'
 import {
+  ASSIGNED_EXTENSION_URL,
+  Bundle,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import * as jwt from 'jsonwebtoken'
+  findExtension,
+  getStatusFromTask,
+  isTask
+} from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
-import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 import { UserInputError } from 'apollo-server-hapi'
-import { Bundle, isTask } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
@@ -2236,7 +2238,6 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2313,8 +2314,6 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }],
-        ['[]', { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2405,8 +2404,6 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',

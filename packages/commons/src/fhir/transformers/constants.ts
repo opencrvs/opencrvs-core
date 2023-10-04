@@ -1,4 +1,4 @@
-import { OPENCRVS_SPECIFICATION_URL } from '@opencrvs/commons/types'
+import { OPENCRVS_SPECIFICATION_URL } from '..'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public

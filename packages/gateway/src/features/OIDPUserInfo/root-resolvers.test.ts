@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers as rootResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import { OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jose from 'jose'
-
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as fetchAny.FetchMock
-const resolvers = rootResolvers as any
+
 beforeEach(() => {
   fetch.resetMocks()
 })

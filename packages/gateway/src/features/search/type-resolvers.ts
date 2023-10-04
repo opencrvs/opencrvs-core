@@ -12,7 +12,7 @@ import { AVATAR_API, NATIVE_LANGUAGE } from '@gateway/constants'
 import {
   IEventDurationResponse,
   getEventDurationsFromMetrics
-} from '@gateway/features/fhir/utils'
+} from '@gateway/features/metrics/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
   GQLOperationHistorySearchSet,

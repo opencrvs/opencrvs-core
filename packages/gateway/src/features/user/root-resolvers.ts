@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  isBase64FileString,
-  postMetrics,
-  uploadBase64ToMinio
-} from '@gateway/features/fhir/utils'
+
 import {
   IUserModelData,
   IUserPayload,
@@ -38,6 +34,8 @@ import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
+import { postMetrics } from '../metrics/service'
+import { isBase64FileString, uploadBase64ToMinio } from '../documents/service'
 
 export const resolvers: GQLResolver = {
   Query: {

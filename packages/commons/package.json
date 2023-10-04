@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "yarn build:watch",
-    "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
+    "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",

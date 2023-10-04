@@ -40,6 +40,7 @@ import {
 } from './smsNotificationUtils'
 import {
   Bundle,
+  BundleEntry,
   Composition,
   DocumentReference,
   Patient,
@@ -452,13 +453,14 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      (entry) => entry.resource && entry.resource.resourceType === 'Task'
+      (entry): entry is BundleEntry<Task> =>
+        entry.resource && entry.resource.resourceType === 'Task'
     )
 
   return (
     (taskEntry &&
       taskEntry.resource &&
-      (taskEntry.resource as Task).status === 'draft') ||
+      taskEntry.resource.status === 'draft') ||
     false
   )
 }

@@ -9,37 +9,45 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-import {
-  ASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  DUPLICATE_TRACKING_ID,
-  EVENT_TYPE,
-  FLAGGED_AS_POTENTIAL_DUPLICATE,
-  MAKE_CORRECTION_EXTENSION_URL,
-  MARKED_AS_DUPLICATE,
-  MARKED_AS_NOT_DUPLICATE,
-  REINSTATED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
+
 import {
   fetchFHIR,
   getCompositionIdFromResponse,
   getDeclarationIds,
   getDeclarationIdsFromResponse,
-  getIDFromResponse,
-  removeDuplicatesFromComposition,
-  setCertificateCollector
-} from '@gateway/features/fhir/utils'
+  getIDFromResponse
+} from '@gateway/features/fhir/service'
 import {
   buildFHIRBundle,
-  checkUserAssignment,
   taskBundleWithExtension,
-  updateFHIRTaskBundle
-} from '@gateway/features/registration/fhir-builders'
+  updateFHIRTaskBundle,
+  Bundle,
+  Composition,
+  Extension,
+  Location,
+  OPENCRVS_SPECIFICATION_URL,
+  Patient,
+  Saved,
+  SavedBundleEntry,
+  Task,
+  TaskStatus,
+  getComposition,
+  getStatusFromTask,
+  getTaskFromBundle,
+  isComposition,
+  resourceToBundleEntry,
+  EVENT_TYPE,
+  TaskActionExtension,
+  toHistoryResource,
+  TaskHistory,
+  resourceIdentifierToUUID,
+  clearActionExtension,
+  addExtensionsToTask
+} from '@opencrvs/commons/types'
 import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -55,37 +63,19 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-import { IAuthHeader, UUID } from '@opencrvs/commons'
-import {
-  Bundle,
-  Composition,
-  Extension,
-  Location,
-  Patient,
-  Saved,
-  SavedBundleEntry,
-  Task,
-  getTaskFromBundle,
-  isComposition,
-  resourceToBundleEntry,
-  TaskActionExtension,
-  TaskHistory,
-  TaskStatus,
-  getStatusFromTask,
-  clearActionExtension,
-  addExtensionsToTask,
-  resourceIdentifierToUUID,
-  toHistoryResource,
-  OPENCRVS_SPECIFICATION_URL
-} from '@opencrvs/commons/types'
 
+import { hasBirthDuplicates, hasDeathDuplicates } from '../search/service'
 import { UserInputError } from 'apollo-server-hapi'
-
+import { checkUserAssignment } from '@gateway/authorisation'
+import {
+  removeDuplicatesFromComposition,
+  setCertificateCollector
+} from './utils'
 import {
   ISystemModelData,
   IUserModelData,
   isSystem
-} from '@gateway/features/user/type-resolvers'
+} from '../user/type-resolvers'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -433,7 +423,7 @@ export const resolvers: GQLResolver = {
         const taskEntry = await getTaskEntry(id, authHeader)
 
         const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: VERIFIED_EXTENSION_URL,
+          url: 'http://opencrvs.org/specs/extension/regVerified',
           valueString: headers['x-real-ip']!
         })
         await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
@@ -674,7 +664,7 @@ export const resolvers: GQLResolver = {
 
       taskEntry.resource.extension = [
         ...(taskEntry.resource.extension ?? []),
-        { url: REINSTATED_EXTENSION_URL }
+        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
       ]
 
       const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
@@ -755,7 +745,9 @@ export const resolvers: GQLResolver = {
 
         const taskEntry = await getTaskEntry(id, authHeader)
 
-        const extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const extension = {
+          url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
+        }
         const taskBundle = taskBundleWithExtension(taskEntry, extension)
         const payloadBundle: Bundle = {
           ...taskBundle,
@@ -782,7 +774,7 @@ export const resolvers: GQLResolver = {
       }
       const taskEntry = await getTaskEntry(id, authHeader)
       const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: UNASSIGNED_EXTENSION_URL
+        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
       })
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
@@ -807,7 +799,7 @@ export const resolvers: GQLResolver = {
 
       const taskEntry = await getTaskEntry(id, authHeader)
       const extension = {
-        url: MARKED_AS_DUPLICATE,
+        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
         valueString: duplicateTrackingId
       }
 
@@ -841,6 +833,32 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
+
+  let isADuplicate = false
+  if (event === EVENT_TYPE.BIRTH) {
+    isADuplicate = await hasBirthDuplicates(
+      authHeader,
+      details as GQLBirthRegistrationInput
+    )
+  } else if (event === EVENT_TYPE.DEATH) {
+    isADuplicate = await hasDeathDuplicates(
+      authHeader,
+      details as GQLDeathRegistrationInput
+    )
+  }
+
+  const composition = getComposition(doc)
+  const hasBeenFlaggedAsDuplicate = composition.extension?.find(
+    (x) => x.url === `${OPENCRVS_SPECIFICATION_URL}duplicate`
+  )
+  if (isADuplicate && !hasBeenFlaggedAsDuplicate) {
+    composition.extension = composition.extension || []
+    composition.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
+      valueBoolean: true
+    })
+  }
+
   const draftId =
     details && details.registration && details.registration.draftId
 
@@ -972,18 +990,18 @@ async function markEventAsIssued(
   return getIDFromResponse(res)
 }
 
-const ACTION_EXTENSIONS = [
-  ASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  MAKE_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
-  DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
+const ACTION_EXTENSIONS: Extension['url'][] = [
+  'http://opencrvs.org/specs/extension/regAssigned',
+  'http://opencrvs.org/specs/extension/regVerified',
+  'http://opencrvs.org/specs/extension/regUnassigned',
+  'http://opencrvs.org/specs/extension/regDownloaded',
+  'http://opencrvs.org/specs/extension/regReinstated',
+  'http://opencrvs.org/specs/extension/makeCorrection',
+  'http://opencrvs.org/specs/extension/regViewed',
+  'http://opencrvs.org/specs/extension/markedAsNotDuplicate',
+  'http://opencrvs.org/specs/extension/markedAsDuplicate',
+  'http://opencrvs.org/specs/extension/duplicateTrackingId',
+  'http://opencrvs.org/specs/extension/flaggedAsPotentialDuplicate'
 ]
 
 type ACTION_EXTENSION_TYPE = typeof ACTION_EXTENSIONS
