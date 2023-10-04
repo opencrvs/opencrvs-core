@@ -722,7 +722,7 @@ export function ReviewCorrection() {
         pageRoute={''}
         location={location}
         history={history}
-        registerForm={registerForm}
+        registerForm={registerForm!}
         declaration={recordWithProposedChanges}
       />
     </>
