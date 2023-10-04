@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
@@ -91,6 +90,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
       mother {
         id
@@ -99,6 +127,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
       spouse {
         id
@@ -106,6 +163,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           use
           firstNames
           familyName
+        }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
         }
       }
       medicalPractitioner {

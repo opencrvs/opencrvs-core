@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -898,83 +897,86 @@ export const DuplicateFormTabs = (props: IProps) => {
 
       {comparisonDelcarationData && (
         <FullBodyContent>
-          <Content
-            title={intl.formatMessage(
-              duplicateMessages.duplicateComparePageTitle,
-              {
-                actualTrackingId: (
-                  <Text variant="bold18" element="span" color="negative">
+          <div>
+            <Content
+              title={intl.formatMessage(
+                duplicateMessages.duplicateComparePageTitle,
+                {
+                  actualTrackingId: (
+                    <Text variant="bold18" element="span" color="negative">
+                      {actualTrackingId}
+                    </Text>
+                  ),
+                  duplicateTrackingId
+                }
+              )}
+              size={ContentSize.LARGE}
+              showTitleOnMobile
+            >
+              <Text element="h1" variant="h4" align="left" id="title-text">
+                {intl.formatMessage(
+                  duplicateMessages.duplicateDeclarationDetails
+                )}
+              </Text>
+              <Stack direction="column" gap={20} alignItems={'stretch'}>
+                {comparisonDelcarationData.map((sections, index) => {
+                  return (
+                    <div key={`comparison-div-${index}`}>
+                      <Text variant="bold18" element="span" color="grey600">
+                        {sections.title}
+                      </Text>
+                      <ComparisonListView
+                        headings={[actualTrackingId, duplicateTrackingId]}
+                        key={`comparison-${index}`}
+                      >
+                        {sections.data.map((item, index) => (
+                          <ComparisonListView.Row
+                            label={item.label}
+                            heading={{
+                              right: item.heading.right,
+                              left: item.heading.left
+                            }}
+                            leftValue={item.leftValue}
+                            rightValue={item.rightValue}
+                            key={`row-${index}`}
+                          />
+                        ))}
+                      </ComparisonListView>
+                    </div>
+                  )
+                })}
+              </Stack>
+            </Content>
+          </div>
+          <div>
+            <Content
+              title={intl.formatMessage(
+                duplicateMessages.duplicateComparePageSupportingDocuments
+              )}
+              size={ContentSize.LARGE}
+              showTitleOnMobile
+            >
+              <SupportingDocumentWrapper
+                justifyContent={'space-between'}
+                gap={25}
+              >
+                <div style={{ flex: 1 }}>
+                  <Text variant="bold14" element="p" color="redDark">
                     {actualTrackingId}
                   </Text>
-                ),
-                duplicateTrackingId
-              }
-            )}
-            size={ContentSize.LARGE}
-            showTitleOnMobile
-          >
-            <Text element="h1" variant="h4" align="left" id="title-text">
-              {intl.formatMessage(
-                duplicateMessages.duplicateDeclarationDetails
-              )}
-            </Text>
-            <Stack direction="column" gap={20} alignItems={'stretch'}>
-              {comparisonDelcarationData.map((sections, index) => {
-                return (
-                  <div key={`comparison-div-${index}`}>
-                    <Text variant="bold18" element="span" color="grey600">
-                      {sections.title}
-                    </Text>
-                    <ComparisonListView
-                      headings={[actualTrackingId, duplicateTrackingId]}
-                      key={`comparison-${index}`}
-                    >
-                      {sections.data.map((item, index) => (
-                        <ComparisonListView.Row
-                          label={item.label}
-                          heading={{
-                            right: item.heading.right,
-                            left: item.heading.left
-                          }}
-                          leftValue={item.leftValue}
-                          rightValue={item.rightValue}
-                          key={`row-${index}`}
-                        />
-                      ))}
-                    </ComparisonListView>
-                  </div>
-                )
-              })}
-            </Stack>
-          </Content>
-
-          <Content
-            title={intl.formatMessage(
-              duplicateMessages.duplicateComparePageSupportingDocuments
-            )}
-            size={ContentSize.LARGE}
-            showTitleOnMobile
-          >
-            <SupportingDocumentWrapper
-              justifyContent={'space-between'}
-              gap={25}
-            >
-              <div style={{ flex: 1 }}>
-                <Text variant="bold14" element="p" color="redDark">
-                  {actualTrackingId}
-                </Text>
-                <SupportingDocumentsView declaration={props.declaration} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <Text variant="bold14" element="p" color="grey400">
-                  {duplicateTrackingId}
-                </Text>
-                <SupportingDocumentsView
-                  declaration={duplicateDeclarationData as IDeclaration}
-                />
-              </div>
-            </SupportingDocumentWrapper>
-          </Content>
+                  <SupportingDocumentsView declaration={props.declaration} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <Text variant="bold14" element="p" color="grey400">
+                    {duplicateTrackingId}
+                  </Text>
+                  <SupportingDocumentsView
+                    declaration={duplicateDeclarationData as IDeclaration}
+                  />
+                </div>
+              </SupportingDocumentWrapper>
+            </Content>
+          </div>
         </FullBodyContent>
       )}
     </>

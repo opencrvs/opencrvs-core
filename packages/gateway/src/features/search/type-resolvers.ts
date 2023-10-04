@@ -6,18 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   AVATAR_API,
   NATIVE_LANGUAGE,
   USER_MANAGEMENT_URL
 } from '@gateway/constants'
-import { resolve } from 'url'
 import fetch from 'node-fetch'
 import {
-  GQLAdvancedSearchParametersInput,
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -35,14 +32,6 @@ interface ISearchEventDataTemplate {
 }
 interface ISearchDataTemplate {
   [key: string]: any
-}
-export interface ISearchCriteria {
-  parameters: GQLAdvancedSearchParametersInput
-  sort?: string
-  sortColumn?: string
-  size?: number
-  from?: number
-  createdBy?: string
 }
 
 interface IAssignment {
@@ -446,7 +435,7 @@ export const searchTypeResolvers: GQLResolver = {
   AssignmentData: {
     async avatarURL(assignmentData: IAssignment, _, { headers: authHeader }) {
       const response = await fetch(
-        resolve(USER_MANAGEMENT_URL, `users/${assignmentData.userId}/avatar`),
+        new URL(`users/${assignmentData.userId}/avatar`, USER_MANAGEMENT_URL),
         {
           method: 'GET',
           headers: {

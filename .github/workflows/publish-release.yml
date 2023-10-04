@@ -1,0 +1,87 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Publish release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Branch to build from
+        default: develop
+        required: true
+      release_version:
+        description: Release version number
+        required: true
+
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: euanmillar,rikukissa
+          minimum-approvals: 1
+          issue-title: 'Release: ${{ github.event.inputs.release_version }}'
+          issue-body: 'Please approve or deny the publishing of release: ${{ github.event.inputs.release_version }} to Dockerhub'
+          exclude-workflow-initiator-as-approver: false
+      - uses: actions/checkout@v2
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_name }}'
+
+      - uses: actions/checkout@v2
+        if: github.event_name == 'push'
+
+      - name: Set version
+        id: set-version
+        run: |
+          export VERSION=${{ github.event.inputs.release_version }}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get list of services
+        id: get-services
+        run: |
+          services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
+          services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
+          # Set the list of service names as an output variable
+          echo "services=$services_json" >> $GITHUB_OUTPUT
+          echo "services=$services_json"
+
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+      version: ${{ steps.set-version.outputs.version }}
+
+  build:
+    needs: base
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_name }}'
+
+      - uses: actions/checkout@v2
+        if: github.event_name == 'push'
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build ${{ matrix.service }}
+        run: |
+          echo ${{ matrix.service }}
+          export VERSION=${{ github.event.inputs.release_version }}
+          docker-compose build ${{ matrix.service }}
+          docker-compose push ${{ matrix.service }}

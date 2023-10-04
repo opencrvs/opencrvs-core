@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -64,11 +63,7 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import {
-  authenticateSystemClientHandler,
-  requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema
-} from '@auth/features/system/handler'
+import { tokenHandler } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
@@ -378,17 +373,11 @@ export async function createServer() {
 
   server.route({
     method: 'POST',
-    path: '/authenticateSystemClient',
-    handler: authenticateSystemClientHandler,
+    path: '/token',
+    handler: tokenHandler,
     options: {
       tags: ['api'],
-      description: 'Authenticate system with client_id and client_secret',
-      validate: {
-        payload: reqSystemSchema
-      },
-      response: {
-        schema: resSystemSchema
-      }
+      description: 'Authenticate system with client_id and client_secret'
     }
   })
 

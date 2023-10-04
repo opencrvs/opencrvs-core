@@ -1,42 +1,25 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [How to Contribute to OpenCRVS](#how-to-contribute-to-opencrvs)
-  - [Internal Dev Process - for the core team (Plan, Jembi and DSI)](#internal-dev-process---for-the-core-team-plan-jembi-and-dsi)
-    - [Sprint work process](#sprint-work-process)
-    - [Code review process](#code-review-process)
-    - [Finalizing stories](#finalizing-stories)
-  - [External Dev Process - for open source contributions](#external-dev-process---for-open-source-contributions)
-  - [License](#license)
+## Become part of the OpenCRVS Community
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+We want to see OpenCRVS implemented across the world. We can’t do this alone. Through the OpenCRVS Community, we are uniting experts in civil registration and other interested parties.
 
-# How to Contribute to OpenCRVS
+[Visit our website](https://www.opencrvs.org)
 
-<a href="https://github.com/opencrvs/opencrvs-core/issues">Raise an issue, request a feature</a> or <a href="https://community.opencrvs.org">join our community</a>
+[Join our community](https://community.opencrvs.org)
 
-## OpenCRVS Lead Architects:
+We greatly appreciate any contributions to opencrvs-core
 
-- Euan Millar https://github.com/euanmillar
-- Ryan Crichton https://github.com/rcrichton
-- Riku Rouvila https://github.com/rikukissa
-- Mushraful Hoque Anik https://github.com/mushrafulhoque-dsi
+<a href="https://github.com/opencrvs/opencrvs-core/issues">Raise an issue</a> or <a href="https://community.opencrvs.org">join our community to ask for a new feature</a>
 
-## External Dev Process - for open source contributions
+1. Raise an issue
+2. Involve yourself in design discussions
+3. Co-create development tasks with our team
+4. Fork the repo
+5. Create a branch with your changes
+6. Submit a PR
+7. Address any comments the core contributors may have
+8. The core contributors will merge the code once it is ready, thanks for you contribution to ensure every individual on the planet is recognised, protected and provided for from birth!
 
-1. Fork the repo
-2. Create a branch with your changes
-3. Submit a PR
-4. Address any comments the core contributors may have
-5. The core contributors will merge the code once it is ready, thanks for you contribution!
-
-By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
-
-## License
-
-This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-OpenCRVS is also distributed under the terms of the Civil Registration & Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS graphic logo are (registered/a) trademark(s) of Plan International.
+By contributing to the OpenCRVS code, you are conforming to the terms of the [license](https://www.opencrvs.org/license).

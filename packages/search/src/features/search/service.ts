@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
@@ -27,10 +26,12 @@ export function formatSearchParams(
     createdBy = '',
     from = 0,
     size = DEFAULT_SIZE,
-    sort = SortOrder.ASC,
     sortColumn = 'dateOfDeclaration',
+    sortBy,
     parameters
   } = searchPayload
+
+  const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
 
   return {
     index: OPENCRVS_INDEX_NAME,
@@ -39,7 +40,7 @@ export function formatSearchParams(
     size,
     body: {
       query: advancedQueryBuilder(parameters, createdBy, isExternalSearch),
-      sort: [{ [sortColumn]: sort }]
+      sort
     }
   }
 }

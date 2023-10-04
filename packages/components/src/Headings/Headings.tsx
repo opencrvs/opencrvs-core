@@ -6,14 +6,22 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import styled from 'styled-components'
 
-export const Heading3 = styled.div`
+// Form Heading 2
+export const Heading2 = styled.h2`
+  ${({ theme }) => theme.fonts.h2};
+  color: ${({ theme }) => theme.colors.grey600};
+  padding-bottom: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+`
+
+// Form Heading 3
+export const Heading3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
-  margin-top: 24px;
+  padding-top: 20px;
 `

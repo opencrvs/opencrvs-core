@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Query } from '@client/components/Query'
 import {
@@ -47,7 +46,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { AddUser, SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
+import { SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -71,10 +70,7 @@ import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAudit
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { ListUser } from '@opencrvs/components/lib/ListUser'
 import { useCallback } from 'react'
 import {
   withOnlineStatus,
@@ -114,10 +110,6 @@ const Loading = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: calc(100vh - 104px);
   }
-`
-
-const AddUserIcon = styled(AddUser)`
-  cursor: pointer;
 `
 
 const Header = styled.h1`
@@ -645,11 +637,15 @@ function UserListComponent(props: IProps) {
         />
       )
       buttons.push(
-        <AddUserIcon
+        <Button
           id="add-user"
+          type="icon"
+          size="medium"
           key={`add-user-${locationId}`}
           onClick={onClickAddUser}
-        />
+        >
+          <Icon name="UserPlus" />
+        </Button>
       )
     }
     return buttons
@@ -672,25 +668,22 @@ function UserListComponent(props: IProps) {
       return (
         <>
           <UserTable id="user_list">
-            <ListViewSimplified>
-              {userContent.length <= 0 ? (
-                <NoRecord id="no-record">
-                  {intl.formatMessage(constantsMessages.noResults)}
-                </NoRecord>
-              ) : (
-                userContent.map((content, index) => {
-                  return (
-                    <ListViewItemSimplified
-                      key={index}
-                      image={content.image}
-                      label={content.label}
-                      value={content.value}
-                      actions={content.actions}
-                    />
-                  )
-                })
-              )}
-            </ListViewSimplified>
+            {userContent.length <= 0 ? (
+              <NoRecord id="no-record">
+                {intl.formatMessage(constantsMessages.noResults)}
+              </NoRecord>
+            ) : (
+              <ListUser
+                rows={userContent.map((content) => ({
+                  avatar: content.image,
+                  label: content.label,
+                  value: content.value,
+                  actions: content.actions ? [content.actions] : []
+                }))}
+                labelHeader="USER"
+                valueHeader="ROLE"
+              />
+            )}
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
               <Pagination
                 currentPage={currentPageNumber}
