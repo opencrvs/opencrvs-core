@@ -33,6 +33,7 @@ import {
 import { checkUserAssignment } from '@gateway/authorisation'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
 import { EVENT_TYPE, updateFHIRBundle } from '@opencrvs/commons/types'
+import { uploadBase64AttachmentsToDocumentsStore } from '../registration/utils'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -252,7 +253,10 @@ async function createEventRegistrationCorrection(
 
   const fhirBundle = await updateFHIRBundle(
     record,
-    inputWithoutCorrection,
+    await uploadBase64AttachmentsToDocumentsStore(
+      inputWithoutCorrection,
+      authHeader
+    ),
     eventType,
     authHeader
   )
@@ -297,7 +301,10 @@ async function approveEventRegistrationCorrection(
 
   const fhirBundle = await updateFHIRBundle(
     record,
-    inputWithoutCorrection,
+    await uploadBase64AttachmentsToDocumentsStore(
+      inputWithoutCorrection,
+      authHeader
+    ),
     eventType,
     authHeader
   )
