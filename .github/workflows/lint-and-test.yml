@@ -41,17 +41,44 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v2
 
+      - name: Check package.json and scripts
+        id: check-scripts
+        run: |
+          if [ ! -f "${{ matrix.package }}/package.json" ]; then
+            echo "No package.json found for ${{ matrix.package }}. Stopping pipeline."
+            echo "::set-output name=skip::true"
+          elif ! grep -q "\"test\":" "${{ matrix.package }}/package.json" || ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
+            echo "Both or one of the test and lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
+            echo "::set-output name=skip::true"
+          else
+            echo "::set-output name=skip::false"
+          fi
+
       - name: Use Node.js ${{ matrix.node-version }}
+        if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Remove other package directories
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: |
+          for dir in packages/*; do
+            if [ "$dir" != "${{ matrix.package }}" ] && [ "$dir" != "packages/commons" ] && [ "$dir" != "packages/components" ]; then
+              echo "Removing $dir"
+              rm -rf "$dir"
+            fi
+          done
+
       - name: Runs dependency installation
+        if: steps.check-scripts.outputs.skip != 'true'
         run: yarn
 
       - name: Run linting
+        if: steps.check-scripts.outputs.skip != 'true'
         run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
+        if: steps.check-scripts.outputs.skip != 'true'
         run: cd ${{ matrix.package }} && yarn test
