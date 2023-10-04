@@ -78,7 +78,8 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: cd packages/common && yarn build
 
-     - name: Build components client and login
+      - name: Build components client and login
+        if: steps.check-scripts.outputs.skip != 'true'
         run: |
           if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
             cd packages/components && yarn build
