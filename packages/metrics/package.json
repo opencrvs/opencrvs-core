@@ -14,8 +14,7 @@
     "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "build:clean": "rm -rf build",
-    "postinstall": "patch-package"
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
