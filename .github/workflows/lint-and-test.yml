@@ -33,6 +33,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         package: ${{fromJson(needs.setup.outputs.matrix)}}
 
@@ -46,14 +47,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Run tests
-        run: cd ${{ matrix.package }}
-
       - name: Runs dependency installation
         run: yarn
 
       - name: Run linting
-        run: yarn lint
+        run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
-        run: yarn test
+        run: cd ${{ matrix.package }} && yarn test
