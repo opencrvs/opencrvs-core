@@ -13,12 +13,28 @@ name: Lint and run unit tests
 on: [pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-20.04
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get list of packages
+        id: set-matrix
+        run: |
+          PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
+          echo "Found packages: $PACKAGES"
+          echo "::set-output name=matrix::${PACKAGES}"
+
+  test:
+    needs: setup
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [16.20.0]
+        package: ${{fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - name: Checking out git repo
@@ -30,19 +46,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Run tests
+        run: cd ${{ matrix.package }}
+
       - name: Runs dependency installation
         run: yarn
 
       - name: Run linting
         run: yarn lint
 
-      - name: Build components
-        run: yarn build:components
-
       - name: Run Unit Test
         run: yarn test
-
-      - name: Run code coverage
-        run: |
-          npm install codecov
-          ./node_modules/.bin/codecov
