@@ -76,7 +76,7 @@ jobs:
 
       - name: Build common package
         if: steps.check-scripts.outputs.skip != 'true'
-        run: cd packages/common && yarn build
+        run: cd packages/commons && yarn build
 
       - name: Build components client and login
         if: steps.check-scripts.outputs.skip != 'true'
