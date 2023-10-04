@@ -79,6 +79,7 @@
     "@types/fhir": "^0.0.30",
     "@types/glob": "^5.0.35",
     "@types/hapi__hapi": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@types/hapi__inert": "^5.2.3",
     "@types/hapi__vision": "^5.5.3",
     "@types/jest": "^26.0.14",

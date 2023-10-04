@@ -75,6 +75,16 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: CI="" yarn
 
+      - name: Build common package
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: cd packages/common && yarn build
+
+     - name: Build components client and login
+        run: |
+          if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
+            cd packages/components && yarn build
+          fi
+
       - name: Run linting
         if: steps.check-scripts.outputs.skip != 'true'
         run: cd ${{ matrix.package }} && yarn lint
