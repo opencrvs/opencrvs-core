@@ -73,7 +73,7 @@ jobs:
 
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'
-        run: yarn
+        run: CI=false yarn
 
       - name: Run linting
         if: steps.check-scripts.outputs.skip != 'true'
