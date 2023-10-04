@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.3.0-beta",
+  "version": "1.3.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -21,13 +21,13 @@
     "precommit": "yarn lint && lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.0",
+    "@elastic/elasticsearch": "7.17.13",
     "@graphql-tools/graphql-file-loader": "^7.5.16",
     "@graphql-tools/load": "^7.8.13",
     "@graphql-tools/schema": "^9.0.17",
     "@graphql-tools/utils": "^9.2.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.3.0-beta",
+    "@opencrvs/commons": "^1.3.0",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",

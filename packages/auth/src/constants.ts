@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const AUTH_HOST = process.env.AUTH_HOST || '0.0.0.0'

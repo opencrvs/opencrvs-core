@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -60,7 +59,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'secondary' && styles.secondary}
   ${(props) =>
     props.variant === 'secondary_negative' && styles.secondary_negative}
-  
+
   ${(props) => props.variant === 'tertiary' && styles.tertiary}
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}

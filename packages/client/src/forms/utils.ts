@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
@@ -44,7 +43,9 @@ import {
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
-  BULLET_LIST
+  BULLET_LIST,
+  HIDDEN,
+  Ii18nHiddenFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -121,6 +122,10 @@ export const internationaliseFieldObject = (
     unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
+  }
+
+  if (base.type === HIDDEN) {
+    return base as Ii18nHiddenFormField
   }
 
   if (

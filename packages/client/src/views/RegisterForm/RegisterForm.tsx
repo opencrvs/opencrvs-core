@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { FormikTouched, FormikValues } from 'formik'
@@ -122,7 +121,7 @@ const BackButtonContainer = styled.div`
   position: fixed;
   padding: 16px 0px;
   height: 64px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: relative;
     margin: 0 16px;
   }
@@ -198,6 +197,7 @@ type State = {
   startTime: number
   selectedDuplicateComId: string
   isDuplicateDeclarationLoading: boolean
+  formFieldKey: string
 }
 
 function getDeclarationIconColor(declaration: IDeclaration): string {
@@ -226,13 +226,13 @@ function FormAppBar({
   const [modal, openModal] = useModal()
 
   const isFormDataAltered = () => {
-    if (!declaration.originalData) {
-      // if there is no originalData property
+    if (!declaration.localData) {
+      // if there is no localData property
       // that means it's a draft and has unsaved changes
       return true
     }
 
-    return !isEqual(declaration.originalData, declaration.data)
+    return !isEqual(declaration.localData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
@@ -296,9 +296,9 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to original data
-      //so that we can revert changes back to data.originalData when users exits without saving
-      declaration.originalData = declaration.data
+      //saving current changes to localData
+      //so that we can revert changes back to data.localData when users exits without saving
+      declaration.localData = declaration.data
       //save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -369,12 +369,12 @@ function FormAppBar({
     ))
 
     if (exitConfirm) {
-      if (!declaration.originalData) {
+      if (!declaration.localData) {
         deleteDeclarationMethod(declaration)
       } else {
         modifyDeclarationMethod({
           ...declaration,
-          data: declaration.originalData
+          data: declaration.localData
         })
       }
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -623,7 +623,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isFileUploading: false,
       startTime: 0,
       selectedDuplicateComId: props.declaration.id,
-      isDuplicateDeclarationLoading: false
+      isDuplicateDeclarationLoading: false,
+      formFieldKey: `${props.activeSection.id}-${props.activeSectionGroup.id}`
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -687,22 +688,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'father'
       }
 
-      // informant needs to be reset as the relationship changed
-      // see https://github.com/opencrvs/opencrvs-core/issues/5866
-      if (
-        ['MOTHER', 'FATHER', 'BRIDE', 'GROOM'].includes(
-          prevProps.declaration?.data?.informant?.informantType as string
-        )
-      ) {
-        const { _fhirIDPatient, ...informantWithoutFhirID } =
-          declaration.data.informant
-        modifiedDeclaration = {
-          ...modifiedDeclaration,
-          data: {
-            ...modifiedDeclaration.data,
-            informant: {
-              ...informantWithoutFhirID
-            }
+      modifiedDeclaration = {
+        ...modifiedDeclaration,
+        data: {
+          ...modifiedDeclaration.data,
+          informant: {
+            informantType: modifiedDeclaration.data.informant.informantType
           }
         }
       }
@@ -720,6 +711,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         }
       }
       this.props.modifyDeclaration(modifiedDeclaration)
+      // this is to forcefully remount the component
+      // to reset the initial values of formik
+      this.setState({
+        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
+      })
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
@@ -1169,7 +1165,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
-                                key={`${activeSection.id}-${activeSectionGroup.id}`}
+                                key={this.state.formFieldKey}
                                 onChange={(values) => {
                                   debouncedModifyDeclaration(
                                     values,

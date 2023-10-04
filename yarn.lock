@@ -3167,10 +3167,10 @@
   dependencies:
     "@elastic/ecs-helpers" "^1.1.0"
 
-"@elastic/elasticsearch@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.npmjs.org/@elastic/elasticsearch/-/elasticsearch-7.17.0.tgz"
-  integrity sha512-5QLPCjd0uLmLj1lSuKSThjNpq39f6NmlTy9ROLFwG5gjyTgpwSqufDeYG/Fm43Xs05uF7WcscoO7eguI3HuuYA==
+"@elastic/elasticsearch@7.17.13":
+  version "7.17.13"
+  resolved "https://registry.yarnpkg.com/@elastic/elasticsearch/-/elasticsearch-7.17.13.tgz#6f5c17ed0c09d92c00ba2f10d5081bbb5d4d247b"
+  integrity sha512-GMXtFVqd3FgUlTtPL/GDc+3GhwvfZ0kSuegCvVVqb58kd+0I6U6u7PL8QFRLHtwzqLEBmYLdwr4PRkBAWKGlzA==
   dependencies:
     debug "^4.3.1"
     hpagent "^0.1.1"
@@ -7427,9 +7427,9 @@
   integrity sha512-iacbaYN9IWWrGWTwlYLVOeUtN/e4cjN9Uh6v7Yo1Qa/vJzeSQeh10L/erBBSl53BTmbnQ07vsWp8mmNHGI4WbQ==
 
 "@types/enzyme@^3.1.13":
-  version "3.10.13"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.13.tgz#332c0ed59b01f7b1c398c532a1c21a5feefabeb1"
-  integrity sha512-FCtoUhmFsud0Yx9fmZk179GkdZ4U9B0GFte64/Md+W/agx0L5SxsIIbhLBOxIb9y2UfBA4WQnaG1Od/UsUQs9Q==
+  version "3.10.14"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.14.tgz#dc30e3820a6331e8165be442cc778f25457ec44d"
+  integrity sha512-JeTG2MNUX1bH2DqccwUe3SuPoLu+kUz5UgR3Tvl9nBdfNj7rBZscytctSjEatd5Ul9GXXGKaQBaxODIgJYVRqA==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "^16"
@@ -7515,9 +7515,9 @@
     "@types/node" "*"
 
 "@types/glob@^5.0.35":
-  version "5.0.37"
-  resolved "https://registry.npmjs.org/@types/glob/-/glob-5.0.37.tgz"
-  integrity sha512-ATA/xrS7CZ3A2WCPVY4eKdNpybq56zqlTirnHhhyOztZM/lPxJzusOBI3BsaXbu6FrUluqzvMlI4sZ6BDYMlMg==
+  version "5.0.38"
+  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-5.0.38.tgz#20e29f3c6332f6b3329f34711ebb31a03dd74a51"
+  integrity sha512-rTtf75rwyP9G2qO5yRpYtdJ6aU1QqEhWbtW55qEgquEDa6bXW0s2TWZfDm02GuppjEozOWG/F2UnPq5hAQb+gw==
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
@@ -8029,9 +8029,9 @@
     csstype "^3.0.2"
 
 "@types/recharts@^1.1.1":
-  version "1.8.23"
-  resolved "https://registry.npmjs.org/@types/recharts/-/recharts-1.8.23.tgz"
-  integrity sha512-O/mIPm9f6dwRWfenOI3GQwsGta3x1YWjwqXOCZqC0MATQ6C+A+Jc8VxFnSUr4N3uYv64zkq90RwXFaMNbhJKvg==
+  version "1.8.25"
+  resolved "https://registry.yarnpkg.com/@types/recharts/-/recharts-1.8.25.tgz#8016786a2d23e95d4e87a0749411480bc5012325"
+  integrity sha512-n00qkrMF77KJ3yaxXlomOv/dIgLKvkI84Js6AoZzhqz2F+RRJAIrLYU6gDnOUM1JsgT2+dMNmnOQ2kgdqTX7fA==
   dependencies:
     "@types/d3-shape" "^1"
     "@types/react" "*"
@@ -8044,9 +8044,9 @@
     "@types/node" "*"
 
 "@types/redux-logger@^3.0.6":
-  version "3.0.9"
-  resolved "https://registry.npmjs.org/@types/redux-logger/-/redux-logger-3.0.9.tgz"
-  integrity sha512-cwYhVbYNgH01aepeMwhd0ABX6fhVB2rcQ9m80u8Fl50ZODhsZ8RhQArnLTkE7/Zrfq4Sz/taNoF7DQy9pCZSKg==
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@types/redux-logger/-/redux-logger-3.0.10.tgz#0edb5bb531633b4b967998efa0b76027d88ac00f"
+  integrity sha512-wjcuptRVZQoWjbwKdLrEnit9A7TvW0HD6ZYNQGWRRCUBBux2RT8JxqwYemaS2fTQT3ebOvsszt2L/Hrylxh5PA==
   dependencies:
     redux "^4.0.0"
 
@@ -14002,9 +14002,9 @@ get-caller-file@^2.0.1, get-caller-file@^2.0.5:
   integrity sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==
 
 get-func-name@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/get-func-name/-/get-func-name-2.0.0.tgz"
-  integrity sha512-Hm0ixYtaSZ/V7C8FJrtZIuBBI+iSgL+1Aq82zSu8VQNB4S3Gk8e7Qs3VwBDJAhmRZcFqkl3tQu36g/Foh5I5ig==
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/get-func-name/-/get-func-name-2.0.2.tgz#0d7cf20cd13fda808669ffa88f4ffc7a3943fc41"
+  integrity sha512-8vXOvuE167CtIc3OyItco7N/dpRtBbYOsPsXCz7X/PMnlGjYjSGuZJgM1Y7mmew7BKf9BqvLX2tnOVy1BBUsxQ==
 
 get-intrinsic@^1.0.2, get-intrinsic@^1.1.0, get-intrinsic@^1.1.1, get-intrinsic@^1.1.2, get-intrinsic@^1.1.3:
   version "1.1.3"
@@ -24638,10 +24638,10 @@ xml-name-validator@^3.0.0:
   resolved "https://registry.npmjs.org/xml-name-validator/-/xml-name-validator-3.0.0.tgz"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
-xml2js@^0.4.15:
-  version "0.4.23"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
-  integrity sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==
+xml2js@0.5.0, xml2js@^0.4.15:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.5.0.tgz#d9440631fbb2ed800203fad106f2724f62c493b7"
+  integrity sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==
   dependencies:
     sax ">=0.6.0"
     xmlbuilder "~11.0.0"

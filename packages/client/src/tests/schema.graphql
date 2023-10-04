@@ -69,6 +69,7 @@ type AdvancedSeachParameters {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -127,6 +128,7 @@ input AdvancedSearchParametersInput {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -273,6 +275,7 @@ type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
+  childIdentifier: String
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
@@ -1209,7 +1212,7 @@ type Query {
   fetchMonthWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [LocationWiseEstimationMetric!]
   getUserAuditLog(practitionerId: String!, skip: Int, count: Int!, timeStart: String, timeEnd: String): UserAuditLogResultSet
-  searchEvents(userId: String, advancedSearchParameters: AdvancedSearchParametersInput!, count: Int, skip: Int, sort: String, sortColumn: String): EventSearchResultSet
+  searchEvents(userId: String, advancedSearchParameters: AdvancedSearchParametersInput!, count: Int, skip: Int, sort: String, sortColumn: String, sortBy: [SortBy!]): EventSearchResultSet
   getEventsWithProgress(declarationJurisdictionId: String, registrationStatuses: [String], compositionType: [String], count: Int, skip: Int, sort: String): EventProgressResultSet
   getSystemRoles(title: String, value: ComparisonInput, role: String, active: Boolean, sortBy: String, sortOrder: String): [SystemRole!]
   getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
@@ -1509,6 +1512,11 @@ input SMSNotificationInput {
   id: String!
   name: String!
   enabled: Boolean!
+}
+
+input SortBy {
+  column: String!
+  order: String!
 }
 
 enum Status {

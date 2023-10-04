@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 print_usage_and_exit () {
     echo 'Usage: ./clear-all-data.sh'
     echo "This script clears all OpenCRVS data locally."
@@ -33,8 +32,8 @@ PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
 if [ -d $PATH_TO_MINIO_DIR ] ; then
  # Locally, as this script is called from the country config repo, the path to core is unknown
  # So we delete the data from the running shared volume location
-  docker exec opencrvs_minio_1 rm -rf /data/minio/ocrvs
-  docker exec opencrvs_minio_1 mkdir -p /data/minio/ocrvs
+  docker exec `docker ps --format "{{.Names}}" | grep minio` sh -c 'rm -rf /data/ocrvs/*'
+  docker exec `docker ps --format "{{.Names}}" | grep minio` mkdir -p /data/ocrvs
   echo "**** Removed minio data ****"
 fi
 

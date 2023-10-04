@@ -28,6 +28,10 @@ Array [
         "valueString": "/ocrvs/c647d125-68ee-4794-b320-d472aadd8c09.png",
       },
       Object {
+        "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+        "valueString": "+260745645645",
+      },
+      Object {
         "url": "http://opencrvs.org/specs/extension/contact-person-email",
         "valueString": "informant@example.com",
       },

@@ -6,8 +6,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # Define the target directory and filename
 
 if [[ "$1" =~ ^(hearth|application-config|openhim|performance|user-mgnt)$ ]]; then
@@ -37,8 +36,7 @@ cat << EOF > "$FILE_PATH"
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { Db, MongoClient } from 'mongodb'

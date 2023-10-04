@@ -1,7 +1,7 @@
-import { METRICS_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 import { ValidRecord } from '@opencrvs/commons/types'
+import { METRICS_URL } from '@workflow/constants'
 
 export async function createNewAuditEvent(
   bundle: ValidRecord,
@@ -10,8 +10,7 @@ export async function createNewAuditEvent(
   const eventType = getEventType(bundle).toLowerCase()
 
   const res = await fetch(
-    new URL(`/events/${eventType}/request-correction`, METRICS_SERVICE_URL)
-      .href,
+    new URL(`/events/${eventType}/request-correction`, METRICS_URL).href,
     {
       method: 'POST',
       body: JSON.stringify(bundle),

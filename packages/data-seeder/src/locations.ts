@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import {
@@ -23,7 +22,7 @@ const LocationSchema = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    alias: z.string(),
+    alias: z.string().optional(),
     partOf: z.string(),
     locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
     jurisdictionType: z
