@@ -50,7 +50,7 @@ export function validateBundle(bundle: unknown): bundle is Bundle {
   if (typeof bundle !== 'object' || bundle === null) {
     throw new Error('Bundle must be an object')
   }
-  if (!('entry' in bundle) || !Array.isArray(bundle.entry)) {
+  if (!('entry' in bundle)) {
     throw new Error('Bundle must have an entry list')
   }
 
