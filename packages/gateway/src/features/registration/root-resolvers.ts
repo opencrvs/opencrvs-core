@@ -69,7 +69,8 @@ import { UserInputError } from 'apollo-server-hapi'
 import { checkUserAssignment } from '@gateway/authorisation'
 import {
   removeDuplicatesFromComposition,
-  setCertificateCollector
+  setCertificateCollector,
+  uploadBase64AttachmentsToDocumentsStore
 } from './utils'
 import {
   ISystemModelData,
@@ -824,6 +825,20 @@ export const resolvers: GQLResolver = {
   }
 }
 
+async function registrationToFHIR(
+  event: EVENT_TYPE,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  authHeader: IAuthHeader
+) {
+  const recordWithAttachmentsUploaded =
+    await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
+
+  return buildFHIRBundle(recordWithAttachmentsUploaded, event, authHeader)
+}
+
 async function createEventRegistration(
   details:
     | GQLBirthRegistrationInput
@@ -832,7 +847,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
 
   let isADuplicate = false
   if (event === EVENT_TYPE.BIRTH) {
@@ -943,7 +958,7 @@ async function markEventAsValidated(
       entry: taskEntry
     }
   } else {
-    doc = await buildFHIRBundle(details, event, authHeader)
+    doc = await registrationToFHIR(event, details, authHeader)
   }
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
@@ -958,7 +973,7 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
@@ -973,7 +988,7 @@ async function markEventAsCertified(
   event: EVENT_TYPE
 ) {
   await setCertificateCollector(details, authHeader)
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
@@ -985,7 +1000,7 @@ async function markEventAsIssued(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   return getIDFromResponse(res)
 }
