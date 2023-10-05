@@ -69,6 +69,10 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=development
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
+      - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
+      - DOCUMENTS_URL=http://documents:9050
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - RESOURCE_SERVICE_URL=http://countryconfig:3040/

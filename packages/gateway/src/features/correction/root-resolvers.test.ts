@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import { resolvers } from '@gateway/features/correction/root-resolvers'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 describe('Correction root resolvers', () => {
   let registerCertifyToken: string
@@ -128,16 +128,18 @@ describe('Correction root resolvers', () => {
     fetch = fetchAny
   })
 
-  describe('requestBirthRegistrationCorrection', () => {
+  describe('requestRegistrationCorrection', () => {
     it('throws authentication error when user does not have register scope', async () => {
       try {
-        await resolvers.Mutation.requestBirthRegistrationCorrection(
+        await resolvers.Mutation.requestRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
           { headers: authHeaderDeclare }
         )
       } catch (e) {
-        expect(e.message).toBe('User does not have a register scope')
+        expect(e.message).toBe(
+          'User does not have a register or validate scope'
+        )
       }
     })
 
@@ -158,70 +160,30 @@ describe('Correction root resolvers', () => {
         })
       )
 
-      const result =
-        await resolvers.Mutation.requestBirthRegistrationCorrection(
-          {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
-          { headers: authHeaderRegCert }
-        )
+      const result = await resolvers.Mutation.requestRegistrationCorrection(
+        {},
+        { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
+        { headers: authHeaderRegCert }
+      )
 
       expect(result).toBeDefined()
       expect(result).toEqual('80b90ac3-1032-4f98-af64-627d2b7443f3')
     })
   })
 
-  describe('requestDeathRegistrationCorrection', () => {
+  describe('requestRegistrationCorrection', () => {
     it('throws authentication error when user does not have register scope', async () => {
       try {
-        await resolvers.Mutation.requestDeathRegistrationCorrection(
+        await resolvers.Mutation.requestRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
           { headers: authHeaderDeclare }
         )
       } catch (e) {
-        expect(e.message).toBe('User does not have a register scope')
-      }
-    })
-
-    it('posts a fhir bundle', async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121223' })])
-
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: {
-                location:
-                  'Task/12423/_history/80b90ac3-1032-4f98-af64-627d2b7443f3'
-              }
-            }
-          ]
-        })
-      )
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: {
-                location:
-                  'Task/12423/_history/80b90ac3-1032-4f98-af64-627d2b7443f3'
-              }
-            }
-          ]
-        })
-      )
-
-      const result =
-        await resolvers.Mutation.requestDeathRegistrationCorrection(
-          {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
-          { headers: authHeaderRegCert }
+        expect(e.message).toBe(
+          'User does not have a register or validate scope'
         )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual('80b90ac3-1032-4f98-af64-627d2b7443f3')
+      }
     })
   })
 })

@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
+  MAKE_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   OPENCRVS_SPECIFICATION_URL,
   MARKED_AS_NOT_DUPLICATE,
@@ -672,7 +672,9 @@ export const resolvers: GQLResolver = {
       const taskBundle = taskBundleWithExtension(taskEntry, {
         url: UNASSIGNED_EXTENSION_URL
       })
+
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+
       // return the taskId
       return taskEntry.resource.id
     },
@@ -864,7 +866,7 @@ const ACTION_EXTENSIONS = [
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
+  MAKE_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   MARKED_AS_NOT_DUPLICATE,
   MARKED_AS_DUPLICATE,
@@ -944,6 +946,7 @@ export async function markRecordAsDownloadedOrAssigned(
   const taskBundle = taskBundleWithExtension(taskEntry, extension)
 
   await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
 }

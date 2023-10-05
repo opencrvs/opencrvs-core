@@ -10,8 +10,10 @@
  */
 /* eslint-disable import/no-relative-parent-imports */
 import PatientAPI from '../features/fhir/patientAPI'
-import { IAuthHeader } from '../common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import LocationsAPI from '../features/fhir/locationsAPI'
+import PaymentsAPI from '../features/fhir/paymentsAPI'
+import DocumentsAPI from '../features/fhir/documentsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
 import MinioAPI from '../features/fhir/minioAPI'
 import { Request } from '@hapi/hapi'
@@ -20,6 +22,8 @@ export interface Context {
   request: Request
   dataSources: {
     locationsAPI: LocationsAPI
+    documentsAPI: DocumentsAPI
+    paymentsAPI: PaymentsAPI
     practitionerRoleAPI: PractitionerRoleAPI
     patientAPI: PatientAPI
     minioAPI: MinioAPI

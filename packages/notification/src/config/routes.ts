@@ -19,6 +19,12 @@ import {
   sendBirthInProgressConfirmation
 } from '@notification/features/sms/birth-handler'
 import {
+  sendCorrectionApprovedNotification,
+  sendCorrectionApprovedNotificationInput,
+  sendCorrectionRejectedNotification,
+  sendCorrectionRejectedNotificationInput
+} from '@notification/features/sms/correction'
+import {
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation,
   sendDeathRejectionConfirmation,
@@ -232,6 +238,36 @@ export default function getRoutes() {
         },
         validate: {
           payload: userCredentialsNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/rejectCorrectionRequest',
+      handler: sendCorrectionRejectedNotification,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionRejectedNotificationInput
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/approveCorrectionRequest',
+      handler: sendCorrectionApprovedNotification,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionApprovedNotificationInput
         }
       }
     },

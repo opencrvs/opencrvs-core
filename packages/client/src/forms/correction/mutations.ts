@@ -10,28 +10,52 @@
  */
 import { gql } from '@apollo/client'
 
-export const REQUEST_BIRTH_REG_CORRECTION = gql`
-  mutation requestBirthRegistrationCorrection(
+export const CREATE_BIRTH_REG_CORRECTION = gql`
+  mutation createBirthRegistrationCorrection(
     $id: ID!
     $details: BirthRegistrationInput!
   ) {
-    requestBirthRegistrationCorrection(id: $id, details: $details)
-  }
-`
-export const REQUEST_DEATH_REG_CORRECTION = gql`
-  mutation requestDeathRegistrationCorrection(
-    $id: ID!
-    $details: DeathRegistrationInput!
-  ) {
-    requestDeathRegistrationCorrection(id: $id, details: $details)
+    createBirthRegistrationCorrection(id: $id, details: $details)
   }
 `
 
-export const REQUEST_MARRIAGE_REG_CORRECTION = gql`
-  mutation requestMarriageRegistrationCorrection(
+export const CREATE_DEATH_REG_CORRECTION = gql`
+  mutation createDeathRegistrationCorrection(
     $id: ID!
-    $details: MarriageRegistrationInput!
+    $details: DeathRegistrationInput!
   ) {
-    requestMarriageRegistrationCorrection(id: $id, details: $details)
+    createDeathRegistrationCorrection(id: $id, details: $details)
+  }
+`
+export const APPROVE_BIRTH_REG_CORRECTION = gql`
+  mutation approveBirthRegistrationCorrection(
+    $id: ID!
+    $details: BirthRegistrationInput!
+  ) {
+    approveBirthRegistrationCorrection(id: $id, details: $details)
+  }
+`
+
+export const APPROVE_DEATH_REG_CORRECTION = gql`
+  mutation approveDeathRegistrationCorrection(
+    $id: ID!
+    $details: DeathRegistrationInput!
+  ) {
+    approveDeathRegistrationCorrection(id: $id, details: $details)
+  }
+`
+
+export const REQUEST_REG_CORRECTION = gql`
+  mutation requestRegistrationCorrection($id: ID!, $details: CorrectionInput!) {
+    requestRegistrationCorrection(id: $id, details: $details)
+  }
+`
+
+export const REJECT_REG_CORRECTION = gql`
+  mutation rejectRegistrationCorrection(
+    $id: ID!
+    $details: CorrectionRejectionInput!
+  ) {
+    rejectRegistrationCorrection(id: $id, details: $details)
   }
 `

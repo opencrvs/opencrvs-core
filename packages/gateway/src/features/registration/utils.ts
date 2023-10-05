@@ -10,7 +10,7 @@
  */
 
 import { fetchDocuments, fetchFHIR } from '@gateway/features/fhir/utils'
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { Context } from '@gateway/graphql/context'
 
 export async function getPresignedUrlFromUri(
