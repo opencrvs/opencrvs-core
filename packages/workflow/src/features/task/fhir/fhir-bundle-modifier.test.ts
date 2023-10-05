@@ -29,15 +29,11 @@ const fetch = fetchAny as any
 let token: string
 describe('Verify handler', () => {
   beforeEach(() => {
-    token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['declare'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
   })
 
   it('modifyTaskBundle returns correct bundle', async () => {

@@ -19,7 +19,7 @@ import { ApolloServer } from 'apollo-server-hapi'
 describe('Test apollo server config', () => {
   const token = jwt.sign(
     { scope: ['register'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',

@@ -492,15 +492,11 @@ describe('validateDeceasedDetails functions', () => {
   let authHeader: { Authorization: string }
   beforeEach(async () => {
     fetch.resetMocks()
-    token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['register'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
 
     authHeader = {
       Authorization: `Bearer ${token}`

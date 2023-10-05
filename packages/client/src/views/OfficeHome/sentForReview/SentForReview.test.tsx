@@ -32,7 +32,7 @@ import { vi, Mock } from 'vitest'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
