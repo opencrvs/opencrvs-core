@@ -46,11 +46,22 @@ jobs:
           if [ ! -f "${{ matrix.package }}/package.json" ]; then
             echo "No package.json found for ${{ matrix.package }}. Stopping pipeline."
             echo "::set-output name=skip::true"
-          elif ! grep -q "\"test\":" "${{ matrix.package }}/package.json" || ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
-            echo "Both or one of the test and lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
-            echo "::set-output name=skip::true"
           else
             echo "::set-output name=skip::false"
+
+            if ! grep -q "\"test\":" "${{ matrix.package }}/package.json"; then
+              echo "Test not found in ${{ matrix.package }}"
+              echo "::set-output name=skip-test::true"
+            else
+              echo "::set-output name=skip-test::false"
+            fi
+
+            if ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
+              echo "Lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
+              echo "::set-output name=skip-lint::true"
+            else
+              echo "::set-output name=skip-lint::false"
+            fi
           fi
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -86,9 +97,9 @@ jobs:
           fi
 
       - name: Run linting
-        if: steps.check-scripts.outputs.skip != 'true'
+        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
-        if: steps.check-scripts.outputs.skip != 'true'
+        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
