@@ -3387,14 +3387,12 @@ export function updateFHIRBundle(
 
 export function buildFHIRBundle(
   reg: BirthRegistration | DeathRegistration | MarriageRegistration,
-  eventType: EVENT_TYPE,
-  authHeader: IAuthHeader
+  eventType: EVENT_TYPE
 ): Bundle {
   const ref = getUUID()
   const context = {
     _index: {},
-    event: eventType,
-    authHeader: authHeader
+    event: eventType
   }
 
   const initialFHIRBundle: Bundle = {

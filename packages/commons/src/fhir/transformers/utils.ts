@@ -157,6 +157,7 @@ export function selectOrCreateEncounterResource(
 
     unsavedComposition.section.push(encounterSection)
     const encounterEntry = createEncounter(ref)
+
     fhirBundle.entry.push(encounterEntry)
     return encounterEntry.resource
   }

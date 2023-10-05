@@ -473,7 +473,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
+        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -836,7 +836,7 @@ async function registrationToFHIR(
   const recordWithAttachmentsUploaded =
     await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
 
-  return buildFHIRBundle(recordWithAttachmentsUploaded, event, authHeader)
+  return buildFHIRBundle(recordWithAttachmentsUploaded, event)
 }
 
 async function createEventRegistration(

@@ -206,8 +206,7 @@ test.only('should build a minimal FHIR registration document without error', asy
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
       }
     },
-    'DEATH' as EVENT_TYPE,
-    {} as any
+    'DEATH' as EVENT_TYPE
   ) as any
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(8)
@@ -270,8 +269,7 @@ test('should build a minimal FHIR registration document without error', async ()
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }]
       }
     },
-    'DEATH' as EVENT_TYPE,
-    {} as any
+    'DEATH' as EVENT_TYPE
   ) as any
   expect(fhir).toBeDefined()
   // informant relationship
