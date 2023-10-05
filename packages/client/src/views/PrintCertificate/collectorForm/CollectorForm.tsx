@@ -489,7 +489,7 @@ const mapStateToProps = (
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const clonedFormSection = cloneDeep(formSection)
-  const isAllowPrintInAdvance =
+  const isPrintInAdvanceAllowed =
     event === Event.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
       : event === Event.Death
@@ -539,7 +539,7 @@ const mapStateToProps = (
       )
     }
   }
-  const formGroup = isAllowPrintInAdvance
+  const formGroup = isPrintInAdvanceAllowed
     ? clonedFormSection.groups.find((group) => group.id === groupId) ||
       clonedFormSection.groups[0]
     : filterPrintInAdvancedOption(
