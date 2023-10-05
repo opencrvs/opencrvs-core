@@ -1,5 +1,5 @@
 import { SEARCH_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
+
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput

@@ -324,7 +324,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
-    
+
     it('returns OK for a registrar user', async () => {
       fetch.mockResponses(
         [userMock, { status: 200 }],
@@ -414,7 +414,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
-    
+
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
 
@@ -1843,7 +1843,7 @@ describe('populateCompositionWithID', () => {
             'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad' as URNReference,
           resource: {
             resourceType: 'Observation',
-            status: 'final',
+            status: 'registered',
             context: {
               reference:
                 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference

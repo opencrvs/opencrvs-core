@@ -13,42 +13,36 @@ import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
-  DUPLICATE_TRACKING_ID,
-  FHIR_SPECIFICATION_URL,
-  FLAGGED_AS_POTENTIAL_DUPLICATE,
-  NO_SUPPORTING_DOCUMENTATION_REQUIRED,
-  ORIGINAL_FILE_NAME_SYSTEM,
-  REQUESTING_INDIVIDUAL,
-  REQUESTING_INDIVIDUAL_OTHER,
-  SYSTEM_FILE_NAME_SYSTEM,
   BIRTH_ATTENDANT_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
   BRIDE_CODE,
+  Bundle,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
+  DUPLICATE_TRACKING_ID,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  FHIR_SPECIFICATION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
+  NO_SUPPORTING_DOCUMENTATION_REQUIRED,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
+  ORIGINAL_FILE_NAME_SYSTEM,
+  REQUESTING_INDIVIDUAL,
+  REQUESTING_INDIVIDUAL_OTHER,
+  SYSTEM_FILE_NAME_SYSTEM,
   findExtension,
   getActionFromTask,
   getStatusFromTask,
-  Bundle,
-  getEventLabelFromBundle
-} from '@opencrvs/commons/types'
-
-import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
-
-import {
   ATTACHMENT_DOCS_CODE,
   CHILD_CODE,
   Coding,
@@ -80,6 +74,7 @@ import {
   findObservationByCode,
   getComposition,
   getEncounterFromRecord,
+  getEventLabelFromBundle,
   getResourceFromBundleById,
   getTaskFromBundle,
   isDocumentReference,
@@ -92,9 +87,14 @@ import {
   urlReferenceToUUID
 } from '@opencrvs/commons/types'
 
+import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
+
+
+import {
+  fetchTaskByCompositionIdFromHearth
+} from '@gateway/features/fhir/service'
 import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
-import { fetchTaskByCompositionIdFromHearth } from '../fhir/service'
 
 function findRelatedPerson(
   patientCode:

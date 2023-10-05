@@ -13,15 +13,15 @@ import { ApolloServer } from 'apollo-server-hapi'
 
 jest.useFakeTimers('modern').setSystemTime(new Date('2023-10-11T07:24:55.108Z'))
 
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { getApolloConfig } from '@gateway/graphql/config'
+import { Context } from '@gateway/graphql/context'
 import { generateQueryForType } from '@gateway/graphql/query-generator'
+import { getAuthHeader } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { BIRTH_BUNDLE } from './fixtures/birth-bundle'
-import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { DEATH_BUNDLE } from './fixtures/death-bundle'
-import { Context } from '@gateway/graphql/context'
-import { getAuthHeader } from '@opencrvs/commons'
 import { MARRIAGE_BUNDLE } from './fixtures/marriage-bundle'
 
 const MOCK_TOKEN = jwt.sign(

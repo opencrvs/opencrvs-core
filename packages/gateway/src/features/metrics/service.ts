@@ -91,30 +91,3 @@ export const postMetrics = (
       )
     })
 }
-
-export interface ITimeLoggedResponse {
-  status?: string
-  timeSpentEditing: number
-}
-
-export const getTimeLoggedFromMetrics = async (
-  authHeader: IAuthHeader,
-  compositionId: string,
-  status?: string
-): Promise<ITimeLoggedResponse | ITimeLoggedResponse[]> => {
-  const params = new URLSearchParams({ compositionId })
-  return fetch(`${METRICS_URL}/timeLogged?` + params, {
-    method: 'GET',
-    headers: {
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Time logged from metrics request failed: ${error.message}`)
-      )
-    })
-}
