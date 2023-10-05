@@ -17,12 +17,13 @@ import {
   getDeclarationIdsFromResponse,
   getIDFromResponse
 } from '@gateway/features/fhir/service'
+import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
+import fetch from '@gateway/fetch'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
 import {
-  buildFHIRBundle,
-  taskBundleWithExtension,
-  updateFHIRTaskBundle,
   Bundle,
   Composition,
+  EVENT_TYPE,
   Extension,
   Location,
   OPENCRVS_SPECIFICATION_URL,
@@ -30,23 +31,22 @@ import {
   Saved,
   SavedBundleEntry,
   Task,
+  TaskActionExtension,
+  TaskHistory,
   TaskStatus,
+  addExtensionsToTask,
+  buildFHIRBundle,
+  clearActionExtension,
   getComposition,
   getStatusFromTask,
   getTaskFromBundle,
   isComposition,
-  resourceToBundleEntry,
-  EVENT_TYPE,
-  TaskActionExtension,
-  toHistoryResource,
-  TaskHistory,
   resourceIdentifierToUUID,
-  clearActionExtension,
-  addExtensionsToTask
+  resourceToBundleEntry,
+  taskBundleWithExtension,
+  toHistoryResource,
+  updateFHIRTaskBundle
 } from '@opencrvs/commons/types'
-import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
-import fetch from '@gateway/fetch'
-import { IAuthHeader, UUID } from '@opencrvs/commons'
 
 import {
   GQLBirthRegistrationInput,
@@ -56,7 +56,7 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import { getRecordById } from '@gateway/search'
+
 import { UnassignError } from '@gateway/utils/unassignError'
 import {
   validateBirthDeclarationAttachments,
@@ -64,19 +64,20 @@ import {
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 
-import { hasBirthDuplicates, hasDeathDuplicates } from '../search/service'
-import { UserInputError } from 'apollo-server-hapi'
 import { checkUserAssignment } from '@gateway/authorisation'
-import {
-  removeDuplicatesFromComposition,
-  setCertificateCollector,
-  uploadBase64AttachmentsToDocumentsStore
-} from './utils'
+import { UserInputError } from 'apollo-server-hapi'
+import { hasBirthDuplicates, hasDeathDuplicates } from '../search/service'
 import {
   ISystemModelData,
   IUserModelData,
   isSystem
 } from '../user/type-resolvers'
+import {
+  removeDuplicatesFromComposition,
+  setCertificateCollector,
+  uploadBase64AttachmentsToDocumentsStore
+} from './utils'
+import { getRecordById } from '@gateway/records'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())

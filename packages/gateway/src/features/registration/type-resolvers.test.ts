@@ -243,8 +243,8 @@ jest.mock('@gateway/features/user/utils', () => {
     getUser: () => Promise.resolve(MOCK_USER)
   }
 })
-jest.mock('@gateway/search', () => {
-  const originalModule = jest.requireActual('@gateway/search')
+jest.mock('@gateway/records', () => {
+  const originalModule = jest.requireActual('@gateway/records')
   return {
     ...originalModule,
     getRecordById: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
@@ -308,7 +308,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/search').getRecordById.mockImplementation(() =>
+  require('@gateway/records').getRecordById.mockImplementation(() =>
     Promise.resolve(DEATH_BUNDLE)
   )
   const testServer = new ApolloServer({
@@ -354,7 +354,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a M
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/search').getRecordById.mockImplementation(() =>
+  require('@gateway/records').getRecordById.mockImplementation(() =>
     Promise.resolve(MARRIAGE_BUNDLE)
   )
   const testServer = new ApolloServer({
