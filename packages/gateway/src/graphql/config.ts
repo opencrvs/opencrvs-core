@@ -50,12 +50,13 @@ import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNot
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
 import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
-import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
 import { Context } from '@gateway/graphql/context'
 import PatientAPI from '@gateway/features/fhir/patientAPI'
 import MinioAPI from '@gateway/features/fhir/minioAPI'
 import { getAuthHeader } from '@opencrvs/commons'
 import { UsersAPI } from '@gateway/features/user/usersAPI'
+import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -162,6 +163,19 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
+export function getDataSources(): Context['dataSources'] {
+  return {
+    documentsAPI: new DocumentsAPI(),
+    paymentsAPI: new PaymentsAPI(),
+    locationsAPI: new LocationsAPI(),
+    usersAPI: new UsersAPI(),
+    fhirAPI: new FHIRAPI(),
+    patientAPI: new PatientAPI(),
+    minioAPI: new MinioAPI(),
+    metricsAPI: new MetricsAPI()
+  }
+}
+
 export const getApolloConfig = (): Config<Context> => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
@@ -176,15 +190,7 @@ export const getApolloConfig = (): Config<Context> => {
   return {
     schema,
     introspection: true,
-    dataSources: (): Context['dataSources'] => ({
-      documentsAPI: new DocumentsAPI(),
-      paymentsAPI: new PaymentsAPI(),
-      locationsAPI: new LocationsAPI(),
-      usersAPI: new UsersAPI(),
-      practitionerRoleAPI: new PractitionerRoleAPI(),
-      patientAPI: new PatientAPI(),
-      minioAPI: new MinioAPI()
-    }),
+    dataSources: getDataSources,
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,

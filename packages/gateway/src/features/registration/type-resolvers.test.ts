@@ -34,7 +34,7 @@ import { GQLRegAction } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
-import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
 
 const fetch = fetchAny as any
 const mockGet = jest.fn()
@@ -473,7 +473,7 @@ describe('Registration type resolvers', () => {
         .mockResolvedValueOnce(roleHistoryBundle)
       fetch.mockResponses([JSON.stringify(mockUser), { status: 200 }])
       const user = await typeResolvers.History.user(mockTaskDownloaded, null, {
-        dataSources: { practitionerRoleAPI: new PractitionerRoleAPI() }
+        dataSources: { fhirAPI: new FHIRAPI() }
       })
       expect(user.role.labels).toEqual(mockUser.role.labels)
     })

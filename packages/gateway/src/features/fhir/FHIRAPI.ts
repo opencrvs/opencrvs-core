@@ -11,16 +11,18 @@
 // eslint-disable-next-line import/no-relative-parent-imports
 import { Context } from '@gateway/graphql/context'
 import {
+  Practitioner,
+  isPractitioner,
   isPractitionerRole,
   isPractitionerRoleOrPractitionerRoleHistory
 } from '@opencrvs/commons/types'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { FHIR_URL } from '../../constants'
 
-export default class PractitionerRoleAPI extends RESTDataSource<Context> {
+export default class FHIRAPI extends RESTDataSource<Context> {
   constructor() {
     super()
-    this.baseURL = `${FHIR_URL}/PractitionerRole`
+    this.baseURL = `${FHIR_URL}`
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
@@ -32,6 +34,20 @@ export default class PractitionerRoleAPI extends RESTDataSource<Context> {
     request.headers.set('Content-Type', 'application/fhir+json')
   }
 
+  async getPractitioner(practitionerId: string) {
+    if (this.context.record) {
+      const inBundle = this.context.record.entry
+        .map(({ resource }) => resource)
+        .filter(isPractitioner)
+        .find((resource) => resource.id === practitionerId)
+
+      if (inBundle) {
+        return inBundle
+      }
+    }
+
+    return this.get<Practitioner>(`/Practitioner/${practitionerId}`)
+  }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
     if (this.context.record) {
       const inBundle = this.context.record.entry
@@ -48,7 +64,7 @@ export default class PractitionerRoleAPI extends RESTDataSource<Context> {
       }
     }
 
-    return this.get(`?practitioner=${practitionerId}`)
+    return this.get(`/PractitionerRole?practitioner=${practitionerId}`)
   }
 
   async getPractionerRoleHistory(id: string) {

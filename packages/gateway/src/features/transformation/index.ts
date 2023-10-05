@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -15,7 +16,6 @@ import {
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import { Bundle } from '@opencrvs/commons/types'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 export type Context<A extends string | number | symbol = never> = {
   authHeader: IAuthHeader

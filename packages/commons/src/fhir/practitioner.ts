@@ -14,7 +14,9 @@ export type Practitioner = WithStrictExtensions<
   }
 >
 
-export function isPractitioner(resource: Resource): resource is Practitioner {
+export function isPractitioner<T extends Resource>(
+  resource: T
+): resource is T & Practitioner {
   return resource.resourceType === 'Practitioner'
 }
 export function isPractitionerRole<T extends Resource>(
