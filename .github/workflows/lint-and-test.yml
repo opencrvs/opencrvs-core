@@ -76,8 +76,12 @@ jobs:
         run: |
           for dir in packages/*; do
             if [ "$dir" != "${{ matrix.package }}" ] && [ "$dir" != "packages/commons" ] && [ "$dir" != "packages/components" ]; then
-              echo "Removing $dir"
-              rm -rf "$dir"
+              if [ "${{ matrix.package }}" == "packages/client" ] && [ "$dir" == "packages/gateway" ] ; then
+                echo "Skipping $dir"
+              else
+                echo "Removing $dir"
+                rm -rf "$dir"
+              fi
             fi
           done
 
