@@ -424,13 +424,16 @@ export const searchTypeResolvers: GQLResolver = {
     async avatarURL(
       assignmentData: IAssignment,
       _,
-      { dataSources, headers: authHeader }
+      { dataSources, headers: authHeader, presignDocumentUrls }
     ) {
       const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
         assignmentData.userId
       )
 
       if (avatarURI) {
+        if (!presignDocumentUrls) {
+          return avatarURI
+        }
         const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
         return avatarURL
       }

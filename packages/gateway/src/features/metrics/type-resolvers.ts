@@ -42,7 +42,14 @@ export const typeResolvers: GQLResolver = {
     }
   },
   VSExport: {
-    async url({ url: fileUri }: GQLVSExport, _, { headers: authHeader }) {
+    async url(
+      { url: fileUri }: GQLVSExport,
+      _,
+      { headers: authHeader, presignDocumentUrls }
+    ) {
+      if (!presignDocumentUrls) {
+        return fileUri
+      }
       return getPresignedUrlFromUri(fileUri, authHeader)
     }
   },

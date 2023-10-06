@@ -54,6 +54,7 @@ export async function fhirBundleToOpenCRVSRecord(
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,
+        presignDocumentUrls: false,
         headers: {
           Authorization: authorizationToken
         }

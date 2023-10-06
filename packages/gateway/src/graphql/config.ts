@@ -194,6 +194,7 @@ export const getApolloConfig = (): Config<Context> => {
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,
+        presignDocumentUrls: true,
         headers: getAuthHeader(request)
       }
     }
