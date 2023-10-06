@@ -78,6 +78,8 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from './utils'
 import { getRecordById } from '@gateway/records'
+import { fhirBundleToOpenCRVSRecord } from '@gateway/records/fhir-to-opencrvs'
+import { createRequest } from '@gateway/workflow/index'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -889,7 +891,16 @@ async function createEventRegistration(
       return await getDeclarationIds(existingComposition, authHeader)
     }
   }
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  const registration = await fhirBundleToOpenCRVSRecord(
+    doc,
+    authHeader.Authorization
+  )
+  const res = await createRequest(
+    'POST',
+    'create-record',
+    authHeader,
+    registration
+  )
 
   /*
    * Some custom logic added here. If you are a registar and
