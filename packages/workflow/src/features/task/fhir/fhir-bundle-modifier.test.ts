@@ -21,6 +21,7 @@ import {
   testFhirTaskBundle,
   taskResouceMock
 } from '@workflow/test/utils'
+import { Task } from '@opencrvs/commons/types'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
@@ -62,7 +63,7 @@ describe('Verify handler', () => {
       payload.entry[0] &&
       payload.entry[0].resource
     ) {
-      const fhirTask = payload.entry[0].resource as fhir.Task
+      const fhirTask = payload.entry[0].resource as Task
       if (
         fhirTask &&
         fhirTask.note &&

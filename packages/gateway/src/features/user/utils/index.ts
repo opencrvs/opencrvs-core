@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,

@@ -27,8 +27,11 @@ export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${E
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
+
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:declarationId/events/:event/parent/:pageId/group/:groupId'
+
+export const REVIEW_CORRECTION = '/review-correction/:declarationId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:declarationId/:pageId'
 

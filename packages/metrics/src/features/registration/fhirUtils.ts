@@ -58,7 +58,7 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
 
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
+export const MAKE_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection`
 
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
@@ -81,7 +81,7 @@ export type DECLARATION_STATUS =
   | 'VALIDATED'
   | 'WAITING_VALIDATION'
   | 'REJECTED'
-  | 'REQUESTED_CORRECTION'
+  | 'CORRECTION_REQUESTED'
   | 'CERTIFIED'
   | 'ISSUED'
 
@@ -122,7 +122,7 @@ function findPreviousTask(
   if (!task) {
     return null
   }
-  return task as Task
+  return task as fhir.Task
 }
 
 function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
@@ -137,11 +137,8 @@ function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
   if (!task) {
     return null
   }
-  return task as Task[]
+  return task as fhir.Task[]
 }
-
-export type Task = fhir.Task & { id: string }
-export type Composition = fhir.Composition & { id: string }
 
 export function getPaymentReconciliation(bundle: fhir.Bundle) {
   return getResourceByType<fhir.PaymentReconciliation>(
@@ -151,7 +148,7 @@ export function getPaymentReconciliation(bundle: fhir.Bundle) {
 }
 
 export function getTask(bundle: fhir.Bundle) {
-  return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+  return getResourceByType<fhir.Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
 export function getDownloadedExtensionStatus(task: fhir.Task) {
   const extension =
@@ -172,7 +169,10 @@ export function findExtension(
 }
 
 export function getComposition(bundle: fhir.Bundle) {
-  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+  return getResourceByType<fhir.Composition>(
+    bundle,
+    FHIR_RESOURCE_TYPE.COMPOSITION
+  )
 }
 
 export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
@@ -189,16 +189,16 @@ export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
 export function hasRequestCorrectionExtension(task: fhir.Task) {
   const extension =
     task.extension &&
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+    findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
 
 export async function getPreviousTask(
-  task: Task,
+  task: fhir.Task,
   allowedPreviousStates: DECLARATION_STATUS[],
   authHeader: IAuthHeader
 ) {
-  const taskHistory = await fetchTaskHistory(task.id, authHeader)
+  const taskHistory = await fetchTaskHistory(task.id!, authHeader)
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
@@ -237,7 +237,9 @@ export function getPractionerIdFromTask(task: fhir.Task) {
     ?.valueReference?.reference?.split('/')?.[1]
 }
 
-export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
+export function getDeclarationStatus(
+  task: fhir.Task
+): DECLARATION_STATUS | null {
   if (!task.businessStatus || !task.businessStatus.coding) {
     return null
   }
@@ -251,7 +253,7 @@ export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
   return coding.code as DECLARATION_STATUS
 }
 
-export function getTrackingId(task: Task) {
+export function getTrackingId(task: fhir.Task) {
   const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
@@ -265,7 +267,7 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getDeclarationType(task: Task): DECLARATION_TYPE {
+export function getDeclarationType(task: fhir.Task): DECLARATION_TYPE {
   const coding = task.code?.coding?.find(
     ({ system }) => system === 'http://opencrvs.org/specs/types'
   )
@@ -510,7 +512,7 @@ export async function fetchDeclarationsBeginnerRole(
   const currentTask = getTask(fhirBundle)
 
   if (currentTask) {
-    const bundle = await fetchTaskHistory(currentTask.id, authHeader)
+    const bundle = await fetchTaskHistory(currentTask.id!, authHeader)
     const length = bundle.entry ? bundle.entry.length : 0
     const task =
       bundle.entry &&

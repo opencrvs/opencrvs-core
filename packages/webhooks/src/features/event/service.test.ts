@@ -26,7 +26,7 @@ const taskBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -280,7 +280,7 @@ const mosipBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },

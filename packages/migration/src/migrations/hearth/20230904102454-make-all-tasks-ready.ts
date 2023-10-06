@@ -8,9 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export interface IAuthHeader {
-  Authorization: string
-  'x-correlation-id'?: string
-  'x-real-ip'?: string
-  'x-real-user-agent'?: string
+
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
+  return db.collection('Task').updateMany({}, { $set: { status: 'ready' } })
+}
+
+export const down = async (db: Db, client: MongoClient) => {
+  return db.collection('Task').updateMany({}, { $set: { status: 'requested' } })
 }

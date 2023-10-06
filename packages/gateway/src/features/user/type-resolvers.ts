@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
 import {

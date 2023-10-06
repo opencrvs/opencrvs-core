@@ -71,6 +71,7 @@ import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -231,6 +232,11 @@ export function App(props: IAppProps) {
                                                 routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
                                               }
                                               component={ReviewForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.REVIEW_CORRECTION}
+                                              component={ReviewCorrection}
                                             />
                                             <ProtectedRoute
                                               exact
