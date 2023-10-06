@@ -345,7 +345,7 @@ function RecordAuditBody({
   if (
     isDownloaded &&
     declaration.type !== Event.Marriage &&
-    (userHasRegisterScope || userHasValidateScope) &&
+    userHasValidateScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
