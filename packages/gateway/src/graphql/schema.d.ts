@@ -603,6 +603,7 @@ export interface GQLBirthRegistrationInput {
   lastPreviousLiveBirth?: GQLDate
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  duplicate?: boolean
 }
 
 export interface GQLDeathRegistrationInput {
@@ -625,6 +626,7 @@ export interface GQLDeathRegistrationInput {
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  duplicate?: boolean
 }
 
 export interface GQLMarriageRegistrationInput {
@@ -640,6 +642,7 @@ export interface GQLMarriageRegistrationInput {
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  duplicate?: boolean
 }
 
 export interface GQLCreatedIds {

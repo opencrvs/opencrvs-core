@@ -229,6 +229,7 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
+  duplicate: Boolean
 }
 
 type BirthRegistration implements EventRegistration { # -> Composition
@@ -274,6 +275,7 @@ input DeathRegistrationInput {
   medicalPractitioner: MedicalPractitionerInput # -> Encounter.participant
   createdAt: Date
   updatedAt: Date
+  duplicate: Boolean
 }
 
 # In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
@@ -315,6 +317,7 @@ input MarriageRegistrationInput {
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
+  duplicate: Boolean
 }
 
 type MarriageRegistration implements EventRegistration { # -> Composition
