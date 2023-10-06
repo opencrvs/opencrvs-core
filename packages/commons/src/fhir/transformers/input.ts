@@ -372,6 +372,7 @@ export interface BirthRegistration {
   lastPreviousLiveBirth?: DateString
   createdAt?: DateString
   updatedAt?: DateString
+  duplicate?: boolean
 }
 interface MedicalPractitioner {
   name?: string
@@ -398,6 +399,7 @@ export interface DeathRegistration {
   medicalPractitioner?: MedicalPractitioner
   createdAt?: DateString
   updatedAt?: DateString
+  duplicate?: boolean
 }
 
 export interface MarriageRegistration {
@@ -413,4 +415,5 @@ export interface MarriageRegistration {
   questionnaire?: Array<QuestionnaireQuestion | null>
   createdAt?: DateString
   updatedAt?: DateString
+  duplicate?: boolean
 }

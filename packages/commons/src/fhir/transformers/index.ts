@@ -3389,6 +3389,22 @@ const builders: IFieldBuilders = {
         }
       ]
     }
+  },
+  duplicate: (fhirBundle, fieldValue, context) => {
+    const composition = getComposition(fhirBundle)
+    const duplicateExtensionURL = `${OPENCRVS_SPECIFICATION_URL}duplicate`
+    const duplicateExtension = composition.extension?.find(
+      (ext) => ext.url === duplicateExtensionURL
+    )
+    if (duplicateExtension) {
+      duplicateExtension.valueBoolean = fieldValue
+    } else {
+      if (!composition.extension) composition.extension = []
+      composition.extension.push({
+        url: duplicateExtensionURL,
+        valueBoolean: fieldValue
+      })
+    }
   }
 }
 
