@@ -51,6 +51,21 @@ const mockPingResponse = [
     name: 'workflow',
     url: 'http://localhost:5050/ping',
     status: 'ok'
+  },
+  {
+    name: 'documents',
+    url: 'http://localhost:9050/ping',
+    status: 'ok'
+  },
+  {
+    name: 'webhooks',
+    url: 'http://localhost:2525/ping',
+    status: 'ok'
+  },
+  {
+    name: 'applicationconfig',
+    url: 'http://localhost:2021/ping',
+    status: 'ok'
   }
 ]
 
@@ -186,6 +201,24 @@ describe('Route authorization', () => {
 
   it('Tests the health check for all service', async () => {
     fetch.mockResponses(
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          status: 'ok'
+        }),
+        { status: 200 }
+      ],
       [
         JSON.stringify({
           status: 'ok'

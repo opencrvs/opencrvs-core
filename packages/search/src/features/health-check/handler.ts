@@ -19,7 +19,9 @@ async function dependencyHealth() {
     const response = await fetch('http://localhost:9200/_cluster/health', {
       method: 'GET'
     })
-    return response.json()
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
+    // return response.json()
   } catch (error) {
     return { status: 'error' }
   }

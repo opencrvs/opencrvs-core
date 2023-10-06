@@ -40,7 +40,10 @@ enum Services {
   COUNTRY_CONFIG = 'countryconfig',
   SEARCH = 'search',
   WORKFLOW = 'workflow',
-  GATEWAY = 'gateway'
+  GATEWAY = 'gateway',
+  DOCUMENTS = 'documents',
+  WEBHOOKS = 'webhooks',
+  APPLICATION_CONFIG = 'applicationconfig'
 }
 
 enum Dependencies {
@@ -128,6 +131,15 @@ export default async function healthCheckHandler(
       case Services.WORKFLOW:
         response = await checkServiceHealth(SERVICES_TO_CHECK[6])
         break
+      case Services.DOCUMENTS:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[7])
+        break
+      case Services.WEBHOOKS:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[8])
+        break
+      case Services.APPLICATION_CONFIG:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[9])
+        break
       default:
         response = await checkServiceHealth(SERVICES_TO_CHECK[0])
     }
@@ -194,7 +206,10 @@ export const querySchema = Joi.object({
         Services.COUNTRY_CONFIG,
         Services.SEARCH,
         Services.WORKFLOW,
-        Services.GATEWAY
+        Services.GATEWAY,
+        Services.DOCUMENTS,
+        Services.WEBHOOKS,
+        Services.APPLICATION_CONFIG
       )
     )
     .single(),

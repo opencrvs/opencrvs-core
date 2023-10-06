@@ -119,7 +119,7 @@ export default function Microservices() {
     metrics: {
       name: 'metrics',
       port: 1050,
-      label: 'Webhooks',
+      label: 'Metrics',
       url: `${pingUrl}=metrics`,
       status: 'LOADING',
       type: 'service',

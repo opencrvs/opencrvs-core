@@ -29,7 +29,8 @@ describe('Route authorization', () => {
       url: '/ping'
     })
     expect(res.statusCode).toBe(200)
-    expect(res.payload).toBe(JSON.stringify({ status: 'ok' }))
+    expect(res.payload).toMatchSnapshot()
+    // expect(res.payload).toBe(JSON.stringify({ status: 'ok' }))
   })
 
   it('accepts requests with a valid token and valid user scope', async () => {

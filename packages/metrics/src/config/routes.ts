@@ -112,10 +112,11 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
 
 async function dependencyHealth() {
   try {
-    const response = await fetch('http://localhost:9200/_cluster/health', {
+    const response = await fetch('http://localhost:3535/minio/health/live', {
       method: 'GET'
     })
-    return response.json()
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
   } catch (error) {
     return { status: 'error' }
   }
@@ -746,10 +747,14 @@ export const getRoutes = () => {
       handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         const dependencyStatus = await dependencyHealth()
-        return {
-          git_hash: GIT_HASH,
-          status: 'ok',
-          dependencies: { InfluxDB: dependencyStatus }
+        try {
+          return {
+            git_hash: GIT_HASH,
+            status: 'ok',
+            dependencies: { InfluxDB: dependencyStatus }
+          }
+        } catch (error) {
+          return { status: 'Internal server error' }
         }
       },
       config: {
