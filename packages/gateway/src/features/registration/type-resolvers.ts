@@ -878,7 +878,7 @@ export const typeResolvers = {
         task.extension
       )
 
-      if (presignDocumentUrls) {
+      if (!presignDocumentUrls) {
         return signatureExtension && signatureExtension.valueString
       }
 
@@ -907,7 +907,7 @@ export const typeResolvers = {
         task.extension
       )
 
-      if (presignDocumentUrls) {
+      if (!presignDocumentUrls) {
         return signatureExtension && signatureExtension.valueString
       }
 

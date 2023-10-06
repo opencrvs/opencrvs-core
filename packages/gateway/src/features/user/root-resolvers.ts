@@ -35,7 +35,8 @@ import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '../metrics/service'
-import { isBase64FileString, uploadBase64ToMinio } from '../documents/service'
+import { uploadBase64ToMinio } from '../documents/service'
+import { isBase64FileString } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {

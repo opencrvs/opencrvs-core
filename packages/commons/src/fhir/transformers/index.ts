@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import transformObj, { Context, IFieldBuilders } from './transformer'
 import { HAS_SHOWED_VERIFIED_DOCUMENT } from './constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
@@ -46,6 +45,7 @@ import {
   WITNESS_TWO_TITLE,
   createCompositionTemplate
 } from './templates'
+import transformObj, { Context, IFieldBuilders } from './transformer'
 import {
   getMaritalStatusCode,
   selectOrCreateCertificateDocRefResource,
@@ -71,7 +71,6 @@ import {
   setQuestionnaireItem
 } from './utils'
 
-import { IAuthHeader, getUUID } from '../..'
 import {
   ATTACHMENT_DOCS_CODE,
   BRIDE_CODE,
@@ -102,9 +101,10 @@ import {
   getComposition,
   markSaved
 } from '..'
+import { getUUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
 import {
-  Address,
+  AddressInput,
   Attachment,
   BirthRegistration,
   ContactPoint,
@@ -337,7 +337,7 @@ function createPhotoBuilder(
 function createAddressBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'address', Address> {
+): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -506,7 +506,7 @@ function createAddressBuilder(
 
 function createLocationAddressBuilder(
   sectionCode: string
-): IFieldBuilders<'address', Address> {
+): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
       const location = selectOrCreateLocationRefResource(
@@ -3365,15 +3365,13 @@ const builders: IFieldBuilders = {
   }
 }
 
-export function updateFHIRBundle(
-  existingBundle: Bundle,
+export function updateFHIRBundle<T extends Bundle>(
+  existingBundle: T,
   recordDetails: BirthRegistration | DeathRegistration | MarriageRegistration,
-  eventType: EVENT_TYPE,
-  authHeader: IAuthHeader
+  eventType: EVENT_TYPE
 ) {
   const context = {
     event: eventType,
-    authHeader: authHeader,
     _index: {}
   }
 
@@ -3382,7 +3380,7 @@ export function updateFHIRBundle(
     existingBundle,
     builders,
     context
-  )
+  ) as T
 }
 
 export function buildFHIRBundle(

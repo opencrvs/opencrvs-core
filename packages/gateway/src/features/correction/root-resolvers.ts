@@ -8,32 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@opencrvs/commons'
+import { inScope } from '@gateway/features/user/utils'
 import {
-  GQLResolver,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLResolver
 } from '@gateway/graphql/schema'
-import { inScope } from '@gateway/features/user/utils'
+import { IAuthHeader } from '@opencrvs/commons'
 
+import { checkUserAssignment } from '@gateway/authorisation'
+import { UnassignError } from '@gateway/utils/unassignError'
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-import { UserInputError } from 'apollo-server-hapi'
-import { UnassignError } from '@gateway/utils/unassignError'
 import {
   approveRegistrationCorrection,
   makeRegistrationCorrection,
   rejectRegistrationCorrection,
   requestRegistrationCorrection
 } from '@gateway/workflow'
-import { checkUserAssignment } from '@gateway/authorisation'
-import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
-import { EVENT_TYPE, updateFHIRBundle } from '@opencrvs/commons/types'
-import { uploadBase64AttachmentsToDocumentsStore } from '../registration/utils'
+import { UserInputError } from 'apollo-server-hapi'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -85,12 +82,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return approveEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.BIRTH
-        )
+        return approveEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -110,12 +102,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return await approveEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.DEATH
-        )
+        return await approveEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -135,12 +122,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return await approveEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.MARRIAGE
-        )
+        return await approveEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -160,12 +142,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return createEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.BIRTH
-        )
+        return createEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -185,12 +162,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return await createEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.DEATH
-        )
+        return await createEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -210,12 +182,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return await createEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.MARRIAGE
-        )
+        return await createEventRegistrationCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -229,46 +196,11 @@ async function createEventRegistrationCorrection(
   input:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  eventType: EVENT_TYPE
+    | GQLMarriageRegistrationInput
 ) {
-  const correctionDetails = input.registration?.correction
+  await makeRegistrationCorrection(id, input, authHeader)
 
-  if (!correctionDetails) {
-    throw new Error('Correction details are required')
-  }
-
-  const { correction, ...otherRegistrationDetails } = input.registration!
-
-  const inputWithoutCorrection = {
-    ...input,
-    registration: otherRegistrationDetails
-  }
-
-  const record = await makeRegistrationCorrection(
-    id,
-    correctionDetails,
-    authHeader
-  )
-
-  const fhirBundle = await updateFHIRBundle(
-    record,
-    await uploadBase64AttachmentsToDocumentsStore(
-      inputWithoutCorrection,
-      authHeader
-    ),
-    eventType,
-    authHeader
-  )
-
-  const res = await fetchFHIR(
-    '',
-    authHeader,
-    'POST',
-    JSON.stringify(fhirBundle)
-  )
-
-  return getIDFromResponse(res)
+  return id
 }
 
 async function approveEventRegistrationCorrection(
@@ -277,45 +209,8 @@ async function approveEventRegistrationCorrection(
   input:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  eventType: EVENT_TYPE
+    | GQLMarriageRegistrationInput
 ) {
-  const correctionDetails = input.registration?.correction
-
-  if (!correctionDetails) {
-    throw new Error('Correction details are required')
-  }
-
-  const { correction, ...otherRegistrationDetails } = input.registration!
-
-  const inputWithoutCorrection = {
-    ...input,
-    registration: otherRegistrationDetails
-  }
-
-  const record = await approveRegistrationCorrection(
-    id,
-    correctionDetails,
-    authHeader
-  )
-
-  const fhirBundle = await updateFHIRBundle(
-    record,
-    await uploadBase64AttachmentsToDocumentsStore(
-      inputWithoutCorrection,
-      authHeader
-    ),
-    eventType,
-    authHeader
-  )
-
-  const res = await fetchFHIR(
-    '',
-    authHeader,
-    'POST',
-    JSON.stringify(fhirBundle)
-  )
-
-  // return composition-id
-  return getIDFromResponse(res)
+  await approveRegistrationCorrection(id, input, authHeader)
+  return id
 }

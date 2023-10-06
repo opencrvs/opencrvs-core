@@ -317,7 +317,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
       return {
         request,
         headers: getAuthHeader(request),
-
+        presignDocumentUrls: true,
         record: DEATH_BUNDLE as any
       }
     }
@@ -363,6 +363,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a M
       return {
         request,
         headers: getAuthHeader(request),
+        presignDocumentUrls: true,
         record: MARRIAGE_BUNDLE
       }
     }

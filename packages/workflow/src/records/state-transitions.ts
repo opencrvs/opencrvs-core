@@ -24,7 +24,8 @@ import {
   RegisteredRecord,
   Task,
   sortTasksDescending,
-  RecordWithPreviousTask
+  RecordWithPreviousTask,
+  Attachment
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -51,7 +52,7 @@ export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
   practitioner: Practitioner,
   correctionDetails: MakeCorrectionRequestInput,
-  proofOfLegalCorrectionAttachments: Array<{ type: string; url: string }>,
+  proofOfLegalCorrectionAttachments: Attachment[],
   paymentAttachmentURL?: string
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromBundle(record)
@@ -70,8 +71,8 @@ export async function toCorrected(
     (attachment) =>
       createCorrectionProofOfLegalCorrectionDocument(
         correctionEncounter.fullUrl,
-        attachment.url,
-        attachment.type
+        attachment.data!,
+        attachment.type!
       )
   )
 

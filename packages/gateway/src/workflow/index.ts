@@ -10,12 +10,14 @@
  */
 import { IAuthHeader } from '@opencrvs/commons'
 import { WORKFLOW_URL } from '@gateway/constants'
-import {
-  GQLCorrectionInput,
-  GQLCorrectionRejectionInput
-} from '@gateway/graphql/schema'
 import fetch from '@gateway/fetch'
-import { Bundle } from '@opencrvs/commons/types'
+import {
+  GQLBirthRegistrationInput,
+  GQLCorrectionInput,
+  GQLCorrectionRejectionInput,
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
+} from '@gateway/graphql/schema'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -59,27 +61,33 @@ export function requestRegistrationCorrection(
 
 export function approveRegistrationCorrection(
   recordId: string,
-  correctionDetails: GQLCorrectionInput,
+  record:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
-  return createRequest(
+  return createRequest<void>(
     'POST',
     `/records/${recordId}/approve-correction`,
     authHeader,
-    correctionDetails
+    record
   )
 }
 
 export function makeRegistrationCorrection(
   recordId: string,
-  correctionDetails: GQLCorrectionInput,
+  record:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
-  return createRequest<Bundle>(
+  return createRequest<void>(
     'POST',
     `/records/${recordId}/make-correction`,
     authHeader,
-    correctionDetails
+    record
   )
 }
 
@@ -88,7 +96,7 @@ export function rejectRegistrationCorrection(
   details: GQLCorrectionRejectionInput,
   authHeader: IAuthHeader
 ) {
-  return createRequest(
+  return createRequest<void>(
     'POST',
     `/records/${recordId}/reject-correction`,
     authHeader,

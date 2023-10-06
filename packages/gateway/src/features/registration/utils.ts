@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, isBase64FileString } from '@opencrvs/commons'
 import { Composition } from '@opencrvs/commons/types'
 import {
   fetchDocuments,
-  isBase64FileString,
   uploadBase64ToMinio
 } from '@gateway/features/documents/service'
 import { getTokenPayload, getUser } from '../user/utils'

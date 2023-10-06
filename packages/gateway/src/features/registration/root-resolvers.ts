@@ -47,7 +47,6 @@ import {
   toHistoryResource,
   updateFHIRTaskBundle
 } from '@opencrvs/commons/types'
-
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
