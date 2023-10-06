@@ -249,6 +249,8 @@ function FormAppBar({
         return WORKQUEUE_TABS.requiresUpdate
       case 'VALIDATED':
         return WORKQUEUE_TABS.readyForReview
+      case 'CORRECTION_REQUESTED':
+        return WORKQUEUE_TABS.readyForReview
       default:
         return WORKQUEUE_TABS.inProgress
     }
