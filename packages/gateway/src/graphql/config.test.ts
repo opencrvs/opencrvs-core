@@ -81,6 +81,7 @@ describe('Test apollo server config', () => {
       h: {}
     })
     expect(context).toStrictEqual({
+      presignDocumentUrls: true,
       request,
       headers: {
         Authorization: `Bearer ${token}`,

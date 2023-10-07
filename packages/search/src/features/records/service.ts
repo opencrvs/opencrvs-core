@@ -718,19 +718,10 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         })
       }
     },
-    {
-      $lookup: {
-        from: 'RelatedPerson',
-        localField: `documentReferenceIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    ...joinCollections('documentReferenceIds', [
+      'RelatedPerson',
+      'PaymentReconciliation'
+    ]),
     {
       $addFields: {
         /*
@@ -750,20 +741,9 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         }
       }
     },
-    // Get Patients by RelatedPersonIds
-    {
-      $lookup: {
-        from: 'Patient',
-        localField: `relatedPersonPatientIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    // Get Patients & RelatedPatients RelatedPersonIds
+    ...joinCollections('relatedPersonPatientIds', ['RelatedPerson', 'Patient']),
+
     // Get PractitionerRoles for all found practitioners
     {
       $addFields: {
