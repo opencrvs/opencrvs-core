@@ -996,7 +996,8 @@ test('should update a task document as rejected', async () => {
           { text: '', time: '2018-11-28T15:13:57.492Z', authorString: 'DUMMY' }
         ],
         focus: {
-          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+          reference:
+            'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422' as ResourceIdentifier
         },
         identifier: [
           {

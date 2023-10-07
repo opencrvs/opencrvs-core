@@ -89,12 +89,9 @@ import {
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
-
-import {
-  fetchTaskByCompositionIdFromHearth
-} from '@gateway/features/fhir/service'
 import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
+import { fetchTaskByCompositionIdFromHearth } from '../fhir/service'
 
 function findRelatedPerson(
   patientCode:
