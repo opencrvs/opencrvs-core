@@ -1,5 +1,14 @@
 import { Nominal } from 'src/nominal'
-import { Bundle, BusinessStatus, Extension, Resource, Saved, isSaved } from '.'
+import {
+  Bundle,
+  BundleEntry,
+  BusinessStatus,
+  Extension,
+  Resource,
+  ResourceIdentifier,
+  Saved,
+  isSaved
+} from '.'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -78,6 +87,12 @@ export type Task = Omit<
   encounter?: fhir3.Reference
 }
 
+export type SavedTask = Omit<Task, 'focus'> & {
+  focus: {
+    reference: ResourceIdentifier
+  }
+}
+
 export type TaskHistory = Task
 
 export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
@@ -105,7 +120,15 @@ export function getBusinessStatus(task: Task) {
   return code.code
 }
 
-export function isTask<T extends Resource>(resource: T): resource is T & Task {
+export function isTaskBundleEntry<T extends BundleEntry>(
+  entry: T
+): entry is (T & BundleEntry<Task>) | (T & Saved<BundleEntry<SavedTask>>) {
+  return entry.resource.resourceType === 'Task'
+}
+
+export function isTask<T extends Resource>(
+  resource: T
+): resource is (T & Task) | (T & SavedTask) {
   return resource.resourceType === 'Task'
 }
 
@@ -121,7 +144,7 @@ export function isTaskOrTaskHistory<T extends Resource>(
   return ['TaskHistory', 'Task'].includes(resource.resourceType)
 }
 
-export function getTaskFromBundle(bundle: Bundle): Saved<Task> {
+export function getTaskFromBundle<T extends Bundle>(bundle: T) {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
   if (!task || !isSaved(task)) {

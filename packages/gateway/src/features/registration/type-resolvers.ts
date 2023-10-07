@@ -44,7 +44,6 @@ import {
   fetchTaskByCompositionIdFromHearth,
   findExtension,
   getActionFromTask,
-  getCertificatesFromTask,
   getStatusFromTask
 } from '@gateway/features/fhir/utils'
 import { SignatureExtensionPostfix } from '@gateway/features/registration/fhir-builders'
@@ -80,6 +79,7 @@ import {
   SPOUSE_CODE,
   Saved,
   Task,
+  URLReference,
   ValidRecord,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
@@ -100,6 +100,7 @@ import {
   urlReferenceToUUID
 } from '@opencrvs/commons/types'
 
+import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
 
 function findRelatedPerson(
@@ -961,10 +962,7 @@ export const typeResolvers: GQLResolver = {
         ))
       return duplicateData
     },
-    certificates: async (task, _, { headers: authHeader }) => {
-      // @todo get from bundle
-      return await getCertificatesFromTask(task, _, authHeader)
-    },
+    certificates: resolveCertificates,
     assignment: async (task, _, context) => {
       const assignmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
@@ -1448,15 +1446,7 @@ export const typeResolvers: GQLResolver = {
     comments: (task) => task.note || [],
     input: (task) => task.input || [],
     output: (task) => task.output || [],
-    certificates: async (task, _, { headers: authHeader }) => {
-      if (
-        getActionFromTask(task) ||
-        getStatusFromTask(task) !== GQLRegStatus.CERTIFIED
-      ) {
-        return null
-      }
-      return await getCertificatesFromTask(task, _, authHeader)
-    },
+    certificates: resolveCertificates,
     signature: async (task: Task, _: any, context) => {
       const action = getActionFromTask(task)
       const status = getStatusFromTask(task)
@@ -1940,4 +1930,24 @@ export const typeResolvers: GQLResolver = {
         )
     }
   }
+} satisfies GQLResolver
+
+async function resolveCertificates(
+  task: Saved<Task>,
+  _: unknown,
+  { dataSources }: Context
+) {
+  const compositionHistory = dataSources.fhirAPI.getCompositionHistory(
+    resourceIdentifierToUUID(task.focus.reference)
+  )
+  return compositionHistory.map((compositionEntry) => {
+    const certSection = findCompositionSection('certificates', compositionEntry)
+    if (!certSection || !certSection.entry || !(certSection.entry.length > 0)) {
+      return null
+    }
+
+    return dataSources.fhirAPI.getDocumentReference(
+      urlReferenceToUUID(certSection.entry[0].reference as URLReference)
+    )
+  })
 }

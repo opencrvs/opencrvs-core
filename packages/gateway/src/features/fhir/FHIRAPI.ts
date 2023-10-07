@@ -12,9 +12,12 @@
 import { Context } from '@gateway/graphql/context'
 import {
   Practitioner,
+  isCompositionOrCompositionHistory,
+  isDocumentReference,
   isPractitioner,
   isPractitionerRole,
-  isPractitionerRoleOrPractitionerRoleHistory
+  isPractitionerRoleOrPractitionerRoleHistory,
+  isSaved
 } from '@opencrvs/commons/types'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { FHIR_URL } from '../../constants'
@@ -75,5 +78,29 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       .map(({ resource }) => resource)
       .filter(isPractitionerRoleOrPractitionerRoleHistory)
       .filter((role) => role.id === id)
+  }
+
+  getCompositionHistory(id: string) {
+    if (!this.context.record) {
+      throw new Error('No record in context. This should never happen')
+    }
+    return this.context.record.entry
+      .map(({ resource }) => resource)
+      .filter((composition) => composition.id === id)
+      .filter(isCompositionOrCompositionHistory)
+      .filter(isSaved)
+  }
+  getDocumentReference(id: string) {
+    if (!this.context.record) {
+      throw new Error('No record in context. This should never happen')
+    }
+    const reference = this.context.record.entry
+      .map(({ resource }) => resource)
+      .filter(isDocumentReference)
+      .find((documentReference) => documentReference.id === id)
+    if (reference) {
+      return reference
+    }
+    return this.get(`/DocumentReference/${id}`)
   }
 }

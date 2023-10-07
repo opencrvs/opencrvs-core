@@ -8,39 +8,40 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@opencrvs/commons'
+import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import {
-  EVENT_TYPE,
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  MAKE_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  OPENCRVS_SPECIFICATION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
+  DOWNLOADED_EXTENSION_URL,
   DUPLICATE_TRACKING_ID,
+  EVENT_TYPE,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  MAKE_CORRECTION_EXTENSION_URL,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  OPENCRVS_SPECIFICATION_URL,
+  REINSTATED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
+  getCompositionIdFromResponse,
+  getDeclarationIds,
   getDeclarationIdsFromResponse,
   getIDFromResponse,
-  getCompositionIdFromResponse,
-  removeDuplicatesFromComposition,
-  getDeclarationIds,
   getStatusFromTask,
+  removeDuplicatesFromComposition,
   setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle,
   checkUserAssignment,
-  taskBundleWithExtension
+  taskBundleWithExtension,
+  updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope, inScope } from '@gateway/features/user/utils'
+import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -49,18 +50,16 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import fetch from '@gateway/fetch'
-import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
+import { getRecordById } from '@gateway/search'
 import { UnassignError } from '@gateway/utils/unassignError'
-import { UserInputError } from 'apollo-server-hapi'
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
-  BundleEntry,
   Composition,
   Extension,
   Patient,
@@ -68,10 +67,10 @@ import {
   Task,
   getTaskFromBundle,
   isComposition,
-  isTask,
+  isTaskBundleEntry,
   resourceToBundleEntry
 } from '@opencrvs/commons/types'
-import { getRecordById } from '@gateway/search'
+import { UserInputError } from 'apollo-server-hapi'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -98,7 +97,7 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a sysadmin scope')
         )
       }
-      const res = await fetchFHIR<Saved<Bundle<Composition>>>(
+      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
         `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
@@ -125,7 +124,7 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a sysadmin scope')
         )
       }
-      const res = await fetchFHIR<Saved<Bundle<Composition>>>(
+      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
         `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
@@ -1012,9 +1011,7 @@ export async function markRecordAsDownloadedOrAssigned(
   authHeader: IAuthHeader
 ) {
   const record = await getRecordById(id, authHeader.Authorization)
-  const task = record.entry.find((entry) => isTask(entry.resource)) as Saved<
-    BundleEntry<Task>
-  >
+  const task = record.entry.find(isTaskBundleEntry)
 
   if (!task) {
     throw new Error('Task not found from record. This should never happen')

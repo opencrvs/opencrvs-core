@@ -7,6 +7,7 @@ import { Encounter, SavedEncounter } from './encounter'
 import { Extension } from './extension'
 import { Patient } from './patient'
 import { CompositionSection, SavedCompositionSection } from './composition'
+import { SavedTask, Task } from './task'
 
 export * from './practitioner'
 export * from './task'
@@ -59,8 +60,14 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedEncounter
   : T extends RelatedPerson
   ? SavedRelatedPerson
+  : T extends Composition
+  ? SavedComposition
+  : T extends SavedCompositionHistory
+  ? SavedCompositionHistory
   : T extends Reference
   ? SavedReference
+  : T extends Task
+  ? SavedTask
   : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
@@ -163,10 +170,26 @@ export type Location = WithStrictExtensions<
   }
 >
 
-export function isComposition(
-  resource: Resource
-): resource is Composition | SavedComposition {
+export type CompositionHistory = Composition & {
+  resourceType: 'CompositionHistory'
+}
+
+export type SavedCompositionHistory = SavedComposition & {
+  resourceType: 'CompositionHistory'
+}
+
+export function isComposition<T extends Resource>(
+  resource: T
+): resource is (T & Composition) | (T & SavedComposition) {
   return resource.resourceType === 'Composition'
+}
+export function isCompositionOrCompositionHistory<T extends Resource>(
+  resource: T
+): resource is (T & Composition) | (T & CompositionHistory) {
+  return (
+    resource.resourceType === 'Composition' ||
+    resource.resourceType === 'CompositionHistory'
+  )
 }
 
 export function isQuestionnaireResponse<T extends Resource>(
@@ -242,6 +265,17 @@ export function getResourceFromBundleById<T extends Resource = Resource>(
   id: string
 ) {
   return getFromBundleById<T>(bundle, id).resource
+}
+
+export function findResourceFromBundleById<T extends Resource = Resource>(
+  bundle: Bundle,
+  id: string
+) {
+  try {
+    return getFromBundleById<T>(bundle, id).resource
+  } catch (error) {
+    return null
+  }
 }
 
 export function isSaved(resource: Resource): resource is Saved<Resource> {

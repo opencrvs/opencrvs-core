@@ -1,11 +1,11 @@
 import { SEARCH_URL } from '@gateway/constants'
-import { Saved, ValidRecord } from '@opencrvs/commons/types'
 import fetch from '@gateway/fetch'
+import { Bundle, Saved } from '@opencrvs/commons/types'
 
 export async function getRecordById(
   recordId: string,
   authorizationToken: string
-): Promise<Saved<ValidRecord>> {
+): Promise<Saved<Bundle>> {
   const url = new URL(
     `/records/${recordId}?includeHistoryResources`,
     SEARCH_URL
