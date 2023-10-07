@@ -11,32 +11,30 @@
 
 import { Nominal } from '../nominal'
 import {
+  ASSIGNED_EXTENSION_URL,
   Bundle,
   BundleEntry,
   BusinessStatus,
   Coding,
-  Extension,
-  Resource,
-  ResourceIdentifier,
-  Saved,
-  findExtension,
-  isSaved
-} from '.'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
+  DUPLICATE_TRACKING_ID,
+  Extension,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
   MAKE_CORRECTION_EXTENSION_URL,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
+  OPENCRVS_SPECIFICATION_URL,
   REINSTATED_EXTENSION_URL,
-  DUPLICATE_TRACKING_ID,
+  Resource,
+  ResourceIdentifier,
+  Saved,
   UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
-} from './constants'
-import { UUID } from '../uuid'
+  VIEWED_EXTENSION_URL,
+  findExtension,
+  isSaved
+} from '.'
+import { UUID } from '..'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>

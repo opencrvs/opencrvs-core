@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-
 import {
   fetchFHIR,
   getCompositionIdFromResponse,
@@ -55,7 +54,6 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-
 import { UnassignError } from '@gateway/utils/unassignError'
 import {
   validateBirthDeclarationAttachments,
