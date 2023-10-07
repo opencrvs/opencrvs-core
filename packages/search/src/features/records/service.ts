@@ -84,25 +84,23 @@ function checkForUnresolvedReferences(bundle: Bundle) {
   }
 }
 
-const COLLECTIONS_TO_AUTOMATICALLY_JOIN = [
-  'DocumentReference',
-  'Encounter',
-  'Location',
-  'Observation',
-  'Patient',
-  'PaymentReconciliation',
-  'Practitioner',
-  'PractitionerRole',
-  'RelatedPerson',
-  'Task'
-]
+type CollectionName =
+  | 'DocumentReference'
+  | 'Encounter'
+  | 'Location'
+  | 'Observation'
+  | 'Patient'
+  | 'PaymentReconciliation'
+  | 'Practitioner'
+  | 'PractitionerRole'
+  | 'RelatedPerson'
+  | 'Task'
 
-/*
- * Reads the array of UUIDs in "localField" and tries to join all collections one by one
- */
-
-function autoJoinAllCollections(localField: string) {
-  return COLLECTIONS_TO_AUTOMATICALLY_JOIN.map((collection) => [
+function joinCollections(
+  localField: string,
+  collectionsToJoin: CollectionName[]
+) {
+  return collectionsToJoin.map((collection) => [
     {
       $lookup: {
         from: collection,
@@ -151,37 +149,16 @@ function flattenArray(nestedQuery: Record<string, any>) {
   }
 }
 
-export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
-  recordId: string,
-  allowedStates: T,
-  includeHistoryResources: boolean
-): Promise<StateIdenfitiers[T[number]]> {
-  const connectedClient = await client.connect()
-
-  const db = connectedClient.db()
-
-  const query: Array<Record<string, any>> = [
-    {
-      $match: {
-        id: recordId
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        composition: { $push: '$$ROOT' }
-      }
-    },
-    { $unwind: '$composition' },
-    /*
-     * Reads all references from Composition.section end makes a list "extensionReferences" of all UUIDs found
-     */
+function joinSectionsToCollections(
+  keyToReadSectionsFrom: string,
+  collectionsToJoinTo: CollectionName[]
+) {
+  return [
     {
       $addFields: {
-        bundle: ['$composition'],
         extensionReferences: flattenArray({
           $map: {
-            input: '$composition.section',
+            input: keyToReadSectionsFrom,
             as: 'el',
             in: {
               $let: {
@@ -219,143 +196,254 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         })
       }
     },
-    ...autoJoinAllCollections('extensionReferences'),
-    /*
-     * Next, find all tasks that reference the composition
-     */
+    ...joinCollections('extensionReferences', collectionsToJoinTo)
+  ]
+}
+
+const FIND_TASKS_REFERENCING_COMPOSITION = [
+  {
+    $addFields: {
+      compositionIdForJoining: {
+        $concat: ['Composition/', '$composition.id']
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: 'Task',
+      localField: `compositionIdForJoining`,
+      foreignField: 'focus.reference',
+      as: 'task'
+    }
+  },
+  {
+    $addFields: {
+      bundle: { $concatArrays: ['$bundle', '$task'] }
+    }
+  },
+  // There should only be one task for each composition, so we can flatten it
+  { $unwind: '$task' }
+]
+
+const CREATE_TASK_HISTORY = [
+  {
+    $lookup: {
+      from: 'Task_history',
+      localField: 'task.id',
+      foreignField: 'id',
+      as: 'taskHistory'
+    }
+  },
+  {
+    $set: {
+      taskHistory: {
+        $map: {
+          input: '$taskHistory',
+          as: 'task',
+          in: {
+            $mergeObjects: [
+              '$$task',
+              {
+                /*
+                 * Custom resource type that forces history items
+                 * to be dealt with separately to avoid conflicts.
+                 * Each resource gets a new ID here.
+                 */
+                resourceType: 'TaskHistory',
+                id: {
+                  $function: {
+                    body: `function () {
+                   return UUID().toString().split('"')[1]
+                 }`,
+                    args: [],
+                    lang: 'js'
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    $addFields: {
+      bundle: { $concatArrays: ['$bundle', '$taskHistory'] }
+    }
+  },
+  // Find all encounters that Task history items are referring to
+  {
+    $addFields: {
+      taskHistoryEncounterIds: {
+        $map: {
+          input: '$taskHistory',
+          as: 'taskHistory',
+          in: {
+            $arrayElemAt: [
+              {
+                $split: ['$$taskHistory.encounter.reference', '/']
+              },
+              1
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: 'Encounter',
+      localField: `taskHistoryEncounterIds`,
+      foreignField: 'id',
+      as: 'joinResult'
+    }
+  },
+  {
+    $addFields: {
+      bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+    }
+  }
+]
+
+function joinFromResourcesResourceIdentifierKey(
+  resourceTypes: CollectionName[],
+  resourceKey: string,
+  collectionToJoin: CollectionName
+) {
+  return [
     {
       $addFields: {
-        compositionIdForJoining: {
-          $concat: ['Composition/', '$composition.id']
+        ids: {
+          $map: {
+            input: filterByType(resourceTypes),
+            as: 'resource',
+            in: {
+              $arrayElemAt: [{ $split: [`$$resource.${resourceKey}`, '/'] }, 1]
+            }
+          }
         }
       }
     },
     {
       $lookup: {
-        from: 'Task',
-        localField: `compositionIdForJoining`,
-        foreignField: 'focus.reference',
-        as: 'task'
+        from: collectionToJoin,
+        localField: `ids`,
+        foreignField: 'id',
+        as: 'joinResult'
       }
     },
     {
       $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$task'] }
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    }
+  ]
+}
+
+function joinFromResourcesIdToResourceIdentifier(
+  resourceType: CollectionName,
+  foreignField: string,
+  collectionToJoin: CollectionName
+) {
+  return [
+    {
+      $addFields: {
+        resourceIds: {
+          $map: {
+            input: filterByType([resourceType]),
+            as: 'resource',
+            in: { $concat: [resourceType, '/', '$$resource.id'] }
+          }
+        }
       }
     },
-    // There should only be one task for each composition, so we can flatten it
-    { $unwind: '$task' },
+    {
+      $lookup: {
+        from: collectionToJoin,
+        localField: `resourceIds`,
+        foreignField,
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    }
+  ]
+}
+
+export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
+  recordId: string,
+  allowedStates: T,
+  includeHistoryResources: boolean
+): Promise<StateIdenfitiers[T[number]]> {
+  const connectedClient = await client.connect()
+
+  const db = connectedClient.db()
+
+  const query: Array<Record<string, any>> = [
+    {
+      $match: {
+        id: recordId
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        composition: { $push: '$$ROOT' }
+      }
+    },
+    { $unwind: '$composition' },
+    {
+      $addFields: {
+        bundle: ['$composition']
+      }
+    },
+
     /*
-     * Create task history
+     * Reads all references from Composition.section end makes a list of UUIDs "extensionReferences" of all resource identifiers found
      */
-    ...(includeHistoryResources
-      ? [
-          {
-            $lookup: {
-              from: 'Task_history',
-              localField: 'task.id',
-              foreignField: 'id',
-              as: 'taskHistory'
-            }
-          },
-          {
-            $set: {
-              taskHistory: {
-                $map: {
-                  input: '$taskHistory',
-                  as: 'task',
-                  in: {
-                    $mergeObjects: [
-                      '$$task',
-                      {
-                        /*
-                         * Custom resource type that forces history items
-                         * to be dealt with separately to avoid conflicts.
-                         * Each resource gets a new ID here.
-                         */
-                        resourceType: 'TaskHistory',
-                        id: {
-                          $function: {
-                            body: `function () {
-                        return UUID().toString().split('"')[1]
-                      }`,
-                            args: [],
-                            lang: 'js'
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          {
-            $addFields: {
-              bundle: { $concatArrays: ['$bundle', '$taskHistory'] }
-            }
-          },
-          // Find all encounters that Task history items are referring to
-          {
-            $addFields: {
-              taskHistoryEncounterIds: {
-                $map: {
-                  input: '$taskHistory',
-                  as: 'taskHistory',
-                  in: {
-                    $arrayElemAt: [
-                      {
-                        $split: ['$$taskHistory.encounter.reference', '/']
-                      },
-                      1
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          {
-            $lookup: {
-              from: 'Encounter',
-              localField: `taskHistoryEncounterIds`,
-              foreignField: 'id',
-              as: 'joinResult'
-            }
-          },
-          {
-            $addFields: {
-              bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-            }
-          }
-        ]
-      : []),
+
+    ...joinSectionsToCollections('$composition.section', [
+      'Encounter',
+      'RelatedPerson',
+      'Patient',
+      'DocumentReference'
+    ]),
+
+    /*
+     * Next, find all tasks that reference the composition
+     */
+    ...FIND_TASKS_REFERENCING_COMPOSITION,
+
+    ...(includeHistoryResources ? CREATE_TASK_HISTORY : []),
+    /*
+     * Creates a list "relatedPerson" of all patient references inside RelatedPerson
+     */
+    ...joinFromResourcesResourceIdentifierKey(
+      ['RelatedPerson'],
+      'patient.reference',
+      'Patient'
+    ),
+
+    // Get Observations by Encounter ids
+    // (Encounter.id -> Observation.context.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'context.reference',
+      'Observation'
+    ),
+
+    // Get DocumentReferences by Encounter ids
+    // (Encounter.id -> DocumentReference.subject.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'subject.reference',
+      'DocumentReference'
+    ),
     {
       $addFields: {
-        /*
-         * Creates a list "relatedPerson" of all patient references inside RelatedPerson
-         */
-        relatedPersonPatientIds: {
-          $map: {
-            input: filterByType(['RelatedPerson']),
-            as: 'relatedPerson',
-            in: {
-              $arrayElemAt: [
-                { $split: ['$$relatedPerson.patient.reference', '/'] },
-                1
-              ]
-            }
-          }
-        },
-        /*
-         * Creates a list "encounterIds" of all encounters. This is later on used for finding all Observations
-         */
-        encounterIds: {
-          $map: {
-            input: filterByType(['Encounter']),
-            as: 'encounter',
-            in: { $concat: ['Encounter/', '$$encounter.id'] }
-          }
-        },
         /*
          * Creates a list of all references inside Task.extensions
          */
@@ -491,21 +579,12 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         }
       }
     },
-    ...autoJoinAllCollections('taskReferenceIds'),
-    // Get Patients by RelatedPersonIds
-    {
-      $lookup: {
-        from: 'Patient',
-        localField: `relatedPersonPatientIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    ...joinCollections('taskReferenceIds', [
+      'Practitioner',
+      'Location',
+      'PaymentReconciliation'
+    ]),
+
     // Get encounters Tasks are referring to
     {
       $lookup: {
@@ -526,34 +605,6 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         from: 'Location',
         localField: `encounterLocationIds`,
         foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
-    // Get observations by Encounter ids
-    {
-      $lookup: {
-        from: 'Observation',
-        localField: `encounterIds`,
-        foreignField: 'context.reference',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
-    // Get document references by Encounter ids
-    {
-      $lookup: {
-        from: 'DocumentReference',
-        localField: `encounterIds`,
-        foreignField: 'subject.reference',
         as: 'joinResult'
       }
     },
@@ -587,19 +638,10 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         })
       }
     },
-    {
-      $lookup: {
-        from: 'RelatedPerson',
-        localField: `documentReferenceIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    ...joinCollections('documentReferenceIds', [
+      'RelatedPerson',
+      'PaymentReconciliation'
+    ]),
     {
       $addFields: {
         /*
@@ -619,51 +661,16 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         }
       }
     },
-    // Get Patients by RelatedPersonIds
-    {
-      $lookup: {
-        from: 'Patient',
-        localField: `relatedPersonPatientIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    // Get Patients & RelatedPatients RelatedPersonIds
+    ...joinCollections('relatedPersonPatientIds', ['RelatedPerson', 'Patient']),
+
     // Get PractitionerRoles for all found practitioners
-    {
-      $addFields: {
-        practitionerIds: {
-          $map: {
-            input: {
-              $filter: {
-                input: '$bundle',
-                as: 'item',
-                cond: { $eq: ['$$item.resourceType', 'Practitioner'] }
-              }
-            },
-            as: 'practitioner',
-            in: { $concat: ['Practitioner/', '$$practitioner.id'] }
-          }
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: 'PractitionerRole',
-        localField: `practitionerIds`,
-        foreignField: 'practitioner.reference',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Practitioner',
+      'practitioner.reference',
+      'PractitionerRole'
+    ),
+
     ...(includeHistoryResources
       ? [
           // Get PractitionerRolesHistory for all found practitioners roles
@@ -772,13 +779,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       $addFields: {
         practitionerLocationIds: flattenArray({
           $map: {
-            input: {
-              $filter: {
-                input: '$bundle',
-                as: 'item',
-                cond: { $eq: ['$$item.resourceType', 'PractitionerRole'] }
-              }
-            },
+            input: filterByType(['PractitionerRole']),
             as: 'practitionerRole',
             in: {
               $map: {
