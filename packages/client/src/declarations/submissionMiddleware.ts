@@ -26,6 +26,7 @@ import {
 } from '@client/notification/actions'
 import { IStoreState } from '@client/store'
 import {
+  addCorrectionDetails,
   appendGqlMetadataFromDraft,
   draftToGqlTransformer
 } from '@client/transformer'
@@ -46,6 +47,7 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { MutationToRequestRegistrationCorrectionArgs } from '@opencrvs/gateway/src/graphql/schema'
 import { UserDetails } from '@client/utils/userUtils'
 
 type IReadyDeclaration = IDeclaration & {
@@ -61,8 +63,11 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
   [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
-  [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
+  [SubmissionAction.REQUEST_CORRECTION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.MAKE_CORRECTION]: SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.APPROVE_CORRECTION]: SUBMISSION_STATUS.APPROVING,
+  [SubmissionAction.REJECT_CORRECTION]: SUBMISSION_STATUS.REJECTING,
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.CERTIFYING,
@@ -81,7 +86,6 @@ function getGqlDetails(
     draft.data,
     draft.id,
     userDetails,
-    draft.originalData,
     offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
@@ -102,6 +106,15 @@ function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
     systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
+}
+
+function isCorrectionAction(action: SubmissionAction) {
+  return [
+    SubmissionAction.REQUEST_CORRECTION,
+    SubmissionAction.MAKE_CORRECTION,
+    SubmissionAction.APPROVE_CORRECTION,
+    SubmissionAction.REJECT_CORRECTION
+  ].includes(action)
 }
 
 async function removeDuplicatesFromCompositionAndElastic(
@@ -151,12 +164,23 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       }
     }
 
-    const gqlDetails = getGqlDetails(
+    const form = getRegisterForm(getState())[event]
+    const offlineData = getOfflineData(getState())
+    let graphqlPayload = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
       getOfflineData(getState()),
       getState().offline.userDetails as UserDetails
     )
+
+    if (isCorrectionAction(submissionAction)) {
+      graphqlPayload = addCorrectionDetails(
+        form,
+        declaration,
+        graphqlPayload,
+        offlineData
+      )
+    }
 
     //then add payment while issue declaration
     if (payments) {
@@ -171,12 +195,19 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         : event === Event.Death
         ? getDeathMutation(submissionAction)
         : getMarriageMutation(submissionAction)
+
+    if (!mutation) {
+      throw new Error(
+        'Unknown mutation for submission action ' + submissionAction
+      )
+    }
+
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         const response = await client.mutate({
           mutation,
           variables: {
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
 
@@ -193,10 +224,22 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             })
           )
         }
+      } else if (submissionAction === SubmissionAction.REQUEST_CORRECTION) {
+        await client.mutate<
+          { requestRegistrationCorrection: string },
+          MutationToRequestRegistrationCorrectionArgs
+        >({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: graphqlPayload.registration.correction
+          }
+        })
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,
-          SubmissionAction.ARCHIVE_DECLARATION
+          SubmissionAction.ARCHIVE_DECLARATION,
+          SubmissionAction.REJECT_CORRECTION
         ].includes(submissionAction)
       ) {
         if (
@@ -224,7 +267,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
         //delete data from certificates to identify event in workflow for markEventAsIssued
@@ -245,7 +288,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
       }

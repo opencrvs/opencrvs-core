@@ -62,7 +62,10 @@ import {
   REQUESTING_INDIVIDUAL,
   HAS_SHOWED_VERIFIED_DOCUMENT,
   DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  NO_SUPPORTING_DOCUMENTATION_REQUIRED,
+  PAYMENT_DETAILS,
+  REQUESTING_INDIVIDUAL_OTHER
 } from '@gateway/features/fhir/constants'
 import {
   ITemplatedComposition,
@@ -1130,7 +1133,15 @@ export const typeResolvers: GQLResolver = {
         docRef.extension as fhir.Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
     }
   },
   Identifier: {
@@ -1210,17 +1221,97 @@ export const typeResolvers: GQLResolver = {
     }
   },
   History: {
+    documents: async (
+      task: fhir.Task,
+      _,
+      { dataSources, headers: authHeader }
+    ) => {
+      const encounter: fhir.Reference = (task as any).encounter
+      if (!encounter) {
+        return []
+      }
+      return dataSources.documentsAPI.findBySubject(
+        encounter.reference as `${string}/${string}`
+      )
+    },
+    payment: async (
+      task: fhir.Task,
+      _,
+      { dataSources, headers: authHeader }
+    ) => {
+      const includesPayment = findExtension(
+        PAYMENT_DETAILS,
+        task.extension as fhir.Extension[]
+      )
+
+      if (!includesPayment) {
+        return null
+      }
+
+      const paymentReference = includesPayment.valueReference!
+        .reference as `${string}/${string}`
+
+      const paymentId = paymentReference.split('/')[1]
+      const paymentReconciliation = await dataSources.paymentsAPI.getPayment(
+        paymentId
+      )
+
+      const documentReference = await dataSources.documentsAPI.findBySubject(
+        paymentReference
+      )
+
+      return {
+        id: paymentId,
+        type: paymentReconciliation.detail?.[0].type?.coding?.[0].code,
+        amount: paymentReconciliation.detail?.[0].amount?.value,
+        outcome: paymentReconciliation.outcome?.coding?.[0].code,
+        date: paymentReconciliation.detail?.[0].date,
+        attachmentURL:
+          documentReference.length > 0
+            ? await getPresignedUrlFromUri(
+                documentReference[0].content[0].attachment.data!,
+                authHeader
+              )
+            : null
+      }
+    },
     hasShowedVerifiedDocument: (task: fhir.Task) => {
       const hasShowedDocument = findExtension(
         HAS_SHOWED_VERIFIED_DOCUMENT,
         task.extension as fhir.Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
     },
+
+    noSupportingDocumentationRequired: (task: fhir.Task) => {
+      const hasShowedDocument = findExtension(
+        NO_SUPPORTING_DOCUMENTATION_REQUIRED,
+        task.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueBoolean)
+    },
+
     requester: (task: fhir.Task) => {
       const requestedBy = findExtension(
         REQUESTING_INDIVIDUAL,
+        task.extension as fhir.Extension[]
+      )
+
+      return requestedBy?.valueString || ''
+    },
+    requesterOther: (task: fhir.Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL_OTHER,
         task.extension as fhir.Extension[]
       )
 
@@ -1242,6 +1333,9 @@ export const typeResolvers: GQLResolver = {
     reason: (task: fhir.Task) => task.reason?.text || null,
     otherReason: (task: fhir.Task) => {
       return task.reason?.extension ? task.reason?.extension[0].valueString : ''
+    },
+    note: (task: fhir.Task) => {
+      return task.note ? task.note[0].text : ''
     },
     date: (task: fhir.Task) => task.meta?.lastUpdated,
     dhis2Notification: (task: fhir.Task) =>

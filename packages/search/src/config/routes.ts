@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Joi from 'joi'
-import { birthEventHandler } from '@search/features/registration/birth/handler'
-import { deathEventHandler } from '@search/features/registration/death/handler'
 import {
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
@@ -25,7 +23,7 @@ import {
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
-import { marriageEventHandler } from '@search/features/registration/marriage/handler'
+import { recordHandler } from '@search/features/registration/record/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -81,8 +79,17 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/record',
+      handler: recordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles indexing a new or existing record'
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/{eventType}',
-      handler: birthEventHandler,
+      handler: recordHandler,
       config: {
         tags: ['api'],
         description:
@@ -92,7 +99,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/{eventType}',
-      handler: deathEventHandler,
+      handler: recordHandler,
       config: {
         tags: ['api'],
         description:
@@ -102,7 +109,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/marriage/{eventType}',
-      handler: marriageEventHandler,
+      handler: recordHandler,
       config: {
         tags: ['api'],
         description:

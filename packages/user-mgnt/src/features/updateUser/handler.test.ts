@@ -107,7 +107,7 @@ const mockPractitionerRole = {
         'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'readys',
         code: {
           coding: [
             {

@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import {
+  APPROVE_DEATH_REG_CORRECTION,
+  CREATE_DEATH_REG_CORRECTION,
+  REJECT_REG_CORRECTION,
+  REQUEST_REG_CORRECTION
+} from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
 const SUBMIT_DEATH_DECLARATION = gql`
@@ -121,7 +126,13 @@ export function getDeathMutation(action: SubmissionAction) {
       return COLLECT_DEATH_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_DEATH_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_DEATH_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return CREATE_DEATH_REG_CORRECTION
+    case SubmissionAction.REQUEST_CORRECTION:
+      return REQUEST_REG_CORRECTION
+    case SubmissionAction.APPROVE_CORRECTION:
+      return APPROVE_DEATH_REG_CORRECTION
+    case SubmissionAction.REJECT_CORRECTION:
+      return REJECT_REG_CORRECTION
   }
 }

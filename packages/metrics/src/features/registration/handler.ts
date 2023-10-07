@@ -23,16 +23,20 @@ import {
   generateRejectedPoints,
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
-import { internal } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
 import {
+  MAKE_CORRECTION_EXTENSION_URL,
+  findExtension,
   getActionFromTask,
+  getPaymentReconciliation,
   getTask
 } from '@metrics/features/registration/fhirUtils'
 import { EventType } from '@metrics/config/routes'
+import { fetchTaskHistory } from '@metrics/api'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -514,20 +518,164 @@ export async function markValidatedHandler(
   return h.response().code(200)
 }
 
-export async function requestCorrectionHandler(
+type TaskBundleEntry = Omit<fhir.BundleEntry, 'resource'> & {
+  resource: fhir.Task
+}
+
+export async function correctionEventHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const task = getTask(request.payload as fhir.Bundle)
+
+  if (!task) {
+    return badRequest('No task found in received bundle')
+  }
+
+  const history = await fetchTaskHistory(task.id!, {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  })
+
+  const latestCorrectionTask: TaskBundleEntry | undefined = history.entry?.find(
+    (entry: TaskBundleEntry): entry is TaskBundleEntry =>
+      entry.resource.businessStatus?.coding?.[0].code ===
+        'CORRECTION_REQUESTED' ||
+      Boolean(
+        findExtension(MAKE_CORRECTION_EXTENSION_URL, entry.resource.extension!)
+      )
+  )
+
+  if (!latestCorrectionTask) {
+    return badRequest('No correction task found in received bundle')
+  }
+
+  if (latestCorrectionTask.resource.status === 'ready') {
+    return correctionHandler(request, h)
+  }
+  if (latestCorrectionTask.resource.status === 'accepted') {
+    return approveCorrectionHandler(request, h)
+  }
+  if (latestCorrectionTask.resource.status === 'rejected') {
+    return rejectCorrectionHandler(request, h)
+  }
+
+  if (latestCorrectionTask.resource.status === 'requested') {
+    return requestCorrectionHandler(request, h)
+  }
+
+  return badRequest('Task is in an unknown state')
+}
+
+async function correctionHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('CORRECTED', request)
+  const payload = request.payload as fhir.Bundle
+  const payment = getPaymentReconciliation(payload)
   try {
     const points = await Promise.all([
-      generatePaymentPoint(
+      ...(payment
+        ? [
+            generatePaymentPoint(
+              payload,
+              {
+                Authorization: request.headers.authorization
+              },
+              'correction'
+            )
+          ]
+        : []),
+      generateCorrectionReasonPoint(payload, {
+        Authorization: request.headers.authorization
+      }),
+      generateEventDurationPoint(payload, ['REGISTERED', 'CERTIFIED'], {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(payload, {
+        Authorization: request.headers.authorization
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+  return h.response().code(200)
+}
+
+async function approveCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('APPROVED_CORRECTION', request)
+  const payload = request.payload as fhir.Bundle
+  const payment = getPaymentReconciliation(payload)
+
+  try {
+    const points = await Promise.all([
+      ...(payment
+        ? [
+            generatePaymentPoint(
+              payload,
+              {
+                Authorization: request.headers.authorization
+              },
+              'correction'
+            )
+          ]
+        : []),
+      generateCorrectionReasonPoint(payload, {
+        Authorization: request.headers.authorization
+      }),
+      generateEventDurationPoint(payload, ['CORRECTION_REQUESTED'], {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(payload, {
+        Authorization: request.headers.authorization
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+  return h.response().code(200)
+}
+async function rejectCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REJECTED_CORRECTION', request)
+  try {
+    const points = await Promise.all([
+      generateEventDurationPoint(
         request.payload as fhir.Bundle,
+        ['REGISTERED', 'CERTIFIED'],
         {
           Authorization: request.headers.authorization
-        },
-        'correction'
+        }
       ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+  return h.response().code(200)
+}
+
+async function requestCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REQUESTED_CORRECTION', request)
+  try {
+    const points = await Promise.all([
       generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization
       }),

@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -157,7 +160,9 @@ class ReadyForReviewComponent extends React.Component<
             ) => {
               e && e.stopPropagation()
               this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.declarationStatus === 'CORRECTION_REQUESTED'
+                  ? REVIEW_CORRECTION
+                  : REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -205,6 +210,10 @@ class ReadyForReviewComponent extends React.Component<
         getPreviousOperationDateByOperationType(
           reg.operationHistories,
           RegStatus.Validated
+        ) ||
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.CorrectionRequested
         ) ||
         ''
       const NameComponent = reg.name ? (
