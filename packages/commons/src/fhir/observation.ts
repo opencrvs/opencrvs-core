@@ -38,6 +38,7 @@ export function findObservationByCode(
   code: ObservationCode
 ) {
   const encounter = getEncounterFromRecord(bundle)
+
   return bundle.entry
     .map((x) => x.resource)
     .filter(isObservation)

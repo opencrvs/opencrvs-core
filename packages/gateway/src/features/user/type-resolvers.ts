@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+
 import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
 
@@ -21,6 +21,7 @@ import {
 import {
   Bundle,
   Extension,
+  OPENCRVS_SPECIFICATION_URL,
   PractitionerRole,
   ResourceIdentifier,
   resourceIdentifierToUUID
@@ -80,10 +81,17 @@ export interface ISystemModelData {
   username: string
   status: string
   sha_secret: string
+  type: 'HEALTH'
   practitionerId: string
   settings: {
     dailyQuota: number
   }
+}
+
+export function isSystem(
+  systemOrUser: IUserModelData | ISystemModelData
+): systemOrUser is ISystemModelData {
+  return (systemOrUser as ISystemModelData).client_id !== undefined
 }
 
 export interface IUserPayload

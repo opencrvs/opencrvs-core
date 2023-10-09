@@ -85,6 +85,8 @@ function checkForUnresolvedReferences(bundle: Bundle) {
 }
 
 type CollectionName =
+  | 'Composition'
+  | 'CompositionHistory'
   | 'DocumentReference'
   | 'Encounter'
   | 'Location'
@@ -149,8 +151,18 @@ function flattenArray(nestedQuery: Record<string, any>) {
   }
 }
 
+function mapKey(input: Record<string, any>, key: string) {
+  return {
+    $map: {
+      input,
+      as: 'item',
+      in: `$$item.${key}`
+    }
+  }
+}
+
 function joinSectionsToCollections(
-  keyToReadSectionsFrom: string,
+  resourceTypes: CollectionName[],
   collectionsToJoinTo: CollectionName[]
 ) {
   return [
@@ -158,7 +170,7 @@ function joinSectionsToCollections(
       $addFields: {
         extensionReferences: flattenArray({
           $map: {
-            input: keyToReadSectionsFrom,
+            input: flattenArray(mapKey(filterByType(resourceTypes), 'section')),
             as: 'el',
             in: {
               $let: {
@@ -247,18 +259,10 @@ const CREATE_TASK_HISTORY = [
                 /*
                  * Custom resource type that forces history items
                  * to be dealt with separately to avoid conflicts.
-                 * Each resource gets a new ID here.
+                 * Each resource gets a new ID here that's based on the version id.
                  */
                 resourceType: 'TaskHistory',
-                id: {
-                  $function: {
-                    body: `function () {
-                   return UUID().toString().split('"')[1]
-                 }`,
-                    args: [],
-                    lang: 'js'
-                  }
-                }
+                id: '$$task.meta.versionId'
               }
             ]
           }
@@ -401,16 +405,66 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       }
     },
 
+    ...(includeHistoryResources
+      ? [
+          // Get CompositionHistory for the composition
+          {
+            $addFields: {
+              compositionIds: {
+                $map: {
+                  input: filterByType(['Composition']),
+                  as: 'composition',
+                  in: '$$composition.id'
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'Composition_history',
+              localField: 'compositionIds',
+              foreignField: 'id',
+              as: 'compositionHistory'
+            }
+          },
+          {
+            $set: {
+              compositionHistory: {
+                $map: {
+                  input: '$compositionHistory',
+                  as: 'composition',
+                  in: {
+                    $mergeObjects: [
+                      '$$composition',
+                      {
+                        /*
+                         * Custom resource type that forces history items
+                         * to be dealt with separately to avoid conflicts.
+                         */
+                        resourceType: 'CompositionHistory'
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              bundle: { $concatArrays: ['$bundle', '$compositionHistory'] }
+            }
+          }
+        ]
+      : []),
+
     /*
      * Reads all references from Composition.section end makes a list of UUIDs "extensionReferences" of all resource identifiers found
      */
 
-    ...joinSectionsToCollections('$composition.section', [
-      'Encounter',
-      'RelatedPerson',
-      'Patient',
-      'DocumentReference'
-    ]),
+    ...joinSectionsToCollections(
+      ['Composition', 'CompositionHistory'],
+      ['Encounter', 'RelatedPerson', 'Patient', 'DocumentReference']
+    ),
 
     /*
      * Next, find all tasks that reference the composition
@@ -718,57 +772,6 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
           {
             $addFields: {
               bundle: { $concatArrays: ['$bundle', '$practitionerRoleHistory'] }
-            }
-          }
-        ]
-      : []),
-    ...(includeHistoryResources
-      ? [
-          // Get CompositionHistory for the composition
-          {
-            $addFields: {
-              compositionIds: {
-                $map: {
-                  input: filterByType(['Composition']),
-                  as: 'composition',
-                  in: '$$composition.id'
-                }
-              }
-            }
-          },
-          {
-            $lookup: {
-              from: 'Composition_history',
-              localField: 'compositionIds',
-              foreignField: 'id',
-              as: 'compositionHistory'
-            }
-          },
-          {
-            $set: {
-              compositionHistory: {
-                $map: {
-                  input: '$compositionHistory',
-                  as: 'composition',
-                  in: {
-                    $mergeObjects: [
-                      '$$composition',
-                      {
-                        /*
-                         * Custom resource type that forces history items
-                         * to be dealt with separately to avoid conflicts.
-                         */
-                        resourceType: 'CompositionHistory'
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          {
-            $addFields: {
-              bundle: { $concatArrays: ['$bundle', '$compositionHistory'] }
             }
           }
         ]

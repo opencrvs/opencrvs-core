@@ -14,6 +14,7 @@ import {
   Composition,
   Patient,
   Practitioner,
+  RegistrationNumber,
   Saved,
   Task,
   findExtension
@@ -153,7 +154,7 @@ export async function invokeRegistrationValidation(
     return { bundle }
   } catch (err) {
     const eventType = getEventType(bundle)
-    const composition = await getComposition(bundle)
+    const composition = getComposition(bundle)
     if (!composition) {
       throw new Error('Cant get composition in bundle')
     }
@@ -254,7 +255,7 @@ export async function markBundleAsDeclarationUpdated<T extends Bundle>(
 
 export async function markEventAsRegistered(
   taskResource: Task,
-  registrationNumber: string,
+  registrationNumber: RegistrationNumber,
   eventType: EVENT_TYPE,
   token: string
 ): Promise<Task> {

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { fetchFromHearth } from '@gateway/features/fhir/utils'
 import {
   ExtensionUrl,
@@ -19,7 +18,13 @@ import {
   LocationStatistic,
   Statistics
 } from './locationHandler'
-import { Location, Extension, Bundle } from '@opencrvs/commons/types'
+import {
+  Location,
+  Extension,
+  Bundle,
+  ResourceIdentifier,
+  OPENCRVS_SPECIFICATION_URL
+} from '@opencrvs/commons/types'
 
 export const composeFhirLocation = (
   location: LocationInput | FacilityInput
@@ -48,7 +53,7 @@ export const composeFhirLocation = (
       status: 'active',
       mode: 'instance',
       partOf: {
-        reference: location.partOf
+        reference: location.partOf as ResourceIdentifier
       },
       type: {
         coding: [
@@ -81,7 +86,7 @@ export const composeFhirLocation = (
       status: 'active',
       mode: 'instance',
       partOf: {
-        reference: location.partOf
+        reference: location.partOf as ResourceIdentifier
       },
       type: {
         coding: [

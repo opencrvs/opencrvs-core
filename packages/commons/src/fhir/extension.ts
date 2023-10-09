@@ -1,4 +1,4 @@
-import { ResourceIdentifier, URNReference } from '.'
+import { ResourceIdentifier, URNReference } from '../fhir'
 
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
@@ -145,6 +145,10 @@ export type KnownExtensionType = StringExtensionType & {
     valueReference: {
       reference: string
     }
+  }
+  'http://opencrvs.org/specs/id/system_identifier': {
+    url: 'http://opencrvs.org/specs/id/system_identifier'
+    value: string
   }
   'http://opencrvs.org/specs/extension/date-of-marriage': {
     url: 'http://opencrvs.org/specs/extension/date-of-marriage'

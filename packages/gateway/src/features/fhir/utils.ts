@@ -52,7 +52,6 @@ import {
   MAKE_CORRECTION_EXTENSION_URL,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
-  OPENCRVS_SPECIFICATION_URL,
   REINSTATED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
@@ -85,6 +84,7 @@ import {
   EncounterParticipant,
   INFORMANT_CODE,
   Location,
+  OPENCRVS_SPECIFICATION_URL,
   Observation,
   PartialBy,
   Patient,
@@ -1150,7 +1150,6 @@ export const fetchFHIR = <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  console.log('fetchFHIR', `${FHIR_URL}${suffix}`)
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
     headers: {
@@ -1172,7 +1171,6 @@ export const fetchFromHearth = <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  console.log('fetchFromHearth', `${HEARTH_URL}${suffix}`)
   return fetch(`${HEARTH_URL}${suffix}`, {
     method,
     headers: {

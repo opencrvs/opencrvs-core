@@ -14,7 +14,6 @@ import {
   FLAGGED_AS_POTENTIAL_DUPLICATE,
   HAS_SHOWED_VERIFIED_DOCUMENT,
   NO_SUPPORTING_DOCUMENTATION_REQUIRED,
-  OPENCRVS_SPECIFICATION_URL,
   ORIGINAL_FILE_NAME_SYSTEM,
   PAYMENT_DETAILS,
   REQUESTING_INDIVIDUAL,
@@ -71,15 +70,16 @@ import {
   Identifier,
   Location,
   MOTHER_CODE,
+  OPENCRVS_SPECIFICATION_URL,
   Patient,
   PaymentReconciliation,
   Practitioner,
   RelatedPerson,
+  Resource,
   ResourceIdentifier,
   SPOUSE_CODE,
   Saved,
   Task,
-  URLReference,
   ValidRecord,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
@@ -96,6 +96,7 @@ import {
   isQuestionnaireResponse,
   isSavedObservation,
   isTaskOrTaskHistory,
+  isURLReference,
   resourceIdentifierToUUID,
   urlReferenceToUUID
 } from '@opencrvs/commons/types'
@@ -904,11 +905,7 @@ export const typeResolvers: GQLResolver = {
       return context.record?.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-        .sort(
-          (a, b) =>
-            new Date(b.lastModified).valueOf() -
-            new Date(a.lastModified).valueOf()
-        )
+        .sort(sortDescending)
     },
     type: (task) => {
       const taskType = task.code
@@ -1655,11 +1652,7 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-        .sort(
-          (a, b) =>
-            new Date(b.lastModified).valueOf() -
-            new Date(a.lastModified).valueOf()
-        )
+        .sort(sortDescending)
     }
   },
   BirthRegistration: {
@@ -1800,11 +1793,7 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-        .sort(
-          (a, b) =>
-            new Date(b.lastModified).valueOf() -
-            new Date(a.lastModified).valueOf()
-        )
+        .sort(sortDescending)
     }
   },
   MarriageRegistration: {
@@ -1923,14 +1912,17 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-        .sort(
-          (a, b) =>
-            new Date(b.lastModified).valueOf() -
-            new Date(a.lastModified).valueOf()
-        )
+        .sort(sortDescending)
     }
   }
 } satisfies GQLResolver
+
+function sortDescending(
+  a: Resource & { lastModified: string },
+  b: Resource & { lastModified: string }
+) {
+  return new Date(b.lastModified).valueOf() - new Date(a.lastModified).valueOf()
+}
 
 async function resolveCertificates(
   task: Saved<Task>,
@@ -1947,7 +1939,11 @@ async function resolveCertificates(
     }
 
     return dataSources.fhirAPI.getDocumentReference(
-      urlReferenceToUUID(certSection.entry[0].reference as URLReference)
+      isURLReference(certSection.entry[0].reference)
+        ? urlReferenceToUUID(certSection.entry[0].reference)
+        : resourceIdentifierToUUID(
+            certSection.entry[0].reference as ResourceIdentifier
+          )
     )
   })
 }

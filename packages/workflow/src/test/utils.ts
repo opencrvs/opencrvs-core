@@ -11,6 +11,7 @@ import {
   Saved,
   StrictBundle,
   Task,
+  TrackingID,
   URLReference,
   URNReference
 } from '@opencrvs/commons/types'
@@ -172,7 +173,7 @@ export const testFhirBundle: StrictBundle<
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B5WGYJE'
+            value: 'B5WGYJE' as TrackingID
           }
         ],
         extension: [
@@ -587,7 +588,7 @@ export const testFhirBundleWithIdsForDeath = {
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/death-tracking-id',
-            value: 'D5WGYJE'
+            value: 'D5WGYJE' as TrackingID
           }
         ],
         extension: [
@@ -727,12 +728,13 @@ export const testFhirTaskBundle: Saved<Bundle<Task>> = {
           }
         ],
         focus: {
-          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+          reference:
+            'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422' as ResourceIdentifier
         },
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B1mW7jA'
+            value: 'B1mW7jA' as TrackingID
           }
         ],
         businessStatus: {
@@ -1897,7 +1899,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
           },
           {
             system: 'http://opencrvs.org/specs/id/marriage-tracking-id',
-            value: 'MYEHHN3'
+            value: 'MYEHHN3' as TrackingID
           }
         ]
       }

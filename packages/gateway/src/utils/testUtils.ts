@@ -1,3 +1,12 @@
+import {
+  BundleEntry,
+  Encounter,
+  Location,
+  Observation,
+  ResourceIdentifier,
+  URLReference
+} from '@opencrvs/commons/types'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -446,7 +455,7 @@ export const mockComposition = {
   subject: {
     reference: 'Patient/xyz' // A reference to the person being registered, by fullUrl
   },
-  date: '{{logicalCompositionDate}}', // declaration date
+  date: '2018-10-05', // declaration date
   author: [
     {
       reference: 'Practitioner/xyz' // CHW that declared the event
@@ -640,7 +649,7 @@ export const mockDeathComposition = {
   subject: {
     reference: 'Patient/xyz' // A reference to the person being registered, by fullUrl
   },
-  date: '{{logicalCompositionDate}}', // declaration date
+  date: '2018-10-05', // declaration date
   author: [
     {
       reference: 'Practitioner/xyz' // CHW that declared the event
@@ -755,7 +764,8 @@ export const mockDeathComposition = {
       text: '',
       entry: [
         {
-          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below
+          reference:
+            'http://localhost:3447/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' // reference to Encounter resource contained below
         }
       ]
     },
@@ -785,6 +795,162 @@ export const mockDeathComposition = {
     }
   ],
   id: '123'
+}
+
+export const mockDeathEncounter: BundleEntry<Encounter> = {
+  fullUrl:
+    'http://localhost:3447/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' as URLReference,
+  resource: {
+    resourceType: 'Encounter',
+    status: 'finished',
+    id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+    location: [
+      {
+        location: {
+          reference:
+            'http://localhost:3447/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference
+        }
+      }
+    ],
+    meta: {
+      lastUpdated: '2023-09-22T11:49:24.305+00:00',
+      versionId: '0a0ef65c-badf-4930-adc8-fe598de05951'
+    }
+  }
+}
+
+export const mockDeathEncounterLocation: BundleEntry<Location> = {
+  fullUrl:
+    'http://localhost:3447/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference,
+  resource: {
+    resourceType: 'Location',
+    identifier: [
+      {
+        system: 'http://opencrvs.org/specs/id/internal-id',
+        value: 'HEALTH_FACILITY_Nw5x6uTYgJF'
+      }
+    ],
+    name: 'Muntemba Rural Health Centre',
+    alias: ['Muntemba Rural Health Centre'],
+    status: 'active',
+    mode: 'instance',
+    partOf: {
+      reference:
+        'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as ResourceIdentifier
+    },
+    type: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/location-type',
+          code: 'HEALTH_FACILITY'
+        }
+      ]
+    },
+    physicalType: {
+      coding: [
+        {
+          code: 'bu',
+          display: 'Building'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:36:07.630+00:00',
+      versionId: 'ae83b6d8-a772-41dd-9554-94b1749c0473'
+    },
+
+    id: '11539b31-0123-4b3e-88a7-db5919b34bd4'
+  }
+}
+
+export const causeOfDeathObservation: BundleEntry<Observation> = {
+  fullUrl:
+    'http://localhost:3447/fhir/Observation/5f08d904-4b70-4f0a-b43c-b0911b5bd6c5/434a745a-be8c-470d-8bfa-c759c600b26f' as URLReference,
+  resource: {
+    resourceType: 'Observation',
+    status: 'final',
+    context: {
+      reference: `Encounter/${mockDeathEncounter.resource.id}`
+    },
+    category: [
+      {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs'
+          }
+        ]
+      }
+    ],
+    code: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: 'cause-of-death-method',
+          display: 'Cause of death method'
+        }
+      ]
+    },
+    id: '5f08d904-4b70-4f0a-b43c-b0911b5bd6c5',
+    valueCodeableConcept: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/cause-of-death-method',
+          code: 'PHYSICIAN'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:40:11.613+00:00',
+      versionId: '434a745a-be8c-470d-8bfa-c759c600b26f'
+    }
+  }
+}
+
+export const mannerOfDeathObservation: BundleEntry<Observation> = {
+  fullUrl:
+    'http://localhost:3447/fhir/Observation/9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb/ccf928d7-8653-4922-87d2-32907f02f402' as URLReference,
+  resource: {
+    resourceType: 'Observation',
+    status: 'final',
+    context: {
+      reference: `Encounter/${mockDeathEncounter.resource.id}`
+    },
+    category: [
+      {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs'
+          }
+        ]
+      }
+    ],
+    code: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: 'uncertified-manner-of-death',
+          display: 'Uncertified manner of death'
+        }
+      ]
+    },
+    id: '9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb',
+    valueCodeableConcept: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/manner-of-death',
+          code: 'NATURAL_CAUSES'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:39:01.517+00:00',
+      versionId: 'ccf928d7-8653-4922-87d2-32907f02f402'
+    }
+  }
 }
 
 export const mockTaskBundle = {

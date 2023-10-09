@@ -66,6 +66,7 @@ import {
   BundleEntry,
   Composition,
   Patient,
+  RegistrationNumber,
   Saved,
   Task
 } from '@opencrvs/commons/types'
@@ -306,7 +307,7 @@ export async function markEventAsRegisteredCallbackHandler(
   try {
     await markEventAsRegistered(
       task,
-      registrationNumber,
+      registrationNumber as RegistrationNumber,
       event,
       getToken(request)
     )

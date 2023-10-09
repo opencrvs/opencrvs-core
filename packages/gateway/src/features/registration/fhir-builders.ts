@@ -11,8 +11,7 @@
 import {
   EVENT_TYPE,
   FHIR_SPECIFICATION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  OPENCRVS_SPECIFICATION_URL
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
@@ -113,11 +112,14 @@ import {
   KnownExtensionType,
   MOTHER_CODE,
   Money,
+  OPENCRVS_SPECIFICATION_URL,
   Patient,
+  ResourceIdentifier,
   SPOUSE_CODE,
   Saved,
   StringExtensionType,
   Task,
+  TaskIdentifier,
   TaskIdentifierSystemType,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
@@ -968,7 +970,7 @@ function setResourceIdentifier(
   resource.identifier.push({
     system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
     value: fieldValue
-  })
+  } as TaskIdentifier)
 }
 
 function createRegStatusComment(
@@ -3129,7 +3131,7 @@ export const builders: IFieldBuilders = {
         context
       )
       location.partOf = {
-        reference: fieldValue
+        reference: fieldValue as ResourceIdentifier
       }
     },
     address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)

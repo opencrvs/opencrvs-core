@@ -18,5 +18,9 @@ export async function getRecordById(
     }
   })
 
+  if (!res.ok) {
+    throw new Error(`Failed to fetch record ${recordId}`)
+  }
+
   return res.json()
 }
