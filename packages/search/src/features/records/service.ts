@@ -37,7 +37,11 @@ export class RecordNotFoundError extends Error {
  * inside the bundle entries that are not resolved in the bundle.
  */
 function checkForUnresolvedReferences(bundle: Bundle) {
-  const EXCLUDED_PATHS = ['Location.partOf.reference']
+  const EXCLUDED_PATHS = [
+    'Location.partOf.reference',
+    'Composition.relatesTo.targetReference.reference',
+    'CompositionHistory.relatesTo.targetReference.reference'
+  ]
 
   function check(
     object: Record<string, any>,
