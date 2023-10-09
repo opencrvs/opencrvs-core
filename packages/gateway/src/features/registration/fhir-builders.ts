@@ -1527,7 +1527,7 @@ export const builders: IFieldBuilders = {
         SPOUSE_TITLE,
         fhirBundle
       )
-      spouse.gender = fieldValue as string
+      spouse.gender = fieldValue
     },
     identifier: createIDBuilder(SPOUSE_CODE, SPOUSE_TITLE),
     name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE),
@@ -1578,24 +1578,12 @@ export const builders: IFieldBuilders = {
         SPOUSE_TITLE,
         fhirBundle
       )
-      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue)
     },
     address: createAddressBuilder(SPOUSE_CODE, SPOUSE_TITLE),
     photo: createPhotoBuilder(SPOUSE_CODE, SPOUSE_TITLE),
-    deceased: (fhirBundle, fieldValue, context) => {
-      const spouse = selectOrCreatePersonResource(
-        SPOUSE_CODE,
-        SPOUSE_TITLE,
-        fhirBundle
-      )
-      spouse.deceasedBoolean = fieldValue as boolean
-    },
 
-    nationality: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
+    nationality: (fhirBundle: Bundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1603,11 +1591,7 @@ export const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
+    dateOfMarriage: (fhirBundle: Bundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1616,7 +1600,7 @@ export const builders: IFieldBuilders = {
       return createDateOfMarriageBuilder(person, fieldValue)
     },
     educationalAttainment: (
-      fhirBundle: ITemplatedBundle,
+      fhirBundle: Bundle,
       fieldValue: string,
       context: any
     ) => {
