@@ -922,7 +922,7 @@ function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
       })
     }
 
-    if (isRelatedPerson(resource) && resource.patient.reference) {
+    if (isRelatedPerson(resource) && resource.patient?.reference) {
       resource.patient.reference = getFromBundleById(
         bundle,
         resource.patient.reference.split('/')[1]

@@ -161,13 +161,13 @@ export type DocumentReference = WithStrictExtensions<
 }
 
 export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
-  patient: {
+  patient?: {
     reference: URNReference | URLReference | ResourceIdentifier
   }
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient: {
+  patient?: {
     reference: URLReference
   }
 }
@@ -237,9 +237,7 @@ export function getComposition<T extends Bundle>(bundle: T) {
     : Composition
 }
 
-export function isRelatedPerson(
-  resource: Resource
-): resource is fhir3.RelatedPerson {
+export function isRelatedPerson(resource: Resource): resource is RelatedPerson {
   return resource.resourceType === 'RelatedPerson'
 }
 
