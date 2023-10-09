@@ -13,10 +13,10 @@ import {
   getDraftInformantFullName,
   transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 
 describe('draftUtils tests', () => {
   describe('getDraftInformantFullName()', () => {

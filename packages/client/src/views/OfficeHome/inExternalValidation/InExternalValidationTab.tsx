@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { transformData } from '@client/search/transformer'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {

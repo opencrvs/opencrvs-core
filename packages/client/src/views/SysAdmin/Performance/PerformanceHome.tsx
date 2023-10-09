@@ -42,10 +42,10 @@ import { ApolloError } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
-import {
+import type {
   GQLCorrectionMetric,
   GQLTotalMetricsResult
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'

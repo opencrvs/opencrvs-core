@@ -15,12 +15,12 @@ import {
 } from '@client/declarations'
 import { IFormSectionData } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'

@@ -45,7 +45,7 @@ import {
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
+import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -53,7 +53,7 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   ApolloClient,
   ApolloError,
