@@ -768,7 +768,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
@@ -789,7 +789,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -809,7 +809,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation.changePhone(
