@@ -10,19 +10,12 @@ export async function getRecordByIdHandler(
   const includeHistoryResources =
     request.query.includeHistoryResources !== undefined
   try {
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.time('getRecordById')
-    }
     const bundle = await getRecordById(
       recordId,
       allowedStates,
       includeHistoryResources
     )
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.timeEnd('getRecordById')
-    }
+
     return bundle
   } catch (error) {
     if (error instanceof RecordNotFoundError) {

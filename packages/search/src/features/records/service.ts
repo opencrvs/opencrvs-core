@@ -10,7 +10,9 @@ import {
 } from '@opencrvs/commons/types'
 import { HEARTH_MONGO_URL } from '@search/constants'
 import { MongoClient } from 'mongodb'
-
+import { writeFileSync } from 'fs'
+import * as os from 'os'
+import { join } from 'path'
 import { sortBy, uniqBy } from 'lodash'
 
 const client = new MongoClient(HEARTH_MONGO_URL)
@@ -60,13 +62,15 @@ function checkForUnresolvedReferences(bundle: Bundle) {
           try {
             getFromBundleById(bundle, id)
           } catch (error) {
+            const dumpFile = join(os.tmpdir(), Date.now() + '.json')
+            writeFileSync(dumpFile, JSON.stringify(bundle))
             developmentTimeError(
               'Unresolved reference found: ' + value,
               'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned',
               'Resource:',
-              JSON.stringify(rootResource),
+              // JSON.stringify(rootResource),
               'Bundle',
-              JSON.stringify(bundle)
+              dumpFile
             )
             throw error
           }
@@ -857,15 +861,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    try {
-      checkForUnresolvedReferences(bundle)
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
-      // eslint-disable-next-line no-console
-      console.log(JSON.stringify(query))
-      throw error
-    }
+    checkForUnresolvedReferences(bundle)
   }
 
   const allEntries = uniqBy(
