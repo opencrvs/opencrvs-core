@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/certificate/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/certificate/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 // eslint-disable-next-line import/no-relative-parent-imports
 import mockCertificate from '../../../test/mockCertificate'
 
+const resolvers = rootResolvers as any
 const fetch = fetchAny as any
 
 beforeEach(() => {

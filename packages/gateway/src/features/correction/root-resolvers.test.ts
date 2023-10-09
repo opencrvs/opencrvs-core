@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/correction/root-resolvers'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-
+const resolvers = rootResolvers as any
 describe('Correction root resolvers', () => {
   let registerCertifyToken: string
   let declareToken: string

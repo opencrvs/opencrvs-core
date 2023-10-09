@@ -16,7 +16,6 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL,
   FHIR_OBSERVATION_CATEGORY_URL,
   EVENT_TYPE
 } from '@gateway/features/fhir/constants'
@@ -37,7 +36,14 @@ import * as jwt from 'jsonwebtoken'
 import { IAuthHeader } from '@opencrvs/commons'
 
 import * as fetchMock from 'jest-fetch-mock'
-import { Extension, isTask } from '@opencrvs/commons/types'
+import {
+  Extension,
+  isTask,
+  TrackingID,
+  URLReference,
+  OPENCRVS_SPECIFICATION_URL,
+  ResourceIdentifier
+} from '@opencrvs/commons/types'
 import {
   GQLAttachmentInputStatus,
   GQLBirthRegistrationInput
@@ -444,7 +450,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce22'
   )
-  expect(fhir.entry[7].resource.docStatus).toBe('amended')
+  expect(fhir.entry[7].resource.docStatus).toBe('approved')
   expect(fhir.entry[7].resource.created).toBe('2018-10-22')
   expect(fhir.entry[7].resource.type).toEqual({
     coding: [
@@ -726,7 +732,7 @@ test('should update a task document as rejected', async () => {
   const fhir: any = await updateFHIRTaskBundle(
     {
       fullUrl:
-        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc' as URLReference,
       resource: {
         resourceType: 'Task',
         intent: 'order',
@@ -741,7 +747,7 @@ test('should update a task document as rejected', async () => {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: { reference: 'DUMMY' }
+            valueReference: { reference: 'DUMMY' as ResourceIdentifier }
           }
         ],
         lastModified: '2018-11-28T15:13:57.492Z',
@@ -754,7 +760,7 @@ test('should update a task document as rejected', async () => {
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B1mW7jA'
+            value: 'B1mW7jA' as TrackingID
           }
         ],
         businessStatus: {

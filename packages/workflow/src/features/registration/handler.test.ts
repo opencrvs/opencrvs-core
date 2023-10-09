@@ -12,42 +12,6 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 // eslint-disable-next-line import/no-relative-parent-imports
-import { createServer } from '../../server'
-import {
-  testFhirBundle,
-  testFhirTaskBundle,
-  testFhirBundleWithIds,
-  mockFormDraft,
-  userMock,
-  fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
-  testFhirBundleWithIdsForDeath,
-  motherMock,
-  patientMock,
-  compositionMock,
-  deathCompositionMock,
-  testInProgressFhirBundle,
-  testInProgressDeathFhirBundle,
-  taskResouceMock,
-  deathTaskMock,
-  relatedPersonMock,
-  hearthResponseMock,
-  userResponseMock,
-  wrapInBundle,
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
-import { populateCompositionWithID } from '@workflow/features/registration/handler'
-import * as fetchAny from 'jest-fetch-mock'
-import {
-  ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
 import {
   Bundle,
   Composition,
@@ -57,8 +21,45 @@ import {
   Patient,
   RelatedPerson,
   Task,
+  TrackingID,
   URNReference
 } from '@opencrvs/commons/types'
+import { populateCompositionWithID } from '@workflow/features/registration/handler'
+import {
+  ASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
+import {
+  compositionMock,
+  deathCompositionMock,
+  deathTaskMock,
+  districtMock,
+  fieldAgentPractitionerMock,
+  fieldAgentPractitionerRoleMock,
+  hearthResponseMock,
+  informantSMSNotificationMock,
+  mockFormDraft,
+  motherMock,
+  officeMock,
+  patientMock,
+  relatedPersonMock,
+  taskResouceMock,
+  testFhirBundle,
+  testFhirBundleWithIds,
+  testFhirBundleWithIdsForDeath,
+  testFhirTaskBundle,
+  testInProgressDeathFhirBundle,
+  testInProgressFhirBundle,
+  unionMock,
+  upazilaMock,
+  userMock,
+  userResponseMock,
+  wrapInBundle
+} from '@workflow/test/utils'
+import * as fetchAny from 'jest-fetch-mock'
+import { cloneDeep } from 'lodash'
+import { createServer } from '../../server'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -1657,7 +1658,7 @@ describe('populateCompositionWithID', () => {
               },
               {
                 system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                value: 'BVORKPB'
+                value: 'BVORKPB' as TrackingID
               }
             ],
             extension: [
