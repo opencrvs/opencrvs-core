@@ -24,7 +24,7 @@ import {
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'

@@ -1,12 +1,16 @@
-import { Bundle, Resource, Task, findExtension } from '.'
+import { Bundle, Resource, Task, WithStrictExtensions, findExtension } from '.'
 
 export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
   use: string
 }
-export type Practitioner = Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
-  name: Array<OpenCRVSPractitionerName>
-  telecom: Array<fhir3.ContactPoint>
-}
+
+export type PractitionerRole = fhir3.PractitionerRole
+export type Practitioner = WithStrictExtensions<
+  Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
+    name: Array<OpenCRVSPractitionerName>
+    telecom: Array<fhir3.ContactPoint>
+  }
+>
 
 export function isPractitioner(resource: Resource): resource is Practitioner {
   return resource.resourceType === 'Practitioner'

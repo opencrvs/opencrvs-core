@@ -38,10 +38,7 @@ import {
   MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
-import {
-  ITemplatedBundle,
-  ITemplatedComposition
-} from '@gateway/features/registration/fhir-builders'
+
 import fetch from 'node-fetch'
 import {
   FHIR_URL,
@@ -77,6 +74,32 @@ import {
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import {
+  Bundle,
+  BundleEntry,
+  CodeableConcept,
+  Coding,
+  Composition,
+  CompositionSection,
+  DocumentReference,
+  Encounter,
+  EncounterParticipant,
+  Location,
+  Observation,
+  Patient,
+  PaymentReconciliation,
+  Practitioner,
+  QuestionnaireResponse,
+  Reference,
+  RelatedPerson,
+  Resource,
+  Task,
+  UnsavedResource,
+  findExtension,
+  getComposition,
+  isObservation
+} from '@opencrvs/commons/types'
+
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -87,18 +110,15 @@ export interface IEventDurationResponse {
 }
 export function findCompositionSectionInBundle(
   code: string,
-  fhirBundle: ITemplatedBundle
+  fhirBundle: Bundle
 ) {
-  return findCompositionSection(code, fhirBundle.entry[0].resource)
+  return findCompositionSection(code, getComposition(fhirBundle))
 }
 
-export function findCompositionSection(
-  code: string,
-  composition: ITemplatedComposition
-) {
+export function findCompositionSection(code: string, composition: Composition) {
   return (
     composition.section &&
-    composition.section.find((section: fhir.CompositionSection) => {
+    composition.section.find((section: CompositionSection) => {
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
@@ -110,8 +130,8 @@ export function findCompositionSection(
 export function selectOrCreatePersonResource(
   sectionCode: string,
   sectionTitle: string,
-  fhirBundle: ITemplatedBundle
-): fhir.Patient {
+  fhirBundle: Bundle
+): Patient {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let personEntry
@@ -119,7 +139,7 @@ export function selectOrCreatePersonResource(
     // create person
     const ref = uuid()
     const personSection = createPersonSection(ref, sectionCode, sectionTitle)
-    const composition = fhirBundle.entry[0].resource
+    const composition = getComposition(fhirBundle)
     composition.section.push(personSection)
     personEntry = createPersonEntryTemplate(ref)
     fhirBundle.entry.push(personEntry)
@@ -139,14 +159,14 @@ export function selectOrCreatePersonResource(
     )
   }
 
-  return personEntry.resource as fhir.Patient
+  return personEntry.resource as Patient
 }
 
 export function selectOrCreateEncounterResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   isCorrection?: boolean
-): fhir.Encounter {
+): Encounter {
   let sectionCode
   if (context.event === EVENT_TYPE.BIRTH) {
     sectionCode = isCorrection
@@ -169,7 +189,7 @@ export function selectOrCreateEncounterResource(
   if (!section) {
     const ref = uuid()
     const encounterSection = createEncounterSection(ref, sectionCode)
-    fhirBundle.entry[0].resource.section.push(encounterSection)
+    getComposition(fhirBundle).section.push(encounterSection)
     encounterEntry = createEncounter(ref)
     fhirBundle.entry.push(encounterEntry)
   } else {
@@ -188,7 +208,7 @@ export function selectOrCreateEncounterResource(
     )
   }
 
-  return encounterEntry.resource as fhir.Encounter
+  return encounterEntry.resource as Encounter
 }
 
 export function selectOrCreateObservationResource(
@@ -197,37 +217,32 @@ export function selectOrCreateObservationResource(
   categoryDescription: string,
   observationCode: string,
   observationDescription: string,
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Observation {
-  let observation = fhirBundle.entry.find((entry) => {
-    if (
-      !entry ||
-      !entry.resource ||
-      entry.resource.resourceType !== 'Observation'
-    ) {
+): Observation | UnsavedResource<Observation> {
+  let observation: Observation | UnsavedResource<Observation> | undefined
+
+  observation = fhirBundle.entry
+    .map(({ resource }) => resource)
+    .filter(isObservation)
+    .find((entry) => {
+      const obCoding =
+        entry.code &&
+        entry.code.coding &&
+        entry.code.coding.find((obCode) => obCode.code === observationCode)
+      if (obCoding) {
+        return true
+      }
       return false
-    }
-    const observationEntry = entry.resource as fhir.Observation
-    const obCoding =
-      observationEntry.code &&
-      observationEntry.code.coding &&
-      observationEntry.code.coding.find(
-        (obCode) => obCode.code === observationCode
-      )
-    if (obCoding) {
-      return true
-    }
-    return false
-  })
+    })
 
   if (observation) {
-    return observation.resource as fhir.Observation
+    return observation
   }
   /* Existing obseration not found for given type */
   observation = createObservationResource(sectionCode, fhirBundle, context)
   return updateObservationInfo(
-    observation as fhir.Observation,
+    observation,
     categoryCode,
     categoryDescription,
     observationCode,
@@ -236,12 +251,12 @@ export function selectOrCreateObservationResource(
 }
 
 export function updateObservationInfo(
-  observation: fhir.Observation,
+  observation: UnsavedResource<Observation>,
   categoryCode: string,
   categoryDescription: string,
   observationCode: string,
   observationDescription: string
-): fhir.Observation {
+): UnsavedResource<Observation> {
   const categoryCoding = {
     coding: [
       {
@@ -270,8 +285,8 @@ export function updateObservationInfo(
 
 export function selectObservationResource(
   observationCode: string,
-  fhirBundle: ITemplatedBundle
-): fhir.Observation | undefined {
+  fhirBundle: Bundle
+): Observation | undefined {
   let observation
   fhirBundle.entry.forEach((entry) => {
     if (
@@ -279,7 +294,7 @@ export function selectObservationResource(
       !entry.resource ||
       entry.resource.resourceType === 'Observation'
     ) {
-      const observationEntry = entry.resource as fhir.Observation
+      const observationEntry = entry.resource as Observation
       const obCoding =
         observationEntry.code &&
         observationEntry.code.coding &&
@@ -297,7 +312,7 @@ export function selectObservationResource(
 
 export async function removeObservationResource(
   observationCode: string,
-  fhirBundle: ITemplatedBundle
+  fhirBundle: Bundle
 ) {
   fhirBundle.entry.forEach((entry, index) => {
     if (
@@ -305,7 +320,7 @@ export async function removeObservationResource(
       !entry.resource ||
       entry.resource.resourceType === 'Observation'
     ) {
-      const observationEntry = entry.resource as fhir.Observation
+      const observationEntry = entry.resource as Observation
       const obCoding =
         observationEntry.code &&
         observationEntry.code.coding &&
@@ -321,9 +336,9 @@ export async function removeObservationResource(
 
 export function createObservationResource(
   sectionCode: string,
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Observation {
+): UnsavedResource<Observation> | Observation {
   const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
@@ -348,10 +363,10 @@ export function createObservationResource(
 
 export function selectOrCreateLocationRefResource(
   sectionCode: string,
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Location {
-  let locationEntry
+): Location | UnsavedResource<Location> {
+  let locationEntry: BundleEntry<UnsavedResource<Location>>
   const isCorrection = [
     BIRTH_CORRECTION_ENCOUNTER_CODE,
     DEATH_CORRECTION_ENCOUNTER_CODE
@@ -377,8 +392,9 @@ export function selectOrCreateLocationRefResource(
     }
     const locationElement = encounter.location[0]
     locationEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === locationElement.location.reference
-    )
+      (entry): entry is BundleEntry<UnsavedResource<Location>> =>
+        entry.fullUrl === locationElement.location.reference
+    )!
   }
 
   if (!locationEntry) {
@@ -387,13 +403,13 @@ export function selectOrCreateLocationRefResource(
     )
   }
 
-  return locationEntry.resource as fhir.Location
+  return locationEntry.resource
 }
 
 export function selectOrCreateEncounterParticipant(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Reference {
+): Reference {
   const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   if (!encounter.participant || !encounter.participant[0]) {
     encounter.participant = [{}]
@@ -402,13 +418,13 @@ export function selectOrCreateEncounterParticipant(
 }
 
 export function selectOrCreateEncounterPartitioner(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Practitioner {
+): Practitioner {
   const encounterParticipant = selectOrCreateEncounterParticipant(
     fhirBundle,
     context
-  ) as fhir.EncounterParticipant
+  ) as EncounterParticipant
   let practitioner
   if (
     !encounterParticipant.individual ||
@@ -430,14 +446,14 @@ export function selectOrCreateEncounterPartitioner(
       )
     }
   }
-  return practitioner.resource as fhir.Practitioner
+  return practitioner.resource as Practitioner
 }
 
 export function selectOrCreateEncounterLocationRef(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   correction?: boolean
-): fhir.Reference {
+): Reference {
   const encounter = selectOrCreateEncounterResource(
     fhirBundle,
     context,
@@ -459,10 +475,10 @@ export function selectOrCreateEncounterLocationRef(
 export function selectOrCreateDocRefResource(
   sectionCode: string,
   sectionTitle: string,
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   indexKey: string
-): fhir.DocumentReference {
+): DocumentReference {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let docRef
@@ -475,7 +491,7 @@ export function selectOrCreateDocRefResource(
     docSection.entry[context._index[indexKey]] = {
       reference: `urn:uuid:${ref}`
     }
-    fhirBundle.entry[0].resource.section.push(docSection)
+    getComposition(fhirBundle).section.push(docSection)
     docRef = createDocRefTemplate(ref)
     fhirBundle.entry.push(docRef)
   } else {
@@ -507,15 +523,15 @@ export function selectOrCreateDocRefResource(
     }
   }
 
-  return docRef.resource as fhir.DocumentReference
+  return docRef.resource as DocumentReference
 }
 
 export function selectOrCreateCertificateDocRefResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   eventType: string,
   isCorrection?: boolean
-): fhir.DocumentReference {
+): DocumentReference {
   const certificate = isCorrection
     ? {
         code: CORRECTION_CERTIFICATE_DOCS_CODE,
@@ -534,7 +550,7 @@ export function selectOrCreateCertificateDocRefResource(
     context,
     certificate.indexKey
   )
-  if (!docRef.type) {
+  if (!docRef.type?.coding) {
     docRef.type = {
       coding: [
         {
@@ -550,8 +566,8 @@ export function selectOrCreateCertificateDocRefResource(
 export function selectOrCreateInformantSection(
   sectionCode: string,
   sectionTitle: string,
-  fhirBundle: ITemplatedBundle
-): fhir.RelatedPerson {
+  fhirBundle: Bundle
+): RelatedPerson {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let informantEntry
@@ -559,7 +575,7 @@ export function selectOrCreateInformantSection(
     // create person
     const ref = uuid()
     const informantSection = createPersonSection(ref, sectionCode, sectionTitle)
-    const composition = fhirBundle.entry[0].resource
+    const composition = getComposition(fhirBundle)
     composition.section.push(informantSection)
     informantEntry = createRelatedPersonTemplate(ref)
     fhirBundle.entry.push(informantEntry)
@@ -579,12 +595,10 @@ export function selectOrCreateInformantSection(
     )
   }
 
-  return informantEntry.resource as fhir.RelatedPerson
+  return informantEntry.resource as RelatedPerson
 }
 
-export function selectOrCreateInformantResource(
-  fhirBundle: ITemplatedBundle
-): fhir.Patient {
+export function selectOrCreateInformantResource(fhirBundle: Bundle): Patient {
   const relatedPersonResource = selectOrCreateInformantSection(
     INFORMANT_CODE,
     INFORMANT_TITLE,
@@ -598,7 +612,7 @@ export function selectOrCreateInformantResource(
     relatedPersonResource.patient = {
       reference: personEntry.fullUrl
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   } else {
     const personEntry = fhirBundle.entry.find(
       (entry) => entry.fullUrl === patientRef
@@ -608,15 +622,15 @@ export function selectOrCreateInformantResource(
         'No related informant person entry not found on fhir bundle'
       )
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   }
 }
 
 export function selectOrCreateWitnessResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   code: string,
   title: string
-): fhir.Patient {
+): Patient {
   const relatedPersonResource = selectOrCreateInformantSection(
     code,
     title,
@@ -630,7 +644,7 @@ export function selectOrCreateWitnessResource(
     relatedPersonResource.patient = {
       reference: personEntry.fullUrl
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   } else {
     const personEntry = fhirBundle.entry.find(
       (entry) => entry.fullUrl === patientRef
@@ -640,15 +654,15 @@ export function selectOrCreateWitnessResource(
         'No related informant person entry not found on fhir bundle'
       )
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   }
 }
 
 export function selectOrCreateRelatedPersonResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   eventType: string
-): fhir.RelatedPerson {
+): RelatedPerson {
   const docRef = selectOrCreateCertificateDocRefResource(
     fhirBundle,
     context,
@@ -657,9 +671,9 @@ export function selectOrCreateRelatedPersonResource(
   if (!docRef.extension) {
     docRef.extension = []
   }
-  const relatedPersonExt = docRef.extension.find(
-    (extention) =>
-      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
+  const relatedPersonExt = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+    docRef.extension
   )
   if (!relatedPersonExt) {
     const relatedPersonEntry = createRelatedPersonTemplate(uuid())
@@ -681,15 +695,15 @@ export function selectOrCreateRelatedPersonResource(
     if (!relatedPersonEntry) {
       throw new Error('No related person entry found on bundle')
     }
-    return relatedPersonEntry.resource as fhir.RelatedPerson
+    return relatedPersonEntry.resource as RelatedPerson
   }
 }
 
 export function selectOrCreateCollectorPersonResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   eventType: string
-): fhir.Patient {
+): Patient {
   const relatedPersonResource = selectOrCreateRelatedPersonResource(
     fhirBundle,
     context,
@@ -703,7 +717,7 @@ export function selectOrCreateCollectorPersonResource(
     relatedPersonResource.patient = {
       reference: personEntry.fullUrl
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   } else {
     const personEntry = fhirBundle.entry.find(
       (entry) => entry.fullUrl === patientRef
@@ -713,14 +727,14 @@ export function selectOrCreateCollectorPersonResource(
         'No related collector person entry not found on fhir bundle'
       )
     }
-    return personEntry.resource as fhir.Patient
+    return personEntry.resource as Patient
   }
 }
 
 export async function setCertificateCollectorReference(
   sectionCode: string,
-  relatedPerson: fhir.RelatedPerson,
-  fhirBundle: ITemplatedBundle,
+  relatedPerson: RelatedPerson,
+  fhirBundle: Bundle,
   context: any
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -737,7 +751,7 @@ export async function setCertificateCollectorReference(
     }
   } else {
     const composition = await fetchFHIR(
-      `/Composition/${fhirBundle.entry[0].resource.id}`,
+      `/Composition/${getComposition(fhirBundle).id}`,
       context.authHeader
     )
 
@@ -751,11 +765,11 @@ export async function setCertificateCollectorReference(
 }
 
 export function selectOrCreatePaymentReconciliationResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any,
   eventType: string,
   isCorrection?: boolean
-): fhir.PaymentReconciliation {
+): PaymentReconciliation {
   const docRef = selectOrCreateCertificateDocRefResource(
     fhirBundle,
     context,
@@ -765,9 +779,9 @@ export function selectOrCreatePaymentReconciliationResource(
   if (!docRef.extension) {
     docRef.extension = []
   }
-  const paymentExt = docRef.extension.find(
-    (extention) =>
-      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/payment`
+  const paymentExt = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
+    docRef.extension
   )
   if (!paymentExt) {
     const paymentEntry = createPaymentReconciliationTemplate(uuid())
@@ -789,15 +803,15 @@ export function selectOrCreatePaymentReconciliationResource(
     if (!paymentEntry) {
       throw new Error('No related payment entry found on bundle')
     }
-    return paymentEntry.resource as fhir.PaymentReconciliation
+    return paymentEntry.resource as PaymentReconciliation
   }
 }
 
 export function selectOrCreateQuestionnaireResource(
   sectionCode: string,
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.QuestionnaireResponse {
+): QuestionnaireResponse {
   const questionnaire = fhirBundle.entry.find((entry) => {
     if (
       !entry ||
@@ -811,7 +825,7 @@ export function selectOrCreateQuestionnaireResource(
   })
 
   if (questionnaire) {
-    return questionnaire.resource as fhir.QuestionnaireResponse
+    return questionnaire.resource as QuestionnaireResponse
   }
 
   const encounter = selectOrCreateEncounterResource(fhirBundle, context)
@@ -837,9 +851,9 @@ export function selectOrCreateQuestionnaireResource(
 }
 
 export function selectOrCreateTaskRefResource(
-  fhirBundle: ITemplatedBundle,
+  fhirBundle: Bundle,
   context: any
-): fhir.Task {
+): Task {
   let taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find((entry) => {
@@ -850,53 +864,84 @@ export function selectOrCreateTaskRefResource(
     })
   if (!taskEntry) {
     taskEntry = createTaskRefTemplate(uuid(), context.event)
-    const taskResource = taskEntry.resource as fhir.Task
+    const taskResource = taskEntry.resource as Task
     if (!taskResource.focus) {
       taskResource.focus = { reference: '' }
     }
     taskResource.focus.reference = fhirBundle.entry[0].fullUrl
     fhirBundle.entry.push(taskEntry)
   }
-  return taskEntry.resource as fhir.Task
+  return taskEntry.resource as Task
 }
-export function setObjectPropInResourceArray(
-  resource: fhir.Resource,
-  label: string,
-  value: string | string[] | Record<string, unknown>,
-  propName: string,
-  context: any,
-  contextProperty?: string
+type ItemType<T> = T extends Array<infer U> ? U : never
+
+type KeysWithArrayValues<T> = {
+  [K in keyof T]: T[K] extends any[] | undefined ? K : never
+}[keyof T]
+
+type TakeIdentifierHackIntoAccount<KeyOfResource, ExpectedType> =
+  KeyOfResource extends 'identifier'
+    ? ExpectedType extends CodeableConcept
+      ? string
+      : ExpectedType
+    : ExpectedType
+
+export function setObjectPropInResourceArray<
+  ResourceType extends Resource,
+  KeyOfResource extends KeysWithArrayValues<ResourceType>,
+  NestedKey extends keyof ItemType<ResourceType[KeyOfResource]>,
+  QueryContext extends {
+    _index: Partial<Record<KeyOfResource, number>>
+  }
+>(
+  resource: ResourceType,
+  label: KeyOfResource,
+  value: ResourceType[KeyOfResource] extends Array<infer U> | undefined
+    ? NestedKey extends keyof U
+      ? TakeIdentifierHackIntoAccount<KeyOfResource, U[NestedKey]>
+      : never
+    : never,
+  propName: NestedKey,
+  context: QueryContext,
+  contextProperty?: KeyOfResource
 ) {
+  type ArrayInResourceKeys = ResourceType[KeyOfResource]
+  type ArrayItem = ArrayInResourceKeys[keyof ArrayInResourceKeys]
   if (!resource[label]) {
-    resource[label] = []
+    resource[label] = [] as ArrayInResourceKeys
   }
 
   if (contextProperty) {
-    if (!resource[label][context._index[contextProperty]]) {
-      resource[label][context._index[contextProperty]] = {}
+    const arrayIndex = context._index[
+      contextProperty
+    ] as keyof ArrayInResourceKeys
+
+    if (!resource[label][arrayIndex]) {
+      resource[label][arrayIndex] = {} as ArrayItem
     }
-    resource[label][context._index[contextProperty]][propName] = value
+    resource[label][arrayIndex][propName as keyof ArrayItem] = value
   } else {
-    if (!resource[label][context._index[label]]) {
-      resource[label][context._index[label]] = {}
+    const indexLabel = context._index[label] as keyof ArrayInResourceKeys
+    if (!resource[label][indexLabel]) {
+      resource[label][indexLabel] = {} as ArrayItem
     }
     if (label === 'identifier' && propName === 'type') {
-      resource[label][context._index[label]][propName] = {
+      resource[label][indexLabel][propName as keyof ArrayItem] = {
         coding: [
           {
             system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
             code: value
           }
         ]
-      }
+      } as ArrayItem[keyof ArrayItem]
     } else {
-      resource[label][context._index[label]][propName] = value
+      resource[label][indexLabel][propName as keyof ArrayItem] = value
     }
   }
 }
 
 export function setQuestionnaireItem(
-  questionnaire: fhir.QuestionnaireResponse,
+  questionnaire: QuestionnaireResponse,
   context: any,
   label: string | null,
   value: string | null
@@ -919,31 +964,19 @@ export function setQuestionnaireItem(
   }
 }
 
-export function setArrayPropInResourceObject(
-  resource: fhir.Resource,
-  label: string,
-  value: Array<{}>,
-  propName: string
-) {
+export function setArrayPropInResourceObject<
+  T extends Resource,
+  L extends keyof T
+>(resource: T, label: L, value: Array<{}>, propName: string) {
   if (!resource[label]) {
-    resource[label] = {}
+    resource[label] = {} as T[L]
   }
-  resource[label][propName] = value
+  resource[label][propName as keyof T[L]] = value as T[L][keyof T[L]]
 }
 
-export function findExtension(
-  url: string,
-  extensions: fhir.Extension[] | undefined
-): fhir.Extension | undefined {
-  const extension =
-    extensions &&
-    extensions.find((obj: fhir.Extension) => {
-      return obj.url === url
-    })
-  return extension
-}
+export { findExtension } from '@opencrvs/commons/types'
 
-export function getDownloadedExtensionStatus(task: fhir.Task) {
+export function getDownloadedExtensionStatus(task: Task) {
   const extension =
     task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
   return extension?.valueString
@@ -980,7 +1013,7 @@ export async function setCertificateCollector(
   return details
 }
 export async function getCertificatesFromTask(
-  task: fhir.Task,
+  task: Task,
   _: any,
   authHeader: IAuthHeader
 ) {
@@ -990,7 +1023,7 @@ export async function getCertificatesFromTask(
     )
   }
 
-  const compositionBundle = await fetchFHIR(
+  const compositionBundle = await fetchFHIR<Bundle<Composition>>(
     `/${task.focus.reference}/_history`,
     authHeader
   )
@@ -999,24 +1032,18 @@ export async function getCertificatesFromTask(
     return null
   }
 
-  return compositionBundle.entry.map(
-    async (compositionEntry: fhir.BundleEntry) => {
-      const certSection = findCompositionSection(
-        CERTIFICATE_DOCS_CODE,
-        compositionEntry.resource as ITemplatedComposition
-      )
-      if (
-        !certSection ||
-        !certSection.entry ||
-        !(certSection.entry.length > 0)
-      ) {
-        return null
-      }
-      return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
+  return compositionBundle.entry.map(async (compositionEntry) => {
+    const certSection = findCompositionSection(
+      CERTIFICATE_DOCS_CODE,
+      compositionEntry.resource
+    )
+    if (!certSection || !certSection.entry || !(certSection.entry.length > 0)) {
+      return null
     }
-  )
+    return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
+  })
 }
-export function getActionFromTask(task: fhir.Task) {
+export function getActionFromTask(task: Task) {
   const extensions = task.extension || []
 
   if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
@@ -1042,7 +1069,7 @@ export function getActionFromTask(task: fhir.Task) {
   }
   if (
     task.businessStatus?.coding?.find(
-      (coding: fhir.Coding) => coding.code === 'CORRECTION_REQUESTED'
+      (coding: Coding) => coding.code === 'CORRECTION_REQUESTED'
     )
   ) {
     if (task.status === 'requested') {
@@ -1055,9 +1082,9 @@ export function getActionFromTask(task: fhir.Task) {
   }
   return null
 }
-export function getStatusFromTask(task: fhir.Task) {
+export function getStatusFromTask(task: Task) {
   const statusType = task.businessStatus?.coding?.find(
-    (coding: fhir.Coding) =>
+    (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
   return statusType && (statusType.code as GQLRegStatus)
@@ -1082,7 +1109,7 @@ export function getMaritalStatusCode(fieldValue: string) {
 }
 
 export async function removeDuplicatesFromComposition(
-  composition: fhir.Composition,
+  composition: Composition,
   compositionId: string,
   duplicateId?: string
 ) {
@@ -1090,7 +1117,7 @@ export async function removeDuplicatesFromComposition(
     const removeAllDuplicates = compositionId === duplicateId
     const updatedRelatesTo =
       composition.relatesTo &&
-      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+      composition.relatesTo.filter((relatesTo) => {
         return (
           relatesTo.code !== 'duplicate' ||
           (!removeAllDuplicates &&
@@ -1354,14 +1381,12 @@ export const getEventDurationsFromMetrics = async (
     })
 }
 
-export function getCompositionFromBundle(
-  bundle: fhir.Bundle
-): fhir.Composition {
+export function getCompositionFromBundle(bundle: Bundle): Composition {
   const composition = bundle.entry
     ?.map(({ resource }) => resource)
-    ?.filter((resource): resource is fhir.Resource => Boolean(resource))
+    ?.filter((resource): resource is Resource => Boolean(resource))
     .find(
-      (resource): resource is fhir.Composition =>
+      (resource): resource is Composition =>
         resource.resourceType === 'Composition'
     )
 
@@ -1373,7 +1398,7 @@ export function getCompositionFromBundle(
 }
 
 export async function getDeclarationIdsFromResponse(
-  resBody: fhir.Bundle,
+  resBody: Bundle,
   authHeader: IAuthHeader,
   compId?: string
 ) {
@@ -1398,14 +1423,14 @@ export async function getDeclarationIds(
 }
 
 export async function getCompositionIdFromResponse(
-  resBody: fhir.Bundle,
+  resBody: Bundle,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
   return { compositionId: getIDFromResponse(resBody) }
 }
 
-export function getIDFromResponse(resBody: fhir.Bundle): string {
+export function getIDFromResponse(resBody: Bundle): string {
   if (
     !resBody ||
     !resBody.entry ||
@@ -1419,24 +1444,11 @@ export function getIDFromResponse(resBody: fhir.Bundle): string {
   return resBody.entry[0].response.location.split('/')[3]
 }
 
-export function isTaskResponse(resBody: fhir.Bundle): boolean {
-  if (
-    !resBody ||
-    !resBody.entry ||
-    !resBody.entry[0] ||
-    !resBody.entry[0].response ||
-    !resBody.entry[0].response.location
-  ) {
-    throw new Error(`FHIR did not send a valid response`)
-  }
-  return resBody.entry[0].response.location.indexOf('Task') > -1
-}
-
 export function setInformantReference(
   sectionCode: string,
   sectionTitle: string,
-  relatedPerson: fhir.RelatedPerson,
-  fhirBundle: ITemplatedBundle,
+  relatedPerson: RelatedPerson,
+  fhirBundle: Bundle,
   context: any
 ) {
   selectOrCreatePersonResource(sectionCode, sectionTitle, fhirBundle)
@@ -1457,7 +1469,7 @@ export function setInformantReference(
   }
 }
 
-export function hasRequestCorrectionExtension(task: fhir.Task) {
+export function hasRequestCorrectionExtension(task: Task) {
   const extension =
     task.extension &&
     findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
@@ -1504,6 +1516,8 @@ export function isBase64FileString(str: string) {
 }
 
 export async function fetchTaskByCompositionIdFromHearth(id: string) {
-  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  const task = await fetchFromHearth<Bundle<Task>>(
+    `/Task?focus=Composition/${id}`
+  )
   return task
 }

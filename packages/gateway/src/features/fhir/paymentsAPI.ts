@@ -11,7 +11,8 @@
  */
 
 // eslint-disable-next-line import/no-relative-parent-imports
-import { FHIR_URL } from '../../constants'
+import { FHIR_URL } from '@gateway/constants'
+import { PaymentReconciliation } from '@opencrvs/commons/types'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class LocationsAPI extends RESTDataSource {
@@ -29,7 +30,7 @@ export default class LocationsAPI extends RESTDataSource {
     request.headers.set('Content-Type', 'application/fhir+json')
   }
 
-  getPayment(id: string): Promise<fhir.PaymentReconciliation> {
+  getPayment(id: string): Promise<PaymentReconciliation> {
     return this.get(`/${id}`)
   }
 }

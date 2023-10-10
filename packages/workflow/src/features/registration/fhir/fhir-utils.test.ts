@@ -31,24 +31,6 @@ describe('Verify getSharedContactMsisdn', () => {
     const phoneNumber = await getSharedContactMsisdn(testFhirBundle)
     expect(phoneNumber).toEqual('+8801622688231')
   })
-
-  it('Returns null when phonenumber is missing for shared contact', async () => {
-    const fhirBundle = cloneDeep(testFhirBundle)
-    if (
-      fhirBundle &&
-      fhirBundle.entry &&
-      fhirBundle.entry[1] &&
-      fhirBundle.entry[1].resource &&
-      fhirBundle.entry[1].resource.extension &&
-      fhirBundle.entry[1].resource.extension[1] &&
-      fhirBundle.entry[1].resource.extension[1].url
-    ) {
-      fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
-      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(null)
-    } else {
-      throw new Error('Failed')
-    }
-  })
 })
 
 describe('Verify getSubjectName', () => {

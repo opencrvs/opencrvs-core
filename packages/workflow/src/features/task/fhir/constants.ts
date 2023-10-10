@@ -10,12 +10,21 @@
  */
 import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 
-export const REINSTATED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
-export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-export const ASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-export const VERIFIED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`
-export const UNASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned`
-export const MAKE_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection`
-export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
-export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
-export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`
+export const REINSTATED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` as const
+export const DOWNLOADED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded` as const
+export const ASSIGNED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned` as const
+export const VERIFIED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regVerified` as const
+export const UNASSIGNED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
+export const MAKE_CORRECTION_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection` as const
+export const VIEWED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regViewed` as const
+export const MARKED_AS_NOT_DUPLICATE =
+  `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
+export const MARKED_AS_DUPLICATE =
+  `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const

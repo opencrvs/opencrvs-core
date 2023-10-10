@@ -8,46 +8,89 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
+} from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
+import { Bundle } from '@opencrvs/commons/types'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
-export type IFieldBuilderFunction = (
-  accumulatedObj: any,
-  fieldValue: string | number | boolean,
-  context: any
-) => void
+export type Context<A extends string | number | symbol = never> = {
+  authHeader: IAuthHeader
+  event: EVENT_TYPE
+  _index: { [Key in A]: number }
+}
+export type IFieldBuilderFunction<
+  Key extends string | number | symbol,
+  FieldType
+> = (
+  accumulatedObj: Bundle,
+  fieldValue: NonNullable<FieldType>,
+  context: Context<Key>
+) => Promise<Bundle | void | boolean> | Bundle | void | boolean
 
-export interface IFieldBuilders {
-  [key: string]: IFieldBuilderFunction | IFieldBuilders
+type AllInputs = GQLBirthRegistrationInput &
+  GQLDeathRegistrationInput &
+  GQLMarriageRegistrationInput
+
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
+
+export type IFieldBuilders<
+  RootKey extends string | number | symbol = '',
+  Root extends Record<string, any> = AllInputs
+> = {
+  [Key in keyof Root]: IfAny<
+    Root[Key],
+    IFieldBuilderFunction<RootKey | Key, any>,
+    // Value is an array, take the inner item
+    NonNullable<Root[Key]> extends Array<infer Item>
+      ? // If the inner item is a record, keep on recursing
+        NonNullable<Item> extends Record<any, any>
+        ? IFieldBuilders<RootKey | Key, NonNullable<Item>>
+        : // Otherwise expect a builder function
+          IFieldBuilderFunction<RootKey | Key, Item>
+      : // If it's not an array, but a record instead
+      NonNullable<Root[Key]> extends Record<any, any>
+      ? // Keep on recursing
+        IFieldBuilders<RootKey | Key, NonNullable<Root[Key]>>
+      : // Otherwise expect a builder function
+        IFieldBuilderFunction<RootKey | Key, Root[Key]>
+  >
 }
 
 function isFieldBuilder(
-  x: IFieldBuilderFunction | IFieldBuilders
+  x: IFieldBuilderFunction<any, any> | IFieldBuilders
 ): x is IFieldBuilders {
   return typeof x === 'object'
 }
 
 function isBuilderFunction(
-  x: IFieldBuilderFunction | IFieldBuilders
-): x is IFieldBuilderFunction {
+  x: IFieldBuilderFunction<any, any> | IFieldBuilders
+): x is IFieldBuilderFunction<any, any> {
   return typeof x === 'function'
 }
 
 async function transformField(
   sourceVal: any,
   targetObj: any,
-  fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
-  context: { authHeader: IAuthHeader },
+  fieldBuilderForVal: IFieldBuilderFunction<any, any> | IFieldBuilders,
+  context: Context<any>,
   currentPropNamePath: string[]
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      await transformObj(
+      const result = await transformObj(
         sourceVal,
         targetObj,
         fieldBuilderForVal,
         context,
         currentPropNamePath
       )
+      if (result) {
+        targetObj = result
+      }
       return targetObj
     }
 
@@ -61,7 +104,10 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    await fieldBuilderForVal(targetObj, sourceVal, context)
+    const result = await fieldBuilderForVal(targetObj, sourceVal, context)
+    if (result) {
+      targetObj = result
+    }
     return targetObj
   }
 
@@ -76,14 +122,16 @@ async function transformField(
 
 export default async function transformObj(
   sourceObj: Record<string, unknown>,
-  targetObj: Record<string, unknown>,
+  bundle: Bundle,
   fieldBuilders: IFieldBuilders,
-  context: { _index?: any; authHeader: IAuthHeader },
+  context: Context<any>,
   currentPropNamePath: string[] = []
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
   sourceObj = Object.assign({}, sourceObj)
+  let targetObj = bundle
+
   for (const currentPropName in sourceObj) {
     if (sourceObj.hasOwnProperty(currentPropName)) {
       if (Array.isArray(sourceObj[currentPropName])) {
@@ -92,29 +140,31 @@ export default async function transformObj(
         ).entries()) {
           context._index = { ...context._index, [currentPropName]: index }
 
-          /* context._index = {
-            [currentPropName]: index
-          } */
-
-          await transformField(
+          const result = await transformField(
             arrayVal,
             targetObj,
-            fieldBuilders[currentPropName],
+            fieldBuilders[currentPropName as keyof typeof fieldBuilders] as any,
             context,
             currentPropNamePath.concat(currentPropName)
           )
+          if (result) {
+            targetObj = result
+          }
         }
 
         continue
       }
 
-      await transformField(
+      const result = await transformField(
         sourceObj[currentPropName],
         targetObj,
-        fieldBuilders[currentPropName],
+        fieldBuilders[currentPropName as keyof typeof fieldBuilders] as any,
         context,
         currentPropNamePath.concat(currentPropName)
       )
+      if (result) {
+        targetObj = result
+      }
     }
   }
 
