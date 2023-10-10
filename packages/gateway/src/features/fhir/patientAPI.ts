@@ -10,7 +10,7 @@
  */
 // eslint-disable-next-line import/no-relative-parent-imports
 import { getResourceFromBundleById } from '@opencrvs/commons/types'
-import { FHIR_URL } from '../../constants'
+import { FHIR_URL } from '@gateway/constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class PatientAPI extends RESTDataSource {

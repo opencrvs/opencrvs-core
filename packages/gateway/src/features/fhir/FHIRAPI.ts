@@ -20,7 +20,7 @@ import {
   isSaved
 } from '@opencrvs/commons/types'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { FHIR_URL } from '../../constants'
+import { FHIR_URL } from '@gateway/constants'
 
 export default class FHIRAPI extends RESTDataSource<Context> {
   constructor() {
