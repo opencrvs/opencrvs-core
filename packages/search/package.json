@@ -87,7 +87,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@search/(.*)": "<rootDir>/src/$1"
+      "@search/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types"
     },
     "coverageReporters": [
       "json",

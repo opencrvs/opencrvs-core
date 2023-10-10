@@ -80,7 +80,7 @@ describe('elastic search utils', () => {
           operatorFirstNamesLocale: '',
           operatorOfficeName: 'Baniajan Union Parishad',
           operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
-          operationType: 'REGISTERED',
+          operationType: 'REGISTERED' as const,
           operatorRole: 'LOCAL_REGISTRAR'
         }
       ]
