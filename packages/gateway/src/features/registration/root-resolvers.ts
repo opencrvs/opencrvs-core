@@ -62,10 +62,6 @@ import {
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
 import {
-  hasBirthDuplicates,
-  hasDeathDuplicates
-} from '@gateway/features/search/service'
-import {
   ISystemModelData,
   IUserModelData,
   isSystem
@@ -847,58 +843,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  let isADuplicate = false
-  if (event === EVENT_TYPE.BIRTH) {
-    isADuplicate = await hasBirthDuplicates(
-      authHeader,
-      details as GQLBirthRegistrationInput
-    )
-  } else if (event === EVENT_TYPE.DEATH) {
-    isADuplicate = await hasDeathDuplicates(
-      authHeader,
-      details as GQLDeathRegistrationInput
-    )
-  }
-
-  const hasBeenFlaggedAsDuplicate = details.duplicate
-  if (isADuplicate && !hasBeenFlaggedAsDuplicate) {
-    details.duplicate = true
-  }
-
-  const draftId =
-    details && details.registration && details.registration.draftId
-
-  const existingComposition =
-    draftId && (await lookForComposition(draftId, authHeader))
-
-  if (existingComposition) {
-    if (hasScope(authHeader, 'register')) {
-      return { compositionId: existingComposition }
-    } else {
-      // return tracking-id
-      return await getDeclarationIds(existingComposition, authHeader)
-    }
-  }
-
-  const res = await createRequest('POST', '/create-record', authHeader, details)
-
-  /*
-   * Some custom logic added here. If you are a registar and
-   * we flagged the declaration as a duplicate, we push the declaration into
-   * "Ready for review" queue and not ready to print.
-   */
-
-  if (hasScope(authHeader, 'register') && !details.duplicate) {
-    // return the registrationNumber
-    return await getCompositionIdFromResponse(res, event, authHeader)
-  } else {
-    // return tracking-id and potential duplicates
-    const ids = await getDeclarationIdsFromResponse(res, authHeader)
-    return {
-      ...ids,
-      isPotentiallyDuplicate: details.duplicate
-    }
-  }
+  return createRequest('POST', '/create-record', authHeader, { details, event })
 }
 
 export async function lookForComposition(
