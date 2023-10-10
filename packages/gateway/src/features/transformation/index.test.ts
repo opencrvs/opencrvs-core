@@ -42,7 +42,7 @@ describe('Object transformation module', () => {
     )
 
     expect(initialObject).toEqual({
-      id: '123',
+      entry: [],
       gender: 'male',
       name: ['John Smith']
     })

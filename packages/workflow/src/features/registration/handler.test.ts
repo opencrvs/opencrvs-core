@@ -1847,7 +1847,7 @@ describe('populateCompositionWithID', () => {
             'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad' as URNReference,
           resource: {
             resourceType: 'Observation',
-            status: 'registered',
+            status: 'final',
             context: {
               reference:
                 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference
@@ -2122,7 +2122,12 @@ describe('populateCompositionWithID', () => {
           resource: {
             resourceType: 'Patient',
             active: true,
-            identifier: [{ value: '123456789', type: 'NATIONAL_ID' }],
+            identifier: [
+              {
+                value: '123456789',
+                type: { coding: [{ code: 'NATIONAL_ID' }] }
+              }
+            ],
             name: [{ use: 'en', family: ['Rahman'] }],
             maritalStatus: {
               coding: [
