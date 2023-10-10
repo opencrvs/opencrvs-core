@@ -72,7 +72,7 @@
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
     "@types/dotenv": "^6.1.0",
-    "@types/fhir": "^0.0.30",
+    "@types/fhir": "0.0.37",
     "@types/glob": "^5.0.35",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
@@ -137,7 +137,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@gateway/(.*)": "<rootDir>/src/$1"
+      "@gateway/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types"
     },
     "coverageReporters": [
       "json",

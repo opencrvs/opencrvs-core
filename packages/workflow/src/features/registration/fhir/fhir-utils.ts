@@ -41,7 +41,8 @@ import {
   OpenCRVSPatientName,
   Patient,
   Resource,
-  Task
+  Task,
+  findExtension
 } from '@opencrvs/commons/types'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
@@ -115,8 +116,9 @@ export async function getCRVSOfficeName(fhirBundle: Bundle) {
     )
   }
   const taskResource = getTaskResourceFromFhirBundle(fhirBundle as Bundle)
-  const regLastOfficeExt = taskResource?.extension?.find(
-    (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+  const regLastOfficeExt = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    taskResource?.extension || []
   )
   if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
     throw new Error('No last registration office found on the bundle')
@@ -340,15 +342,11 @@ export async function updateResourceInHearth(resource: Resource) {
 export function getPhoneNo(taskResource: Task, eventType: EVENT_TYPE) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
-    const phoneExtension =
-      taskResource &&
-      taskResource.extension &&
-      taskResource.extension.find((extension) => {
-        return (
-          extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
-        )
-      })
+    const phoneExtension = findExtension(
+      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
+      taskResource.extension || []
+    )
+
     phoneNumber = phoneExtension && phoneExtension.valueString
   }
   if (!phoneNumber) {
@@ -361,15 +359,11 @@ export function getPhoneNo(taskResource: Task, eventType: EVENT_TYPE) {
 export function getEmailAddress(taskResource: Task, eventType: EVENT_TYPE) {
   let emailAddress
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
-    const emailExtension =
-      taskResource &&
-      taskResource.extension &&
-      taskResource.extension.find((extension) => {
-        return (
-          extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
-        )
-      })
+    const emailExtension = findExtension(
+      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+      taskResource.extension || []
+    )
+
     emailAddress = emailExtension && emailExtension.valueString
   }
   if (!emailAddress) {

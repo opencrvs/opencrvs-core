@@ -41,7 +41,7 @@ export function transformMongoComparisonObject(
   return Object.keys(obj).reduce(
     (result, key) => ({
       ...result,
-      [`$${key}`]: obj[key]
+      [`$${key}`]: obj[key as keyof IComparisonObject]
     }),
     {}
   )

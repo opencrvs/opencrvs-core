@@ -6,6 +6,10 @@ export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
 
 type TaskIdentifier =
   | {
+      system: 'http://opencrvs.org/specs/id/mosip-aid'
+      value: string
+    }
+  | {
       system: 'http://opencrvs.org/specs/id/draft-id'
       value: string
     }
@@ -41,6 +45,12 @@ type TaskIdentifier =
       system: 'http://opencrvs.org/specs/id/paper-form-id'
       value: string
     }
+
+type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
+type AllSystems = ExtractSystem<TaskIdentifier>
+type AfterLastSlash<S extends string> =
+  S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
+export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
   Saved<fhir3.Task>,

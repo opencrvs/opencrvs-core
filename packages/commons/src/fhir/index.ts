@@ -2,6 +2,7 @@
 
 import { Nominal } from 'src/nominal'
 import { UUID } from 'src/uuid'
+import { Extension } from './extension'
 
 export * from './practitioner'
 export * from './task'
@@ -9,7 +10,16 @@ export * from './extension'
 export * from './payments'
 
 export type Resource = fhir3.Resource
+
+export type WithStrictExtensions<T extends Resource> = Omit<T, 'extension'> & {
+  extension?: Array<Extension>
+}
+
+/*
+ * Unsaved resource is a resource that has just been created and does not have an id yet
+ */
 export type UnsavedResource<T extends Resource> = Omit<T, 'id'>
+
 export type Saved<T> = Omit<T, 'id'> & {
   id: string
 }
@@ -33,6 +43,20 @@ export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
   fullUrl: string
 }
 
+/*
+ * A placeholder until someone writes better with Zod
+ */
+export function validateBundle(bundle: unknown): bundle is Bundle {
+  if (typeof bundle !== 'object' || bundle === null) {
+    throw new Error('Bundle must be an object')
+  }
+  if (!('entry' in bundle)) {
+    throw new Error('Bundle must have an entry list')
+  }
+
+  return true
+}
+
 export type Unsaved<T extends BundleEntry> = Omit<T, 'fullUrl' | 'resource'> & {
   fullUrl: `urn:uuid:${UUID}`
   resource: UnsavedResource<T['resource']>
@@ -47,29 +71,58 @@ export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use' | 'family'> & {
   family: string[]
 }
 
-type Address = Omit<fhir3.Address, 'type'> & {
-  type: 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
+export type Address = Omit<fhir3.Address, 'type'> & {
+  type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
 }
-
-export type Extension = fhir3.Extension
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
   coding: fhir3.Coding[]
 }
 
-export type Composition = Saved<fhir3.Composition>
+export type Composition = Omit<
+  Saved<fhir3.Composition>,
+  'relatesTo' | 'section'
+> & {
+  section: Array<CompositionSection>
+  relatesTo?: Array<
+    Omit<fhir3.CompositionRelatesTo, 'code'> & {
+      code: fhir3.CompositionRelatesTo['code'] | 'duplicate'
+    }
+  >
+}
 
-export type DocumentReference = Saved<Omit<fhir3.DocumentReference, 'indexed'>>
-
-export type Patient = Saved<
-  Omit<fhir3.Patient, 'name' | 'address'> & {
-    name: Array<OpenCRVSPatientName>
-    address?: Address[]
-    deceased?: boolean
+export type DocumentReference = WithStrictExtensions<
+  Saved<Omit<fhir3.DocumentReference, 'indexed' | 'docStatus'>> & {
+    indexed?: string
+    docStatus?: 'validated' | 'approved' | 'deleted'
   }
 >
+
+export type PatientIdentifier = fhir3.Identifier & {
+  otherType?: string
+  fieldsModifiedByIdentity?: string[]
+}
+
+export type Patient = WithStrictExtensions<
+  Saved<
+    Omit<fhir3.Patient, 'name' | 'address' | 'identifier'> & {
+      name: Array<OpenCRVSPatientName>
+      address?: Address[]
+      deceased?: boolean
+      identifier?: PatientIdentifier[]
+    }
+  >
+>
+
 export type RelatedPerson = Saved<fhir3.RelatedPerson>
-export type Location = Saved<fhir3.Location>
+export type Location = WithStrictExtensions<
+  Saved<
+    Omit<fhir3.Location, 'address'> & {
+      address?: Address
+    }
+  >
+>
+
 export type Encounter = Saved<
   Omit<fhir3.Encounter, 'location'> & {
     location: Array<{
@@ -97,8 +150,47 @@ export function isEncounter(resource: Resource): resource is Encounter {
   return resource.resourceType === 'Encounter'
 }
 
+export function isObservation(resource: Resource): resource is Observation {
+  return resource.resourceType === 'Observation'
+}
+
+export function getComposition(bundle: Bundle) {
+  const composition = bundle.entry
+    .map(({ resource }) => resource)
+    .find(isComposition)
+
+  if (!composition) {
+    throw new Error('Composition not found in bundle')
+  }
+
+  return composition
+}
+
 export function isRelatedPerson(
   resource: Resource
 ): resource is fhir3.RelatedPerson {
   return resource.resourceType === 'RelatedPerson'
+}
+
+export type Identifier = fhir3.Identifier
+export type Reference = fhir3.Reference
+export type Coding = fhir3.Coding
+export type QuestionnaireResponse = fhir3.QuestionnaireResponse
+export type CompositionRelatesTo = fhir3.CompositionRelatesTo
+
+export type CompositionSection = fhir3.CompositionSection
+export type EncounterParticipant = fhir3.EncounterParticipant
+
+type ItemType<T> = T extends Array<infer U> ? U : never
+export type TelecomSystem = ItemType<Patient['telecom']>['system']
+export type CodeableConcept = fhir3.CodeableConcept
+
+export function markSaved<T extends Resource>(
+  resource: T,
+  id: string
+): Saved<T> {
+  return {
+    ...resource,
+    id
+  }
 }

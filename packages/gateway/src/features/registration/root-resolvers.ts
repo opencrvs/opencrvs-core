@@ -37,7 +37,6 @@ import {
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  ITaskBundle,
   checkUserAssignment,
   taskBundleWithExtension
 } from '@gateway/features/registration/fhir-builders'
@@ -59,6 +58,14 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
+import {
+  Bundle,
+  Composition,
+  Extension,
+  Patient,
+  Task,
+  isComposition
+} from '@opencrvs/commons/types'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -90,8 +97,8 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
-      const compositions: fhir.Composition[] = res.entry.map(
-        ({ resource }: { resource: fhir.Composition }) => resource
+      const compositions: Composition[] = res.entry.map(
+        ({ resource }: { resource: Composition }) => resource
       )
 
       return compositions.filter(({ type }) =>
@@ -113,8 +120,8 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
-      const compositions: fhir.Composition[] = res.entry.map(
-        ({ resource }: { resource: fhir.Composition }) => resource
+      const compositions: Composition[] = res.entry.map(
+        ({ resource }: { resource: Composition }) => resource
       )
 
       return compositions.filter(({ type }) =>
@@ -169,7 +176,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const taskBundle = await fetchFHIR(
+        const taskBundle = await fetchFHIR<Bundle<Task>>(
           `/Task?identifier=${identifier}`,
           authHeader
         )
@@ -177,7 +184,7 @@ export const resolvers: GQLResolver = {
         if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
           throw new Error(`Task does not exist for identifer ${identifier}`)
         }
-        const task = taskBundle.entry[0].resource as fhir.Task
+        const task = taskBundle.entry[0].resource
 
         if (!task.focus || !task.focus.reference) {
           throw new Error(`Composition reference not found`)
@@ -195,8 +202,10 @@ export const resolvers: GQLResolver = {
     },
     async fetchRegistrationForViewing(_, { id }, { headers: authHeader }) {
       const taskEntry = await getTaskEntry(id, authHeader)
-      const extension = { url: VIEWED_EXTENSION_URL }
-      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: VIEWED_EXTENSION_URL
+      })
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return fetchFHIR(`/Composition/${id}`, authHeader)
@@ -207,14 +216,14 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        const personBundle = await fetchFHIR(
+        const personBundle = await fetchFHIR<Bundle<Patient>>(
           `/Patient?identifier=${identifier}`,
           authHeader
         )
         if (!personBundle || !personBundle.entry || !personBundle.entry[0]) {
           throw new Error(`Person does not exist for identifer ${identifier}`)
         }
-        const person = personBundle.entry[0].resource as fhir.Person
+        const person = personBundle.entry[0].resource
 
         return person
       } else {
@@ -322,7 +331,7 @@ export const resolvers: GQLResolver = {
 
         const taskBundle = taskBundleWithExtension(taskEntry, {
           url: VERIFIED_EXTENSION_URL,
-          valueString: headers['x-real-ip']
+          valueString: headers['x-real-ip']!
         })
         await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
@@ -631,21 +640,21 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition: fhir.Composition = await fetchFHIR(
+        const composition: Composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
           'GET'
         )
         await removeDuplicatesFromComposition(composition, id)
-        const compositionEntry: fhir.BundleEntry = {
+        const compositionEntry = {
           resource: composition
         }
 
         const taskEntry = await getTaskEntry(id, authHeader)
 
-        const extension: fhir.Extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const extension = { url: MARKED_AS_NOT_DUPLICATE }
         const taskBundle = taskBundleWithExtension(taskEntry, extension)
-        const payloadBundle: fhir.Bundle = {
+        const payloadBundle: Bundle = {
           ...taskBundle,
           entry: [compositionEntry, ...taskBundle.entry]
         }
@@ -694,7 +703,10 @@ export const resolvers: GQLResolver = {
       }
 
       const taskEntry = await getTaskEntry(id, authHeader)
-      const extension: fhir.Extension = { url: MARKED_AS_DUPLICATE }
+      const extension = {
+        url: MARKED_AS_DUPLICATE,
+        valueString: duplicateTrackingId
+      }
 
       if (comment || reason) {
         if (!taskEntry.resource.reason) {
@@ -704,14 +716,10 @@ export const resolvers: GQLResolver = {
         }
 
         taskEntry.resource.reason.text = reason || ''
-        const statusReason: fhir.CodeableConcept = {
+        const statusReason = {
           text: comment
         }
         taskEntry.resource.statusReason = statusReason
-      }
-
-      if (duplicateTrackingId) {
-        extension.valueString = duplicateTrackingId
       }
 
       const taskBundle = taskBundleWithExtension(taskEntry, extension)
@@ -753,8 +761,9 @@ async function createEventRegistration(
    */
   const hasDuplicates = Boolean(
     doc.entry
-      .find((entry) => entry.resource.resourceType === 'Composition')
-      ?.resource?.extension?.find(
+      .map((entry) => entry.resource)
+      .find(isComposition)
+      ?.extension?.find(
         (ext) =>
           ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
           ext.valueBoolean
@@ -778,7 +787,7 @@ export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {
-  const taskBundle = await fetchFHIR<fhir.Bundle>(
+  const taskBundle = await fetchFHIR<Bundle>(
     `/Task?identifier=${identifier}`,
     authHeader
   )
@@ -787,7 +796,7 @@ export async function lookForComposition(
     taskBundle &&
     taskBundle.entry &&
     taskBundle.entry[0] &&
-    (taskBundle.entry[0].resource as fhir.Task)
+    (taskBundle.entry[0].resource as Task)
 
   return (
     task &&
@@ -876,7 +885,7 @@ const ACTION_EXTENSIONS = [
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
-  const taskBundle: ITaskBundle = await fetchFHIR(
+  const taskBundle = await fetchFHIR<Bundle<Task>>(
     `/Task?focus=Composition/${compositionId}`,
     authHeader
   )
@@ -885,7 +894,8 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
     throw new Error('Task does not exist')
   }
   taskEntry.resource.extension = taskEntry.resource.extension?.filter(
-    ({ url }) => !ACTION_EXTENSIONS.includes(url)
+    ({ url }) =>
+      !ACTION_EXTENSIONS.includes(url as unknown as typeof ACTION_EXTENSIONS[0])
   )
   taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
     ({ system }) => system != systemIdentifierUrl
@@ -896,7 +906,7 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
   status: string
-): fhir.Extension {
+): Extension {
   if (
     inScope(authHeader, ['declare', 'recordsearch']) ||
     (hasScope(authHeader, 'validate') && status === GQLRegStatus.VALIDATED)
@@ -911,13 +921,13 @@ function getDownloadedOrAssignedExtension(
 }
 
 async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-  const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
+  const taskHistoryBundle: Bundle = await fetchFHIR(
     `/Task/${taskId}/_history`,
     authHeader
   )
 
   const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-    return taskEntry.resource as fhir.Task
+    return taskEntry.resource as Task
   })
 
   if (!taskHistory) {

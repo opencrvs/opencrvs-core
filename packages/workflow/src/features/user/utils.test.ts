@@ -12,7 +12,6 @@ import {
   getLoggedInPractitionerResource,
   getUser,
   getLoggedInPractitionerPrimaryLocation,
-  getPrimaryLocationFromLocationList,
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import {
@@ -28,7 +27,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 import * as fetchAny from 'jest-fetch-mock'
-import { Location, Practitioner } from '@opencrvs/commons/types'
+import { Practitioner } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 
@@ -278,139 +277,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
     )
   })
 })
-describe('Verify getPrimaryLocationFromLocationList', () => {
-  it('returns the primary location properly', () => {
-    const locations = [
-      JSON.parse(districtMock),
-      JSON.parse(upazilaMock),
-      JSON.parse(unionMock),
-      JSON.parse(officeMock)
-    ]
-    const primaryLocation = getPrimaryLocationFromLocationList(
-      locations as [Location]
-    )
-    expect(primaryLocation).toBeDefined()
-    expect(primaryLocation).toEqual(JSON.parse(unionMock))
-  })
-  it('throws error if no CRVS office is found', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UPAZILA'
-          }
-        ]
-      },
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ]
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [Location])
-    ).toThrowError('No CRVS office found')
-  })
-  it('throws error if no primary location for crvs office found', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ]
-      },
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'CRVS_OFFICE'
-          }
-        ],
-        type: {
-          coding: [{ code: 'CRVS_OFFICE' }]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'bu',
-              display: 'Building'
-            }
-          ]
-        }
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [Location])
-    ).toThrowError('No primary location found')
-  })
-  it('throws error if crvs office has a invalid location id', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'CRVS_OFFICE'
-          }
-        ],
-        partOf: {
-          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
-        },
-        type: {
-          coding: [{ code: 'CRVS_OFFICE' }]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'bu',
-              display: 'Building'
-            }
-          ]
-        }
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [Location])
-    ).toThrowError(
-      'No primary location not found for office: d33e4cb2-670e-4564-a8ed-c72baacdy48y'
-    )
-  })
-})
+
 describe('Verify getPractitionerRef', () => {
   it('returns practinioner ref properly', () => {
     const practitioner: Practitioner = {

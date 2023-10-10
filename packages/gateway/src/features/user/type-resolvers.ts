@@ -17,6 +17,12 @@ import {
   GQLSignatureInput,
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
+import {
+  Bundle,
+  Extension,
+  Practitioner,
+  PractitionerRole
+} from '@opencrvs/commons/types'
 
 interface IAuditHistory {
   auditedBy: string
@@ -115,7 +121,7 @@ async function getPractitionerByOfficeId(
   primaryOfficeId: string,
   authHeader: IAuthHeader
 ) {
-  const roleBundle: fhir.Bundle = await fetchFHIR(
+  const roleBundle: Bundle = await fetchFHIR(
     `/PractitionerRole?location=${primaryOfficeId}&role=LOCAL_REGISTRAR`,
     authHeader
   )
@@ -125,7 +131,7 @@ async function getPractitionerByOfficeId(
     roleBundle.entry &&
     roleBundle.entry &&
     roleBundle.entry.length > 0 &&
-    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+    (roleBundle.entry[0].resource as PractitionerRole)
 
   const roleCode =
     practitionerRole &&
@@ -143,9 +149,7 @@ async function getPractitionerByOfficeId(
   }
 }
 
-export function getSignatureExtension(
-  extensions: fhir.Extension[] | undefined
-): fhir.Extension | undefined {
+export function getSignatureExtension(extensions: Extension[] | undefined) {
   return findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
     extensions || []
@@ -208,7 +212,7 @@ export const userTypeResolvers: GQLResolver = {
         return
       }
 
-      const practitioner: fhir.Practitioner = await fetchFHIR(
+      const practitioner: Practitioner = await fetchFHIR(
         `/${practitionerId}`,
         authHeader
       )
@@ -234,7 +238,7 @@ export const userTypeResolvers: GQLResolver = {
       }
     },
     async signature(userModel: IUserModelData, _, { headers: authHeader }) {
-      const practitioner: fhir.Practitioner = await fetchFHIR(
+      const practitioner: Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader
       )

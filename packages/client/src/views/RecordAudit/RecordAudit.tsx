@@ -49,7 +49,7 @@ import {
   modifyDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
-import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Toast } from '@opencrvs/components/lib/Toast'

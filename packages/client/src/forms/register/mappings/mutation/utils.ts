@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { GQLRelatedPersonInput } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLRelatedPersonInput } from '@client/utils/gateway-deprecated-do-not-use'
 import { ICertificate, IFileValue, TransformedData } from '@client/forms'
 import { omit } from 'lodash'
 

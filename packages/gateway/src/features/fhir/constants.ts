@@ -22,24 +22,41 @@ export enum EVENT_TYPE {
   MARRIAGE = 'MARRIAGE'
 }
 
-export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-export const REINSTATED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
-export const ASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-export const VERIFIED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`
-export const UNASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned`
-export const MAKE_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection`
-export const REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/otherReason`
-export const REQUESTING_INDIVIDUAL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
-export const REQUESTING_INDIVIDUAL_OTHER = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividualOther`
-export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
-export const PAYMENT_DETAILS = `${OPENCRVS_SPECIFICATION_URL}extension/paymentDetails`
-export const NO_SUPPORTING_DOCUMENTATION_REQUIRED = `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`
-export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
-export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
-export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`
-export const DUPLICATE_TRACKING_ID = `${OPENCRVS_SPECIFICATION_URL}extension/duplicateTrackingId`
-export const FLAGGED_AS_POTENTIAL_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/flaggedAsPotentialDuplicate`
+export const DOWNLOADED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded` as const
+export const REINSTATED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` as const
+export const ASSIGNED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned` as const
+export const VERIFIED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regVerified` as const
+export const UNASSIGNED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
+export const MAKE_CORRECTION_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection` as const
+export const REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/otherReason` as const
+export const REQUESTING_INDIVIDUAL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual` as const
+export const REQUESTING_INDIVIDUAL_OTHER =
+  `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividualOther` as const
+export const HAS_SHOWED_VERIFIED_DOCUMENT =
+  `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument` as const
+export const PAYMENT_DETAILS =
+  `${OPENCRVS_SPECIFICATION_URL}extension/paymentDetails` as const
+export const NO_SUPPORTING_DOCUMENTATION_REQUIRED =
+  `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired` as const
+export const VIEWED_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regViewed` as const
+export const MARKED_AS_NOT_DUPLICATE =
+  `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
+export const MARKED_AS_DUPLICATE =
+  `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const
+export const DUPLICATE_TRACKING_ID =
+  `${OPENCRVS_SPECIFICATION_URL}extension/duplicateTrackingId` as const
+export const FLAGGED_AS_POTENTIAL_DUPLICATE =
+  `${OPENCRVS_SPECIFICATION_URL}extension/flaggedAsPotentialDuplicate` as const
 
-export const BIRTH_REG_NO = 'birth-registration-number'
-export const DEATH_REG_NO = 'death-registration-number'
-export const MARRIAGE_REG_NO = 'marriage-registration-number'
+export const BIRTH_REG_NO = 'birth-registration-number' as const
+export const DEATH_REG_NO = 'death-registration-number' as const
+export const MARRIAGE_REG_NO = 'marriage-registration-number' as const

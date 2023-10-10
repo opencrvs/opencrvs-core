@@ -60,7 +60,8 @@ import {
   Composition,
   Patient,
   Practitioner,
-  Task
+  Task,
+  findExtension
 } from '@opencrvs/commons/types'
 
 export async function modifyRegistrationBundle(
@@ -472,13 +473,9 @@ export async function setupLastRegLocation(
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserLastLocationExtension = taskResource.extension.find(
-    (extension) => {
-      return (
-        extension.url ===
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
-      )
-    }
+  const regUserLastLocationExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+    taskResource.extension
   )
   if (
     regUserLastLocationExtension &&
@@ -494,19 +491,16 @@ export async function setupLastRegLocation(
 
   const primaryOffice = await getPractitionerOffice(practitioner.id)
 
-  const regUserLastOfficeExtension = taskResource.extension.find(
-    (extension) => {
-      return (
-        extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
-      )
-    }
+  const regUserLastOfficeExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    taskResource.extension
   )
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
     regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-      valueString: primaryOffice.name,
+      valueString: primaryOffice.name!,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
@@ -559,11 +553,10 @@ export function setupLastRegUser(
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`
-    )
-  })
+  const regUserExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+    taskResource.extension
+  )
   if (regUserExtension && regUserExtension.valueReference) {
     regUserExtension.valueReference.reference = getPractitionerRef(practitioner)
   } else {
@@ -787,7 +780,7 @@ export async function validateDeceasedDetails(
                 ]
               },
               value: patient.id
-            } as fhir3.CodeableConcept)
+            })
 
             await updateResourceInHearth(birthPatient)
             // mark patient with link to the birth patient
@@ -801,7 +794,7 @@ export async function validateDeceasedDetails(
                 ]
               },
               value: birthPatient.id
-            } as fhir3.CodeableConcept)
+            })
           }
         }
       } catch (err) {

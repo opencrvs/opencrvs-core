@@ -15,10 +15,10 @@ import {
   COLUMNS,
   SORT_ORDER
 } from '@opencrvs/components/lib/Workqueue'
-import {
+import type {
   GQLHumanName,
   GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   IDeclaration,
   DOWNLOAD_STATUS,

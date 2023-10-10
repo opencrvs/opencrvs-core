@@ -12,7 +12,23 @@ import {
   DUPLICATE_TRACKING_ID,
   EVENT_TYPE
 } from '@gateway/features/fhir/constants'
-import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import {
+  BundleEntry,
+  CodeableConcept,
+  Composition,
+  DocumentReference,
+  Encounter,
+  Observation,
+  Patient,
+  PaymentReconciliation,
+  Practitioner,
+  QuestionnaireResponse,
+  Reference,
+  RelatedPerson,
+  Task,
+  Unsaved,
+  UnsavedResource
+} from '@opencrvs/commons/types'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -102,8 +118,8 @@ export function createLocationResource(refUuid: string) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
-      resourceType: 'Location',
-      mode: 'instance'
+      resourceType: 'Location' as const,
+      mode: 'instance' as const
     }
   }
 }
@@ -149,7 +165,7 @@ export function createEncounter(refUuid: string) {
     resource: {
       resourceType: 'Encounter',
       status: 'finished'
-    } as fhir.Encounter
+    } as Encounter
   }
 }
 
@@ -158,7 +174,7 @@ export function createRelatedPersonTemplate(refUuid: string) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'RelatedPerson'
-    } as fhir.RelatedPerson
+    } as RelatedPerson
   }
 }
 
@@ -168,7 +184,7 @@ export function createPaymentReconciliationTemplate(refUuid: string) {
     resource: {
       resourceType: 'PaymentReconciliation',
       status: 'active'
-    } as fhir.PaymentReconciliation
+    } as PaymentReconciliation
   }
 }
 
@@ -218,17 +234,17 @@ export function createCompositionTemplate(refUuid: string, context: any) {
       subject: {},
       date: '',
       author: []
-    } as ITemplatedComposition
+    } as UnsavedResource<Composition>
   }
 }
 
 export function updateTaskTemplate(
-  task: fhir.Task,
+  task: Task,
   status: string,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
-): fhir.Task {
+): Task {
   if (
     !task ||
     !task.businessStatus ||
@@ -245,7 +261,7 @@ export function updateTaskTemplate(
     }
   }
   task.reason.text = reason || ''
-  const statusReason: fhir.CodeableConcept = {
+  const statusReason: CodeableConcept = {
     text: comment || ''
   }
   task.statusReason = statusReason
@@ -259,23 +275,32 @@ export function updateTaskTemplate(
   return task
 }
 
-export function createPersonEntryTemplate(refUuid: string) {
+export function createPersonEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Patient>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Patient',
-      active: true
-    } as fhir.Patient
+      extension: [],
+      active: true,
+      name: []
+    }
   }
 }
 
-export function createPractitionerEntryTemplate(refUuid: string) {
+export function createPractitionerEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Practitioner>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Practitioner',
-      active: true
-    } as fhir.Practitioner
+      extension: [],
+      active: true,
+      name: [],
+      telecom: []
+    }
   }
 }
 
@@ -294,11 +319,13 @@ export function createSupportingDocumentsSection(
       ],
       text: sectionTitle
     },
-    entry: [] as fhir.Reference[]
+    entry: [] as Reference[]
   }
 }
 
-export function createDocRefTemplate(refUuid: string) {
+export function createDocRefTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<DocumentReference>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -307,18 +334,25 @@ export function createDocRefTemplate(refUuid: string) {
         system: 'urn:ietf:rfc:3986',
         value: refUuid
       },
+      extension: [],
+      type: {},
+      content: [],
       status: 'current'
-    } as fhir.DocumentReference
+    }
   }
 }
 
-export function createObservationEntryTemplate(refUuid: string) {
+export function createObservationEntryTemplate(
+  refUuid: string
+): Unsaved<BundleEntry<Observation>> {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Observation',
-      status: 'final'
-    } as fhir.Observation
+      extension: [],
+      status: 'final',
+      code: {}
+    }
   }
 }
 
@@ -327,6 +361,7 @@ export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Task',
+      extension: [],
       status: 'ready',
       code: {
         coding: [
@@ -344,7 +379,8 @@ export function createQuestionnaireResponseTemplate(refUuid: string) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'QuestionnaireResponse',
+      extension: [],
       status: 'completed'
-    } as fhir.QuestionnaireResponse
+    } as QuestionnaireResponse
   }
 }

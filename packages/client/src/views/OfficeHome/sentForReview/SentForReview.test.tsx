@@ -22,10 +22,10 @@ import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { SentForReview } from './SentForReview'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
