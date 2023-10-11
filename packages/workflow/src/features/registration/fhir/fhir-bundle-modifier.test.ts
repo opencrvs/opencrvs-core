@@ -251,7 +251,7 @@ describe('Verify fhir bundle modifier functions', () => {
         const taskResource = setupLastRegUser(
           testFhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
         if (
           taskResource &&
           taskResource.extension &&
@@ -277,11 +277,13 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[1] &&
         fhirBundle.entry[1].resource
       ) {
-        fhirBundle.entry[1].resource.extension = [{ url: '', valueString: '' }]
+        fhirBundle.entry[1].resource.extension = [
+          { url: '', valueString: '' }
+        ] as any
         const taskResource = setupLastRegUser(
           fhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
 
         if (
           taskResource &&
@@ -313,7 +315,7 @@ describe('Verify fhir bundle modifier functions', () => {
         const taskResource = setupLastRegUser(
           testFhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
         if (
           taskResource &&
           taskResource.extension &&

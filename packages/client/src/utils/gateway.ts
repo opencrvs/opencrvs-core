@@ -64,13 +64,28 @@ export type AddressInput = {
   country?: InputMaybe<Scalars['String']>
   district?: InputMaybe<Scalars['String']>
   from?: InputMaybe<Scalars['Date']>
-  line?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
+  line?: InputMaybe<Array<Scalars['String']>>
   postalCode?: InputMaybe<Scalars['String']>
   state?: InputMaybe<Scalars['String']>
   text?: InputMaybe<Scalars['String']>
   to?: InputMaybe<Scalars['Date']>
-  type?: InputMaybe<Scalars['String']>
-  use?: InputMaybe<Scalars['String']>
+  type?: InputMaybe<AddressType>
+  use?: InputMaybe<AddressUse>
+}
+
+export enum AddressType {
+  PrimaryAddress = 'PRIMARY_ADDRESS',
+  SecondaryAddress = 'SECONDARY_ADDRESS',
+  Both = 'both',
+  Physical = 'physical',
+  Postal = 'postal'
+}
+
+export enum AddressUse {
+  Home = 'home',
+  Old = 'old',
+  Temp = 'temp',
+  Work = 'work'
 }
 
 export type AdvancedSeachParameters = {
@@ -274,11 +289,18 @@ export type AttachmentInput = {
   data?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<Scalars['String']>
+  status?: InputMaybe<AttachmentStatus>
   subject?: InputMaybe<Scalars['String']>
   systemFileName?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
   uri?: InputMaybe<Scalars['String']>
+}
+
+export enum AttachmentStatus {
+  Amended = 'AMENDED',
+  EnteredInError = 'ENTERED_IN_ERROR',
+  Final = 'FINAL',
+  Preliminary = 'PRELIMINARY'
 }
 
 export type AuditLogItemBase = {
@@ -378,7 +400,7 @@ export type BirthRegistration = EventRegistration & {
 }
 
 export type BirthRegistrationInput = {
-  _fhirIDMap?: InputMaybe<Scalars['Map']>
+  _fhirIDMap?: InputMaybe<FhiridMap>
   attendantAtBirth?: InputMaybe<Scalars['String']>
   birthType?: InputMaybe<Scalars['String']>
   child?: InputMaybe<PersonInput>
@@ -497,8 +519,8 @@ export type ContactPoint = {
 }
 
 export type ContactPointInput = {
-  system?: InputMaybe<Scalars['String']>
-  use?: InputMaybe<Scalars['String']>
+  system?: InputMaybe<TelecomSystem>
+  use?: InputMaybe<TelecomUse>
   value?: InputMaybe<Scalars['String']>
 }
 
@@ -632,7 +654,7 @@ export type DeathRegistration = EventRegistration & {
 }
 
 export type DeathRegistrationInput = {
-  _fhirIDMap?: InputMaybe<Scalars['Map']>
+  _fhirIDMap?: InputMaybe<FhiridMap>
   causeOfDeath?: InputMaybe<Scalars['String']>
   causeOfDeathEstablished?: InputMaybe<Scalars['String']>
   causeOfDeathMethod?: InputMaybe<Scalars['String']>
@@ -782,6 +804,21 @@ export type EventSearchSet = {
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
   registration?: Maybe<RegistrationSearchSet>
   type?: Maybe<Scalars['String']>
+}
+
+export type FhiridMap = {
+  composition?: InputMaybe<Scalars['String']>
+  encounter?: InputMaybe<Scalars['String']>
+  eventLocation?: InputMaybe<Scalars['String']>
+  observation?: InputMaybe<ObservationFhirids>
+  questionnaireResponse?: InputMaybe<Scalars['String']>
+}
+
+export enum Gender {
+  Female = 'female',
+  Male = 'male',
+  Other = 'other',
+  Unknown = 'unknown'
 }
 
 export type History = {
@@ -1010,7 +1047,7 @@ export type MarriageRegistration = EventRegistration & {
 }
 
 export type MarriageRegistrationInput = {
-  _fhirIDMap?: InputMaybe<Scalars['Map']>
+  _fhirIDMap?: InputMaybe<FhiridMap>
   bride?: InputMaybe<PersonInput>
   createdAt?: InputMaybe<Scalars['Date']>
   eventLocation?: InputMaybe<LocationInput>
@@ -1445,6 +1482,23 @@ export type OidpUserInfo = {
   zoneinfo?: Maybe<Scalars['String']>
 }
 
+export type ObservationFhirids = {
+  attendantAtBirth?: InputMaybe<Scalars['String']>
+  birthType?: InputMaybe<Scalars['String']>
+  causeOfDeath?: InputMaybe<Scalars['String']>
+  causeOfDeathEstablished?: InputMaybe<Scalars['String']>
+  causeOfDeathMethod?: InputMaybe<Scalars['String']>
+  childrenBornAliveToMother?: InputMaybe<Scalars['String']>
+  deathDescription?: InputMaybe<Scalars['String']>
+  femaleDependentsOfDeceased?: InputMaybe<Scalars['String']>
+  foetalDeathsToMother?: InputMaybe<Scalars['String']>
+  lastPreviousLiveBirth?: InputMaybe<Scalars['String']>
+  maleDependentsOfDeceased?: InputMaybe<Scalars['String']>
+  mannerOfDeath?: InputMaybe<Scalars['String']>
+  typeOfMarriage?: InputMaybe<Scalars['String']>
+  weightAtBirth?: InputMaybe<Scalars['String']>
+}
+
 export type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
   notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
@@ -1530,7 +1584,7 @@ export type PersonInput = {
   deceased?: InputMaybe<DeceasedInput>
   detailsExist?: InputMaybe<Scalars['Boolean']>
   educationalAttainment?: InputMaybe<Scalars['String']>
-  gender?: InputMaybe<Scalars['String']>
+  gender?: InputMaybe<Gender>
   identifier?: InputMaybe<Array<InputMaybe<IdentityInput>>>
   maritalStatus?: InputMaybe<Scalars['String']>
   multipleBirth?: InputMaybe<Scalars['Int']>
@@ -2041,7 +2095,7 @@ export type RelatedPersonInput = {
   detailsExist?: InputMaybe<Scalars['Boolean']>
   educationalAttainment?: InputMaybe<Scalars['String']>
   exactDateOfBirthUnknown?: InputMaybe<Scalars['Boolean']>
-  gender?: InputMaybe<Scalars['String']>
+  gender?: InputMaybe<Gender>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<IdentityInput>>>
   maritalStatus?: InputMaybe<Scalars['String']>
@@ -2233,6 +2287,24 @@ export enum SystemType {
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
+}
+
+export enum TelecomSystem {
+  Email = 'email',
+  Fax = 'fax',
+  Other = 'other',
+  Pager = 'pager',
+  Phone = 'phone',
+  Sms = 'sms',
+  Url = 'url'
+}
+
+export enum TelecomUse {
+  Home = 'home',
+  Mobile = 'mobile',
+  Old = 'old',
+  Temp = 'temp',
+  Work = 'work'
 }
 
 export type TotalMetricsByLocation = {
@@ -2450,6 +2522,16 @@ export type RequestRegistrationCorrectionMutationVariables = Exact<{
 export type RequestRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   requestRegistrationCorrection: string
+}
+
+export type RejectRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: CorrectionRejectionInput
+}>
+
+export type RejectRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  rejectRegistrationCorrection: string
 }
 
 export type FetchPersonQueryVariables = Exact<{

@@ -3,39 +3,25 @@
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
-      "@gateway/*": [
-        "./*"
-      ]
+      "@gateway/*": ["./*"]
     },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": [
-      "esnext.asynciterable",
-      "es6",
-      "es2019",
-      "DOM.Iterable"
-    ],
+    "lib": ["esnext.asynciterable", "es6", "es2019", "DOM.Iterable"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": [
-      "fhir",
-      "jest"
-    ]
+    "types": ["fhir", "jest"]
   },
-  "include": [
-    "src/**/*.ts",
-    "typings",
-  ],
+  "include": ["src/**/*.ts", "typings"],
   "exclude": [
     "node_modules",
     "build",

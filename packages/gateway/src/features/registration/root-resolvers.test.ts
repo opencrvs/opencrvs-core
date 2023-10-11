@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  resolvers,
+  resolvers as appResolvers,
   lookForComposition
 } from '@gateway/features/registration/root-resolvers'
 import {
@@ -25,8 +25,10 @@ import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 import { UserInputError } from 'apollo-server-hapi'
-const fetch = fetchAny as any
+import { Bundle, isTask } from '@opencrvs/commons/types'
 
+const fetch = fetchAny as any
+const resolvers = appResolvers as any
 const registerCertifyToken = jwt.sign(
   { scope: ['register', 'certify'] },
   readFileSync('./test/cert.key'),
@@ -633,7 +635,8 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses([JSON.stringify({})])
 
       const result = await lookForComposition(
-        '9633042c-ca34-4b9f-959b-9d16909fd85c'
+        '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        {} as any
       )
 
       expect(result).toBeUndefined()
@@ -2731,10 +2734,13 @@ describe('markEventAsUnassigned()', () => {
       { id },
       { headers: authHeaderRegCert }
     )
-    const postData = JSON.parse(fetch.mock.calls[1][1].body)
+    const bundle: Bundle = JSON.parse(fetch.mock.calls[1][1].body)
+    const task = bundle.entry.map(({ resource }) => resource).find(isTask)!
+
     expect(
-      findExtension(ASSIGNED_EXTENSION_URL, postData.extension)
+      findExtension(ASSIGNED_EXTENSION_URL, task.extension)
     ).toBeUndefined()
+
     expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
   })
 

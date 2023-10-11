@@ -1,6 +1,9 @@
-import { BundleEntry, Resource, Saved, Unsaved } from '.'
+import { BundleEntry, Resource, Unsaved } from '.'
 
-export type PaymentReconciliation = Saved<fhir3.PaymentReconciliation>
+export type PaymentReconciliationDetail = fhir3.PaymentReconciliationDetail
+
+export type PaymentReconciliation = fhir3.PaymentReconciliation
+export type Money = fhir3.Money
 
 export function isPaymentReconciliation(
   resource: Resource

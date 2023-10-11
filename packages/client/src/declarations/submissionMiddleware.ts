@@ -47,7 +47,7 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { MutationToRequestRegistrationCorrectionArgs } from '@opencrvs/gateway/src/graphql/schema'
+import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 
 type IReadyDeclaration = IDeclaration & {

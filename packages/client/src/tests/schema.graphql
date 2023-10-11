@@ -27,10 +27,10 @@ type Address {
 }
 
 input AddressInput {
-  use: String
-  type: String
+  use: AddressUse
+  type: AddressType
   text: String
-  line: [String]
+  line: [String!]
   city: String
   district: String
   state: String
@@ -38,6 +38,21 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+}
+
+enum AddressType {
+  PRIMARY_ADDRESS
+  SECONDARY_ADDRESS
+  postal
+  physical
+  both
+}
+
+enum AddressUse {
+  home
+  work
+  temp
+  old
 }
 
 type AdvancedSeachParameters {
@@ -237,13 +252,20 @@ input AttachmentInput {
   contentType: String
   data: String
   uri: String
-  status: String
+  status: AttachmentStatus
   originalFileName: String
   systemFileName: String
   type: String
   description: String
   subject: String
   createdAt: Date
+}
+
+enum AttachmentStatus {
+  ENTERED_IN_ERROR
+  PRELIMINARY
+  FINAL
+  AMENDED
 }
 
 interface AuditLogItemBase {
@@ -333,7 +355,7 @@ type BirthRegistration implements EventRegistration {
 }
 
 input BirthRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -450,9 +472,9 @@ type ContactPoint {
 }
 
 input ContactPointInput {
-  system: String
+  system: TelecomSystem
   value: String
-  use: String
+  use: TelecomUse
 }
 
 input CorrectionInput {
@@ -579,7 +601,7 @@ type DeathRegistration implements EventRegistration {
 }
 
 input DeathRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   deceased: PersonInput
   informant: RelatedPersonInput
@@ -716,6 +738,21 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+input FHIRIDMap {
+  composition: String
+  encounter: String
+  eventLocation: String
+  questionnaireResponse: String
+  observation: ObservationFHIRIDS
+}
+
+enum Gender {
+  male
+  female
+  other
+  unknown
 }
 
 type History {
@@ -931,7 +968,7 @@ type MarriageRegistration implements EventRegistration {
 }
 
 input MarriageRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   informant: RelatedPersonInput
   bride: PersonInput
@@ -1050,6 +1087,23 @@ input NotificationInput {
   updatedAt: Date
 }
 
+input ObservationFHIRIDS {
+  maleDependentsOfDeceased: String
+  femaleDependentsOfDeceased: String
+  mannerOfDeath: String
+  deathDescription: String
+  causeOfDeathEstablished: String
+  causeOfDeathMethod: String
+  causeOfDeath: String
+  birthType: String
+  typeOfMarriage: String
+  weightAtBirth: String
+  attendantAtBirth: String
+  childrenBornAliveToMother: String
+  foetalDeathsToMother: String
+  lastPreviousLiveBirth: String
+}
+
 type OIDPUserAddress {
   formatted: String
   street_address: String
@@ -1159,7 +1213,7 @@ input PersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String
@@ -1212,7 +1266,7 @@ type Query {
   fetchMonthWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String, event: String!): [LocationWiseEstimationMetric!]
   getUserAuditLog(practitionerId: String!, skip: Int, count: Int!, timeStart: String, timeEnd: String): UserAuditLogResultSet
-  searchEvents(userId: String, advancedSearchParameters: AdvancedSearchParametersInput!, count: Int, skip: Int, sort: String, sortColumn: String, sortBy: [SortBy!]): EventSearchResultSet
+  searchEvents(userId: String, advancedSearchParameters: AdvancedSearchParametersInput!, count: Int, skip: Int, sort: String, sortColumn: String): EventSearchResultSet
   getEventsWithProgress(declarationJurisdictionId: String, registrationStatuses: [String], compositionType: [String], count: Int, skip: Int, sort: String): EventProgressResultSet
   getSystemRoles(title: String, value: ComparisonInput, role: String, active: Boolean, sortBy: String, sortOrder: String): [SystemRole!]
   getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
@@ -1420,7 +1474,7 @@ input RelatedPersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String
@@ -1605,6 +1659,24 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+}
+
+enum TelecomSystem {
+  other
+  phone
+  fax
+  email
+  pager
+  url
+  sms
+}
+
+enum TelecomUse {
+  home
+  work
+  temp
+  old
+  mobile
 }
 
 type TotalMetricsByLocation {

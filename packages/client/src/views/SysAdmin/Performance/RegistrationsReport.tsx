@@ -23,7 +23,7 @@ import {
   TotalDisplayWithPercentage,
   PerformanceListHeader
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'

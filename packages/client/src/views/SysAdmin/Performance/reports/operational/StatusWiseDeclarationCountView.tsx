@@ -15,7 +15,7 @@ import {
   SubHeader
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { ProgressBar } from '@opencrvs/components/lib/ProgressBar'
-import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLRegistrationCountResult } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import {
   injectIntl,
