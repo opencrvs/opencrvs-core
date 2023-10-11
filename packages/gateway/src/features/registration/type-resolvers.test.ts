@@ -33,8 +33,8 @@ import {
 } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { getApolloConfig } from '../../graphql/config'
-import { generateQueryForType } from '../../graphql/query-generator'
+import { getApolloConfig } from '@gateway/graphql/config'
+import { generateQueryForType } from '@gateway/graphql/query-generator'
 
 const validateToken = jwt.sign(
   { scope: ['validate'] },
