@@ -115,7 +115,7 @@ export type TaskHistory = Saved<Task> & {
 
 export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
   encounter: {
-    reference: `${string}/${string}`
+    reference: `Encounter/${string}`
   }
   requester: {
     agent: { reference: `Practitioner/${string}` }
@@ -337,7 +337,7 @@ export function clearActionExtension(task: Task) {
     extension: (task.extension ?? []).filter(
       (ext) =>
         !TaskActionExtension.includes(
-          ext.url as (typeof TaskActionExtension)[number]
+          ext.url as typeof TaskActionExtension[number]
         )
     )
   }
