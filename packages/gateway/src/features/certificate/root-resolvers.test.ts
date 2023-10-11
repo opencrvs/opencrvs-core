@@ -95,7 +95,7 @@ describe('Certificate root resolvers', () => {
       fetch.resetMocks()
       const natlSYSAdminToken = jwt.sign(
         { scope: ['natlsysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -108,7 +108,7 @@ describe('Certificate root resolvers', () => {
       }
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',

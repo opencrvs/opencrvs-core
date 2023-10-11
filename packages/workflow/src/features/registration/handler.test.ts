@@ -176,7 +176,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -212,7 +212,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -248,7 +248,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -295,7 +295,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -313,7 +313,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
-
+    
     it('returns OK for a registrar user', async () => {
       fetch.mockResponses(
         [userMock, { status: 200 }],
@@ -385,7 +385,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -403,13 +403,13 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
-
+    
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -446,7 +446,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -476,7 +476,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -515,7 +515,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -537,7 +537,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -559,7 +559,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle with input output as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -580,7 +580,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundl with input outpute as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -627,7 +627,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -688,7 +688,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -739,7 +739,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with task entry as payload for birth', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -830,7 +830,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with task entry as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -931,15 +931,11 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   let server: any
   let token: any
   beforeEach(async () => {
-    token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['register'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
     fetch.resetMocks()
     server = await createServer()
 
@@ -1046,7 +1042,7 @@ describe('downloaded action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1100,7 +1096,7 @@ describe('assigned action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1154,7 +1150,7 @@ describe('unassigned action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1199,7 +1195,7 @@ describe('markEventAsWaitingValidationHandler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1220,7 +1216,7 @@ describe('markEventAsWaitingValidationHandler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1250,7 +1246,7 @@ describe('fhirWorkflowEventHandler', () => {
   it('returns un-authorized response when scope does not match event', async () => {
     const token = jwt.sign(
       { scope: ['???'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1279,7 +1275,7 @@ describe('fhirWorkflowEventHandler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1306,7 +1302,7 @@ describe('fhirWorkflowEventHandler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1368,7 +1364,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for birth', async () => {
     const token = jwt.sign(
       { scope: ['certify'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1414,7 +1410,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['certify'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1486,7 +1482,7 @@ describe('Register handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
