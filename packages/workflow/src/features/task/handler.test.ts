@@ -72,7 +72,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -104,7 +104,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -140,7 +140,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -176,7 +176,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -213,7 +213,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -236,7 +236,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -271,7 +271,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -312,7 +312,7 @@ describe('Verify handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

@@ -26,7 +26,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -56,7 +56,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -91,7 +91,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -125,7 +125,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -157,7 +157,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -194,7 +194,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -230,7 +230,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -263,7 +263,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid data', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -296,7 +296,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -333,7 +333,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -365,7 +365,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -402,7 +402,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',

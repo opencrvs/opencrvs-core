@@ -31,7 +31,7 @@ const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
 const registerCertifyToken = jwt.sign(
   { scope: ['register', 'certify'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -42,7 +42,7 @@ const registerCertifyToken = jwt.sign(
 
 const validateToken = jwt.sign(
   { scope: ['validate'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -53,7 +53,7 @@ const validateToken = jwt.sign(
 
 const declareToken = jwt.sign(
   { scope: ['declare'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -64,7 +64,7 @@ const declareToken = jwt.sign(
 
 const certifyToken = jwt.sign(
   { scope: ['certify'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -74,7 +74,7 @@ const certifyToken = jwt.sign(
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -821,7 +821,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle as registrar', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -1000,7 +1000,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle as registrar', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',

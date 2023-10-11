@@ -12,7 +12,7 @@
     "build": "VITE_APP_VERSION=$VERSION NODE_OPTIONS=--max_old_space_size=8000 vite build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",
-    "test": "NODE_OPTIONS=--max_old_space_size=8000 vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors && yarn test:compilation",
+    "test": "yarn test:compilation && NODE_OPTIONS=--max_old_space_size=8000 vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors",
     "test:watch": "vitest",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "yarn lint:css && yarn lint:ts",
@@ -111,6 +111,7 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
+    "@types/fhir": "^0.0.30",
     "@graphql-codegen/add": "^3.1.1",
     "@graphql-codegen/cli": "^3.0.0",
     "@graphql-codegen/introspection": "^3.0.0",
@@ -144,8 +145,9 @@
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-formatjs": "2.17.2",
     "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-prettier": "^4.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-react-hooks": "^4.0.8",
     "express": "^4.17.1",

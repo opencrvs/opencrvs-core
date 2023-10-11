@@ -26,7 +26,7 @@ describe('Advanced search resolvers', () => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -123,7 +123,7 @@ describe('Advanced search resolvers', () => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',

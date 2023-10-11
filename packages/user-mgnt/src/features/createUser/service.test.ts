@@ -21,15 +21,11 @@ const mockUser = {
   username: 'je.doe'
 }
 
-const token = jwt.sign(
-  { scope: ['system'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:user-mgnt-user'
-  }
-)
+const token = jwt.sign({ scope: ['system'] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:user-mgnt-user'
+})
 
 describe('Username generation', () => {
   it('generates valid username with given and family names', async () => {

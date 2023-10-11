@@ -22,7 +22,7 @@ beforeEach(() => {
   fetch.resetMocks()
   const sysAdminToken = jwt.sign(
     { scope: ['natlsysadmin'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
       algorithm: 'RS256',
@@ -32,7 +32,7 @@ beforeEach(() => {
   )
   const registerToken = jwt.sign(
     { scope: ['register'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
       algorithm: 'RS256',
@@ -151,7 +151,7 @@ describe('generate refresh token', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -164,7 +164,7 @@ describe('generate refresh token', () => {
     }
     const registerToken = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -221,7 +221,7 @@ describe('delete system integration', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -234,7 +234,7 @@ describe('delete system integration', () => {
     }
     const registerToken = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',

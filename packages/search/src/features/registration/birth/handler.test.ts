@@ -44,7 +44,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 if invalid payload received', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -72,7 +72,7 @@ describe('Verify handlers', () => {
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -91,7 +91,7 @@ describe('Verify handlers', () => {
     })
 
     it('500 if the event data is updated with a task where there is no focus reference for Composition', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -121,7 +121,7 @@ describe('Verify handlers', () => {
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
         [JSON.stringify({}), { status: 200 }]
       )
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'

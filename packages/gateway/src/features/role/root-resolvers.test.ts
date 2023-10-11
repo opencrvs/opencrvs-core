@@ -269,7 +269,7 @@ describe('system role update', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',

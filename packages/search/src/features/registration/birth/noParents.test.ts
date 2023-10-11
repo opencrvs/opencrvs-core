@@ -51,7 +51,7 @@ describe('Verify handlers', () => {
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'

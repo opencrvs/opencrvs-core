@@ -74,7 +74,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -87,7 +87,7 @@ describe('User root resolvers', () => {
       }
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -247,7 +247,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -260,7 +260,7 @@ describe('User root resolvers', () => {
       }
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -553,7 +553,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -658,7 +658,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -671,7 +671,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -740,7 +740,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -753,7 +753,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -836,7 +836,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -849,7 +849,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -960,7 +960,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -973,7 +973,7 @@ describe('User root resolvers', () => {
       }
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1074,7 +1074,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1087,7 +1087,7 @@ describe('User root resolvers', () => {
       }
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1158,7 +1158,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1171,7 +1171,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1236,7 +1236,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1249,7 +1249,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1314,7 +1314,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1327,7 +1327,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
