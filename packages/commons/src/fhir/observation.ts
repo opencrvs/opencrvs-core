@@ -65,9 +65,3 @@ export function isObservation(
 export function isObservation(resource: Resource): resource is Observation {
   return resource.resourceType === 'Observation'
 }
-
-export function isSavedObservation(
-  resource: Saved<Resource>
-): resource is Saved<Observation> {
-  return resource.resourceType === 'Observation'
-}

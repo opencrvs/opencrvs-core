@@ -94,7 +94,6 @@ import {
   isObservation,
   isPatient,
   isQuestionnaireResponse,
-  isSavedObservation,
   isTaskOrTaskHistory,
   isURLReference,
   resourceIdentifierToUUID,
@@ -1588,7 +1587,7 @@ export const typeResolvers: GQLResolver = {
       const observation: Record<string, string> = {}
 
       const observations = recordResources
-        .filter(isSavedObservation)
+        .filter(isObservation)
         .filter(
           (observation) => observation.context?.reference === encounterReference
         )
@@ -1888,7 +1887,7 @@ export const typeResolvers: GQLResolver = {
       const observation: Record<string, string> = {}
 
       const observations = recordResources
-        .filter(isSavedObservation)
+        .filter(isObservation)
         .filter(
           (observation) => observation.context?.reference === encounterReference
         )
