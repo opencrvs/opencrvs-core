@@ -12,8 +12,6 @@ import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { Bundle } from '@opencrvs/commons/types'
 const mockContext = { authHeader: { Authorization: '' } }
 
-jest.useRealTimers()
-
 describe('Object transformation module', () => {
   it('converts an object using a simple set of field builders', async () => {
     const fieldBuilders: any = {

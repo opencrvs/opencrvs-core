@@ -15,8 +15,6 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
-jest.useRealTimers()
-
 describe('Route authorization', () => {
   let server: any
   beforeEach(async () => {
