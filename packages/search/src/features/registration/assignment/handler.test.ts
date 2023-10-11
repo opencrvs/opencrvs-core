@@ -30,7 +30,7 @@ describe('assignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -49,7 +49,7 @@ describe('assignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -73,15 +73,11 @@ describe('assignEventHandler', () => {
       { status: 200 }
     ])
 
-    const token = jwt.sign(
-      { scope: [] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      }
-    )
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:search-user'
+    })
 
     const res = await server.server.inject({
       method: 'POST',
@@ -106,7 +102,7 @@ describe('unassignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -125,7 +121,7 @@ describe('unassignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -149,7 +145,7 @@ describe('unassignEventHandler', () => {
       { status: 200 }
     ])
 
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
