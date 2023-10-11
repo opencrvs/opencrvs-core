@@ -297,19 +297,6 @@ export function addExtensionsToTask(
       .filter(
         (ext) =>
           !extensions.some((e) => {
-            if (
-              e.url === 'http://opencrvs.org/specs/id/system_identifier' &&
-              ext.url === 'http://opencrvs.org/specs/extension/regLastUser'
-            ) {
-              return false
-            }
-            if (
-              e.url === 'http://opencrvs.org/specs/extension/regLastUser' &&
-              ext.url === 'http://opencrvs.org/specs/id/system_identifier'
-            ) {
-              return false
-            }
-
             return e.url === ext.url
           })
       )

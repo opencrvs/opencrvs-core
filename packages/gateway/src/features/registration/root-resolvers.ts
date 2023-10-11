@@ -1051,16 +1051,7 @@ export function insertActionToBundle(
   ) as SavedBundleEntry<TaskHistory>
 
   const extensions = isSystem(user)
-    ? ([
-        {
-          url: 'http://opencrvs.org/specs/id/system_identifier',
-          value: JSON.stringify({
-            name: user.name,
-            username: user.username,
-            type: user.type
-          })
-        }
-      ] as const)
+    ? []
     : ([
         {
           url: 'http://opencrvs.org/specs/extension/regLastUser',
@@ -1092,11 +1083,28 @@ export function insertActionToBundle(
       ...extensions
     ]),
     lastModified: new Date().toISOString(),
+    identifier: task.identifier.filter(
+      ({ system }) =>
+        // Clear old system identifier task if it happens that the last task was made
+        // by an intergration but this one is by a real user
+        system !== 'http://opencrvs.org/specs/id/system_identifier'
+    ),
     meta: {
       ...task.meta,
       lastUpdated: new Date().toISOString()
     }
   }
+  if (isSystem(user)) {
+    newTask.identifier.push({
+      system: 'http://opencrvs.org/specs/id/system_identifier',
+      value: JSON.stringify({
+        name: user.name,
+        username: user.username,
+        type: user.type
+      })
+    })
+  }
+
   const updatedBundleEntry = {
     ...bundleEntry,
     resource: newTask

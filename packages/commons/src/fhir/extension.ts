@@ -146,10 +146,6 @@ export type KnownExtensionType = StringExtensionType & {
       reference: string
     }
   }
-  'http://opencrvs.org/specs/id/system_identifier': {
-    url: 'http://opencrvs.org/specs/id/system_identifier'
-    value: string
-  }
   'http://opencrvs.org/specs/extension/date-of-marriage': {
     url: 'http://opencrvs.org/specs/extension/date-of-marriage'
     valueDateTime: string
