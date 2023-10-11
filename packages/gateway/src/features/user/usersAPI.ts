@@ -13,6 +13,11 @@
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 
+type IAvatarResponse = {
+  userName: string
+  avatarURI?: string
+}
+
 export class UsersAPI extends RESTDataSource {
   constructor() {
     super()
@@ -28,8 +33,24 @@ export class UsersAPI extends RESTDataSource {
     }
   }
 
+  async getUserAvatar(id: string): Promise<IAvatarResponse> {
+    const cacheKey = `${this.baseURL}/user-avatar:${id}`
+
+    const cachedResponse = this.memoizedResults.get(cacheKey)
+
+    if (cachedResponse) {
+      return cachedResponse
+    }
+
+    const response = this.get(`users/${id}/avatar`)
+
+    this.memoizedResults.set(cacheKey, response)
+
+    return response
+  }
+
   async getUserByEmail(email: string) {
-    const cacheKey = `${this.baseURL}/getUser:mobile:${email}`
+    const cacheKey = `${this.baseURL}/getUser:email:${email}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
 

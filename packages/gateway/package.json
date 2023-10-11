@@ -136,6 +136,7 @@
     "modulePaths": [
       "<rootDir>"
     ],
+    "timers": "modern",
     "moduleNameMapper": {
       "@gateway/(.*)": "<rootDir>/src/$1",
       "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types"
