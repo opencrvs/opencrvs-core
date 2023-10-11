@@ -635,10 +635,13 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
+      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
+        inputProps
+
       return (
         <input
           type="hidden"
-          {...inputProps}
+          {...allowedInputProps}
           value={inputProps.value as string}
         />
       )
