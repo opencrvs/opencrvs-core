@@ -22,6 +22,7 @@ import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { DEATH_BUNDLE } from './fixtures/death-bundle'
 import { Context } from '@gateway/graphql/context'
 import { getAuthHeader } from '@opencrvs/commons'
+import { MARRIAGE_BUNDLE } from './fixtures/marriage-bundle'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -325,6 +326,51 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
   const query = `query {
     fetchDeathRegistration(id: "") {
     ${generateQueryForType(apolloConfig.schema!, 'DeathRegistration')}
+    }
+  }
+  `
+
+  const response = await testServer.executeOperation(
+    {
+      query
+    },
+    {
+      request: {
+        auth: {
+          isAuthenticated: true,
+          credentials: {
+            scope: ['register', 'performance', 'certify', 'demo']
+          }
+        },
+        headers: {
+          authorization: `Bearer ${MOCK_TOKEN}`
+        }
+      }
+    }
+  )
+  expect(response.data).toMatchSnapshot()
+})
+test('running a full aggregated birth FHIR bundle through resolvers produces a MarriageRegistration object', async () => {
+  const apolloConfig = getApolloConfig()
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('@gateway/search').getRecordById.mockImplementation(() =>
+    Promise.resolve(MARRIAGE_BUNDLE)
+  )
+  const testServer = new ApolloServer({
+    ...getApolloConfig(),
+    context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
+      return {
+        request,
+        headers: getAuthHeader(request),
+        record: MARRIAGE_BUNDLE
+      }
+    }
+  })
+
+  const query = `query {
+    fetchMarriageRegistration(id: "") {
+    ${generateQueryForType(apolloConfig.schema!, 'MarriageRegistration')}
     }
   }
   `

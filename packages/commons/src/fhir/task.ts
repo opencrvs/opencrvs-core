@@ -25,6 +25,7 @@ import {
   VIEWED_EXTENSION_URL
 } from './constants'
 import { Nominal } from '../nominal'
+import { UUID } from '../uuid'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -103,7 +104,8 @@ export type Task = Omit<
   encounter?: fhir3.Reference
 }
 
-export type SavedTask = Omit<Task, 'focus'> & {
+export type SavedTask = Omit<Task, 'focus' | 'id'> & {
+  id: UUID
   focus: {
     reference: ResourceIdentifier
   }
@@ -324,7 +326,7 @@ export function clearActionExtension(task: Task) {
     extension: (task.extension ?? []).filter(
       (ext) =>
         !TaskActionExtension.includes(
-          ext.url as typeof TaskActionExtension[number]
+          ext.url as (typeof TaskActionExtension)[number]
         )
     )
   }

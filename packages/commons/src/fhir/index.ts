@@ -121,7 +121,7 @@ export function validateBundle(bundle: unknown): bundle is Bundle {
 
 export type SavedBundleEntry<T extends Resource = Resource> = Omit<
   fhir3.BundleEntry<T>,
-  'fullUrl'
+  'fullUrl' | 'resource'
 > & {
   fullUrl: URLReference
   resource: SavedResource<T>
@@ -180,9 +180,10 @@ export type Location = WithStrictExtensions<
     }
   }
 >
-export type SavedLocation = Omit<Location, 'partOf'> & {
+export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
+  id: UUID
   address?: Address
-  partOf: {
+  partOf?: {
     reference: ResourceIdentifier
   }
 }

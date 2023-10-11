@@ -1063,7 +1063,7 @@ export function insertActionToBundle(
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
             reference: `Location/${resourceIdentifierToUUID(
-              office!.partOf.reference
+              office!.partOf!.reference
             )}`
           }
         },

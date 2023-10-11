@@ -17,13 +17,13 @@ import DocumentsAPI from '../features/fhir/documentsAPI'
 import FHIRAPI from '../features/fhir/FHIRAPI'
 import MinioAPI from '../features/fhir/minioAPI'
 import { Request } from '@hapi/hapi'
-import { Saved, ValidRecord } from '@opencrvs/commons/types'
+import { Bundle, Saved } from '@opencrvs/commons/types'
 import { UsersAPI } from '@gateway/features/user/usersAPI'
 import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 export interface Context {
   request: Request
-  record?: Saved<ValidRecord>
+  record?: Saved<Bundle>
   dataSources: {
     locationsAPI: LocationsAPI
     documentsAPI: DocumentsAPI
