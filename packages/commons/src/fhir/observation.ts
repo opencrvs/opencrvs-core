@@ -49,8 +49,12 @@ export function findObservationByCode(
     )
 }
 
-export type Observation = Omit<fhir3.Observation, 'valueQuantity'> & {
+export type Observation = Omit<
+  fhir3.Observation,
+  'valueQuantity' | 'valueString'
+> & {
   valueInteger?: number
+  valueString?: string | number
   valueQuantity?: Omit<fhir3.Quantity, 'value'> & {
     // Birth plurality of Pregnancy
     // { value: 'TWIN' }
