@@ -34,19 +34,7 @@ export class UsersAPI extends RESTDataSource {
   }
 
   async getUserAvatar(id: string): Promise<IAvatarResponse> {
-    const cacheKey = `${this.baseURL}/user-avatar:${id}`
-
-    const cachedResponse = this.memoizedResults.get(cacheKey)
-
-    if (cachedResponse) {
-      return cachedResponse
-    }
-
-    const response = this.get(`users/${id}/avatar`)
-
-    this.memoizedResults.set(cacheKey, response)
-
-    return response
+    return this.get(`users/${id}/avatar`)
   }
 
   async getUserByEmail(email: string) {
