@@ -47,22 +47,27 @@ export function identityHelperTextMapper(
   }
 }
 
+/*
+ * @customization - this was made as in Cameroon we always want the document id label to say "Document ID" and not reflect the previously
+ * selected document type
+ */
+
 export function identityNameMapper(code: string): MessageDescriptor {
   switch (code) {
-    case 'NATIONAL_ID':
-      return formMessages.iDTypeNationalID
-    case 'PASSPORT':
-      return formMessages.iDTypePassport
-    case 'DRIVING_LICENSE':
-      return formMessages.iDTypeDrivingLicense
-    case 'BIRTH_REGISTRATION_NUMBER':
-      return formMessages.iDTypeBRN
-    case 'DEATH_REGISTRATION_NUMBER':
-      return formMessages.iDTypeDRN
-    case 'REFUGEE_NUMBER':
-      return formMessages.iDTypeRefugeeNumber
-    case 'ALIEN_NUMBER':
-      return formMessages.iDTypeAlienNumber
+    // case 'NATIONAL_ID':
+    //   return formMessages.iDTypeNationalID
+    // case 'PASSPORT':
+    //   return formMessages.iDTypePassport
+    // case 'DRIVING_LICENSE':
+    //   return formMessages.iDTypeDrivingLicense
+    // case 'BIRTH_REGISTRATION_NUMBER':
+    //   return formMessages.iDTypeBRN
+    // case 'DEATH_REGISTRATION_NUMBER':
+    //   return formMessages.iDTypeDRN
+    // case 'REFUGEE_NUMBER':
+    //   return formMessages.iDTypeRefugeeNumber
+    // case 'ALIEN_NUMBER':
+    //   return formMessages.iDTypeAlienNumber
     default:
       return formMessages.iD
   }

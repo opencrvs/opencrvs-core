@@ -497,6 +497,22 @@ export const dateNotPastLimit =
     }
   }
 
+export const dateNotPastFieldDate =
+  (section: string, fieldname: string): Validation =>
+  (value: IFormFieldValue, drafts?) => {
+    const cast = value as string
+    if (section && fieldname && drafts) {
+      const limit = drafts[section][fieldname] as string
+      if (limit) {
+        if (isDateNotPastLimit(cast, limit)) {
+          return undefined
+        } else {
+          return { message: messages.dateFormat }
+        }
+      }
+    }
+  }
+
 export const dateNotToday = (date: string): boolean => {
   const today = new Date().setHours(0, 0, 0, 0)
   const day = new Date(date).setHours(0, 0, 0, 0)
