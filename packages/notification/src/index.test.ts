@@ -34,7 +34,7 @@ describe('Route authorization', () => {
   it('accepts requests with a valid token and valid user scope', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -64,7 +64,7 @@ describe('Route authorization', () => {
   it('blocks requests with a invalid user scope', async () => {
     const token = jwt.sign(
       { scope: ['demo'] }, // required declare | register | certify
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

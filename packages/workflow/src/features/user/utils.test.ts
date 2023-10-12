@@ -63,7 +63,7 @@ describe('Verify getLoggedInPractitionerResource', () => {
     )
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -100,7 +100,7 @@ describe('Verify getLoggedInPractitionerResource', () => {
     )
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -125,7 +125,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('returns the primary location', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -150,7 +150,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('throws errof if valid practioner is not found', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -194,7 +194,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('throws errof if practioner does not have any valid role entry', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
