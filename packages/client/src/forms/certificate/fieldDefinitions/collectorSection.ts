@@ -31,6 +31,7 @@ import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
+import { MessageDescriptor } from 'react-intl'
 
 export interface INameField {
   firstNamesField: string
@@ -324,13 +325,17 @@ export const collectBirthCertificateFormSection: IFormSection = {
           ],
           conditionals: [conditionals.iDType]
         },
+        /*
+         * @customization - this was made as in Cameroon we always want the document id label to say "Document ID" and not reflect the previously
+         * selected document type
+         */
         {
           name: 'iD',
           type: FIELD_WITH_DYNAMIC_DEFINITIONS,
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: (): MessageDescriptor => formMessages.iD
             },
             type: {
               kind: 'dynamic',
