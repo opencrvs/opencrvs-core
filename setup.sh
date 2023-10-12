@@ -113,7 +113,13 @@ sleep_if_non_ci 5
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
+if  [ -n "$(uname -r | grep microsoft-standard-WSL2)" ] && [ -n "$(cat /etc/os-release | grep Ubuntu)" ]; then
+  wslKernelWithUbuntu=true
+  echo -e "\033[32m:::::::::::::::: You are running Windows Subsystem for Linux .  Checking distro ::::::::::::::::\033[0m"
+  echo
+fi
+
+if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
   echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
   echo
 
