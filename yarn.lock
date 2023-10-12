@@ -8413,48 +8413,53 @@
     csstype "^3.0.2"
 
 "@types/traverse@^0.6.32":
-  version "0.6.32"
-  resolved "https://registry.npmjs.org/@types/traverse/-/traverse-0.6.32.tgz"
-  integrity sha512-RBz2uRZVCXuMg93WD//aTS5B120QlT4lR/gL+935QtGsKHLS6sCtZBaKfWjIfk7ZXv/r8mtGbwjVIee6/3XTow==
+  version "0.6.33"
+  resolved "https://registry.yarnpkg.com/@types/traverse/-/traverse-0.6.33.tgz#2c8769aac0f8b9da38e9ab770853c68a716fca26"
+  integrity sha512-vBtKrVlsf6Tty18EK208adHoe0cYGFgZHbHuh/+jPVjC9pz/NIz3ElXje/zt6UebFz3BXOLXZTmn9oX6MdnNIw==
 
 "@types/trusted-types@^2.0.2":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.3.tgz#a136f83b0758698df454e328759dbd3d44555311"
-  integrity sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.4.tgz#2b38784cd16957d3782e8e2b31c03bc1d13b4d65"
+  integrity sha512-IDaobHimLQhjwsQ/NMwRVfa/yL7L/wriQPMhw1ZJall0KX6E1oxk29XMDeilW5qTIg5aoiqf5Udy8U/51aNoQQ==
 
-"@types/unist@*", "@types/unist@^2.0.0":
-  version "2.0.6"
-  resolved "https://registry.npmjs.org/@types/unist/-/unist-2.0.6.tgz"
-  integrity sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==
+"@types/unist@*":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.0.tgz#988ae8af1e5239e89f9fbb1ade4c935f4eeedf9a"
+  integrity sha512-MFETx3tbTjE7Uk6vvnWINA/1iJ7LuMdO4fcq8UfF0pRbj01aGLduVvQcRyswuACJdpnHgg8E3rQLhaRdNEJS0w==
+
+"@types/unist@^2.0.0":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.8.tgz#bb197b9639aa1a04cf464a617fe800cccd92ad5c"
+  integrity sha512-d0XxK3YTObnWVp6rZuev3c49+j4Lo8g4L1ZRm9z5L0xpoZycUPshHgczK5gsUMaZOstjVYYi09p5gYvUtfChYw==
 
 "@types/uuid-validate@^0.0.1":
   version "0.0.1"
-  resolved "https://registry.npmjs.org/@types/uuid-validate/-/uuid-validate-0.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/@types/uuid-validate/-/uuid-validate-0.0.1.tgz#b4eedecbd9db25851490d65a58f13feaa89dd509"
   integrity sha512-RbX9q0U00SLoV+l7loYX0Wrtv4QTClBC0QcdNts6x2b5G1HJN8NI9YlS1HNA6THrI9EH3OXSgya6eMQIlDjKFA==
 
 "@types/uuid@^3.4.3", "@types/uuid@^3.4.4":
-  version "3.4.10"
-  resolved "https://registry.npmjs.org/@types/uuid/-/uuid-3.4.10.tgz"
-  integrity sha512-BgeaZuElf7DEYZhWYDTc/XcLZXdVgFkVSTa13BqKvbnmUrxr3TJFKofUxCtDO9UQOdhnV+HPOESdHiHKZOJV1A==
+  version "3.4.11"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.11.tgz#201bf1ca5756537886931aac6672c21c1a06f98a"
+  integrity sha512-CJNkbEu4IdVuBMRVaNC2GjASgJK7ziqDlVXWuJ1pvhOLADl7nzxhTKjHRdOmo2SuXuygcWBmzgYgn9foTX0UiA==
 
 "@types/uuid@^9.0.3":
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.3.tgz#6cdd939b4316b4f81625de9f06028d848c4a1533"
-  integrity sha512-taHQQH/3ZyI3zP8M/puluDEIEvtQHVYcC6y3N8ijFtAd28+Ey/G4sg1u2gB01S8MwybLOKAp9/yCMu/uR5l3Ug==
+  version "9.0.5"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.5.tgz#25a71eb73eba95ac0e559ff3dd018fc08294acf6"
+  integrity sha512-xfHdwa1FMJ082prjSJpoEI57GZITiQz10r3vEJCHa2khEFQjKy91aWKz6+zybzssCvXUwE1LQWgWVwZ4nYUvHQ==
 
 "@types/webfontloader@^1.6.34":
   version "1.6.35"
-  resolved "https://registry.npmjs.org/@types/webfontloader/-/webfontloader-1.6.35.tgz"
+  resolved "https://registry.yarnpkg.com/@types/webfontloader/-/webfontloader-1.6.35.tgz#c9cedff2995c61ee9b2064714e7f7d7763ac50bd"
   integrity sha512-IJlrsiDWq6KghQ7tPlL5tcwSUyOxLDceT+AFUY7Ylj0Fcv3/h3QkANqQxZ0B5mEpEKxhTw76vDmvrruSMV9n9Q==
 
 "@types/webidl-conversions@*":
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/@types/webidl-conversions/-/webidl-conversions-7.0.0.tgz"
-  integrity sha512-xTE1E+YF4aWPJJeUzaZI5DRntlkY3+BCVJi0axFptnjGmAoWxkyREIh/XMrfxVLejwQxMCfDXdICo0VLxThrog==
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@types/webidl-conversions/-/webidl-conversions-7.0.1.tgz#2b9a2062b39a7272343c185cdb884f2e52188f75"
+  integrity sha512-8hKOnOan+Uu+NgMaCouhg3cT9x5fFZ92Jwf+uDLXLu/MFRbXxlWwGeQY7KVHkeSft6RvY+tdxklUBuyY9eIEKg==
 
 "@types/whatwg-url@^8.2.1":
   version "8.2.2"
-  resolved "https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-8.2.2.tgz"
+  resolved "https://registry.yarnpkg.com/@types/whatwg-url/-/whatwg-url-8.2.2.tgz#749d5b3873e845897ada99be4448041d4cc39e63"
   integrity sha512-FtQu10RWgn3D9U4aazdwIE2yzphmTJREDqNdODHrbrZmmMqI0vMheC/6NE/J1Yveaj8H+ela+YwWTjq5PGmuhA==
   dependencies:
     "@types/node" "*"
