@@ -69,7 +69,6 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=development
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - DOCUMENTS_URL=http://documents:9050
@@ -87,6 +86,7 @@ services:
       dockerfile: ./packages/search/Dockerfile
     restart: unless-stopped
     environment:
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200

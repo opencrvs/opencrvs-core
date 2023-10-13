@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
 import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
-
+const resolvers = rootResolvers as any
 beforeEach(() => {
   fetch.resetMocks()
 })
@@ -23,40 +23,45 @@ beforeEach(() => {
 describe('User root resolvers', () => {
   describe('getUser()', () => {
     it('returns a user object', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          _id: 'ba7022f0ff4822',
-          name: [
-            {
-              use: 'en',
-              given: ['Sakib Al'],
-              family: ['Hasan']
-            }
-          ],
-          username: 'sakibal.hasan',
-          mobile: '+8801711111111',
-          email: 'test@test.org',
-          passwordHash:
-            'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-          salt: '12345',
-          systemRole: 'FIELD_AGENT',
-          status: 'active',
-          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-          catchmentAreaIds: [
-            'b21ce04e-7ccd-4d65-929f-453bc193a736',
-            '95754572-ab6f-407b-b51a-1636cb3d0683',
-            '7719942b-16a7-474a-8af1-cd0c94c730d2',
-            '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-          ],
-          creationDate: 1559054406433
-        })
-      )
-
       const user = await resolvers.Query.getUser(
         {},
         { userId: 'ba7022f0ff4822' },
-        { headers: undefined }
+        {
+          headers: undefined,
+          dataSources: {
+            usersAPI: {
+              getUserById: () => {
+                return {
+                  _id: 'ba7022f0ff4822',
+                  name: [
+                    {
+                      use: 'en',
+                      given: ['Sakib Al'],
+                      family: ['Hasan']
+                    }
+                  ],
+                  username: 'sakibal.hasan',
+                  mobile: '+8801711111111',
+                  email: 'test@test.org',
+                  passwordHash:
+                    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
+                  salt: '12345',
+                  systemRole: 'FIELD_AGENT',
+                  status: 'active',
+                  practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+                  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+                  catchmentAreaIds: [
+                    'b21ce04e-7ccd-4d65-929f-453bc193a736',
+                    '95754572-ab6f-407b-b51a-1636cb3d0683',
+                    '7719942b-16a7-474a-8af1-cd0c94c730d2',
+                    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+                  ],
+                  creationDate: 1559054406433
+                }
+              }
+            }
+          }
+        }
       )
 
       expect(user).toBeDefined()
@@ -763,7 +768,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
@@ -784,7 +789,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -804,7 +809,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation.changePhone(

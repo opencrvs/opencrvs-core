@@ -8,22 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AVATAR_API, NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  AVATAR_API,
-  NATIVE_LANGUAGE,
-  USER_MANAGEMENT_URL
-} from '@gateway/constants'
-import fetch from 'node-fetch'
+  IEventDurationResponse,
+  getEventDurationsFromMetrics
+} from '@gateway/features/fhir/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
-import {
-  getEventDurationsFromMetrics,
-  IEventDurationResponse
-} from '@gateway/features/fhir/utils'
-import { getUser } from '@gateway/features/user/utils'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -39,11 +33,6 @@ interface IAssignment {
   firstName: string
   lastName: string
   userId: string
-}
-
-type IAvatarResponse = {
-  userName: string
-  avatarURI?: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -380,11 +369,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedBy: async (
       searchData: ISearchEventDataTemplate,
       _,
-      { headers: authHeader }
+      { dataSources }
     ) => {
-      const res = await getUser(
-        { practitionerId: searchData._source && searchData._source.createdBy },
-        authHeader
+      const res = await dataSources.usersAPI.getUserByPractitionerId(
+        searchData._source && searchData._source.createdBy
       )
       // declarations created by health facilities don't have user
       // associated with it, so it returns an error
@@ -433,17 +421,14 @@ export const searchTypeResolvers: GQLResolver = {
     }
   },
   AssignmentData: {
-    async avatarURL(assignmentData: IAssignment, _, { headers: authHeader }) {
-      const response = await fetch(
-        new URL(`users/${assignmentData.userId}/avatar`, USER_MANAGEMENT_URL),
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+    async avatarURL(
+      assignmentData: IAssignment,
+      _,
+      { dataSources, headers: authHeader }
+    ) {
+      const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
+        assignmentData.userId
       )
-      const { userName, avatarURI }: IAvatarResponse = await response.json()
 
       if (avatarURI) {
         const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)

@@ -442,6 +442,12 @@ input QuestionnaireQuestionInput {
   value: String
 }
 
+enum AttachmentInputStatus {
+  approved
+  validated
+  deleted
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String

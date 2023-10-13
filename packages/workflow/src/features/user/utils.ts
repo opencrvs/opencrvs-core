@@ -13,6 +13,7 @@ import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { Practitioner } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 
 export async function getUser(
   userId: string,
@@ -188,9 +189,11 @@ export async function getPractitionerLocations(
   return locList as [fhir3.Location]
 }
 
-export function getPractitionerRef(practitioner: Practitioner): string {
+export function getPractitionerRef(practitioner: Practitioner) {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  return `Practitioner/${practitioner.id}`
+  return `Practitioner/${
+    practitioner.id as UUID /* @todo move to practitioner */
+  }` as const
 }

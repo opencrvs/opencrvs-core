@@ -10,7 +10,7 @@
  */
 import * as jwt from 'jsonwebtoken'
 import * as jose from 'jose'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import {
   OIDP_REST_URL,
   OIDP_CLIENT_PRIVATE_KEY,

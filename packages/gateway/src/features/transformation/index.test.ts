@@ -27,7 +27,7 @@ describe('Object transformation module', () => {
       }
     }
 
-    const initialObject = { id: '123' }
+    const initialObject = { entry: [] }
     await transformObj(
       { gender: 'm', name: 'John Smith' },
       // transformObj is now strictly typed as a FHIR bundle
@@ -42,7 +42,7 @@ describe('Object transformation module', () => {
     )
 
     expect(initialObject).toEqual({
-      id: '123',
+      entry: [],
       gender: 'male',
       name: ['John Smith']
     })

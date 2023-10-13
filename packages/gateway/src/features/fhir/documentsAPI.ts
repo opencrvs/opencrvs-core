@@ -15,7 +15,7 @@ import { Bundle, BundleEntry, DocumentReference } from '@opencrvs/commons/types'
 
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
-export default class LocationsAPI extends RESTDataSource {
+export default class DocumentsAPI extends RESTDataSource {
   constructor() {
     super()
     this.baseURL = `${FHIR_URL}/DocumentReference`
