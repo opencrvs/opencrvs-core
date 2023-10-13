@@ -23,12 +23,7 @@ import {
   StoreEnhancer
 } from 'redux'
 import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
-
 import { declarationsReducer, IDeclarationsState } from '@client/declarations'
-import {
-  IPrintFormState,
-  printReducer
-} from '@client/forms/certificate/printReducer'
 import {
   IRegisterFormState,
   registerFormReducer
@@ -66,7 +61,6 @@ export interface IStoreState {
   navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
-  printCertificateForm: IPrintFormState
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
@@ -92,7 +86,6 @@ export const createStore = <T>(
     navigation: navigationReducer,
     notification: notificationReducer,
     reviewForm: reviewReducer,
-    printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
