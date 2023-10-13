@@ -203,7 +203,7 @@ export const formMessageDescriptors = {
     id: 'form.field.label.app.certifyRecordTo.mother'
   },
   certifyRecordToInformant: {
-    defaultMessage: 'Print and issue to informant (informant)',
+    defaultMessage: 'Print and issue to informant ({informant})',
     description: 'Label for mother select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.informant'
   },

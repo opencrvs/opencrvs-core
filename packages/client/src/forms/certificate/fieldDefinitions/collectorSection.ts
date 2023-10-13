@@ -1087,10 +1087,16 @@ const marriageCertCollectorOptions = [
 
 export function getCertCollectorGroupForEvent(
   event: Event,
-  informant?: string
+  informant: string
 ): IFormSectionGroup {
   const options: IRadioOption[] = [
-    { value: 'INFORMANT', label: formMessages.certifyRecordToInformant }
+    {
+      value: 'INFORMANT',
+      label: formMessages.certifyRecordToInformant,
+      param: {
+        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+      }
+    }
   ]
 
   if (event === Event.Birth) {
@@ -1100,11 +1106,11 @@ export function getCertCollectorGroupForEvent(
   }
 
   options.push(
+    { value: 'OTHER', label: formMessages.someoneElseCollector },
     {
       value: 'PRINT_IN_ADVANCE',
       label: formMessages.certificatePrintInAdvance
-    },
-    { value: 'OTHER', label: formMessages.someoneElseCollector }
+    }
   )
   return {
     id: 'certCollector',
@@ -1126,14 +1132,17 @@ export function getCertCollectorGroupForEvent(
   }
 }
 
-export function getCertificateCollectorFormSection(event: Event): IFormSection {
+export function getCertificateCollectorFormSection(
+  event: Event,
+  informant: string
+): IFormSection {
   return {
     id: CertificateSection.Collector,
     viewType: 'form',
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(event),
+      getCertCollectorGroupForEvent(event, informant),
       otherCertCollectorFormGroup(event),
       affidavitCertCollectorGroup
     ]

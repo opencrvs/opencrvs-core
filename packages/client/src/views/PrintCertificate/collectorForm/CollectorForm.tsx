@@ -473,12 +473,16 @@ const mapStateToProps = (
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
 
-  const informantType = declaration?.data.informant.informantType
+  const informantType =
+    declaration?.data.informant.otherInformantType ||
+    declaration?.data.informant.informantType
+
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const clonedFormSection = getCertificateCollectorFormSection(
-    declaration?.event!
+    declaration?.event!,
+    informantType as string
   )
 
   const isAllowPrintInAdvance =
