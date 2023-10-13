@@ -1250,12 +1250,12 @@ export const typeResolvers: GQLResolver = {
         return null
       }
 
-      const practitioner = getResourceFromBundleById(
+      const practitioner = getResourceFromBundleById<Practitioner>(
         context.record!,
         resourceIdentifierToUUID(
           encounterParticipant.individual.reference as ResourceIdentifier
         )
-      ) as Practitioner
+      )
 
       return (
         (practitioner &&
@@ -1274,10 +1274,10 @@ export const typeResolvers: GQLResolver = {
         return null
       }
 
-      const practitioner = getResourceFromBundleById(
+      const practitioner = getResourceFromBundleById<Practitioner>(
         context.record!,
         resourceIdentifierToUUID(encounterParticipant.individual.reference)
-      ) as Practitioner
+      )
       return (
         (practitioner &&
           practitioner.qualification &&

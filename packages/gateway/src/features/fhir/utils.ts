@@ -1033,7 +1033,7 @@ export async function getCertificatesFromTask(
     )
   }
 
-  const compositionBundle = await fetchFHIR<Bundle<Composition>>(
+  const compositionBundle = await fetchFHIR<Saved<Bundle<Composition>>>(
     `/${task.focus.reference}/_history`,
     authHeader
   )
