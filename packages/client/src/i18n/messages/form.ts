@@ -198,7 +198,7 @@ export const formMessageDescriptors = {
     id: 'form.field.label.firstName'
   },
   certifyRecordToMother: {
-    defaultMessage: 'Print and issue to informant (Mother)',
+    defaultMessage: 'Print and issue to mother',
     description: 'Label for mother select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.mother'
   },
@@ -218,7 +218,7 @@ export const formMessageDescriptors = {
     id: 'form.field.label.certificatePrintInAdvance'
   },
   certifyRecordToFather: {
-    defaultMessage: 'Print and issue to informant (Father)',
+    defaultMessage: 'Print and issue to father',
     description: 'Label for father select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.father'
   },
