@@ -1089,7 +1089,7 @@ export function getCertCollectorGroupForEvent(
   event: Event,
   informant: string
 ): IFormSectionGroup {
-  const options: IRadioOption[] = [
+  let options: IRadioOption[] = [
     {
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
@@ -1112,6 +1112,10 @@ export function getCertCollectorGroupForEvent(
       label: formMessages.certificatePrintInAdvance
     }
   )
+  if (['BRIDE', 'GROOM', 'MOTHER', 'FATHER'].includes(informant)) {
+    options = options.filter((opt) => opt.value !== informant)
+  }
+
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,

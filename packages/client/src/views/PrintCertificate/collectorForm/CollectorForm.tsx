@@ -480,8 +480,8 @@ const mapStateToProps = (
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const clonedFormSection = getCertificateCollectorFormSection(
-    declaration?.event!,
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration?.event ?? Event.Birth,
     informantType as string
   )
 
@@ -492,55 +492,12 @@ const mapStateToProps = (
       ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
       : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
 
-  if (event === Event.Birth && groupId === 'certCollector') {
-    const declarationData = declaration && declaration.data
-    let motherDataExist: boolean | undefined
-    let fatherDataExist: boolean | undefined
-
-    //TODO: This needs to be dynamic.
-    // We shouldn't hardcode 'fathersDetailsExist' field check here
-    // As it's part of the form definition so we can't ensure
-    // that all countries will have this field in their definition
-    // if (
-    //   declarationData &&
-    //   declarationData.father &&
-    //   declarationData.father.detailsExist !== undefined
-    // ) {
-    //   fatherDataExist = declarationData.father.detailsExist
-    // }
-
-    // if (
-    //   declarationData &&
-    //   declarationData.mother &&
-    //   declarationData.mother.detailsExist !== undefined
-    // ) {
-    //   motherDataExist = declarationData.mother.detailsExist
-    // }
-
-    // if (motherDataExist && fatherDataExist) {
-    //   clonedFormSection.groups.unshift(
-    //     certCollectorGroupForBirthAppWithParentDetails
-    //   )
-    // } else if (fatherDataExist && !motherDataExist) {
-    //   clonedFormSection.groups.unshift(
-    //     certCollectorGroupForBirthAppWithoutMotherDetails
-    //   )
-    // } else if (motherDataExist && !fatherDataExist) {
-    //   clonedFormSection.groups.unshift(
-    //     certCollectorGroupForBirthAppWithoutFatherDetails
-    //   )
-    // } else if (!motherDataExist && !fatherDataExist) {
-    //   clonedFormSection.groups.unshift(
-    //     certCollectorGroupForBirthAppWithoutParentDetails
-    //   )
-    // }
-  }
   const formGroup = isAllowPrintInAdvance
-    ? clonedFormSection.groups.find((group) => group.id === groupId) ||
-      clonedFormSection.groups[0]
+    ? certFormSection.groups.find((group) => group.id === groupId) ||
+      certFormSection.groups[0]
     : filterPrintInAdvancedOption(
-        clonedFormSection.groups.find((group) => group.id === groupId) ||
-          clonedFormSection.groups[0]
+        certFormSection.groups.find((group) => group.id === groupId) ||
+          certFormSection.groups[0]
       )
 
   /**
@@ -575,7 +532,7 @@ const mapStateToProps = (
     pageRoute: CERTIFICATE_COLLECTOR,
     declarationId: registrationId,
     declaration,
-    formSection: clonedFormSection,
+    formSection: certFormSection,
     formGroup: {
       ...formGroup,
       fields
