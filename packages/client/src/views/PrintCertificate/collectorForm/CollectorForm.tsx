@@ -61,20 +61,14 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { flatten, cloneDeep } from 'lodash'
+import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  certCollectorGroupForBirthAppWithParentDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails,
-  getCertificateCollectorFormSection
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
