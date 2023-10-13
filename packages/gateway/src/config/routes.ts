@@ -10,9 +10,7 @@
  */
 import * as glob from 'glob'
 import { join, resolve } from 'path'
-import healthCheckHandler, {
-  querySchema as healthCheckQuerySchema
-} from '@gateway/features/healthCheck/handler'
+import healthCheckHandler from '@gateway/features/healthCheck/handler'
 import {
   createLocationHandler,
   requestSchema,
