@@ -72,7 +72,8 @@ import {
   certCollectorGroupForBirthAppWithParentDetails,
   certCollectorGroupForBirthAppWithoutFatherDetails,
   certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails
+  certCollectorGroupForBirthAppWithoutMotherDetails,
+  getCertificateCollectorFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
@@ -457,18 +458,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 }
 
-const getCollectCertificateForm = (event: Event, state: IStoreState) => {
-  switch (event) {
-    case Event.Birth:
-    default:
-      return state.printCertificateForm.collectBirthCertificateForm
-    case Event.Death:
-      return state.printCertificateForm.collectDeathCertificateForm
-    case Event.Marriage:
-      return state.printCertificateForm.collectMarriageCertificateForm
-  }
-}
-
 const mapStateToProps = (
   state: IStoreState,
   props: RouteComponentProps<{
@@ -484,11 +473,14 @@ const mapStateToProps = (
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
 
-  const formSection = getCollectCertificateForm(event, state)
+  const informantType = declaration?.data.informant.informantType
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const clonedFormSection = cloneDeep(formSection)
+  const clonedFormSection = getCertificateCollectorFormSection(
+    declaration?.event!
+  )
+
   const isAllowPrintInAdvance =
     event === Event.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
@@ -505,39 +497,39 @@ const mapStateToProps = (
     // We shouldn't hardcode 'fathersDetailsExist' field check here
     // As it's part of the form definition so we can't ensure
     // that all countries will have this field in their definition
-    if (
-      declarationData &&
-      declarationData.father &&
-      declarationData.father.detailsExist !== undefined
-    ) {
-      fatherDataExist = declarationData.father.detailsExist
-    }
+    // if (
+    //   declarationData &&
+    //   declarationData.father &&
+    //   declarationData.father.detailsExist !== undefined
+    // ) {
+    //   fatherDataExist = declarationData.father.detailsExist
+    // }
 
-    if (
-      declarationData &&
-      declarationData.mother &&
-      declarationData.mother.detailsExist !== undefined
-    ) {
-      motherDataExist = declarationData.mother.detailsExist
-    }
+    // if (
+    //   declarationData &&
+    //   declarationData.mother &&
+    //   declarationData.mother.detailsExist !== undefined
+    // ) {
+    //   motherDataExist = declarationData.mother.detailsExist
+    // }
 
-    if (motherDataExist && fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithParentDetails
-      )
-    } else if (fatherDataExist && !motherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutMotherDetails
-      )
-    } else if (motherDataExist && !fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutFatherDetails
-      )
-    } else if (!motherDataExist && !fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutParentDetails
-      )
-    }
+    // if (motherDataExist && fatherDataExist) {
+    //   clonedFormSection.groups.unshift(
+    //     certCollectorGroupForBirthAppWithParentDetails
+    //   )
+    // } else if (fatherDataExist && !motherDataExist) {
+    //   clonedFormSection.groups.unshift(
+    //     certCollectorGroupForBirthAppWithoutMotherDetails
+    //   )
+    // } else if (motherDataExist && !fatherDataExist) {
+    //   clonedFormSection.groups.unshift(
+    //     certCollectorGroupForBirthAppWithoutFatherDetails
+    //   )
+    // } else if (!motherDataExist && !fatherDataExist) {
+    //   clonedFormSection.groups.unshift(
+    //     certCollectorGroupForBirthAppWithoutParentDetails
+    //   )
+    // }
   }
   const formGroup = isAllowPrintInAdvance
     ? clonedFormSection.groups.find((group) => group.id === groupId) ||

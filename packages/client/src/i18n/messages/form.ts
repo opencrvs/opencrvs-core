@@ -202,6 +202,11 @@ export const formMessageDescriptors = {
     description: 'Label for mother select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.mother'
   },
+  certifyRecordToInformant: {
+    defaultMessage: 'Print and issue to informant (informant)',
+    description: 'Label for mother select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.informant'
+  },
   someoneElseCollector: {
     defaultMessage: 'Print and issue to someone else',
     description: 'Other Label',

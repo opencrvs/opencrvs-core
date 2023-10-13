@@ -13,8 +13,10 @@ import {
   CHECKBOX_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   identityTypeMapper,
+  IFormField,
   IFormSection,
   IFormSectionGroup,
+  IRadioOption,
   PARAGRAPH,
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
@@ -30,6 +32,7 @@ import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
+import { Event } from '@client/utils/gateway'
 
 export interface INameField {
   firstNamesField: string
@@ -887,4 +890,252 @@ export const collectMarriageCertificateFormSection: IFormSection = {
       ]
     }
   ]
+}
+
+const otherCertCollectorFormGroup = (event: Event): IFormSectionGroup => {
+  const labelMap = {
+    [Event.Birth]: formMessages.informantsRelationWithChild,
+    [Event.Death]: formMessages.informantsRelationWithDeceased,
+    [Event.Marriage]: formMessages.relationshipToSpouses
+  }
+
+  const fields: IFormField[] = [
+    {
+      name: 'iDType',
+      type: SELECT_WITH_OPTIONS,
+      label: formMessages.typeOfId,
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ],
+      placeholder: formMessages.select,
+      options: identityOptions
+    },
+    {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: formMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ],
+      conditionals: [conditionals.iDType]
+    },
+    {
+      name: 'iD',
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          kind: 'dynamic',
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validator: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
+      label: formMessages.iD,
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ],
+      conditionals: [conditionals.iDAvailable]
+    },
+    {
+      name: 'firstName',
+      type: TEXT,
+      label: formMessages.firstName,
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ]
+    },
+    {
+      name: 'lastName',
+      type: TEXT,
+      label: formMessages.lastName,
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ]
+    },
+    {
+      name: 'relationship',
+      type: TEXT,
+      label: labelMap[event],
+      required: true,
+      initialValue: '',
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'requiredBasic'
+          },
+          validators
+        )
+      ]
+    }
+  ]
+
+  return {
+    id: 'otherCertCollector',
+    conditionals: [conditionals.certCollectorOther],
+    title: certificateMessages.otherCollectorFormTitle,
+    error: certificateMessages.certificateOtherCollectorInfoError,
+    fields
+  }
+}
+
+const affidavitCertCollectorGroup: IFormSectionGroup = {
+  id: 'affidavit',
+  conditionals: [conditionals.certCollectorOther],
+  title: certificateMessages.certificateOtherCollectorAffidavitFormTitle,
+  error: certificateMessages.certificateOtherCollectorAffidavitError,
+  fields: [
+    {
+      name: 'paragraph',
+      type: PARAGRAPH,
+      label:
+        certificateMessages.certificateOtherCollectorAffidavitFormParagraph,
+      initialValue: '',
+      validator: []
+    },
+    {
+      name: 'affidavitFile',
+      type: SIMPLE_DOCUMENT_UPLOADER,
+      label: certificateMessages.signedAffidavitFileLabel,
+      description: certificateMessages.noLabel,
+      initialValue: '',
+      required: false,
+      allowedDocType: ['image/png', 'image/jpeg'],
+      validator: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'values.noAffidavitAgreement?.length !== 0'
+        }
+      ]
+    },
+    {
+      name: 'noAffidavitAgreement',
+      type: CHECKBOX_GROUP,
+      label: certificateMessages.noLabel,
+      required: false,
+      initialValue: [],
+      validator: [],
+      options: [
+        {
+          value: 'AFFIDAVIT',
+          label: certificateMessages.noSignedAffidavitAvailable
+        }
+      ],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'values.affidavitFile !== ""'
+        }
+      ]
+    }
+  ]
+}
+
+const birthCertCollectorOptions = [
+  { value: 'MOTHER', label: formMessages.certifyRecordToMother },
+  { value: 'FATHER', label: formMessages.certifyRecordToFather }
+]
+
+const marriageCertCollectorOptions = [
+  { value: 'BRIDE', label: formMessages.brideName },
+  { value: 'GROOM', label: formMessages.groomName }
+]
+
+export function getCertCollectorGroupForEvent(
+  event: Event,
+  informant?: string
+): IFormSectionGroup {
+  const options: IRadioOption[] = [
+    { value: 'INFORMANT', label: formMessages.certifyRecordToInformant }
+  ]
+
+  if (event === Event.Birth) {
+    options.push(...birthCertCollectorOptions)
+  } else if (event === Event.Marriage) {
+    options.push(...marriageCertCollectorOptions)
+  }
+
+  options.push(
+    {
+      value: 'PRINT_IN_ADVANCE',
+      label: formMessages.certificatePrintInAdvance
+    },
+    { value: 'OTHER', label: formMessages.someoneElseCollector }
+  )
+  return {
+    id: 'certCollector',
+    title: certificateMessages.whoToCollect,
+    error: certificateMessages.certificateCollectorError,
+    fields: [
+      {
+        name: 'type',
+        type: RADIO_GROUP,
+        size: RadioSize.LARGE,
+        label: certificateMessages.whoToCollect,
+        hideHeader: true,
+        required: true,
+        initialValue: '',
+        validator: [],
+        options
+      }
+    ]
+  }
+}
+
+export function getCertificateCollectorFormSection(event: Event): IFormSection {
+  return {
+    id: CertificateSection.Collector,
+    viewType: 'form',
+    name: certificateMessages.printCertificate,
+    title: certificateMessages.certificateCollectionTitle,
+    groups: [
+      getCertCollectorGroupForEvent(event),
+      otherCertCollectorFormGroup(event),
+      affidavitCertCollectorGroup
+    ]
+  }
 }
