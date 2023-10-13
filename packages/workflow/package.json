@@ -31,7 +31,7 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
-    "mongodb": "4.16.0",
+    "mongodb": "4.17.0",
     "node-fetch": "^2.6.7",
     "node-verhoeff": "^0.0.11",
     "pino": "^6.0.0",
