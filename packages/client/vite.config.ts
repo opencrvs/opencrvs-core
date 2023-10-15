@@ -97,6 +97,7 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
+      include: ['**/*.{test-rtl,spec}.?(c|m)[jt]s?(x)'],
       testTimeout: 60000,
       hookTimeout: 60000,
       globals: true,

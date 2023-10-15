@@ -8,6 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
-const localForage = vi.mock('localforage')
-module.exports = localForage
+const store: Record<string, string | null> = {}
+
+function getItem(key: string): string | null {
+  return store[key]
+}
+
+function setItem(key: string, value: string) {
+  store[key] = value
+  return value
+}
+
+async function removeItem(key: string) {
+  store[key] = null
+}
+
+export const storage = {
+  getItem,
+  setItem,
+  removeItem
+}
