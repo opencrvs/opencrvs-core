@@ -227,7 +227,7 @@ export const eventLocationMutationTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    let defaultLocation: fhir.Location = {}
+    let defaultLocation: Omit<fhir3.Location, 'resourceType'> = {}
     if (
       (transformedData.eventLocation &&
         !transformedData.eventLocation.address) ||
@@ -242,7 +242,7 @@ export const eventLocationMutationTransformer =
           postalCode: '',
           line: getDefaultAddressLines()
         }
-      } as fhir.Location
+      } as fhir3.Location
       if (transformedData.eventLocation && transformedData.eventLocation.type) {
         defaultLocation['type'] = transformedData.eventLocation.type
       }
@@ -274,7 +274,7 @@ export const eventLocationMutationTransformer =
       field.name === 'birthLocation' ||
       field.name === 'deathLocation'
     ) {
-      transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
+      transformedData.eventLocation._fhir3ID = draftData[sectionId][field.name]
       if (transformedData.eventLocation.address) {
         delete transformedData.eventLocation.address
       }
@@ -394,7 +394,7 @@ export const copyEventAddressTransformer =
     if (!fromSectionData.address) {
       return transformedData
     }
-    const address = (fromSectionData.address as [fhir.Address]).find(
+    const address = (fromSectionData.address as [fhir3.Address]).find(
       (addr) => addr.type === draftData[sectionId][field.name]
     )
     if (!address) {
@@ -404,8 +404,8 @@ export const copyEventAddressTransformer =
     transformedData.eventLocation = {
       address: {
         ...address
-      } as fhir.Address
-    } as fhir.Location
+      } as fhir3.Address
+    } as fhir3.Location
 
     transformedData.eventLocation.type = draftData[sectionId][field.name]
     if (address && address.line && address.line[5]) {

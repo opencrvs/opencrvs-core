@@ -224,7 +224,7 @@ export const identityToFieldTransformer =
   ) => {
     if (queryData[sectionId] && queryData[sectionId].identifier) {
       const existingIdentity = queryData[sectionId].identifier.find(
-        (identity: fhir.Identifier) => identity.type === identityType
+        (identity: fhir3.Identifier) => identity.type === identityType
       )
       if (!transformedData[sectionId]) {
         transformedData[sectionId] = {}
@@ -446,7 +446,7 @@ export const eventLocationQueryTransformer =
     if (!queryData.eventLocation || !queryData.eventLocation.address) {
       return transformedData
     }
-    const eventLocation = queryData.eventLocation as fhir.Location
+    const eventLocation = queryData.eventLocation as fhir3.Location
     const address = eventLocation.address as IAddress
     const line = address.line as string[]
     const country = address.country

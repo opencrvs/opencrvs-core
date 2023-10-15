@@ -18,6 +18,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "types": ["fhir"],
     "noEmit": true,
     "jsx": "react",
     "noFallthroughCasesInSwitch": true
@@ -28,5 +29,6 @@
     "codegen.ts",
     "vite.config.ts"
   ],
+  "exclude": ["src/**/*.test.ts*", "src/tests/util.tsx"],
   "extends": "./tsconfig.paths.json"
 }
