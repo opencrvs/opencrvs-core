@@ -33,6 +33,7 @@ import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
+import { IDeclaration } from '@client/declarations'
 
 export interface INameField {
   firstNamesField: string
@@ -144,6 +145,19 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
       }
     },
     marriage: {
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'informantBirthDate',
+        nationalityField: 'nationality'
+      },
       groom: {
         identifierTypeField: 'iDType',
         identifierOtherTypeField: 'iDTypeOther',
@@ -978,9 +992,20 @@ const marriageCertCollectorOptions = [
 ]
 
 export function getCertCollectorGroupForEvent(
-  event: Event,
-  informant: string
+  declaration: IDeclaration
 ): IFormSectionGroup {
+  const informant = (declaration?.data.informant.otherInformantType ||
+    declaration?.data.informant.informantType) as string
+
+  const isBirthEvent = declaration.event === Event.Birth
+  const isMarriageEvent = declaration.event === Event.Marriage
+  const isInImpornantInformantList = [
+    'BRIDE',
+    'GROOM',
+    'MOTHER',
+    'FATHER'
+  ].includes(informant)
+
   let options: IRadioOption[] = [
     {
       value: 'INFORMANT',
@@ -988,23 +1013,28 @@ export function getCertCollectorGroupForEvent(
       param: {
         informant: informant.charAt(0) + informant.slice(1).toLowerCase()
       }
-    }
-  ]
-
-  if (event === Event.Birth) {
-    options.push(...birthCertCollectorOptions)
-  } else if (event === Event.Marriage) {
-    options.push(...marriageCertCollectorOptions)
-  }
-
-  options.push(
+    },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
     {
       value: 'PRINT_IN_ADVANCE',
       label: formMessages.certificatePrintInAdvance
     }
-  )
-  if (['BRIDE', 'GROOM', 'MOTHER', 'FATHER'].includes(informant)) {
+  ]
+
+  if (isBirthEvent) {
+    options.splice(1, 0, ...birthCertCollectorOptions)
+
+    const rolesToCheck = ['mother', 'father']
+    for (const role of rolesToCheck) {
+      if (declaration.data[role].detailsExist === false) {
+        options = options.filter((opt) => opt.value !== role)
+      }
+    }
+  } else if (isMarriageEvent) {
+    options.splice(1, 0, ...marriageCertCollectorOptions)
+  }
+
+  if (isInImpornantInformantList) {
     options = options.filter((opt) => opt.value !== informant)
   }
 
@@ -1029,8 +1059,7 @@ export function getCertCollectorGroupForEvent(
 }
 
 export function getCertificateCollectorFormSection(
-  event: Event,
-  informant: string
+  declaration: IDeclaration
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1038,8 +1067,8 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(event, informant),
-      otherCertCollectorFormGroup(event),
+      getCertCollectorGroupForEvent(declaration),
+      otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]
   }

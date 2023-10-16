@@ -19,7 +19,8 @@ import {
   storeDeclaration,
   writeDeclaration,
   IPrintableDeclaration,
-  ICertificate
+  ICertificate,
+  IDeclaration
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -467,16 +468,11 @@ const mapStateToProps = (
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
 
-  const informantType =
-    declaration?.data.informant.otherInformantType ||
-    declaration?.data.informant.informantType
-
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const certFormSection = getCertificateCollectorFormSection(
-    declaration?.event ?? Event.Birth,
-    informantType as string
+    declaration as IDeclaration
   )
 
   const isAllowPrintInAdvance =
