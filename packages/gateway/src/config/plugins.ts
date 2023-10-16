@@ -28,6 +28,7 @@ export const getPlugins = () => {
       title: 'Gateway API Documentation',
       version: '1.3.0'
     },
+    definitionPrefix: 'useLabel',
     schemes: ['http', 'https'],
     swaggerUI: false,
     documentationPage: false

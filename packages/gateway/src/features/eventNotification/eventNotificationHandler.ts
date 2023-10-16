@@ -57,7 +57,7 @@ const taskSchema = Joi.object({
 const entrySchema = Joi.object({
   fullUrl: Joi.string().required(),
   resource: resourceSchema.required().unknown()
-})
+}).label('BundleEntry')
 
 export const fhirBundleSchema = Joi.object({
   resourceType: Joi.string().required().valid('Bundle'),
@@ -69,7 +69,8 @@ export const fhirBundleSchema = Joi.object({
     .ordered(compositionSchema, taskSchema)
     .items(entrySchema)
     .required()
-})
+    .label('BundleEntries')
+}).label('FhirBundle')
 
 export const validationFailedAction: Hapi.RouteOptionsValidate['failAction'] = (
   _,
