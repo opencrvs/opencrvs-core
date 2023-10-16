@@ -542,13 +542,17 @@ export const collectDeathCertificateFormSection: IFormSection = {
           ],
           conditionals: [conditionals.iDType]
         },
+        /*
+         * @customization - this was made as in Cameroon we always want the document id label to say "Document ID" and not reflect the previously
+         * selected document type
+         */
         {
           name: 'iD',
           type: FIELD_WITH_DYNAMIC_DEFINITIONS,
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: (): MessageDescriptor => formMessages.iD
             },
             type: {
               kind: 'dynamic',
@@ -604,22 +608,25 @@ export const collectDeathCertificateFormSection: IFormSection = {
               validators
             )
           ]
-        },
-        {
-          name: 'relationship',
-          type: TEXT,
-          label: formMessages.informantsRelationWithDeceased,
-          required: true,
-          initialValue: '',
-          validator: [
-            fieldValidationDescriptorToValidationFunction(
-              {
-                operation: 'requiredBasic'
-              },
-              validators
-            )
-          ]
         }
+        /*
+         * @customization - this was made as in Cameroon we don't want relationShip field
+         */
+        // {
+        //   name: 'relationship',
+        //   type: TEXT,
+        //   label: formMessages.informantsRelationWithDeceased,
+        //   required: true,
+        //   initialValue: '',
+        //   validator: [
+        //     fieldValidationDescriptorToValidationFunction(
+        //       {
+        //         operation: 'requiredBasic'
+        //       },
+        //       validators
+        //     )
+        //   ]
+        // }
       ]
     },
     {

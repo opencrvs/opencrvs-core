@@ -59,7 +59,8 @@ import {
   CorrectionSection,
   IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  SubmissionAction
+  SubmissionAction,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -91,7 +92,8 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  ACCUMULATED_FILE_SIZE,
+  ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -108,6 +110,8 @@ import { client } from '@client/utils/apolloClient'
 import { Stack, ToggleMenu } from '@client/../../components/lib'
 import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
+import { EVENT_TYPE } from '../../../../metrics/src/features/metrics/utils'
+import { SystemRole } from '../../utils/gateway'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -1373,6 +1377,72 @@ function findFirstVisibleSection(sections: IFormSection[]) {
   return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
+/*
+ * @customization - this function was made as in Cameroon we want to remove FIELD_AGENT options in informantType when
+ * user is REGISTRATION_AGENT
+ */
+function updateInformantTypeOptionByUserSystemRole(
+  fields: IFormField[],
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
+) {
+  const {
+    event,
+    registrationStatus,
+    data: { history }
+  } = declaration
+
+  if (event === 'birth' || event === 'death') {
+    if (!registrationStatus) {
+      return fields.map((item) => {
+        if (item.name === 'informantType') {
+          if (userDetails?.systemRole === ROLE_REGISTRATION_AGENT) {
+            const currentItem = item as ISelectFormFieldWithOptions
+            return {
+              ...currentItem,
+              options: currentItem?.options?.filter(
+                ({ value }) => value !== 'FIELD_AGENT'
+              )
+            }
+          }
+        }
+
+        return item
+      })
+    }
+    if (registrationStatus === SUBMISSION_STATUS.DECLARED) {
+      const historyDeclared = history?.find(
+        (r: any) => r.regStatus === SUBMISSION_STATUS.DECLARED && !r.action
+      )
+
+      if (historyDeclared) {
+        const {
+          user: { id }
+        } = historyDeclared
+        if (userDetails?.id === id) {
+          return fields.map((item) => {
+            if (item.name === 'informantType') {
+              if (userDetails?.systemRole === ROLE_REGISTRATION_AGENT) {
+                const currentItem = item as ISelectFormFieldWithOptions
+                return {
+                  ...currentItem,
+                  options: currentItem?.options?.filter(
+                    ({ value }) => value !== 'FIELD_AGENT'
+                  )
+                }
+              }
+            }
+
+            return item
+          })
+        }
+      }
+    }
+  }
+
+  return fields
+}
+
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
   const sectionId =
@@ -1402,8 +1472,18 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ) > -1) ||
     false
 
-  const fields = replaceInitialValues(
+  /*
+   * @customization - Apply updateInformantTypeOptionByUserSystemRole function to remove FIELD_AGENT options in informantType when
+   * user is REGISTRATION_AGENT
+   */
+  const activeSectionGroupUpdated = updateInformantTypeOptionByUserSystemRole(
     activeSectionGroup.fields,
+    declaration,
+    userDetails
+  )
+
+  const fields = replaceInitialValues(
+    activeSectionGroupUpdated,
     declaration.data[activeSection.id] || {},
     declaration.data,
     userDetails
