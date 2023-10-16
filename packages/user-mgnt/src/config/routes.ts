@@ -786,4 +786,5 @@ export const getRoutes = () => {
       }
     }
   ]
+  return routes
 }
