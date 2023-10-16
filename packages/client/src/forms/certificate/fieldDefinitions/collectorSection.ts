@@ -37,11 +37,11 @@ import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
-export interface INameField {
+interface INameField {
   firstNamesField: string
   familyNameField: string
 }
-export interface INameFields {
+interface INameFields {
   [language: string]: INameField
 }
 export interface IVerifyIDCertificateCollectorField {
@@ -53,11 +53,11 @@ export interface IVerifyIDCertificateCollectorField {
   nationalityField: string
 }
 
-export interface IVerifyIDCertificateCollector {
+interface IVerifyIDCertificateCollector {
   [collector: string]: IVerifyIDCertificateCollectorField
 }
 
-export interface IVerifyIDCertificateCollectorDefinition {
+interface IVerifyIDCertificateCollectorDefinition {
   [event: string]: IVerifyIDCertificateCollector
 }
 
@@ -68,7 +68,7 @@ const ALIEN_NUMBER = 'ALIEN_NUMBER'
 const OTHER = 'OTHER'
 const NO_ID = 'NO_ID'
 
-export const identityOptions = [
+const identityOptions = [
   { value: PASSPORT, label: formMessages.iDTypePassport },
   { value: NATIONAL_ID, label: formMessages.iDTypeNationalID },
   {
@@ -1003,7 +1003,7 @@ const marriageIssueCollectorFormOptions = [
   { value: 'BRIDE', label: issueMessages.issueToBride }
 ]
 
-export function getCertCollectorGroupForEvent(
+function getCertCollectorGroupForEvent(
   declaration: IDeclaration
 ): IFormSectionGroup {
   const informant = (declaration?.data.informant.otherInformantType ||
@@ -1110,7 +1110,7 @@ export function getIssueCertCollectorGroupForEvent(
   return fields
 }
 
-export function getCorrectOptionsForPrintingAndIssuing(
+function getCorrectOptionsForPrintingAndIssuing(
   declaration: IDeclaration,
   informant: string,
   options: IRadioOption[],
