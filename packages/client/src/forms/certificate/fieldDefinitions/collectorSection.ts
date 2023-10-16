@@ -1119,12 +1119,6 @@ export function getCorrectOptionsForPrintingAndIssuing(
 ): IRadioOption[] {
   const isBirthEvent = declaration.event === Event.Birth
   const isMarriageEvent = declaration.event === Event.Marriage
-  const isInImportantInformantList = [
-    'BRIDE',
-    'GROOM',
-    'MOTHER',
-    'FATHER'
-  ].includes(informant)
 
   if (isBirthEvent) {
     options.splice(1, 0, ...birthForm)
@@ -1139,7 +1133,7 @@ export function getCorrectOptionsForPrintingAndIssuing(
     options.splice(1, 0, ...marriageForm)
   }
 
-  if (isInImportantInformantList) {
+  if (['BRIDE', 'GROOM', 'MOTHER', 'FATHER'].includes(informant)) {
     options = options.filter((opt) => opt.value !== informant)
   }
 
