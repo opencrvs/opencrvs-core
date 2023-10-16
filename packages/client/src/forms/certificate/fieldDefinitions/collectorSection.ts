@@ -16,6 +16,7 @@ import {
   IFormField,
   IFormSection,
   IFormSectionGroup,
+  IRadioGroupFormField,
   IRadioOption,
   PARAGRAPH,
   RADIO_GROUP,
@@ -34,6 +35,7 @@ import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 export interface INameField {
   firstNamesField: string
@@ -991,22 +993,23 @@ const marriageCertCollectorOptions = [
   { value: 'GROOM', label: formMessages.groomName }
 ]
 
+const birthIssueCollectorFormOptions = [
+  { value: 'MOTHER', label: issueMessages.issueToMother },
+  { value: 'FATHER', label: issueMessages.issueToFather }
+]
+
+const marriageIssueCollectorFormOptions = [
+  { value: 'GROOM', label: issueMessages.issueToGroom },
+  { value: 'BRIDE', label: issueMessages.issueToBride }
+]
+
 export function getCertCollectorGroupForEvent(
   declaration: IDeclaration
 ): IFormSectionGroup {
   const informant = (declaration?.data.informant.otherInformantType ||
     declaration?.data.informant.informantType) as string
 
-  const isBirthEvent = declaration.event === Event.Birth
-  const isMarriageEvent = declaration.event === Event.Marriage
-  const isInImpornantInformantList = [
-    'BRIDE',
-    'GROOM',
-    'MOTHER',
-    'FATHER'
-  ].includes(informant)
-
-  let options: IRadioOption[] = [
+  let defaultPrintCertOptions: IRadioOption[] = [
     {
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
@@ -1021,22 +1024,13 @@ export function getCertCollectorGroupForEvent(
     }
   ]
 
-  if (isBirthEvent) {
-    options.splice(1, 0, ...birthCertCollectorOptions)
-
-    const rolesToCheck = ['mother', 'father']
-    for (const role of rolesToCheck) {
-      if (declaration.data[role].detailsExist === false) {
-        options = options.filter((opt) => opt.value !== role)
-      }
-    }
-  } else if (isMarriageEvent) {
-    options.splice(1, 0, ...marriageCertCollectorOptions)
-  }
-
-  if (isInImpornantInformantList) {
-    options = options.filter((opt) => opt.value !== informant)
-  }
+  const finalOptions = getCorrectOptionsForPrintingAndIssuing(
+    declaration,
+    informant,
+    defaultPrintCertOptions,
+    birthCertCollectorOptions,
+    marriageCertCollectorOptions
+  )
 
   return {
     id: 'certCollector',
@@ -1052,7 +1046,7 @@ export function getCertCollectorGroupForEvent(
         required: true,
         initialValue: '',
         validator: [],
-        options
+        options: finalOptions
       }
     ]
   }
@@ -1072,4 +1066,90 @@ export function getCertificateCollectorFormSection(
       affidavitCertCollectorGroup
     ]
   }
+}
+
+export function getIssueCertCollectorGroupForEvent(
+  declaration: IDeclaration
+): IRadioGroupFormField[] {
+  const informant = (declaration?.data.informant.otherInformantType ||
+    declaration?.data.informant.informantType) as string
+  const isBirthEvent = declaration.event === Event.Birth
+  const isMarriageEvent = declaration.event === Event.Marriage
+  const isInImportantInformantList = [
+    'BRIDE',
+    'GROOM',
+    'MOTHER',
+    'FATHER'
+  ].includes(informant)
+
+  let defaultIssueFormOptions: IRadioOption[] = [
+    {
+      value: 'INFORMANT',
+      label: issueMessages.issueToInformant,
+      param: {
+        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+      }
+    },
+    { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
+  ]
+
+  const finalOptions = getCorrectOptionsForPrintingAndIssuing(
+    declaration,
+    informant,
+    defaultIssueFormOptions,
+    birthIssueCollectorFormOptions,
+    marriageIssueCollectorFormOptions
+  )
+
+  const fields: IRadioGroupFormField[] = [
+    {
+      name: 'type',
+      type: RADIO_GROUP,
+      size: RadioSize.LARGE,
+      label: issueMessages.issueCertificate,
+      hideHeader: true,
+      required: true,
+      initialValue: '',
+      validator: [],
+      options: finalOptions
+    }
+  ]
+
+  return fields
+}
+
+export function getCorrectOptionsForPrintingAndIssuing(
+  declaration: IDeclaration,
+  informant: string,
+  options: IRadioOption[],
+  birthForm: IRadioOption[],
+  marriageForm: IRadioOption[]
+): IRadioOption[] {
+  const isBirthEvent = declaration.event === Event.Birth
+  const isMarriageEvent = declaration.event === Event.Marriage
+  const isInImportantInformantList = [
+    'BRIDE',
+    'GROOM',
+    'MOTHER',
+    'FATHER'
+  ].includes(informant)
+
+  if (isBirthEvent) {
+    options.splice(1, 0, ...birthForm)
+
+    const rolesToCheck = ['mother', 'father']
+    for (const role of rolesToCheck) {
+      if (declaration.data[role].detailsExist === false) {
+        options = options.filter((opt) => opt.value !== role)
+      }
+    }
+  } else if (isMarriageEvent) {
+    options.splice(1, 0, ...marriageForm)
+  }
+
+  if (isInImportantInformantList) {
+    options = options.filter((opt) => opt.value !== informant)
+  }
+
+  return options
 }
