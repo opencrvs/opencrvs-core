@@ -980,7 +980,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === SELECT_WITH_DYNAMIC_OPTIONS
@@ -990,7 +991,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
