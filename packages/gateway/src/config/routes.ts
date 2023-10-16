@@ -59,7 +59,7 @@ export const getRoutes = () => {
     // get all locations
     {
       method: 'GET',
-      path: '/location',
+      path: '/v1/location',
       handler: fetchLocationHandler,
       options: {
         tags: ['api'],
@@ -69,7 +69,17 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/location/{locationId}',
+      path: '/location',
+      handler: (r, h) => h.redirect(`/v1/location${r.url.search}`),
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get all locations'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/v1/location/{locationId}',
       handler: fetchLocationHandler,
       options: {
         tags: ['api'],
@@ -80,7 +90,35 @@ export const getRoutes = () => {
         }
       }
     },
+    {
+      method: 'GET',
+      path: '/location/{locationId}',
+      handler: (r, h) => h.redirect(`/v1/location/${r.params.locationId}`),
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get a single location',
+        validate: {
+          params: requestParamsSchema
+        }
+      }
+    },
     // create Location/Facility
+    {
+      method: 'POST',
+      path: '/v1/location',
+      handler: createLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Create a location',
+        validate: {
+          payload: requestSchema
+        }
+      }
+    },
     {
       method: 'POST',
       path: '/location',
@@ -99,6 +137,22 @@ export const getRoutes = () => {
     // update Location/Facility
     {
       method: 'PUT',
+      path: '/v1/location/{locationId}',
+      handler: updateLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Update a location or facility',
+        validate: {
+          payload: updateSchema,
+          params: requestParamsSchema
+        }
+      }
+    },
+    {
+      method: 'PUT',
       path: '/location/{locationId}',
       handler: updateLocationHandler,
       options: {
@@ -114,6 +168,22 @@ export const getRoutes = () => {
       }
     },
     // create event notification
+    {
+      method: 'POST',
+      path: '/v1/notification',
+      handler: eventNotificationHandler,
+      options: {
+        tags: ['api'],
+        description: 'Create a health notification',
+        auth: {
+          scope: ['declare', 'notification-api']
+        },
+        validate: {
+          payload: fhirBundleSchema,
+          failAction: validationFailedAction
+        }
+      }
+    },
     {
       method: 'POST',
       path: '/notification',
