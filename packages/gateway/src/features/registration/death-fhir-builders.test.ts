@@ -11,6 +11,14 @@
 import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as fetchMock from 'jest-fetch-mock'
+import {
+  GQLAddressType,
+  GQLAddressUse,
+  GQLGender,
+  GQLPaymentType,
+  GQLTelecomSystem,
+  GQLTelecomUse
+} from '@gateway/graphql/schema'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -20,14 +28,14 @@ test('should build a minimal FHIR registration document without error', async ()
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = await buildFHIRBundle(
+  const fhir = (await buildFHIRBundle(
     {
       deceased: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
-        gender: 'male',
+        gender: GQLGender.male,
         birthDate: '2000-01-28',
-        age: '34',
+        age: 34,
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
         deceased: {
@@ -54,7 +62,7 @@ test('should build a minimal FHIR registration document without error', async ()
       informant: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
-        gender: 'male',
+        gender: GQLGender.male,
         birthDate: '2000-01-28',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'John', familyName: 'Doe', use: 'en' }],
@@ -63,11 +71,17 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_4',
-        telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
+        telecom: [
+          {
+            use: GQLTelecomUse.mobile,
+            system: GQLTelecomSystem.phone,
+            value: '0171111111'
+          }
+        ],
         address: [
           {
-            use: 'home',
-            type: 'both',
+            use: GQLAddressUse.home,
+            type: GQLAddressType.both,
             line: ['2760 Mlosi Street', 'Wallacedene'],
             district: 'Kraaifontein',
             state: 'Western Cape',
@@ -76,8 +90,8 @@ test('should build a minimal FHIR registration document without error', async ()
             country: 'BGD'
           },
           {
-            use: 'home',
-            type: 'both',
+            use: GQLAddressUse.home,
+            type: GQLAddressType.both,
             line: ['40 Orbis Wharf', 'Wallacedene'],
             text: 'Optional address text',
             district: 'Kraaifontein',
@@ -90,8 +104,7 @@ test('should build a minimal FHIR registration document without error', async ()
         photo: [
           {
             contentType: 'image/jpeg',
-            data: '123456',
-            title: 'father-national-id'
+            data: '123456'
           }
         ]
         // _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7xxy33',
@@ -126,7 +139,6 @@ test('should build a minimal FHIR registration document without error', async ()
             _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce11',
             contentType: 'image/jpeg',
             data: 'SampleData',
-            status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
             type: 'NATIONAL_ID',
@@ -136,7 +148,6 @@ test('should build a minimal FHIR registration document without error', async ()
             _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
             contentType: 'image/png',
             data: 'ExampleData',
-            status: 'deleted',
             originalFileName: 'original.png',
             systemFileName: 'system.png',
             type: 'PASSPORT',
@@ -155,10 +166,9 @@ test('should build a minimal FHIR registration document without error', async ()
             payments: [
               {
                 paymentId: '1234',
-                type: 'MANUAL',
+                type: GQLPaymentType.MANUAL,
                 total: 50.0,
                 amount: 50.0,
-                outcome: 'COMPLETED',
                 date: '2018-10-22'
               }
             ],
@@ -195,8 +205,9 @@ test('should build a minimal FHIR registration document without error', async ()
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
       }
     },
-    'DEATH' as EVENT_TYPE
-  )
+    'DEATH' as EVENT_TYPE,
+    {} as any
+  )) as any
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(8)
   expect(fhir.entry[0].resource.date).toBeDefined()
@@ -230,12 +241,12 @@ test('should build a minimal FHIR registration document without error', async ()
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = await buildFHIRBundle(
+  const fhir = (await buildFHIRBundle(
     {
       deceased: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
-        gender: 'female',
+        gender: GQLGender.female,
         birthDate: '2000-01-28',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
@@ -258,8 +269,9 @@ test('should build a minimal FHIR registration document without error', async ()
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }]
       }
     },
-    'DEATH' as EVENT_TYPE
-  )
+    'DEATH' as EVENT_TYPE,
+    {} as any
+  )) as any
   expect(fhir).toBeDefined()
   // informant relationship
   expect(fhir.entry[3].resource.relationship.coding[0].code).toEqual('OTHER')

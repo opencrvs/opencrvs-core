@@ -92,6 +92,7 @@ export function createRoute<
     handler: async (request: Request) => {
       const record = await getRecordById(
         request.params.recordId,
+        request.headers.authorization,
         params.allowedStartStates
       )
       return params.handler(request, record)

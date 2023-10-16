@@ -14,19 +14,25 @@ import { IAuthHeader } from '@opencrvs/commons'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PaymentsAPI from '../features/fhir/paymentsAPI'
 import DocumentsAPI from '../features/fhir/documentsAPI'
-import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
+import FHIRAPI from '../features/fhir/FHIRAPI'
 import MinioAPI from '../features/fhir/minioAPI'
 import { Request } from '@hapi/hapi'
+import { Bundle, Saved } from '@opencrvs/commons/types'
+import { UsersAPI } from '@gateway/features/user/usersAPI'
+import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 export interface Context {
   request: Request
+  record?: Saved<Bundle>
   dataSources: {
     locationsAPI: LocationsAPI
     documentsAPI: DocumentsAPI
+    usersAPI: UsersAPI
     paymentsAPI: PaymentsAPI
-    practitionerRoleAPI: PractitionerRoleAPI
+    fhirAPI: FHIRAPI
     patientAPI: PatientAPI
     minioAPI: MinioAPI
+    metricsAPI: MetricsAPI
   }
   headers: IAuthHeader
 }

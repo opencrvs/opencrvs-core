@@ -11,14 +11,39 @@ import {
   PaymentReconciliation,
   Practitioner,
   RelatedPerson,
+  Resource,
   Task,
   getBusinessStatus,
+  getComposition,
   getTaskFromBundle,
   isCorrectionRequestedTask,
   isTask,
   sortTasksDescending
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
+
+export enum EVENT_TYPE {
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
+}
+
+export function getEventLabelFromBundle(bundle: Bundle) {
+  const composition = getComposition(bundle)
+  if (
+    composition.type.coding?.[0].code === 'birth-declaration' ||
+    composition.type.coding?.[0].code === 'birth-notification'
+  ) {
+    return 'BirthRegistration'
+  } else if (
+    composition.type.coding?.[0].code === 'death-declaration' ||
+    composition.type.coding?.[0].code === 'death-notification'
+  ) {
+    return 'DeathRegistration'
+  } else {
+    return 'MarriageRegistration'
+  }
+}
 
 type RecordBase = Bundle
 export type WaitingForValidationRecord = Nominal<
@@ -65,10 +90,10 @@ export type StateIdenfitiers = {
   ISSUED: IssuedRecord
 }
 
-export function changeState<
-  R extends RecordBase,
-  A extends keyof StateIdenfitiers
->(record: R, nextState: A) {
+export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
+  record: R,
+  nextState: A
+) {
   return record as any as StateIdenfitiers[A]
 }
 
@@ -129,4 +154,20 @@ export function getTrackingId(record: ValidRecord) {
   }
 
   return identifier.value
+}
+
+export function replaceFromBundle(
+  bundle: Bundle,
+  resource: Resource,
+  newResource: Resource
+) {
+  return {
+    ...bundle,
+    entry: bundle.entry.map((entry) => {
+      const shouldUpdate =
+        entry.resource === resource ||
+        (entry.resource.id && resource.id && entry.resource.id === resource.id)
+      return shouldUpdate ? { ...entry, resource: newResource } : entry
+    })
+  }
 }

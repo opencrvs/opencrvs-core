@@ -8,6 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
+import {
+  Bundle,
+  Composition,
+  Patient,
+  Practitioner,
+  RegistrationNumber,
+  Saved,
+  Task,
+  findExtension
+} from '@opencrvs/commons/types'
+import {
+  APPLICATION_CONFIG_URL,
+  RESOURCE_SERVICE_URL
+} from '@workflow/constants'
+import { triggerEvent } from '@workflow/features/events/handler'
 import {
   BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
@@ -19,9 +35,9 @@ import {
   getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
+  fetchExistingRegStatusCode,
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode,
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -30,9 +46,9 @@ import {
   getComposition,
   getEventType,
   getMosipUINToken,
+  getVoidEvent,
   isEventNotification,
-  isInProgressDeclaration,
-  getVoidEvent
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -42,31 +58,18 @@ import {
   getSystem
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import * as Hapi from '@hapi/hapi'
 import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
-import {
-  getToken,
-  getTokenPayload,
   ITokenPayload,
-  USER_SCOPE
+  USER_SCOPE,
+  getToken,
+  getTokenPayload
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
-import { triggerEvent } from '@workflow/features/events/handler'
-import {
-  Bundle,
-  Composition,
-  Patient,
-  Practitioner,
-  Task
-} from '@opencrvs/commons/types'
 
-export async function modifyRegistrationBundle(
-  fhirBundle: Bundle,
+export async function modifyRegistrationBundle<T extends Bundle>(
+  fhirBundle: T,
   token: string
-): Promise<Bundle> {
+): Promise<T> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -109,10 +112,10 @@ export async function modifyRegistrationBundle(
   return fhirBundle
 }
 
-export async function markBundleAsValidated(
-  bundle: Bundle,
+export async function markBundleAsValidated<T extends Bundle>(
+  bundle: T,
   token: string
-): Promise<Bundle> {
+): Promise<T> {
   const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -131,7 +134,7 @@ export async function markBundleAsValidated(
 }
 
 export async function invokeRegistrationValidation(
-  bundle: Bundle,
+  bundle: Saved<Bundle>,
   headers: Record<string, string>,
   token: string
 ): Promise<{ bundle: Bundle; regValidationError?: boolean }> {
@@ -151,7 +154,7 @@ export async function invokeRegistrationValidation(
     return { bundle }
   } catch (err) {
     const eventType = getEventType(bundle)
-    const composition = await getComposition(bundle)
+    const composition = getComposition(bundle)
     if (!composition) {
       throw new Error('Cant get composition in bundle')
     }
@@ -202,10 +205,10 @@ export async function invokeRegistrationValidation(
   }
 }
 
-export async function markBundleAsWaitingValidation(
-  bundle: Bundle,
+export async function markBundleAsWaitingValidation<T extends Bundle>(
+  bundle: T,
   token: string
-): Promise<Bundle> {
+): Promise<T> {
   const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -226,10 +229,10 @@ export async function markBundleAsWaitingValidation(
   return bundle
 }
 
-export async function markBundleAsDeclarationUpdated(
-  bundle: Bundle,
+export async function markBundleAsDeclarationUpdated<T extends Bundle>(
+  bundle: T,
   token: string
-): Promise<Bundle> {
+): Promise<T> {
   const taskResource = getTaskResourceFromFhirBundle(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -252,7 +255,7 @@ export async function markBundleAsDeclarationUpdated(
 
 export async function markEventAsRegistered(
   taskResource: Task,
-  registrationNumber: string,
+  registrationNumber: RegistrationNumber,
   eventType: EVENT_TYPE,
   token: string
 ): Promise<Task> {
@@ -361,7 +364,7 @@ export async function touchBundle(
   return bundle
 }
 
-export function setTrackingId(fhirBundle: Bundle): Bundle {
+export function setTrackingId<T extends Bundle>(fhirBundle: T): T {
   const eventType = getEventType(fhirBundle)
   const trackingId = generateTrackingIdForEvents(eventType)
   const trackingIdFhirName = `${
@@ -472,13 +475,9 @@ export async function setupLastRegLocation(
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserLastLocationExtension = taskResource.extension.find(
-    (extension) => {
-      return (
-        extension.url ===
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
-      )
-    }
+  const regUserLastLocationExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+    taskResource.extension
   )
   if (
     regUserLastLocationExtension &&
@@ -494,19 +493,16 @@ export async function setupLastRegLocation(
 
   const primaryOffice = await getPractitionerOffice(practitioner.id)
 
-  const regUserLastOfficeExtension = taskResource.extension.find(
-    (extension) => {
-      return (
-        extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
-      )
-    }
+  const regUserLastOfficeExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    taskResource.extension
   )
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
     regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-      valueString: primaryOffice.name,
+      valueString: primaryOffice.name!,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
@@ -559,11 +555,10 @@ export function setupLastRegUser(
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`
-    )
-  })
+  const regUserExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+    taskResource.extension
+  )
   if (regUserExtension && regUserExtension.valueReference) {
     regUserExtension.valueReference.reference = getPractitionerRef(practitioner)
   } else {
@@ -787,7 +782,7 @@ export async function validateDeceasedDetails(
                 ]
               },
               value: patient.id
-            } as fhir3.CodeableConcept)
+            })
 
             await updateResourceInHearth(birthPatient)
             // mark patient with link to the birth patient
@@ -801,7 +796,7 @@ export async function validateDeceasedDetails(
                 ]
               },
               value: birthPatient.id
-            } as fhir3.CodeableConcept)
+            })
           }
         }
       } catch (err) {

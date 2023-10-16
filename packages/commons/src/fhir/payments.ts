@@ -1,6 +1,9 @@
-import { BundleEntry, Resource, Saved, Unsaved } from '.'
+import { BundleEntry, Resource } from '.'
 
-export type PaymentReconciliation = Saved<fhir3.PaymentReconciliation>
+export type PaymentReconciliationDetail = fhir3.PaymentReconciliationDetail
+
+export type PaymentReconciliation = fhir3.PaymentReconciliation
+export type Money = fhir3.Money
 
 export function isPaymentReconciliation(
   resource: Resource
@@ -8,11 +11,10 @@ export function isPaymentReconciliation(
   return resource.resourceType === 'PaymentReconciliation'
 }
 
-export function isUnsavedPaymentReconciliationBundleEntry(
-  entry: Unsaved<BundleEntry>
-): entry is Unsaved<BundleEntry<PaymentReconciliation>> {
-  return (
-    entry.fullUrl.startsWith('urn:uuid:') &&
-    isPaymentReconciliation(entry.resource)
-  )
+export function isPaymentReconciliationBundleEntry(
+  entry: BundleEntry
+): entry is BundleEntry<PaymentReconciliation> {
+  return entry.fullUrl?.startsWith('urn:uuid:')
+    ? isPaymentReconciliation(entry.resource)
+    : false
 }

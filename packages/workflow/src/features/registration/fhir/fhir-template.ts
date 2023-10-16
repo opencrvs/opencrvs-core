@@ -127,7 +127,7 @@ export async function findRelatedPersonEntryByComposition(
     fhirBundle.entry.find(
       (entry) =>
         entry.fullUrl ===
-        (relatedPersonEntry.resource as RelatedPerson).patient.reference
+        (relatedPersonEntry.resource as RelatedPerson).patient?.reference
     )
 
   if (!personEntry) {
@@ -175,6 +175,10 @@ export async function findRelatedPersonEntryByTask(
   const relatedPerson = (await getFromFhir(
     `/${relatedPersonSectionEntry.reference}`
   )) as RelatedPerson
+
+  if (!relatedPerson.patient) {
+    return undefined
+  }
   return (await getFromFhir(`/${relatedPerson.patient.reference}`)) as Patient
 }
 
@@ -238,7 +242,7 @@ export function selectInformantResource(
     fhirBundle.entry.find(
       (entry) =>
         entry.fullUrl ===
-        (relatedPersonEntry.resource as RelatedPerson).patient.reference
+        (relatedPersonEntry.resource as RelatedPerson).patient?.reference
     )
 
   return informantEntry && (informantEntry.resource as Patient)

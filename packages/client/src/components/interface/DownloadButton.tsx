@@ -30,7 +30,7 @@ import {
   useApolloClient
 } from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import {

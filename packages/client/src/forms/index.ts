@@ -18,7 +18,7 @@ import {
   RadioSize
 } from '@opencrvs/components/lib/Radio'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use.d'
 import { MessageDescriptor } from 'react-intl'
 
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
@@ -373,7 +373,7 @@ export type IFormFieldQueryMapDescriptor<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -785,7 +785,7 @@ export type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
-  parameters: Params<typeof validators[T]>
+  parameters: Params<(typeof validators)[T]>
 }
 
 type ValidationDefaultOperation<
@@ -815,7 +815,7 @@ export type QueryFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -851,7 +851,7 @@ export type MutationFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof mutations[T]>,
+    Params<(typeof mutations)[T]>,
     IMutationDescriptor
   >
 }
@@ -867,7 +867,7 @@ export type IMutationDescriptor =
   | MutationDefaultOperation
 
 export type X = FunctionParamsToDescriptor<
-  Params<typeof mutations['eventLocationMutationTransformer']>,
+  Params<(typeof mutations)['eventLocationMutationTransformer']>,
   IMutationDescriptor
 >
 

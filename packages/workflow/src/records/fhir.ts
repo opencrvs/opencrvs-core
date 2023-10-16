@@ -1,29 +1,29 @@
 import {
   Bundle,
   BundleEntry,
-  BundleEntryWithFullUrl,
   DocumentReference,
+  Extension,
   PaymentReconciliation,
   Practitioner,
   Task,
-  Unsaved
+  URNReference
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
+import { getUUID } from '@opencrvs/commons'
+import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
   CorrectionRequestInput,
   CorrectionRequestPaymentInput
 } from './correction-request'
-import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { getUUID } from '@opencrvs/commons'
 
 export function createCorrectionProofOfLegalCorrectionDocument(
-  subjectReference: string,
+  subjectReference: URNReference,
   attachmentURL: string,
   attachmentType: string
-): Unsaved<BundleEntry<DocumentReference>> {
+): BundleEntry<DocumentReference> {
   const temporaryDocumentReferenceId = getUUID()
   return {
     fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
@@ -60,29 +60,23 @@ export function createCorrectionProofOfLegalCorrectionDocument(
 
 export function createCorrectionPaymentResources(
   paymentDetails: CorrectionRequestPaymentInput
-): [Unsaved<BundleEntry<PaymentReconciliation>>]
+): [BundleEntry<PaymentReconciliation>]
 
 export function createCorrectionPaymentResources(
   paymentDetails: CorrectionRequestPaymentInput,
   attachmentURL?: string
-): [
-  Unsaved<BundleEntry<PaymentReconciliation>>,
-  Unsaved<BundleEntry<DocumentReference>>
-]
+): [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]
 
 export function createCorrectionPaymentResources(
   paymentDetails: CorrectionRequestPaymentInput,
   attachmentURL?: string
 ):
-  | [
-      Unsaved<BundleEntry<PaymentReconciliation>>,
-      Unsaved<BundleEntry<DocumentReference>>
-    ]
-  | [Unsaved<BundleEntry<PaymentReconciliation>>] {
+  | [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]
+  | [BundleEntry<PaymentReconciliation>] {
   const temporaryPaymentId = getUUID()
   const temporaryDocumentReferenceId = getUUID()
 
-  const paymentBundleEntry: Unsaved<BundleEntry<PaymentReconciliation>> = {
+  const paymentBundleEntry = {
     fullUrl: `urn:uuid:${temporaryPaymentId}`,
     resource: {
       resourceType: 'PaymentReconciliation',
@@ -110,7 +104,7 @@ export function createCorrectionPaymentResources(
         ]
       }
     }
-  }
+  } satisfies BundleEntry<PaymentReconciliation>
 
   if (!attachmentURL) {
     return [paymentBundleEntry]
@@ -160,28 +154,46 @@ export function createCorrectionPaymentResources(
   ]
 }
 
-export function createCorrectionEncounter(): Unsaved<
-  BundleEntry<fhir3.Encounter>
-> {
-  return {
-    fullUrl: `urn:uuid:${getUUID()}`,
+export function createCorrectionEncounter() {
+  const encounter = {
+    fullUrl: `urn:uuid:${getUUID()}` as const,
     resource: {
-      resourceType: 'Encounter',
-      status: 'finished'
+      resourceType: 'Encounter' as const,
+      status: 'finished' as const
     }
-  }
+  } satisfies BundleEntry<fhir3.Encounter>
+
+  return encounter
 }
 
 export function createCorrectedTask(
   previousTask: Task, // @todo do not require previous task, pass values from outside
   correctionDetails: CorrectionRequestInput | ApproveRequestInput,
   correctionEncounter:
-    | Unsaved<BundleEntry<fhir3.Encounter>>
+    | BundleEntry<fhir3.Encounter>
     | BundleEntry<fhir3.Encounter>,
   paymentReconciliation?:
-    | Unsaved<BundleEntry<PaymentReconciliation>>
+    | BundleEntry<PaymentReconciliation>
     | BundleEntry<PaymentReconciliation>
 ): Task {
+  const conditionalExtensions: Extension[] = []
+
+  if (paymentReconciliation?.fullUrl) {
+    conditionalExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/paymentDetails',
+      valueReference: {
+        reference: paymentReconciliation.fullUrl
+      }
+    })
+  }
+
+  if (correctionDetails.requesterOther) {
+    conditionalExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
+      valueString: correctionDetails.requesterOther
+    })
+  }
+
   return {
     resourceType: 'Task',
     status: 'ready',
@@ -199,20 +211,11 @@ export function createCorrectedTask(
           'http://opencrvs.org/specs/extension/contact-person-email'
         ].includes(extension.url)
       ),
+      ...conditionalExtensions,
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       },
-      ...(paymentReconciliation
-        ? [
-            {
-              url: 'http://opencrvs.org/specs/extension/paymentDetails',
-              valueReference: {
-                reference: paymentReconciliation.fullUrl
-              }
-            }
-          ]
-        : []),
       {
         url: 'http://opencrvs.org/specs/extension/noSupportingDocumentationRequired',
         valueBoolean: correctionDetails.noSupportingDocumentationRequired
@@ -220,10 +223,6 @@ export function createCorrectedTask(
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',
         valueString: correctionDetails.requester
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
-        valueString: correctionDetails.requesterOther
       },
       {
         url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
@@ -275,10 +274,29 @@ export function createCorrectedTask(
 export function createCorrectionRequestTask(
   previousTask: Task,
   correctionDetails: CorrectionRequestInput,
-  correctionEncounter: Unsaved<BundleEntry<fhir3.Encounter>>,
+  correctionEncounter: BundleEntry<fhir3.Encounter>,
   practitioner: Practitioner,
-  paymentReconciliation?: Unsaved<BundleEntry<PaymentReconciliation>>
+  paymentReconciliation?: BundleEntry<PaymentReconciliation>
 ): Task {
+  const conditionalExtensions: Extension[] = []
+
+  if (paymentReconciliation) {
+    conditionalExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/paymentDetails',
+      valueReference: {
+        // @todo implement URLReference and URNReference types for Extensions
+        reference: paymentReconciliation.fullUrl as string
+      }
+    })
+  }
+
+  if (correctionDetails.requesterOther) {
+    conditionalExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
+      valueString: correctionDetails.requesterOther
+    })
+  }
+
   return {
     resourceType: 'Task',
     status: 'requested',
@@ -303,16 +321,7 @@ export function createCorrectionRequestTask(
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       },
-      ...(paymentReconciliation
-        ? [
-            {
-              url: 'http://opencrvs.org/specs/extension/paymentDetails',
-              valueReference: {
-                reference: paymentReconciliation.fullUrl
-              }
-            }
-          ]
-        : []),
+      ...conditionalExtensions,
       {
         url: 'http://opencrvs.org/specs/extension/noSupportingDocumentationRequired',
         valueBoolean: correctionDetails.noSupportingDocumentationRequired
@@ -322,11 +331,7 @@ export function createCorrectionRequestTask(
         valueString: correctionDetails.requester
       },
       {
-        url: 'http://opencrvs.org/specs/extension/requestingIndividualOther',
-        valueString: correctionDetails.requesterOther
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+        url: `http://opencrvs.org/specs/extension/hasShowedVerifiedDocument` as const,
         valueBoolean: correctionDetails.hasShowedVerifiedDocument
       }
     ],
@@ -367,25 +372,6 @@ export function createCorrectionRequestTask(
       ]
     }
   }
-}
-
-export function findFromBundleById(
-  bundle: Bundle,
-  id: string
-): BundleEntryWithFullUrl {
-  const resource = bundle.entry?.find((item) => item.resource?.id === id)
-
-  if (!resource) {
-    throw new Error('Resource not found in bundle with id ' + id)
-  }
-
-  if (!resource.fullUrl) {
-    throw new Error(
-      'A resource was found but it did not have a fullUrl. This should not happen.'
-    )
-  }
-
-  return resource as BundleEntryWithFullUrl
 }
 
 export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {

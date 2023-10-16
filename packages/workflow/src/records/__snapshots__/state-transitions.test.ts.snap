@@ -54,10 +54,6 @@ Array [
         "valueString": "MOTHER",
       },
       Object {
-        "url": "http://opencrvs.org/specs/extension/requestingIndividualOther",
-        "valueString": undefined,
-      },
-      Object {
         "url": "http://opencrvs.org/specs/extension/hasShowedVerifiedDocument",
         "valueBoolean": true,
       },

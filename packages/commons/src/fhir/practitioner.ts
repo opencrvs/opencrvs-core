@@ -1,15 +1,42 @@
-import { Bundle, Resource, Task, findExtension } from '.'
+import { Bundle, Resource, Task, WithStrictExtensions, findExtension } from '.'
 
 export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
   use: string
 }
-export type Practitioner = Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
-  name: Array<OpenCRVSPractitionerName>
-  telecom: Array<fhir3.ContactPoint>
+
+export type PractitionerRole = fhir3.PractitionerRole
+export type PractitionerRoleHistory = PractitionerRole
+
+export type Practitioner = WithStrictExtensions<
+  Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
+    name: Array<OpenCRVSPractitionerName>
+    telecom: Array<fhir3.ContactPoint>
+  }
+>
+
+export function isPractitioner<T extends Resource>(
+  resource: T
+): resource is T & Practitioner {
+  return resource.resourceType === 'Practitioner'
+}
+export function isPractitionerRole<T extends Resource>(
+  resource: T
+): resource is T & PractitionerRole {
+  return resource.resourceType === 'PractitionerRole'
 }
 
-export function isPractitioner(resource: Resource): resource is Practitioner {
-  return resource.resourceType === 'Practitioner'
+export function isPractitionerRoleHistory<T extends Resource>(
+  resource: T
+): resource is T & PractitionerRoleHistory {
+  return resource.resourceType === 'PractitionerRoleHistory'
+}
+
+export function isPractitionerRoleOrPractitionerRoleHistory<T extends Resource>(
+  resource: T
+): resource is (T & PractitionerRoleHistory) | (T & PractitionerRole) {
+  return ['PractitionerRoleHistory', 'PractitionerRole'].includes(
+    resource.resourceType
+  )
 }
 
 export function getPractitioner(id: string, bundle: Bundle) {

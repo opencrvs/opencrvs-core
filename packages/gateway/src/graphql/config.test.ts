@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
+const fetch = fetchMock as fetchMock.FetchMock
 import * as jwt from 'jsonwebtoken'
 import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
@@ -19,7 +20,7 @@ import { ApolloServer } from 'apollo-server-hapi'
 describe('Test apollo server config', () => {
   const token = jwt.sign(
     { scope: ['register'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',

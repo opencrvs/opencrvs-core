@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/correction/root-resolvers'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-
+const resolvers = rootResolvers as any
 describe('Correction root resolvers', () => {
   let registerCertifyToken: string
   let declareToken: string
@@ -25,7 +25,7 @@ describe('Correction root resolvers', () => {
   beforeEach(() => {
     registerCertifyToken = jwt.sign(
       { scope: ['register', 'certify'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '121223',
         algorithm: 'RS256',
@@ -35,7 +35,7 @@ describe('Correction root resolvers', () => {
     )
     declareToken = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

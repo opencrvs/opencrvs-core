@@ -20,10 +20,10 @@ import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import {
+import type {
   GQLLocationWiseEstimationMetric,
   GQLMonthWiseEstimationMetric
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -143,7 +143,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
     )
   }
 
-  const sortedContent = orderBy<typeof content[number]>(
+  const sortedContent = orderBy<(typeof content)[number]>(
     content,
     sortOrder.map(({ key }) => key),
     sortOrder.map(({ value }) => value)

@@ -9,13 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { FHIR_URL } from '../../constants'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
+import { METRICS_URL } from '@gateway/constants'
+import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 
-export default class PractitionerRoleAPI extends RESTDataSource {
+export interface ITimeLoggedResponse {
+  status?: string
+  timeSpentEditing: number
+}
+
+export default class MetricsAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = `${FHIR_URL}/PractitionerRole`
+    this.baseURL = `${METRICS_URL}`
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
@@ -24,14 +29,9 @@ export default class PractitionerRoleAPI extends RESTDataSource {
     for (const each of headerKeys) {
       request.headers.set(each, headers[each])
     }
-    request.headers.set('Content-Type', 'application/fhir+json')
   }
 
-  async getPractitionerRoleByPractitionerId(practitionerId: string) {
-    return this.get(`?practitioner=${practitionerId}`)
-  }
-
-  async getPractionerRoleHistory(id: string) {
-    return this.get(`/${id}/_history`)
+  getTimeLogged(recordId: string) {
+    return this.get(`/timeLogged?compositionId=${recordId}`)
   }
 }

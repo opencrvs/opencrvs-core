@@ -44,7 +44,9 @@ import {
   DocumentReference,
   Patient,
   Resource,
-  Task
+  Saved,
+  Task,
+  TrackingID
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getTaskResourceFromFhirBundle } from './fhir/fhir-template'
@@ -68,10 +70,10 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
+export function generateTrackingIdForEvents(eventType: EVENT_TYPE) {
   // using first letter of eventType for prefix
   // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
-  return generateTrackingId(eventType.charAt(0))
+  return generateTrackingId(eventType.charAt(0)) as TrackingID
 }
 
 function generateTrackingId(prefix: string): string {
@@ -608,8 +610,10 @@ export function getResourceByType<T = Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export function getComposition(bundle: Bundle) {
-  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+export function getComposition<T extends Bundle>(bundle: T) {
+  return getResourceByType<
+    T extends Saved<Bundle> ? Saved<Composition> : Composition
+  >(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
 }
 
 export function getPatientBySection(bundle: Bundle, section: fhir3.Reference) {

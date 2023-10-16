@@ -4,7 +4,8 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
+import { Bundle } from '@opencrvs/commons/types'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -64,7 +65,7 @@ export function makeRegistrationCorrection(
   correctionDetails: GQLCorrectionInput,
   authHeader: IAuthHeader
 ) {
-  return createRequest<fhir.Bundle>(
+  return createRequest<Bundle>(
     'POST',
     `/records/${recordId}/make-correction`,
     authHeader,

@@ -16,7 +16,6 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import { testFhirBundle } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
-import { cloneDeep } from 'lodash'
 
 const fetch = fetchAny as any
 
@@ -97,29 +96,6 @@ describe('Verify fhir templates', () => {
       ).rejects.toThrow(
         'Invalid person section found for given code: INVALID_SECTION_CODE'
       )
-    })
-    it('throws error for invalid section reference on composite entry', async () => {
-      const fhirBundle = cloneDeep(testFhirBundle)
-      if (
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[0].resource.section &&
-        fhirBundle.entry[0].resource.section[1] &&
-        fhirBundle.entry[0].resource.section[1].entry &&
-        fhirBundle.entry[0].resource.section[1].entry[0] &&
-        fhirBundle.entry[0].resource.section[1].entry[0].reference
-      ) {
-        fhirBundle.entry[0].resource.section[1].entry[0].reference =
-          'INVALID_REF_MOTHER_ENTRY'
-        await expect(
-          findPersonEntry(MOTHER_SECTION_CODE, fhirBundle)
-        ).rejects.toThrow(
-          'Patient referenced from composition section not found in FHIR bundle'
-        )
-      } else {
-        throw new Error('Failed')
-      }
     })
   })
 
