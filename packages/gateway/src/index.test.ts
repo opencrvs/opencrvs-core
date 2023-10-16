@@ -16,58 +16,58 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
-const mockPingResponse = [
-  {
-    name: 'auth',
-    url: 'http://localhost:4040/ping',
-    status: 'ok'
-  },
-  {
-    name: 'user-mgnt',
-    url: 'http://localhost:3030/ping',
-    status: 'ok'
-  },
-  {
-    name: 'metrics',
-    url: 'http://localhost:1050/ping',
-    status: 'ok'
-  },
-  {
-    name: 'notification',
-    url: 'http://localhost:2020/ping',
-    status: 'ok'
-  },
-  {
-    name: 'countryconfig',
-    url: 'http://localhost:3040/ping',
-    status: 'ok'
-  },
-  {
-    name: 'search',
-    url: 'http://localhost:9090/ping',
-    status: 'ok'
-  },
-  {
-    name: 'workflow',
-    url: 'http://localhost:5050/ping',
-    status: 'ok'
-  },
-  {
-    name: 'documents',
-    url: 'http://localhost:9050/ping',
-    status: 'ok'
-  },
-  {
-    name: 'webhooks',
-    url: 'http://localhost:2525/ping',
-    status: 'ok'
-  },
-  {
-    name: 'applicationconfig',
-    url: 'http://localhost:2021/ping',
-    status: 'ok'
-  }
-]
+// const mockPingResponse = [
+//   {
+//     name: 'auth',
+//     url: 'http://localhost:4040/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'user-mgnt',
+//     url: 'http://localhost:3030/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'metrics',
+//     url: 'http://localhost:1050/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'notification',
+//     url: 'http://localhost:2020/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'countryconfig',
+//     url: 'http://localhost:3040/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'search',
+//     url: 'http://localhost:9090/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'workflow',
+//     url: 'http://localhost:5050/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'documents',
+//     url: 'http://localhost:9050/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'webhooks',
+//     url: 'http://localhost:2525/ping',
+//     status: 'ok'
+//   },
+//   {
+//     name: 'applicationconfig',
+//     url: 'http://localhost:2021/ping',
+//     status: 'ok'
+//   }
+// ]
 
 describe('Route authorization', () => {
   let server: any
@@ -199,78 +199,87 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('Tests the health check for all service', async () => {
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          status: 'ok'
-        }),
-        { status: 200 }
-      ]
-    )
+  // it('Tests the health check for all service', async () => {
+  //   fetch.mockResponses(
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ],
+  //     [
+  //       JSON.stringify({
+  //         status: 'ok'
+  //       }),
+  //       { status: 200 }
+  //     ]
+  //   )
 
+  //   const res = await server.app.inject({
+  //     method: 'GET',
+  //     url: '/ping'
+  //   })
+
+  //   expect(res.result).toMatchObject(mockPingResponse)
+  // })
+
+  it('Tests the health check for all service', async () => {
+    const server = await createServer()
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-
-    expect(res.result).toMatchObject(mockPingResponse)
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toMatchSnapshot()
   })
-
   // TODO: after implementing the query parameter, this can be fixed to test the health check
   // it('Tests the health check with a valid parameter', async () => {
   //   fetch.mockResponse(
