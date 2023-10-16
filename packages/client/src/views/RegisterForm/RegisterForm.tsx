@@ -1409,8 +1409,7 @@ function updateInformantTypeOptionByUserSystemRole(
 
         return item
       })
-    }
-    if (registrationStatus === SUBMISSION_STATUS.DECLARED) {
+    } else {
       const historyDeclared = history?.find(
         (r: any) => r.regStatus === SUBMISSION_STATUS.DECLARED && !r.action
       )
