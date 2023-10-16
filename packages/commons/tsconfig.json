@@ -24,9 +24,6 @@
   "include": ["src/**/*.ts", "typings"],
   "exclude": [
     "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts"
+    "build"
   ]
 }
