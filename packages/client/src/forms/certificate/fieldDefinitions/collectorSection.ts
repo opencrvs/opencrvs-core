@@ -1073,14 +1073,6 @@ export function getIssueCertCollectorGroupForEvent(
 ): IRadioGroupFormField[] {
   const informant = (declaration?.data.informant.otherInformantType ||
     declaration?.data.informant.informantType) as string
-  const isBirthEvent = declaration.event === Event.Birth
-  const isMarriageEvent = declaration.event === Event.Marriage
-  const isInImportantInformantList = [
-    'BRIDE',
-    'GROOM',
-    'MOTHER',
-    'FATHER'
-  ].includes(informant)
 
   let defaultIssueFormOptions: IRadioOption[] = [
     {
@@ -1137,9 +1129,9 @@ export function getCorrectOptionsForPrintingAndIssuing(
   if (isBirthEvent) {
     options.splice(1, 0, ...birthForm)
 
-    const rolesToCheck = ['mother', 'father']
+    const rolesToCheck = ['MOTHER', 'FATHER']
     for (const role of rolesToCheck) {
-      if (declaration.data[role].detailsExist === false) {
+      if (declaration.data[role.toLocaleLowerCase()].detailsExist === false) {
         options = options.filter((opt) => opt.value !== role)
       }
     }
