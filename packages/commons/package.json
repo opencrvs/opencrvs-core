@@ -15,7 +15,7 @@
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "build:watch": "tsc --watch",
     "build:clean": "rm -rf build"
   },
