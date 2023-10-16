@@ -7781,9 +7781,9 @@
     "@types/node" "*"
 
 "@types/google-libphonenumber@^7.4.23":
-  version "7.4.27"
-  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.27.tgz#5a8b39001a2294d7866fb67cf09d1aa0e274d433"
-  integrity sha512-A9I7sLv941PQhnQgN+BtydlZTOZERSEN3C7vZS3kE+RQoDU6Z+YKYRWXU+nEDGjOCXeUtSp7z+sZqXNxIyvrUw==
+  version "7.4.28"
+  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.28.tgz#184121ee9298196a58fd7a3660e31d4780558a1f"
+  integrity sha512-i9pFs/UUuaXiJhbw/A866U4L1+l1viYwYOHouXuKF0RU5xESaqIppf+QkOogjoSakcGgkTAM1N3yB5LI7X0TKQ==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.7"
