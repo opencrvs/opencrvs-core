@@ -21,6 +21,7 @@ import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
+import { getFilteredRadioOptions } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
 export enum CorrectorRelationship {
   //death
@@ -103,7 +104,7 @@ export const getCorrectorSection = (
   const informant = (declaration?.data.informant.otherInformantType ||
     declaration?.data.informant.informantType) as string
 
-  let options: IRadioOption[] = [
+  const initialOptions: IRadioOption[] = [
     {
       value: CorrectorRelationship.INFORMANT,
       label: messages.informant,
@@ -129,7 +130,7 @@ export const getCorrectorSection = (
     }
   ]
 
-  let birthCorrectorRelationshipOptions: IRadioOption[] = [
+  const birthCorrectorRelationshipOptions: IRadioOption[] = [
     { value: CorrectorRelationship.MOTHER, label: messages.mother },
     { value: CorrectorRelationship.FATHER, label: messages.father },
     { value: CorrectorRelationship.CHILD, label: messages.child },
@@ -139,9 +140,12 @@ export const getCorrectorSection = (
     }
   ]
 
-  if (declaration.event === Event.Birth) {
-    options.splice(1, 0, ...birthCorrectorRelationshipOptions)
-  }
+  const finalOptions = getFilteredRadioOptions(
+    declaration,
+    informant,
+    initialOptions,
+    birthCorrectorRelationshipOptions
+  )
 
   const correctorRelationGroup: IFormSectionGroup = {
     id: 'correctorRelation',
@@ -157,7 +161,7 @@ export const getCorrectorSection = (
         required: true,
         initialValue: '',
         validator: [],
-        options,
+        options: finalOptions,
         nestedFields: {
           MOTHER: [],
           FATHER: [],

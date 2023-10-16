@@ -1009,7 +1009,7 @@ function getCertCollectorGroupForEvent(
   const informant = (declaration?.data.informant.otherInformantType ||
     declaration?.data.informant.informantType) as string
 
-  let defaultPrintCertOptions: IRadioOption[] = [
+  const defaultPrintCertOptions: IRadioOption[] = [
     {
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
@@ -1024,7 +1024,7 @@ function getCertCollectorGroupForEvent(
     }
   ]
 
-  const finalOptions = getCorrectOptionsForPrintingAndIssuing(
+  const finalOptions = getFilteredRadioOptions(
     declaration,
     informant,
     defaultPrintCertOptions,
@@ -1074,7 +1074,7 @@ export function getIssueCertCollectorGroupForEvent(
   const informant = (declaration?.data.informant.otherInformantType ||
     declaration?.data.informant.informantType) as string
 
-  let defaultIssueFormOptions: IRadioOption[] = [
+  const defaultIssueFormOptions: IRadioOption[] = [
     {
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
@@ -1085,7 +1085,7 @@ export function getIssueCertCollectorGroupForEvent(
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
   ]
 
-  const finalOptions = getCorrectOptionsForPrintingAndIssuing(
+  const finalOptions = getFilteredRadioOptions(
     declaration,
     informant,
     defaultIssueFormOptions,
@@ -1110,12 +1110,12 @@ export function getIssueCertCollectorGroupForEvent(
   return fields
 }
 
-function getCorrectOptionsForPrintingAndIssuing(
+export function getFilteredRadioOptions(
   declaration: IDeclaration,
   informant: string,
   options: IRadioOption[],
   birthForm: IRadioOption[],
-  marriageForm: IRadioOption[]
+  marriageForm?: IRadioOption[]
 ): IRadioOption[] {
   const isBirthEvent = declaration.event === Event.Birth
   const isMarriageEvent = declaration.event === Event.Marriage
@@ -1129,7 +1129,7 @@ function getCorrectOptionsForPrintingAndIssuing(
         options = options.filter((opt) => opt.value !== role)
       }
     }
-  } else if (isMarriageEvent) {
+  } else if (isMarriageEvent && marriageForm) {
     options.splice(1, 0, ...marriageForm)
   }
 
