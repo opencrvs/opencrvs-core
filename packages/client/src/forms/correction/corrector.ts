@@ -8,13 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IDeclaration } from '@client/declarations'
 import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
+  IRadioOption,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
+import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
@@ -94,164 +97,111 @@ export const CollectorRelationLabelArray = [
   { value: CorrectorRelationship.GROOM, label: messages.groom }
 ]
 
-const birthCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'correctorRelation',
-  title: messages.whoRequestedCorrection,
-  error: messages.correctorError,
-  fields: [
+export const getCorrectorSection = (
+  declaration: IDeclaration
+): IFormSection => {
+  const informant = (declaration?.data.informant.otherInformantType ||
+    declaration?.data.informant.informantType) as string
+
+  let options: IRadioOption[] = [
     {
-      name: 'relationship',
-      type: RADIO_GROUP_WITH_NESTED_FIELDS,
-      size: RadioSize.LARGE,
-      label: messages.whoRequestedCorrection,
-      hideHeader: true,
-      required: true,
-      initialValue: '',
-      validator: [],
-      options: [
-        { value: CorrectorRelationship.MOTHER, label: messages.mother },
-        { value: CorrectorRelationship.FATHER, label: messages.father },
-        { value: CorrectorRelationship.CHILD, label: messages.child },
-        {
-          value: CorrectorRelationship.LEGAL_GUARDIAN,
-          label: messages.legalGuardian
-        },
-        {
-          value: CorrectorRelationship.ANOTHER_AGENT,
-          label: messages.anotherRegOrFieldAgent
-        },
-        {
-          value: CorrectorRelationship.REGISTRAR,
-          label: messages.me
-        },
-        {
-          value: CorrectorRelationship.COURT,
-          label: messages.court
-        },
-        {
-          value: CorrectorRelationship.OTHER,
-          label: messages.others
-        }
-      ],
-      nestedFields: {
-        MOTHER: [],
-        FATHER: [],
-        CHILD: [],
-        LEGAL_GUARDIAN: [],
-        ANOTHER_AGENT: [],
-        REGISTRAR: [],
-        OTHER: [
-          {
-            name: 'otherRelationship',
-            type: 'TEXT',
-            label: {
-              defaultMessage: 'Relationship to child',
-              id: 'form.field.label.informantsRelationWithChild',
-              description: 'Label for input Relationship to child'
-            },
-            placeholder: {
-              defaultMessage: 'eg. Grandmother',
-              description: 'Placeholder for example of relationship',
-              id: 'form.field.label.relationshipPlaceHolder'
-            },
-            required: true,
-            initialValue: '',
-            validator: [],
-            mapping: {}
-          }
-        ]
-      },
-      mapping: {
-        mutation: fieldValueSectionExchangeTransformer(
-          'correction',
-          'requester'
-        )
+      value: CorrectorRelationship.INFORMANT,
+      label: messages.informant,
+      param: {
+        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
       }
+    },
+    {
+      value: CorrectorRelationship.ANOTHER_AGENT,
+      label: messages.anotherRegOrFieldAgent
+    },
+    {
+      value: CorrectorRelationship.REGISTRAR,
+      label: messages.me
+    },
+    {
+      value: CorrectorRelationship.COURT,
+      label: messages.court
+    },
+    {
+      value: CorrectorRelationship.OTHER,
+      label: messages.others
     }
   ]
-}
 
-const deathCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'correctorRelation',
-  title: messages.whoRequestedCorrection,
-  error: messages.correctorError,
-  fields: [
+  let birthCorrectorRelationshipOptions: IRadioOption[] = [
+    { value: CorrectorRelationship.MOTHER, label: messages.mother },
+    { value: CorrectorRelationship.FATHER, label: messages.father },
+    { value: CorrectorRelationship.CHILD, label: messages.child },
     {
-      name: 'relationship',
-      type: RADIO_GROUP_WITH_NESTED_FIELDS,
-      size: RadioSize.LARGE,
-      label: messages.whoRequestedCorrection,
-      hideHeader: true,
-      required: true,
-      initialValue: '',
-      validator: [],
-      options: [
-        { value: 'INFORMANT', label: messages.informant },
-        { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
-        {
-          value: 'REGISTRAR',
-          label: messages.me
-        },
-        {
-          value: 'COURT',
-          label: messages.court
-        },
-        {
-          value: 'OTHER',
-          label: messages.others
-        }
-      ],
-      nestedFields: {
-        INFORMANT: [],
-        REGISTRAR: [],
-        ANOTHER_AGENT: [],
-        OTHER: [
-          {
-            name: 'otherRelationship',
-            type: 'TEXT',
-            label: {
-              defaultMessage: 'Relationship to deceased',
-              id: 'form.field.label.informantsRelationWithDeceased',
-              description: 'Label for input Relationship to deceased select'
-            },
-            placeholder: {
-              defaultMessage: 'eg. Grandmother',
-              description: 'Placeholder for example of relationship',
-              id: 'form.field.label.relationshipPlaceHolder'
-            },
-            required: true,
-            initialValue: '',
-            validator: [],
-            mapping: {}
-          }
-        ]
-      },
-      mapping: {
-        mutation: fieldValueSectionExchangeTransformer(
-          'correction',
-          'requester'
-        )
-      }
+      value: CorrectorRelationship.LEGAL_GUARDIAN,
+      label: messages.legalGuardian
     }
   ]
-}
 
-const birthCorrectorSection: IFormSection = {
-  id: CorrectionSection.Corrector,
-  viewType: 'form',
-  name: messages.name,
-  title: messages.title,
-  groups: [birthCorrectorRelationGroup]
-}
+  if (declaration.event === Event.Birth) {
+    options.splice(1, 0, ...birthCorrectorRelationshipOptions)
+  }
 
-const deathCorrectorSection: IFormSection = {
-  id: CorrectionSection.Corrector,
-  viewType: 'form',
-  name: messages.name,
-  title: messages.title,
-  groups: [deathCorrectorRelationGroup]
-}
+  const correctorRelationGroup: IFormSectionGroup = {
+    id: 'correctorRelation',
+    title: messages.whoRequestedCorrection,
+    error: messages.correctorError,
+    fields: [
+      {
+        name: 'relationship',
+        type: RADIO_GROUP_WITH_NESTED_FIELDS,
+        size: RadioSize.LARGE,
+        label: messages.whoRequestedCorrection,
+        hideHeader: true,
+        required: true,
+        initialValue: '',
+        validator: [],
+        options,
+        nestedFields: {
+          MOTHER: [],
+          FATHER: [],
+          CHILD: [],
+          LEGAL_GUARDIAN: [],
+          ANOTHER_AGENT: [],
+          REGISTRAR: [],
+          OTHER: [
+            {
+              name: 'otherRelationship',
+              type: 'TEXT',
+              label:
+                declaration.event === Event.Birth
+                  ? formMessages.informantsRelationWithChild
+                  : formMessages.informantsRelationWithDeceased,
+              placeholder: {
+                defaultMessage: 'eg. Grandmother',
+                description: 'Placeholder for example of relationship',
+                id: 'form.field.label.relationshipPlaceHolder'
+              },
+              required: true,
+              initialValue: '',
+              validator: [],
+              mapping: {}
+            }
+          ]
+        },
+        mapping: {
+          mutation: fieldValueSectionExchangeTransformer(
+            'correction',
+            'requester'
+          )
+        }
+      }
+    ]
+  }
 
-export const getCorrectorSection = (event: Event) => {
-  return event === Event.Birth ? birthCorrectorSection : deathCorrectorSection
+  const correctorSection: IFormSection = {
+    id: CorrectionSection.Corrector,
+    viewType: 'form',
+    name: messages.name,
+    title: messages.title,
+    groups: [correctorRelationGroup]
+  }
+
+  return correctorSection
 }

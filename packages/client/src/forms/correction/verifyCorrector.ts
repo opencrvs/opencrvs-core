@@ -12,6 +12,19 @@ import { Event } from '@client/utils/gateway'
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 const verifyBirthCorrector: ICertificateCorrectorDefinition = {
+  informant: {
+    identifierTypeField: 'iDType',
+    identifierOtherTypeField: 'iDTypeOther',
+    identifierField: 'informantID',
+    nameFields: {
+      en: {
+        firstNamesField: 'firstNamesEng',
+        familyNameField: 'familyNameEng'
+      }
+    },
+    birthDateField: 'informantBirthDate',
+    nationalityField: 'nationality'
+  },
   mother: {
     identifierTypeField: 'iDType',
     identifierOtherTypeField: 'iDTypeOther',

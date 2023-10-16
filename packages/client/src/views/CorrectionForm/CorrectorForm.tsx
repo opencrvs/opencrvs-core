@@ -111,7 +111,7 @@ function getGroupWithVisibleFields(
 function CorrectorFormComponent(props: IFullProps) {
   const { declaration, intl } = props
 
-  const section = getCorrectorSection(declaration.event)
+  const section = getCorrectorSection(declaration)
 
   const group = React.useMemo(
     () => getGroupWithVisibleFields(section, declaration),

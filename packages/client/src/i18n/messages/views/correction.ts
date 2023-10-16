@@ -147,7 +147,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   informant: {
     id: 'correction.corrector.informant',
-    defaultMessage: 'Informant',
+    defaultMessage: 'Informant ({informant})',
     description: 'Label for informant option in certificate correction form'
   },
   whatWasTheReasonForCorrection: {
