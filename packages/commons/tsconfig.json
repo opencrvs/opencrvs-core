@@ -25,8 +25,7 @@
   "exclude": [
     "node_modules",
     "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts"
+    "test/setupJest.ts",
+    "src/**/*.test.ts"
   ]
 }
