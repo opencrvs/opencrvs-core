@@ -1117,19 +1117,19 @@ export function getFilteredRadioOptions(
   birthForm: IRadioOption[],
   marriageForm?: IRadioOption[]
 ): IRadioOption[] {
-  const isBirthEvent = declaration.event === Event.Birth
-  const isMarriageEvent = declaration.event === Event.Marriage
-
-  if (isBirthEvent) {
+  if (declaration.event === Event.Birth) {
     options.splice(1, 0, ...birthForm)
 
     const rolesToCheck = ['MOTHER', 'FATHER']
     for (const role of rolesToCheck) {
-      if (declaration.data[role.toLocaleLowerCase()].detailsExist === false) {
+      if (
+        !declaration.data[role.toLowerCase()]?.detailsExist ||
+        declaration.data[role.toLowerCase()].detailsExist === false
+      ) {
         options = options.filter((opt) => opt.value !== role)
       }
     }
-  } else if (isMarriageEvent && marriageForm) {
+  } else if (declaration.event === Event.Marriage && marriageForm) {
     options.splice(1, 0, ...marriageForm)
   }
 
