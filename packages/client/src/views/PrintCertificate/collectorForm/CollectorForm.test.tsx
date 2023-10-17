@@ -162,7 +162,7 @@ const deathDeclaration = {
 const marriageDeclaration = {
   id: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
   data: mockMarriageDeclarationData,
-  event: Event.Death
+  event: Event.Marriage
 }
 
 beforeEach(() => {
@@ -558,8 +558,8 @@ describe('Certificate collector test for a death registration', () => {
       component = testComponent
     })
 
-    it('informant will be available', async () => {
-      const element = await waitForElement(component, '#type_INFORMANT')
+    it('informant will be spouse', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT_Spouse')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -608,6 +608,11 @@ describe('Certificate collector test for a marriage registration', () => {
       )
 
       component = testComponent
+    })
+
+    it('informant will be available', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT_Uncle')
+      expect(element.hostNodes()).toHaveLength(1)
     })
 
     it('groom will be available', async () => {
@@ -666,6 +671,12 @@ describe('Certificate collector test for a birth registration without father and
       )
       component = testComponent
       await waitForElement(component, '#collector_form')
+    })
+
+    it('informant option will be uncle', () => {
+      expect(component.find('#type_INFORMANT_Uncle').hostNodes()).toHaveLength(
+        1
+      )
     })
 
     it('father option will not be available', () => {
