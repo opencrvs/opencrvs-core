@@ -627,6 +627,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.contactEmail) {
+    must.push({
+      terms: {
+        'contactEmail.keyword': [params.contactEmail]
+      }
+    })
+  }
+
   if (params.registrationNumber) {
     must.push({
       match: {

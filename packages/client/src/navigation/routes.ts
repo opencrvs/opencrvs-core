@@ -38,7 +38,7 @@ export const CERTIFICATE_CORRECTION_REVIEW =
 export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
 
 export const SEARCH = '/search'
-export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
+export const SEARCH_RESULT = '/search-result'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'

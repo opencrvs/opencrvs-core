@@ -30,6 +30,7 @@ export const SEARCH_EVENTS = gql`
         registration {
           status
           contactNumber
+          contactEmail
           trackingId
           registrationNumber
           registeredLocationId
