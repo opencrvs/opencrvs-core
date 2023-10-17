@@ -610,13 +610,8 @@ describe('Certificate collector test for a marriage registration', () => {
       component = testComponent
     })
 
-    it('informant will be available', async () => {
-      const element = await waitForElement(component, '#type_INFORMANT_Uncle')
-      expect(element.hostNodes()).toHaveLength(1)
-    })
-
-    it('groom will be available', async () => {
-      const element = await waitForElement(component, '#type_GROOM')
+    it('informant will be grrom', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT_Groom')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -673,18 +668,14 @@ describe('Certificate collector test for a birth registration without father and
       await waitForElement(component, '#collector_form')
     })
 
-    it('informant option will be uncle', () => {
-      expect(component.find('#type_INFORMANT_Uncle').hostNodes()).toHaveLength(
+    it('informant will be mother', () => {
+      expect(component.find('#type_INFORMANT_Mother').hostNodes()).toHaveLength(
         1
       )
     })
 
     it('father option will not be available', () => {
       expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
-    })
-
-    it('mother option will be available', () => {
-      expect(component.find('#type_MOTHER').hostNodes()).toHaveLength(1)
     })
   })
 })

@@ -749,7 +749,7 @@ export const mockDeclarationData = {
     primaryAddressSameAsOtherPrimary: true
   },
   informant: {
-    informantType: 'UNCLE',
+    informantType: 'MOTHER',
     otherInformantType: '',
     registrationPhone: '01733333333',
     registrationEmail: 'sdfsbg@hgh.com',
@@ -914,7 +914,7 @@ export const mockMarriageDeclarationData = {
     ]
   },
   informant: {
-    informantType: 'UNCLE',
+    informantType: 'GROOM',
     otherInformantType: '',
     exactDateOfBirthUnknown: '',
     registrationPhone: '01733333333',
