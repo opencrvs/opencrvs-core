@@ -66,6 +66,7 @@ interface IConditionals {
 export interface IRadioOption {
   label: string
   value: string | boolean
+  param?: Record<string, string>
   conditionals?: IConditionals[]
   disabled?: boolean
 }
@@ -113,7 +114,13 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     disabled={option.disabled}
                     label={option.label}
                     value={option.value}
-                    id={`${name}_${option.value}`}
+                    id={
+                      option.param
+                        ? `${name}_${option.value}_${Object.values(
+                            option.param
+                          ).toString()}`
+                        : `${name}_${option.value}`
+                    }
                     selected={value}
                     onChange={this.props.onChange}
                     hasFlexDirection={flexDirection ? true : false}
@@ -139,7 +146,13 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     disabled={option.disabled}
                     label={option.label}
                     value={option.value}
-                    id={`${name}_${option.value}`}
+                    id={
+                      option.param
+                        ? `${name}_${option.value}_${Object.values(
+                            option.param
+                          ).toString()}`
+                        : `${name}_${option.value}`
+                    }
                     selected={value}
                     onChange={this.props.onChange}
                     hasFlexDirection={flexDirection ? true : false}
