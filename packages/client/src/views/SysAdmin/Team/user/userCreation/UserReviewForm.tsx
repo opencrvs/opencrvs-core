@@ -148,27 +148,34 @@ class UserReviewFormComponent extends React.Component<
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
           if (field.name === 'username' && !this.getValue(field)) return
+
           let label =
             field.type === SIMPLE_DOCUMENT_UPLOADER ? (
-              <DocumentUploaderContainer>
-                <SimpleDocumentUploader
-                  label={intl.formatMessage(field.label)}
-                  disableDeleteInPreview={true}
-                  name={field.name}
-                  onComplete={(file) => {
-                    this.props.modify({
-                      ...this.props.formData,
-                      [field.name]: file
-                    })
-                  }}
-                  allowedDocType={field.allowedDocType}
-                  files={
-                    this.props.formData[
-                      field.name
-                    ] as unknown as IAttachmentValue
-                  }
-                />
-              </DocumentUploaderContainer>
+              <>
+                {this.props.formData[field.name] ? (
+                  <DocumentUploaderContainer>
+                    <SimpleDocumentUploader
+                      label={intl.formatMessage(field.label)}
+                      disableDeleteInPreview={true}
+                      name={field.name}
+                      onComplete={(file) => {
+                        this.props.modify({
+                          ...this.props.formData,
+                          [field.name]: file
+                        })
+                      }}
+                      allowedDocType={field.allowedDocType}
+                      files={
+                        this.props.formData[
+                          field.name
+                        ] as unknown as IAttachmentValue
+                      }
+                    />
+                  </DocumentUploaderContainer>
+                ) : (
+                  intl.formatMessage(field.label)
+                )}
+              </>
             ) : (
               intl.formatMessage(field.label)
             )
