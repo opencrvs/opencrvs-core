@@ -59,7 +59,8 @@ import {
   CorrectionSection,
   IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  SubmissionAction
+  SubmissionAction,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -91,7 +92,8 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  ACCUMULATED_FILE_SIZE,
+  ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -108,7 +110,6 @@ import { client } from '@client/utils/apolloClient'
 import { Stack, ToggleMenu } from '@client/../../components/lib'
 import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
-
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
