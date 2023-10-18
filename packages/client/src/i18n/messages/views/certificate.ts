@@ -39,6 +39,7 @@ interface ICertificateMessages
   manualPaymentMethod: MessageDescriptor
   mother: MessageDescriptor
   nationality: MessageDescriptor
+  age: MessageDescriptor
   next: MessageDescriptor
   noLabel: MessageDescriptor
   number: MessageDescriptor
@@ -232,6 +233,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Nationality',
     description: 'Parent Nationality',
     id: 'certificate.parent.details.label.nationality'
+  },
+  age: {
+    defaultMessage: 'Age',
+    description: 'Parent Nationality',
+    id: 'certificate.parent.details.label.age'
   },
   next: {
     defaultMessage: 'Next',
