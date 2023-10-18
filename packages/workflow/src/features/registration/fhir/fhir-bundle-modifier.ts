@@ -159,7 +159,7 @@ export async function invokeRegistrationValidation(
       throw new Error('Cant get composition in bundle')
     }
     const taskResource = await fetchTaskByCompositionIdFromHearth(
-      composition.id
+      composition.id!
     )
     const practitioner = await getLoggedInPractitionerResource(token)
 

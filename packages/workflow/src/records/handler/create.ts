@@ -1,5 +1,11 @@
 import * as Hapi from '@hapi/hapi'
-import { EVENT_TYPE, buildFHIRBundle } from '@opencrvs/commons/types'
+import {
+  BirthRegistration,
+  DeathRegistration,
+  EVENT_TYPE,
+  MarriageRegistration,
+  buildFHIRBundle
+} from '@opencrvs/commons/types'
 import {
   modifyRegistrationBundle,
   markBundleAsWaitingValidation,
@@ -21,13 +27,14 @@ import { sendBundleToHearth } from '@workflow/records/fhir'
 import { z } from 'zod'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
+import { validateRequest } from '@workflow/utils'
 
 export const requestSchema = z.object({
   eventType: z.custom<EVENT_TYPE>(),
-  details: z.any() // TBD Later
+  details: z.custom<
+    BirthRegistration | DeathRegistration | MarriageRegistration
+  >()
 })
-
-type Payload = z.infer<typeof requestSchema>
 
 export default async function createRecordHandler(
   request: Hapi.Request,
@@ -37,33 +44,34 @@ export default async function createRecordHandler(
     const token = getToken(request)
     const fromRegistrar = hasRegisterScope(request)
     const fromRegAgent = hasValidateScope(request)
-    const { details, eventType } = request.payload as Payload
+    const payload = validateRequest(requestSchema, request.payload)
+    const { details, eventType } = payload
     const fhirBundle = buildFHIRBundle(details, eventType)
-    let payload = await modifyRegistrationBundle(fhirBundle, token)
+    let bundle = await modifyRegistrationBundle(fhirBundle, token)
     if (fromRegistrar) {
-      payload = await markBundleAsWaitingValidation(payload, token)
+      bundle = await markBundleAsWaitingValidation(bundle, token)
     } else if (fromRegAgent) {
-      payload = await markBundleAsValidated(payload, token)
+      bundle = await markBundleAsValidated(bundle, token)
     }
-    const resBundle = await sendBundleToHearth(payload)
-    populateCompositionWithID(payload, resBundle)
-    await createNewAuditEvent(payload, token)
-    await indexBundle(payload, token)
+    const resBundle = await sendBundleToHearth(bundle)
+    populateCompositionWithID(bundle, resBundle)
+    await createNewAuditEvent(bundle, token)
+    await indexBundle(bundle, token)
 
     if (fromRegistrar) {
-      return { resBundle, payloadForInvokingValidation: payload }
+      return { resBundle, payloadForInvokingValidation: bundle }
     }
 
     /* sending notification to the contact */
-    const sms = await getSharedContactMsisdn(payload)
-    const email = await getSharedContactEmail(payload)
+    const sms = await getSharedContactMsisdn(bundle)
+    const email = await getSharedContactEmail(bundle)
     if (!sms && !email) {
       logger.info('createRecordHandler could not send event notification')
-      return { resBundle, payloadForInvokingValidation: payload }
+      return { resBundle, payloadForInvokingValidation: bundle }
     }
     logger.info('createRecordHandler sending event notification')
     sendCreateRecordNotification(
-      payload,
+      bundle,
       eventType,
       { sms, email },
       {
@@ -71,7 +79,7 @@ export default async function createRecordHandler(
       }
     )
 
-    return { resBundle, payloadForInvokingValidation: payload }
+    return { resBundle, payloadForInvokingValidation: bundle }
   } catch (error) {
     logger.error(`Workflow/createRecordHandler: error: ${error}`)
     throw new Error(error)

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { badRequest, conflict } from '@hapi/boom'
+import { conflict } from '@hapi/boom'
 import {
   BirthRegistration,
   Bundle,
@@ -48,8 +48,6 @@ import {
 } from '@workflow/records/state-transitions'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
-import { z } from 'zod'
-
 import { Request } from '@hapi/hapi'
 import { getAuthHeader } from '@opencrvs/commons'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
@@ -57,17 +55,7 @@ import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
-
-function validateRequest<T extends z.ZodType>(
-  validator: T,
-  payload: unknown
-): z.infer<T> {
-  try {
-    return validator.parse(payload)
-  } catch (error) {
-    throw badRequest(error.message)
-  }
-}
+import { validateRequest } from '@workflow/utils'
 
 export const routes = [
   createRoute({

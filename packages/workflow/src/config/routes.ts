@@ -11,9 +11,7 @@
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
-import createRecordHandler, {
-  requestSchema as createRecordRequestSchema
-} from '@workflow/records/handler/create'
+import createRecordHandler from '@workflow/records/handler/create'
 
 export const getRoutes = () => {
   const routes = [
@@ -68,9 +66,6 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/create-record',
-      validate: {
-        payload: createRecordRequestSchema
-      },
       handler: createRecordHandler,
       config: {
         tags: ['api'],
