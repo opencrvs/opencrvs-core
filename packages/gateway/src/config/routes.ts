@@ -69,31 +69,10 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/location',
-      handler: (r, h) => h.redirect(`/v1/location${r.url.search}`),
-      options: {
-        auth: false,
-        description: 'Get all locations'
-      }
-    },
-    {
-      method: 'GET',
       path: '/v1/location/{locationId}',
       handler: fetchLocationHandler,
       options: {
         tags: ['api'],
-        auth: false,
-        description: 'Get a single location',
-        validate: {
-          params: requestParamsSchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/location/{locationId}',
-      handler: (r, h) => h.redirect(`/v1/location/${r.params.locationId}`),
-      options: {
         auth: false,
         description: 'Get a single location',
         validate: {
@@ -108,20 +87,6 @@ export const getRoutes = () => {
       handler: createLocationHandler,
       options: {
         tags: ['api'],
-        auth: {
-          scope: ['natlsysadmin']
-        },
-        description: 'Create a location',
-        validate: {
-          payload: requestSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/location',
-      handler: createLocationHandler,
-      options: {
         auth: {
           scope: ['natlsysadmin']
         },
@@ -148,21 +113,6 @@ export const getRoutes = () => {
         }
       }
     },
-    {
-      method: 'PUT',
-      path: '/location/{locationId}',
-      handler: updateLocationHandler,
-      options: {
-        auth: {
-          scope: ['natlsysadmin']
-        },
-        description: 'Update a location or facility',
-        validate: {
-          payload: updateSchema,
-          params: requestParamsSchema
-        }
-      }
-    },
     // create event notification
     {
       method: 'POST',
@@ -170,21 +120,6 @@ export const getRoutes = () => {
       handler: eventNotificationHandler,
       options: {
         tags: ['api'],
-        description: 'Create a health notification',
-        auth: {
-          scope: ['declare', 'notification-api']
-        },
-        validate: {
-          payload: fhirBundleSchema,
-          failAction: validationFailedAction
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/notification',
-      handler: eventNotificationHandler,
-      options: {
         description: 'Create a health notification',
         auth: {
           scope: ['declare', 'notification-api']

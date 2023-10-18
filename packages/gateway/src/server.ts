@@ -89,6 +89,17 @@ export async function createServer() {
   const routes = getRoutes()
   app.route(routes)
 
+  app.ext('onRequest', (req, h) => {
+    if (
+      req.url.pathname.startsWith('/location') ||
+      req.url.pathname.startsWith('/notification')
+    ) {
+      req.url.pathname = `/v1${req.url.pathname}`
+      req.setUrl(req.url)
+    }
+    return h.continue
+  })
+
   /*
    * For debugging sent declarations on pre-prod environments.
    * Custom implementation a sGood doesn't support logging request payloads
