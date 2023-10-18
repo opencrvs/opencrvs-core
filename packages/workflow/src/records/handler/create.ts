@@ -25,12 +25,12 @@ import {
 } from '@workflow/utils/authUtils'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { z } from 'zod'
-import { createNewAuditEvent } from '@workflow/records/audit'
+// import { createNewAuditEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
 
 export const requestSchema = z.object({
-  eventType: z.custom<EVENT_TYPE>(),
+  event: z.custom<EVENT_TYPE>(),
   details: z.custom<
     BirthRegistration | DeathRegistration | MarriageRegistration
   >()
@@ -45,8 +45,8 @@ export default async function createRecordHandler(
     const fromRegistrar = hasRegisterScope(request)
     const fromRegAgent = hasValidateScope(request)
     const payload = validateRequest(requestSchema, request.payload)
-    const { details, eventType } = payload
-    const fhirBundle = buildFHIRBundle(details, eventType)
+    const { details, event } = payload
+    const fhirBundle = buildFHIRBundle(details, event)
     let bundle = await modifyRegistrationBundle(fhirBundle, token)
     if (fromRegistrar) {
       bundle = await markBundleAsWaitingValidation(bundle, token)
@@ -55,7 +55,7 @@ export default async function createRecordHandler(
     }
     const resBundle = await sendBundleToHearth(bundle)
     populateCompositionWithID(bundle, resBundle)
-    await createNewAuditEvent(bundle, token)
+    // await createNewAuditEvent(bundle, token)
     await indexBundle(bundle, token)
 
     if (fromRegistrar) {
@@ -72,7 +72,7 @@ export default async function createRecordHandler(
     logger.info('createRecordHandler sending event notification')
     sendCreateRecordNotification(
       bundle,
-      eventType,
+      event,
       { sms, email },
       {
         Authorization: request.headers.authorization
