@@ -236,7 +236,7 @@ const messagesToDefine: ICertificateMessages = {
   },
   age: {
     defaultMessage: 'Age',
-    description: 'Parent Nationality',
+    description: 'Person age',
     id: 'certificate.parent.details.label.age'
   },
   next: {
