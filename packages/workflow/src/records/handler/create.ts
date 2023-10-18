@@ -1,5 +1,5 @@
 import * as Hapi from '@hapi/hapi'
-import { EVENT_TYPE, Saved, buildFHIRBundle } from '@opencrvs/commons/types'
+import { EVENT_TYPE, buildFHIRBundle } from '@opencrvs/commons/types'
 import {
   modifyRegistrationBundle,
   markBundleAsWaitingValidation,
@@ -10,10 +10,7 @@ import {
   getSharedContactEmail
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
-import {
-  isEventNonNotifiable,
-  sendEventNotification
-} from '@workflow/features/registration/utils'
+import { sendCreateRecordNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import {
   getToken,
@@ -22,6 +19,8 @@ import {
 } from '@workflow/utils/authUtils'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { z } from 'zod'
+import { createNewAuditEvent } from '@workflow/records/audit'
+import { indexBundle } from '@workflow/records/search'
 
 export const requestSchema = z.object({
   eventType: z.custom<EVENT_TYPE>(),
@@ -48,8 +47,10 @@ export default async function createRecordHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
+    await createNewAuditEvent(payload, token)
+    await indexBundle(payload, token)
 
-    if (isEventNonNotifiable(event)) {
+    if (fromRegistrar) {
       return { resBundle, payloadForInvokingValidation: payload }
     }
 
@@ -57,23 +58,22 @@ export default async function createRecordHandler(
     const sms = await getSharedContactMsisdn(payload)
     const email = await getSharedContactEmail(payload)
     if (!sms && !email) {
-      logger.info('createRegistrationHandler could not send event notification')
+      logger.info('createRecordHandler could not send event notification')
       return { resBundle, payloadForInvokingValidation: payload }
     }
-    logger.info('createRegistrationHandler sending event notification')
-    sendEventNotification(
+    logger.info('createRecordHandler sending event notification')
+    sendCreateRecordNotification(
       payload,
-      event,
+      eventType,
       { sms, email },
       {
         Authorization: request.headers.authorization
       }
     )
+
     return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
-    logger.error(
-      `Workflow/createRegistrationHandler[${event}]: error: ${error}`
-    )
+    logger.error(`Workflow/createRecordHandler: error: ${error}`)
     throw new Error(error)
   }
 }
