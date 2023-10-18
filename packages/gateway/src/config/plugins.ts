@@ -29,6 +29,7 @@ export const getPlugins = () => {
       version: '1.3.0'
     },
     definitionPrefix: 'useLabel',
+    basePath: '/v1/',
     schemes: ['http', 'https'],
     swaggerUI: false,
     documentationPage: false
