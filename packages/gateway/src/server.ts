@@ -90,11 +90,8 @@ export async function createServer() {
   app.route(routes)
 
   app.ext('onRequest', (req, h) => {
-    if (
-      req.url.pathname.startsWith('/location') ||
-      req.url.pathname.startsWith('/notification')
-    ) {
-      req.url.pathname = `/v1${req.url.pathname}`
+    if (req.url.pathname.startsWith('/v1')) {
+      req.url.pathname = req.url.pathname.replace('/v1', '')
       req.setUrl(req.url)
     }
     return h.continue

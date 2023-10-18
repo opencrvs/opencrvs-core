@@ -59,7 +59,7 @@ export const getRoutes = () => {
     // get all locations
     {
       method: 'GET',
-      path: '/v1/location',
+      path: '/location',
       handler: fetchLocationHandler,
       options: {
         tags: ['api'],
@@ -69,7 +69,7 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/v1/location/{locationId}',
+      path: '/location/{locationId}',
       handler: fetchLocationHandler,
       options: {
         tags: ['api'],
@@ -83,7 +83,7 @@ export const getRoutes = () => {
     // create Location/Facility
     {
       method: 'POST',
-      path: '/v1/location',
+      path: '/location',
       handler: createLocationHandler,
       options: {
         tags: ['api'],
@@ -99,7 +99,7 @@ export const getRoutes = () => {
     // update Location/Facility
     {
       method: 'PUT',
-      path: '/v1/location/{locationId}',
+      path: '/location/{locationId}',
       handler: updateLocationHandler,
       options: {
         tags: ['api'],
@@ -116,7 +116,7 @@ export const getRoutes = () => {
     // create event notification
     {
       method: 'POST',
-      path: '/v1/notification',
+      path: '/notification',
       handler: eventNotificationHandler,
       options: {
         tags: ['api'],
