@@ -143,7 +143,7 @@ export const updateSchema = Joi.object({
 })
 
 export const requestParamsSchema = Joi.object({
-  locationId: Joi.string()
+  locationId: Joi.string().uuid()
 })
 
 export async function fetchLocationHandler(
