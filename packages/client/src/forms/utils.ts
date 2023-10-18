@@ -349,7 +349,7 @@ export const getFieldOptions = (
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
       return field.options.filter((field) =>
-        conditionEvaluator({field, values, draftData})
+        conditionEvaluator({ field, values, declaration: draftData })
       )
     }
 

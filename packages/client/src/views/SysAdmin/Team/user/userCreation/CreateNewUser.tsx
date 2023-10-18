@@ -157,11 +157,11 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
       return this.renderLoadingPage()
     }
 
-    if (section.viewType === 'form') {
+    if (section?.viewType === 'form') {
       return <UserForm {...this.props} />
     }
 
-    if (section.viewType === 'preview') {
+    if (section?.viewType === 'preview') {
       return (
         <UserReviewForm
           client={this.props.client as ApolloClient<any>}
@@ -210,14 +210,18 @@ function getNextSectionIds(
 
 const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
-    props.match.params.sectionId || state.userForm.userForm!.sections[0].id
+    props.match.params.sectionId || state.userForm.userForm?.sections[0].id
 
-  const section = state.userForm.userForm!.sections.find(
+  const section = state.userForm.userForm?.sections.find(
     (section) => section.id === sectionId
   ) as IFormSection
 
   if (!section) {
-    throw new Error(`No section found ${sectionId}`)
+    return {
+      sectionId,
+      userId: props.match.params.userId,
+      submitting: state.userForm.submitting
+    }
   }
 
   let formData = { ...state.userForm.userFormData }
