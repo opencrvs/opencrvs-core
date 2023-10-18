@@ -1006,8 +1006,8 @@ const marriageIssueCollectorFormOptions = [
 function getCertCollectorGroupForEvent(
   declaration: IDeclaration
 ): IFormSectionGroup {
-  const informant = (declaration?.data.informant.otherInformantType ||
-    declaration?.data.informant.informantType) as string
+  const informant = (declaration.data.informant.otherInformantType ||
+    declaration.data.informant.informantType) as string
 
   const defaultPrintCertOptions: IRadioOption[] = [
     {
@@ -1071,8 +1071,8 @@ export function getCertificateCollectorFormSection(
 export function getIssueCertCollectorGroupForEvent(
   declaration: IDeclaration
 ): IRadioGroupFormField[] {
-  const informant = (declaration?.data.informant.otherInformantType ||
-    declaration?.data.informant.informantType) as string
+  const informant = (declaration.data.informant.otherInformantType ||
+    declaration.data.informant.informantType) as string
 
   const defaultIssueFormOptions: IRadioOption[] = [
     {
@@ -1122,10 +1122,7 @@ export function getFilteredRadioOptions(
 
     const rolesToCheck = ['MOTHER', 'FATHER']
     for (const role of rolesToCheck) {
-      if (
-        !declaration.data[role.toLowerCase()]?.detailsExist ||
-        declaration.data[role.toLowerCase()].detailsExist === false
-      ) {
+      if (!Boolean(declaration.data[role.toLowerCase()]?.detailsExist)) {
         options = options.filter((opt) => opt.value !== role)
       }
     }

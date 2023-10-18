@@ -101,8 +101,8 @@ export const CollectorRelationLabelArray = [
 export const getCorrectorSection = (
   declaration: IDeclaration
 ): IFormSection => {
-  const informant = (declaration?.data.informant.otherInformantType ||
-    declaration?.data.informant.informantType) as string
+  const informant = (declaration.data.informant.otherInformantType ||
+    declaration.data.informant.informantType) as string
 
   const initialOptions: IRadioOption[] = [
     {
