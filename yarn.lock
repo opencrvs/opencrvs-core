@@ -5789,6 +5789,13 @@
     "@types/mdx" "^2.0.0"
     "@types/react" ">=16"
 
+"@mongodb-js/saslprep@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mongodb-js/saslprep/-/saslprep-1.1.0.tgz#022fa36620a7287d17acd05c4aae1e5f390d250d"
+  integrity sha512-Xfijy7HvfzzqiOAhAepF4SGN5e9leLkMvg/OPOF97XemjfVCYN/oWa75wnkc6mltMSTwY+XlbhWgUOJmkFspSw==
+  dependencies:
+    sparse-bitfield "^3.0.3"
+
 "@msgpackr-extract/msgpackr-extract-darwin-arm64@2.1.2":
   version "2.1.2"
   resolved "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-darwin-arm64/-/msgpackr-extract-darwin-arm64-2.1.2.tgz"
@@ -7781,9 +7788,9 @@
     "@types/node" "*"
 
 "@types/google-libphonenumber@^7.4.23":
-  version "7.4.27"
-  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.27.tgz#5a8b39001a2294d7866fb67cf09d1aa0e274d433"
-  integrity sha512-A9I7sLv941PQhnQgN+BtydlZTOZERSEN3C7vZS3kE+RQoDU6Z+YKYRWXU+nEDGjOCXeUtSp7z+sZqXNxIyvrUw==
+  version "7.4.28"
+  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.28.tgz#184121ee9298196a58fd7a3660e31d4780558a1f"
+  integrity sha512-i9pFs/UUuaXiJhbw/A866U4L1+l1viYwYOHouXuKF0RU5xESaqIppf+QkOogjoSakcGgkTAM1N3yB5LI7X0TKQ==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.7"
@@ -7842,9 +7849,9 @@
     joi "^17.3.0"
 
 "@types/hapi__inert@^5.2.3":
-  version "5.2.7"
-  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.7.tgz#907e32ffb6034e7e1550c94a024c08eedde31005"
-  integrity sha512-Uu6HLg8E8OSh5vKiCkN6zafS2dKkHAqLzTSWdwoSJ2ccn5rDQDymNWMKrDRsch+ebPd4/1EVeEdJR7j6ay4eAg==
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.8.tgz#bb8f10a600967bb4b123ce522de5ee86699bbd25"
+  integrity sha512-gGr9TssoWngxSVBMFJa0jtJwWhHzJMspAru45Mc6VNf7A7qh1bSYqXEgRqCHkei2OyRFzN0H5PnSKaMEGV9Qwg==
   dependencies:
     "@hapi/hapi" "^21.1.0"
     joi "^17.7.0"
@@ -18576,6 +18583,14 @@ mongodb-connection-string-url@^2.5.4:
     "@types/whatwg-url" "^8.2.1"
     whatwg-url "^11.0.0"
 
+mongodb-connection-string-url@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/mongodb-connection-string-url/-/mongodb-connection-string-url-2.6.0.tgz#57901bf352372abdde812c81be47b75c6b2ec5cf"
+  integrity sha512-WvTZlI9ab0QYtTYnuMLgobULWhokRjtC7db9LtcVfJ+Hsnyr5eo6ZtNAt3Ly24XZScGMelOcGtm7lSn0332tPQ==
+  dependencies:
+    "@types/whatwg-url" "^8.2.1"
+    whatwg-url "^11.0.0"
+
 mongodb@*, mongodb@4.16.0, mongodb@^4.4.1:
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.16.0.tgz#8b0043de7b577c6a7e0ce44a2ca7315b9c0a7927"
@@ -18600,6 +18615,18 @@ mongodb@3.7.3:
     safe-buffer "^5.1.2"
   optionalDependencies:
     saslprep "^1.0.0"
+
+mongodb@4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.17.0.tgz#10202357c1a5910ce9a4aecb4e5f79df500db31c"
+  integrity sha512-LZGMIPjPfWEfhPJATk1s9IvVTD18tyfKdT/0blCMih5vGagk2SwA9wFAUPMdtJpTrhXmyfGgwAaMkvneX2bn2A==
+  dependencies:
+    bson "^4.7.2"
+    mongodb-connection-string-url "^2.6.0"
+    socks "^2.7.1"
+  optionalDependencies:
+    "@aws-sdk/credential-providers" "^3.186.0"
+    "@mongodb-js/saslprep" "^1.1.0"
 
 mongoose@^6.6.1:
   version "6.11.3"
