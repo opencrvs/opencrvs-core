@@ -140,7 +140,7 @@ class IDVerifierComponent extends React.Component<
 
         {collectorInformation.age && (
           <LabelValuePair
-            label={intl.formatMessage(certificateMessages.nationality)}
+            label={intl.formatMessage(certificateMessages.age)}
             value={String(collectorInformation.age as string)}
           />
         )}
