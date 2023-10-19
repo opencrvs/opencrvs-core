@@ -171,7 +171,6 @@ export function executeHandlebarsTemplate(
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
-  console.log(output)
   return output
 }
 
