@@ -534,6 +534,10 @@ export interface IDynamicFormIntialValue {
   }[]
 }
 
+/*
+ * @customization for cameroon - this modification add dynamicInitialValue attribut for type Field FIELD_WITH_DYNAMIC_DEFINITIONS.
+ * This attribute allows the value of the field to be modified according to a dependency
+ */
 export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions

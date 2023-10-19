@@ -894,6 +894,9 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     fieldsToReset.forEach((fieldToReset) => {
+      /*
+       * @customization for cameroon - this modification help to set value when is depend of some field (Select field) for type Field FIELD_WITH_DYNAMIC_DEFINITIONS.
+       */
       if (fieldToReset.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
         const newValue = fieldToReset.dynamicInitialValue?.valueMapper.find(
           (r) => r.key === val
