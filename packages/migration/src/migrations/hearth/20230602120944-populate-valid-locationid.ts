@@ -118,6 +118,7 @@ async function updateEventLocationIdOrJurisdictionIds(db: Db, elasticDoc: any) {
   const encounterSection = composition.section.find(
     (section: any) =>
       section.code?.coding?.[0]?.code === 'birth-encounter' ||
+      section.code?.coding?.[0]?.code === 'marriage-encounter' ||
       section.code?.coding?.[0]?.code === 'death-encounter'
   )
 
@@ -137,7 +138,7 @@ async function updateEventLocationIdOrJurisdictionIds(db: Db, elasticDoc: any) {
     [encounterId]
   )
 
-  if (encounterDoc.length > 0) {
+  if (encounterDoc.length > 0 && encounterDoc[0].location?.length > 0) {
     const locationId = encounterDoc[0].location[0].location.reference.replace(
       'Location/',
       ''
