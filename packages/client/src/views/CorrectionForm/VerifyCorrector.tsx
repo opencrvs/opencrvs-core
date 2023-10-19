@@ -124,7 +124,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     )
     if (showInfoFor.includes(corrector)) {
       const fields = form[corrector]
-      const iD = info[fields.identifierField] as string
+      const iD = eventRegistrationInput?.[corrector]?.identifier?.[0]?.id
       const iDType = eventRegistrationInput?.[corrector]?.identifier?.[0]
         ?.type as string
 
