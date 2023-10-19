@@ -45,6 +45,7 @@ export interface ICorrectorInfo {
   familyName: string | undefined
   birthDate: string | undefined
   nationality: string | undefined
+  age: string | undefined
 }
 
 interface IIDVerifierProps {
@@ -122,13 +123,24 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        {correctorInformation && correctorInformation.birthDate && (
+        {
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(
-              correctorInformation.birthDate as string,
-              intl.locale
-            )}
+            value={
+              correctorInformation?.birthDate
+                ? formatLongDate(
+                    correctorInformation.birthDate as string,
+                    intl.locale
+                  )
+                : '-'
+            }
+          />
+        }
+
+        {correctorInformation?.age && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.nationality)}
+            value={String(correctorInformation.age as string)}
           />
         )}
 

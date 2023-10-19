@@ -95,7 +95,6 @@ class IDVerifierComponent extends React.Component<
 
   renderLabelValue = () => {
     const { collectorInformation, intl } = this.props
-    console.log('collectorInformation', collectorInformation)
 
     return (
       <>
