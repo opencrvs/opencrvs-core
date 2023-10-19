@@ -129,7 +129,7 @@ export const locationQuerySchema = Joi.object({
     Code.CRVS_OFFICE,
     Code.HEALTH_FACILITY
   ),
-  identifier: Joi.string().regex(/^()[a-zA-Z0-9_]+$/),
+  identifier: Joi.string().regex(/^[a-zA-Z0-9_]+$/),
   name: Joi.string().regex(/^[a-zA-Z0-9_,.\s]+$/),
   status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE),
   _count: Joi.number()
