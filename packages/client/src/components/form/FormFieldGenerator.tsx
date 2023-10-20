@@ -890,7 +890,7 @@ class FormSectionComponent extends React.Component<Props> {
           field.dynamicOptions.dependency === fieldName) ||
         (field.type === TEXT && field.dependency === fieldName) ||
         (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
-          field.dynamicInitialValue?.dependency === fieldName)
+          field.dynamicInitialValue?.dependOn === fieldName)
     )
 
     fieldsToReset.forEach((fieldToReset) => {

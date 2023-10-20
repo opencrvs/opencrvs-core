@@ -527,7 +527,7 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
 }
 
 export interface IDynamicFormIntialValue {
-  dependency: string
+  dependOn: string
   valueMapper: {
     key: string
     value: string
