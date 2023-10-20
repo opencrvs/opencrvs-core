@@ -147,7 +147,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   informant: {
     id: 'correction.corrector.informant',
-    defaultMessage: 'Informant',
+    defaultMessage: 'Informant ({informant})',
     description: 'Label for informant option in certificate correction form'
   },
   whatWasTheReasonForCorrection: {
@@ -193,7 +193,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckTitle: {
     id: 'correction.certificate.corrector.idCheck',
-    defaultMessage: 'Check proof of ID',
+    defaultMessage: 'Verify their identity',
     description: 'The title for id check component'
   },
   otherIdCheckTitle: {

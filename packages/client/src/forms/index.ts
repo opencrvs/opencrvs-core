@@ -109,6 +109,7 @@ export interface ISelectOption {
 export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
+  param?: Record<string, string>
   conditionals?: RadioComponentOption['conditionals']
 }
 export interface ICheckboxOption {

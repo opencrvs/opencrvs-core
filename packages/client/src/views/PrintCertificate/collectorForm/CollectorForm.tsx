@@ -19,7 +19,8 @@ import {
   storeDeclaration,
   writeDeclaration,
   IPrintableDeclaration,
-  ICertificate
+  ICertificate,
+  IDeclaration
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -61,19 +62,14 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { flatten, cloneDeep } from 'lodash'
+import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  certCollectorGroupForBirthAppWithParentDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -457,18 +453,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 }
 
-const getCollectCertificateForm = (event: Event, state: IStoreState) => {
-  switch (event) {
-    case Event.Birth:
-    default:
-      return state.printCertificateForm.collectBirthCertificateForm
-    case Event.Death:
-      return state.printCertificateForm.collectDeathCertificateForm
-    case Event.Marriage:
-      return state.printCertificateForm.collectMarriageCertificateForm
-  }
-}
-
 const mapStateToProps = (
   state: IStoreState,
   props: RouteComponentProps<{
@@ -484,67 +468,26 @@ const mapStateToProps = (
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
 
-  const formSection = getCollectCertificateForm(event, state)
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const clonedFormSection = cloneDeep(formSection)
-  const isPrintInAdvanceAllowed =
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration as IDeclaration
+  )
+
+  const isAllowPrintInAdvance =
     event === Event.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
       : event === Event.Death
       ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
       : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
 
-  if (event === Event.Birth && groupId === 'certCollector') {
-    const declarationData = declaration && declaration.data
-    let motherDataExist: boolean | undefined
-    let fatherDataExist: boolean | undefined
-
-    //TODO: This needs to be dynamic.
-    // We shouldn't hardcode 'fathersDetailsExist' field check here
-    // As it's part of the form definition so we can't ensure
-    // that all countries will have this field in their definition
-    if (
-      declarationData &&
-      declarationData.father &&
-      declarationData.father.detailsExist !== undefined
-    ) {
-      fatherDataExist = declarationData.father.detailsExist
-    }
-
-    if (
-      declarationData &&
-      declarationData.mother &&
-      declarationData.mother.detailsExist !== undefined
-    ) {
-      motherDataExist = declarationData.mother.detailsExist
-    }
-
-    if (motherDataExist && fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithParentDetails
-      )
-    } else if (fatherDataExist && !motherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutMotherDetails
-      )
-    } else if (motherDataExist && !fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutFatherDetails
-      )
-    } else if (!motherDataExist && !fatherDataExist) {
-      clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutParentDetails
-      )
-    }
-  }
-  const formGroup = isPrintInAdvanceAllowed
-    ? clonedFormSection.groups.find((group) => group.id === groupId) ||
-      clonedFormSection.groups[0]
+  const formGroup = isAllowPrintInAdvance
+    ? certFormSection.groups.find((group) => group.id === groupId) ||
+      certFormSection.groups[0]
     : filterPrintInAdvancedOption(
-        clonedFormSection.groups.find((group) => group.id === groupId) ||
-          clonedFormSection.groups[0]
+        certFormSection.groups.find((group) => group.id === groupId) ||
+          certFormSection.groups[0]
       )
 
   /**
@@ -579,7 +522,7 @@ const mapStateToProps = (
     pageRoute: CERTIFICATE_COLLECTOR,
     declarationId: registrationId,
     declaration,
-    formSection: clonedFormSection,
+    formSection: certFormSection,
     formGroup: {
       ...formGroup,
       fields
