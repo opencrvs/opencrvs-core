@@ -186,39 +186,45 @@ async function getLocations() {
   return parsedLocations.data
 }
 
+function locationBundleToIdentifier(
+  bundle: fhir3.Bundle<fhir3.Location>
+): string[] {
+  return (bundle.entry ?? [])
+    .map((bundleEntry) => bundleEntry.resource)
+    .filter((maybeLocation): maybeLocation is fhir3.Location =>
+      Boolean(maybeLocation)
+    )
+    .map((location) =>
+      location.identifier
+        ?.find(
+          ({ system }) =>
+            system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
+            system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+        )
+        ?.value?.split('_')
+        .pop()
+    )
+    .filter((maybeId): maybeId is string => Boolean(maybeId))
+}
+
 export async function seedLocations(token: string) {
-  const savedLocations = await fetch(`${GATEWAY_HOST}/location?_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-    .then((res) => res.json())
-    .then((bundle: fhir3.Bundle<fhir3.Location>) => {
-      return (
-        bundle.entry
-          ?.map((bundleEntry) => bundleEntry.resource)
-          .filter((maybeLocation): maybeLocation is fhir3.Location =>
-            Boolean(maybeLocation)
+  const savedLocations = (
+    await Promise.all(
+      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
+        fetch(`${GATEWAY_HOST}/location?type=${type}&_count=0`, {
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
+        })
+          .then((res) => res.json())
+          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
+            locationBundleToIdentifier(bundle)
           )
-          .map((location) =>
-            location.identifier
-              ?.find(
-                ({ system }) =>
-                  system ===
-                    `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
-                  system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-              )
-              ?.value?.split('_')
-              .pop()
-          )
-          .filter((maybeId): maybeId is string => Boolean(maybeId)) ?? []
       )
-    })
+    )
+  ).flat()
   const savedLocationsSet = new Set(savedLocations)
   const locations = (await getLocations()).filter((location) => {
-    if (savedLocationsSet.has(location.id)) {
-      console.log(`Location with id "${location.id}" already exists. Skipping`)
-    }
     return !savedLocationsSet.has(location.id)
   })
   const res = await fetch(`${GATEWAY_HOST}/location?`, {

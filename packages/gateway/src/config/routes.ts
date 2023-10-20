@@ -20,16 +20,18 @@ import {
   updateLocationHandler,
   updateSchema,
   fetchLocationHandler,
-  requestParamsSchema
+  requestParamsSchema,
+  locationQuerySchema
 } from '@gateway/features/restLocation/locationHandler'
 import {
   eventNotificationHandler,
   fhirBundleSchema,
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
+import { ServerRoute } from '@hapi/hapi'
 
 export const getRoutes = () => {
-  const routes = [
+  const routes: ServerRoute[] = [
     // used for tests to check JWT auth
     {
       method: 'GET',
@@ -43,7 +45,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/ping',
       handler: healthCheckHandler,
-      config: {
+      options: {
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service',
@@ -60,17 +62,20 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/location',
       handler: fetchLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false,
-        description: 'Get all locations'
+        description: 'Get all locations',
+        validate: {
+          query: locationQuerySchema
+        }
       }
     },
     {
       method: 'GET',
       path: '/location/{locationId}',
       handler: fetchLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false,
         description: 'Get a single location',
@@ -84,7 +89,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/location',
       handler: createLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: {
           scope: ['natlsysadmin']
@@ -100,7 +105,7 @@ export const getRoutes = () => {
       method: 'PUT',
       path: '/location/{locationId}',
       handler: updateLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: {
           scope: ['natlsysadmin']
@@ -117,7 +122,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/notification',
       handler: eventNotificationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Create a health notification',
         auth: {
