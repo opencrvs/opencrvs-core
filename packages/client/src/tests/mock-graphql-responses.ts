@@ -9,17 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
-  GET_BIRTH_REGISTRATION_FOR_REVIEW
-} from '@client/views/DataProvider/birth/queries'
-import {
-  GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
-  GET_DEATH_REGISTRATION_FOR_REVIEW
-} from '@client/views/DataProvider/death/queries'
-import { createReviewDeclaration } from '@opencrvs/client/src/declarations'
-import { Event } from '@client/utils/gateway'
-import { v4 as uuid } from 'uuid'
+import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
 
 export const birthDeclarationForReview = {
   _fhirIDMap: {
