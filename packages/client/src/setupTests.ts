@@ -111,6 +111,17 @@ vi.mock('@client/forms/validators', async () => {
   }
 })
 
+vi.mock('@client/forms/handlebarHelpers', async () => {
+  const actual = (await vi.importActual(
+    '@client/forms/handlebarHelpers'
+  )) as any
+  return {
+    ...actual,
+    handlebarHelpers: {},
+    initHandlebarHelpers: () => Promise.resolve()
+  }
+})
+
 /*
  * Initialize mocks
  */

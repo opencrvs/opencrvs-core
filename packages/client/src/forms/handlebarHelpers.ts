@@ -19,10 +19,12 @@ export async function initHandlebarHelpers() {
 }
 
 export function registerHandlebarHelpers() {
-  for (const funcName of Object.keys(handlebarHelpers)) {
-    const func = handlebarHelpers[funcName]
-    if (typeof func === 'function') {
-      Handlebars.registerHelper(funcName, func)
+  if (handlebarHelpers) {
+    for (const funcName of Object.keys(handlebarHelpers)) {
+      const func = handlebarHelpers[funcName]
+      if (typeof func === 'function') {
+        Handlebars.registerHelper(funcName, func)
+      }
     }
   }
 }
