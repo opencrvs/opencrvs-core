@@ -192,7 +192,8 @@ vi.doMock(
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),
-      importValidators: () => Promise.resolve({})
+      importValidators: () => Promise.resolve({}),
+      importHandlebarHelpers: () => Promise.resolve({})
     }
   })
 )
