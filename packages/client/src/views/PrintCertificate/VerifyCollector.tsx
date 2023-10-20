@@ -43,6 +43,9 @@ import {
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { draftToGqlTransformer } from '@client/transformer'
+import { IForm } from '@client/forms'
+import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 
 interface IMatchParams {
   registrationId: string
@@ -51,6 +54,7 @@ interface IMatchParams {
 }
 
 interface IStateProps {
+  registerForm: IForm
   declaration: IPrintableDeclaration
   offlineCountryConfiguration: IOfflineData
 }
@@ -120,16 +124,20 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
-    const { intl, declaration } = this.props
+    const { intl, declaration, registerForm } = this.props
     const info = declaration.data[collector]
 
+    const eventRegistrationInput = draftToGqlTransformer(
+      registerForm,
+      declaration.data
+    )
     const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
 
-    const iD = info[fields.identifierField] as string
-    const iDType = (info[fields.identifierTypeField] ||
-      info[fields.identifierOtherTypeField]) as string
+    const iD = eventRegistrationInput?.[collector]?.identifier?.[0]?.id
+    const iDType = eventRegistrationInput?.[collector]?.identifier?.[0]
+      ?.type as string
 
     const firstNameIndex = (
       fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
@@ -149,6 +157,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       fields.birthDateField && !isExactDobUnknownForIdVerifier
         ? (info[fields.birthDateField] as string)
         : ''
+
+    const age = isExactDobUnknownForIdVerifier
+      ? (info[fields.ageOfPerson as string] as string)
+      : ''
+
     const nationality = info[fields.nationalityField] as string
 
     return {
@@ -157,7 +170,8 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       firstNames,
       familyName,
       birthDate,
-      nationality
+      nationality,
+      age
     }
   }
 
@@ -229,8 +243,10 @@ const mapStateToProps = (
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
   ) as IPrintableDeclaration
+  const registerForm = getEventRegisterForm(state, declaration.event)
 
   return {
+    registerForm,
     declaration,
     offlineCountryConfiguration: getOfflineData(state)
   }

@@ -23,6 +23,7 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'informantBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   },
   mother: {
@@ -36,6 +37,7 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'motherBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   },
   father: {
@@ -49,6 +51,7 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'fatherBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   },
   child: {
@@ -61,7 +64,8 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
         familyNameField: 'familyNameEng'
       }
     },
-    birthDateField: 'childBirthDate'
+    birthDateField: 'childBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears'
   }
 }
 
@@ -77,6 +81,7 @@ const verifyDeathCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'informantBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   }
 }

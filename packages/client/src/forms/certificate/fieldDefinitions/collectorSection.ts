@@ -50,6 +50,7 @@ export interface IVerifyIDCertificateCollectorField {
   identifierField: string
   nameFields: INameFields
   birthDateField?: string
+  ageOfPerson?: string
   nationalityField: string
 }
 
@@ -102,6 +103,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'motherBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       },
       father: {
@@ -115,6 +117,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'fatherBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       },
       informant: {
@@ -128,6 +131,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'informantBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       }
     },
@@ -143,6 +147,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'informantBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       }
     },
@@ -158,6 +163,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'informantBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       },
       groom: {
@@ -171,6 +177,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'groomBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       },
       bride: {
@@ -184,6 +191,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
           }
         },
         birthDateField: 'brideBirthDate',
+        ageOfPerson: 'ageOfIndividualInYears',
         nationalityField: 'nationality'
       }
     }
