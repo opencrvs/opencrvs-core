@@ -59,7 +59,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.mother(
+    const patient = await typeResolvers.BirthRegistration!.mother(
       {
         section: [
           {
@@ -86,7 +86,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.father(
+    const patient = await typeResolvers.BirthRegistration!.father(
       {
         section: [
           {
@@ -113,7 +113,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.child(
+    const patient = await typeResolvers.BirthRegistration!.child(
       {
         section: [
           {
@@ -140,7 +140,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({}))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.child(
+    const patient = await typeResolvers.BirthRegistration!.child(
       {
         section: []
       },
@@ -154,7 +154,7 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
 
     // @ts-ignore
-    const informant = await typeResolvers.BirthRegistration.informant(
+    const informant = await typeResolvers.BirthRegistration!.informant(
       mockComposition,
       undefined,
       { headers: undefined }
@@ -166,7 +166,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns id from identifier', () => {
-    const id = typeResolvers.IdentityType.id({
+    const id = typeResolvers.IdentityType!.id({
       value: '123456789',
       type: 'PASSPORT'
     })
@@ -174,7 +174,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns type from identifier', () => {
-    const type = typeResolvers.IdentityType.type({
+    const type = typeResolvers.IdentityType!.type({
       value: '123456789',
       type: {
         coding: [
@@ -189,7 +189,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns otherType from identifier', () => {
-    const type = typeResolvers.IdentityType.otherType({
+    const type = typeResolvers.IdentityType!.otherType({
       value: '123456789',
       type: 'OTHER',
       otherType: 'Office ID'
@@ -198,7 +198,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns id from identifier', () => {
-    const id = typeResolvers.IdentityType.id({
+    const id = typeResolvers.IdentityType!.id({
       value: '123456789',
       type: 'PASSPORT'
     })
@@ -207,7 +207,7 @@ describe('Registration type resolvers', () => {
 
   it('returns first names part with one name', () => {
     // @ts-ignore
-    const given = typeResolvers.HumanName.firstNames({
+    const given = typeResolvers.HumanName!.firstNames({
       use: 'test',
       given: ['John']
     })
@@ -216,7 +216,7 @@ describe('Registration type resolvers', () => {
 
   it('returns first names part with empty first name', () => {
     // @ts-ignore
-    const given = typeResolvers.HumanName.firstNames({
+    const given = typeResolvers.HumanName!.firstNames({
       use: 'test',
       given: undefined
     })
@@ -225,7 +225,7 @@ describe('Registration type resolvers', () => {
 
   it('returns first names part with multiple naems', () => {
     // @ts-ignore
-    const given = typeResolvers.HumanName.firstNames({
+    const given = typeResolvers.HumanName!.firstNames({
       use: 'test',
       given: ['John', 'Dean']
     })
@@ -234,7 +234,7 @@ describe('Registration type resolvers', () => {
 
   it('returns family part of name', () => {
     // @ts-ignore
-    const family = typeResolvers.HumanName.familyName({
+    const family = typeResolvers.HumanName!.familyName({
       use: 'test',
       family: ['Smith']
     })
@@ -243,7 +243,7 @@ describe('Registration type resolvers', () => {
 
   it('returns createdAt date', () => {
     // @ts-ignore
-    const createdAt = typeResolvers.BirthRegistration.createdAt({
+    const createdAt = typeResolvers.BirthRegistration!.createdAt({
       date: '2018-10-05'
     })
     expect(createdAt).toBe('2018-10-05')
@@ -251,43 +251,43 @@ describe('Registration type resolvers', () => {
 
   it('returns dateOfMarriage', () => {
     // @ts-ignore
-    const dateOfMarriage = typeResolvers.Person.dateOfMarriage(mockPatient)
+    const dateOfMarriage = typeResolvers.Person!.dateOfMarriage(mockPatient)
     expect(dateOfMarriage).toBe('2014-01-28')
   })
 
   it('returns marital status', () => {
     // @ts-ignore
-    const maritalStatus = typeResolvers.Person.maritalStatus(mockPatient)
+    const maritalStatus = typeResolvers.Person!.maritalStatus(mockPatient)
     expect(maritalStatus).toBe('Married')
   })
 
   it('returns occupation', () => {
     // @ts-ignore
-    const maritalStatus = typeResolvers.Person.occupation(mockPatient)
+    const maritalStatus = typeResolvers.Person!.occupation(mockPatient)
     expect(maritalStatus).toBe('Some Occupation')
   })
 
   it('returns multipleBirth', () => {
     // @ts-ignore
-    const multipleBirth = typeResolvers.Person.multipleBirth(mockPatient)
+    const multipleBirth = typeResolvers.Person!.multipleBirth(mockPatient)
     expect(multipleBirth).toBe(1)
   })
 
   it('returns deceased', () => {
     // @ts-ignore
-    const deceased = typeResolvers.Deceased.deceased(mockPatient)
+    const deceased = typeResolvers.Deceased!.deceased(mockPatient)
     expect(deceased).toBe('true')
   })
 
   it('returns nationality', () => {
     // @ts-ignore
-    const nationality = typeResolvers.Person.nationality(mockPatient)
+    const nationality = typeResolvers.Person!.nationality(mockPatient)
     expect(nationality).toEqual(['BN', 'EN'])
   })
 
   it('returns null if nationality not found', () => {
     // @ts-ignore
-    const nationality = typeResolvers.Person.nationality({
+    const nationality = typeResolvers.Person!.nationality({
       resourceType: 'Patient',
       extension: []
     })
@@ -297,25 +297,25 @@ describe('Registration type resolvers', () => {
   it('returns educationalAttainment', () => {
     // @ts-ignore
     const educationalAttainment =
-      typeResolvers.Person.educationalAttainment(mockPatient)
+      typeResolvers.Person!.educationalAttainment(mockPatient)
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
   })
 
   describe('History type resolver', () => {
     it('Should return action DOWNLOADED', async () => {
-      const action = await typeResolvers.History.action(mockTaskDownloaded)
+      const action = await typeResolvers.History!.action(mockTaskDownloaded)
       expect(action).toEqual(GQLRegAction.DOWNLOADED)
     })
 
     it('Should return reject reason', async () => {
-      const statusReason = await typeResolvers.History.statusReason(
+      const statusReason = await typeResolvers.History!.statusReason(
         mockTaskDownloaded
       )
       expect(statusReason.text).toEqual('Rejected reason')
     })
 
     it('Should return date', () => {
-      const date = typeResolvers.History.date(mockTaskDownloaded)
+      const date = typeResolvers.History!.date(mockTaskDownloaded)
       expect(date).toBe('2016-10-31T09:45:05+10:00')
     })
 
@@ -472,7 +472,7 @@ describe('Registration type resolvers', () => {
         .mockResolvedValueOnce(roleBundle)
         .mockResolvedValueOnce(roleHistoryBundle)
       fetch.mockResponses([JSON.stringify(mockUser), { status: 200 }])
-      const user = await typeResolvers.History.user(mockTaskDownloaded, null, {
+      const user = await typeResolvers.History!.user(mockTaskDownloaded, null, {
         dataSources: { practitionerRoleAPI: new PractitionerRoleAPI() }
       })
       expect(user.role.labels).toEqual(mockUser.role.labels)
@@ -480,7 +480,7 @@ describe('Registration type resolvers', () => {
 
     it('Should return location', async () => {
       mockGet.mockResolvedValueOnce(mockLocation)
-      const location = await typeResolvers.History.location(
+      const location = await typeResolvers.History!.location(
         mockTaskDownloaded,
         null,
         {
@@ -493,14 +493,14 @@ describe('Registration type resolvers', () => {
     })
 
     it('Should return comment', () => {
-      const comment = typeResolvers.History.comments(mockTaskDownloaded)
+      const comment = typeResolvers.History!.comments(mockTaskDownloaded)
       expect(comment[0].text).toBe('Comment')
     })
 
     it('Should return certificate', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockCertificate))
 
-      const certificates = await typeResolvers.History.certificates(
+      const certificates = await typeResolvers.History!.certificates(
         mockTaskDownloaded,
         null,
         {}
@@ -523,7 +523,7 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.BirthRegistration.registration(
+      const registration = await typeResolvers.BirthRegistration!.registration(
         {
           id: 123
         },
@@ -551,7 +551,7 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.BirthRegistration.registration(
+      const registration = await typeResolvers.BirthRegistration!.registration(
         {
           id: 123
         },
@@ -693,7 +693,7 @@ describe('Registration type resolvers', () => {
       mockCompositionCloned.id = '123'
       mockCompositionCloned.section[4].entry[0].reference = 'Encounter/456'
       // @ts-ignore
-      const idMap = await typeResolvers.BirthRegistration._fhirIDMap(
+      const idMap = await typeResolvers.BirthRegistration!._fhirIDMap(
         mockCompositionCloned,
         undefined,
         { headers: undefined }
@@ -714,7 +714,7 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.birthWeight))
 
       // @ts-ignore
-      const weight = await typeResolvers.BirthRegistration.weightAtBirth(
+      const weight = await typeResolvers.BirthRegistration!.weightAtBirth(
         mockComposition,
         undefined,
         { headers: undefined }
@@ -726,7 +726,7 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.birthType))
 
       // @ts-ignore
-      const birthType = await typeResolvers.BirthRegistration.birthType(
+      const birthType = await typeResolvers.BirthRegistration!.birthType(
         mockComposition,
         undefined,
         { headers: undefined }
@@ -739,7 +739,7 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const attendantAtBirth =
-        await typeResolvers.BirthRegistration.attendantAtBirth(
+        await typeResolvers.BirthRegistration!.attendantAtBirth(
           mockComposition,
           undefined,
           { headers: undefined }
@@ -753,7 +753,7 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const lastPreviousLiveBirth =
-        await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+        await typeResolvers.BirthRegistration!.lastPreviousLiveBirth(
           mockComposition,
           undefined,
           { headers: undefined }
@@ -767,7 +767,7 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const childrenBornAliveToMother =
-        await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+        await typeResolvers.BirthRegistration!.childrenBornAliveToMother(
           mockComposition,
           undefined,
           { headers: undefined }
@@ -781,7 +781,7 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const foetalDeathsToMother =
-        await typeResolvers.BirthRegistration.foetalDeathsToMother(
+        await typeResolvers.BirthRegistration!.foetalDeathsToMother(
           mockComposition,
           undefined,
           { headers: undefined }
@@ -812,11 +812,12 @@ describe('Registration type resolvers', () => {
         [JSON.stringify(mockLocation), { status: 200 }]
       )
       // @ts-ignore
-      const eventLocation = await typeResolvers.BirthRegistration.eventLocation(
-        mockComposition,
-        undefined,
-        { headers: undefined }
-      )
+      const eventLocation =
+        await typeResolvers.BirthRegistration!.eventLocation(
+          mockComposition,
+          undefined,
+          { headers: undefined }
+        )
       expect(eventLocation).toBeDefined()
       expect(eventLocation).toEqual(mockLocation)
     })
@@ -825,7 +826,7 @@ describe('Registration type resolvers', () => {
   describe('Birth Registration branch', () => {
     it('returns mother null', async () => {
       // @ts-ignore
-      const value = await typeResolvers.BirthRegistration.mother(
+      const value = await typeResolvers.BirthRegistration!.mother(
         {
           section: []
         },
@@ -836,7 +837,7 @@ describe('Registration type resolvers', () => {
     })
     it('returns father null', async () => {
       // @ts-ignore
-      const father = await typeResolvers.BirthRegistration.father(
+      const father = await typeResolvers.BirthRegistration!.father(
         {
           section: []
         },
@@ -847,7 +848,7 @@ describe('Registration type resolvers', () => {
     })
     it('returns child null', async () => {
       // @ts-ignore
-      const child = await typeResolvers.BirthRegistration.father(
+      const child = await typeResolvers.BirthRegistration!.father(
         {
           section: []
         },
@@ -858,7 +859,7 @@ describe('Registration type resolvers', () => {
     })
     it('returns informant null', async () => {
       // @ts-ignore
-      const informant = await typeResolvers.BirthRegistration.informant(
+      const informant = await typeResolvers.BirthRegistration!.informant(
         {
           section: []
         },
@@ -869,7 +870,7 @@ describe('Registration type resolvers', () => {
     })
     it('returns weight At birth null', async () => {
       // @ts-ignore
-      const weight = await typeResolvers.BirthRegistration.weightAtBirth(
+      const weight = await typeResolvers.BirthRegistration!.weightAtBirth(
         {
           section: []
         },
@@ -880,7 +881,7 @@ describe('Registration type resolvers', () => {
     })
     it('returns birthType null', async () => {
       // @ts-ignore
-      const birthType = await typeResolvers.BirthRegistration.birthType(
+      const birthType = await typeResolvers.BirthRegistration!.birthType(
         {
           section: []
         },
@@ -892,7 +893,7 @@ describe('Registration type resolvers', () => {
     it('returns attendantAtBirth null', async () => {
       // @ts-ignore
       const attendantAtBirth =
-        await typeResolvers.BirthRegistration.attendantAtBirth(
+        await typeResolvers.BirthRegistration!.attendantAtBirth(
           {
             section: []
           },
@@ -904,7 +905,7 @@ describe('Registration type resolvers', () => {
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore
       const childrenBornAliveToMother =
-        await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+        await typeResolvers.BirthRegistration!.childrenBornAliveToMother(
           {
             section: []
           },
@@ -916,7 +917,7 @@ describe('Registration type resolvers', () => {
     it('returns foetalDeathsToMother null', async () => {
       // @ts-ignore
       const foetalDeathsToMother =
-        await typeResolvers.BirthRegistration.foetalDeathsToMother(
+        await typeResolvers.BirthRegistration!.foetalDeathsToMother(
           {
             section: []
           },
@@ -928,7 +929,7 @@ describe('Registration type resolvers', () => {
     it('returns lastPreviousLiveBirth null', async () => {
       // @ts-ignore
       const lastPreviousLiveBirth =
-        await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+        await typeResolvers.BirthRegistration!.lastPreviousLiveBirth(
           {
             section: []
           },
@@ -942,7 +943,7 @@ describe('Registration type resolvers', () => {
   describe('Attachment type', () => {
     it('returns id', () => {
       // @ts-ignore
-      const id = typeResolvers.Attachment.id(mockDocumentReference)
+      const id = typeResolvers.Attachment!.id(mockDocumentReference)
       expect(id).toBe('b9648bdf-fb4e-4216-905f-d7fc3930301d')
     })
 
@@ -952,7 +953,7 @@ describe('Registration type resolvers', () => {
         JSON.stringify({ presignedURL: '/ocrvs/presignedurl' })
       ])
 
-      const data = typeResolvers.Attachment.data(
+      const data = typeResolvers.Attachment!.data(
         mockDocumentReference,
         undefined,
         { headers: undefined }
@@ -962,7 +963,7 @@ describe('Registration type resolvers', () => {
 
     it('returns originalFileName', () => {
       // @ts-ignore
-      const originalFileName = typeResolvers.Attachment.originalFileName(
+      const originalFileName = typeResolvers.Attachment!.originalFileName(
         mockDocumentReference
       )
       expect(originalFileName).toBe('scan.pdf')
@@ -970,7 +971,7 @@ describe('Registration type resolvers', () => {
 
     it('returns null when originalFileName identifier can not be found', () => {
       // @ts-ignore
-      const originalFileName = typeResolvers.Attachment.originalFileName({
+      const originalFileName = typeResolvers.Attachment!.originalFileName({
         identifer: []
       })
       expect(originalFileName).toBeNull()
@@ -978,7 +979,7 @@ describe('Registration type resolvers', () => {
 
     it('returns systemFileName', () => {
       // @ts-ignore
-      const systemFileName = typeResolvers.Attachment.systemFileName(
+      const systemFileName = typeResolvers.Attachment!.systemFileName(
         mockDocumentReference
       )
       expect(systemFileName).toBe('1234.pdf')
@@ -986,7 +987,7 @@ describe('Registration type resolvers', () => {
 
     it('returns null when systemFileName identifier can not be found', () => {
       // @ts-ignore
-      const systemFileName = typeResolvers.Attachment.systemFileName({
+      const systemFileName = typeResolvers.Attachment!.systemFileName({
         identifer: []
       })
       expect(systemFileName).toBeNull()
@@ -994,19 +995,19 @@ describe('Registration type resolvers', () => {
 
     it('returns type', () => {
       // @ts-ignore
-      const type = typeResolvers.Attachment.type(mockDocumentReference)
+      const type = typeResolvers.Attachment!.type(mockDocumentReference)
       expect(type).toBe('PASSPORT')
     })
 
     it('returns subject', () => {
       // @ts-ignore
-      const subject = typeResolvers.Attachment.subject(mockDocumentReference)
+      const subject = typeResolvers.Attachment!.subject(mockDocumentReference)
       expect(subject).toBe('MOTHER')
     })
 
     it('returns createdAt date', () => {
       // @ts-ignore
-      const createdAt = typeResolvers.Attachment.createdAt(
+      const createdAt = typeResolvers.Attachment!.createdAt(
         mockDocumentReference
       )
       expect(createdAt).toBe('2018-10-18T14:13:03+02:00')
@@ -1022,7 +1023,7 @@ describe('Registration type resolvers', () => {
         .mockResponseOnce(JSON.stringify({ id: 'zzz' })) // Doc ref zzz
 
       // @ts-ignore
-      const attachments = await typeResolvers.Registration.attachments(
+      const attachments = await typeResolvers.Registration!.attachments(
         mockTask,
         undefined,
         { headers: undefined }
@@ -1068,7 +1069,7 @@ describe('Registration type resolvers', () => {
       const mock = fetch.mockResponseOnce(
         JSON.stringify({ resourceType: 'Composition', section: [] })
       )
-      const attachments = await typeResolvers.Registration.attachments(
+      const attachments = await typeResolvers.Registration!.attachments(
         mockTask,
         undefined,
         { headers: undefined }
@@ -1093,7 +1094,7 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const status = await typeResolvers.Registration.status(
+      const status = await typeResolvers.Registration!.status(
         mockTask,
         undefined,
         { headers: undefined }
@@ -1106,12 +1107,12 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns birth tracking ID from the task object', async () => {
-      const trackingID = await typeResolvers.Registration.trackingId(mockTask)
+      const trackingID = await typeResolvers.Registration!.trackingId(mockTask)
 
       expect(trackingID).toBe('123')
     })
     it('returns death tracking ID from the task object', async () => {
-      const trackingID = await typeResolvers.Registration.trackingId(
+      const trackingID = await typeResolvers.Registration!.trackingId(
         mockTaskForDeath
       )
 
@@ -1119,53 +1120,55 @@ describe('Registration type resolvers', () => {
     })
     it('returns birth registration number from the task object', async () => {
       const registrationNumber =
-        await typeResolvers.Registration.registrationNumber(mockTask)
+        await typeResolvers.Registration!.registrationNumber(mockTask)
 
       expect(registrationNumber).toBe('123')
     })
     it('returns death registration number from the task object', async () => {
       const registrationNumber =
-        await typeResolvers.Registration.registrationNumber(mockTaskForDeath)
+        await typeResolvers.Registration!.registrationNumber(mockTaskForDeath)
 
       expect(registrationNumber).toBe('123')
     })
 
     it('returns paper form id from the task', async () => {
       // @ts-ignore
-      const paperFormId = await typeResolvers.Registration.paperFormID(mockTask)
+      const paperFormId = await typeResolvers.Registration!.paperFormID(
+        mockTask
+      )
 
       expect(paperFormId).toBe('123')
     })
 
     it('returns form page number from the task', async () => {
       // @ts-ignore
-      const formPage = await typeResolvers.Registration.page(mockTask)
+      const formPage = await typeResolvers.Registration!.page(mockTask)
 
       expect(formPage).toBe('123')
     })
 
     it('returns form book from the task', async () => {
       // @ts-ignore
-      const formBook = await typeResolvers.Registration.book(mockTask)
+      const formBook = await typeResolvers.Registration!.book(mockTask)
 
       expect(formBook).toBe('123')
     })
 
     it('returns registration type from the task', async () => {
       // @ts-ignore
-      const regType = await typeResolvers.Registration.type(mockTask)
+      const regType = await typeResolvers.Registration!.type(mockTask)
 
       expect(regType).toBe('BIRTH')
     })
     it('returns registration type from the task', async () => {
       // @ts-ignore
-      const regType = await typeResolvers.Registration.type(mockTaskForDeath)
+      const regType = await typeResolvers.Registration!.type(mockTaskForDeath)
 
       expect(regType).toBe('DEATH')
     })
     it('returns contact person from the task', async () => {
       // @ts-ignore
-      const contact = await typeResolvers.Registration.contact(mockTask)
+      const contact = await typeResolvers.Registration!.contact(mockTask)
 
       expect(contact).toEqual('MOTHER')
     })
@@ -1190,11 +1193,11 @@ describe('Registration type resolvers', () => {
         ...mockTask,
         extension: extensionOtherContactPerson
       }
-      const contact = await typeResolvers.Registration.contact(
+      const contact = await typeResolvers.Registration!.contact(
         mockTaskWithOtherContact
       )
       const contactRelationship =
-        await typeResolvers.Registration.contactRelationship(
+        await typeResolvers.Registration!.contactRelationship(
           mockTaskWithOtherContact
         )
       expect(contact).toBe('OTHER')
@@ -1203,16 +1206,15 @@ describe('Registration type resolvers', () => {
 
     it('returns contact person phone number from the task', async () => {
       // @ts-ignore
-      const contactNumber = await typeResolvers.Registration.contactPhoneNumber(
-        mockTask
-      )
+      const contactNumber =
+        await typeResolvers.Registration!.contactPhoneNumber(mockTask)
 
       expect(contactNumber).toEqual('01733333333')
     })
 
     it('returns business status of the task', async () => {
       // @ts-ignore
-      const status = await typeResolvers.RegWorkflow.type(mockTask)
+      const status = await typeResolvers.RegWorkflow!.type(mockTask)
 
       expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
     })
@@ -1220,7 +1222,7 @@ describe('Registration type resolvers', () => {
     it('returns office of the task', async () => {
       mockGet.mockResolvedValueOnce(mockLocation)
 
-      const office = await typeResolvers.RegWorkflow.office(
+      const office = await typeResolvers.RegWorkflow!.office(
         mockTask,
         undefined,
         { dataSources: { locationsAPI: new LocationsAPI() } }
@@ -1230,7 +1232,7 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns null as office of the task', async () => {
-      const office = await typeResolvers.RegWorkflow.office(
+      const office = await typeResolvers.RegWorkflow!.office(
         mockTaskForError,
         undefined,
         { dataSources: { locationsAPI: new LocationsAPI() } }
@@ -1242,25 +1244,25 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockUser))
 
       // @ts-ignore
-      const comments = await typeResolvers.RegWorkflow.comments(
+      const comments = await typeResolvers.RegWorkflow!.comments(
         mockTask,
         undefined,
         { headers: undefined }
       )
       // @ts-ignore
-      const comment = await typeResolvers.Comment.comment(
+      const comment = await typeResolvers.Comment!.comment(
         mockTask.note[0],
         undefined,
         { headers: undefined }
       )
       // @ts-ignore
-      const user = await typeResolvers.Comment.user(
+      const user = await typeResolvers.Comment!.user(
         mockTask.note[0],
         undefined,
         { headers: undefined }
       )
       // @ts-ignore
-      const time = await typeResolvers.Comment.createdAt(
+      const time = await typeResolvers.Comment!.createdAt(
         mockTask.note[0],
         undefined,
         { headers: undefined }
@@ -1276,14 +1278,14 @@ describe('Registration type resolvers', () => {
 
     it('returns timestamp of the task', async () => {
       // @ts-ignore
-      const time = await typeResolvers.RegWorkflow.timestamp(mockTask)
+      const time = await typeResolvers.RegWorkflow!.timestamp(mockTask)
 
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
     it('returns timeLogged of the task', async () => {
       fetch.mockResponseOnce(JSON.stringify({ timeSpentEditing: 0 }))
-      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(
+      const timeLogged = await typeResolvers.RegWorkflow!.timeLogged(
         mockTask,
         undefined,
         { headers: undefined }
@@ -1295,7 +1297,7 @@ describe('Registration type resolvers', () => {
     it('returns user of the task', async () => {
       const mock = fetch.mockResponseOnce(JSON.stringify({ _id: '1' }))
       // @ts-ignore
-      const user = await typeResolvers.RegWorkflow.user(mockTask, undefined, {
+      const user = await typeResolvers.RegWorkflow!.user(mockTask, undefined, {
         headers: undefined
       })
 
@@ -1310,7 +1312,7 @@ describe('Registration type resolvers', () => {
     it('returns null when there is no user extension in task', async () => {
       fetch.mockResponseOnce(JSON.stringify({}))
       // @ts-ignore
-      const user = await typeResolvers.RegWorkflow.user(
+      const user = await typeResolvers.RegWorkflow!.user(
         {
           resourceType: 'Task',
           extension: []
@@ -1325,7 +1327,7 @@ describe('Registration type resolvers', () => {
     it('returns location of the task', async () => {
       mockGet.mockResolvedValueOnce(mockLocation)
 
-      const taskLocation = await typeResolvers.RegWorkflow.location(
+      const taskLocation = await typeResolvers.RegWorkflow!.location(
         mockTask,
         undefined,
         { dataSources: { locationsAPI: new LocationsAPI() } }
@@ -1336,7 +1338,7 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns null when there is no location ref in task extension', async () => {
-      const taskLocation = await typeResolvers.RegWorkflow.location(
+      const taskLocation = await typeResolvers.RegWorkflow!.location(
         {
           resourceType: 'Task',
           extension: []
@@ -1351,7 +1353,7 @@ describe('Registration type resolvers', () => {
     it('throw when tasks has no focus', async () => {
       // @ts-ignore
       expect(
-        typeResolvers.Registration.attachments({}, undefined, {
+        typeResolvers.Registration!.attachments({}, undefined, {
           headers: undefined
         })
       ).rejects.toThrowError(
@@ -1365,7 +1367,7 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockComposition))
 
       // @ts-ignore
-      const duplicates = await typeResolvers.Registration.duplicates(
+      const duplicates = await typeResolvers.Registration!.duplicates(
         mockTask,
         undefined,
         { headers: undefined }
@@ -1379,7 +1381,7 @@ describe('Registration type resolvers', () => {
     it('throws when task has no focus in duplicate resolver', async () => {
       // @ts-ignore
       expect(
-        typeResolvers.Registration.duplicates({}, undefined, {
+        typeResolvers.Registration!.duplicates({}, undefined, {
           headers: undefined
         })
       ).rejects.toThrowError(
@@ -1405,13 +1407,13 @@ describe('Registration type resolvers', () => {
     }
     it('returns name', () => {
       // @ts-ignore
-      const name = typeResolvers.Location.name(location)
+      const name = typeResolvers.Location!.name(location)
       expect(name).toBe('village')
     })
     it('returns identenfier having length 1', () => {
-      const identifier = typeResolvers.Location.identifier(location)
-      const identifierSystem = typeResolvers.Identifier.system(identifier[0])
-      const identifierValue = typeResolvers.Identifier.value(identifier[0])
+      const identifier = typeResolvers.Location!.identifier(location)
+      const identifierSystem = typeResolvers.Identifier!.system(identifier[0])
+      const identifierValue = typeResolvers.Identifier!.value(identifier[0])
       expect(identifier).toHaveLength(1)
       expect(identifierSystem).toBe(
         'http://opencrvs.org/specs/id/jurisdiction-type'
@@ -1420,17 +1422,17 @@ describe('Registration type resolvers', () => {
     })
     it('returns status', () => {
       // @ts-ignore
-      const status = typeResolvers.Location.status(location)
+      const status = typeResolvers.Location!.status(location)
       expect(status).toBe('active')
     })
     it('returns longitude', () => {
       // @ts-ignore
-      const longitude = typeResolvers.Location.longitude(location)
+      const longitude = typeResolvers.Location!.longitude(location)
       expect(longitude).toBe(18.4392)
     })
     it('returns name', () => {
       // @ts-ignore
-      const latitude = typeResolvers.Location.latitude(location)
+      const latitude = typeResolvers.Location!.latitude(location)
       expect(latitude).toBe(-34.08002)
     })
   })
@@ -1445,7 +1447,7 @@ describe('Registration type resolvers', () => {
         ]
       }
     }
-    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    const res = typeResolvers.EventRegistration!.__resolveType(mock)
     expect(res).toEqual('BirthRegistration')
   })
   it('return DeathRegistration type', () => {
@@ -1458,7 +1460,7 @@ describe('Registration type resolvers', () => {
         ]
       }
     }
-    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    const res = typeResolvers.EventRegistration!.__resolveType(mock)
     expect(res).toEqual('DeathRegistration')
   })
 
@@ -1468,7 +1470,7 @@ describe('Registration type resolvers', () => {
       [JSON.stringify(mockCertificate)]
     )
 
-    const certificates = await typeResolvers.Registration.certificates(
+    const certificates = await typeResolvers.Registration!.certificates(
       mockTask,
       undefined,
       { headers: undefined }
@@ -1479,7 +1481,7 @@ describe('Registration type resolvers', () => {
 
   it('throws error as certificate of the task', async () => {
     expect(
-      typeResolvers.Registration.certificates({}, undefined, {
+      typeResolvers.Registration!.certificates({}, undefined, {
         headers: undefined
       })
     ).rejects.toThrowError(
@@ -1493,7 +1495,7 @@ describe('Registration type resolvers', () => {
       [JSON.stringify(mockCertificate)]
     )
 
-    const certificates = await typeResolvers.Registration.certificates(
+    const certificates = await typeResolvers.Registration!.certificates(
       mockTask,
       undefined,
       { headers: undefined }
@@ -1505,7 +1507,7 @@ describe('Registration type resolvers', () => {
     it('returns collector of the certificate', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
 
-      const relatedPerson = await typeResolvers.Certificate.collector(
+      const relatedPerson = await typeResolvers.Certificate!.collector(
         mockCertificate,
         undefined,
         { headers: undefined }

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { presignSignatureV4 } from 'minio/dist/main/signing'
+import { presignSignatureV4 } from 'minio/dist/main/signing.js'
 import {
   MINIO_ACCESS_KEY,
   MINIO_BUCKET_REGION,
