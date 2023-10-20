@@ -31,6 +31,7 @@ import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
+import { registerHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -97,6 +98,7 @@ export function executeHandlebarsTemplate(
     },
     cache
   )
+  registerHandlebarHelpers()
 
   Handlebars.registerHelper(
     'intl',

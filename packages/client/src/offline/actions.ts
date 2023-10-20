@@ -24,7 +24,8 @@ import {
   IApplicationConfigAnonymous,
   LoadFormsResponse,
   LoadValidatorsResponse,
-  LoadConditionalsResponse
+  LoadConditionalsResponse,
+  LoadHandlebarHelpersResponse
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -324,6 +325,16 @@ export const validatorsFailed = (error: Error) => ({
   payload: error
 })
 
+export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
+  type: 'OFFLINE/HANDLEBARS_LOADED' as const,
+  payload: payload
+})
+
+export const handlebarsFailed = (error: Error) => ({
+  type: 'OFFLINE/HANDLEBARS_FAILED' as const,
+  payload: error
+})
+
 export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
   type: 'OFFLINE/CONDITIONALS_LOADED' as const,
   payload: payload
@@ -367,3 +378,5 @@ export type Action =
   | ReturnType<typeof validatorsFailed>
   | ReturnType<typeof conditionalsLoaded>
   | ReturnType<typeof conditionalsFailed>
+  | ReturnType<typeof handlebarsLoaded>
+  | ReturnType<typeof handlebarsFailed>

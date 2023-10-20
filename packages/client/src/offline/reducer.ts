@@ -46,6 +46,7 @@ import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -236,6 +237,11 @@ const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
   failActionCreator: actions.validatorsFailed
 })
 
+const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
+  successActionCreator: actions.handlebarsLoaded,
+  failActionCreator: actions.handlebarsFailed
+})
+
 const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
@@ -252,6 +258,7 @@ function getDataLoadingCommands() {
     CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
+    HANDLEBARS_CMD,
     FORMS_CMD,
     CONTENT_CMD
   ])

@@ -203,6 +203,19 @@ export async function importConditionals(): Promise<LoadConditionalsResponse> {
   return conditionals
 }
 
+export type LoadHandlebarHelpersResponse = Record<
+  string,
+  Handlebars.HelperDelegate
+>
+async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
+  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+  const handlebars = await import(
+    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+  )
+
+  return handlebars
+}
+
 async function loadContent(): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
@@ -345,5 +358,6 @@ export const referenceApi = {
   loadForms,
   importValidators,
   importConditionals,
+  importHandlebarHelpers,
   loadConfigAnonymousUser
 }
