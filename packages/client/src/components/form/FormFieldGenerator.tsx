@@ -183,7 +183,7 @@ type GeneratedInputFieldProps = {
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
-  resetDependentSelectValues: (name: string) => void
+  resetDependentSelectValues: (name: string, val?: string) => void
   resetNestedInputValues?: (field: Ii18nFormField) => void
   nestedFields?: { [key: string]: JSX.Element[] }
   value: IFormFieldValue
@@ -260,7 +260,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             isDisabled={fieldDefinition.disabled}
             value={value as string}
             onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
+              resetDependentSelectValues(fieldDefinition.name, val)
               onSetFieldValue(fieldDefinition.name, val)
             }}
             onFocus={() =>
@@ -320,7 +320,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             {...inputProps}
             size={fieldDefinition.size}
             onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
+              resetDependentSelectValues(fieldDefinition.name, val)
               onSetFieldValue(fieldDefinition.name, val)
             }}
             options={fieldDefinition.options}
@@ -882,17 +882,34 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setFieldTouched(e.target.name)
   }
 
-  resetDependentSelectValues = (fieldName: string) => {
+  resetDependentSelectValues = (fieldName: string, val?: string) => {
     const fields = this.props.fields
     const fieldsToReset = fields.filter(
       (field) =>
         (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
           field.dynamicOptions.dependency === fieldName) ||
-        (field.type === TEXT && field.dependency === fieldName)
+        (field.type === TEXT && field.dependency === fieldName) ||
+        (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+          field.dynamicInitialValue?.dependOn === fieldName)
     )
 
     fieldsToReset.forEach((fieldToReset) => {
-      this.props.setFieldValue(fieldToReset.name, '')
+      /*
+       * @customization for cameroon - this modification help to set value when is depend of some field (Select field) for type Field FIELD_WITH_DYNAMIC_DEFINITIONS.
+       */
+      if (fieldToReset.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
+        const newValue = fieldToReset.dynamicInitialValue?.valueMapper.find(
+          (r) => r.key === val
+        )
+        if (newValue) {
+          this.props.setFieldValue(fieldToReset.name, newValue.value)
+        } else {
+          this.props.setFieldValue(fieldToReset.name, '')
+        }
+      } else {
+        this.props.setFieldValue(fieldToReset.name, '')
+      }
+
       this.resetDependentSelectValues(fieldToReset.name)
     })
   }
@@ -1112,22 +1129,24 @@ class FormSectionComponent extends React.Component<Props> {
               >
                 <Field name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                      draftData={draftData}
-                      disabled={isFieldDisabled}
-                      dynamicDispatch={dynamicDispatch}
-                    />
+                    <>
+                      <GeneratedInputField
+                        fieldDefinition={internationaliseFieldObject(
+                          intl,
+                          withDynamicallyGeneratedFields
+                        )}
+                        onSetFieldValue={setFieldValue}
+                        resetDependentSelectValues={
+                          this.resetDependentSelectValues
+                        }
+                        {...formikFieldProps.field}
+                        touched={touched[field.name] || false}
+                        error={error}
+                        draftData={draftData}
+                        disabled={isFieldDisabled}
+                        dynamicDispatch={dynamicDispatch}
+                      />
+                    </>
                   )}
                 </Field>
               </FormItem>

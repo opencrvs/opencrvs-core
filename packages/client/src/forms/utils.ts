@@ -231,7 +231,7 @@ export const getFieldLabel = (
   values: IFormSectionData
 ): MessageDescriptor | undefined => {
   if (!field.dynamicDefinitions.label) {
-    return undefined
+    return field.label
   }
   return field.dynamicDefinitions.label.labelMapper(
     values[field.dynamicDefinitions.label.dependency] as string

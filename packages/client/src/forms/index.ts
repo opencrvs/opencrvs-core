@@ -526,9 +526,22 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   dynamicOptions: IDynamicOptions
 }
 
+export interface IDynamicFormIntialValue {
+  dependOn: string
+  valueMapper: {
+    key: string
+    value: string
+  }[]
+}
+
+/*
+ * @customization for cameroon - this modification add dynamicInitialValue attribut for type Field FIELD_WITH_DYNAMIC_DEFINITIONS.
+ * This attribute allows the value of the field to be modified according to a dependency
+ */
 export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions
+  dynamicInitialValue?: IDynamicFormIntialValue
 }
 
 export type INestedInputFields = {
