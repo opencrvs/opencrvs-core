@@ -182,14 +182,12 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   ],
   deathEvent: [
     'deathDate',
-    'placeOfDeathTitle',
     'placeOfDeath',
     'deathLocation',
     ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofdeath`)
   ],
   marriageEvent: [
     'marriageDate',
-    'placeOfMarriageTitle',
     ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
   ],
   groom: [
@@ -285,10 +283,12 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'causeOfDeathEstablished',
     'causeOfDeathMethod',
     'deathDescription',
+    'placeOfDeathTitle',
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofdeath`)
   ],
   marriageEvent: [
     'typeOfMarriage',
+    'placeOfMarriageTitle',
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
   ],
   groom: [

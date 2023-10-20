@@ -540,7 +540,8 @@ export const getConditionalActionsForField = (
    */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
