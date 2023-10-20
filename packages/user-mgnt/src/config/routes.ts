@@ -102,6 +102,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
+import * as mongoose from 'mongoose'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -121,10 +122,15 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
-        // Perform any health checks and return true or false for success prop
-        return {
-          success: true
+      handler: async (request: any, h: any) => {
+        try {
+          return {
+            success: mongoose.connection.readyState === 1
+          }
+        } catch (error) {
+          return {
+            success: false
+          }
         }
       },
       config: {

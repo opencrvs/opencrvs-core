@@ -29,6 +29,7 @@ interface EventSearchSet {
 type RegistrationSearchSet {
   status: String
   contactNumber: String
+  contactEmail: String
   contactRelationship: String
   dateOfDeclaration: Date
   trackingId: String

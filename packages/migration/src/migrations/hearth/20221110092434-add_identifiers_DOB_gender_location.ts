@@ -18,7 +18,7 @@ import {
 
 import {
   updateComposition,
-  updateFieldNameByCompositionId
+  renameField
 } from '../../utils/elasticsearch-helper.js'
 import { Db, MongoClient } from 'mongodb'
 import { Identifier } from '../../utils/migration-interfaces.js'
@@ -31,9 +31,9 @@ export const up = async (db: Db, client: MongoClient) => {
   try {
     await session.withTransaction(async () => {
       // rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on elasticSearch
-      await updateFieldNameByCompositionId(
-        'declarationJurisdictionIds',
-        'declarationLocationHirarchyIds'
+      await renameField(
+        'declarationLocationHirarchyIds',
+        'declarationJurisdictionIds'
       )
       const totalCompositionCount = await getTotalDocCountByCollectionName(
         db,

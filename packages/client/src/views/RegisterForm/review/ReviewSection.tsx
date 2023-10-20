@@ -857,7 +857,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isVisibleField(field: IFormField, section: IFormSection) {
-    const { draft, offlineCountryConfiguration } = this.props
+    const { draft, offlineCountryConfiguration, userDetails } = this.props
 
     if (field.type === HIDDEN) {
       return false
@@ -867,7 +867,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       draft.data[section.id] || {},
       offlineCountryConfiguration,
-      draft.data
+      draft.data,
+      userDetails
     )
     return (
       !conditionalActions.includes('hide') &&
@@ -1358,6 +1359,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getOverriddenFieldsListForPreview(
     formSections: IFormSection[]
   ): IFormField[] {
+    const { userDetails } = this.props
     const overriddenFields = formSections
       .map((section) => {
         return section.groups
@@ -1377,7 +1379,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   tempField,
                   draft.data[residingSection] || {},
                   offlineCountryConfiguration,
-                  draft.data
+                  draft.data,
+                  userDetails
                 ).includes('hide')
 
                 return isVisible ? field : ({} as IFormField)
@@ -1528,7 +1531,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     offlineCountryConfiguration: IOfflineData,
     declaration: IDeclaration
   ) => {
-    const { intl, draft } = this.props
+    const { intl, draft, userDetails } = this.props
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
@@ -1553,7 +1556,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               draft.data[section.id] || {},
               offlineCountryConfiguration,
-              draft.data
+              draft.data,
+              userDetails
             )
 
             tempItem = field.previewGroup

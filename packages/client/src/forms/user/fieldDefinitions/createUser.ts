@@ -209,7 +209,6 @@ export function userSectionFormType(): ISerializedFormSection {
             validator: [],
             conditionals: []
           },
-
           {
             name: 'device',
             type: TEXT,
@@ -227,7 +226,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             action: 'hide',
             expression:
-              'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
+              '!window.config.SIGNATURE_REQUIRED_FOR_ROLES.includes(values.systemRole)'
           }
         ],
         fields: [
@@ -243,7 +242,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             name: 'signature',
             type: SIMPLE_DOCUMENT_UPLOADER,
-            label: userFormMessages.userSignatureAttachment,
+            label: userFormMessages.userAttachmentSection,
             description: userFormMessages.userSignatureAttachmentDesc,
             allowedDocType: ['image/png'],
             initialValue: '',

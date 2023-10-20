@@ -123,6 +123,18 @@ export const requestSchema = Joi.alternatives().try(
   Joi.array().items(locationRequestSchema)
 )
 
+export const locationQuerySchema = Joi.object({
+  type: Joi.string().valid(
+    Code.ADMIN_STRUCTURE,
+    Code.CRVS_OFFICE,
+    Code.HEALTH_FACILITY
+  ),
+  identifier: Joi.string().regex(/^[a-zA-Z0-9_]+$/),
+  name: Joi.string().regex(/^[a-zA-Z0-9_,.\s]+$/),
+  status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE),
+  _count: Joi.number()
+}).or('type', 'identifier')
+
 export const updateSchema = Joi.object({
   name: Joi.string().optional(),
   alias: Joi.string().optional(),
@@ -131,7 +143,7 @@ export const updateSchema = Joi.object({
 })
 
 export const requestParamsSchema = Joi.object({
-  locationId: Joi.string()
+  locationId: Joi.string().uuid()
 })
 
 export async function fetchLocationHandler(

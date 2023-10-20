@@ -922,6 +922,7 @@ class FormSectionComponent extends React.Component<Props> {
       offlineCountryConfig,
       intl,
       draftData,
+      userDetails,
       setValues,
       dynamicDispatch
     } = this.props
@@ -947,7 +948,8 @@ class FormSectionComponent extends React.Component<Props> {
             field,
             { ...draftData?.[sectionName], ...values },
             offlineCountryConfig,
-            draftData
+            draftData,
+            userDetails
           )
 
           if (conditionalActions.includes('hide')) {

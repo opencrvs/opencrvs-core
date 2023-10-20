@@ -58,7 +58,7 @@ describe('Integrations root resolvers', () => {
         [JSON.stringify({})]
       )
 
-      const response = await resolvers.Mutation.reactivateSystem(
+      const response = await resolvers.Mutation!.reactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -80,7 +80,7 @@ describe('Integrations root resolvers', () => {
         [JSON.stringify({})]
       )
 
-      const response = await resolvers.Mutation.deactivateSystem(
+      const response = await resolvers.Mutation!.deactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -107,7 +107,7 @@ describe('Integrations root resolvers', () => {
         [JSON.stringify({})]
       )
       expect(
-        resolvers.Mutation.deactivateSystem(
+        resolvers.Mutation!.deactivateSystem(
           {},
           {
             clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -132,7 +132,7 @@ describe('Integrations root resolvers', () => {
       [JSON.stringify({})]
     )
     expect(
-      resolvers.Mutation.reactivateSystem(
+      resolvers.Mutation!.reactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -190,7 +190,7 @@ describe('generate refresh token', () => {
     }
     fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
 
-    const response = await resolvers.Mutation.refreshSystemSecret(
+    const response = await resolvers.Mutation!.refreshSystemSecret(
       {},
       { clientId: '1231234' },
       { headers: authHeaderSysAdmin }
@@ -202,7 +202,7 @@ describe('generate refresh token', () => {
   it('should throw error for register user', async () => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
-    const response = resolvers.Mutation.refreshSystemSecret(
+    const response = resolvers.Mutation!.refreshSystemSecret(
       {},
       { clientId: '1231234' },
       { headers: authHeaderRegister }
@@ -259,7 +259,7 @@ describe('delete system integration', () => {
     }
     fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
 
-    const response = await resolvers.Mutation.deleteSystem(
+    const response = await resolvers.Mutation!.deleteSystem(
       {},
       { clientId: '1231234' },
       { headers: authHeaderSysAdmin }
@@ -271,7 +271,7 @@ describe('delete system integration', () => {
   it('should throw error for register user', async () => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
-    const response = resolvers.Mutation.deleteSystem(
+    const response = resolvers.Mutation!.deleteSystem(
       {},
       { clientId: '1231234' },
       { headers: authHeaderRegister }

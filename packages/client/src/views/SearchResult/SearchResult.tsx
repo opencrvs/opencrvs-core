@@ -44,6 +44,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
+  EMAIL,
   NAME_TEXT,
   NATIONAL_ID_TEXT,
   PHONE_TEXT,
@@ -270,8 +271,13 @@ class SearchResultView extends React.Component<
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { intl, match, userDetails } = this.props
-        const { searchText, searchType } = match.params
+        const { intl, location, userDetails } = this.props
+        const search = location.search
+        const params = new URLSearchParams(search)
+        const [searchText, searchType] = [
+          params.get('searchText'),
+          params.get('searchType')
+        ]
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
@@ -343,7 +349,10 @@ class SearchResultView extends React.Component<
                           searchType === BRN_DRN_TEXT ? searchText : '',
                         contactNumber:
                           searchType === PHONE_TEXT
-                            ? convertToMSISDN(searchText, window.config.COUNTRY)
+                            ? convertToMSISDN(
+                                searchText!,
+                                window.config.COUNTRY
+                              )
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
                         declarationLocationId:
@@ -434,14 +443,19 @@ class SearchResultView extends React.Component<
   }
 
   render() {
-    const { intl, match, userDetails } = this.props
-    const { searchText, searchType } = match.params
+    const { intl, location, userDetails } = this.props
+    const search = location.search
+    const params = new URLSearchParams(search)
+    const [searchText, searchType] = [
+      params.get('searchText'),
+      params.get('searchType')
+    ]
     return (
       <Frame
         header={
           <Header
-            searchText={searchText}
-            selectedSearchType={searchType}
+            searchText={searchText!}
+            selectedSearchType={searchType!}
             mobileSearchBar={true}
             enableMenuSelection={false}
           />
@@ -473,6 +487,7 @@ class SearchResultView extends React.Component<
                   searchType === PHONE_TEXT
                     ? convertToMSISDN(searchText, window.config.COUNTRY)
                     : '',
+                contactEmail: searchType === EMAIL ? searchText : '',
                 name: searchType === NAME_TEXT ? searchText : ''
               },
               sort: SEARCH_RESULT_SORT

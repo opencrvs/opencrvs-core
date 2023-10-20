@@ -32,7 +32,7 @@ export default function getPlugins() {
       plugin: Sentry,
       options: {
         client: {
-          environment: process.env.HOSTNAME,
+          environment: process.env.DOMAIN,
           dsn: SENTRY_DSN
         },
         catchLogErrors: true

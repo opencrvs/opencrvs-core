@@ -8,23 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-type Request = {
-  headers: {
-    host: string
-  }
-  protocol: string
-  method: string
-  path: string
+import { renameField } from '../../utils/elasticsearch-helper.js'
+
+export const up = async () => {
+  // rename field name contactRelationship to informantType on elasticSearch
+  await renameField('contactRelationship', 'informantType')
 }
 
-declare module 'minio/dist/main/signing' {
-  export function presignSignatureV4(
-    request: Request,
-    accessKey: string,
-    secretKey: string,
-    sessionToken?: string,
-    region: string,
-    requestDate: Date,
-    expires: number
-  ): string
+export const down = async () => {
+  // rename field name informantType to contactRelationship on elasticSearch
+  await renameField('informantType', 'contactRelationship')
 }

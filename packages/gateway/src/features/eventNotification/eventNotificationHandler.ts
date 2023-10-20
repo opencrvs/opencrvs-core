@@ -64,11 +64,11 @@ export const fhirBundleSchema = Joi.object({
     .required()
 })
 
-export function validationFailedAction(
-  _: Hapi.Request,
-  _2: Hapi.ResponseToolkit,
-  e: Joi.ValidationError
-) {
+export const validationFailedAction: Hapi.RouteOptionsValidate['failAction'] = (
+  _,
+  _2,
+  e
+) => {
   throw e
 }
 
