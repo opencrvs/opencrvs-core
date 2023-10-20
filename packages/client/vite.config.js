@@ -80,7 +80,8 @@ export default defineConfig(({ mode }) => {
       },
       commonjsOptions: {
         transformMixedEsModules: true
-      }
+      },
+      sourcemap: true
     },
     resolve: {
       alias: {
