@@ -209,7 +209,6 @@ export function userSectionFormType(): ISerializedFormSection {
             validator: [],
             conditionals: []
           },
-
           {
             name: 'device',
             type: TEXT,
@@ -243,7 +242,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             name: 'signature',
             type: SIMPLE_DOCUMENT_UPLOADER,
-            label: userFormMessages.userSignatureAttachment,
+            label: userFormMessages.userAttachmentSection,
             description: userFormMessages.userSignatureAttachmentDesc,
             allowedDocType: ['image/png'],
             initialValue: '',
