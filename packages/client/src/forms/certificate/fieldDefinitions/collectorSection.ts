@@ -1132,7 +1132,7 @@ export function getFilteredRadioOptions(
   if (declaration.event === Event.Birth) {
     options.splice(1, 0, ...birthForm)
 
-    const rolesToCheck = ['MOTHER', 'FATHER']
+    const rolesToCheck = ['MOTHER', 'FATHER', 'LEGAL_GUARDIAN']
     for (const role of rolesToCheck) {
       if (!Boolean(declaration.data[role.toLowerCase()]?.detailsExist)) {
         options = options.filter((opt) => opt.value !== role)
