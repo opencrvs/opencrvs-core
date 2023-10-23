@@ -120,6 +120,9 @@ async function transformField(
   )
 }
 
+/**
+ * Transforms the inputted GQL types (`sourceObj`) into a FHIR Bundle
+ */
 export default async function transformObj(
   sourceObj: Record<string, unknown>,
   bundle: Bundle,

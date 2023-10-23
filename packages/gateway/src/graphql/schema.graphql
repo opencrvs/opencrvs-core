@@ -1842,6 +1842,7 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+  partOf: String
 }
 
 input DeceasedInput {

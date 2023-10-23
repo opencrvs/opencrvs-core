@@ -492,6 +492,28 @@ function createAddressBuilder(
         'country',
         context
       )
+    },
+    partOf: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        [
+          {
+            url: 'http://opencrvs.org/specs/extension/address-location',
+            valueReference: {
+              reference: `Location/${fieldValue}`
+            }
+          }
+        ],
+        'extension',
+        context
+      )
     }
   }
 }
@@ -607,6 +629,15 @@ function createLocationAddressBuilder(
         location.address = {}
       }
       location.address.country = fieldValue
+    },
+    partOf: (fhirBundle, fieldValue, context) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      location.partOf = { reference: `Location/${fieldValue}` }
     }
   }
 }
