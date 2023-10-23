@@ -25,7 +25,11 @@ export type Resource = fhir3.Resource
 export type URNReference = `urn:uuid:${UUID}`
 
 // Patient/${UUID}
-export type ResourceIdentifier = `${FhirResource}/${UUID}`
+export type ResourceIdentifier<
+  Resource extends { resourceType: FhirResourceType } = {
+    resourceType: FhirResourceType
+  }
+> = `${Resource['resourceType']}/${UUID}`
 
 // http://localhost:3447/fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
@@ -242,7 +246,7 @@ export function isRelatedPerson(resource: Resource): resource is RelatedPerson {
   return resource.resourceType === 'RelatedPerson'
 }
 
-export type FhirResource =
+export type FhirResourceType =
   | fhir3.FhirResource['resourceType']
   | 'TaskHistory'
   | 'CompositionHistory'

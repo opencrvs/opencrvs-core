@@ -1,7 +1,7 @@
 import {
   Bundle,
   BundleEntry,
-  FhirResource,
+  FhirResourceType,
   StateIdenfitiers,
   getFromBundleById,
   isComposition,
@@ -127,7 +127,7 @@ function joinCollections(
   ])
 }
 
-function filterByType(resourceTypes: Array<FhirResource>) {
+function filterByType(resourceTypes: Array<FhirResourceType>) {
   return {
     $filter: {
       input: '$bundle',

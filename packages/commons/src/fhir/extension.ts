@@ -1,4 +1,4 @@
-import { ResourceIdentifier, URNReference } from '../fhir'
+import { ResourceIdentifier, URNReference, Location } from '../fhir'
 
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
@@ -203,7 +203,13 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/regLastLocation': {
     url: 'http://opencrvs.org/specs/extension/regLastLocation'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier<Location>
+    }
+  }
+  'http://opencrvs.org/specs/extension/address-location': {
+    url: 'http://opencrvs.org/specs/extension/address-location'
+    valueReference: {
+      reference: ResourceIdentifier<Location>
     }
   }
   'http://hl7.org/fhir/StructureDefinition/patient-nationality': {
