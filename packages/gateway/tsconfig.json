@@ -6,7 +6,7 @@
       "@gateway/*": ["./*"]
     },
     "target": "es6",
-    "module": "node16",
+    "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node16",
