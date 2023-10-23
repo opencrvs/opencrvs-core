@@ -7498,14 +7498,14 @@
     "@types/node" "*"
 
 "@types/boom@^7.3.1":
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.3.tgz#bc923339698b4528e0a5afacecfbebe788b5e7ce"
-  integrity sha512-PEYCW26A4hpu2SD9Dz+kd55WQg0HAGA1Uf4zTuNflIdZgMw/XGoOMPQKyjnbl7lVIRUmc+YpZHtwtgTwfPlF9g==
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.4.tgz#125b0161211195e0d1e2b6a54814e4bdf7f23a9a"
+  integrity sha512-esE4g2sYFu5sJhZR1l0OFXAzIN0K7DCWJNtLhzFX1I/KAzNWi2n3yV7QcLMFOam0xg/C4D0ZDC02LzL/p6880A==
 
 "@types/bunyan@^1.8.4":
-  version "1.8.9"
-  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.9.tgz#22d4517f3217b7c8f5a69bbc8c9f6df79779dcb5"
-  integrity sha512-ZqS9JGpBxVOvsawzmVt30sP++gSQMTejCkIAQ3VdadOcRE8izTyW66hufvwLeH+YEGP6Js2AW7Gz+RMyvrEbmw==
+  version "1.8.10"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.10.tgz#60f2d297c3d29fd3b85c54f28a48b99d61686fe0"
+  integrity sha512-A82U/3EAdWX89f+dfysGiRvbeoLuRLV3i6SLg3HuNK4Yf+dHOqdbxT70vQUwvD3DOr2Dvpcv9dRX4ipTf0LpEg==
   dependencies:
     "@types/node" "*"
 
