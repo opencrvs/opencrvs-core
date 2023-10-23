@@ -743,6 +743,10 @@ export const taskResouceMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
       valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: '123' }
     }
   ],
   note: [
@@ -1992,6 +1996,10 @@ export const deathTaskMock = JSON.stringify({
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: { reference: '123' }
     }
   ],
