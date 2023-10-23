@@ -185,7 +185,9 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { corrector } = this.props.match.params
+    const corrector = (
+      this.props.declaration.data.informant.informantType as string
+    ).toLowerCase()
     const { intl, declaration } = this.props
     if (!declaration) {
       return (

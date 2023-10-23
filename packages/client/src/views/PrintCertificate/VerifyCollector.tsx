@@ -176,7 +176,9 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { collector } = this.props.match.params
+    const collector = (
+      this.props.declaration.data.informant.informantType as string
+    ).toLowerCase()
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
