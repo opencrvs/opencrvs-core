@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.3.0-beta",
+  "version": "1.3.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -21,15 +21,13 @@
     "precommit": "yarn lint && lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.0",
+    "@elastic/elasticsearch": "7.17.13",
     "@graphql-tools/graphql-file-loader": "^7.5.16",
     "@graphql-tools/load": "^7.8.13",
     "@graphql-tools/schema": "^9.0.17",
     "@graphql-tools/utils": "^9.2.1",
     "@hapi/hapi": "^20.0.1",
-    "@hapi/inert": "^7.0.0",
-    "@hapi/vision": "^7.0.0",
-    "@opencrvs/commons": "^1.3.0-beta",
+    "@opencrvs/commons": "^1.3.0",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
@@ -74,31 +72,37 @@
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
     "@types/dotenv": "^6.1.0",
-    "@types/fhir": "^0.0.30",
+    "@types/fhir": "0.0.37",
     "@types/glob": "^5.0.35",
     "@types/hapi__hapi": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@types/hapi__inert": "^5.2.3",
     "@types/hapi__vision": "^5.5.3",
     "@types/jest": "^26.0.14",
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node-fetch": "^2.5.12",
+    "@types/redis": "^2.8.6",
     "@types/uuid": "^3.4.3",
     "concurrently": "^3.5.1",
     "copyfiles": "^2.1.1",
     "eslint": "^7.11.0",
-    "eslint-config-prettier": "^8.3.0",
     "graphql-schema-typescript": "^1.5.0",
     "jest": "26.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest-fetch-mock": "^2.1.2",
     "lab-transform-typescript": "^3.0.1",
+    "@typescript-eslint/parser": "^4.5.0",
     "lint-staged": "^7.1.0",
     "nodemon": "^2.0.22",
     "opener": "^1.5.1",
     "prettier": "2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.3"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
@@ -139,7 +143,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@gateway/(.*)": "<rootDir>/src/$1"
+      "@gateway/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types"
     },
     "coverageReporters": [
       "json",

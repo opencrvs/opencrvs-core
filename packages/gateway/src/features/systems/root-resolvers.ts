@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL, WEBHOOK_URL } from '@gateway/constants'
+import fetch from '@gateway/fetch'
+import { USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
 import { getSystem, hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
@@ -139,7 +138,7 @@ export const resolvers: GQLResolver = {
         throw new Error(`No System found by given clientId`)
       }
 
-      await fetch(`${WEBHOOK_URL}deleteWebhooksByClientId`, {
+      await fetch(`${WEBHOOKS_URL}deleteWebhooksByClientId`, {
         method: 'POST',
         body: JSON.stringify({ clientId: clientId }),
         headers: {

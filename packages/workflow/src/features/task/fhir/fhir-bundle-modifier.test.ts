@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -22,6 +21,7 @@ import {
   testFhirTaskBundle,
   taskResouceMock
 } from '@workflow/test/utils'
+import { Task } from '@opencrvs/commons/types'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
@@ -30,15 +30,11 @@ const fetch = fetchAny as any
 let token: string
 describe('Verify handler', () => {
   beforeEach(() => {
-    token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['declare'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
   })
 
   it('modifyTaskBundle returns correct bundle', async () => {
@@ -67,7 +63,7 @@ describe('Verify handler', () => {
       payload.entry[0] &&
       payload.entry[0].resource
     ) {
-      const fhirTask = payload.entry[0].resource as fhir.Task
+      const fhirTask = payload.entry[0].resource as Task
       if (
         fhirTask &&
         fhirTask.note &&

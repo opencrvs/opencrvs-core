@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -27,7 +26,6 @@ import {
   hideUserAuditSuccessToast,
   hidePINUpdateSuccessToast,
   hideDownloadDeclarationFailedToast,
-  ShowUnassignedPayload,
   hideUnassignedModal,
   hideCreateUserErrorToast,
   hideCreateUserFormDuplicateEmailErrorToast,
@@ -35,25 +33,10 @@ import {
   hideDuplicateRecordsToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { NotificationState } from '@client/notification/reducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
-type NotificationProps = {
-  language?: string
-  configurationErrorVisible: boolean
-  saveDraftClicked: boolean
-  submitFormSuccessToast: string | null
-  submitFormErrorToast: string | null
-  userAuditSuccessToast: NotificationState['userAuditSuccessToast']
-  showPINUpdateSuccess: boolean
-  showDuplicateRecordsToast: boolean
-  duplicateCompositionId: string | null
-  duplicateTrackingId: string | null
-  downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
-  unassignedModal: ShowUnassignedPayload | null
-  userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
-  userCreateDuplicateEmailFailedToast: NotificationState['userCreateDuplicateEmailFailedToast']
-  userReconnectedToast: boolean
+type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
 }
 
@@ -77,7 +60,7 @@ class Component extends React.Component<
   NotificationProps &
     DispatchProps &
     IntlShapeProps &
-    RouteComponentProps<{}> & { children?: any }
+    RouteComponentProps<{}> & { isOnline: boolean }
 > {
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
@@ -113,6 +96,7 @@ class Component extends React.Component<
   render() {
     const {
       children,
+      configurationError,
       configurationErrorVisible,
       intl,
       saveDraftClicked,
@@ -128,8 +112,13 @@ class Component extends React.Component<
       userCreateDuplicateMobileFailedToast,
       userCreateDuplicateEmailFailedToast,
       userReconnectedToast,
-      goToDeclarationRecordAudit
+      goToDeclarationRecordAudit,
+      isOnline
     } = this.props
+
+    const userFormSubmitErrorMessage = isOnline
+      ? intl.formatMessage(messages.userFormFail)
+      : intl.formatMessage(messages.userFormFailForOffline)
 
     return (
       <div>
@@ -141,6 +130,11 @@ class Component extends React.Component<
             onClose={this.hideUserReconnectedToast}
           >
             {intl.formatMessage(messages.onlineUserStatus)}
+          </Toast>
+        )}
+        {configurationError && (
+          <Toast type="warning" id="formValidationErrorNotification">
+            {configurationError}
           </Toast>
         )}
         {configurationErrorVisible && (
@@ -181,7 +175,7 @@ class Component extends React.Component<
             type="warning"
             onClose={this.hideSubmitFormErrorToast}
           >
-            {intl.formatMessage(messages.userFormFail)}
+            {userFormSubmitErrorMessage}
           </Toast>
         )}
         {userAuditSuccessToast.visible && (
@@ -284,6 +278,7 @@ const mapStateToProps = (store: IStoreState) => {
     language: getLanguage(store),
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
+    configurationError: store.notification.configurationError,
     configurationErrorVisible: store.notification.configurationErrorVisible,
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
@@ -319,5 +314,5 @@ export const NotificationComponent = withRouter(
     hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
     goToDeclarationRecordAudit
-  })(injectIntl(Component))
+  })(injectIntl(withOnlineStatus(Component)))
 )

@@ -6,16 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/application/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/application/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
-
+const resolvers = rootResolvers as any
 beforeEach(() => {
   fetch.resetMocks()
 })
@@ -28,7 +27,7 @@ describe('Application config root resolvers', () => {
 
     const natlSYSAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -41,7 +40,7 @@ describe('Application config root resolvers', () => {
     }
     const regsiterToken = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',

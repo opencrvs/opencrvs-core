@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -45,7 +44,8 @@ import {
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate
+  addFlaggedAsPotentialDuplicate,
+  findPatient
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
@@ -57,17 +57,22 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
+function getTypeFromTask(task: fhir.Task) {
+  return task?.businessStatus?.coding?.[0]?.code
+}
+
 export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as fhir.Bundle
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -90,7 +95,14 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   )
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+  const patient = findPatient(bundle)
+
   const compositionId =
     task &&
     task.focus &&
@@ -112,12 +124,9 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
   const body: ICompositionBody = {
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
-  body.type =
-    task &&
-    task.businessStatus &&
-    task.businessStatus.coding &&
-    task.businessStatus.coding[0].code
+  body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
+
   if (body.type === REJECTED_STATUS) {
     const rejectAnnotation: fhir.Annotation = (task &&
       task.note &&
@@ -135,6 +144,10 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
+  body.childIdentifier = patient?.identifier?.find(
+    (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+  )?.value
+
   if (
     [
       REJECTED_STATUS,
@@ -164,6 +177,7 @@ async function indexAndSearchComposition(
         result.body.hits.hits.length > 0 &&
         result.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
+    modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
@@ -214,7 +228,6 @@ async function createChildIndex(
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child && child.birthDate
-  body.gender = child && child.gender
   body.gender = child && child.gender
 }
 
@@ -393,11 +406,7 @@ async function createDeclarationIndex(
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.contactEmail = emailExtension && emailExtension.valueString
-  body.type =
-    task &&
-    task.businessStatus &&
-    task.businessStatus.coding &&
-    task.businessStatus.coding[0].code
+  body.type = task && getTypeFromTask(task)
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =

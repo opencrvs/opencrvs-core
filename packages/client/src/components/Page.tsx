@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
@@ -59,7 +58,7 @@ const spinnerAppearAnimation = keyframes`
 `
 
 const StyledSpinner = styled(Spinner)`
-  visibility: hidden;
+  opacity: 0;
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;

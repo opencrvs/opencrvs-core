@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Events } from '@workflow/features/events/utils'
 import { USER_SCOPE } from '@workflow/utils/authUtils'
@@ -73,9 +72,9 @@ function getEventToScopeMap(event: Events) {
     case Events.MARRIAGE_MARK_ARCHIVED:
       return [USER_SCOPE.VALIDATE, USER_SCOPE.REGISTER]
 
-    case Events.BIRTH_REQUEST_CORRECTION:
-    case Events.DEATH_REQUEST_CORRECTION:
-    case Events.MARRIAGE_REQUEST_CORRECTION:
+    case Events.BIRTH_MAKE_CORRECTION:
+    case Events.DEATH_MAKE_CORRECTION:
+    case Events.MARRIAGE_MAKE_CORRECTION:
       return [USER_SCOPE.REGISTER, USER_SCOPE.CERTIFY]
     case Events.BIRTH_MARK_ISSUE:
     case Events.DEATH_MARK_ISSUE:

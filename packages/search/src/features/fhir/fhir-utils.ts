@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
 import {
@@ -36,19 +35,17 @@ export function findCompositionSection(
   )
 }
 
-export function findTask(
-  bundleEntries?: fhir.BundleEntry[]
-): fhir.Task | undefined {
-  const taskEntry: fhir.BundleEntry | undefined =
-    bundleEntries &&
-    bundleEntries.find((entry) => {
-      if (entry && entry.resource) {
-        return entry.resource.resourceType === 'Task'
-      } else {
-        return false
-      }
-    })
-  return taskEntry && (taskEntry.resource as fhir.Task)
+export function findTask(bundleEntries?: fhir.BundleEntry[]) {
+  const taskEntry = bundleEntries?.find(
+    (entry) => entry?.resource?.resourceType === 'Task'
+  )
+  return taskEntry?.resource as fhir.Task | undefined
+}
+
+export function findPatient(bundle: fhir.Bundle) {
+  return bundle.entry?.find(
+    (entry) => entry?.resource?.resourceType === 'Patient'
+  )?.resource as fhir.Patient | undefined
 }
 
 export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
@@ -107,6 +104,7 @@ export async function addEventLocation(
     data = await getFromFhir(
       `/Encounter/${encounterSection.entry[0].reference}`
     )
+
     if (data && data.location && data.location[0].location) {
       location = await getFromFhir(`/${data.location[0].location.reference}`)
     }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -31,6 +30,7 @@ interface ICertificateMessages
   idCheckDialogConfirm: MessageDescriptor
   idCheckDialogDescription: MessageDescriptor
   idCheckDialogTitle: MessageDescriptor
+  idCheckForCorrectionTitle: MessageDescriptor
   idCheckTitle: MessageDescriptor
   idCheckVerify: MessageDescriptor
   idCheckWithoutVerify: MessageDescriptor
@@ -183,6 +183,12 @@ const messagesToDefine: ICertificateMessages = {
     description:
       'The title for the dialog when details of the collector not verified',
     id: 'print.certificate.collector.idCheckDialog.title'
+  },
+  idCheckForCorrectionTitle: {
+    id: 'correction.summary.idCheckForCorrection',
+    defaultMessage: 'Correct without proof of ID?',
+    description:
+      'The title for the dialog when details of the collector not verified for correction'
   },
   idCheckTitle: {
     defaultMessage: 'Check proof of ID',

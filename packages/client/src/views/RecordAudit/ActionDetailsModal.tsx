@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -44,6 +43,7 @@ import { Table } from '@client/../../components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -292,6 +292,7 @@ const ActionDetailsModalListTable = ({
       ) as IFormSection
 
       if (section.id === 'documents') {
+        item.valueString = EMPTY_STRING
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )
@@ -449,6 +450,15 @@ const ActionDetailsModalListTable = ({
             noResultText=" "
             columns={requesterColumn}
             content={[{ requester: requesterLabel }]}
+          />
+        )}
+      {/* Correction rejected */}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RejectedCorrection && (
+          <Table
+            noResultText=" "
+            columns={reasonColumn}
+            content={[{ text: actionDetailsData.reason }]}
           />
         )}
 

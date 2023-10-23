@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
@@ -62,12 +61,9 @@ export interface IApplicationConfig {
   HEALTH_FACILITY_FILTER: string
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
-  ADDRESSES: number
   LOGIN_BACKGROUND: ILoginBackground
-  ADMIN_LEVELS: number
 }
 
 export async function getApplicationConfig(

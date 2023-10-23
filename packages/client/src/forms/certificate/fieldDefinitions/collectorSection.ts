@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CertificateSection,
   CHECKBOX_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  identityTypeMapper,
   IFormSection,
   IFormSectionGroup,
   PARAGRAPH,
@@ -22,18 +22,14 @@ import {
   TEXT
 } from '@client/forms'
 import { builtInConditionals as conditionals } from '@client/forms/conditionals'
-import {
-  identityOptions,
-  identityHelperTextMapper,
-  identityNameMapper,
-  identityTypeMapper
-} from '@client/forms/identity'
-import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
+import { fieldValidationDescriptorToValidationFunction } from '@client/forms/deserializer/deserializer'
 import { validators } from '@client/forms/validators'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
+import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
+import { identityHelperTextMapper, identityNameMapper } from './messages'
 
 export interface INameField {
   firstNamesField: string
@@ -58,6 +54,33 @@ export interface IVerifyIDCertificateCollector {
 export interface IVerifyIDCertificateCollectorDefinition {
   [event: string]: IVerifyIDCertificateCollector
 }
+
+const PASSPORT = 'PASSPORT'
+const DRIVING_LICENSE = 'DRIVING_LICENSE'
+const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
+const ALIEN_NUMBER = 'ALIEN_NUMBER'
+const OTHER = 'OTHER'
+const NO_ID = 'NO_ID'
+
+export const identityOptions = [
+  { value: PASSPORT, label: formMessages.iDTypePassport },
+  { value: NATIONAL_ID, label: formMessages.iDTypeNationalID },
+  {
+    value: DRIVING_LICENSE,
+    label: formMessages.iDTypeDrivingLicense
+  },
+  {
+    value: BIRTH_REGISTRATION_NUMBER,
+    label: formMessages.iDTypeBRN
+  },
+  {
+    value: REFUGEE_NUMBER,
+    label: formMessages.iDTypeRefugeeNumber
+  },
+  { value: ALIEN_NUMBER, label: formMessages.iDTypeAlienNumber },
+  { value: NO_ID, label: formMessages.iDTypeNoID },
+  { value: OTHER, label: formMessages.iDTypeOther }
+]
 
 export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
   {
@@ -98,6 +121,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
             familyNameField: 'familyNameEng'
           }
         },
+        birthDateField: 'informantBirthDate',
         nationalityField: 'nationality'
       }
     },
@@ -112,6 +136,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
             familyNameField: 'familyNameEng'
           }
         },
+        birthDateField: 'informantBirthDate',
         nationalityField: 'nationality'
       }
     },

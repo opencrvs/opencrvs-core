@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -23,12 +22,14 @@ import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
 import { logger } from '@gateway/logger'
 import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { chainW, tryCatch } from 'fp-ts/Either'
+import * as F from 'fp-ts'
+
+const pipe = F.function.pipe
+const { chainW, tryCatch } = F.either
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

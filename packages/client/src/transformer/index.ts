@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IForm,
@@ -30,7 +29,7 @@ import {
 import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   EventRegistration,
@@ -153,16 +152,75 @@ const transformRegistrationCorrection = (
     })
   }
 }
+
+export function addCorrectionDetails(
+  formDefinition: IForm,
+  declaration: IDeclaration,
+  transformedData: TransformedData,
+  offlineCountryConfig?: IOfflineData
+) {
+  const draftData = declaration.data
+  const originalDraftData = declaration.originalData || {}
+
+  if (!formDefinition.sections) {
+    throw new Error('Sections are missing in form definition')
+  }
+
+  formDefinition.sections.forEach((section) => {
+    if (!draftData[section.id]) {
+      return
+    }
+
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      draftData[section.id],
+      draftData
+    ).forEach((groupDef) => {
+      groupDef.fields.forEach((fieldDef) => {
+        const conditionalActions: string[] = getConditionalActionsForField(
+          fieldDef,
+          draftData[section.id],
+          offlineCountryConfig,
+          draftData
+        )
+
+        if (Object.keys(originalDraftData).length) {
+          if (
+            !conditionalActions.includes('hide') &&
+            !conditionalActions.includes('disable') &&
+            hasFieldChanged(
+              fieldDef,
+              draftData[section.id],
+              originalDraftData[section.id]
+            )
+          ) {
+            transformRegistrationCorrection(
+              section,
+              fieldDef,
+              draftData,
+              originalDraftData,
+              transformedData
+            )
+          }
+        }
+      })
+    })
+  })
+
+  return transformedData
+}
+
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {},
+  userDetails?: UserDetails | null,
   offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
+
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
@@ -175,7 +233,8 @@ export const draftToGqlTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       draftData[section.id],
-      draftData
+      draftData,
+      userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
@@ -201,25 +260,6 @@ export const draftToGqlTransformer = (
             `${section.id}/${groupDef.id}/${fieldDef.name}`
           )
           return
-        }
-        if (Object.keys(originalDraftData).length) {
-          if (
-            !conditionalActions.includes('hide') &&
-            !conditionalActions.includes('disable') &&
-            hasFieldChanged(
-              fieldDef,
-              draftData[section.id],
-              originalDraftData[section.id]
-            )
-          ) {
-            transformRegistrationCorrection(
-              section,
-              fieldDef,
-              draftData,
-              originalDraftData,
-              transformedData
-            )
-          }
         }
 
         if (
@@ -318,7 +358,8 @@ export const gqlToDraftTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       queryData[section.id] || {},
-      queryData
+      queryData,
+      userDetails
     )
   )
   visibleSections.forEach((section) => {

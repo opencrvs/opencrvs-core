@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 set -e
 
 export LANGUAGES='en'
@@ -102,8 +101,8 @@ echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep_if_non_ci 10
 echo
-echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
-[ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
+echo "As part of this script, we checkout another GIT repo: A country configuration module into the folder next to this one called: 'opencrvs-countryconfig'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
+[ -d "../opencrvs-countryconfig" ] && echo "Enter your password to delete the existing country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-countryconfig
 
 sleep_if_non_ci 10
 echo
@@ -114,7 +113,13 @@ sleep_if_non_ci 5
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
+if  [ -n "$(uname -r | grep microsoft-standard-WSL2)" ] && [ -n "$(cat /etc/os-release | grep Ubuntu)" ]; then
+  wslKernelWithUbuntu=true
+  echo -e "\033[32m:::::::::::::::: You are running Windows Subsystem for Linux .  Checking distro ::::::::::::::::\033[0m"
+  echo
+fi
+
+if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
   echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
   echo
 
@@ -382,14 +387,14 @@ set -- $(stty size) #$1=rows, $2=columns
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
-tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
+tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -p 30
 tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
-tmux set -p @mytitle "opencrvs-farajaland"
+tmux set -p @mytitle "opencrvs-countryconfig"
 DIR=$(cd "$(dirname "$0")"; pwd)
-tmux send-keys -t opencrvs "bash setup-scripts/setup-countryconfig.sh $DIR" C-m
+tmux send-keys -t opencrvs "bash development-environment/setup-countryconfig.sh $DIR" C-m
 tmux setw -g mouse on
 tmux attach -t opencrvs
 

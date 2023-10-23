@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as ShortUIDGen from 'short-uid'
 import {
@@ -29,19 +28,28 @@ import {
   EVENT_TYPE,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
-  BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE,
   INFORMANT_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
   getInformantSMSNotification,
   InformantNotificationName,
   isInformantSMSNotificationEnabled
 } from './smsNotificationUtils'
+import {
+  Bundle,
+  Composition,
+  DocumentReference,
+  Patient,
+  Resource,
+  Saved,
+  Task,
+  TrackingID
+} from '@opencrvs/commons/types'
+import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { getTaskResourceFromFhirBundle } from './fhir/fhir-template'
 
 interface INotificationPayload {
   recipient: {
@@ -53,8 +61,7 @@ interface INotificationPayload {
   crvsOffice?: string
   registrationNumber?: string
 }
-export type Composition = fhir.Composition & { id: string }
-export type Patient = fhir.Patient & { id: string }
+
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task',
@@ -63,10 +70,10 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
+export function generateTrackingIdForEvents(eventType: EVENT_TYPE) {
   // using first letter of eventType for prefix
   // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
-  return generateTrackingId(eventType.charAt(0))
+  return generateTrackingId(eventType.charAt(0)) as TrackingID
 }
 
 function generateTrackingId(prefix: string): string {
@@ -81,7 +88,7 @@ export function convertStringToASCII(str: string): string {
 
 // TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getSubjectName() )
 export async function sendEventNotification(
-  fhirBundle: fhir.Bundle,
+  fhirBundle: Bundle,
   event: Events,
   recipient: {
     sms?: string | null
@@ -164,7 +171,7 @@ export async function sendEventNotification(
               INFORMANT_SECTION_CODE
             ),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle),
+              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
               EVENT_TYPE[eventType]
             )
           }
@@ -260,7 +267,7 @@ export async function sendEventNotification(
             crvsOffice: await getCRVSOfficeName(fhirBundle),
             name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle),
+              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
               EVENT_TYPE[eventType]
             ),
             informantName: await getInformantName(
@@ -391,46 +398,35 @@ const DETECT_EVENT: Record<string, EVENT_TYPE> = {
   'marriage-declaration': EVENT_TYPE.MARRIAGE
 }
 
-export function getCompositionEventType(compoition: fhir.Composition) {
+export function getCompositionEventType(compoition: Composition) {
   const eventType = compoition?.type?.coding?.[0].code
   return eventType && DETECT_EVENT[eventType]
 }
 
-export function getEventType(fhirBundle: fhir.Bundle) {
+export function getEventType(fhirBundle: Bundle) {
   if (fhirBundle.entry && fhirBundle.entry[0] && fhirBundle.entry[0].resource) {
     const firstEntry = fhirBundle.entry[0].resource
     if (firstEntry.resourceType === 'Composition') {
-      return getCompositionEventType(
-        firstEntry as fhir.Composition
-      ) as EVENT_TYPE
+      return getCompositionEventType(firstEntry as Composition) as EVENT_TYPE
     } else {
-      return getTaskEventType(firstEntry as fhir.Task) as EVENT_TYPE
+      return getTaskEventType(firstEntry as Task) as EVENT_TYPE
     }
   }
   throw new Error('Invalid FHIR bundle found')
 }
 
-export function taskHasInput(taskResource: fhir.Task) {
+export function taskHasInput(taskResource: Task) {
   return !!(taskResource.input && taskResource.input.length > 0)
 }
 
-export function hasCorrectionEncounterSection(
-  compositionResource: fhir.Composition
-) {
-  return compositionResource.section?.some((section) => {
-    if (section.code?.coding?.[0]?.code) {
-      return [
-        BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
-      ].includes(section.code.coding[0].code)
-    }
-    return false
-  })
+export function hasCorrectionExtension(taskResource: Task) {
+  return taskResource.extension.some(
+    (extension) => extension.url === MAKE_CORRECTION_EXTENSION_URL
+  )
 }
 
-export function hasCertificateDataInDocRef(fhirBundle: fhir.Bundle) {
-  const firstEntry = fhirBundle?.entry?.[0].resource as fhir.Composition
+export function hasCertificateDataInDocRef(fhirBundle: Bundle) {
+  const firstEntry = fhirBundle?.entry?.[0].resource as Composition
 
   const certificateSection = firstEntry.section?.find((sec) => {
     if (sec.code?.coding?.[0]?.code == 'certificates') {
@@ -443,7 +439,7 @@ export function hasCertificateDataInDocRef(fhirBundle: fhir.Bundle) {
   return fhirBundle.entry?.some((item) => {
     if (
       item.fullUrl === docRefId &&
-      (item.resource as fhir.DocumentReference)?.content
+      (item.resource as DocumentReference)?.content
     ) {
       return true
     }
@@ -451,7 +447,7 @@ export function hasCertificateDataInDocRef(fhirBundle: fhir.Bundle) {
   })
 }
 
-export function isInProgressDeclaration(fhirBundle: fhir.Bundle) {
+export function isInProgressDeclaration(fhirBundle: Bundle) {
   const taskEntry =
     fhirBundle &&
     fhirBundle.entry &&
@@ -462,12 +458,12 @@ export function isInProgressDeclaration(fhirBundle: fhir.Bundle) {
   return (
     (taskEntry &&
       taskEntry.resource &&
-      (taskEntry.resource as fhir.Task).status === 'draft') ||
+      (taskEntry.resource as Task).status === 'draft') ||
     false
   )
 }
 
-export function isEventNotification(fhirBundle: fhir.Bundle) {
+export function isEventNotification(fhirBundle: Bundle) {
   const compositionEntry =
     fhirBundle &&
     fhirBundle.entry &&
@@ -475,7 +471,7 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
       (entry) => entry.resource && entry.resource.resourceType === 'Composition'
     )
   const composition =
-    compositionEntry && (compositionEntry.resource as fhir.Composition)
+    compositionEntry && (compositionEntry.resource as Composition)
   const compositionDocTypeCode =
     composition &&
     composition.type.coding &&
@@ -548,12 +544,12 @@ export interface IMosipSeederResponse {
 }
 
 export async function getMosipUINToken(
-  patient: fhir.Patient
+  patient: Patient
 ): Promise<IMosipSeederResponse> {
   logger.info(`getMosipUINToken: ${JSON.stringify(patient)}`)
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
-    (identifier: fhir.Identifier) => {
+    (identifier: fhir3.Identifier) => {
       return identifier.type?.coding?.[0].code === 'NATIONAL_ID'
     }
   )
@@ -569,7 +565,7 @@ export async function getMosipUINToken(
       lang: 'eng',
       authdata: {
         vid: submittedNationalIDInForm,
-        name: concatenateName(patient.name as fhir.HumanName[]),
+        name: concatenateName(patient.name),
         gender: patient.gender,
         dob: patient.birthDate?.replace(/-/g, '/')
         // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently
@@ -597,8 +593,8 @@ export async function getMosipUINToken(
   return body
 }
 
-export function getResourceByType<T = fhir.Resource>(
-  bundle: fhir.Bundle,
+export function getResourceByType<T = Resource>(
+  bundle: Bundle,
   type: string
 ): T | undefined {
   const bundleEntry =
@@ -614,14 +610,13 @@ export function getResourceByType<T = fhir.Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export function getComposition(bundle: fhir.Bundle) {
-  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+export function getComposition<T extends Bundle>(bundle: T) {
+  return getResourceByType<
+    T extends Saved<Bundle> ? Saved<Composition> : Composition
+  >(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
 }
 
-export function getPatientBySection(
-  bundle: fhir.Bundle,
-  section: fhir.Reference
-) {
+export function getPatientBySection(bundle: Bundle, section: fhir3.Reference) {
   return (
     bundle &&
     bundle.entry &&
@@ -634,7 +629,7 @@ export function getPatientBySection(
           entry.fullUrl === section.reference
         )
       }
-    })?.resource as fhir.Patient)
+    })?.resource as fhir3.Patient)
   )
 }
 export const fetchHearth = async <T = any>(
@@ -659,10 +654,8 @@ export const fetchHearth = async <T = any>(
 }
 
 export async function fetchTaskByCompositionIdFromHearth(id: string) {
-  const taskBundle: fhir.Bundle = await fetchHearth(
-    `/Task?focus=Composition/${id}`
-  )
-  return taskBundle.entry?.[0]?.resource as fhir.Task
+  const taskBundle: Bundle = await fetchHearth(`/Task?focus=Composition/${id}`)
+  return taskBundle.entry?.[0]?.resource as Task
 }
 
 export function getVoidEvent(event: EVENT_TYPE): Events {

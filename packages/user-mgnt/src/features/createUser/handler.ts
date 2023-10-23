@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createFhirPractitioner,
@@ -39,7 +38,7 @@ export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser & { password: string }
+  const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
 
   // construct Practitioner resource and save them
@@ -75,7 +74,7 @@ export default async function createUser(
     ) {
       userScopes.push('demo')
     }
-    user.status = statuses.PENDING
+    user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
 
     if (
@@ -94,8 +93,7 @@ export default async function createUser(
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
-
-    user.username = await generateUsername(user.name)
+    user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)

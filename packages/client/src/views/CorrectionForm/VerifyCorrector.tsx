@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import {
@@ -131,8 +130,12 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       const firstNames = info[firstNameIndex] as string
       const familyName = info[familyNameIndex] as string
 
-      const birthDate =
-        (fields.birthDateField && (info[fields.birthDateField] as string)) || ''
+      const isExactDobUnknownForIdVerifier =
+        !!declaration?.data[corrector]?.exactDateOfBirthUnknown
+
+      const birthDate = !isExactDobUnknownForIdVerifier
+        ? fields.birthDateField && (info[fields.birthDateField] as string)
+        : ''
       const nationality =
         (fields.nationalityField &&
           (info[fields.nationalityField] as string)) ||

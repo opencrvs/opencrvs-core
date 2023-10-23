@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
@@ -46,6 +45,49 @@ const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
+const validStatusMapping = {
+  [ARCHIVED_STATUS]: [
+    DECLARED_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [IN_PROGRESS_STATUS]: [null] as const,
+  [DECLARED_STATUS]: [ARCHIVED_STATUS, null] as const,
+  [REJECTED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    WAITING_VALIDATION_STATUS,
+    VALIDATED_STATUS,
+    ARCHIVED_STATUS
+  ] as const,
+  [VALIDATED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    ARCHIVED_STATUS,
+    null
+  ] as const,
+  [WAITING_VALIDATION_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [REGISTERED_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS,
+    WAITING_VALIDATION_STATUS
+  ] as const,
+  [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS] as const,
+  [ISSUED_STATUS]: [CERTIFIED_STATUS] as const,
+  [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS] as const,
+  [REINSTATED_STATUS]: [ARCHIVED_STATUS] as const
+}
+
 export interface ICorrection {
   section: string
   fieldName: string
@@ -61,7 +103,7 @@ export interface IAssignment {
 }
 
 export interface IOperationHistory {
-  operationType: string
+  operationType: keyof typeof validStatusMapping
   operatedOn: string
   operatorRole: string
   operatorFirstNames: string
@@ -104,6 +146,7 @@ export interface ICompositionBody {
   motherDoB?: string
   motherIdentifier?: string
   childDoB?: string
+  childIdentifier?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -118,6 +161,7 @@ export interface IBirthCompositionBody extends ICompositionBody {
   childFirstNamesLocal?: string
   childFamilyNameLocal?: string
   childDoB?: string
+  childIdentifier?: string
   gender?: string
   motherFirstNames?: string
   motherFamilyName?: string
@@ -368,52 +412,13 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 }
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
-  const validStatusMapping = {
-    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
-    [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
-    [REJECTED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      WAITING_VALIDATION_STATUS,
-      VALIDATED_STATUS,
-      ARCHIVED_STATUS
-    ],
-    [VALIDATED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      ARCHIVED_STATUS,
-      null
-    ],
-    [WAITING_VALIDATION_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS
-    ],
-    [REGISTERED_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      WAITING_VALIDATION_STATUS
-    ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS],
-    [ISSUED_STATUS]: [CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REINSTATED_STATUS]: [ARCHIVED_STATUS]
-  }
-
   const previousStatus = getPreviousStatus(body)
-  const currentStatus = body.type
+  const currentStatus = body.type as keyof typeof validStatusMapping
 
   if (
     currentStatus &&
     validStatusMapping[currentStatus] &&
-    !validStatusMapping[currentStatus].includes(previousStatus)
+    !validStatusMapping[currentStatus].includes(previousStatus as never)
   ) {
     return false
   }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils'
 import { defaultFieldResolver, GraphQLSchema } from 'graphql'
@@ -45,14 +44,19 @@ import {
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual, uniqueId } from 'lodash'
+import { merge, isEqual } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
-import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
+import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
+import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
 import { Context } from '@gateway/graphql/context'
 import PatientAPI from '@gateway/features/fhir/patientAPI'
 import MinioAPI from '@gateway/features/fhir/minioAPI'
+import { getAuthHeader } from '@opencrvs/commons'
+import { UsersAPI } from '@gateway/features/user/usersAPI'
+import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -159,6 +163,19 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
+export function getDataSources(): Context['dataSources'] {
+  return {
+    documentsAPI: new DocumentsAPI(),
+    paymentsAPI: new PaymentsAPI(),
+    locationsAPI: new LocationsAPI(),
+    usersAPI: new UsersAPI(),
+    fhirAPI: new FHIRAPI(),
+    patientAPI: new PatientAPI(),
+    minioAPI: new MinioAPI(),
+    metricsAPI: new MetricsAPI()
+  }
+}
+
 export const getApolloConfig = (): Config<Context> => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
@@ -173,22 +190,11 @@ export const getApolloConfig = (): Config<Context> => {
   return {
     schema,
     introspection: true,
-    dataSources: (): Context['dataSources'] => ({
-      locationsAPI: new LocationsAPI(),
-      practitionerRoleAPI: new PractitionerRoleAPI(),
-      patientAPI: new PatientAPI(),
-      minioAPI: new MinioAPI()
-    }),
+    dataSources: getDataSources,
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,
-        headers: {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
-          'x-real-ip':
-            request.headers['x-real-ip'] || request.info?.remoteAddress,
-          'x-real-user-agent': request.headers['user-agent']
-        }
+        headers: getAuthHeader(request)
       }
     }
   }

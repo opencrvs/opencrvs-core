@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
@@ -26,7 +25,7 @@ import { Query } from '@client/components/Query'
 import { GET_TOTAL_CERTIFICATIONS } from './queries'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLCertificationMetric } from '@client/utils/gateway-deprecated-do-not-use.d'
 interface ICertificationRateData {
   label: string
   value: number

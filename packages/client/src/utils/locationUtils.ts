@@ -6,15 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { UserDetails } from './userUtils'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -181,7 +180,8 @@ export type LocationName = string | MessageDescriptor
 
 export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
-  offlineLocations: Record<string, ILocation>
+  offlineLocations: Record<string, ILocation>,
+  countryAsString?: boolean
 ): Record<string, LocationName> {
   let location: ILocation = facilityLocation
   let continueLoop = true
@@ -190,12 +190,14 @@ export function getLocationNameMapOfFacility(
     const parent = location.partOf.split('/')[1]
     if (parent === '0') {
       continueLoop = false
-      map.country = countries.find(
-        ({ value }) => value === window.config.COUNTRY
-      )?.label as MessageDescriptor
+      map.country = countryAsString
+        ? (countries.find(({ value }) => value === window.config.COUNTRY)?.label
+            .defaultMessage as string)
+        : (countries.find(({ value }) => value === window.config.COUNTRY)
+            ?.label as MessageDescriptor)
     } else {
       location = offlineLocations[parent]
-      map[location.jurisdictionType as string] = location.name
+      map[location.jurisdictionType?.toLowerCase() as string] = location.name
     }
   }
   return map

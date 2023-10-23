@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
@@ -32,7 +31,7 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
@@ -57,7 +56,6 @@ import {
   ISearchType,
   INavigationType
 } from '@opencrvs/components/lib/SearchTool'
-import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -72,9 +70,11 @@ import {
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 
 type IStateProps = {
   userDetails: UserDetails | null
+  fieldNames: string[]
   language: string
 }
 
@@ -96,7 +96,6 @@ type IDispatchProps = {
 }
 
 interface IProps extends RouteComponentProps {
-  theme: ITheme
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -169,7 +168,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
+  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
     const locationId = new URLSearchParams(this.props.location.search).get(
       'locationId'
     )
@@ -325,7 +324,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
-    const { intl, searchText, selectedSearchType, language } = props
+    const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -336,22 +335,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         isDefault: true
       },
       {
-        label: intl.formatMessage(messages.typeBrnDrn),
+        label: intl.formatMessage(messages.typeRN),
         value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
-      },
-      {
-        label: intl.formatMessage(messages.nationalId),
-        value: NATIONAL_ID_TEXT,
-        icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
-      },
-      {
-        label: intl.formatMessage(messages.typePhone),
-        value: PHONE_TEXT,
-        icon: <Icon name="Phone" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
@@ -360,6 +347,28 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
+
+    if (fieldNames.includes('registrationPhone')) {
+      searchTypeList.splice(3, 0, {
+        label: intl.formatMessage(messages.typePhone),
+        value: PHONE_TEXT,
+        icon: <Icon name="Phone" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
+      })
+    }
+    if (
+      fieldNames.includes('iD') ||
+      fieldNames.includes('deceasedID') ||
+      fieldNames.includes('informantID')
+    ) {
+      searchTypeList.splice(2, 0, {
+        label: intl.formatMessage(messages.nationalId),
+        value: NATIONAL_ID_TEXT,
+        icon: <Icon name="IdentificationCard" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+      })
+    }
+
     const navigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
@@ -427,7 +436,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { className, intl, activeMenuItem, theme } = this.props
+    const { className, intl, activeMenuItem } = this.props
 
     const title =
       this.props.title ||
@@ -504,10 +513,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
-      activeMenuItem,
-      theme
-    )
+    const mobileHeaderActionProps =
+      this.getMobileHeaderActionProps(activeMenuItem)
 
     const mobileHeaderActionPropsWithDefaults = {
       mobileRight: this.props.mobileRight,
@@ -546,7 +553,12 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    fieldNames: Object.values(getRegisterForm(store))
+      .flatMap((form) => form.sections)
+      .flatMap((section) => section.groups)
+      .flatMap((group) => group.fields)
+      .map((field) => field.name)
   }),
   {
     redirectToAuthentication,
@@ -564,7 +576,7 @@ export const Header = connect(
     goToAdvancedSearch: goToAdvancedSearch,
     setAdvancedSearchParam: setAdvancedSearchParam
   }
-)(injectIntl(withTheme(withRouter(HeaderComp))))
+)(injectIntl(withRouter(HeaderComp)))
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`

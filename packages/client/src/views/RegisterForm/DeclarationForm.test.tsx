@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createTestApp,
@@ -91,73 +90,6 @@ describe('when user has starts a new declaration', () => {
       store = testApp.store
     })
 
-    describe('when user tries to continue without providing contact-point datas', () => {
-      let draft: IDeclaration
-      beforeEach(async () => {
-        const data = {
-          registration: {
-            informantType: {
-              value: '',
-              nestedFields: { otherInformantType: '' }
-            }
-          }
-        }
-        draft = createDeclaration(Event.Birth, data)
-        store.dispatch(storeDeclaration(draft))
-        history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
-        )
-        await waitForElement(app, '#content-name')
-      })
-      describe('when user clicks continue without choosing informantType', () => {
-        it('prevents from continuing and show radio button error', async () => {
-          app.find('#next_section').hostNodes().simulate('click')
-          await waitForElement(app, '#informantType_error')
-          expect(app.find('#informantType_error').hostNodes()).toHaveLength(1)
-        })
-      })
-      describe('when user enters informantType, clicks to contact page, then clicks continue without entering valid phone number of contact point ', () => {
-        it('prevents from continuing and shows phone input field error', async () => {
-          app
-            .find('#informantType_MOTHER')
-            .hostNodes()
-            .simulate('change', { target: { checked: true } })
-          app.find('#next_section').hostNodes().simulate('click')
-          app.update()
-          await waitForElement(app, '#contactPoint_MOTHER')
-          app
-            .find('#contactPoint_MOTHER')
-            .hostNodes()
-            .simulate('change', { target: { checked: true } })
-          await waitForElement(
-            app,
-            'input[name="contactPoint.nestedFields.registrationPhone"]'
-          )
-          app
-            .find('input[name="contactPoint.nestedFields.registrationPhone"]')
-            .simulate('change', {
-              target: {
-                name: 'contactPoint.nestedFields.registrationPhone',
-                value: '0'
-              }
-            })
-          app.find('#next_section').hostNodes().simulate('click')
-          app.update()
-          await waitForElement(
-            app,
-            'div[id="contactPoint.nestedFields.registrationPhone_error"]'
-          )
-          expect(
-            app
-              .find(
-                'div[id="contactPoint.nestedFields.registrationPhone_error"]'
-              )
-              .hostNodes()
-          ).toHaveLength(1)
-        })
-      })
-    })
-
     describe('when user is in birth registration by parent informant view', () => {
       let draft: IDeclaration
       beforeEach(async () => {
@@ -186,29 +118,7 @@ describe('when user has starts a new declaration', () => {
         )
         await waitForElement(app, '#content-name')
 
-        app
-          .find('#informantType_MOTHER')
-          .hostNodes()
-          .simulate('change', { target: { checked: true } })
         app.find('#next_section').hostNodes().simulate('click')
-        await waitForElement(app, '#contactPoint_MOTHER')
-        app
-          .find('#contactPoint_MOTHER')
-          .hostNodes()
-          .simulate('change', { target: { checked: true } })
-        await waitForElement(
-          app,
-          'input[name="contactPoint.nestedFields.registrationPhone"]'
-        )
-
-        app
-          .find('input[name="contactPoint.nestedFields.registrationPhone"]')
-          .simulate('change', {
-            target: {
-              name: 'contactPoint.nestedFields.registrationPhone',
-              value: '01999999999'
-            }
-          })
         app.find('#next_section').hostNodes().simulate('click')
         await waitForElement(app, '#form_section_id_child-view-group')
       })
@@ -293,6 +203,9 @@ describe('when user has starts a new declaration', () => {
             app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
             app.update()
+            app.find('#next_section').hostNodes().simulate('click')
+            await flushPromises()
+            app.update()
           })
           it('renders list of document upload field', async () => {
             const fileInputs = app
@@ -366,7 +279,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
-          await goToSection(app, 4)
+          await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
             .hostNodes()

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { storage } from '@client/storage'
 import { IUserData } from './declarations'
@@ -66,9 +65,7 @@ const config = {
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
-  ADDRESSES: 1,
-  ADMIN_LEVELS: 2
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
 }
 
 vi.stubGlobal('config', config)

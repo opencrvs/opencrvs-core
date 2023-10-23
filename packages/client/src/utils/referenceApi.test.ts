@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { referenceApi } from '@client/utils/referenceApi'
 import { vi } from 'vitest'
@@ -531,7 +530,6 @@ const mockFetchConfig = {
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
     DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-    HIDE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
     PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
     SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
@@ -543,8 +541,6 @@ const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1,
-    ADMIN_LEVELS: 2,
     INTEGRATIONS: [
       {
         name: 'MOSIP',

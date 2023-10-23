@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
@@ -19,6 +18,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
+        identifier {
+          id
+          type
+          otherType
+        }
         name {
           use
           firstNames
@@ -197,12 +201,28 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         otherReason
         requester
+        requesterOther
+        noSupportingDocumentationRequired
         hasShowedVerifiedDocument
         date
         action
         regStatus
         dhis2Notification
         ipAddress
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         statusReason {
           text
         }

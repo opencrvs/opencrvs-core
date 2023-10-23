@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
@@ -211,9 +210,24 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       history {
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus

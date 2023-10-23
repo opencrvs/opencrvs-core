@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import {
@@ -39,10 +38,10 @@ import {
 import { merge } from 'lodash'
 import * as React from 'react'
 import { InProgress, SELECTOR_ID } from './InProgress'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { vi, Mock } from 'vitest'

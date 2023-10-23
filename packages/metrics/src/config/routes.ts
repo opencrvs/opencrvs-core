@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -35,7 +34,6 @@ import {
   markValidatedHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
-  requestCorrectionHandler,
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
@@ -49,7 +47,8 @@ import {
   newEventRegistrationHandler,
   markIssuedHandler,
   markedAsDuplicate,
-  markedAsNotDuplicate
+  markedAsNotDuplicate,
+  correctionEventHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -314,8 +313,21 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
+      path: '/events/{event}/make-correction',
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
+      config: {
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/{event}/request-correction',
-      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
       config: {
         tags: ['api'],
         validate: {

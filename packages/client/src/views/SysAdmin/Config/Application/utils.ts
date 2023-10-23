@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { countries as countryList, lookup } from 'country-data'
@@ -183,6 +182,12 @@ export const isWithinFileLength = (base64data: string) => {
   return decoded.length < 2000000
 }
 
+const isGeneralOrConfigAction = (
+  configProperty: IActionType
+): configProperty is GeneralActionId => {
+  return Object.keys(GeneralActionId).includes(configProperty)
+}
+
 export async function callApplicationConfigMutation(
   configProperty: IActionType,
   appConfig: IApplicationConfig,
@@ -192,7 +197,9 @@ export async function callApplicationConfigMutation(
   try {
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      configProperty in BirthActionId
+      isGeneralOrConfigAction(configProperty)
+        ? { [configProperty]: appConfig[configProperty] }
+        : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
         : configProperty in DeathActionId
         ? { DEATH: appConfig.DEATH }

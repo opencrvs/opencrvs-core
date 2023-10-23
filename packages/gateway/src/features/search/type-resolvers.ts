@@ -6,27 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AVATAR_API, NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  AVATAR_API,
-  NATIVE_LANGUAGE,
-  USER_MANAGEMENT_URL
-} from '@gateway/constants'
-import { resolve } from 'url'
-import fetch from 'node-fetch'
+  IEventDurationResponse,
+  getEventDurationsFromMetrics
+} from '@gateway/features/fhir/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
-  GQLAdvancedSearchParametersInput,
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
-import {
-  getEventDurationsFromMetrics,
-  IEventDurationResponse
-} from '@gateway/features/fhir/utils'
-import { getUser } from '@gateway/features/user/utils'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -36,25 +27,12 @@ interface ISearchEventDataTemplate {
 interface ISearchDataTemplate {
   [key: string]: any
 }
-export interface ISearchCriteria {
-  parameters: GQLAdvancedSearchParametersInput
-  sort?: string
-  sortColumn?: string
-  size?: number
-  from?: number
-  createdBy?: string
-}
 
 interface IAssignment {
   officeName: string
   firstName: string
   lastName: string
   userId: string
-}
-
-type IAvatarResponse = {
-  userName: string
-  avatarURI?: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -220,6 +198,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     childGender(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.gender) || null
+    },
+    childIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.childIdentifier) || null
     },
     mothersFirstName(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.motherFirstNames) || null
@@ -388,11 +369,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedBy: async (
       searchData: ISearchEventDataTemplate,
       _,
-      { headers: authHeader }
+      { dataSources }
     ) => {
-      const res = await getUser(
-        { practitionerId: searchData._source && searchData._source.createdBy },
-        authHeader
+      const res = await dataSources.usersAPI.getUserByPractitionerId(
+        searchData._source && searchData._source.createdBy
       )
       // declarations created by health facilities don't have user
       // associated with it, so it returns an error
@@ -441,17 +421,14 @@ export const searchTypeResolvers: GQLResolver = {
     }
   },
   AssignmentData: {
-    async avatarURL(assignmentData: IAssignment, _, { headers: authHeader }) {
-      const response = await fetch(
-        resolve(USER_MANAGEMENT_URL, `users/${assignmentData.userId}/avatar`),
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+    async avatarURL(
+      assignmentData: IAssignment,
+      _,
+      { dataSources, headers: authHeader }
+    ) {
+      const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
+        assignmentData.userId
       )
-      const { userName, avatarURI }: IAvatarResponse = await response.json()
 
       if (avatarURI) {
         const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)

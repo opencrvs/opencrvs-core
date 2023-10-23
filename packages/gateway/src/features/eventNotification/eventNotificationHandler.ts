@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -20,8 +19,16 @@ import {
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
+import {
+  Address,
+  Bundle,
+  Encounter,
+  OPENCRVS_SPECIFICATION_URL,
+  Patient,
+  Resource,
+  Task
+} from '@opencrvs/commons/types'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
@@ -73,7 +80,7 @@ export function validationFailedAction(
   throw e
 }
 
-async function validateTask(bundle: fhir.Bundle) {
+async function validateTask(bundle: Bundle) {
   const taskEntry = bundle.entry?.find(
     (entry) => entry.resource?.resourceType === 'Task'
   )
@@ -86,7 +93,7 @@ async function validateTask(bundle: fhir.Bundle) {
   if (!compositionEntry) {
     throw new Error('Composition entry not found! in bundle')
   }
-  const task = taskEntry.resource as fhir.Task
+  const task = taskEntry.resource as Task
   if (task.status !== 'draft') {
     throw new Error('Task status should be draft')
   }
@@ -156,7 +163,7 @@ export async function eventNotificationHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const bundle = req.payload as fhir.Bundle
+    const bundle = req.payload as Bundle
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
@@ -179,11 +186,11 @@ export async function eventNotificationHandler(
   )
 }
 
-export async function validateAddressesOfTask(bundle: fhir.Bundle) {
+export async function validateAddressesOfTask(bundle: Bundle) {
   //validate the patient addresses
-  const patientEntries = bundle.entry?.filter(
-    (e) => e.resource?.resourceType === 'Patient'
-  )
+  const patientEntries = bundle.entry
+    .map(({ resource }) => resource)
+    .filter(isPatient)
 
   if (!patientEntries || patientEntries.length === 0) {
     throw BoomErrorWithCustomMessage(
@@ -192,7 +199,7 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 
   for (const patient of patientEntries) {
-    const addresses = (patient as fhir.Patient).address
+    const addresses = (patient as Patient).address
 
     if (addresses) {
       for (const address of addresses) {
@@ -202,7 +209,7 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 
   // validate event encounter
-  const encounter = getResourceByType<fhir.Encounter>(bundle, 'Encounter')
+  const encounter = getResourceByType<Encounter>(bundle, 'Encounter')
   if (!encounter) {
     throw BoomErrorWithCustomMessage('Encounter entry not found!!')
   }
@@ -225,8 +232,8 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 }
 
-export function getResourceByType<T = fhir.Resource>(
-  bundle: fhir.Bundle,
+export function getResourceByType<T = Resource>(
+  bundle: Bundle,
   type: string
 ): T | undefined {
   const bundleEntry =
@@ -242,7 +249,7 @@ export function getResourceByType<T = fhir.Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export async function validateLocationLevelsAndCountry(address: fhir.Address) {
+export async function validateLocationLevelsAndCountry(address: Address) {
   const isCountryValid =
     address.country === 'FAR' ||
     (address?.country && lookup.byIso(address?.country))
@@ -286,4 +293,11 @@ export function BoomErrorWithCustomMessage(message: string) {
   const boomError = badImplementation()
   boomError.output.payload.boomCustomMessage = message
   return boomError
+}
+function isPatient(
+  value: Resource,
+  index: number,
+  array: Resource[]
+): value is Resource {
+  throw new Error('Function not implemented.')
 }

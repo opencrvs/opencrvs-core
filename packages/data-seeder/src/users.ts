@@ -6,48 +6,44 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST, GATEWAY_URL } from './constants'
+import { ACTIVATE_USERS, COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import { z } from 'zod'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
+
+const WithoutContact = z.object({
+  primaryOfficeId: z.string(),
+  givenNames: z.string(),
+  familyName: z.string(),
+  systemRole: z.enum([
+    'FIELD_AGENT',
+    'REGISTRATION_AGENT',
+    'LOCAL_REGISTRAR',
+    'LOCAL_SYSTEM_ADMIN',
+    'NATIONAL_SYSTEM_ADMIN',
+    'PERFORMANCE_MANAGEMENT',
+    'NATIONAL_REGISTRAR'
+  ]),
+  role: z.string(),
+  username: z.string(),
+  password: z.string()
+})
 
 const UserSchema = z.array(
-  z.object({
-    primaryOfficeId: z.string(),
-    givenNames: z.string(),
-    familyName: z.string(),
-    systemRole: z.enum([
-      'FIELD_AGENT',
-      'REGISTRATION_AGENT',
-      'LOCAL_REGISTRAR',
-      'LOCAL_SYSTEM_ADMIN',
-      'NATIONAL_SYSTEM_ADMIN',
-      'PERFORMANCE_MANAGEMENT',
-      'NATIONAL_REGISTRAR'
-    ]),
-    role: z.enum([
-      'Field Agent',
-      'Police Officer',
-      'Local Leader',
-      'Social Worker',
-      'Healthcare Worker',
-      'Registration Agent',
-      'Local Registrar',
-      'Local System Admin',
-      'National System Admin',
-      'Performance Manager',
-      'National Registrar'
-    ]),
-    username: z.string(),
+  WithoutContact.extend({
     mobile: z.string(),
-    email: z.string().email(),
-    password: z.string()
-  })
+    email: z.string().email().optional()
+  }).or(
+    WithoutContact.extend({
+      email: z.string().email(),
+      mobile: z.string().optional()
+    })
+  )
 )
 
 const searchUserQuery = print(gql`
@@ -67,7 +63,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUseres() {
-  const url = new URL('users', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('users', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
@@ -75,9 +71,18 @@ async function getUseres() {
   const parsedUsers = UserSchema.safeParse(await res.json())
   if (!parsedUsers.success) {
     raise(
-      `Error when getting users metadata from country-config: ${JSON.stringify(
+      `Error when getting users metadata from country-config: ${inspect(
         parsedUsers.error.issues
       )}`
+    )
+  }
+  if (
+    parsedUsers.data.every(
+      ({ systemRole }) => systemRole !== 'NATIONAL_SYSTEM_ADMIN'
+    )
+  ) {
+    raise(
+      `At least one user with "NATIONAL_SYSTEM_ADMIN" systemRole must be created`
     )
   }
   return parsedUsers.data
@@ -87,7 +92,7 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(GATEWAY_GQL_HOST, {
+  const searchResponse = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -108,7 +113,7 @@ async function userAlreadyExists(
 
 async function getOfficeIdFromIdentifier(identifier: string) {
   const response = await fetch(
-    `${GATEWAY_URL}/location?identifier=${identifier}`,
+    `${GATEWAY_HOST}/location?identifier=${identifier}`,
     {
       headers: {
         'Content-Type': 'application/fhir+json'
@@ -163,9 +168,11 @@ export async function seedUsers(
             firstNames: givenNames
           }
         ],
-        primaryOffice
+        ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
+        primaryOffice,
+        username
       }
-      const res = await fetch(GATEWAY_GQL_HOST, {
+      const res = await fetch(`${GATEWAY_HOST}/graphql`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

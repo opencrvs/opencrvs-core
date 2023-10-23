@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CorrectionSection,
@@ -15,7 +14,7 @@ import {
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'

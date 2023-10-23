@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { Header } from '@client/components/Header/Header'
@@ -50,7 +49,7 @@ import {
   modifyDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
-import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Toast } from '@opencrvs/components/lib/Toast'
@@ -209,6 +208,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   VALIDATED: 'grey',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
+  CORRECTION_REQUESTED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
   SUBMITTING: 'orange',
@@ -218,9 +218,11 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
 const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
-  toggleDisplayDialog
+  toggleDisplayDialog,
+  refetchDeclarationInfo
 }: {
   toggleDisplayDialog: () => void
+  refetchDeclarationInfo?: () => void
 }) {
   const { declarationId } = useParams<{ declarationId: string }>()
   const intl = useIntl()
@@ -244,20 +246,15 @@ function ReinstateButton({
           ? REINSTATE_BIRTH_DECLARATION
           : REINSTATE_DEATH_DECLARATION
       }
-      refetchQueries={[
-        {
-          query: FETCH_DECLARATION_SHORT_INFO,
-          variables: { id: declaration.id }
-        }
-      ]}
-      onCompleted={() =>
+      onCompleted={() => {
+        refetchDeclarationInfo?.()
         dispatch(
           modifyDeclaration({
             ...declaration,
             submissionStatus: ''
           })
         )
-      }
+      }}
     >
       {(reinstateDeclaration) => (
         <PrimaryButton
@@ -296,6 +293,7 @@ function RecordAuditBody({
   goToPage,
   goToHomeTab,
   scope,
+  refetchDeclarationInfo,
   userDetails,
   registerForm,
   goToUserProfile,
@@ -311,12 +309,15 @@ function RecordAuditBody({
   userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
+  refetchDeclarationInfo?: () => void
   tab: IRecordAuditTabs
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
-  const [actionDetailsData, setActionDetailsData] = React.useState({})
+
+  const [actionDetailsData, setActionDetailsData] = React.useState<History>()
+
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
 
@@ -343,7 +344,7 @@ function RecordAuditBody({
   if (
     isDownloaded &&
     declaration.type !== Event.Marriage &&
-    userHasRegisterScope &&
+    (userHasRegisterScope || userHasValidateScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
@@ -431,8 +432,11 @@ function RecordAuditBody({
   }
 
   if (
-    (declaration.status === SUBMISSION_STATUS.DECLARED ||
-      declaration.status === SUBMISSION_STATUS.VALIDATED) &&
+    [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.VALIDATED,
+      SUBMISSION_STATUS.CORRECTION_REQUESTED
+    ].includes(declaration.status as SUBMISSION_STATUS) &&
     userDetails?.systemRole &&
     !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
   ) {
@@ -636,7 +640,12 @@ function RecordAuditBody({
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
-      <ActionDetailsModal {...actionDetailsModalProps} />
+      {actionDetailsModalProps.actionDetailsData && (
+        <ActionDetailsModal
+          {...actionDetailsModalProps}
+          actionDetailsData={actionDetailsModalProps.actionDetailsData}
+        />
+      )}
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
@@ -656,7 +665,10 @@ function RecordAuditBody({
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           declaration.status && ARCHIVED.includes(declaration.status) ? (
-            <ReinstateButton toggleDisplayDialog={toggleDisplayDialog} />
+            <ReinstateButton
+              toggleDisplayDialog={toggleDisplayDialog}
+              refetchDeclarationInfo={refetchDeclarationInfo}
+            />
           ) : (
             <DangerButton
               id="archive_confirm"
@@ -699,7 +711,6 @@ const BodyContent = ({
   ...actionProps
 }: IFullProps) => {
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
-
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -712,7 +723,7 @@ const BodyContent = ({
           variables={{
             id: declarationId
           }}
-          fetchPolicy="cache-and-network"
+          fetchPolicy="no-cache"
         >
           {({ loading, error, data, refetch }) => {
             if (loading) {
@@ -764,6 +775,7 @@ const BodyContent = ({
                 tab={tab}
                 draft={draft}
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
+                refetchDeclarationInfo={refetch}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -779,7 +791,6 @@ const BodyContent = ({
       draft?.data?.registration?.trackingId?.toString() ||
       workqueueDeclaration?.registration?.trackingId ||
       ''
-
     let declaration =
       draft &&
       (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -793,7 +804,6 @@ const BodyContent = ({
             language,
             trackingId
           )
-
     const wqStatus = workqueueDeclaration?.registration?.status
     const draftStatus =
       draft?.submissionStatus?.toString() ||

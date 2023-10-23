@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -61,12 +60,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -84,7 +84,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+
   const compositionId =
     task &&
     task.focus &&

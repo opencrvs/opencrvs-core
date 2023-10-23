@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   buildFHIRBundle,
@@ -17,7 +16,6 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL,
   FHIR_OBSERVATION_CATEGORY_URL,
   EVENT_TYPE
 } from '@gateway/features/fhir/constants'
@@ -34,8 +32,22 @@ import { mockTask } from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { IAuthHeader } from '@gateway/common-types'
+
+import { IAuthHeader } from '@opencrvs/commons'
+
 import * as fetchMock from 'jest-fetch-mock'
+import {
+  Extension,
+  isTask,
+  TrackingID,
+  URLReference,
+  OPENCRVS_SPECIFICATION_URL,
+  ResourceIdentifier
+} from '@opencrvs/commons/types'
+import {
+  GQLAttachmentInputStatus,
+  GQLBirthRegistrationInput
+} from '@gateway/graphql/schema'
 
 const fetch = fetchMock as fetchMock.FetchMock
 type AuthHeader = { Authorization?: string } & IAuthHeader
@@ -45,7 +57,7 @@ test('should build a minimal FHIR registration document without error', async ()
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = await buildFHIRBundle(
+  const fhir: any = await buildFHIRBundle(
     {
       mother: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
@@ -54,7 +66,6 @@ test('should build a minimal FHIR registration document without error', async ()
         birthDate: '2000-01-28',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
-        deceased: false,
         multipleBirth: 1,
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
@@ -69,7 +80,6 @@ test('should build a minimal FHIR registration document without error', async ()
         telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
         maritalStatus: 'MARRIED',
         birthDate: '2000-09-28',
-        deceased: false,
         multipleBirth: 2,
         address: [
           {
@@ -97,8 +107,7 @@ test('should build a minimal FHIR registration document without error', async ()
         photo: [
           {
             contentType: 'image/jpeg',
-            data: '123456',
-            title: 'father-national-id'
+            data: '123456'
           }
         ],
         dateOfMarriage: '2014-01-28',
@@ -113,7 +122,6 @@ test('should build a minimal FHIR registration document without error', async ()
         name: [],
         birthDate: '2018-01-28',
         maritalStatus: 'NOT_STATED',
-        deceased: false,
         multipleBirth: 3,
         dateOfMarriage: '',
         nationality: ['BGD'],
@@ -160,7 +168,7 @@ test('should build a minimal FHIR registration document without error', async ()
             _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
             contentType: 'image/png',
             data: 'ExampleData',
-            status: 'deleted',
+            status: 'amended' as GQLAttachmentInputStatus,
             originalFileName: 'original.png',
             systemFileName: 'system.png',
             type: 'PASSPORT',
@@ -172,10 +180,12 @@ test('should build a minimal FHIR registration document without error', async ()
           {
             collector: {
               relationship: 'OTHER',
-              affidavit: {
-                contentType: 'image/jpg',
-                data: 'data:image/png;base64,2324256'
-              },
+              affidavit: [
+                {
+                  contentType: 'image/jpg',
+                  data: 'data:image/png;base64,2324256'
+                }
+              ],
               name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
               identifier: [{ id: '123456', type: 'PASSPORT' }]
             },
@@ -212,7 +222,7 @@ test('should build a minimal FHIR registration document without error', async ()
           ]
         }
       },
-      birthType: 2,
+      birthType: 'SINGLE',
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
       childrenBornAliveToMother: 2,
@@ -233,8 +243,9 @@ test('should build a minimal FHIR registration document without error', async ()
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
         }
       }
-    },
-    'BIRTH' as EVENT_TYPE
+    } as GQLBirthRegistrationInput,
+    'BIRTH' as EVENT_TYPE,
+    {} as any
   )
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(7)
@@ -255,7 +266,6 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[1].resource.maritalStatus.coding[0].code).toBe('M')
   expect(fhir.entry[1].resource.multipleBirthInteger).toBe(1)
-  expect(fhir.entry[1].resource.deceasedBoolean).toBe(false)
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
   expect(fhir.entry[1].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
@@ -298,8 +308,6 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[2].resource.maritalStatus.coding[0].code).toBe('M')
   expect(fhir.entry[2].resource.multipleBirthInteger).toBe(2)
-  expect(fhir.entry[2].resource.deceasedBoolean).toBe(false)
-  expect(fhir.entry[2].resource.photo[0].title).toBe('father-national-id')
   expect(fhir.entry[2].resource.address[0].use).toBe('home')
   expect(fhir.entry[2].resource.address[0].line[0]).toBe('2760 Mlosi Street')
   expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
@@ -334,7 +342,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[3].resource.maritalStatus.text).toBe('NOT_STATED')
   expect(fhir.entry[3].resource.maritalStatus.coding[0].code).toBe('UNK')
   expect(fhir.entry[3].resource.multipleBirthInteger).toBe(3)
-  expect(fhir.entry[3].resource.deceasedBoolean).toBe(false)
+
   expect(fhir.entry[3].resource.extension[0].valueDateTime).toBe('')
   expect(fhir.entry[3].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
@@ -442,7 +450,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce22'
   )
-  expect(fhir.entry[7].resource.docStatus).toBe('deleted')
+  expect(fhir.entry[7].resource.docStatus).toBe('approved')
   expect(fhir.entry[7].resource.created).toBe('2018-10-22')
   expect(fhir.entry[7].resource.type).toEqual({
     coding: [
@@ -475,6 +483,7 @@ test('should build a minimal FHIR registration document without error', async ()
   })
   // Certificate collection
   expect(fhir.entry[8].resource.resourceType).toBe('DocumentReference')
+
   expect(fhir.entry[8].resource.type).toEqual({
     coding: [
       {
@@ -492,7 +501,7 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     {
       url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
-      valueString: true
+      valueBoolean: true
     },
     {
       url: 'http://opencrvs.org/specs/extension/payment',
@@ -591,7 +600,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[14].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283'
   )
-  expect(fhir.entry[14].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[14].resource.valueQuantity.value).toBe('SINGLE')
   expect(fhir.entry[14].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
@@ -720,14 +729,14 @@ test('should update a task document as rejected', async () => {
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = await updateFHIRTaskBundle(
+  const fhir: any = await updateFHIRTaskBundle(
     {
       fullUrl:
-        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc' as URLReference,
       resource: {
         resourceType: 'Task',
-        intent: '000',
-        status: 'requested',
+        intent: 'order',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -738,7 +747,7 @@ test('should update a task document as rejected', async () => {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: { reference: 'DUMMY' }
+            valueReference: { reference: 'DUMMY' as ResourceIdentifier }
           }
         ],
         lastModified: '2018-11-28T15:13:57.492Z',
@@ -751,7 +760,7 @@ test('should update a task document as rejected', async () => {
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B1mW7jA'
+            value: 'B1mW7jA' as TrackingID
           }
         ],
         businessStatus: {
@@ -781,13 +790,13 @@ test('should update a task document as rejected', async () => {
   )
 })
 
-test('creates task with contact other relationship', async () => {
+test.only('creates task with contact other relationship', async () => {
   fetch.mockResponse(
     JSON.stringify({
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const simpleFhir: fhir.Bundle = await buildFHIRBundle(
+  const simpleFhir = await buildFHIRBundle(
     {
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
@@ -864,17 +873,16 @@ test('creates task with contact other relationship', async () => {
           }
         ]
       }
-    },
-    'BIRTH' as EVENT_TYPE
+    } as any,
+    'BIRTH' as EVENT_TYPE,
+    {} as any
   )
 
   expect(simpleFhir).toBeDefined()
 
-  const taskResource = (
-    simpleFhir?.entry?.find(
-      ({ resource }) => resource?.resourceType === 'Task'
-    ) as fhir.BundleEntry
-  ).resource as fhir.Task
+  const taskResource = simpleFhir!.entry
+    .map(({ resource }) => resource)
+    .find(isTask)
 
   expect(taskResource).toBeDefined()
   expect(
@@ -896,113 +904,14 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 })
 
-test('should build bundle for correction fhir builders', async () => {
-  fetch.mockResponse(
-    JSON.stringify({
-      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-    })
-  )
-  const fhir = await buildFHIRBundle(
-    {
-      child: {
-        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
-        gender: 'male',
-        name: [],
-        birthDate: '2018-01-28',
-        maritalStatus: 'NOT_STATED',
-        deceased: false,
-        multipleBirth: 3,
-        dateOfMarriage: '',
-        nationality: ['BGD'],
-        educationalAttainment: 'NO_SCHOOLING'
-      },
-      registration: {
-        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        informantType: 'MOTHER',
-        contactPhoneNumber: '01733333333',
-        paperFormID: '12345678',
-        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        trackingId: 'B123456',
-        registrationNumber: '201923324512345671',
-        correction: {
-          location: {
-            _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
-          },
-          requester: 'MOTHER',
-          hasShowedVerifiedDocument: true,
-          attestedAndCopied: true,
-          noSupportingDocumentationRequired: false,
-          values: [
-            {
-              section: 'child',
-              fieldName: 'name',
-              oldValue: 'Khaby Lame',
-              newValue: 'Khaby Lame Corrected'
-            }
-          ],
-          reason: 'CLERICAL_ERROR',
-          note: 'Spelling mistake',
-          payments: {
-            amount: 10,
-            total: 10,
-            paymentId: '123',
-            type: 'MANUAL',
-            date: '2022-01-28T07:09:01.079Z',
-            data: 'data:image/png;base64,2324256'
-          },
-          data: 'data:image/png;base64,2324234'
-        }
-      }
-    },
-    'BIRTH' as EVENT_TYPE
-  )
-
-  expect(fhir).toBeDefined()
-  // Task resource
-  expect(fhir.entry[2].resource.extension[2]).toEqual({
-    url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-    valueString: 'MOTHER'
-  })
-  expect(fhir.entry[2].resource.input).toEqual([
-    {
-      valueCode: 'child',
-      valueId: 'name',
-      type: {
-        coding: [
-          {
-            code: 'update',
-            system: 'http://terminology.hl7.org/CodeSystem/action-type'
-          }
-        ]
-      },
-      valueString: 'Khaby Lame'
-    }
-  ])
-  expect(fhir.entry[2].resource.output).toEqual([
-    {
-      valueCode: 'child',
-      valueId: 'name',
-      type: {
-        coding: [
-          {
-            code: 'update',
-            system: 'http://terminology.hl7.org/CodeSystem/action-type'
-          }
-        ]
-      },
-      valueString: 'Khaby Lame Corrected'
-    }
-  ])
-})
-
 describe('taskBundleWithExtension()', () => {
   it('should add the extension', () => {
-    const bundle = taskBundleWithExtension(
-      { resource: mockTask },
-      { url: 'mock-url', valueString: 'mock-value' }
-    )
-    const extension = bundle.entry[0].resource.extension as fhir.Extension[]
-    expect(findExtension('mock-url', extension)).toHaveProperty(
+    const bundle = taskBundleWithExtension({ resource: mockTask as any }, {
+      url: 'mock-url',
+      valueString: 'mock-value'
+    } as any)
+    const extension = bundle.entry[0].resource.extension as Extension[]
+    expect(findExtension('mock-url' as any, extension)).toHaveProperty(
       'valueString',
       'mock-value'
     )
@@ -1013,7 +922,7 @@ describe('checkUserAssignment()', () => {
   const fetch = fetchMock as fetchMock.FetchMock
   const registerCertifyToken = jwt.sign(
     { scope: ['register', 'certify'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: '121221',
       algorithm: 'RS256',

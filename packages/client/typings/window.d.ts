@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 interface Window {
@@ -60,9 +59,6 @@ interface Window {
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
-    HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
-    HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
@@ -70,11 +66,9 @@ interface Window {
     DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
-    ADDRESSES: number
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
-    ADMIN_LEVELS: number
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string

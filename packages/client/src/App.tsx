@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { NotificationComponent } from '@client/components/Notification'
@@ -73,6 +72,7 @@ import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPV
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -233,6 +233,11 @@ export function App(props: IAppProps) {
                                                 routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
                                               }
                                               component={ReviewForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.REVIEW_CORRECTION}
+                                              component={ReviewCorrection}
                                             />
                                             <ProtectedRoute
                                               exact

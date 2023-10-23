@@ -6,99 +6,166 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  findCompositionSection,
-  findExtension,
-  fetchFHIR,
-  getTimeLoggedFromMetrics,
-  getStatusFromTask,
-  ITimeLoggedResponse,
-  getCertificatesFromTask,
-  getActionFromTask,
-  fetchTaskByCompositionIdFromHearth
-} from '@gateway/features/fhir/utils'
+  DUPLICATE_TRACKING_ID,
+  FHIR_SPECIFICATION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  NO_SUPPORTING_DOCUMENTATION_REQUIRED,
+  ORIGINAL_FILE_NAME_SYSTEM,
+  PAYMENT_DETAILS,
+  REQUESTING_INDIVIDUAL,
+  REQUESTING_INDIVIDUAL_OTHER,
+  SYSTEM_FILE_NAME_SYSTEM
+} from '@gateway/features/fhir/constants'
 import {
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE,
-  ATTACHMENT_DOCS_CODE,
-  BIRTH_ENCOUNTER_CODE,
-  BODY_WEIGHT_CODE,
-  BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
-  LAST_LIVE_BIRTH_CODE,
-  NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE,
-  DECEASED_CODE,
-  INFORMANT_CODE,
-  DEATH_ENCOUNTER_CODE,
-  MANNER_OF_DEATH_CODE,
+  BIRTH_ENCOUNTER_CODE,
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
   CAUSE_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE,
-  SPOUSE_CODE,
-  MALE_DEPENDENTS_ON_DECEASED_CODE,
-  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  DEATH_DESCRIPTION_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
+  CAUSE_OF_DEATH_METHOD_CODE,
+  DEATH_DESCRIPTION_CODE,
+  DEATH_ENCOUNTER_CODE,
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  LAST_LIVE_BIRTH_CODE,
+  MALE_DEPENDENTS_ON_DECEASED_CODE,
+  MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
-  BRIDE_CODE,
-  GROOM_CODE,
-  WITNESS_ONE_CODE,
-  WITNESS_TWO_CODE
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE
 } from '@gateway/features/fhir/templates'
+import {
+  fetchTaskByCompositionIdFromHearth,
+  findExtension,
+  getActionFromTask,
+  getStatusFromTask
+} from '@gateway/features/fhir/utils'
+import { SignatureExtensionPostfix } from '@gateway/features/registration/fhir-builders'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
+
 import {
   GQLQuestionnaireQuestion,
   GQLRegStatus,
   GQLResolver
 } from '@gateway/graphql/schema'
 import {
-  ORIGINAL_FILE_NAME_SYSTEM,
-  SYSTEM_FILE_NAME_SYSTEM,
-  FHIR_SPECIFICATION_URL,
+  ATTACHMENT_DOCS_CODE,
+  BRIDE_CODE,
+  Bundle,
+  CHILD_CODE,
+  Coding,
+  DECEASED_CODE,
+  DocumentReference,
+  EncounterParticipant,
+  Extension,
+  FATHER_CODE,
+  GROOM_CODE,
+  INFORMANT_CODE,
+  Identifier,
+  Location,
+  MOTHER_CODE,
   OPENCRVS_SPECIFICATION_URL,
-  REQUESTING_INDIVIDUAL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
-} from '@gateway/features/fhir/constants'
-import {
-  ITemplatedComposition,
-  SignatureExtensionPostfix,
-  ITaskBundle
-} from '@gateway/features/registration/fhir-builders'
-import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+  Patient,
+  PaymentReconciliation,
+  Practitioner,
+  RelatedPerson,
+  Resource,
+  ResourceIdentifier,
+  SPOUSE_CODE,
+  Saved,
+  Task,
+  ValidRecord,
+  WITNESS_ONE_CODE,
+  WITNESS_TWO_CODE,
+  findCompositionSection,
+  findObservationByCode,
+  getComposition,
+  getEncounterFromRecord,
+  getEventLabelFromBundle,
+  getResourceFromBundleById,
+  getTaskFromBundle,
+  isDocumentReference,
+  isObservation,
+  isPatient,
+  isQuestionnaireResponse,
+  isTaskOrTaskHistory,
+  isURLReference,
+  resourceIdentifierToUUID,
+  urlReferenceToUUID
+} from '@opencrvs/commons/types'
+
+import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
-import {
-  getSignatureExtension,
-  IUserModelData
-} from '@gateway/features/user/type-resolvers'
-import { getSystem, getUser } from '@gateway/features/user/utils'
-import {
-  getPatientResource,
-  getPresignedUrlFromUri
-} from '@gateway/features/registration/utils'
+
+function findRelatedPerson(
+  patientCode:
+    | typeof INFORMANT_CODE
+    | typeof WITNESS_ONE_CODE
+    | typeof WITNESS_TWO_CODE
+) {
+  return (record: Saved<Saved<Bundle>>) => {
+    const composition = getComposition(record)
+    const patientSection = findCompositionSection(patientCode, composition)
+
+    if (!patientSection || !patientSection.entry) {
+      return null
+    }
+    return getResourceFromBundleById<RelatedPerson>(
+      record,
+      urlReferenceToUUID(patientSection.entry![0].reference)
+    )
+  }
+}
+function findPatient(
+  patientCode:
+    | typeof MOTHER_CODE
+    | typeof FATHER_CODE
+    | typeof CHILD_CODE
+    | typeof INFORMANT_CODE
+    | typeof DECEASED_CODE
+    | typeof SPOUSE_CODE
+    | typeof BRIDE_CODE
+    | typeof GROOM_CODE
+    | typeof WITNESS_ONE_CODE
+    | typeof WITNESS_TWO_CODE
+) {
+  return (record: Saved<Saved<Bundle>>) => {
+    const composition = getComposition(record)
+    const patientSection = findCompositionSection(patientCode, composition)
+
+    if (!patientSection || !patientSection.entry) {
+      return null
+    }
+
+    const patientOrRelatedPerson = getResourceFromBundleById<
+      Patient | RelatedPerson
+    >(record, urlReferenceToUUID(patientSection.entry![0].reference))
+
+    if (isPatient(patientOrRelatedPerson)) {
+      return patientOrRelatedPerson
+    }
+
+    if (!patientOrRelatedPerson.patient) {
+      return null
+    }
+
+    return getResourceFromBundleById(
+      record,
+      urlReferenceToUUID(patientOrRelatedPerson.patient.reference)
+    )
+  }
+}
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
-    __resolveType(obj) {
-      if (
-        obj.type.coding[0].code === 'birth-declaration' ||
-        obj.type.coding[0].code === 'birth-notification'
-      ) {
-        return 'BirthRegistration'
-      } else if (
-        obj.type.coding[0].code === 'death-declaration' ||
-        obj.type.coding[0].code === 'death-notification'
-      ) {
-        return 'DeathRegistration'
-      } else {
-        return 'MarriageRegistration'
-      }
+    __resolveType(record: Saved<ValidRecord>) {
+      return getEventLabelFromBundle(record)
     }
   },
   HumanName: {
@@ -122,7 +189,7 @@ export const typeResolvers: GQLResolver = {
     id: (identifier) => {
       return identifier.value
     },
-    type: (identifier: fhir.Identifier) => {
+    type: (identifier: Identifier) => {
       return identifier.type?.coding?.[0].code
     },
     otherType: (identifier) => {
@@ -157,31 +224,53 @@ export const typeResolvers: GQLResolver = {
   },
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
-    dateOfMarriage: (person) => {
+    dateOfMarriage: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
         person.extension
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
-    age: (person) => {
+    age: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
         person.extension
       )
-      return (marriageExtension && marriageExtension.valueString) || null
+      if (!marriageExtension) {
+        return null
+      }
+      if (marriageExtension.valueInteger) {
+        return marriageExtension.valueInteger
+      }
+      return marriageExtension.valueString
     },
-    maritalStatus: (person) => {
+    maritalStatus: (person: Patient) => {
       return person && person.maritalStatus && person.maritalStatus.text
     },
-    occupation: (person) => {
+    occupation: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
         person.extension
       )
       return (occupationExtension && occupationExtension.valueString) || null
     },
-    reasonNotApplying: (person) => {
+    reasonNotApplying: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
         person.extension
@@ -192,38 +281,50 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    ageOfIndividualInYears: (person) => {
+    ageOfIndividualInYears: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person.extension
       )
       return (
         (ageOfIndividualInYearsExtension &&
-          ageOfIndividualInYearsExtension.valueString) ||
+          ageOfIndividualInYearsExtension.valueInteger) ||
         null
       )
     },
-    exactDateOfBirthUnknown: (person) => {
+    exactDateOfBirthUnknown: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person.extension
       )
       return (
         (exactDateOfBirthUnknownExtension &&
-          exactDateOfBirthUnknownExtension.valueString) ||
+          exactDateOfBirthUnknownExtension.valueInteger) ||
         null
       )
     },
-    detailsExist: (person) => {
+    detailsExist: (person: Patient) => {
       return person.active
     },
-    multipleBirth: (person) => {
+    multipleBirth: (person: Patient) => {
       return person.multipleBirthInteger
     },
-    deceased: (person) => {
+    deceased: (person: Patient) => {
       return person
     },
-    nationality: (person) => {
+    nationality: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
         person.extension
@@ -250,7 +351,11 @@ export const typeResolvers: GQLResolver = {
 
       return nationality
     },
-    educationalAttainment: (person) => {
+    educationalAttainment: (person: Patient) => {
+      if (!person.extension) {
+        return null
+      }
+
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
         person.extension
@@ -263,22 +368,16 @@ export const typeResolvers: GQLResolver = {
     }
   },
   RelatedPerson: {
-    id: (relatedPerson) => {
+    id: (relatedPerson: Saved<RelatedPerson>) => {
       return relatedPerson && relatedPerson.id
     },
-    _fhirIDPatient: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
-      )
-      return person && person.id
+    _fhirIDPatient: async (relatedPerson: Saved<RelatedPerson>) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      return urlReferenceToUUID(relatedPerson.patient.reference)
     },
-    relationship: (relatedPerson) => {
+    relationship: (relatedPerson: Saved<RelatedPerson>) => {
       return (
         relatedPerson &&
         relatedPerson.relationship &&
@@ -286,114 +385,116 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.coding[0].code
       )
     },
-    otherRelationship: (relatedPerson) => {
+    otherRelationship: (relatedPerson: Saved<RelatedPerson>) => {
       return (
         relatedPerson &&
         relatedPerson.relationship &&
         relatedPerson.relationship.text
       )
     },
-    name: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    name: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.name) || null
     },
-    dateOfMarriage: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    dateOfMarriage: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-        person?.extension
+        person?.extension || []
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
-    age: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    age: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
-        person?.extension
+        person?.extension || []
       )
-      return (marriageExtension && marriageExtension.valueString) || null
+      if (!marriageExtension) {
+        return null
+      }
+      if (marriageExtension.valueInteger) {
+        return marriageExtension.valueInteger
+      }
+      return marriageExtension.valueString
     },
-    birthDate: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    birthDate: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.birthDate) || null
     },
-    identifier: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    identifier: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return (person && person.identifier) || null
     },
-    maritalStatus: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    maritalStatus: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person && person.maritalStatus && person.maritalStatus.text
     },
-    occupation: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    occupation: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-        person?.extension
+        person?.extension || []
       )
       return (occupationExtension && occupationExtension.valueString) || null
     },
     reasonNotApplying: async (
-      relatedPerson,
+      relatedPerson: Saved<RelatedPerson>,
       _,
-      { headers: authHeader, dataSources }
+      context
     ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+      if (!relatedPerson.patient) {
+        return
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-        person?.extension
+        person?.extension || []
       )
       return (
         (reasonNotApplyingExtension &&
@@ -402,94 +503,91 @@ export const typeResolvers: GQLResolver = {
       )
     },
     ageOfIndividualInYears: async (
-      relatedPerson,
+      relatedPerson: Saved<RelatedPerson>,
       _,
-      { headers: authHeader, dataSources }
+      context
     ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person?.extension
+        person?.extension || []
       )
       return (
         (ageOfIndividualInYearsExtension &&
-          ageOfIndividualInYearsExtension.valueString) ||
+          ageOfIndividualInYearsExtension.valueInteger) ||
         null
       )
     },
     exactDateOfBirthUnknown: async (
-      relatedPerson,
+      relatedPerson: Saved<RelatedPerson>,
       _,
-      { headers: authHeader, dataSources }
+      context
     ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person?.extension
+        person?.extension || []
       )
       return (
         (exactDateOfBirthUnknownExtension &&
-          exactDateOfBirthUnknownExtension.valueString) ||
+          exactDateOfBirthUnknownExtension.valueInteger) ||
         null
       )
     },
-    detailsExist: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    detailsExist: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.active
     },
-    multipleBirth: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    multipleBirth: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.multipleBirthInteger
     },
-    deceased: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    deceased: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person
     },
-    nationality: async (
-      relatedPerson,
-      _,
-      { headers: authHeader, dataSources }
-    ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    nationality: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
+
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
-        person?.extension
+        person?.extension || []
       )
       if (!nationalityExtension || !nationalityExtension.extension) {
         return null
@@ -514,18 +612,20 @@ export const typeResolvers: GQLResolver = {
       return nationality
     },
     educationalAttainment: async (
-      relatedPerson,
+      relatedPerson: Saved<RelatedPerson>,
       _,
-      { headers: authHeader, dataSources }
+      context
     ) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
-        person?.extension
+        person?.extension || []
       )
       return (
         (educationalAttainmentExtension &&
@@ -533,11 +633,13 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    address: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
-      const person = await getPatientResource(
-        relatedPerson,
-        authHeader,
-        dataSources
+    address: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
+      if (!relatedPerson.patient) {
+        return null
+      }
+      const person = getResourceFromBundleById<Patient>(
+        context.record!,
+        urlReferenceToUUID(relatedPerson.patient.reference)
       )
       return person?.address
     }
@@ -551,86 +653,95 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Registration: {
-    async trackingId(task: fhir.Task) {
-      let trackingId =
+    async trackingId(task: Task) {
+      const trackingId =
         task &&
         task.code &&
         task.code.coding &&
         task.code.coding[0] &&
         task.code.coding[0].code
+
+      let specificationIdentifier:
+        | 'birth-tracking-id'
+        | 'death-tracking-id'
+        | 'marriage-tracking-id'
+
       if (trackingId === 'BIRTH') {
-        trackingId = 'birth-tracking-id'
+        specificationIdentifier = 'birth-tracking-id'
       } else if (trackingId === 'DEATH') {
-        trackingId = 'death-tracking-id'
+        specificationIdentifier = 'death-tracking-id'
       } else if (trackingId === 'MARRIAGE') {
-        trackingId = 'marriage-tracking-id'
+        specificationIdentifier = 'marriage-tracking-id'
       }
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system ===
-            `${OPENCRVS_SPECIFICATION_URL}id/${trackingId}`
+            `${OPENCRVS_SPECIFICATION_URL}id/${specificationIdentifier}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async registrationNumber(task: fhir.Task) {
-      let regNoType =
+    async registrationNumber(task: Task) {
+      const regNoType =
         task &&
         task.code &&
         task.code.coding &&
         task.code.coding[0] &&
         task.code.coding[0].code
+
+      let specificationIdentifier:
+        | 'birth-registration-number'
+        | 'death-registration-number'
+        | 'marriage-registration-number'
+
       if (regNoType === 'BIRTH') {
-        regNoType = 'birth-registration-number'
+        specificationIdentifier = 'birth-registration-number'
       } else if (regNoType === 'DEATH') {
-        regNoType = 'death-registration-number'
+        specificationIdentifier = 'death-registration-number'
       } else if (regNoType === 'MARRIAGE') {
-        regNoType = 'marriage-registration-number'
+        specificationIdentifier = 'marriage-registration-number'
       }
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
-            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/${regNoType}`
+          (identifier: Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/${specificationIdentifier}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async mosipAid(task: fhir.Task) {
-      let mosipAidType =
+    async mosipAid(task: Task) {
+      const mosipAidType =
         task &&
         task.code &&
         task.code.coding &&
         task.code.coding[0] &&
         task.code.coding[0].code
-      if (mosipAidType === 'BIRTH') {
-        mosipAidType = 'mosip-aid'
-      } else {
+
+      if (mosipAidType !== 'BIRTH') {
         return null
       }
+
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
-            identifier.system ===
-            `${OPENCRVS_SPECIFICATION_URL}id/${mosipAidType}`
+          (identifier: Identifier) =>
+            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/mosip-aid`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async attachments(task: fhir.Task, _, { headers: authHeader }) {
+    async attachments(task: Task, _, context) {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
         )
       }
 
-      const composition = await fetchFHIR(
-        `/${task.focus.reference}`,
-        authHeader
-      )
+      const composition = getComposition(context.record!)
       const docSection = findCompositionSection(
         ATTACHMENT_DOCS_CODE,
         composition
@@ -639,28 +750,30 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const docRefReferences = docSection.entry.map(
-        (docRefEntry: fhir.Reference) => docRefEntry.reference
+        (docRefEntry) => docRefEntry.reference
       )
-      return docRefReferences.map(async (docRefReference: string) => {
-        return await fetchFHIR(`/${docRefReference}`, authHeader)
-      })
+      return docRefReferences.map(async (docRefReference) =>
+        getResourceFromBundleById(
+          context.record!,
+          urlReferenceToUUID(docRefReference)
+        )
+      )
     },
-    async informantType(task: fhir.Task, _, { headers: authHeader }) {
+    async informantType(task: Saved<Task>, _, context) {
       if (!task.focus) {
         return null
       }
-      const composition = await fetchFHIR(
-        `/${task.focus.reference}`,
-        authHeader
-      )
+      const composition = getComposition(context.record!)
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
-      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
+
+      const relatedPerson = getResourceFromBundleById<RelatedPerson>(
+        context.record!,
+        urlReferenceToUUID(patientSection.entry[0].reference)
       )
+
       if (
         relatedPerson &&
         relatedPerson.relationship &&
@@ -672,22 +785,20 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async otherInformantType(task: fhir.Task, _, { headers: authHeader }) {
+    async otherInformantType(task: Task, _, context) {
       if (!task.focus) {
         return null
       }
-      const composition = await fetchFHIR(
-        `/${task.focus.reference}`,
-        authHeader
-      )
+      const composition = getComposition(context.record!)
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
-      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
+      const relatedPerson = getResourceFromBundleById<RelatedPerson>(
+        context.record!,
+        urlReferenceToUUID(patientSection.entry[0].reference)
       )
+
       if (
         relatedPerson &&
         relatedPerson.relationship &&
@@ -831,7 +942,7 @@ export const typeResolvers: GQLResolver = {
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
         )
@@ -842,7 +953,7 @@ export const typeResolvers: GQLResolver = {
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-page`
         )
@@ -853,53 +964,38 @@ export const typeResolvers: GQLResolver = {
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-book`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    status: async (task: fhir.Task, _, { headers: authHeader }) => {
-      // fetch full task history
-      const taskBundle: fhir.Bundle = await fetchFHIR(
-        `/Task/${task.id}/_history`,
-        authHeader
-      )
-      return (
-        taskBundle.entry &&
-        taskBundle.entry.map((taskEntry: fhir.BundleEntry, i) => {
-          const historicalTask = taskEntry.resource
-          // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
-          if (historicalTask && historicalTask.meta) {
-            historicalTask.id = `${historicalTask.id}/_history/${historicalTask.meta.versionId}`
-          }
-          return historicalTask
-        })
-      )
+    status: async (task: Saved<Task>, _, context) => {
+      return context.record?.entry
+        .map(({ resource }) => resource)
+        .filter(isTaskOrTaskHistory)
+        .sort(sortDescending)
     },
     type: (task) => {
       const taskType = task.code
       const taskCode = taskType.coding.find(
-        (coding: fhir.Coding) =>
+        (coding: Coding) =>
           coding.system === `${OPENCRVS_SPECIFICATION_URL}types`
       )
       return (taskCode && taskCode.code) || null
     },
-    duplicates: async (task, _, { headers: authHeader }) => {
+    duplicates: async (task, _, context) => {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
         )
       }
 
-      const composition = await fetchFHIR(
-        `/${task.focus.reference}`,
-        authHeader
-      )
+      const composition = getComposition(context.record!)
       const duplicateCompositionIds =
         composition.relatesTo &&
-        composition.relatesTo.map((duplicate: fhir.CompositionRelatesTo) => {
+        composition.relatesTo.map((duplicate) => {
           if (
             duplicate.code &&
             duplicate.code === 'duplicate' &&
@@ -915,8 +1011,9 @@ export const typeResolvers: GQLResolver = {
         duplicateCompositionIds &&
         (await Promise.all(
           duplicateCompositionIds.map(async (compositionId: string) => {
-            const taskData: ITaskBundle =
-              await fetchTaskByCompositionIdFromHearth(compositionId)
+            const taskData = await fetchTaskByCompositionIdFromHearth(
+              compositionId
+            )
             return {
               compositionId: compositionId,
               trackingId: taskData.entry?.[0].resource?.identifier?.find(
@@ -932,9 +1029,8 @@ export const typeResolvers: GQLResolver = {
         ))
       return duplicateData
     },
-    certificates: async (task, _, { headers: authHeader }) =>
-      await getCertificatesFromTask(task, _, authHeader),
-    assignment: async (task, _, { headers: authHeader }) => {
+    certificates: resolveCertificates,
+    assignment: async (task, _, context) => {
       const assignmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
@@ -954,7 +1050,10 @@ export const typeResolvers: GQLResolver = {
           regLastUserExtension?.valueReference?.reference?.split('/')?.[1]
 
         if (practitionerId) {
-          const user = await getUser({ practitionerId }, authHeader)
+          const user =
+            await context.dataSources.usersAPI.getUserByPractitionerId(
+              practitionerId
+            )
           if (user) {
             return {
               userId: user._id,
@@ -969,10 +1068,10 @@ export const typeResolvers: GQLResolver = {
     }
   },
   RegWorkflow: {
-    type: (task: fhir.Task) => {
+    type: (task: Task) => {
       return getStatusFromTask(task)
     },
-    user: async (task, _, { headers: authHeader }) => {
+    user: async (task, _, context) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
@@ -980,19 +1079,11 @@ export const typeResolvers: GQLResolver = {
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-        method: 'POST',
-        body: JSON.stringify({
-          practitionerId: user.valueReference.reference.split('/')[1]
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      return await res.json()
+      return context.dataSources.usersAPI.getUserByPractitionerId(
+        resourceIdentifierToUUID(user.valueReference.reference)
+      )
     },
-    reason: (task: fhir.Task) => (task.reason && task.reason.text) || null,
+    reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
     location: async (task, _, { dataSources }) => {
@@ -1003,9 +1094,11 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return dataSources.locationsAPI.getLocation(
+      const found = await dataSources.locationsAPI.getLocation(
         taskLocation.valueReference.reference?.split('/')[1] as string
       )
+
+      return found
     },
     office: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
@@ -1019,119 +1112,109 @@ export const typeResolvers: GQLResolver = {
         taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
-    timeLogged: async (task, _, { headers: authHeader }) => {
+    timeLogged: async (task, _, { dataSources }) => {
       const compositionId =
         (task.focus.reference && task.focus.reference.split('/')[1]) || ''
-      const timeLoggedResponse = (await getTimeLoggedFromMetrics(
-        authHeader,
-        compositionId,
-        getStatusFromTask(task) || ''
-      )) as ITimeLoggedResponse
+      const timeLoggedResponse = await dataSources.metricsAPI.getTimeLogged(
+        compositionId
+      )
       return (timeLoggedResponse && timeLoggedResponse.timeSpentEditing) || 0
     }
   },
   Comment: {
-    user: async (comment, _, { headers: authHeader }) => {
+    user: async (comment, _, context) => {
       if (!comment.authorString) {
         return null
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-        method: 'POST',
-        body: JSON.stringify({
-          practitionerId: comment.authorString.split('/')[1]
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      return await res.json()
+      return context.dataSources.usersAPI.getUserByPractitionerId(
+        resourceIdentifierToUUID(comment.authorString)
+      )
     },
     comment: (comment) => comment.text,
     createdAt: (comment) => comment.time
   },
   Attachment: {
-    id(docRef: fhir.DocumentReference) {
+    id(docRef: DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
-    async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
+    async data(docRef: DocumentReference, _, { headers: authHeader }) {
       const fileUri = docRef.content[0].attachment.data
       if (fileUri) {
         return getPresignedUrlFromUri(fileUri, authHeader)
       }
       return null
     },
-    uri(docRef: fhir.DocumentReference) {
+    uri(docRef: DocumentReference) {
       return docRef.content[0].attachment.data
     },
-    contentType(docRef: fhir.DocumentReference) {
+    contentType(docRef: DocumentReference) {
       return docRef.content[0].attachment.contentType
     },
-    originalFileName(docRef: fhir.DocumentReference) {
+    originalFileName(docRef: DocumentReference) {
       const foundIdentifier =
         docRef.identifier &&
         docRef.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system === ORIGINAL_FILE_NAME_SYSTEM
         )
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    systemFileName(docRef: fhir.DocumentReference) {
+    systemFileName(docRef: DocumentReference) {
       const foundIdentifier =
         docRef.identifier &&
         docRef.identifier.find(
-          (identifier: fhir.Identifier) =>
+          (identifier: Identifier) =>
             identifier.system === SYSTEM_FILE_NAME_SYSTEM
         )
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    type(docRef: fhir.DocumentReference) {
+    type(docRef: DocumentReference) {
       return (
         (docRef.type && docRef.type.coding && docRef.type.coding[0].code) ||
         null
       )
     },
-    subject(docRef: fhir.DocumentReference) {
+    subject(docRef: DocumentReference) {
       return (docRef.subject && docRef.subject.display) || null
     },
-    createdAt(docRef: fhir.DocumentReference) {
+    createdAt(docRef: DocumentReference) {
       return docRef.created
     }
   },
   Certificate: {
-    async collector(
-      docRef: fhir.DocumentReference,
-      _,
-      { headers: authHeader }
-    ) {
+    async collector(docRef: DocumentReference, _, context) {
       const relatedPersonRef =
         docRef.extension &&
-        docRef.extension.find(
-          (extension: fhir.Extension) =>
-            extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
+        findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+          docRef.extension
         )
-      if (!relatedPersonRef) {
+      if (!relatedPersonRef || !relatedPersonRef.valueReference.reference) {
         return null
       }
-      return (await fetchFHIR(
-        `/${
-          relatedPersonRef.valueReference &&
-          relatedPersonRef.valueReference.reference
-        }`,
-        authHeader
-      )) as fhir.RelatedPerson
+
+      return getResourceFromBundleById<RelatedPerson>(
+        context.record!,
+        resourceIdentifierToUUID(
+          relatedPersonRef.valueReference.reference as ResourceIdentifier
+        )
+      )
     },
-    async hasShowedVerifiedDocument(
-      docRef: fhir.DocumentReference,
-      _,
-      { headers: authHeader }
-    ) {
+    async hasShowedVerifiedDocument(docRef: DocumentReference, _) {
       const hasShowedDocument = findExtension(
         HAS_SHOWED_VERIFIED_DOCUMENT,
-        docRef.extension as fhir.Extension[]
+        docRef.extension as Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
     }
   },
   Identifier: {
@@ -1139,15 +1222,15 @@ export const typeResolvers: GQLResolver = {
     value: (identifier) => identifier.value
   },
   Location: {
-    name: (location) => location.name,
-    status: (location) => location.status,
-    identifier: (location) => location.identifier,
-    longitude: (location) => location.position.longitude,
-    latitude: (location) => location.position.latitude,
-    alias: (location) => location.alias,
-    description: (location) => location.description,
-    partOf: (location) => location.partOf.reference,
-    type: (location: fhir.Location) => {
+    name: (location: Location) => location.name,
+    status: (location: Location) => location.status,
+    identifier: (location: Location) => location.identifier,
+    longitude: (location: Location) => location.position?.longitude,
+    latitude: (location: Location) => location.position?.latitude,
+    alias: (location: Location) => location.alias,
+    description: (location: Location) => location.description,
+    partOf: (location: Location) => location.partOf?.reference,
+    type: (location: Location) => {
       return (
         (location.type &&
           location.type.coding &&
@@ -1158,7 +1241,7 @@ export const typeResolvers: GQLResolver = {
     address: (location) => location.address
   },
   MedicalPractitioner: {
-    name: async (encounterParticipant, _, { headers: authHeader }) => {
+    name: async (encounterParticipant: EncounterParticipant, _, context) => {
       if (
         !encounterParticipant ||
         !encounterParticipant.individual ||
@@ -1166,10 +1249,14 @@ export const typeResolvers: GQLResolver = {
       ) {
         return null
       }
-      const practitioner = await fetchFHIR(
-        `/${encounterParticipant.individual.reference}`,
-        authHeader
+
+      const practitioner = getResourceFromBundleById<Practitioner>(
+        context.record!,
+        resourceIdentifierToUUID(
+          encounterParticipant.individual.reference as ResourceIdentifier
+        )
       )
+
       return (
         (practitioner &&
           practitioner.name &&
@@ -1178,7 +1265,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    qualification: async (encounterParticipant, _, { headers: authHeader }) => {
+    qualification: async (encounterParticipant, _, context) => {
       if (
         !encounterParticipant ||
         !encounterParticipant.individual ||
@@ -1186,9 +1273,10 @@ export const typeResolvers: GQLResolver = {
       ) {
         return null
       }
-      const practitioner = await fetchFHIR(
-        `/${encounterParticipant.individual.reference}`,
-        authHeader
+
+      const practitioner = getResourceFromBundleById<Practitioner>(
+        context.record!,
+        resourceIdentifierToUUID(encounterParticipant.individual.reference)
       )
       return (
         (practitioner &&
@@ -1211,57 +1299,141 @@ export const typeResolvers: GQLResolver = {
     }
   },
   History: {
-    hasShowedVerifiedDocument: (task: fhir.Task) => {
-      const hasShowedDocument = findExtension(
-        HAS_SHOWED_VERIFIED_DOCUMENT,
-        task.extension as fhir.Extension[]
+    documents: async (task: Task, _, context) => {
+      const encounter = task.encounter?.reference
+      if (!encounter) {
+        return []
+      }
+
+      return context
+        .record!.entry.map((entry) => entry.resource)
+        .filter(isDocumentReference)
+        .filter((x) => x.subject?.reference === encounter)
+    },
+    payment: async (task: Task, _, context) => {
+      const includesPayment = findExtension(
+        PAYMENT_DETAILS,
+        task.extension as Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (!includesPayment) {
+        return null
+      }
+
+      const paymentReference = includesPayment.valueReference!
+        .reference as `${string}/${string}`
+
+      const paymentId = paymentReference.split('/')[1]
+      const paymentReconciliation =
+        getResourceFromBundleById<PaymentReconciliation>(
+          context.record!,
+          paymentId
+        )
+
+      if (!paymentReconciliation) {
+        throw new Error(
+          'PaymentReconciliation resource not found even when task has payment extension. This should never happen'
+        )
+      }
+
+      const documentReference = context
+        .record!.entry.map((entry) => entry.resource)
+        .filter(isDocumentReference)
+        .filter(
+          (x) => x.subject?.reference === `PaymentReconciliation/${paymentId}`
+        )
+
+      return {
+        id: paymentId,
+        type: paymentReconciliation.detail?.[0].type?.coding?.[0].code,
+        amount: paymentReconciliation.detail?.[0].amount?.value,
+        outcome: paymentReconciliation.outcome?.coding?.[0].code,
+        date: paymentReconciliation.detail?.[0].date,
+        attachmentURL:
+          documentReference.length > 0
+            ? await getPresignedUrlFromUri(
+                documentReference[0].content[0].attachment.data!,
+                context.headers
+              )
+            : null
+      }
     },
-    requester: (task: fhir.Task) => {
+    hasShowedVerifiedDocument: (task: Task) => {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        task.extension as Extension[]
+      )
+
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
+    },
+
+    noSupportingDocumentationRequired: (task: Task) => {
+      const hasShowedDocument = findExtension(
+        NO_SUPPORTING_DOCUMENTATION_REQUIRED,
+        task.extension as Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueBoolean)
+    },
+
+    requester: (task: Task) => {
       const requestedBy = findExtension(
         REQUESTING_INDIVIDUAL,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
 
       return requestedBy?.valueString || ''
     },
-    regStatus: (task: fhir.Task) => getStatusFromTask(task),
+    requesterOther: (task: Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL_OTHER,
+        task.extension as Extension[]
+      )
+
+      return requestedBy?.valueString || ''
+    },
+    regStatus: (task: Task) => getStatusFromTask(task),
     action: (task) => getActionFromTask(task),
-    ipAddress: (task) => {
+    ipAddress: (task, _, context) => {
       const verifiedExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
       if (!verifiedExtension || !verifiedExtension.valueString) {
         return null
       }
       return verifiedExtension.valueString
     },
-    statusReason: (task: fhir.Task) => task.statusReason || null,
-    reason: (task: fhir.Task) => task.reason?.text || null,
-    otherReason: (task: fhir.Task) => {
+    statusReason: (task: Task) => task.statusReason || null,
+    reason: (task: Task) => task.reason?.text || null,
+    otherReason: (task: Task) => {
       return task.reason?.extension ? task.reason?.extension[0].valueString : ''
     },
-    date: (task: fhir.Task) => task.meta?.lastUpdated,
-    dhis2Notification: (task: fhir.Task) =>
+    note: (task: Task) => {
+      return task.note ? task.note[0].text : ''
+    },
+    date: (task: Task) => task.meta?.lastUpdated,
+    dhis2Notification: (task: Task) =>
       task.identifier?.some(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
-    user: async (
-      task: fhir.Task,
-      _: any,
-      { dataSources, headers: authHeader }
-    ) => {
+    user: async (task: Task, _: any, { dataSources }) => {
       const systemIdentifier = task.identifier?.find(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
       )
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
       if (
         systemIdentifier ||
@@ -1273,22 +1445,20 @@ export const typeResolvers: GQLResolver = {
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
       const practitionerRoleBundle =
-        await dataSources.practitionerRoleAPI.getPractitionerRoleByPractitionerId(
+        await dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
           practitionerId
         )
 
       const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
-      const practitionerRoleHistoryBundle: fhir.Bundle & {
-        entry: fhir.PractitionerRole[]
-      } = await dataSources.practitionerRoleAPI.getPractionerRoleHistory(
-        practitionerRoleId
-      )
-      const result = practitionerRoleHistoryBundle.entry.find(
-        (it: fhir.BundleEntry) =>
-          it.resource?.meta?.lastUpdated &&
+
+      const practitionerRoleHistory =
+        await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
+      const result = practitionerRoleHistory.find(
+        (it) =>
+          it?.meta?.lastUpdated &&
           task.lastModified &&
-          it.resource?.meta?.lastUpdated <= task.lastModified!
-      )?.resource as fhir.PractitionerRole | undefined
+          it?.meta?.lastUpdated <= task.lastModified!
+      )
 
       const targetCode = result?.code?.find((element) => {
         return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
@@ -1296,24 +1466,17 @@ export const typeResolvers: GQLResolver = {
 
       const role = targetCode?.coding?.[0].code
 
-      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-        method: 'POST',
-        body: JSON.stringify({
-          practitionerId: user.valueReference.reference.split('/')[1]
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      const userResponse: IUserModelData = await res.json()
+      const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
+        resourceIdentifierToUUID(user.valueReference.reference)
+      )
+
       if (role) {
         userResponse.role.labels = JSON.parse(role)
       }
 
       return userResponse
     },
-    system: async (task: fhir.Task, _: any, { headers: authHeader }) => {
+    system: async (task: Task, _: any, { headers: authHeader }) => {
       const systemIdentifier = task.identifier?.find(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
@@ -1321,12 +1484,12 @@ export const typeResolvers: GQLResolver = {
       if (!systemIdentifier || !systemIdentifier.value) {
         return null
       }
-      return await getSystem({ systemId: systemIdentifier.value }, authHeader)
+      return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: fhir.Task, _: any, { dataSources }) => {
+    location: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
@@ -1335,10 +1498,10 @@ export const typeResolvers: GQLResolver = {
         taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
-    office: async (task: fhir.Task, _: any, { dataSources }) => {
+    office: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
@@ -1350,16 +1513,8 @@ export const typeResolvers: GQLResolver = {
     comments: (task) => task.note || [],
     input: (task) => task.input || [],
     output: (task) => task.output || [],
-    certificates: async (task, _, { headers: authHeader }) => {
-      if (
-        getActionFromTask(task) ||
-        getStatusFromTask(task) !== GQLRegStatus.CERTIFIED
-      ) {
-        return null
-      }
-      return await getCertificatesFromTask(task, _, authHeader)
-    },
-    signature: async (task: fhir.Task, _: any, { headers: authHeader }) => {
+    certificates: resolveCertificates,
+    signature: async (task: Task, _: any, context) => {
       const action = getActionFromTask(task)
       const status = getStatusFromTask(task)
       if (
@@ -1371,17 +1526,20 @@ export const typeResolvers: GQLResolver = {
       }
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-        task.extension as fhir.Extension[]
+        task.extension as Extension[]
       )
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
 
-      const practitionerId = user.valueReference.reference.split('/')[1]
-      const practitioner: fhir.Practitioner = await fetchFHIR(
-        `/Practitioner/${practitionerId}`,
-        authHeader
+      const practitionerId = resourceIdentifierToUUID(
+        user.valueReference.reference
       )
+      const practitioner = getResourceFromBundleById<Practitioner>(
+        context.record!,
+        practitionerId
+      )
+
       const signatureExtension = getSignatureExtension(practitioner.extension)
       const signature = signatureExtension && signatureExtension.valueSignature
       return (
@@ -1391,7 +1549,7 @@ export const typeResolvers: GQLResolver = {
         }
       )
     },
-    duplicateOf: (task: fhir.Task) => {
+    duplicateOf: (task: Task) => {
       const extensions = task.extension || []
       const duplicateTrackingIdExt = findExtension(
         DUPLICATE_TRACKING_ID,
@@ -1399,7 +1557,7 @@ export const typeResolvers: GQLResolver = {
       )
       return duplicateTrackingIdExt?.valueString
     },
-    potentialDuplicates: (task: fhir.Task) => {
+    potentialDuplicates: (task: Task) => {
       const extensions = task.extension || []
       const duplicateTrackingIdExt = findExtension(
         FLAGGED_AS_POTENTIAL_DUPLICATE,
@@ -1409,40 +1567,30 @@ export const typeResolvers: GQLResolver = {
     }
   },
   DeathRegistration: {
-    async _fhirIDMap(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      // Preparing Encounter
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
+    id(record: Saved<Bundle>) {
+      const composition = getComposition(record)
+      return composition.id
+    },
+    async _fhirIDMap(record: Saved<Bundle>) {
+      const composition = getComposition(record)
+      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      const encounterReference =
-        encounterSection &&
-        encounterSection.entry &&
-        encounterSection.entry[0].reference
+      const encounterReference = `Encounter/${encounter.id}`
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (!encounterReference) {
-        return {
-          composition: composition.id
-        }
-      }
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) => response.subject?.reference === encounterReference
+        )
 
-      const questionnaireResponse = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterReference}`,
-        authHeader
-      )
+      const observation: Record<string, string> = {}
 
-      const observation = {}
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterReference}`,
-        authHeader
-      )
-
-      const encounter = await fetchFHIR(`/${encounterReference}`, authHeader)
+      const observations = recordResources
+        .filter(isObservation)
+        .filter(
+          (observation) => observation.context?.reference === encounterReference
+        )
 
       if (observations) {
         const observationKeys = {
@@ -1454,352 +1602,92 @@ export const typeResolvers: GQLResolver = {
           deathDescription: DEATH_DESCRIPTION_CODE,
           causeOfDeath: CAUSE_OF_DEATH_CODE
         }
-        observations.entry.map(
-          (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
-            if (item.resource?.code.coding?.[0]?.code) {
-              const itemCode = item.resource.code.coding[0].code
-              const observationKey = Object.keys(observationKeys).find(
-                (key) => observationKeys[key] === itemCode
-              )
-              if (observationKey) {
-                observation[observationKey] = item.resource.id
-              }
+        observations.map((item) => {
+          if (item.code.coding?.[0]?.code) {
+            const itemCode = item.code.coding[0].code
+            const observationKey = Object.keys(observationKeys).find(
+              (key: keyof typeof observationKeys) =>
+                observationKeys[key] === itemCode
+            )
+            if (observationKey) {
+              observation[observationKey] = item.id
             }
           }
-        )
+        })
       }
 
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation:
-          encounter.location &&
-          encounter.location[0].location.reference.split('/')[1],
+        eventLocation: urlReferenceToUUID(
+          encounter.location[0].location.reference
+        ),
         observation,
-        questionnaireResponse: questionnaireResponse?.entry?.[0]?.resource?.id
+        questionnaireResponse: questionnaireResponses[0]?.id
       }
     },
-    createdAt(composition: ITemplatedComposition) {
+    createdAt(record: Saved<Bundle>) {
+      const composition = getComposition(record)
       return composition.date
     },
-    async mother(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(MOTHER_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async father(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(FATHER_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async spouse(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(SPOUSE_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async deceased(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(DECEASED_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async informant(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return (await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.RelatedPerson
-    },
-    async registration(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const taskBundle = await fetchFHIR(
-        `/Task?focus=Composition/${composition.id}`,
-        authHeader
-      )
+    mother: findPatient(MOTHER_CODE),
+    father: findPatient(FATHER_CODE),
+    informant: findRelatedPerson(INFORMANT_CODE),
+    deceased: findPatient(DECEASED_CODE),
+    spouse: findPatient(SPOUSE_CODE),
 
-      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
-        return null
-      }
-      return taskBundle.entry[0].resource
+    async registration(record: Saved<Bundle>) {
+      return getTaskFromBundle(record)
+    },
+    async eventLocation(record: Saved<Bundle>) {
+      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      return getResourceFromBundleById(
+        record,
+        urlReferenceToUUID(encounter.location[0].location.reference)
+      )
+    },
+    async deathDescription(record: Saved<Bundle>) {
+      return findObservationByCode(record, DEATH_DESCRIPTION_CODE)?.valueString
+    },
+    async mannerOfDeath(record: Saved<Bundle>) {
+      return findObservationByCode(record, MANNER_OF_DEATH_CODE)
+        ?.valueCodeableConcept?.coding?.[0].code
+    },
+    async causeOfDeathEstablished(record: Saved<Bundle>) {
+      return findObservationByCode(record, CAUSE_OF_DEATH_ESTABLISHED_CODE)
+        ?.valueCodeableConcept?.coding?.[0].code
+    },
+    async causeOfDeathMethod(record: Saved<Bundle>) {
+      return findObservationByCode(record, CAUSE_OF_DEATH_METHOD_CODE)
+        ?.valueCodeableConcept?.coding?.[0].code
+    },
+    async causeOfDeath(record: Saved<Bundle>) {
+      return findObservationByCode(record, CAUSE_OF_DEATH_CODE)
+        ?.valueCodeableConcept?.coding?.[0].code
+    },
+    async maleDependentsOfDeceased(record: Saved<Bundle>) {
+      return findObservationByCode(record, MALE_DEPENDENTS_ON_DECEASED_CODE)
+        ?.valueString
+    },
+    async femaleDependentsOfDeceased(record: Saved<Bundle>) {
+      return findObservationByCode(record, FEMALE_DEPENDENTS_ON_DECEASED_CODE)
+        ?.valueString
     },
 
-    async eventLocation(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const data = await fetchFHIR(
-        `/${encounterSection.entry[0].reference}`,
-        authHeader
-      )
+    async questionnaire(record: Saved<Bundle>) {
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (!data || !data.location || !data.location[0].location) {
-        return null
-      }
+      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      return await fetchFHIR(
-        `/${data.location[0].location.reference}`,
-        authHeader
-      )
-    },
-    async deathDescription(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${DEATH_DESCRIPTION_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    },
-    async mannerOfDeath(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MANNER_OF_DEATH_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueCodeableConcept &&
-          observations.entry[0].resource.valueCodeableConcept.coding &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
-        null
-      )
-    },
-    async causeOfDeathEstablished(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_ESTABLISHED_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueCodeableConcept &&
-          observations.entry[0].resource.valueCodeableConcept.coding &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
-        null
-      )
-    },
-    async causeOfDeathMethod(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_METHOD_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueCodeableConcept &&
-          observations.entry[0].resource.valueCodeableConcept.coding &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
-        null
-      )
-    },
-    async causeOfDeath(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_CODE}`,
-        authHeader
-      )
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) =>
+            response.subject?.reference === `Encounter/${encounter.id}`
+        )
 
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueCodeableConcept &&
-          observations.entry[0].resource.valueCodeableConcept.coding &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
-          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
-        null
-      )
-    },
-    async maleDependentsOfDeceased(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MALE_DEPENDENTS_ON_DECEASED_CODE}`,
-        authHeader
-      )
-      return observations &&
-        observations.entry &&
-        observations.entry[0] &&
-        observations.entry[0].resource
-        ? observations.entry[0].resource.valueString
-        : null
-    },
-    async femaleDependentsOfDeceased(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${FEMALE_DEPENDENTS_ON_DECEASED_CODE}`,
-        authHeader
-      )
-
-      return observations &&
-        observations.entry &&
-        observations.entry[0] &&
-        observations.entry[0].resource
-        ? observations.entry[0].resource.valueString
-        : null
-    },
-    async questionnaire(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const response = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
-        authHeader
-      )
-      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
-
-      if (
-        response &&
-        response.entry &&
-        response.entry[0] &&
-        response.entry[0].resource
-      ) {
-        questionnaireResponse = response.entry[0].resource
-      }
+      const questionnaireResponse = questionnaireResponses[0]
 
       if (!questionnaireResponse) {
         return null
@@ -1820,22 +1708,9 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async medicalPractitioner(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        DEATH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const encounter = await fetchFHIR(
-        `/${encounterSection.entry[0].reference}`,
-        authHeader
-      )
+    async medicalPractitioner(record: Saved<Bundle>) {
+      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
       const encounterParticipant =
         encounter && encounter.participant && encounter.participant[0]
       if (!encounterParticipant) {
@@ -1843,72 +1718,40 @@ export const typeResolvers: GQLResolver = {
       }
       return encounterParticipant
     },
-    async history(
-      composition: ITemplatedComposition,
-      _: any,
-      { headers: authHeader }
-    ) {
-      const task = await fetchFHIR(
-        `/Task/?focus=Composition/${composition.id}`,
-        authHeader
-      )
-
-      const taskId = task.entry[0].resource.id
-
-      const taskHistory = await fetchFHIR(
-        `/Task/${taskId}/_history?_count=100`,
-        authHeader
-      )
-
-      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
-        return null
-      }
-
-      return taskHistory?.entry?.map(
-        (item: {
-          resource: { extension: any }
-          extension: fhir.Extension[]
-        }) => {
-          return item.resource
-        }
-      )
+    async history(record: Saved<Bundle>) {
+      return record.entry
+        .map(({ resource }) => resource)
+        .filter(isTaskOrTaskHistory)
+        .sort(sortDescending)
     }
   },
   BirthRegistration: {
-    async _fhirIDMap(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      // Preparing Encounter
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
+    id(record: Saved<Bundle>) {
+      const composition = getComposition(record)
+      return composition.id
+    },
+    async _fhirIDMap(record: Saved<Bundle>) {
+      const composition = getComposition(record)
 
-      const encounterReference =
-        encounterSection &&
-        encounterSection.entry &&
-        encounterSection.entry[0].reference
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (!encounterReference) {
-        return {
-          composition: composition.id
-        }
-      }
+      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
 
-      const questionnaireResponse = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterReference}`,
-        authHeader
-      )
+      const encounterReference = `Encounter/${encounter.id}`
 
-      const observation = {}
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterReference}`,
-        authHeader
-      )
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) => response.subject?.reference === encounterReference
+        )
 
-      const encounter = await fetchFHIR(`/${encounterReference}`, authHeader)
+      const observation: Record<string, string> = {}
+
+      const observations = recordResources
+        .filter(isObservation)
+        .filter(
+          (observation) => observation.context?.reference === encounterReference
+        )
 
       if (observations) {
         const observationKeys = {
@@ -1919,158 +1762,75 @@ export const typeResolvers: GQLResolver = {
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
         }
-        observations.entry.map(
-          (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
-            if (item.resource?.code.coding?.[0]?.code) {
-              const itemCode = item.resource.code.coding[0].code
-              const observationKey = Object.keys(observationKeys).find(
-                (key) => observationKeys[key] === itemCode
-              )
-              if (observationKey) {
-                observation[observationKey] = item.resource.id
-              }
+        observations.map((item) => {
+          if (item.code.coding?.[0]?.code) {
+            const itemCode = item.code.coding[0].code
+            const observationKey = Object.keys(observationKeys).find(
+              (key: keyof typeof observationKeys) =>
+                observationKeys[key] === itemCode
+            )
+            if (observationKey) {
+              observation[observationKey] = item.id
             }
           }
-        )
+        })
       }
 
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation:
-          encounter.location &&
-          encounter.location[0].location.reference.split('/')[1],
+        eventLocation: urlReferenceToUUID(
+          encounter.location[0].location.reference
+        ),
         observation,
-        questionnaireResponse: questionnaireResponse?.entry?.[0]?.resource?.id
+        questionnaireResponse: questionnaireResponses[0]?.id
       }
     },
-    createdAt(composition: ITemplatedComposition) {
+    createdAt(record: Saved<Bundle>) {
+      const composition = getComposition(record)
       return composition.date
     },
-    async mother(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(MOTHER_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
+    mother: findPatient(MOTHER_CODE),
+    father: findPatient(FATHER_CODE),
+    child: findPatient(CHILD_CODE),
+    informant: findRelatedPerson(INFORMANT_CODE),
+    async registration(record: Saved<Bundle>) {
+      return getTaskFromBundle(record)
     },
-    async father(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(FATHER_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
+    async weightAtBirth(record: Saved<Bundle>) {
+      return findObservationByCode(record, BODY_WEIGHT_CODE)?.valueQuantity
+        ?.value
     },
-    async child(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(CHILD_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
+    async attendantAtBirth(record: Saved<Bundle>) {
+      return findObservationByCode(record, BIRTH_ATTENDANT_CODE)?.valueString
     },
-    async informant(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return (await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.RelatedPerson
+    async childrenBornAliveToMother(record: Saved<Bundle>) {
+      return findObservationByCode(record, BIRTH_ATTENDANT_CODE)?.valueInteger
     },
-    async registration(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const taskBundle = await fetchFHIR(
-        `/Task?focus=Composition/${composition.id}`,
-        authHeader
-      )
+    async foetalDeathsToMother(record: Saved<Bundle>) {
+      return findObservationByCode(record, NUMBER_FOEATAL_DEATH_CODE)
+        ?.valueInteger
+    },
+    async lastPreviousLiveBirth(record: Saved<Bundle>) {
+      return findObservationByCode(record, LAST_LIVE_BIRTH_CODE)?.valueDateTime
+    },
+    async birthType(record: Saved<Bundle>) {
+      return findObservationByCode(record, BIRTH_TYPE_CODE)?.valueQuantity
+        ?.value
+    },
+    async questionnaire(record: Saved<Bundle>) {
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
-        return null
-      }
-      return taskBundle.entry[0].resource
-    },
-    async weightAtBirth(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BODY_WEIGHT_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource &&
-          observations.entry[0].resource.valueQuantity &&
-          observations.entry[0].resource.valueQuantity.value) ||
-        null
-      )
-    },
+      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
 
-    async questionnaire(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const response = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
-        authHeader
-      )
-      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) =>
+            response.subject?.reference === `Encounter/${encounter.id}`
+        )
 
-      if (
-        response &&
-        response.entry &&
-        response.entry[0] &&
-        response.entry[0].resource
-      ) {
-        questionnaireResponse = response.entry[0].resource
-      }
+      const questionnaireResponse = questionnaireResponses[0]
 
       if (!questionnaireResponse) {
         return null
@@ -2091,372 +1851,101 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async birthType(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_TYPE_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueQuantity.value) ||
-        null
+    async eventLocation(record: Saved<Bundle>) {
+      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      return getResourceFromBundleById(
+        record,
+        urlReferenceToUUID(encounter.location[0].location.reference)
       )
     },
-    async eventLocation(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const data = await fetchFHIR(
-        `/${encounterSection.entry[0].reference}`,
-        authHeader
-      )
-
-      if (!data || !data.location || !data.location[0].location) {
-        return null
-      }
-
-      return await fetchFHIR(
-        `/${data.location[0].location.reference}`,
-        authHeader
-      )
-    },
-    async attendantAtBirth(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_ATTENDANT_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    },
-    async childrenBornAliveToMother(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${NUMBER_BORN_ALIVE_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueInteger) ||
-        null
-      )
-    },
-    async foetalDeathsToMother(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${NUMBER_FOEATAL_DEATH_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueInteger) ||
-        null
-      )
-    },
-    async lastPreviousLiveBirth(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${LAST_LIVE_BIRTH_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueDateTime) ||
-        null
-      )
-    },
-    async history(
-      composition: ITemplatedComposition,
-      _: any,
-      { headers: authHeader }
-    ) {
-      const task = await fetchFHIR(
-        `/Task/?focus=Composition/${composition.id}`,
-        authHeader
-      )
-
-      const taskId = task.entry[0].resource.id
-
-      const taskHistory = await fetchFHIR(
-        `/Task/${taskId}/_history?_count=100`,
-        authHeader
-      )
-
-      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
-        return null
-      }
-
-      return taskHistory?.entry?.map(
-        (item: {
-          resource: { extension: any }
-          extension: fhir.Extension[]
-        }) => {
-          return item.resource
-        }
-      )
+    async history(record: Saved<Bundle>) {
+      return record.entry
+        .map(({ resource }) => resource)
+        .filter(isTaskOrTaskHistory)
+        .sort(sortDescending)
     }
   },
   MarriageRegistration: {
-    async _fhirIDMap(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      // Preparing Encounter
-      const encounterSection = findCompositionSection(
-        MARRIAGE_ENCOUNTER_CODE,
-        composition
-      )
+    id(record: Saved<Bundle>) {
+      const composition = getComposition(record)
+      return composition.id
+    },
+    async _fhirIDMap(record: Saved<Bundle>) {
+      const composition = getComposition(record)
+      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
 
-      const encounterReference =
-        encounterSection &&
-        encounterSection.entry &&
-        encounterSection.entry[0].reference
+      const encounterReference = `Encounter/${encounter.id}`
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (!encounterReference) {
-        return {
-          composition: composition.id
-        }
-      }
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) => response.subject?.reference === encounterReference
+        )
 
-      const questionnaireResponse = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterReference}`,
-        authHeader
-      )
+      const observation: Record<string, string> = {}
 
-      const observation = {}
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterReference}`,
-        authHeader
-      )
-
-      const encounter = await fetchFHIR(`/${encounterReference}`, authHeader)
+      const observations = recordResources
+        .filter(isObservation)
+        .filter(
+          (observation) => observation.context?.reference === encounterReference
+        )
 
       if (observations) {
         const observationKeys = {
           typeOfMarriage: MARRIAGE_TYPE_CODE
         }
-        observations.entry.map(
-          (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
-            if (item.resource?.code.coding?.[0]?.code) {
-              const itemCode = item.resource.code.coding[0].code
-              const observationKey = Object.keys(observationKeys).find(
-                (key) => observationKeys[key] === itemCode
-              )
-              if (observationKey) {
-                observation[observationKey] = item.resource.id
-              }
+        observations.map((item) => {
+          if (item.code.coding?.[0]?.code) {
+            const itemCode = item.code.coding[0].code
+            const observationKey = Object.keys(observationKeys).find(
+              (key: keyof typeof observationKeys) =>
+                observationKeys[key] === itemCode
+            )
+            if (observationKey) {
+              observation[observationKey] = item.id
             }
           }
-        )
+        })
       }
 
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation:
-          encounter.location &&
-          encounter.location[0].location.reference.split('/')[1],
+        eventLocation: urlReferenceToUUID(
+          encounter.location[0].location.reference
+        ),
         observation,
-        questionnaireResponse: questionnaireResponse?.entry?.[0]?.resource?.id
+        questionnaireResponse: questionnaireResponses[0]?.id
       }
     },
-    createdAt(composition: ITemplatedComposition) {
+    createdAt(record: Saved<Bundle>) {
+      const composition = getComposition(record)
       return composition.date
     },
-    async informant(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const relatedPersonSection = findCompositionSection(
-        INFORMANT_CODE,
-        composition
-      )
-      if (!relatedPersonSection || !relatedPersonSection.entry) {
-        return null
-      }
-      return (await fetchFHIR(
-        `/${relatedPersonSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.RelatedPerson
-    },
-    async bride(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(BRIDE_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async groom(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const patientSection = findCompositionSection(GROOM_CODE, composition)
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
-      return await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
-        authHeader
-      )
-    },
-    async witnessOne(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const relatedPersonSection = findCompositionSection(
-        WITNESS_ONE_CODE,
-        composition
-      )
-      if (!relatedPersonSection || !relatedPersonSection.entry) {
-        return null
-      }
-      return (await fetchFHIR(
-        `/${relatedPersonSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.RelatedPerson
-    },
-    async witnessTwo(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const relatedPersonSection = findCompositionSection(
-        WITNESS_TWO_CODE,
-        composition
-      )
-      if (!relatedPersonSection || !relatedPersonSection.entry) {
-        return null
-      }
-      const relatedPerson = (await fetchFHIR(
-        `/${relatedPersonSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.RelatedPerson
-      return relatedPerson
-    },
-    async registration(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const taskBundle = await fetchFHIR(
-        `/Task?focus=Composition/${composition.id}`,
-        authHeader
-      )
+    informant: findRelatedPerson(INFORMANT_CODE),
+    bride: findPatient(BRIDE_CODE),
+    groom: findPatient(GROOM_CODE),
+    witnessOne: findRelatedPerson(WITNESS_ONE_CODE),
+    witnessTwo: findRelatedPerson(WITNESS_TWO_CODE),
 
-      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
-        return null
-      }
-      return taskBundle.entry[0].resource
+    async registration(record: Saved<Bundle>) {
+      return getTaskFromBundle(record)
     },
-    async questionnaire(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        MARRIAGE_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const response = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
-        authHeader
-      )
-      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+    async questionnaire(record: Saved<Bundle>) {
+      const recordResources = record.entry.map((x) => x.resource)
 
-      if (
-        response &&
-        response.entry &&
-        response.entry[0] &&
-        response.entry[0].resource
-      ) {
-        questionnaireResponse = response.entry[0].resource
-      }
+      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      const questionnaireResponses = recordResources
+        .filter(isQuestionnaireResponse)
+        .filter(
+          (response) =>
+            response.subject?.reference === `Encounter/${encounter.id}`
+        )
+
+      const questionnaireResponse = questionnaireResponses[0]
 
       if (!questionnaireResponse) {
         return null
@@ -2477,77 +1966,54 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async typeOfMarriage(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        MARRIAGE_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MARRIAGE_TYPE_CODE}`,
-        authHeader
-      )
-      return observations?.entry?.[0]?.resource?.valueQuantity?.value || null
+    async typeOfMarriage(record: Saved<Bundle>) {
+      return findObservationByCode(record, MARRIAGE_TYPE_CODE)?.valueQuantity
+        ?.value
     },
-    async eventLocation(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        MARRIAGE_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const data = await fetchFHIR(
-        `/${encounterSection.entry[0].reference}`,
-        authHeader
-      )
+    async eventLocation(record: Saved<Bundle>) {
+      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
 
-      if (!data || !data.location || !data.location[0].location) {
-        return null
-      }
-
-      return await fetchFHIR(
-        `/${data.location[0].location.reference}`,
-        authHeader
+      return getResourceFromBundleById(
+        record,
+        urlReferenceToUUID(encounter.location[0].location.reference)
       )
     },
-    async history(
-      composition: ITemplatedComposition,
-      _: any,
-      { headers: authHeader }
-    ) {
-      const task = await fetchFHIR(
-        `/Task/?focus=Composition/${composition.id}`,
-        authHeader
-      )
-      const taskId = task.entry[0].resource.id
-      const taskHistory = await fetchFHIR(
-        `/Task/${taskId}/_history?_count=100`,
-        authHeader
-      )
-
-      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
-        return null
-      }
-
-      return taskHistory?.entry?.map(
-        (item: {
-          resource: { extension: any }
-          extension: fhir.Extension[]
-        }) => {
-          return item.resource
-        }
-      )
+    async history(record: Saved<Bundle>) {
+      return record.entry
+        .map(({ resource }) => resource)
+        .filter(isTaskOrTaskHistory)
+        .sort(sortDescending)
     }
   }
+} satisfies GQLResolver
+
+function sortDescending(
+  a: Resource & { lastModified: string },
+  b: Resource & { lastModified: string }
+) {
+  return new Date(b.lastModified).valueOf() - new Date(a.lastModified).valueOf()
+}
+
+async function resolveCertificates(
+  task: Saved<Task>,
+  _: unknown,
+  { dataSources }: Context
+) {
+  const compositionHistory = dataSources.fhirAPI.getCompositionHistory(
+    resourceIdentifierToUUID(task.focus.reference)
+  )
+  return compositionHistory.map((compositionEntry) => {
+    const certSection = findCompositionSection('certificates', compositionEntry)
+    if (!certSection || !certSection.entry || !(certSection.entry.length > 0)) {
+      return null
+    }
+
+    return dataSources.fhirAPI.getDocumentReference(
+      isURLReference(certSection.entry[0].reference)
+        ? urlReferenceToUUID(certSection.entry[0].reference)
+        : resourceIdentifierToUUID(
+            certSection.entry[0].reference as ResourceIdentifier
+          )
+    )
+  })
 }

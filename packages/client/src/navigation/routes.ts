@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 
@@ -28,8 +27,11 @@ export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${E
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
+
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:declarationId/events/:event/parent/:pageId/group/:groupId'
+
+export const REVIEW_CORRECTION = '/review-correction/:declarationId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:declarationId/:pageId'
 

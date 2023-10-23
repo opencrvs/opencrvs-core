@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
-import { REQUEST_MARRIAGE_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 const SUBMIT_MARRIAGE_DECLARATION = gql`
   mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
@@ -133,7 +132,7 @@ export function getMarriageMutation(action: SubmissionAction) {
       return COLLECT_MARRIAGE_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_MARRIAGE_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_MARRIAGE_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return REQUEST_REG_CORRECTION
   }
 }

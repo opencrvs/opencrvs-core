@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { cloneDeep } from 'lodash'
@@ -50,7 +49,7 @@ describe('location utils function testing', () => {
           population: 5555,
           crude_birth_rate: 2.0
         },
-        mockFhirLocation.extension
+        mockFhirLocation.extension as any
       )
       expect(extentions).toEqual([
         {
@@ -87,7 +86,7 @@ describe('location utils function testing', () => {
           population: 3000,
           crude_birth_rate: 1.5
         },
-        mockFhirLocation.extension
+        mockFhirLocation.extension as any
       )
       expect(extentions).toEqual([
         {

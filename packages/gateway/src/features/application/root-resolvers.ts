@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   GQLBirthInput,
@@ -18,7 +17,7 @@ import {
   GQLResolver,
   GQLMarriageInput
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
 import { IApplicationConfigPayload } from '@gateway/features/application/type-resolvers'
@@ -48,25 +47,21 @@ export const resolvers: GQLResolver = {
         MARRIAGE: applicationConfig.MARRIAGE as GQLMarriageInput,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
-        HIDE_BIRTH_EVENT_REGISTER_INFORMATION:
-          applicationConfig.HIDE_BIRTH_EVENT_REGISTER_INFORMATION as boolean,
-        HIDE_DEATH_EVENT_REGISTER_INFORMATION:
-          applicationConfig.HIDE_DEATH_EVENT_REGISTER_INFORMATION as boolean,
-        HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION:
-          applicationConfig.HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION as boolean,
         EXTERNAL_VALIDATION_WORKQUEUE:
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
-        ADDRESSES: applicationConfig.ADDRESSES as number,
         DATE_OF_BIRTH_UNKNOWN:
           applicationConfig.DATE_OF_BIRTH_UNKNOWN as boolean,
         INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean,
         INFORMANT_SIGNATURE_REQUIRED:
           applicationConfig.INFORMANT_SIGNATURE_REQUIRED as boolean,
-        ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number,
         LOGIN_BACKGROUND:
-          applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput
+          applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput,
+        USER_NOTIFICATION_DELIVERY_METHOD:
+          applicationConfig.USER_NOTIFICATION_DELIVERY_METHOD as string,
+        INFORMANT_NOTIFICATION_DELIVERY_METHOD:
+          applicationConfig.INFORMANT_NOTIFICATION_DELIVERY_METHOD as string
       }
 
       const res = await fetch(

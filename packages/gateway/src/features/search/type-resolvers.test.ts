@@ -6,14 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { searchTypeResolvers as resolvers } from '@gateway/features/search/type-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
-
+const searchTypeResolvers = resolvers as any
 beforeEach(() => {
   fetch.resetMocks()
 })
@@ -619,12 +618,6 @@ describe('Search type resolvers', () => {
       expect(startedAt).toBe('2019-12-12T15:21:51.355Z')
     })
     it('return user model data', async () => {
-      fetch.resetMocks()
-      fetch.mockResponse(
-        JSON.stringify({
-          _id: 'dummy_user_id'
-        })
-      )
       const userModelData =
         await searchTypeResolvers.EventProgressSet.startedBy(
           {
@@ -634,7 +627,16 @@ describe('Search type resolvers', () => {
           },
           {},
           {
-            Authorization: 'dummy_token'
+            dataSources: {
+              usersAPI: {
+                getUserByPractitionerId: () => ({
+                  _id: 'dummy_user_id'
+                })
+              }
+            },
+            headers: {
+              Authorization: 'dummy_token'
+            }
           }
         )
       expect(userModelData).toEqual({

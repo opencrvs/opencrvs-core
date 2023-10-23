@@ -6,14 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IUserModelData,
-  userTypeResolvers
+  userTypeResolvers as resolvers
 } from '@gateway/features/user/type-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 
 const mockGet = jest.fn()
@@ -25,6 +24,8 @@ jest.mock('apollo-datasource-rest', () => {
     RESTDataSource: MockRESTDataSource
   }
 })
+const fetch = fetchAny as fetchAny.FetchMock
+const userTypeResolvers = resolvers as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -135,7 +136,13 @@ describe('User type resolvers', () => {
     const res = await userTypeResolvers.User.primaryOffice(
       mockResponse,
       undefined,
-      { dataSources: { locationsAPI: new LocationsAPI() } }
+      {
+        dataSources: {
+          locationsAPI: {
+            getLocation: () => mockOffice
+          }
+        }
+      }
     )
     expect(res).toEqual(mockOffice)
   })
@@ -311,12 +318,13 @@ describe('User type resolvers', () => {
       .mockResolvedValueOnce(mockLocations[1])
       .mockResolvedValueOnce(mockLocations[2])
       .mockResolvedValueOnce(mockLocations[3])
-
+    const locationsAPI = new LocationsAPI()
+    locationsAPI.context = { record: null }
     const res = await userTypeResolvers.User.catchmentArea(
       mockResponse,
       undefined,
       {
-        dataSources: { locationsAPI: new LocationsAPI() }
+        dataSources: { locationsAPI }
       }
     )
     expect(res).toEqual(mockLocations)
@@ -388,7 +396,14 @@ describe('User type resolvers', () => {
     const response = await userTypeResolvers.User.localRegistrar(
       mockResponse,
       undefined,
-      { headers: undefined }
+      {
+        headers: undefined,
+        dataSources: {
+          fhirAPI: {
+            getPractitioner: () => practitioner
+          }
+        }
+      }
     )
 
     expect(response).toEqual({
@@ -426,12 +441,19 @@ describe('User type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
 
     const userResponse = mockResponse
-    userResponse.scope.push('register')
+    userResponse.scope!.push('register')
 
     const response = await userTypeResolvers.User.localRegistrar(
       userResponse,
       undefined,
-      { headers: undefined }
+      {
+        headers: undefined,
+        dataSources: {
+          fhirAPI: {
+            getPractitioner: () => practitioner
+          }
+        }
+      }
     )
 
     expect(response).toEqual({

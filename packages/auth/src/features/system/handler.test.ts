@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createServer } from '@auth/server'
@@ -26,11 +25,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockReject(new Error())
       const res = await server.server.inject({
         method: 'POST',
-        url: '/authenticateSystemClient',
-        payload: {
-          client_id: '123',
-          client_secret: '456'
-        }
+        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
       })
 
       expect(res.statusCode).toBe(401)
@@ -50,14 +45,10 @@ describe('authenticate handler receives a request', () => {
       )
       const res = await server.server.inject({
         method: 'POST',
-        url: '/authenticateSystemClient',
-        payload: {
-          client_id: '123',
-          client_secret: '456'
-        }
+        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
       })
 
-      expect(JSON.parse(res.payload).token).toBe('789')
+      expect(JSON.parse(res.payload).access_token).toBe('789')
     })
   })
 })

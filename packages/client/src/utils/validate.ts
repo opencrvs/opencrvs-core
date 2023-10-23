@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
@@ -19,11 +18,11 @@ import {
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE
+  INFORMANT_MINIMUM_AGE,
+  NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
-import { NATIONAL_ID } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'

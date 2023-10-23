@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   generateAndStoreVerificationCode,
@@ -20,13 +19,12 @@ import {
 import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from '@gateway/constants'
 
 const nonce = '12345'
-const mobile = '+447111111111'
 
 describe('verifyCode service', () => {
   describe('generateAndStoreVerificationCode', () => {
     it('generates a pseudo random 6 digit code', async () => {
       const code = expect.stringMatching(/^\d{6}$/)
-      return generateAndStoreVerificationCode(nonce, mobile).then((data) => {
+      return generateAndStoreVerificationCode(nonce).then((data) => {
         expect(data).toEqual(code)
       })
     })
@@ -39,7 +37,7 @@ describe('verifyCode service', () => {
         code: expect.stringMatching(/^\d{6}$/),
         createdAt: 1487076708000
       }
-      await generateAndStoreVerificationCode(nonce, mobile)
+      await generateAndStoreVerificationCode(nonce)
       const data = await getVerificationCodeDetails(nonce)
       expect(data).toEqual(codeDetails)
     })
@@ -57,7 +55,7 @@ describe('verifyCode service', () => {
       const codeCreationTime = 1487076708000
       Date.now = jest.fn(() => codeCreationTime + 60 * 1000)
 
-      await generateAndStoreVerificationCode(nonce, mobile)
+      await generateAndStoreVerificationCode(nonce)
       return expect(checkVerificationCode(nonce, 'abcdef')).rejects.toThrow(
         'sms code invalid'
       )
@@ -67,7 +65,7 @@ describe('verifyCode service', () => {
       const codeCreationTime = 1487076708000
 
       Date.now = jest.fn(() => codeCreationTime)
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       Date.now = jest.fn(
         () => codeCreationTime + (CONFIG_SMS_CODE_EXPIRY_SECONDS + 60) * 1000
@@ -87,14 +85,14 @@ describe('verifyCode service', () => {
       const codeCreationTime = 1487076708000
       Date.now = jest.fn(() => codeCreationTime + 60 * 1000)
 
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
       return expect(checkVerificationCode(nonce, code)).resolves.toBeUndefined()
     })
   })
 
   describe('deleteUsedVerificationCode', () => {
     it('deletes a code without error', async () => {
-      await generateAndStoreVerificationCode(nonce, mobile)
+      await generateAndStoreVerificationCode(nonce)
       return expect(deleteUsedVerificationCode(nonce)).resolves.toBe(true)
     })
   })

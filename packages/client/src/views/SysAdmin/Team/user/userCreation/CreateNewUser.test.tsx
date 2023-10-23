@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/query/queries'
@@ -339,6 +338,7 @@ describe('edit user tests', () => {
             ],
             username: 'shakib1',
             mobile: '+8801662132163',
+            email: 'jeff@gmail.com',
             identifier: {
               system: 'NATIONAL_ID',
               value: '101488192',

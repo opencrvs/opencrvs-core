@@ -12,8 +12,7 @@ import {
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export interface IBirthRegistrationFields extends IPoint {
   compositionId: string
@@ -126,6 +125,14 @@ export interface IInProgressDeclarationTags {
   locationLevel3?: string
   locationLevel2?: string
 }
+export interface ICertifiedTags {
+  eventType: DECLARATION_TYPE
+  officeLocation?: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+}
 
 export interface ILocationTags {
   officeLocation?: string
@@ -137,6 +144,9 @@ export interface ILocationTags {
 
 export interface ITimeLoggedFields {
   timeSpentEditing: number
+  compositionId: string
+}
+export interface ICertifiedFields {
   compositionId: string
 }
 
@@ -168,6 +178,12 @@ export interface IDurationPoints {
   measurement: string
   tags: IDurationTags
   fields: IDurationFields
+  timestamp: number | undefined
+}
+export interface ICertifiedPoints {
+  measurement: string
+  tags: ICertifiedTags
+  fields: ICertifiedFields
   timestamp: number | undefined
 }
 
@@ -277,6 +293,7 @@ export interface IAdvancedSearchPoints {
 
 export type IPoints =
   | IDurationPoints
+  | ICertifiedPoints
   | ITimeLoggedPoints
   | IInProgressDeclarationPoints
   | IPaymentPoints

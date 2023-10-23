@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ReactElement } from 'react'
@@ -40,7 +39,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 20px;
+  padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
@@ -66,7 +65,7 @@ export const Body = styled.div`
 `
 const Footer = styled.div`
   display: flex;
-  padding: 24px 20px;
+  padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 16px;
   }
@@ -134,12 +133,10 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
+  ${({ theme }) => theme.fonts.h1}
   color: ${({ theme }) => theme.colors.copy};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `
+
 const Icon = styled.div`
   height: 24px;
   background-color: ${({ theme }) => theme.colors.white};
@@ -149,7 +146,7 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '16px 20px')};
+  padding: ${(props) => (props.noPadding ? 0 : '24px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: ${(props) => (props.noPadding ? 0 : '16px')};
   }

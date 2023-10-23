@@ -6,57 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrecacheEntry, precacheAndRoute } from 'workbox-precaching'
+import {
+  PrecacheEntry,
+  createHandlerBoundToURL,
+  precacheAndRoute,
+  cleanupOutdatedCaches
+} from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
-import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
-import { RouteHandler, skipWaiting } from 'workbox-core'
+import { clientsClaim } from 'workbox-core'
 
-interface OnSyncCallbackOptions {
-  queue: Queue
-}
-interface OnSyncCallback {
-  (options: OnSyncCallbackOptions): void | Promise<void>
-}
+declare let self: ServiceWorkerGlobalScope
 
-const callback = (requestArray: any[]) => {
-  let requestSynced = 0
-  requestArray.forEach((item) => {
-    if (!item.error) {
-      requestSynced++
-    }
-  })
-
-  if (requestSynced > 0) {
-    new BroadcastChannel('backgroundSynBroadCastChannel').postMessage(
-      requestSynced
-    )
-  }
-}
-
-const queue = new Queue('registerQueue', {
-  onSync: callback as unknown as OnSyncCallback
-})
-const GraphQLMatch = /graphql(\S+)?/
-
-/* eslint-disable-next-line no-restricted-globals */
-self.addEventListener('fetch', (event: any) => {
-  if (
-    null !== event.request.url.match(GraphQLMatch) &&
-    navigator.onLine === false
-  ) {
-    const promiseChain = fetch(event.request.clone()).catch((err) => {
-      return queue.pushRequest(event.request)
-    })
-
-    event.waitUntil(promiseChain)
-  }
-})
-
-/* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', async (event) => {
   if (!event.data) {
     return
@@ -69,22 +32,12 @@ self.addEventListener('message', async (event) => {
     await removeCache(event.data.minioUrls)
     return
   }
-
-  switch (event.data) {
-    case 'skipWaiting':
-      // About caches variable: https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/delete
-      caches
-        .keys()
-        .then((cs) => cs.forEach((c) => caches.delete(c)))
-        .then(() => skipWaiting())
-      break
-    default:
-      break
-  }
 })
 
 /* eslint-disable-next-line no-restricted-globals */
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
+
+cleanupOutdatedCaches()
 
 /*
  * As the config file can change after the app is built, we cannot precache it
@@ -102,16 +55,25 @@ registerRoute(/http(.+)validation\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 
 // This caches the minio urls
-registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
+registerRoute(
+  import.meta.env.DEV
+    ? /http(.+)localhost:3535\/ocrvs\/.+/
+    : /http(.+)minio\.(.+)\/ocrvs\/.+/,
+  new CacheFirst()
+)
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
-  new NavigationRoute('/index.html' as unknown as RouteHandler, {
+  new NavigationRoute(createHandlerBoundToURL('/index.html'), {
+    ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
     denylist: [/^\/__.*$/]
   })
 )
+
+self.skipWaiting()
+clientsClaim()
 
 const removeCache = async (minioUrls: string) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>
@@ -123,6 +85,7 @@ const removeCache = async (minioUrls: string) => {
   const runtimecache = await caches.open(runTimeCacheKey)
   for (const minioUrl of minioUrls) {
     const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
+    // eslint-disable-next-line no-console
     console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
   }
 }

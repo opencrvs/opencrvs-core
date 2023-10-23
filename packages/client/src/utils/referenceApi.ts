@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
@@ -15,7 +14,6 @@ import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { merge } from 'lodash'
 import { Validator } from '@client/forms/validators'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -100,18 +98,15 @@ export interface IApplicationConfig {
   MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
-  ADDRESSES: number
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: ILoginBackground
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
@@ -127,6 +122,14 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+
+  if (res && res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
+
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
@@ -136,19 +139,6 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
-  /*
-   * This is a temporary fix to merge the config from the config API with the global config object.
-   * Without this questionsTransformer doesn't have the correct window.config.ADMIN_LEVELS value
-   * when the application is loaded with no offline data.
-   * This causes:
-   * - incorrect form fields for address to be shown in the forms
-   * - runtime errors if an implementing country has customized address fields
-   */
-
-  /*
-  We can deprecate this when addresses is moved into Farajaland I think
-  */
-  merge(window.config, response.config)
 
   return response
 }
@@ -176,6 +166,12 @@ async function loadForms(): Promise<LoadFormsResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+  if (res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
 
   if (res && res.status !== 201) {
     throw Error(res.statusText)
