@@ -1022,7 +1022,9 @@ function getCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
       param: {
-        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+        informant:
+          informant.charAt(0) +
+          informant.slice(1).toLowerCase().replace('_', ' ')
       }
     },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
@@ -1087,7 +1089,9 @@ export function getIssueCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
       param: {
-        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+        informant:
+          informant.charAt(0) +
+          informant.slice(1).toLowerCase().replace('_', ' ')
       }
     },
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }

@@ -109,7 +109,9 @@ export const getCorrectorSection = (
       value: CorrectorRelationship.INFORMANT,
       label: messages.informant,
       param: {
-        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+        informant: (
+          informant.charAt(0) + informant.slice(1).toLowerCase()
+        ).replace('_', ' ')
       }
     },
     {
