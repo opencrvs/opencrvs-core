@@ -123,6 +123,18 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
   }
 
+  getCollectorType = () => {
+    const informant = (
+      this.props.declaration.data.informant.informantType as string
+    ).toLowerCase()
+    if (!['mother', 'father'].includes(informant)) {
+      const { collector } = this.props.match.params
+      return collector
+    } else {
+      return informant
+    }
+  }
+
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, declaration, registerForm } = this.props
     const info = declaration.data[collector]
@@ -176,9 +188,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const collector = (
-      this.props.declaration.data.informant.informantType as string
-    ).toLowerCase()
+    const collector = this.getCollectorType()
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl

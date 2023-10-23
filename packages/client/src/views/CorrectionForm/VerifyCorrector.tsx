@@ -184,10 +184,20 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     this.props.modifyDeclaration(declaration)
   }
 
-  render() {
-    const corrector = (
+  getCorrectorType = () => {
+    const informant = (
       this.props.declaration.data.informant.informantType as string
     ).toLowerCase()
+    if (!['mother', 'father'].includes(informant)) {
+      const { corrector } = this.props.match.params
+      return corrector
+    } else {
+      return informant
+    }
+  }
+
+  render() {
+    const corrector = this.getCorrectorType()
     const { intl, declaration } = this.props
     if (!declaration) {
       return (
