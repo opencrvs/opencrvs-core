@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-relative-parent-imports
-
-import { ValidRecord } from 'src/record'
+import { ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
