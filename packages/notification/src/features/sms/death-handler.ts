@@ -38,6 +38,7 @@ export async function sendDeathInProgressConfirmation(
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       informantName: payload.informantName
     }
   )
@@ -64,6 +65,7 @@ export async function sendDeathDeclarationConfirmation(
       name: payload.name,
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       informantName: payload.informantName
     }
   )
@@ -91,6 +93,7 @@ export async function sendDeathRegistrationConfirmation(
       informantName: payload.informantName,
       trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber,
+      registrationLocation: payload.registrationLocation,
       crvsOffice: payload.crvsOffice
     }
   )
@@ -117,6 +120,7 @@ export async function sendDeathRejectionConfirmation(
       name: payload.name,
       informantName: payload.informantName,
       trackingId: payload.trackingId,
+      registrationLocation: payload.registrationLocation,
       crvsOffice: payload.crvsOffice
     }
   )

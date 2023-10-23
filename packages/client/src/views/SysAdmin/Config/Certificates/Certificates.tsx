@@ -332,10 +332,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         event
       )
       if (res && res.createOrUpdateCertificateSVG) {
+        // Sometimes it takes a second for the Minio URL to be available, otherwise you get a 404.
         this.setState({ imageUploading: false })
-        this.props.updateOfflineCertificate(
-          res.createOrUpdateCertificateSVG as ICertificateTemplateData
-        )
+        setTimeout(() => {
+          this.props.updateOfflineCertificate(
+            res.createOrUpdateCertificateSVG as ICertificateTemplateData
+          )
+        }, 1000)
       }
     } catch (err) {
       this.setState({
