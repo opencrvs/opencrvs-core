@@ -7485,27 +7485,27 @@
     "@babel/types" "^7.3.0"
 
 "@types/bcryptjs@^2.4.2":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@types/bcryptjs/-/bcryptjs-2.4.4.tgz#cd3c4c007f600f1d21db09c9bd4ced8b49d04670"
-  integrity sha512-9wlJI7k5gRyJEC4yrV7DubzNQFTPiykYxUA6lBtsk5NlOfW9oWLJ1HdIA4YtE+6C3i3mTpDQQEosJ2rVZfBWnw==
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@types/bcryptjs/-/bcryptjs-2.4.5.tgz#15473cc012f825b3435b189376f645bdd2fc9f11"
+  integrity sha512-tOF6TivOIvq+TWQm78335CMdyVJhpBG3NUdWQDAp95ax4E2rSKbws/ELHLk5EBoucwx/tHt3/hhLOHwWJgVrSw==
 
 "@types/body-parser@*":
-  version "1.19.3"
-  resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.3.tgz#fb558014374f7d9e56c8f34bab2042a3a07d25cd"
-  integrity sha512-oyl4jvAfTGX9Bt6Or4H9ni1Z447/tQuxnZsytsCaExKlmJiU8sFgnIBRzJUpKwB5eWn9HuBYlUlVA74q/yN0eQ==
+  version "1.19.4"
+  resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.4.tgz#78ad68f1f79eb851aa3634db0c7f57f6f601b462"
+  integrity sha512-N7UDG0/xiPQa2D/XrVJXjkWbpqHCd2sBaB32ggRF2l83RhPfamgKGF8gwwqyksS95qUS5ZYF9aF+lLPRlwI2UA==
   dependencies:
     "@types/connect" "*"
     "@types/node" "*"
 
 "@types/boom@^7.3.1":
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.3.tgz#bc923339698b4528e0a5afacecfbebe788b5e7ce"
-  integrity sha512-PEYCW26A4hpu2SD9Dz+kd55WQg0HAGA1Uf4zTuNflIdZgMw/XGoOMPQKyjnbl7lVIRUmc+YpZHtwtgTwfPlF9g==
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.4.tgz#125b0161211195e0d1e2b6a54814e4bdf7f23a9a"
+  integrity sha512-esE4g2sYFu5sJhZR1l0OFXAzIN0K7DCWJNtLhzFX1I/KAzNWi2n3yV7QcLMFOam0xg/C4D0ZDC02LzL/p6880A==
 
 "@types/bunyan@^1.8.4":
-  version "1.8.9"
-  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.9.tgz#22d4517f3217b7c8f5a69bbc8c9f6df79779dcb5"
-  integrity sha512-ZqS9JGpBxVOvsawzmVt30sP++gSQMTejCkIAQ3VdadOcRE8izTyW66hufvwLeH+YEGP6Js2AW7Gz+RMyvrEbmw==
+  version "1.8.10"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.10.tgz#60f2d297c3d29fd3b85c54f28a48b99d61686fe0"
+  integrity sha512-A82U/3EAdWX89f+dfysGiRvbeoLuRLV3i6SLg3HuNK4Yf+dHOqdbxT70vQUwvD3DOr2Dvpcv9dRX4ipTf0LpEg==
   dependencies:
     "@types/node" "*"
 
@@ -7788,9 +7788,9 @@
     "@types/node" "*"
 
 "@types/google-libphonenumber@^7.4.23":
-  version "7.4.27"
-  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.27.tgz#5a8b39001a2294d7866fb67cf09d1aa0e274d433"
-  integrity sha512-A9I7sLv941PQhnQgN+BtydlZTOZERSEN3C7vZS3kE+RQoDU6Z+YKYRWXU+nEDGjOCXeUtSp7z+sZqXNxIyvrUw==
+  version "7.4.28"
+  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.28.tgz#184121ee9298196a58fd7a3660e31d4780558a1f"
+  integrity sha512-i9pFs/UUuaXiJhbw/A866U4L1+l1viYwYOHouXuKF0RU5xESaqIppf+QkOogjoSakcGgkTAM1N3yB5LI7X0TKQ==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.7"
@@ -7849,9 +7849,9 @@
     joi "^17.3.0"
 
 "@types/hapi__inert@^5.2.3":
-  version "5.2.7"
-  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.7.tgz#907e32ffb6034e7e1550c94a024c08eedde31005"
-  integrity sha512-Uu6HLg8E8OSh5vKiCkN6zafS2dKkHAqLzTSWdwoSJ2ccn5rDQDymNWMKrDRsch+ebPd4/1EVeEdJR7j6ay4eAg==
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.8.tgz#bb8f10a600967bb4b123ce522de5ee86699bbd25"
+  integrity sha512-gGr9TssoWngxSVBMFJa0jtJwWhHzJMspAru45Mc6VNf7A7qh1bSYqXEgRqCHkei2OyRFzN0H5PnSKaMEGV9Qwg==
   dependencies:
     "@hapi/hapi" "^21.1.0"
     joi "^17.7.0"
@@ -20202,7 +20202,12 @@ prettier@2.5.1:
   resolved "https://registry.npmjs.org/prettier/-/prettier-2.5.1.tgz"
   integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
 
-prettier@^2.5.0, prettier@^2.5.1:
+prettier@2.8.8:
+  version "2.8.8"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
+  integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
+
+prettier@^2.5.0:
   version "2.7.1"
   resolved "https://registry.npmjs.org/prettier/-/prettier-2.7.1.tgz"
   integrity sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==
@@ -23723,6 +23728,11 @@ typescript-react-intl@^0.3.0:
   dependencies:
     typescript "^2.6.2"
 
+typescript@4.9.3:
+  version "4.9.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.3.tgz#3aea307c1746b8c384435d8ac36b8a2e580d85db"
+  integrity sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==
+
 typescript@^2.6.2:
   version "2.9.2"
   resolved "https://registry.npmjs.org/typescript/-/typescript-2.9.2.tgz"
@@ -23732,11 +23742,6 @@ typescript@^2.6.2:
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
-
-typescript@^4.7.4, typescript@^4.8.3:
-  version "4.8.4"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-4.8.4.tgz"
-  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
 typical@^2.6.1:
   version "2.6.1"

@@ -24,6 +24,7 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 import { recordHandler } from '@search/features/registration/record/handler'
+import { getRecordByIdHandler } from '@search/features/records/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -75,6 +76,16 @@ export const getRoutes = () => {
           scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
         },
         description: 'Handles searching declaration assignment'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/records/{recordId}',
+      handler: getRecordByIdHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Fetch all FHIR entities concerning a record'
       }
     },
     {

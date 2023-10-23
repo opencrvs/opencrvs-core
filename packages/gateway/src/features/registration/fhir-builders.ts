@@ -11,41 +11,32 @@
 import {
   EVENT_TYPE,
   FHIR_SPECIFICATION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  OPENCRVS_SPECIFICATION_URL
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
-  ATTACHMENT_DOCS_CODE,
   ATTACHMENT_DOCS_TITLE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
-  BRIDE_CODE,
   BRIDE_TITLE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  CHILD_CODE,
   CHILD_TITLE,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
-  DECEASED_CODE,
   DECEASED_TITLE,
-  FATHER_CODE,
   FATHER_TITLE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  GROOM_CODE,
   GROOM_TITLE,
-  INFORMANT_CODE,
   INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
-  MOTHER_CODE,
   MOTHER_TITLE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
@@ -53,11 +44,8 @@ import {
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
   OBSERVATION_CATEGORY_VSIGN_DESC,
-  SPOUSE_CODE,
   SPOUSE_TITLE,
-  WITNESS_ONE_CODE,
   WITNESS_ONE_TITLE,
-  WITNESS_TWO_CODE,
   WITNESS_TWO_TITLE,
   createCompositionTemplate,
   updateTaskTemplate
@@ -107,24 +95,39 @@ import {
   GQLMarriageRegistrationInput,
   GQLQuestionnaireQuestionInput
 } from '@gateway/graphql/schema'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, UUID, getUUID } from '@opencrvs/commons'
 import {
+  ATTACHMENT_DOCS_CODE,
+  BRIDE_CODE,
   Bundle,
   BundleEntry,
+  CHILD_CODE,
+  CompositionSectionCode,
+  DECEASED_CODE,
   EncounterParticipant,
   Extension,
+  FATHER_CODE,
+  GROOM_CODE,
+  INFORMANT_CODE,
   KnownExtensionType,
+  MOTHER_CODE,
   Money,
+  OPENCRVS_SPECIFICATION_URL,
   Patient,
+  ResourceIdentifier,
+  SPOUSE_CODE,
+  Saved,
   StringExtensionType,
   Task,
+  TaskIdentifier,
   TaskIdentifierSystemType,
+  WITNESS_ONE_CODE,
+  WITNESS_TWO_CODE,
   findExtension,
   getComposition,
   markSaved,
   replaceFromBundle
 } from '@opencrvs/commons/types'
-import { v4 as uuid } from 'uuid'
 
 type StringReplace<
   T extends string,
@@ -144,7 +147,7 @@ export enum SignatureExtensionPostfix {
 }
 
 function createNameBuilder(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   sectionTitle: string
 ): IFieldBuilders<'name', GQLHumanName> {
   return {
@@ -202,7 +205,7 @@ function createNameBuilder(
 }
 
 function createIDBuilder(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   sectionTitle: string
 ): IFieldBuilders<'identifier', GQLIdentityType> {
   return {
@@ -266,7 +269,7 @@ function createIDBuilder(
 }
 
 function createTelecomBuilder(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   sectionTitle: string
 ): IFieldBuilders<'telecom', GQLContactPointInput> {
   return {
@@ -316,7 +319,7 @@ function createTelecomBuilder(
 }
 
 function createPhotoBuilder(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   sectionTitle: string
 ): IFieldBuilders<'photo', GQLAttachmentInput> {
   return {
@@ -346,7 +349,7 @@ function createPhotoBuilder(
 }
 
 function createAddressBuilder(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   sectionTitle: string
 ): IFieldBuilders<'address', GQLAddressInput> {
   return {
@@ -967,7 +970,7 @@ function setResourceIdentifier(
   resource.identifier.push({
     system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
     value: fieldValue
-  })
+  } as TaskIdentifier)
 }
 
 function createRegStatusComment(
@@ -1056,7 +1059,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       femaleDependentsOfDeceased: (fhirBundle, fieldValue, context) => {
@@ -1069,7 +1072,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       mannerOfDeath: (fhirBundle, fieldValue, context) => {
@@ -1082,7 +1085,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       deathDescription: (fhirBundle, fieldValue, context) => {
@@ -1095,7 +1098,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathEstablished: (fhirBundle, fieldValue, context) => {
@@ -1108,7 +1111,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathMethod: (fhirBundle, fieldValue, context) => {
@@ -1121,7 +1124,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeath: (fhirBundle, fieldValue, context) => {
@@ -1134,7 +1137,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       birthType: (fhirBundle, fieldValue, context) => {
@@ -1147,16 +1150,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-
-        const savedObservation = markSaved(observation, fieldValue)
-
-        const newBundle = replaceFromBundle(
-          fhirBundle,
-          observation,
-          savedObservation
-        )
-
-        return newBundle
+        const savedObservation = markSaved(observation, fieldValue as UUID)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       typeOfMarriage: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1168,7 +1163,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       weightAtBirth: (fhirBundle, fieldValue, context) => {
@@ -1181,7 +1176,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       attendantAtBirth: (fhirBundle, fieldValue, context) => {
@@ -1194,7 +1189,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       childrenBornAliveToMother: (fhirBundle, fieldValue, context) => {
@@ -1207,14 +1202,8 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
-        const newBundle = replaceFromBundle(
-          fhirBundle,
-          observation,
-          savedObservation
-        )
-
-        return newBundle
+        const savedObservation = markSaved(observation, fieldValue as UUID)
+        return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       foetalDeathsToMother: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
@@ -1226,7 +1215,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       lastPreviousLiveBirth: (fhirBundle, fieldValue, context) => {
@@ -1239,7 +1228,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue)
+        const savedObservation = markSaved(observation, fieldValue as UUID)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       }
     },
@@ -3098,7 +3087,7 @@ export const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-      encounterLocationRef.reference = `Location/${fieldValue}`
+      encounterLocationRef.reference = `Location/${fieldValue as UUID}`
     },
     type: (fhirBundle, fieldValue, context) => {
       let location
@@ -3142,7 +3131,7 @@ export const builders: IFieldBuilders = {
         context
       )
       location.partOf = {
-        reference: fieldValue
+        reference: fieldValue as ResourceIdentifier
       }
     },
     address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)
@@ -3437,7 +3426,7 @@ export async function buildFHIRBundle(
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ): Promise<Bundle> {
-  const ref = uuid()
+  const ref = getUUID()
   const context = {
     _index: {},
     event: eventType,
@@ -3547,7 +3536,7 @@ export async function updateFHIRTaskBundle(
 }
 
 export function taskBundleWithExtension(
-  taskEntry: BundleEntry<Task>,
+  taskEntry: BundleEntry<Task> | Saved<BundleEntry<Task>>,
   extension: Extension
 ) {
   const task = taskEntry.resource

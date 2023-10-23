@@ -20,7 +20,7 @@ import {
   COUNTRY_CONFIG_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 
 export async function checkServiceHealth(url: string) {
   const res = await fetch(url, {

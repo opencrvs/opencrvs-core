@@ -16,12 +16,7 @@ import {
   setInformantReference,
   getDownloadedExtensionStatus
 } from '@gateway/features/fhir/utils'
-import {
-  FATHER_CODE,
-  FATHER_TITLE,
-  INFORMANT_CODE,
-  INFORMANT_TITLE
-} from '@gateway/features/fhir/templates'
+import { FATHER_TITLE, INFORMANT_TITLE } from '@gateway/features/fhir/templates'
 import {
   mockFhirBundle,
   mockComposition,
@@ -30,7 +25,12 @@ import {
 
 import { clone, cloneDeep } from 'lodash'
 import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
-import { Bundle, Task } from '@opencrvs/commons/types'
+import {
+  FATHER_CODE,
+  INFORMANT_CODE,
+  Bundle,
+  Task
+} from '@opencrvs/commons/types'
 
 describe('Fhir util function testing', () => {
   describe('selectOrCreateDocRefResource()', () => {

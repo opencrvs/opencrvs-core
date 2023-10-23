@@ -16,7 +16,7 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 
 export interface ITokenPayload {
   sub: string

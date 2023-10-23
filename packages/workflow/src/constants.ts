@@ -44,5 +44,3 @@ export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
 export const DEFAULT_TIMEOUT = 600000
-export const HEARTH_MONGO_URL =
-  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'

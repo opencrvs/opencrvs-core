@@ -17,7 +17,7 @@ import {
   GQLResolver,
   GQLMarriageInput
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
 import { IApplicationConfigPayload } from '@gateway/features/application/type-resolvers'

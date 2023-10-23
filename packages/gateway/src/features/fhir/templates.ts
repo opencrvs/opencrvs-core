@@ -12,37 +12,23 @@ import {
   DUPLICATE_TRACKING_ID,
   EVENT_TYPE
 } from '@gateway/features/fhir/constants'
+import { UUID } from '@opencrvs/commons'
 import {
   BundleEntry,
   CodeableConcept,
   Composition,
+  CompositionSectionCode,
+  CompositionSectionEncounterReference,
   DocumentReference,
   Encounter,
   Observation,
-  Patient,
   PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
-  Reference,
-  RelatedPerson,
-  Task,
-  Unsaved,
-  UnsavedResource
+  Section,
+  Task
 } from '@opencrvs/commons/types'
 
-export const MOTHER_CODE = 'mother-details'
-export const FATHER_CODE = 'father-details'
-export const CHILD_CODE = 'child-details'
-export const DECEASED_CODE = 'deceased-details'
-export const INFORMANT_CODE = 'informant-details'
-export const WITNESS_ONE_CODE = 'witness-one-details'
-export const WITNESS_TWO_CODE = 'witness-two-details'
-export const SPOUSE_CODE = 'spouse-details'
-export const BRIDE_CODE = 'bride-details'
-export const GROOM_CODE = 'groom-details'
-export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
-export const CERTIFICATE_DOCS_CODE = 'certificates'
-export const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
 export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
 export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
@@ -90,17 +76,17 @@ export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
 export const MARRIAGE_CORRECTION_ENCOUNTER_CODE =
   'marriage-correction-encounters'
 
-export function createPersonSection(
-  refUuid: string,
-  sectionCode: string,
+export function createPersonSection<T extends CompositionSectionCode>(
+  refUuid: UUID,
+  sectionCode: T,
   sectionTitle: string
-) {
+): Section<T> {
   return {
     title: sectionTitle,
     code: {
       coding: [
         {
-          system: 'http://opencrvs.org/doc-sections',
+          system: 'http://opencrvs.org/doc-sections' as const,
           code: sectionCode
         }
       ],
@@ -114,9 +100,9 @@ export function createPersonSection(
   }
 }
 
-export function createLocationResource(refUuid: string) {
+export function createLocationResource(refUuid: UUID) {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'Location' as const,
       mode: 'instance' as const
@@ -124,7 +110,9 @@ export function createLocationResource(refUuid: string) {
   }
 }
 
-export function createEncounterSection(refUuid: string, sectionCode: string) {
+export function createEncounterSection<
+  T extends CompositionSectionEncounterReference
+>(refUuid: UUID, sectionCode: T): Section<T> {
   let sectionTitle
   if (sectionCode === BIRTH_ENCOUNTER_CODE) {
     sectionTitle = 'Birth encounter'
@@ -153,34 +141,36 @@ export function createEncounterSection(refUuid: string, sectionCode: string) {
     },
     entry: [
       {
-        reference: `urn:uuid:${refUuid}`
+        reference: `urn:uuid:${refUuid}` as const
       }
     ]
   }
 }
 
-export function createEncounter(refUuid: string) {
+export function createEncounter(refUuid: UUID): BundleEntry<Encounter> {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'Encounter',
       status: 'finished'
-    } as Encounter
+    }
   }
 }
 
-export function createRelatedPersonTemplate(refUuid: string) {
+export function createRelatedPersonTemplate(
+  refUuid: UUID
+) /*: BundleEntry<PartialBy<RelatedPerson, 'patient'>> */ {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
-      resourceType: 'RelatedPerson'
-    } as RelatedPerson
+      resourceType: 'RelatedPerson' as const
+    }
   }
 }
 
-export function createPaymentReconciliationTemplate(refUuid: string) {
+export function createPaymentReconciliationTemplate(refUuid: UUID) {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'PaymentReconciliation',
       status: 'active'
@@ -188,7 +178,10 @@ export function createPaymentReconciliationTemplate(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate(refUuid: string, context: any) {
+export function createCompositionTemplate(
+  refUuid: UUID,
+  context: any
+): BundleEntry<Composition> {
   let declarationText
   let declarationCode
   if (context.event === EVENT_TYPE.BIRTH) {
@@ -203,7 +196,7 @@ export function createCompositionTemplate(refUuid: string, context: any) {
   }
 
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
@@ -234,7 +227,7 @@ export function createCompositionTemplate(refUuid: string, context: any) {
       subject: {},
       date: '',
       author: []
-    } as UnsavedResource<Composition>
+    }
   }
 }
 
@@ -275,13 +268,11 @@ export function updateTaskTemplate(
   return task
 }
 
-export function createPersonEntryTemplate(
-  refUuid: string
-): Unsaved<BundleEntry<Patient>> {
+export function createPersonEntryTemplate(refUuid: UUID) {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
-      resourceType: 'Patient',
+      resourceType: 'Patient' as const,
       extension: [],
       active: true,
       name: []
@@ -290,12 +281,12 @@ export function createPersonEntryTemplate(
 }
 
 export function createPractitionerEntryTemplate(
-  refUuid: string
-): Unsaved<BundleEntry<Practitioner>> {
+  refUuid: UUID
+): BundleEntry<Practitioner> {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
-      resourceType: 'Practitioner',
+      resourceType: 'Practitioner' as const,
       extension: [],
       active: true,
       name: [],
@@ -304,10 +295,9 @@ export function createPractitionerEntryTemplate(
   }
 }
 
-export function createSupportingDocumentsSection(
-  sectionCode: string,
-  sectionTitle: string
-) {
+export function createSupportingDocumentsSection<
+  T extends CompositionSectionCode
+>(sectionCode: T, sectionTitle: string): Section<T> {
   return {
     title: sectionTitle,
     code: {
@@ -319,15 +309,15 @@ export function createSupportingDocumentsSection(
       ],
       text: sectionTitle
     },
-    entry: [] as Reference[]
+    entry: []
   }
 }
 
 export function createDocRefTemplate(
-  refUuid: string
-): Unsaved<BundleEntry<DocumentReference>> {
+  refUuid: UUID
+): BundleEntry<DocumentReference> {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'DocumentReference',
       masterIdentifier: {
@@ -343,10 +333,10 @@ export function createDocRefTemplate(
 }
 
 export function createObservationEntryTemplate(
-  refUuid: string
-): Unsaved<BundleEntry<Observation>> {
+  refUuid: UUID
+): BundleEntry<Observation> {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'Observation',
       extension: [],
@@ -356,27 +346,35 @@ export function createObservationEntryTemplate(
   }
 }
 
-export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
+export function createTaskRefTemplate(
+  refUuid: UUID,
+  event: EVENT_TYPE
+): BundleEntry<Task> {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'Task',
       extension: [],
       status: 'ready',
+      identifier: [],
+      lastModified: new Date().toISOString(),
+      businessStatus: {
+        coding: []
+      },
       code: {
         coding: [
           {
             system: 'http://opencrvs.org/specs/types',
-            code: event.toString()
+            code: event
           }
         ]
       }
     }
   }
 }
-export function createQuestionnaireResponseTemplate(refUuid: string) {
+export function createQuestionnaireResponseTemplate(refUuid: UUID) {
   return {
-    fullUrl: `urn:uuid:${refUuid}`,
+    fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'QuestionnaireResponse',
       extension: [],

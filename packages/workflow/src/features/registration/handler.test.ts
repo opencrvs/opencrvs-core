@@ -12,43 +12,54 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 // eslint-disable-next-line import/no-relative-parent-imports
-import { createServer } from '../../server'
 import {
-  testFhirBundle,
-  testFhirTaskBundle,
-  testFhirBundleWithIds,
-  mockFormDraft,
-  userMock,
-  fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
-  testFhirBundleWithIdsForDeath,
-  motherMock,
-  patientMock,
-  compositionMock,
-  deathCompositionMock,
-  testInProgressFhirBundle,
-  testInProgressDeathFhirBundle,
-  taskResouceMock,
-  deathTaskMock,
-  relatedPersonMock,
-  hearthResponseMock,
-  userResponseMock,
-  wrapInBundle,
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
+  Bundle,
+  Composition,
+  Encounter,
+  Location,
+  Observation,
+  Patient,
+  RelatedPerson,
+  Task,
+  TrackingID,
+  URNReference
+} from '@opencrvs/commons/types'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
-import * as fetchAny from 'jest-fetch-mock'
 import {
   ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL
+  DOWNLOADED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
-import { Bundle, Task } from '@opencrvs/commons/types'
+import {
+  compositionMock,
+  deathCompositionMock,
+  deathTaskMock,
+  districtMock,
+  fieldAgentPractitionerMock,
+  fieldAgentPractitionerRoleMock,
+  hearthResponseMock,
+  informantSMSNotificationMock,
+  mockFormDraft,
+  motherMock,
+  officeMock,
+  patientMock,
+  relatedPersonMock,
+  taskResouceMock,
+  testFhirBundle,
+  testFhirBundleWithIds,
+  testFhirBundleWithIdsForDeath,
+  testFhirTaskBundle,
+  testInProgressDeathFhirBundle,
+  testInProgressFhirBundle,
+  unionMock,
+  upazilaMock,
+  userMock,
+  userResponseMock,
+  wrapInBundle
+} from '@workflow/test/utils'
+import * as fetchAny from 'jest-fetch-mock'
+import { cloneDeep } from 'lodash'
+import { createServer } from '@workflow/server'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -1504,15 +1515,24 @@ describe('Register handler', () => {
 
 describe('populateCompositionWithID', () => {
   it('Populates payload with response ID and response encounter ID for DECLARED status', () => {
-    const payload = {
+    const payload: Bundle<
+      | Composition
+      | Task
+      | Patient
+      | RelatedPerson
+      | Location
+      | Encounter
+      | Observation
+    > = {
       resourceType: 'Bundle',
       type: 'document',
       entry: [
         {
-          fullUrl: 'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234',
+          fullUrl:
+            'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234' as URNReference,
           resource: {
-            identifier: { system: 'urn:ietf:rfc:3986', value: 'BVORKPB' },
             resourceType: 'Composition',
+            identifier: { system: 'urn:ietf:rfc:3986', value: 'BVORKPB' },
             status: 'preliminary',
             type: {
               coding: [
@@ -1546,7 +1566,10 @@ describe('populateCompositionWithID', () => {
                   text: 'Child details'
                 },
                 entry: [
-                  { reference: 'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' }
+                  {
+                    reference:
+                      'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' as URNReference
+                  }
                 ]
               },
               {
@@ -1561,7 +1584,10 @@ describe('populateCompositionWithID', () => {
                   text: "Mother's details"
                 },
                 entry: [
-                  { reference: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' }
+                  {
+                    reference:
+                      'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference
+                  }
                 ]
               },
               {
@@ -1576,7 +1602,10 @@ describe('populateCompositionWithID', () => {
                   text: "Informant's details"
                 },
                 entry: [
-                  { reference: 'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' }
+                  {
+                    reference:
+                      'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' as URNReference
+                  }
                 ]
               },
               {
@@ -1591,7 +1620,10 @@ describe('populateCompositionWithID', () => {
                   text: 'Birth encounter'
                 },
                 entry: [
-                  { reference: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' }
+                  {
+                    reference:
+                      'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference
+                  }
                 ]
               }
             ],
@@ -1601,7 +1633,8 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a',
+          fullUrl:
+            'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a' as URNReference,
           resource: {
             resourceType: 'Task',
             status: 'ready',
@@ -1611,7 +1644,8 @@ describe('populateCompositionWithID', () => {
               ]
             },
             focus: {
-              reference: 'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234'
+              reference:
+                'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234' as URNReference
             },
             identifier: [
               {
@@ -1620,7 +1654,7 @@ describe('populateCompositionWithID', () => {
               },
               {
                 system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                value: 'BVORKPB'
+                value: 'BVORKPB' as TrackingID
               }
             ],
             extension: [
@@ -1671,7 +1705,8 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd',
+          fullUrl:
+            'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' as URNReference,
           resource: {
             resourceType: 'Patient',
             active: true,
@@ -1682,11 +1717,17 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e',
+          fullUrl:
+            'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference,
           resource: {
             resourceType: 'Patient',
             active: true,
-            identifier: [{ value: '123456789', type: 'NATIONAL_ID' }],
+            identifier: [
+              {
+                value: '123456789',
+                type: { coding: [{ code: 'NATIONAL_ID' }] }
+              }
+            ],
             name: [{ use: 'en', family: ['Rahman'] }],
             maritalStatus: {
               coding: [
@@ -1738,7 +1779,8 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f',
+          fullUrl:
+            'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' as URNReference,
           resource: {
             resourceType: 'RelatedPerson',
             relationship: {
@@ -1751,26 +1793,30 @@ describe('populateCompositionWithID', () => {
               ]
             },
             patient: {
-              reference: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e'
+              reference:
+                'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference
             }
           }
         },
         {
-          fullUrl: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd',
+          fullUrl:
+            'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference,
           resource: {
             resourceType: 'Encounter',
             status: 'finished',
             location: [
               {
                 location: {
-                  reference: 'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8'
+                  reference:
+                    'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8' as URNReference
                 }
               }
             ]
           }
         },
         {
-          fullUrl: 'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8',
+          fullUrl:
+            'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8' as URNReference,
           resource: {
             resourceType: 'Location',
             mode: 'instance',
@@ -1793,12 +1839,14 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad',
+          fullUrl:
+            'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad' as URNReference,
           resource: {
             resourceType: 'Observation',
             status: 'final',
             context: {
-              reference: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd'
+              reference:
+                'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference
             },
             category: [
               {
@@ -1825,7 +1873,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:49.664Z' }
-    } as Bundle
+    }
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2070,7 +2118,12 @@ describe('populateCompositionWithID', () => {
           resource: {
             resourceType: 'Patient',
             active: true,
-            identifier: [{ value: '123456789', type: 'NATIONAL_ID' }],
+            identifier: [
+              {
+                value: '123456789',
+                type: { coding: [{ code: 'NATIONAL_ID' }] }
+              }
+            ],
             name: [{ use: 'en', family: ['Rahman'] }],
             maritalStatus: {
               coding: [
@@ -2542,7 +2595,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
-    } as Bundle
+    }
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2605,7 +2658,7 @@ describe('populateCompositionWithID', () => {
       ],
       type: 'transaction-response'
     } as Bundle
-    populateCompositionWithID(payload, response)
+    populateCompositionWithID(payload as any, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',
       type: 'document',

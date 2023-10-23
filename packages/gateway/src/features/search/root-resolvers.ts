@@ -10,7 +10,7 @@
  */
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getMetrics, postMetrics } from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
+import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
 import {
   getSystem,
   getTokenPayload,
@@ -120,7 +120,7 @@ export const resolvers: GQLResolver = {
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
+          await markRecordAsDownloadedBySystem(hit._id, system, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {

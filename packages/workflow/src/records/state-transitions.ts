@@ -8,12 +8,11 @@ import {
   getCorrectionRequestedTask,
   getTaskFromBundle,
   IssuedRecord,
-  isUnsavedPaymentReconciliationBundleEntry,
+  isPaymentReconciliationBundleEntry,
   PaymentReconciliation,
   Practitioner,
   RegisteredRecord,
   Task,
-  Unsaved,
   sortTasksDescending,
   RecordWithPreviousTask
 } from '@opencrvs/commons/types'
@@ -47,7 +46,7 @@ export async function toCorrected(
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromBundle(record)
 
-  let correctionPaymentBundleEntries: Unsaved<BundleEntry>[] = []
+  let correctionPaymentBundleEntries: BundleEntry[] = []
 
   if (correctionDetails.payment) {
     correctionPaymentBundleEntries = createCorrectionPaymentResources(
@@ -67,7 +66,7 @@ export async function toCorrected(
   )
 
   const paymentReconciliation = correctionPaymentBundleEntries.find(
-    isUnsavedPaymentReconciliationBundleEntry
+    isPaymentReconciliationBundleEntry
   )
 
   const correctedTask = createCorrectedTask(
@@ -87,18 +86,20 @@ export async function toCorrected(
     practitioner
   )
 
-  return changeState(
-    {
-      ...record,
-      entry: record.entry
-        .filter((entry) => entry.resource.id !== previousTask.id)
-        .concat(correctionPaymentBundleEntries)
-        .concat(otherDocumentReferences)
-        .concat(correctionEncounter)
-        .concat({ resource: correctionRequestWithLocationExtensions })
-    },
-    'REGISTERED'
-  )
+  const newEntries = [
+    ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
+    ...correctionPaymentBundleEntries,
+    ...otherDocumentReferences,
+    correctionEncounter,
+    { resource: correctionRequestWithLocationExtensions }
+  ]
+
+  const updatedRecord = {
+    ...record,
+    entry: newEntries
+  }
+
+  return changeState(updatedRecord, 'REGISTERED')
 }
 
 export async function toCorrectionApproved(
@@ -159,10 +160,13 @@ export async function toCorrectionApproved(
   return changeState(
     {
       ...record,
-      entry: record.entry
-        .filter((entry) => entry.resource.id !== correctionAcceptedTask.id)
-        .concat({ resource: correctionAcceptedTask })
-        .concat({ resource: correctionRequestWithLocationExtensions })
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== correctionAcceptedTask.id
+        ),
+        { resource: correctionAcceptedTask },
+        { resource: correctionRequestWithLocationExtensions }
+      ]
     },
     'REGISTERED'
   ) as any as RecordWithPreviousTask<RegisteredRecord>
@@ -177,7 +181,7 @@ export async function toCorrectionRequested(
 ): Promise<CorrectionRequestedRecord> {
   const previousTask = getTaskFromBundle(record)
 
-  let correctionPaymentBundleEntries: Unsaved<BundleEntry>[] = []
+  let correctionPaymentBundleEntries: BundleEntry[] = []
 
   if (correctionDetails.payment) {
     correctionPaymentBundleEntries = createCorrectionPaymentResources(
@@ -197,7 +201,7 @@ export async function toCorrectionRequested(
   )
 
   const paymentReconciliation = correctionPaymentBundleEntries.find(
-    isUnsavedPaymentReconciliationBundleEntry
+    isPaymentReconciliationBundleEntry
   )
 
   const correctionRequestTask = createCorrectionRequestTask(
@@ -221,12 +225,15 @@ export async function toCorrectionRequested(
   return changeState(
     {
       ...record,
-      entry: record.entry
-        .filter((entry) => entry.resource.id !== previousTask.id)
-        .concat(correctionPaymentBundleEntries)
-        .concat(otherDocumentReferences)
-        .concat(correctionEncounter)
-        .concat({ resource: correctionRequestWithLocationExtensions })
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        ...correctionPaymentBundleEntries,
+        ...otherDocumentReferences,
+        correctionEncounter,
+        { resource: correctionRequestWithLocationExtensions }
+      ]
     },
     'CORRECTION_REQUESTED'
   )
@@ -304,11 +311,12 @@ export async function toCorrectionRejected(
   return changeState(
     {
       ...record,
-      entry: record.entry
-        .filter(
+      entry: [
+        ...record.entry.filter(
           (entry) => entry.resource.id !== currentCorrectionRequestedTask.id
-        )
-        .concat(tasksToBeIncludedInBundle.map((resource) => ({ resource })))
+        ),
+        ...tasksToBeIncludedInBundle.map((resource) => ({ resource }))
+      ]
     },
     previousStatus
   ) as any as RecordWithPreviousTask<

@@ -19,11 +19,12 @@ import {
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+
 import {
   Address,
   Bundle,
   Encounter,
+  OPENCRVS_SPECIFICATION_URL,
   Patient,
   Resource,
   Task

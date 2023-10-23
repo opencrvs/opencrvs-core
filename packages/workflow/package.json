@@ -31,7 +31,6 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
-    "mongodb": "4.17.0",
     "node-fetch": "^2.6.7",
     "node-verhoeff": "^0.0.11",
     "pino": "^6.0.0",
@@ -61,10 +60,10 @@
     "jest-fetch-mock": "^2.1.2",
     "lint-staged": "^7.1.0",
     "nodemon": "^2.0.22",
-    "prettier": "^2.5.1",
+    "prettier": "2.8.8",
     "ts-jest": "26.4.4",
     "ts-node": "^6.1.1",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.3"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

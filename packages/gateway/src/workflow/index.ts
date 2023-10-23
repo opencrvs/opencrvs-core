@@ -4,7 +4,7 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { Bundle } from '@opencrvs/commons/types'
 
 const createRequest = async <T = any>(

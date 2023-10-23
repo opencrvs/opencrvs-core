@@ -41,8 +41,10 @@ import {
   OpenCRVSPatientName,
   Patient,
   Resource,
+  Saved,
   Task,
-  findExtension
+  findExtension,
+  isSaved
 } from '@opencrvs/commons/types'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
@@ -461,25 +463,23 @@ export async function mergePatientIdentifier(bundle: Bundle) {
         `/Patient/${patient?.id}`
       )
       if (patientFromFhir) {
-        bundle.entry =
-          bundle &&
-          bundle.entry &&
-          bundle.entry.map((entry) => {
-            if (entry.resource?.id === patientFromFhir.id) {
-              return {
-                ...entry,
-                resource: {
-                  ...entry.resource,
-                  identifier: mergeFhirIdentifiers(
-                    patientFromFhir.identifier ?? [],
-                    (entry.resource as Patient).identifier ?? []
-                  )
-                }
+        bundle.entry = bundle.entry.map((entry) => {
+          const resource = entry.resource
+          if (isSaved(resource) && resource?.id === patientFromFhir.id) {
+            const newEntry = {
+              ...entry,
+              resource: {
+                ...resource,
+                identifier: mergeFhirIdentifiers(
+                  patientFromFhir.identifier ?? [],
+                  (entry.resource as Saved<Patient>).identifier ?? []
+                )
               }
-            } else {
-              return entry
             }
-          })
+            return newEntry
+          }
+          return entry
+        })
       }
     })
   )

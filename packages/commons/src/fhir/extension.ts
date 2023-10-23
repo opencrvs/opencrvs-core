@@ -1,3 +1,5 @@
+import { ResourceIdentifier, URNReference } from '../fhir'
+
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
     url: 'http://opencrvs.org/specs/extension/makeCorrection'
@@ -15,9 +17,10 @@ export type StringExtensionType = {
     url: 'http://opencrvs.org/specs/extension/age'
     /**
      * @deprecated The field should not be used!
+     * valueString seems to be either a string or a number
      */
-    valueString?: string
-    valueInteger: number
+    valueString?: string | number
+    valueInteger?: number
   }
   'http://opencrvs.org/specs/extension/patient-occupation': {
     url: 'http://opencrvs.org/specs/extension/patient-occupation'
@@ -129,13 +132,13 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/regLastUser': {
     url: 'http://opencrvs.org/specs/extension/regLastUser'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier
     }
   }
   'http://opencrvs.org/specs/extension/collector': {
     url: 'http://opencrvs.org/specs/extension/collector'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier | URNReference /* Unsaved */
     }
   }
   'http://opencrvs.org/specs/extension/payment': {
@@ -177,6 +180,8 @@ export type KnownExtensionType = StringExtensionType & {
     url: 'http://opencrvs.org/specs/extension/employee-signature'
     valueSignature: {
       contentType: string
+      when?: string
+      type?: Array<{ system: string; code: string; display: string }>
       blob: string
     }
   }
