@@ -177,7 +177,7 @@ export const addressMutationTransformer =
     useCase?: string
     lineNumber?: number
     transformedFieldName?: string
-    isLeafLevel?: boolean
+    isLowestAdministrativeLevel?: boolean
   }) =>
   (
     transformedData: TransformedData,
@@ -200,7 +200,7 @@ export const addressMutationTransformer =
       }
       sectionData.address.push(address)
     }
-    if (config.isLeafLevel) {
+    if (config.isLowestAdministrativeLevel) {
       address.partOf = draftData[sectionId][field.name]
     }
     if (config.lineNumber || config.lineNumber === 0) {
@@ -219,7 +219,7 @@ export const eventLocationMutationTransformer =
     useCase?: string
     lineNumber?: number
     transformedFieldName?: string
-    isLeafLevel?: boolean
+    isLowestAdministrativeLevel?: boolean
   }) =>
   (
     transformedData: TransformedData,
@@ -248,7 +248,7 @@ export const eventLocationMutationTransformer =
       }
       transformedData.eventLocation = defaultLocation
     }
-    if (config.isLeafLevel) {
+    if (config.isLowestAdministrativeLevel) {
       transformedData.eventLocation.address.partOf =
         draftData[sectionId][field.name]
     }
