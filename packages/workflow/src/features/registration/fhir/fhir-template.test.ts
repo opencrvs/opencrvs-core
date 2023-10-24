@@ -109,6 +109,10 @@ describe('Verify fhir templates', () => {
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: { reference: '123' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: { reference: '123' }
           }
         ]
       })
