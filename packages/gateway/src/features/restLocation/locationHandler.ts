@@ -98,7 +98,7 @@ const locationStatisticSchema = Joi.object({
   female_population: Joi.number().required(),
   population: Joi.number().required(),
   crude_birth_rate: Joi.number().required()
-})
+}).label('YearStatistics')
 
 function instanceOfJurisdiction(object: any): object is Location {
   return 'statistics' in object
@@ -123,8 +123,11 @@ const locationRequestSchema = Joi.object({
       JurisdictionType.LOCATION_LEVEL_5
     )
     .optional(),
-  statistics: Joi.array().items(locationStatisticSchema).optional()
-})
+  statistics: Joi.array()
+    .items(locationStatisticSchema)
+    .optional()
+    .label('Statistics')
+}).label('LocationPayload')
 
 export const requestSchema = Joi.alternatives().try(
   locationRequestSchema,
@@ -136,7 +139,7 @@ export const updateSchema = Joi.object({
   alias: Joi.string().optional(),
   status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE).optional(),
   statistics: locationStatisticSchema.optional()
-})
+}).label('UpdateLocationPayload')
 
 export const requestParamsSchema = Joi.object({
   locationId: Joi.string()
