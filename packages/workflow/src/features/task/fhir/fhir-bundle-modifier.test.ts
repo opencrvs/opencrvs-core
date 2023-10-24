@@ -19,7 +19,7 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
-  taskResouceMock
+  taskResourceMock
 } from '@workflow/test/utils'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
@@ -42,7 +42,7 @@ describe('Verify handler', () => {
 
   it('modifyTaskBundle returns correct bundle', async () => {
     fetch.mockResponses(
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],

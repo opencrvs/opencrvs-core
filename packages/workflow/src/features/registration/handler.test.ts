@@ -33,7 +33,7 @@ import {
   deathCompositionMock,
   testInProgressFhirBundle,
   testInProgressDeathFhirBundle,
-  taskResouceMock,
+  taskResourceMock,
   deathTaskMock,
   relatedPersonMock,
   hearthResponseMock,
@@ -120,7 +120,7 @@ bundleWithInputOutputDeath.entry[1].resource.output = mockOutput
 const getMarkBundleAndPostToHearthMockResponses = [
   [userMock, { status: 200 }],
   [fieldAgentPractitionerMock, { status: 200 }],
-  [taskResouceMock, { status: 200 }],
+  [taskResourceMock, { status: 200 }],
   [fieldAgentPractitionerRoleMock, { status: 200 }],
   [districtMock, { status: 200 }],
   [upazilaMock, { status: 200 }],
@@ -728,7 +728,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -870,7 +870,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -961,7 +961,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1089,7 +1089,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(taskResouceMock), { status: 200 }],
+      [wrapInBundle(taskResourceMock), { status: 200 }],
       [compositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
@@ -1373,7 +1373,7 @@ describe('markEventAsRequestedForCorrection handler', () => {
       [userMock, { status: 200 }],
       [patientMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],

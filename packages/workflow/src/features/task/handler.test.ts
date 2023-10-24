@@ -21,7 +21,7 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
-  taskResouceMock,
+  taskResourceMock,
   testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
@@ -40,7 +40,7 @@ describe('Verify handler', () => {
     fetch.resetMocks()
     server = await createServer()
     fetch.mockResponses(
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
