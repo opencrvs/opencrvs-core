@@ -289,6 +289,11 @@ const messagesToDefine = {
     defaultMessage:
       'Select the office that this declaration should be sent to for review',
     description: 'Helper text for registration office select component'
+  },
+  documentViewerTitle: {
+    id: 'review.documentViewer.title',
+    defaultMessage: 'Supporting documents',
+    description: 'Label for Supporting documents section'
   }
 }
 

@@ -57,6 +57,7 @@ import {
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
+  PRINT_RECORD,
   SELECT_DEATH_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_MARRIAGE_FORM,
@@ -686,6 +687,9 @@ export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 
+export function goToPrintRecordView(declarationId: string) {
+  return push(formatUrl(PRINT_RECORD, { declarationId }))
+}
 export type INavigationState = undefined
 
 export function navigationReducer(state: INavigationState, action: any) {

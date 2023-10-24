@@ -118,7 +118,7 @@ export interface CheckboxProps extends React.OptionHTMLAttributes<{}> {
   value: string
   selected: boolean
   size?: Size
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export class Checkbox extends React.Component<CheckboxProps> {
