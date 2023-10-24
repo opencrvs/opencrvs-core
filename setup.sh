@@ -148,35 +148,6 @@ if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
     else
         echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     fi
-
-    echo
-    if [  -n "$(google-chrome --version | grep Chrome)" ]; then
-      echo -e "Chrome is \033[32minstalled!\033[0m :)"
-      echo
-    else
-      echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-      echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-      echo
-      echo "We think that you do not have Chrome installed."
-      echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-      echo
-    fi
-  fi
-elif [ "$(uname)" == "Darwin" ]; then
-  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
-  echo
-  OS="MAC"
-  if [  -n "$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | grep Chrome)" ]; then
-    echo -e "Chrome is \033[32minstalled!\033[0m :)"
-    echo
-  else
-    echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-    echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-    echo
-    echo "We think that you do not have Chrome installed, or it is not available on this path: "
-    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-    echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-    echo
   fi
 else
   echo "Sorry your operating system is not supported."
@@ -192,7 +163,7 @@ echo
 
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
-  dependencies+=("docker compose" "google-chrome")
+  dependencies+=("docker compose")
 fi
 for i in "${dependencies[@]}"
 do
@@ -243,14 +214,6 @@ do
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
            echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
-        fi
-        if [ $i == "google-chrome" ] ; then
-          echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-          echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-          echo
-          echo "We think that you do not have Chrome installed."
-          echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-          echo
         fi
         if [ $i == "tmux" ] ; then
           if [ $OS == "UBUNTU" ]; then
