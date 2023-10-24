@@ -167,6 +167,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               title={intl.formatMessage(
                 messages.recoveryCodeEntryFormBodyHeader
               )}
+              showTitleOnMobile
               subtitle={intl.formatMessage(
                 notificationMethod === 'sms'
                   ? messages.recoveryCodeEntryFormBodySubheaderMobile
