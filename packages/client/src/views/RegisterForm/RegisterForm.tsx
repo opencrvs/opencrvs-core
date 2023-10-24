@@ -469,7 +469,7 @@ function FormAppBar({
                       <Button
                         id="print-btn"
                         type="secondary"
-                        size="medium"
+                        size="small"
                         onClick={() => printDeclarationMethod(declaration.id)}
                       >
                         <Icon name="Printer" />
@@ -551,7 +551,7 @@ function FormAppBar({
                   <Button
                     id="print-btn"
                     type="secondary"
-                    size="medium"
+                    size="small"
                     onClick={() => printDeclarationMethod(declaration.id)}
                   >
                     <Icon name="Printer" />

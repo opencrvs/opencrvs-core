@@ -115,6 +115,7 @@ type CollectionName =
   | 'PractitionerRole'
   | 'RelatedPerson'
   | 'Task'
+  | 'QuestionnaireResponse'
 
 function joinCollections(
   localField: string,
@@ -741,6 +742,14 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       'Practitioner',
       'practitioner.reference',
       'PractitionerRole'
+    ),
+
+    // Get QuestionnaireResponse by Encounter ids
+    // (Encounter.id -> QuestionnaireResponse.subject.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'subject.reference',
+      'QuestionnaireResponse'
     ),
 
     ...(includeHistoryResources
