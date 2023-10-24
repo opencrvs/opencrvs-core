@@ -203,6 +203,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
           <form id="password-update-form" onSubmit={this.whatNext}>
             <Content
               title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
+              showTitleOnMobile
               subtitle={intl.formatMessage(
                 messages.passwordUpdateFormBodySubheader
               )}
