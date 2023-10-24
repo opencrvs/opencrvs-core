@@ -348,10 +348,20 @@ const messagesToDefine: IUserMessages = {
     description: 'Password change modal header',
     id: 'settings.changePassword'
   },
+  changeCurrentPasswordTitle: {
+    defaultMessage: 'Enter current password',
+    description: 'Password change modal title',
+    id: 'settings.changeCurrentPasswordTitle'
+  },
+  changeNewPasswordTitle: {
+    defaultMessage: 'Choose a new password',
+    description: 'New password change modal title',
+    id: 'settings.changeNewPasswordTitle'
+  },
   changePasswordMessage: {
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
-    description: 'Password change message',
+    description: 'New Password change message',
     id: 'misc.newPass.instruction'
   },
   changePhoneTitle: {

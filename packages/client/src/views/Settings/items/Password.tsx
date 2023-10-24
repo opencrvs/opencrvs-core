@@ -24,6 +24,7 @@ import {
 } from '@client/i18n/messages'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { useOnlineStatus } from '@client/utils'
+import { PasswordChangeModals } from '@client/views/Settings/PasswordChangeModals'
 
 export function Password() {
   const intl = useIntl()
@@ -64,7 +65,12 @@ export function Password() {
           </DynamicHeightLinkButton>
         }
       />
-      <PasswordChangeModal
+      {/* <PasswordChangeModal
+        togglePasswordChangeModal={togglePasswordChangeModal}
+        showPasswordChange={showModal}
+        passwordChanged={changePassword}
+      /> */}
+      <PasswordChangeModals
         togglePasswordChangeModal={togglePasswordChangeModal}
         showPasswordChange={showModal}
         passwordChanged={changePassword}
