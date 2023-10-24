@@ -71,7 +71,7 @@ import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 const SCREEN_LOCK = 'screenLock'
 
 type Keys = keyof typeof WORKQUEUE_TABS
-export type IWORKQUEUE_TABS = typeof WORKQUEUE_TABS[Keys]
+export type IWORKQUEUE_TABS = (typeof WORKQUEUE_TABS)[Keys]
 
 export const WORKQUEUE_TABS = {
   inProgress: 'progress',
@@ -361,7 +361,13 @@ const NavigationView = (props: IFullProps) => {
     (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
-    if (!userDetails || !loadWorkqueueStatuses) {
+    if (
+      !userDetails ||
+      !loadWorkqueueStatuses ||
+      userDetails.systemRole === 'LOCAL_SYSTEM_ADMIN' ||
+      userDetails.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
+      userDetails.systemRole === 'PERFORMANCE_MANAGEMENT'
+    ) {
       return
     }
     updateRegistrarWorkqueue(
