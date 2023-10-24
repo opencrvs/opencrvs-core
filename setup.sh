@@ -163,7 +163,7 @@ echo
 
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
-  dependencies+=("docker-compose")
+  dependencies+=("docker compose")
 fi
 for i in "${dependencies[@]}"
 do
@@ -184,9 +184,9 @@ do
                 echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
             fi
         fi
-        if [ $i == "docker-compose" ] ; then
+        if [ $i == "docker compose" ] ; then
             if [ $OS == "UBUNTU" ]; then
-                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker-compose installation."
+                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker compose installation."
                 echo "Please follow the documentation here: https://docs.docker.com/compose/install/"
             else
                 echo "You need to install Docker Desktop for Mac, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker installation."
