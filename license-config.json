@@ -26,6 +26,7 @@
     "packages/gateway/src/graphql/schema.d.ts",
     "packages/gateway/src/graphql/schema.graphql",
     "packages/client/index.html",
+    "packages/client/src/tests/schema.graphql",
     "packages/login/index.html",
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",

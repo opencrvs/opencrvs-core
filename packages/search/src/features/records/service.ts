@@ -1,3 +1,13 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 import {
   Bundle,
   BundleEntry,
@@ -105,6 +115,7 @@ type CollectionName =
   | 'PractitionerRole'
   | 'RelatedPerson'
   | 'Task'
+  | 'QuestionnaireResponse'
 
 function joinCollections(
   localField: string,
@@ -731,6 +742,14 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       'Practitioner',
       'practitioner.reference',
       'PractitionerRole'
+    ),
+
+    // Get QuestionnaireResponse by Encounter ids
+    // (Encounter.id -> QuestionnaireResponse.subject.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'subject.reference',
+      'QuestionnaireResponse'
     ),
 
     ...(includeHistoryResources
