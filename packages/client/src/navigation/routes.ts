@@ -104,3 +104,5 @@ export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
 
 export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'
+
+export const PRINT_RECORD = '/print-record/:declarationId'

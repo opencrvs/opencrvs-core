@@ -266,6 +266,11 @@ const messagesToDefine = {
     defaultMessage: 'Clear',
     description: 'Label for button that clear signature input',
     id: 'review.signature.clear'
+  },
+  documentViewerTitle: {
+    id: 'review.documentViewer.title',
+    defaultMessage: 'Supporting documents',
+    description: 'Label for Supporting documents section'
   }
 }
 

@@ -71,6 +71,7 @@ import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
+import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 
 interface IAppProps {
@@ -540,6 +541,11 @@ export function App(props: IAppProps) {
                                               component={
                                                 OIDPVerificationCallback
                                               }
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.PRINT_RECORD}
+                                              component={PrintRecord}
                                             />
                                           </Switch>
                                         </TransitionWrapper>
