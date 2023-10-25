@@ -36,6 +36,7 @@ import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface INameField {
   firstNamesField: string
@@ -1022,9 +1023,7 @@ function getCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
       param: {
-        informant:
-          informant.charAt(0) +
-          informant.slice(1).toLowerCase().replace('_', ' ')
+        informant: labelFormatterForInformant(informant)
       }
     },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
@@ -1089,9 +1088,7 @@ export function getIssueCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
       param: {
-        informant:
-          informant.charAt(0) +
-          informant.slice(1).toLowerCase().replace('_', ' ')
+        informant: labelFormatterForInformant(informant)
       }
     },
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
@@ -1132,7 +1129,7 @@ export function getFilteredRadioOptions(
   if (declaration.event === Event.Birth) {
     options.splice(1, 0, ...birthForm)
 
-    const rolesToCheck = ['MOTHER', 'FATHER', 'LEGAL_GUARDIAN']
+    const rolesToCheck = ['MOTHER', 'FATHER']
     for (const role of rolesToCheck) {
       if (!Boolean(declaration.data[role.toLowerCase()]?.detailsExist)) {
         options = options.filter((opt) => opt.value !== role)
@@ -1142,7 +1139,9 @@ export function getFilteredRadioOptions(
     options.splice(1, 0, ...marriageForm)
   }
 
-  if (['BRIDE', 'GROOM', 'MOTHER', 'FATHER'].includes(informant)) {
+  if (
+    ['BRIDE', 'GROOM', 'MOTHER', 'FATHER', 'LEGAL_GUARDIAN'].includes(informant)
+  ) {
     options = options.filter((opt) => opt.value !== informant)
   }
 
