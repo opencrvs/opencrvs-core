@@ -69,7 +69,6 @@ export async function generateTrackingIdForEvents(
   token: string
 ): Promise<string> {
   const trackingIdFromCountryConfig = await getTrackingIdFromCountryConfig(
-    eventType,
     bundle,
     token
   )
@@ -83,11 +82,10 @@ export async function generateTrackingIdForEvents(
 }
 
 export async function getTrackingIdFromCountryConfig(
-  eventType: EVENT_TYPE,
   bundle: fhir.Bundle,
   token: string
 ): Promise<string | null> {
-  return fetch(new URL(`/tracking-id`, COUNTRY_CONFIG_URL).toString(), {
+  return fetch(new URL('/tracking-id', COUNTRY_CONFIG_URL).toString(), {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`
