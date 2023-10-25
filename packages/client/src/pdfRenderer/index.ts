@@ -21,20 +21,46 @@ import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { ContentSvg } from 'pdfmake/interfaces'
 
 /*
   Converts template definition into actual PDF using defined transformers, declarationData and userDetails
 */
-export function createPDF(
+export async function createPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
   userDetails: UserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData
-): TCreatedPdf {
+): Promise<TCreatedPdf> {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
-  let definitionString = JSON.stringify(template.definition)
+  const imageUrl = await new Promise<string>(function (resolve, reject) {
+    const tmpImage = new Image()
+    tmpImage.src =
+      'data:image/svg+xml;charset=utf-8,' +
+      encodeURIComponent((template.definition.content as ContentSvg).svg)
+
+    tmpImage.onload = function () {
+      const tmpCanvas = document.createElement('canvas')
+      tmpCanvas.width = 1190.56
+      tmpCanvas.height = 1683.78
+      const canvasContext = tmpCanvas.getContext('2d')
+      canvasContext?.drawImage(tmpImage, 0, 0, 1190.56, 1683.78)
+      resolve(tmpCanvas.toDataURL())
+    }
+  })
+
+  const tmpDef = {
+    ...template.definition,
+    content: {
+      fit: (template.definition.content as ContentSvg).fit,
+      image: imageUrl
+    }
+  }
+
+  let definitionString = JSON.stringify(tmpDef)
+
   if (template.transformers && template.transformers.length > 0) {
     template.transformers.forEach((transformerDef) => {
       const transformFunction = transformers[transformerDef.operation]
@@ -110,7 +136,7 @@ export function createSVG(
   return JSON.parse(definitionString)
 }
 
-export function printPDF(
+export async function printPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
   userDetails: UserDetails,
@@ -118,7 +144,7 @@ export function printPDF(
   intl: IntlShape,
   optionalData?: OptionalData
 ) {
-  const pdf = createPDF(
+  const pdf: TCreatedPdf = await createPDF(
     template,
     declaration,
     userDetails,
