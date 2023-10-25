@@ -12,7 +12,8 @@ import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
   MOSIP_TOKEN_SEEDER_URL,
-  HEARTH_URL
+  HEARTH_URL,
+  COUNTRY_CONFIG_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -62,10 +63,44 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
-  // using first letter of eventType for prefix
-  // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
-  return generateTrackingId(eventType.charAt(0))
+export async function generateTrackingIdForEvents(
+  eventType: EVENT_TYPE,
+  bundle: fhir.Bundle,
+  token: string
+): Promise<string> {
+  const trackingIdFromCountryConfig = await getTrackingIdFromCountryConfig(
+    eventType,
+    bundle,
+    token
+  )
+  if (trackingIdFromCountryConfig) {
+    return trackingIdFromCountryConfig
+  } else {
+    // using first letter of eventType for prefix
+    // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
+    return generateTrackingId(eventType.charAt(0))
+  }
+}
+
+export async function getTrackingIdFromCountryConfig(
+  eventType: EVENT_TYPE,
+  bundle: fhir.Bundle,
+  token: string
+): Promise<string | null> {
+  return fetch(
+    new URL(`/tracking-id/${eventType}`, COUNTRY_CONFIG_URL).toString(),
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(bundle)
+    }
+  ).then((res) => {
+    if (res.ok) return res.text()
+    else if (res.status === 404) return null
+    else throw new Error(res.statusText)
+  })
 }
 
 function generateTrackingId(prefix: string): string {
