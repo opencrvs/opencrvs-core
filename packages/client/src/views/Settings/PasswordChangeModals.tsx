@@ -1,6 +1,5 @@
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import React, { useState } from 'react'
@@ -81,21 +80,6 @@ const Field = styled.div`
     margin-bottom: 0px;
   }
 `
-
-type State = {
-  currentPassword: string
-  incorrectCurrentPassword: boolean
-  newPassword: string
-  confirmPassword: string
-  validLength: boolean
-  hasNumber: boolean
-  hasCases: boolean
-  passwordMismatched: boolean
-  passwordMatched: boolean
-  errorOccured: boolean
-  currentStepModal: 1 | 2
-}
-
 interface IProps {
   showPasswordChange: boolean
   togglePasswordChangeModal: () => void
