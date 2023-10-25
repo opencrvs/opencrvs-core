@@ -76,7 +76,7 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = await setTrackingId(fhirBundle, token)
+  fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   const eventType = getEventType(fhirBundle)
@@ -388,12 +388,9 @@ export async function touchBundle(
   return bundle
 }
 
-export async function setTrackingId(
-  fhirBundle: fhir.Bundle,
-  token: string
-): Promise<fhir.Bundle> {
+export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const eventType = getEventType(fhirBundle)
-  const trackingId = await generateTrackingIdForEvents(eventType, token)
+  const trackingId = generateTrackingIdForEvents(eventType)
   const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
 
   if (

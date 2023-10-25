@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
   MOSIP_TOKEN_SEEDER_URL,
-  HEARTH_URL,
-  COUNTRY_CONFIG_URL
+  HEARTH_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -62,21 +62,14 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export async function generateTrackingIdForEvents(
-  eventType: EVENT_TYPE,
-  token: string
-): Promise<string> {
-  return fetch(
-    new URL(`/tracking-id/${eventType}`, COUNTRY_CONFIG_URL).toString(),
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  ).then((res) => {
-    if (res.ok) return res.text()
-    else throw new Error(res.statusText)
-  })
+export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
+  // using first letter of eventType for prefix
+  // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
+  return generateTrackingId(eventType.charAt(0))
+}
+
+function generateTrackingId(prefix: string): string {
+  return prefix.concat(new ShortUIDGen().randomUUID()).toUpperCase()
 }
 
 export function convertStringToASCII(str: string): string {
