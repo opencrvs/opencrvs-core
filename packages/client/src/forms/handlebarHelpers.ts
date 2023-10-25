@@ -13,9 +13,8 @@ import {
   LoadHandlebarHelpersResponse,
   referenceApi
 } from '@client/utils/referenceApi'
-import * as Handlebars from 'handlebars'
 
-export let handlebarHelpers: LoadHandlebarHelpersResponse
+let handlebarHelpers: LoadHandlebarHelpersResponse
 
 export async function initHandlebarHelpers() {
   handlebarHelpers = await referenceApi.importHandlebarHelpers()
@@ -28,15 +27,4 @@ export function getHandlebarHelpers() {
     )
   }
   return handlebarHelpers
-}
-
-export function registerHandlebarHelpers() {
-  if (handlebarHelpers) {
-    for (const funcName of Object.keys(handlebarHelpers)) {
-      const func = handlebarHelpers[funcName]
-      if (typeof func === 'function') {
-        Handlebars.registerHelper(funcName, func)
-      }
-    }
-  }
 }
