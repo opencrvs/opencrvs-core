@@ -12,29 +12,36 @@
 import { Db, MongoClient } from 'mongodb'
 import { isEmpty } from 'lodash-es'
 
+function derivePartOfFromAddress(address: fhir.Address) {
+  let partOf = address.state
+
+  if (!isEmpty(address.district)) {
+    partOf = address.district
+  }
+
+  if (!isEmpty(address.line?.[10])) {
+    partOf = address.line?.[10]
+  }
+
+  if (!isEmpty(address.line?.[11])) {
+    partOf = address.line?.[11]
+  }
+
+  if (!isEmpty(address.line?.[12])) {
+    partOf = address.line?.[12]
+  }
+
+  return partOf
+}
+
 export const up = async (db: Db, client: MongoClient) => {
   const patients = db.collection('Patient')
-
-  const cursor = patients.find<fhir.Patient>({})
-  await cursor.forEach((patient) => {
-    const updatedAddresses = patient.address?.map((address) => {
-      let partOf = address.state
-
-      if (!isEmpty(address.district)) {
-        partOf = address.district
-      }
-
-      if (!isEmpty(address.line?.[10])) {
-        partOf = address.line?.[10]
-      }
-
-      if (!isEmpty(address.line?.[11])) {
-        partOf = address.line?.[11]
-      }
-
-      if (!isEmpty(address.line?.[12])) {
-        partOf = address.line?.[12]
-      }
+  const patientCursor = patients.find<fhir.Patient>({
+    address: { $exists: true }
+  })
+  await patientCursor.forEach((patient) => {
+    const updatedAddresses = patient.address!.map((address) => {
+      const partOf = derivePartOfFromAddress(address)
 
       if (partOf) {
         address.extension ??= []
@@ -54,12 +61,31 @@ export const up = async (db: Db, client: MongoClient) => {
       { $set: { address: updatedAddresses } }
     )
   })
+
+  const locations = db.collection('Location')
+  const locationCursor = locations.find<fhir.Location>({
+    // Asserts that `partOf` doesn't exist for any fhir.Locations that have an address
+    address: { $exists: true },
+    partOf: { $exists: false }
+  })
+  await locationCursor.forEach((location) => {
+    const partOf = derivePartOfFromAddress(location.address!)
+
+    if (partOf) {
+      locations.updateOne(
+        { _id: location._id },
+        { $set: { partOf: { reference: `Location/${partOf}` } } }
+      )
+    }
+  })
 }
 
 export const down = async (db: Db, client: MongoClient) => {
   const patients = db.collection('Patient')
-  const cursor = patients.find<fhir.Patient>({})
-  await cursor.forEach((patient) => {
+  const patientCursor = patients.find<fhir.Patient>({
+    address: { $exists: true }
+  })
+  await patientCursor.forEach((patient) => {
     const updatedAddresses = patient.address?.map((address) => {
       const extensionsWithoutAddressLocation = address.extension?.filter(
         ({ url }) =>
@@ -82,4 +108,11 @@ export const down = async (db: Db, client: MongoClient) => {
       { $set: { address: updatedAddresses } }
     )
   })
+
+  await db.collection('Location').updateMany(
+    {
+      address: { $exists: true }
+    },
+    { $unset: { partOf: '' } }
+  )
 }
