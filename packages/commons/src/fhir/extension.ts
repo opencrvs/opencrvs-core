@@ -216,8 +216,8 @@ export type KnownExtensionType = StringExtensionType & {
       reference: ResourceIdentifier<Location>
     }
   }
-  'http://opencrvs.org/specs/extension/address-location': {
-    url: 'http://opencrvs.org/specs/extension/address-location'
+  'http://opencrvs.org/specs/extension/part-of': {
+    url: 'http://opencrvs.org/specs/extension/part-of'
     valueReference: {
       reference: ResourceIdentifier<Location>
     }

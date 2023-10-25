@@ -46,7 +46,7 @@ export const up = async (db: Db, client: MongoClient) => {
       if (partOf) {
         address.extension ??= []
         address.extension.push({
-          url: 'http://opencrvs.org/specs/extension/address-location',
+          url: 'http://opencrvs.org/specs/extension/part-of',
           valueReference: {
             reference: `Location/${partOf}`
           }
@@ -88,8 +88,7 @@ export const down = async (db: Db, client: MongoClient) => {
   await patientCursor.forEach((patient) => {
     const updatedAddresses = patient.address?.map((address) => {
       const extensionsWithoutAddressLocation = address.extension?.filter(
-        ({ url }) =>
-          url !== 'http://opencrvs.org/specs/extension/address-location'
+        ({ url }) => url !== 'http://opencrvs.org/specs/extension/part-of'
       )
 
       if ((extensionsWithoutAddressLocation?.length ?? 0) > 0) {

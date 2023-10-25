@@ -505,7 +505,7 @@ function createAddressBuilder(
         'address',
         [
           {
-            url: 'http://opencrvs.org/specs/extension/address-location',
+            url: 'http://opencrvs.org/specs/extension/part-of',
             valueReference: {
               reference: `Location/${fieldValue}`
             }
