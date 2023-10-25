@@ -45,10 +45,7 @@ import {
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import * as Hapi from '@hapi/hapi'
-import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   getToken,
   getTokenPayload,
@@ -165,7 +162,7 @@ export async function invokeRegistrationValidation(
   token: string
 ): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
+    const res = await fetch(`${COUNTRY_CONFIG_URL}event-registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
