@@ -225,11 +225,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
           {
             <IDVerifier
               id="idVerifier"
-              title={
-                hasNoInfo
-                  ? intl.formatMessage(messages.otherIdCheckTitle)
-                  : intl.formatMessage(messages.idCheckTitle)
-              }
+              title={intl.formatMessage(messages.idCheckTitle)}
               correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
               actionProps={{
                 positiveAction: {

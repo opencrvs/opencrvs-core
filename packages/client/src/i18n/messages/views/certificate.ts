@@ -192,7 +192,7 @@ const messagesToDefine: ICertificateMessages = {
       'The title for the dialog when details of the collector not verified for correction'
   },
   idCheckTitle: {
-    defaultMessage: 'Check proof of ID',
+    defaultMessage: 'Verify their identity',
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
