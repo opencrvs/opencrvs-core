@@ -12,6 +12,10 @@ import styled from 'styled-components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { gql } from '@apollo/client'
+import { Mutation } from '@apollo/client/react/components'
+import { userQueries } from '@client/user/queries'
+import { get } from 'lodash'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -80,15 +84,33 @@ const Field = styled.div`
     margin-bottom: 0px;
   }
 `
+
+const changePasswordMutation = gql`
+  mutation changePassword(
+    $userId: String!
+    $existingPassword: String!
+    $password: String!
+  ) {
+    changePassword(
+      userId: $userId
+      existingPassword: $existingPassword
+      password: $password
+    )
+  }
+`
+
 interface IProps {
   showPasswordChange: boolean
   togglePasswordChangeModal: () => void
   passwordChanged: () => void
   userDetails: UserDetails | null
 }
+
 type IFullProps = IProps & IntlShapeProps
 
 const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
+  const { showPasswordChange, intl } = props
+
   const [currentPassword, setCurrentPassword] = useState('')
   const [incorrectCurrentPassword, setIncorrectCurrentPassword] =
     useState(false)
@@ -99,7 +121,6 @@ const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
   const [hasCases, setHasCases] = useState(false)
   const [passwordMismatched, setPasswordMismatched] = useState(false)
   const [passwordMatched, setPasswordMatched] = useState(false)
-  const [errorOccured, setErrorOccured] = useState(false)
   const [currentStepModal, setCurrentStepModal] = useState(1)
 
   const togglePasswordChangeModals = () => {
@@ -112,7 +133,6 @@ const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
     setHasCases(false)
     setPasswordMismatched(false)
     setPasswordMatched(false)
-    setErrorOccured(false)
     setCurrentStepModal(1)
     props.togglePasswordChangeModal()
   }
@@ -124,8 +144,16 @@ const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
     setCurrentPassword(value)
   }
 
-  const goToNextModal = () => {
-    setCurrentStepModal(2)
+  const goToNextModal = async () => {
+    try {
+      await userQueries.verifyPasswordById(
+        get(props, 'userDetails.userMgntUserID'),
+        currentPassword
+      )
+      setCurrentStepModal(2)
+    } catch (e) {
+      setIncorrectCurrentPassword(true)
+    }
   }
 
   const validateLength = (value: string) => {
@@ -160,7 +188,32 @@ const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
     setPasswordMatched(value.length > 0 && newPassword === value)
   }
 
-  const { showPasswordChange, intl } = props
+  const passwordChangecompleted = () => {
+    setCurrentPassword('')
+    setIncorrectCurrentPassword(false)
+    setNewPassword('')
+    setConfirmPassword('')
+    setValidLength(false)
+    setHasNumber(false)
+    setHasCases(false)
+    setPasswordMismatched(false)
+    setPasswordMatched(false)
+    setCurrentStepModal(1)
+
+    props.passwordChanged()
+  }
+
+  const changingPassword = (mutation: () => void) => {
+    if (
+      passwordMatched &&
+      currentPassword &&
+      hasCases &&
+      hasNumber &&
+      validLength
+    ) {
+      mutation()
+    }
+  }
 
   return (
     <>
@@ -229,15 +282,37 @@ const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
           >
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
-          <Button
-            type="primary"
-            size="medium"
-            id="confirm_new_password_modal"
-            key="confirm_new_password_modal"
-            // onClick={this.approveCorrectionAction}
+          <Mutation
+            key="change-password-mutation"
+            mutation={changePasswordMutation}
+            variables={{
+              userId: get(props, 'userDetails.userMgntUserID'),
+              existingPassword: currentPassword,
+              password: newPassword
+            }}
+            onCompleted={passwordChangecompleted}
           >
-            {intl.formatMessage(buttonMessages.continueButton)}
-          </Button>
+            {(changePassword: any) => {
+              return (
+                <Button
+                  type="primary"
+                  size="medium"
+                  id="confirm_new_password_modal"
+                  key="confirm_new_password_modal"
+                  onClick={() => changingPassword(changePassword)}
+                  disabled={
+                    !Boolean(currentPassword.length) ||
+                    !hasCases ||
+                    !hasNumber ||
+                    !validLength ||
+                    !passwordMatched
+                  }
+                >
+                  {intl.formatMessage(buttonMessages.continueButton)}
+                </Button>
+              )
+            }}
+          </Mutation>
         ]}
       >
         <Message>
