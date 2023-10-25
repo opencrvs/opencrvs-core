@@ -87,16 +87,13 @@ export async function getTrackingIdFromCountryConfig(
   bundle: fhir.Bundle,
   token: string
 ): Promise<string | null> {
-  return fetch(
-    new URL(`/tracking-id/${eventType}`, COUNTRY_CONFIG_URL).toString(),
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(bundle)
-    }
-  ).then((res) => {
+  return fetch(new URL(`/tracking-id`, COUNTRY_CONFIG_URL).toString(), {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(bundle)
+  }).then((res) => {
     if (res.ok) return res.text()
     else if (res.status === 404) return null
     else throw new Error(res.statusText)
