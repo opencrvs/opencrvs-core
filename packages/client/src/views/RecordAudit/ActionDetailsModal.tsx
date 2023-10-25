@@ -149,6 +149,7 @@ const requesterLabelMapper = (
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
 
+  // informant info added for corrector being informant
   return requesterIndividual?.label
     ? intl.formatMessage(requesterIndividual.label, {
         informant: labelFormatterForInformant(informant)
