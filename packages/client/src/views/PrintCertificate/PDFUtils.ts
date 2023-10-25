@@ -195,9 +195,11 @@ export async function previewCertificate(
     offlineResource,
     intl,
     optionalData
-  ).getDataUrl((pdf: string) => {
-    callBack(pdf)
-  })
+  ).then((pdf) =>
+    pdf.getDataUrl((pdf: string) => {
+      callBack(pdf)
+    })
+  )
 }
 
 export async function printCertificate(
