@@ -3,7 +3,7 @@ import { IStoreState } from '@client/store'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
@@ -104,242 +104,186 @@ interface IProps {
 }
 type IFullProps = IProps & IntlShapeProps
 
-class PasswordChangeModalsComp extends React.Component<IFullProps, State> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      currentPassword: EMPTY_STRING,
-      incorrectCurrentPassword: false,
-      newPassword: EMPTY_STRING,
-      confirmPassword: EMPTY_STRING,
-      validLength: false,
-      hasNumber: false,
-      hasCases: false,
-      passwordMismatched: false,
-      passwordMatched: false,
-      errorOccured: false,
-      currentStepModal: 1
-    }
+const PasswordChangeModalsComp: React.FC<IFullProps> = (props) => {
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [incorrectCurrentPassword, setIncorrectCurrentPassword] =
+    useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [validLength, setValidLength] = useState(false)
+  const [hasNumber, setHasNumber] = useState(false)
+  const [hasCases, setHasCases] = useState(false)
+  const [passwordMismatched, setPasswordMismatched] = useState(false)
+  const [passwordMatched, setPasswordMatched] = useState(false)
+  const [errorOccured, setErrorOccured] = useState(false)
+  const [currentStepModal, setCurrentStepModal] = useState(1)
+
+  const togglePasswordChangeModals = () => {
+    setCurrentPassword('')
+    setIncorrectCurrentPassword(false)
+    setNewPassword('')
+    setConfirmPassword('')
+    setValidLength(false)
+    setHasNumber(false)
+    setHasCases(false)
+    setPasswordMismatched(false)
+    setPasswordMatched(false)
+    setErrorOccured(false)
+    setCurrentStepModal(1)
+    props.togglePasswordChangeModal()
   }
 
-  togglePasswordChangeModals() {
-    this.setState(() => ({
-      currentPassword: EMPTY_STRING,
-      incorrectCurrentPassword: false,
-      newPassword: EMPTY_STRING,
-      confirmPassword: EMPTY_STRING,
-      validLength: false,
-      hasNumber: false,
-      hasCases: false,
-      passwordMismatched: false,
-      passwordMatched: false,
-      errorOccured: false,
-      currentStepModal: 1
-    }))
-    this.props.togglePasswordChangeModal()
-  }
-
-  setCurrentPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const currentPassword = event.target.value
-    this.setState(() => ({ currentPassword }))
-  }
-
-  goToNextModal = () => {
-    /*
-      Check the current password and initiate the display of an error message
-    */
-    this.setState(() => ({
-      currentStepModal: 2
-    }))
-  }
-
-  validateLength = (value: string) => {
-    this.setState(() => ({
-      validLength: value.length >= 8
-    }))
-  }
-  validateNumber = (value: string) => {
-    this.setState(() => ({
-      hasNumber: /\d/.test(value)
-    }))
-  }
-  validateCases = (value: string) => {
-    this.setState(() => ({
-      hasCases: /[a-z]/.test(value) && /[A-Z]/.test(value)
-    }))
-  }
-
-  checkPasswordStrength = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCurrentPasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value
-    this.setState(() => ({
-      newPassword: value,
-      confirmPassword: EMPTY_STRING,
-      passwordMatched: false,
-      passwordMismatched: false
-    }))
-    this.validateLength(value)
-    this.validateNumber(value)
-    this.validateCases(value)
+    setCurrentPassword(value)
   }
 
-  matchPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = this.state.newPassword
+  const goToNextModal = () => {
+    setCurrentStepModal(2)
+  }
+
+  const validateLength = (value: string) => {
+    setValidLength(value.length >= 8)
+  }
+
+  const validateNumber = (value: string) => {
+    setHasNumber(/\d/.test(value))
+  }
+
+  const validateCases = (value: string) => {
+    setHasCases(/[a-z]/.test(value) && /[A-Z]/.test(value))
+  }
+
+  const checkPasswordStrength = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value
-    this.setState(() => ({
-      confirmPassword: value,
-      passwordMismatched: value.length > 0 && newPassword !== value,
-      passwordMatched: value.length > 0 && newPassword === value
-    }))
+    setNewPassword(value)
+    setConfirmPassword('')
+    setPasswordMatched(false)
+    setPasswordMismatched(false)
+    validateLength(value)
+    validateNumber(value)
+    validateCases(value)
   }
 
-  render() {
-    const { showPasswordChange, intl } = this.props
-    return (
-      <>
-        <Dialog
-          id="check_current_password"
-          title={intl.formatMessage(messages.changeCurrentPasswordTitle)}
-          isOpen={showPasswordChange && this.state.currentStepModal === 1}
-          onClose={() => this.togglePasswordChangeModals()}
-          actions={[
-            <Button
-              type="tertiary"
-              size="medium"
-              id="cancel_current_password_modal"
-              key="cancel_current_password_modal"
-              onClick={() => this.togglePasswordChangeModals()}
+  const matchPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setConfirmPassword(value)
+    setPasswordMismatched(value.length > 0 && newPassword !== value)
+    setPasswordMatched(value.length > 0 && newPassword === value)
+  }
+
+  const { showPasswordChange, intl } = props
+
+  return (
+    <>
+      <Dialog
+        id="check_current_password"
+        title={intl.formatMessage(messages.changeCurrentPasswordTitle)}
+        isOpen={showPasswordChange && currentStepModal === 1}
+        onClose={() => togglePasswordChangeModals()}
+        actions={[
+          <Button
+            type="tertiary"
+            size="medium"
+            id="cancel_current_password_modal"
+            key="cancel_current_password_modal"
+            onClick={() => togglePasswordChangeModals()}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            size="medium"
+            id="confirm_current_password_modal"
+            key="confirm_current_password_modal"
+            onClick={() => goToNextModal()}
+          >
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </Button>
+        ]}
+      >
+        <PasswordContents>
+          <Field>
+            <InputField
+              id="currentPassword"
+              touched={true}
+              required={false}
+              optionalLabel=""
+              error={
+                incorrectCurrentPassword
+                  ? intl.formatMessage(messages.incorrectPassword)
+                  : ''
+              }
             >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </Button>,
-            <Button
-              type="primary"
-              size="medium"
-              id="confirm_current_password_modal"
-              key="confirm_current_password_modal"
-              onClick={() => this.goToNextModal()}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </Button>
-          ]}
-        >
-          <PasswordContents>
-            <Field>
-              <InputField
-                id="currentPassword"
+              <TextInput
+                id="CurrentPassword"
+                type="password"
                 touched={true}
-                required={false}
-                optionalLabel=""
-                error={
-                  this.state.incorrectCurrentPassword
-                    ? intl.formatMessage(messages.incorrectPassword)
-                    : ''
-                }
-              >
-                <TextInput
-                  id="CurrentPassword"
-                  type="password"
-                  touched={true}
-                  value={this.state.currentPassword}
-                  onChange={this.setCurrentPassword}
-                />
-              </InputField>
-            </Field>
-          </PasswordContents>
-        </Dialog>
-        <Dialog
-          id="new_password"
-          title={intl.formatMessage(messages.changeNewPasswordTitle)}
-          isOpen={showPasswordChange && this.state.currentStepModal === 2}
-          onClose={() => this.togglePasswordChangeModals()}
-          actions={[
-            <Button
-              type="tertiary"
-              size="medium"
-              id="cancel_new_password_modal"
-              key="cancel_new_password_modal"
-              onClick={() => this.togglePasswordChangeModals()}
+                value={currentPassword}
+                onChange={handleCurrentPasswordChange}
+              />
+            </InputField>
+          </Field>
+        </PasswordContents>
+      </Dialog>
+      <Dialog
+        id="new_password"
+        title={intl.formatMessage(messages.changeNewPasswordTitle)}
+        isOpen={showPasswordChange && currentStepModal === 2}
+        onClose={() => togglePasswordChangeModals()}
+        actions={[
+          <Button
+            type="tertiary"
+            size="medium"
+            id="cancel_new_password_modal"
+            key="cancel_new_password_modal"
+            onClick={() => togglePasswordChangeModals()}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            size="medium"
+            id="confirm_new_password_modal"
+            key="confirm_new_password_modal"
+            // onClick={this.approveCorrectionAction}
+          >
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </Button>
+        ]}
+      >
+        <Message>
+          <Text element="span" variant="reg18">
+            {intl.formatMessage(messages.changePasswordMessage)}
+          </Text>
+        </Message>
+        <PasswordContents>
+          <Field>
+            <InputField
+              id="newPassword"
+              label={intl.formatMessage(messages.newPasswordLabel)}
+              touched={true}
+              required={false}
             >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </Button>,
-            <Button
-              type="primary"
-              size="medium"
-              id="confirm_new_password_modal"
-              key="confirm_new_password_modal"
-              // onClick={this.approveCorrectionAction}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </Button>
-          ]}
-        >
-          <Message>
-            <Text element="span" variant="reg18">
-              {intl.formatMessage(messages.changePasswordMessage)}
-            </Text>
-          </Message>
-          <PasswordContents>
-            <Field>
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.newPasswordLabel)}
+              <TextInput
+                id="NewPassword"
+                type="password"
                 touched={true}
-                required={false}
-              >
-                <TextInput
-                  id="NewPassword"
-                  type="password"
-                  touched={true}
-                  value={this.state.newPassword}
-                  onChange={this.checkPasswordStrength}
-                />
-              </InputField>
-              <ValidationRulesSection>
-                <div>
-                  {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
-                </div>
-                <div>
-                  {this.state.validLength && <TickOn />}
-                  {!this.state.validLength && <TickOff />}
-                  <span>
-                    {intl.formatMessage(
-                      messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                      {
-                        min: intl.formatMessage({
-                          defaultMessage: '8',
-                          description: 'Minimum length password',
-                          id: 'number.eight'
-                        })
-                      }
-                    )}
-                  </span>
-                </div>
-                <div>
-                  {this.state.hasCases && <TickOn />}
-                  {!this.state.hasCases && <TickOff />}
-                  <span>
-                    {intl.formatMessage(
-                      messages.passwordCaseCharacteristicsForPasswordUpdateForm
-                    )}
-                  </span>
-                </div>
-                <div>
-                  {this.state.hasNumber && <TickOn />}
-                  {!this.state.hasNumber && <TickOff />}
-                  <span>
-                    {intl.formatMessage(
-                      messages.passwordNumberCharacteristicsForPasswordUpdateForm
-                    )}
-                  </span>
-                </div>
-              </ValidationRulesSection>
-            </Field>
-            <ValidationRulesSectionLg>
+                value={newPassword}
+                onChange={checkPasswordStrength}
+              />
+            </InputField>
+            <ValidationRulesSection>
               <div>
                 {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
               </div>
               <div>
-                {this.state.validLength && <TickOn />}
-                {!this.state.validLength && <TickOff />}
+                {validLength && <TickOn />}
+                {!validLength && <TickOff />}
                 <span>
                   {intl.formatMessage(
                     messages.passwordLengthCharacteristicsForPasswordUpdateForm,
@@ -354,8 +298,8 @@ class PasswordChangeModalsComp extends React.Component<IFullProps, State> {
                 </span>
               </div>
               <div>
-                {this.state.hasCases && <TickOn />}
-                {!this.state.hasCases && <TickOff />}
+                {hasCases && <TickOn />}
+                {!hasCases && <TickOff />}
                 <span>
                   {intl.formatMessage(
                     messages.passwordCaseCharacteristicsForPasswordUpdateForm
@@ -363,48 +307,87 @@ class PasswordChangeModalsComp extends React.Component<IFullProps, State> {
                 </span>
               </div>
               <div>
-                {this.state.hasNumber && <TickOn />}
-                {!this.state.hasNumber && <TickOff />}
+                {hasNumber && <TickOn />}
+                {!hasNumber && <TickOff />}
                 <span>
                   {intl.formatMessage(
                     messages.passwordNumberCharacteristicsForPasswordUpdateForm
                   )}
                 </span>
               </div>
-            </ValidationRulesSectionLg>
-            <Field>
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.confirmPasswordLabel)}
+            </ValidationRulesSection>
+          </Field>
+          <ValidationRulesSectionLg>
+            <div>
+              {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
+            </div>
+            <div>
+              {validLength && <TickOn />}
+              {!validLength && <TickOff />}
+              <span>
+                {intl.formatMessage(
+                  messages.passwordLengthCharacteristicsForPasswordUpdateForm,
+                  {
+                    min: intl.formatMessage({
+                      defaultMessage: '8',
+                      description: 'Minimum length password',
+                      id: 'number.eight'
+                    })
+                  }
+                )}
+              </span>
+            </div>
+            <div>
+              {hasCases && <TickOn />}
+              {!hasCases && <TickOff />}
+              <span>
+                {intl.formatMessage(
+                  messages.passwordCaseCharacteristicsForPasswordUpdateForm
+                )}
+              </span>
+            </div>
+            <div>
+              {hasNumber && <TickOn />}
+              {!hasNumber && <TickOff />}
+              <span>
+                {intl.formatMessage(
+                  messages.passwordNumberCharacteristicsForPasswordUpdateForm
+                )}
+              </span>
+            </div>
+          </ValidationRulesSectionLg>
+          <Field>
+            <InputField
+              id="newPassword"
+              label={intl.formatMessage(messages.confirmPasswordLabel)}
+              touched={true}
+              required={false}
+              optionalLabel=""
+            >
+              <TextInput
+                id="ConfirmPassword"
+                type="password"
                 touched={true}
-                required={false}
-                optionalLabel=""
-              >
-                <TextInput
-                  id="ConfirmPassword"
-                  type="password"
-                  touched={true}
-                  error={this.state.passwordMismatched}
-                  value={this.state.confirmPassword}
-                  onChange={this.matchPassword}
-                />
-              </InputField>
-              {this.state.passwordMismatched && (
-                <PasswordMismatch id="passwordMismatch">
-                  {intl.formatMessage(messages.mismatchedPasswordMsg)}
-                </PasswordMismatch>
-              )}
-              {this.state.passwordMatched && (
-                <PasswordMatch id="passwordMatch">
-                  {intl.formatMessage(messages.matchedPasswordMsg)}
-                </PasswordMatch>
-              )}
-            </Field>
-          </PasswordContents>
-        </Dialog>
-      </>
-    )
-  }
+                error={passwordMismatched}
+                value={confirmPassword}
+                onChange={matchPassword}
+              />
+            </InputField>
+            {passwordMismatched && (
+              <PasswordMismatch id="passwordMismatch">
+                {intl.formatMessage(messages.mismatchedPasswordMsg)}
+              </PasswordMismatch>
+            )}
+            {passwordMatched && (
+              <PasswordMatch id="passwordMatch">
+                {intl.formatMessage(messages.matchedPasswordMsg)}
+              </PasswordMatch>
+            )}
+          </Field>
+        </PasswordContents>
+      </Dialog>
+    </>
+  )
 }
 
 const mapStateToProps = (state: IStoreState) => {
