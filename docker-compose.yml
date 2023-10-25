@@ -76,6 +76,7 @@ services:
       - OPENHIM_URL=http://openhim-core:5001
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
   search:
     image: opencrvs/ocrvs-search:${VERSION:-latest}
     build:
