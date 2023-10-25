@@ -154,6 +154,10 @@ export const testFhirBundle = {
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: { reference: '123' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: { reference: '123' }
           }
         ]
       }
@@ -554,6 +558,10 @@ export const testFhirBundleWithIdsForDeath = {
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: { reference: '123' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: { reference: '123' }
           }
         ]
       }
@@ -721,7 +729,7 @@ export const testDeathFhirTaskBundle = {
   ]
 }
 
-export const taskResouceMock = JSON.stringify({
+export const taskResourceMock = JSON.stringify({
   resourceType: 'Task',
   status: 'requested',
   code: {
@@ -742,6 +750,10 @@ export const taskResouceMock = JSON.stringify({
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: { reference: '123' }
     }
   ],
@@ -1992,6 +2004,10 @@ export const deathTaskMock = JSON.stringify({
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: { reference: '123' }
     }
   ],
