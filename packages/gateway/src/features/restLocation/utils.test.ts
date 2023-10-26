@@ -73,7 +73,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":1}]'
+          valueString: '[{"2020":13.675},{"2021":2.0}]'
         }
       ])
     })
@@ -110,7 +110,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":6.9875},{"2022":0.75}]'
+          valueString: '[{"2020":13.675},{"2021":13.975},{"2022":1.5}]'
         }
       ])
     })

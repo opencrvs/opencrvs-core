@@ -109,6 +109,37 @@ export const generateEmptyBirthKeyFigure = (
   }
 }
 
+function createEstimatesArray(
+  years: number[],
+  output: number[],
+  extension: fhir.Extension
+) {
+  const locationExtensions = JSON.parse(extension.valueString as string) as {
+    [key: string]: number
+  }[]
+  // Imagine that years searching: [2022,2023] & extensions is: [2017,2022]
+  // We have no data for 2023 so we want to use 2022 estimates
+  for (let i = 0; i < years.length; i++) {
+    let year = years[i]
+    let entryIndex = locationExtensions.findIndex((obj) =>
+      obj.hasOwnProperty(year.toString())
+    )
+    while (entryIndex === -1) {
+      // If no extensions entry for that year find immediately preceeding year's data and use it.
+      // Keep going through the while loop till you find a matching year
+      year--
+      entryIndex = locationExtensions.findIndex((obj) =>
+        obj.hasOwnProperty(year.toString())
+      )
+    }
+    const entry = locationExtensions[entryIndex]
+    output.push(Number(entry[year]))
+    // If you use a preceeding year's data ensure that you remove that item from the years array
+    // so you dont revisit that year again in the loop
+    years.splice(entryIndex, 1)
+  }
+}
+
 export const fetchEstimateByLocation = async (
   locationData: Location,
   event: EVENT_TYPE,
@@ -152,71 +183,23 @@ export const fetchEstimateByLocation = async (
       event === EVENT_TYPE.BIRTH
     ) {
       estimateExtensionFound = true
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          crudArray.push(Number(entry[year]))
-        } else {
-          crudArray.push(0)
-        }
-      }
+      createEstimatesArray(yearArray, crudArray, extension)
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
     ) {
       estimateExtensionFound = true
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          totalPopulationArray.push(Number(entry[year]))
-        } else {
-          totalPopulationArray.push(0)
-        }
-      }
+      createEstimatesArray(yearArray, totalPopulationArray, extension)
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          malePopulationArray.push(Number(entry[year]))
-        } else {
-          malePopulationArray.push(0)
-        }
-      }
+      createEstimatesArray(yearArray, malePopulationArray, extension)
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          femalePopulationArray.push(Number(entry[year]))
-        } else {
-          femalePopulationArray.push(0)
-        }
-      }
+      createEstimatesArray(yearArray, femalePopulationArray, extension)
     }
   })
   if (!estimateExtensionFound) {
@@ -239,6 +222,7 @@ export const fetchEstimateByLocation = async (
     }
   }
   for (let i = 0; i < yearArray.length; i++) {
+    // for total estimations we multiply crude birth rate by 2 because it is halved for gender sp
     totalEstimation =
       totalEstimation +
       ((crudArray[i] * totalPopulationArray[i]) / 1000) *
@@ -256,9 +240,9 @@ export const fetchEstimateByLocation = async (
   }
 
   return {
-    totalEstimation: Math.round(totalEstimation),
-    maleEstimation: Math.round(maleEstimation),
-    femaleEstimation: Math.round(femaleEstimation),
+    totalEstimation,
+    maleEstimation,
+    femaleEstimation,
     locationId: locationData.id,
     locationLevel: getLocationLevelFromLocationData(locationData)
   }

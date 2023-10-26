@@ -155,7 +155,7 @@ export function generateStatisticalExtensions(
       [data.year]: data.population
     })
     birthRates.push({
-      [data.year]: data.crude_birth_rate / 2
+      [data.year]: data.crude_birth_rate
     })
   }
 
@@ -219,8 +219,7 @@ export function updateStatisticalExtensions(
         Boolean(year[sourceStatistic.year])
       )
       if (previousData) {
-        previousData[sourceStatistic.year] =
-          sourceStatistic.crude_birth_rate / 2
+        previousData[sourceStatistic.year] = sourceStatistic.crude_birth_rate
       } else {
         birthRates.push({
           [sourceStatistic.year]: sourceStatistic.crude_birth_rate / 2
