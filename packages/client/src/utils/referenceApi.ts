@@ -15,6 +15,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
+import { IntlShape } from 'react-intl'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
@@ -203,17 +204,25 @@ export async function importConditionals(): Promise<LoadConditionalsResponse> {
   return conditionals
 }
 
+type InjectedUtilities = {
+  intl: IntlShape
+}
+
 export type LoadHandlebarHelpersResponse = Record<
   string,
-  Handlebars.HelperDelegate
+  (injectedUtilities: InjectedUtilities) => Handlebars.HelperDelegate
 >
-async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
-  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const handlebars = await import(
-    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
-  )
 
-  return handlebars
+async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
+  try {
+    // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+    const handlebars = await import(
+      /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+    )
+    return handlebars
+  } catch (error) {
+    return {}
+  }
 }
 
 async function loadContent(): Promise<IContentResponse> {
