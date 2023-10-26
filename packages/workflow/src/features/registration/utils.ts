@@ -90,7 +90,8 @@ export async function getTrackingIdFromCountryConfig(
   return fetch(new URL('/tracking-id', COUNTRY_CONFIG_URL).toString(), {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json'
     },
     body: JSON.stringify(bundle)
   }).then((res) => {
