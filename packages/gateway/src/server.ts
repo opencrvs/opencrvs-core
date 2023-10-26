@@ -18,7 +18,7 @@ import {
   AUTH_URL,
   PORT,
   HOST,
-  HOSTNAME,
+  CORS_WHITELIST,
   DEFAULT_TIMEOUT
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
@@ -36,10 +36,7 @@ import { badRequest, Boom } from '@hapi/boom'
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  let whitelist: string[] = [HOSTNAME]
-  if (HOSTNAME[0] !== '*') {
-    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
-  }
+  const whitelist: string[] = CORS_WHITELIST as string[]
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const app = new Hapi.Server({
     host: HOST,

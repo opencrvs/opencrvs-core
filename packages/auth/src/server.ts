@@ -14,7 +14,7 @@ import {
   AUTH_HOST,
   AUTH_PORT,
   DEFAULT_TIMEOUT,
-  HOSTNAME
+  CORS_WHITELIST
 } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
@@ -71,14 +71,7 @@ import anonymousTokenHandler, {
 } from './features/anonymousToken/handler'
 
 export async function createServer() {
-  let whitelist: string[] = [HOSTNAME]
-  if (HOSTNAME[0] !== '*') {
-    whitelist = [
-      `https://countryconfig.${HOSTNAME}`,
-      `https://login.${HOSTNAME}`,
-      `https://register.${HOSTNAME}`
-    ]
-  }
+  const whitelist: string[] = CORS_WHITELIST as string[]
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: AUTH_HOST,

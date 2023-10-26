@@ -9,5 +9,5 @@
 set -e
 
 sed -i s~THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE~$COUNTRY_CONFIG_URL~g /usr/share/nginx/html/index.html
-sed -i s~{{hostname}}~$HOST~g /etc/nginx/conf.d/default.conf
+sed -i s~{{CSP_WILDCARD}}~$CSP_WILDCARD~g /etc/nginx/conf.d/default.conf
 nginx -g 'daemon off;'

@@ -21,7 +21,7 @@ WORKDIR /app/packages/components
 RUN yarn build
 
 WORKDIR /app/packages/client
-ENV HOST "{{hostname}}"
+ENV CSP_WILDCARD "{{CSP_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL "THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE"
 RUN yarn build
 
