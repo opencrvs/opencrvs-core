@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IUserModelData,
@@ -71,11 +70,11 @@ describe('User type resolvers', () => {
     device: ''
   }
   it('return id type', () => {
-    const res = userTypeResolvers.User.id(mockResponse)
+    const res = userTypeResolvers.User!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
   it('return userMgntUserID type', () => {
-    const res = userTypeResolvers.User.userMgntUserID(mockResponse)
+    const res = userTypeResolvers.User!.userMgntUserID(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
   it('return suspicious user flag', () => {
@@ -89,11 +88,11 @@ describe('User type resolvers', () => {
         reason: 'SUSPICIOUS'
       }
     ]
-    const res = userTypeResolvers.User.underInvestigation(mockResponse)
+    const res = userTypeResolvers.User!.underInvestigation(mockResponse)
     expect(res).toBeTruthy()
   })
   it('return user identifier', () => {
-    const res = userTypeResolvers.User.identifier(mockResponse)
+    const res = userTypeResolvers.User!.identifier(mockResponse)
     expect(res).toEqual({
       system: mockResponse.identifiers[0].system,
       value: mockResponse.identifiers[0].value
@@ -132,7 +131,7 @@ describe('User type resolvers', () => {
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
     mockGet.mockResolvedValueOnce(mockOffice)
-    const res = await userTypeResolvers.User.primaryOffice(
+    const res = await userTypeResolvers.User!.primaryOffice(
       mockResponse,
       undefined,
       { dataSources: { locationsAPI: new LocationsAPI() } }
@@ -312,7 +311,7 @@ describe('User type resolvers', () => {
       .mockResolvedValueOnce(mockLocations[2])
       .mockResolvedValueOnce(mockLocations[3])
 
-    const res = await userTypeResolvers.User.catchmentArea(
+    const res = await userTypeResolvers.User!.catchmentArea(
       mockResponse,
       undefined,
       {
@@ -385,7 +384,7 @@ describe('User type resolvers', () => {
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
-    const response = await userTypeResolvers.User.localRegistrar(
+    const response = await userTypeResolvers.User!.localRegistrar(
       mockResponse,
       undefined,
       { headers: undefined }
@@ -426,9 +425,9 @@ describe('User type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
 
     const userResponse = mockResponse
-    userResponse.scope.push('register')
+    userResponse.scope!.push('register')
 
-    const response = await userTypeResolvers.User.localRegistrar(
+    const response = await userTypeResolvers.User!.localRegistrar(
       userResponse,
       undefined,
       { headers: undefined }

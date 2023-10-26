@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   filterTaskExtensions,
@@ -24,12 +23,13 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { cloneDeep } from 'lodash'
+import { Task } from '@opencrvs/commons/types'
 
 const task = testFhirTaskBundle.entry[0].resource
 
 describe('getTaskBusinessStatus()', () => {
   it('should return the businessStatus of the task', () => {
-    expect(getTaskBusinessStatus(task)).toBe(RegStatus.DECLARED)
+    expect(getTaskBusinessStatus(task as Task)).toBe(RegStatus.DECLARED)
   })
 })
 
@@ -37,11 +37,11 @@ describe('isArchiveTask()', () => {
   it('should return true if businessStatus is archived', () => {
     const archiveTask = cloneDeep(task)
     archiveTask.businessStatus.coding[0].code = RegStatus.ARCHIVED
-    expect(isArchiveTask(archiveTask)).toBeTruthy()
+    expect(isArchiveTask(archiveTask as Task)).toBeTruthy()
   })
 
   it('should return false if businessStatus is not archived', () => {
-    expect(isArchiveTask(task)).toBeFalsy()
+    expect(isArchiveTask(task as Task)).toBeFalsy()
   })
 })
 
@@ -49,17 +49,17 @@ describe('isRejectedTask()', () => {
   it('should return true if businessStatus is rejected', () => {
     const rejectedTask = cloneDeep(task)
     rejectedTask.businessStatus.coding[0].code = RegStatus.REJECTED
-    expect(isRejectedTask(rejectedTask)).toBeTruthy()
+    expect(isRejectedTask(rejectedTask as Task)).toBeTruthy()
   })
 
   it('should return false if businessStatus is not archived', () => {
-    expect(isRejectedTask(task)).toBeFalsy()
+    expect(isRejectedTask(task as Task)).toBeFalsy()
   })
 })
 
 describe('hasExtension()', () => {
   it('should return false if task has no reinstated extension', () => {
-    expect(hasExtension(task, REINSTATED_EXTENSION_URL)).toBeFalsy()
+    expect(hasExtension(task as Task, REINSTATED_EXTENSION_URL)).toBeFalsy()
   })
 
   it('should return true if task has reinstated extension', () => {
@@ -73,14 +73,17 @@ describe('hasExtension()', () => {
       ]
     }
     expect(
-      hasExtension(taskWithReinstatedExtension, REINSTATED_EXTENSION_URL)
+      hasExtension(
+        taskWithReinstatedExtension as Task,
+        REINSTATED_EXTENSION_URL
+      )
     ).toBeTruthy()
   })
 })
 
 describe('getTaskEventType()', () => {
   it('should return the event type of the task', () => {
-    expect(getTaskEventType(task)).toBe(EVENT_TYPE.BIRTH)
+    expect(getTaskEventType(task as Task)).toBe(EVENT_TYPE.BIRTH)
   })
 })
 

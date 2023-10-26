@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
@@ -51,7 +50,7 @@ export interface IUserModelData {
   scope?: string[]
   email: string
   emailForNotification?: string
-  mobile: string
+  mobile?: string
   status: string
   systemRole: string
   role: IUserRole

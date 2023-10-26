@@ -18,8 +18,7 @@ import {
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const testFhirBundle: StrictBundle<
   [
@@ -185,6 +184,10 @@ export const testFhirBundle: StrictBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: { reference: '123' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
             valueReference: { reference: '123' }
           }
         ]
@@ -587,6 +590,10 @@ export const testFhirBundleWithIdsForDeath = {
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: { reference: '123' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: { reference: '123' }
           }
         ]
       }
@@ -662,9 +669,9 @@ export const testFhirBundleWithIdsForDeath = {
       }
     }
   ]
-} as Bundle
+}
 
-export const testFhirTaskBundle: Bundle<Task> = {
+export const testFhirTaskBundle = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -757,7 +764,7 @@ export const testDeathFhirTaskBundle = {
   ]
 }
 
-export const taskResouceMock = JSON.stringify({
+export const taskResourceMock = JSON.stringify({
   resourceType: 'Task',
   status: 'ready',
   code: {
@@ -778,6 +785,10 @@ export const taskResouceMock = JSON.stringify({
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: { reference: '123' }
     }
   ],
@@ -2061,6 +2072,10 @@ export const deathTaskMock = JSON.stringify({
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: { reference: '123' }
     }
   ],

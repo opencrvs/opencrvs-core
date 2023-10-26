@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -130,6 +129,31 @@ export async function getCRVSOfficeName(fhirBundle: Bundle) {
     (language === 'en'
       ? office.name
       : (office.alias && office.alias[0]) || office.name) || ''
+  )
+}
+
+export async function getRegistrationLocation(fhirBundle: Bundle) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error(
+      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
+    )
+  }
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  const regLastLocationExt = taskResource?.extension?.find(
+    (ext) =>
+      ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+  )
+  if (!regLastLocationExt || !regLastLocationExt.valueReference) {
+    throw new Error('No last registration office found on the bundle')
+  }
+  const location: Location = await getFromFhir(
+    `/${regLastLocationExt.valueReference.reference}`
+  )
+  const language = getDefaultLanguage()
+  return (
+    (language === 'en'
+      ? location.name
+      : (location.alias && location.alias[0]) || location.name) || ''
   )
 }
 

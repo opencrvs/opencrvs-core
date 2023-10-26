@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import {
@@ -23,7 +22,7 @@ const LocationSchema = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    alias: z.string(),
+    alias: z.string().optional(),
     partOf: z.string(),
     locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
     jurisdictionType: z
@@ -188,34 +187,43 @@ async function getLocations() {
   return parsedLocations.data
 }
 
+function locationBundleToIdentifier(
+  bundle: fhir3.Bundle<fhir3.Location>
+): string[] {
+  return (bundle.entry ?? [])
+    .map((bundleEntry) => bundleEntry.resource)
+    .filter((maybeLocation): maybeLocation is fhir3.Location =>
+      Boolean(maybeLocation)
+    )
+    .map((location) =>
+      location.identifier
+        ?.find(
+          ({ system }) =>
+            system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
+            system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+        )
+        ?.value?.split('_')
+        .pop()
+    )
+    .filter((maybeId): maybeId is string => Boolean(maybeId))
+}
+
 export async function seedLocations(token: string) {
-  const savedLocations = await fetch(`${GATEWAY_HOST}/location?_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-    .then((res) => res.json())
-    .then((bundle: fhir3.Bundle<fhir3.Location>) => {
-      return (
-        bundle.entry
-          ?.map((bundleEntry) => bundleEntry.resource)
-          .filter((maybeLocation): maybeLocation is fhir3.Location =>
-            Boolean(maybeLocation)
+  const savedLocations = (
+    await Promise.all(
+      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
+        fetch(`${GATEWAY_HOST}/location?type=${type}&_count=0`, {
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
+        })
+          .then((res) => res.json())
+          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
+            locationBundleToIdentifier(bundle)
           )
-          .map((location) =>
-            location.identifier
-              ?.find(
-                ({ system }) =>
-                  system ===
-                    `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
-                  system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-              )
-              ?.value?.split('_')
-              .pop()
-          )
-          .filter((maybeId): maybeId is string => Boolean(maybeId)) ?? []
       )
-    })
+    )
+  ).flat()
   const savedLocationsSet = new Set(savedLocations)
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AppStore, createStore } from '@client/store'
 import {
@@ -163,7 +162,7 @@ const deathDeclaration = {
 const marriageDeclaration = {
   id: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
   data: mockMarriageDeclarationData,
-  event: Event.Death
+  event: Event.Marriage
 }
 
 beforeEach(() => {
@@ -559,8 +558,8 @@ describe.skip('Certificate collector test for a death registration', () => {
       component = testComponent
     })
 
-    it('informant will be available', async () => {
-      const element = await waitForElement(component, '#type_INFORMANT')
+    it('informant will be spouse', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT_Spouse')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -611,8 +610,8 @@ describe.skip('Certificate collector test for a marriage registration', () => {
       component = testComponent
     })
 
-    it('groom will be available', async () => {
-      const element = await waitForElement(component, '#type_GROOM')
+    it('informant will be grrom', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT_Groom')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -669,12 +668,14 @@ describe.skip('Certificate collector test for a birth registration without fathe
       await waitForElement(component, '#collector_form')
     })
 
-    it('father option will not be available', () => {
-      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
+    it('informant will be mother', () => {
+      expect(component.find('#type_INFORMANT_Mother').hostNodes()).toHaveLength(
+        1
+      )
     })
 
-    it('mother option will be available', () => {
-      expect(component.find('#type_MOTHER').hostNodes()).toHaveLength(1)
+    it('father option will not be available', () => {
+      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
     })
   })
 })

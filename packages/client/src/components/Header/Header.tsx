@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
@@ -46,7 +45,8 @@ import {
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES,
-  ROLE_LOCAL_REGISTRAR
+  ROLE_LOCAL_REGISTRAR,
+  EMAIL
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -368,6 +368,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+      })
+    }
+    if (fieldNames.includes('registrationEmail')) {
+      searchTypeList.push({
+        label: intl.formatMessage(messages.email),
+        value: EMAIL,
+        icon: <Icon name="Envelope" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })
     }
 

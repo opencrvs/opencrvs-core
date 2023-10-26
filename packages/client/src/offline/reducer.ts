@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   loop,
@@ -47,6 +46,7 @@ import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -238,6 +238,11 @@ const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
   failActionCreator: actions.validatorsFailed
 })
 
+const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
+  successActionCreator: actions.handlebarsLoaded,
+  failActionCreator: actions.handlebarsFailed
+})
+
 const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
@@ -254,6 +259,7 @@ function getDataLoadingCommands() {
     CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
+    HANDLEBARS_CMD,
     FORMS_CMD,
     CONTENT_CMD
   ])

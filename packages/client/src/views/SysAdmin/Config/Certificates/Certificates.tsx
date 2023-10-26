@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -333,6 +332,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         event
       )
       if (res && res.createOrUpdateCertificateSVG) {
+        // Sometimes it takes a second for the Minio URL to be available, otherwise you get a 404.
         this.setState({ imageUploading: false })
         this.props.updateOfflineCertificate(
           res.createOrUpdateCertificateSVG as ICertificateTemplateData

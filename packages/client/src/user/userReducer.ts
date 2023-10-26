@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IForm,
@@ -61,7 +60,7 @@ export enum TOAST_MESSAGES {
 }
 
 const initialState: IUserFormState = {
-  userForm: null,
+  userForm: deserializeForm(getCreateUserForm(), validators),
   userFormData: {},
   userDetailsStored: false,
   submitting: false,
@@ -180,19 +179,14 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
-    validators: Record<string, Validator>
   }
 }
 
-export function rolesLoaded(
-  systemRoles: SystemRole[],
-  validators: Record<string, Validator>
-): IRoleLoadedAction {
+export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
-      systemRoles,
-      validators
+      systemRoles
     }
   }
 }
@@ -259,7 +253,7 @@ export interface ISystemRolesMap {
   [key: string]: string
 }
 export interface IUserFormState {
-  userForm: IForm | null
+  userForm: IForm
   userFormData: IFormSectionData
   userDetailsStored: boolean
   submitting: boolean

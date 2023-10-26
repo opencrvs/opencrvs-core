@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   selectOrCreateDocRefResource,
@@ -98,7 +97,7 @@ describe('Fhir util function testing', () => {
         '123',
         'abc'
       )
-      expect(composition.relatesTo.length).toEqual(1)
+      expect(composition.relatesTo!.length).toEqual(1)
     })
 
     it('should remove all duplicates', async () => {
@@ -108,7 +107,7 @@ describe('Fhir util function testing', () => {
         mockCompositionCloned,
         '123'
       )
-      expect(composition.relatesTo.length).toEqual(0)
+      expect(composition.relatesTo!.length).toEqual(0)
     })
   })
   describe('setInformantReference()', () => {

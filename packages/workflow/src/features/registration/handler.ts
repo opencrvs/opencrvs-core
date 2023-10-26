@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
 import {
@@ -35,7 +34,8 @@ import {
   getSharedContactEmail,
   getEmailAddress,
   getInformantName,
-  getCRVSOfficeName
+  getCRVSOfficeName,
+  getRegistrationLocation
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -380,6 +380,7 @@ export async function markEventAsRegisteredCallbackHandler(
       const informantName = await getInformantName(bundle, INFORMANT_CODE)
       const name = await getEventInformantName(composition, event)
       const crvsOffice = await getCRVSOfficeName(bundle)
+      const registrationLocation = await getRegistrationLocation(bundle)
 
       /* sending notification to the contact */
       if ((sms || email) && informantName) {
@@ -393,6 +394,7 @@ export async function markEventAsRegisteredCallbackHandler(
           trackingId,
           registrationNumber,
           crvsOffice,
+          registrationLocation,
           event,
           {
             Authorization: request.headers.authorization

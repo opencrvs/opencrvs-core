@@ -6,50 +6,49 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 // eslint-disable-next-line import/no-relative-parent-imports
-import { createServer } from '../../server'
-import {
-  testFhirBundle,
-  testFhirTaskBundle,
-  testFhirBundleWithIds,
-  mockFormDraft,
-  userMock,
-  fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
-  testFhirBundleWithIdsForDeath,
-  motherMock,
-  patientMock,
-  compositionMock,
-  deathCompositionMock,
-  testInProgressFhirBundle,
-  testInProgressDeathFhirBundle,
-  taskResouceMock,
-  deathTaskMock,
-  relatedPersonMock,
-  hearthResponseMock,
-  userResponseMock,
-  wrapInBundle,
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
+import { Bundle, Task } from '@opencrvs/commons/types'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
-import * as fetchAny from 'jest-fetch-mock'
 import {
   ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL
+  DOWNLOADED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
-import { Bundle, Task } from '@opencrvs/commons/types'
+import {
+  compositionMock,
+  deathCompositionMock,
+  deathTaskMock,
+  districtMock,
+  fieldAgentPractitionerMock,
+  fieldAgentPractitionerRoleMock,
+  hearthResponseMock,
+  informantSMSNotificationMock,
+  mockFormDraft,
+  motherMock,
+  officeMock,
+  patientMock,
+  relatedPersonMock,
+  taskResourceMock,
+  testFhirBundle,
+  testFhirBundleWithIds,
+  testFhirBundleWithIdsForDeath,
+  testFhirTaskBundle,
+  testInProgressDeathFhirBundle,
+  testInProgressFhirBundle,
+  unionMock,
+  upazilaMock,
+  userMock,
+  userResponseMock,
+  wrapInBundle
+} from '@workflow/test/utils'
+import * as fetchAny from 'jest-fetch-mock'
+import { cloneDeep } from 'lodash'
+import { createServer } from '../../server'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -121,7 +120,7 @@ bundleWithInputOutputDeath.entry[1].resource.output = mockOutput
 const getMarkBundleAndPostToHearthMockResponses = [
   [userMock, { status: 200 }],
   [fieldAgentPractitionerMock, { status: 200 }],
-  [taskResouceMock, { status: 200 }],
+  [taskResourceMock, { status: 200 }],
   [fieldAgentPractitionerRoleMock, { status: 200 }],
   [districtMock, { status: 200 }],
   [upazilaMock, { status: 200 }],
@@ -621,7 +620,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -763,7 +762,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -854,7 +853,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -982,8 +981,9 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(taskResouceMock), { status: 200 }],
+      [wrapInBundle(taskResourceMock), { status: 200 }],
       [compositionMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [patientMock, { status: 200 }],
@@ -1010,6 +1010,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify([]), { status: 200 }],
       [JSON.stringify([]), { status: 200 }],
       [patientMock, { status: 200 }],
       [motherMock, { status: 200 }],
@@ -1841,7 +1842,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:49.664Z' }
-    } as Bundle
+    }
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -1903,8 +1904,9 @@ describe('populateCompositionWithID', () => {
         }
       ],
       type: 'transaction-response'
-    } as Bundle
-    populateCompositionWithID(payload, response)
+    }
+
+    populateCompositionWithID(payload as Bundle, response as Bundle)
     expect(payload).toEqual({
       resourceType: 'Bundle',
       type: 'document',
@@ -2558,7 +2560,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
-    } as Bundle
+    }
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2621,7 +2623,7 @@ describe('populateCompositionWithID', () => {
       ],
       type: 'transaction-response'
     } as Bundle
-    populateCompositionWithID(payload, response)
+    populateCompositionWithID(payload as Bundle, response as Bundle)
     expect(payload).toEqual({
       resourceType: 'Bundle',
       type: 'document',

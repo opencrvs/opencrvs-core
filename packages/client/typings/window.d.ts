@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 interface Window {
@@ -50,6 +49,7 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
+    DEATH_REGISTRATION: boolean
     MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
@@ -73,6 +73,7 @@ interface Window {
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string
+    SIGNATURE_REQUIRED_FOR_ROLES: string[]
   }
   __localeId__: string
   __WB_MANIFEST: Array<{ url: string; revision: string }>

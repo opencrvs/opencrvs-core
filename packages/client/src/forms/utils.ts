@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
@@ -98,7 +97,10 @@ export const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(opt.label)
+      label: intl.formatMessage(
+        opt.label,
+        'param' in opt ? opt.param : undefined
+      )
     }
   })
 }
@@ -544,7 +546,8 @@ export const getConditionalActionsForField = (
    */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []

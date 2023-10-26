@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -46,6 +45,7 @@ export interface ICorrectorInfo {
   familyName: string | undefined
   birthDate: string | undefined
   nationality: string | undefined
+  age: string | undefined
 }
 
 interface IIDVerifierProps {
@@ -123,13 +123,24 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        {correctorInformation && correctorInformation.birthDate && (
+        {
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(
-              correctorInformation.birthDate as string,
-              intl.locale
-            )}
+            value={
+              correctorInformation?.birthDate
+                ? formatLongDate(
+                    correctorInformation.birthDate as string,
+                    intl.locale
+                  )
+                : '-'
+            }
+          />
+        }
+
+        {correctorInformation?.age && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.age)}
+            value={String(correctorInformation.age as string)}
           />
         )}
 

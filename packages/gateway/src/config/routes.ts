@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as glob from 'glob'
 import { join, resolve } from 'path'
@@ -18,16 +17,18 @@ import {
   updateLocationHandler,
   updateSchema,
   fetchLocationHandler,
-  requestParamsSchema
+  requestParamsSchema,
+  locationQuerySchema
 } from '@gateway/features/restLocation/locationHandler'
 import {
   eventNotificationHandler,
   fhirBundleSchema,
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
+import { ServerRoute } from '@hapi/hapi'
 
 export const getRoutes = () => {
-  const routes = [
+  const routes: ServerRoute[] = [
     // used for tests to check JWT auth
     {
       method: 'GET',
@@ -41,7 +42,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/ping',
       handler: healthCheckHandler,
-      config: {
+      options: {
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service'
@@ -52,17 +53,20 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/location',
       handler: fetchLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false,
-        description: 'Get all locations'
+        description: 'Get all locations',
+        validate: {
+          query: locationQuerySchema
+        }
       }
     },
     {
       method: 'GET',
       path: '/location/{locationId}',
       handler: fetchLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false,
         description: 'Get a single location',
@@ -76,7 +80,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/location',
       handler: createLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: {
           scope: ['natlsysadmin']
@@ -92,7 +96,7 @@ export const getRoutes = () => {
       method: 'PUT',
       path: '/location/{locationId}',
       handler: updateLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: {
           scope: ['natlsysadmin']
@@ -109,7 +113,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/notification',
       handler: eventNotificationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Create a health notification',
         auth: {

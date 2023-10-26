@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/search/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -65,7 +64,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -90,7 +89,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -115,7 +114,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -140,7 +139,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -167,7 +166,7 @@ describe('Search root resolvers', () => {
       )
 
       await expect(
-        resolvers.Query.searchEvents(
+        resolvers.Query!.searchEvents(
           {},
           {
             advancedSearchParameters: {}
@@ -187,7 +186,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -212,7 +211,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -238,7 +237,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -260,7 +259,7 @@ describe('Search root resolvers', () => {
           body: { hits: null }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -286,7 +285,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -346,7 +345,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         {
           declarationJurisdictionId: 'dummy_loc_id_parent',
@@ -364,7 +363,7 @@ describe('Search root resolvers', () => {
     })
     it('throws an error for unauthorized user', async () => {
       await expect(
-        resolvers.Query.getEventsWithProgress(
+        resolvers.Query!.getEventsWithProgress(
           {},
           {},
           { headers: unauthorizedUser }
@@ -379,7 +378,7 @@ describe('Search root resolvers', () => {
           entry: []
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         { declarationJurisdictionId: null },
         { headers: authorizedUser }

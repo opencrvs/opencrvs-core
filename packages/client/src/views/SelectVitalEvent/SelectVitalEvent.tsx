@@ -6,11 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -30,12 +29,7 @@ import {
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  FIELD_AGENT_ROLES,
-  PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_ENTER_TIME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
-} from '@client/utils/constants'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 import {
   storeDeclaration,
@@ -161,18 +155,21 @@ class SelectVitalEventView extends React.Component<
                 this.setState({ goTo: 'birth', noEventSelectedError: false })
               }
             />
-            <RadioButton
-              size="large"
-              key="deathevent"
-              name="deathevent"
-              label={intl.formatMessage(constantsMessages.death)}
-              value="death"
-              id="select_death_event"
-              selected={this.state.goTo === 'death' ? 'death' : ''}
-              onChange={() =>
-                this.setState({ goTo: 'death', noEventSelectedError: false })
-              }
-            />
+            {typeof window.config.DEATH_REGISTRATION === 'boolean' &&
+            window.config.DEATH_REGISTRATION === false ? null : (
+              <RadioButton
+                size="large"
+                key="deathevent"
+                name="deathevent"
+                label={intl.formatMessage(constantsMessages.death)}
+                value="death"
+                id="select_death_event"
+                selected={this.state.goTo === 'death' ? 'death' : ''}
+                onChange={() =>
+                  this.setState({ goTo: 'death', noEventSelectedError: false })
+                }
+              />
+            )}
             {window.config.MARRIAGE_REGISTRATION && !isFieldAgent && (
               <RadioButton
                 size="large"

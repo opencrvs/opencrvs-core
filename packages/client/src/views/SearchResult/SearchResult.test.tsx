@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
@@ -62,16 +61,10 @@ describe('SearchResult tests', () => {
 
   it('sets loading state while waiting for data', async () => {
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history }
@@ -94,7 +87,8 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -303,16 +297,10 @@ describe('SearchResult tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: '01622688232',
-            searchType: 'phone'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=01622688232&searchType=phone'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -338,7 +326,8 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              declarationLocationId: '1234567s2323289'
+              declarationLocationId: '1234567s2323289',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -348,16 +337,10 @@ describe('SearchResult tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: '+8801622688232',
-            searchType: 'phone'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=+8801622688232&searchType=phone'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -375,8 +358,8 @@ describe('SearchResult tests', () => {
   })
   it('renders empty search page with a header in small devices', async () => {
     const testSearchResultComponent = await createTestComponent(
-      // @ts-ignore
-      <SearchResult match={{ params: {} }} />,
+      //@ts-ignore
+      <SearchResult location={{}} />,
       { store, history }
     )
 
@@ -400,7 +383,9 @@ describe('SearchResult tests', () => {
       .hostNodes()
       .simulate('click')
 
-    expect(window.location.pathname).toBe('/search-result/tracking-id/DW0UTHR')
+    expect(window.location.search).toBe(
+      '?searchText=DW0UTHR&searchType=tracking-id'
+    )
   })
 
   it('renders download button and modals in search page', async () => {
@@ -416,7 +401,8 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -466,16 +452,10 @@ describe('SearchResult tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -515,7 +495,8 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -570,16 +551,10 @@ describe('SearchResult tests', () => {
       value: 1100
     })
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -622,7 +597,8 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -672,16 +648,10 @@ describe('SearchResult tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -734,7 +704,8 @@ describe('SearchResult downloadButton tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -784,16 +755,10 @@ describe('SearchResult downloadButton tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -836,7 +801,8 @@ describe('SearchResult downloadButton tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '',
-              name: ''
+              name: '',
+              contactEmail: ''
             },
             sort: 'DESC'
           }
@@ -886,16 +852,10 @@ describe('SearchResult downloadButton tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+        // @ts-ignore
+        location={{
+          search: '?searchText=DW0UTHR&searchType=tracking-id'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }

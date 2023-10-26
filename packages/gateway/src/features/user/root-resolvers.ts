@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
@@ -616,8 +615,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
-      family: name.familyName as string,
-      given: (name.firstNames || '').split(' ') as string[]
+      family: name.familyName?.trim() as string,
+      given: (name.firstNames || '')?.trim().split(' ') as string[]
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
@@ -626,9 +625,9 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
-    emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
     title: user.title,
-    mobile: user.mobile as string,
+    ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property
+    ...(user.mobile && { mobile: user.mobile as string }),
     device: user.device as string,
     primaryFacilityId: user.primaryFacilityId,
     signature: user.signature,

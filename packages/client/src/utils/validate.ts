@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
@@ -221,7 +220,7 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
-export const isDateNotPastLimit = (date: string, limit: string) => {
+export const isDateNotPastLimit = (date: string, limit: Date) => {
   return new Date(date) >= new Date(limit)
 }
 
@@ -295,7 +294,7 @@ export const isValidBirthDate: Validation = (
 
 export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   const childBirthDate = value as string
-  const pastDateLimit = '1900-1-1'
+  const pastDateLimit = new Date(1900, 0, 1)
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
@@ -490,7 +489,7 @@ export const dateNotPastLimit =
   (limit: string): Validation =>
   (value: IFormFieldValue) => {
     const cast = value as string
-    if (isDateNotPastLimit(cast, limit)) {
+    if (isDateNotPastLimit(cast, new Date(limit))) {
       return undefined
     } else {
       return { message: messages.dateFormat }
@@ -504,7 +503,7 @@ export const dateNotPastFieldDate =
     if (section && fieldname && drafts) {
       const limit = drafts[section][fieldname] as string
       if (limit) {
-        if (isDateNotPastLimit(cast, limit)) {
+        if (isDateNotPastLimit(cast, new Date(limit))) {
           return undefined
         } else {
           return { message: messages.dateFormat }

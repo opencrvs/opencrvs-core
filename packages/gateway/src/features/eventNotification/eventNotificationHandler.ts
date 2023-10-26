@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -65,11 +64,11 @@ export const fhirBundleSchema = Joi.object({
     .required()
 })
 
-export function validationFailedAction(
-  _: Hapi.Request,
-  _2: Hapi.ResponseToolkit,
-  e: Joi.ValidationError
-) {
+export const validationFailedAction: Hapi.RouteOptionsValidate['failAction'] = (
+  _,
+  _2,
+  e
+) => {
   throw e
 }
 

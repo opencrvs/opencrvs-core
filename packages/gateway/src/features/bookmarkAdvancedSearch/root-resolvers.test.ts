@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -58,7 +57,7 @@ describe('Advanced search resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.bookmarkAdvancedSearch(
+      const response = await resolvers.Mutation!.bookmarkAdvancedSearch(
         {},
         {
           bookmarkSearchInput: {
@@ -77,7 +76,7 @@ describe('Advanced search resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.bookmarkAdvancedSearch(
+        resolvers.Mutation!.bookmarkAdvancedSearch(
           {},
           {
             bookmarkSearchInput: {
@@ -99,7 +98,7 @@ describe('Advanced search resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.bookmarkAdvancedSearch(
+        resolvers.Mutation!.bookmarkAdvancedSearch(
           {},
           {
             bookmarkSearchInput: {
@@ -152,7 +151,7 @@ describe('Advanced search resolvers', () => {
         { status: 200 }
       )
 
-      const response = await resolvers.Mutation.removeBookmarkedAdvancedSearch(
+      const response = await resolvers.Mutation!.removeBookmarkedAdvancedSearch(
         {},
         {
           removeBookmarkedSearchInput: {
@@ -168,7 +167,7 @@ describe('Advanced search resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.removeBookmarkedAdvancedSearch(
+        resolvers.Mutation!.removeBookmarkedAdvancedSearch(
           {},
           {
             removeBookmarkedSearchInput: {
@@ -187,7 +186,7 @@ describe('Advanced search resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.removeBookmarkedAdvancedSearch(
+        resolvers.Mutation!.removeBookmarkedAdvancedSearch(
           {},
           {
             removeBookmarkedSearchInput: {

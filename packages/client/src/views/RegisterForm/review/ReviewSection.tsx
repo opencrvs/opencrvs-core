@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -117,7 +116,7 @@ import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
+import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
   injectIntl,
   IntlShape,
@@ -131,6 +130,7 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
+  addressFieldNames,
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
@@ -423,28 +423,18 @@ const renderValue = (
   isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const isAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
   // Showing State & District Name instead of their ID
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'cityUrbanOptionPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'internationalCityPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'cityUrbanOptionSecondary',
-      'internationalStateSecondary',
-      'internationalCitySecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name) &&
-    isOriginalData
-  ) {
+  if (isAddressField && isOriginalData) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -452,9 +442,9 @@ const renderValue = (
       dynamicOption.dependency = [
         'internationalStatePrimary',
         'statePrimary'
-      ].includes(field.name)
-        ? 'countryPrimary'
-        : 'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -466,7 +456,10 @@ const renderValue = (
       )
     }
 
-    if (sectionData.countrySecondary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -474,9 +467,9 @@ const renderValue = (
       dynamicOption.dependency = [
         'internationalStateSecondary',
         'stateSecondary'
-      ].includes(field.name)
-        ? 'countrySecondary'
-        : 'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -882,7 +875,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isVisibleField(field: IFormField, section: IFormSection) {
-    const { draft, offlineCountryConfiguration } = this.props
+    const { draft, offlineCountryConfiguration, userDetails } = this.props
 
     if (field.type === HIDDEN) {
       return false
@@ -892,7 +885,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       draft.data[section.id] || {},
       offlineCountryConfiguration,
-      draft.data
+      draft.data,
+      userDetails
     )
     return (
       !conditionalActions.includes('hide') &&
@@ -1391,6 +1385,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getOverriddenFieldsListForPreview(
     formSections: IFormSection[]
   ): IFormField[] {
+    const { userDetails } = this.props
     const overriddenFields = formSections
       .map((section) => {
         return section.groups
@@ -1410,7 +1405,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   tempField,
                   draft.data[residingSection] || {},
                   offlineCountryConfiguration,
-                  draft.data
+                  draft.data,
+                  userDetails
                 ).includes('hide')
 
                 return isVisible ? field : ({} as IFormField)
@@ -1561,7 +1557,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     offlineCountryConfiguration: IOfflineData,
     declaration: IDeclaration
   ) => {
-    const { intl, draft } = this.props
+    const { intl, draft, userDetails } = this.props
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
@@ -1586,7 +1582,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               draft.data[section.id] || {},
               offlineCountryConfiguration,
-              draft.data
+              draft.data,
+              userDetails
             )
 
             tempItem = field.previewGroup

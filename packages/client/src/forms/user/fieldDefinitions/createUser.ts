@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   FIELD_GROUP_TITLE,
@@ -222,7 +221,6 @@ export function userSectionFormType(): ISerializedFormSection {
             validator: [],
             conditionals: []
           },
-
           {
             name: 'device',
             type: TEXT,
@@ -240,7 +238,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             action: 'hide',
             expression:
-              'values.systemRole!=="REGISTRATION_AGENT" && values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
+              '!window.config.SIGNATURE_REQUIRED_FOR_ROLES.includes(values.systemRole)'
           }
         ],
         fields: [
@@ -256,7 +254,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             name: 'signature',
             type: SIMPLE_DOCUMENT_UPLOADER,
-            label: userFormMessages.userSignatureAttachment,
+            label: userFormMessages.userAttachmentSection,
             description: userFormMessages.userSignatureAttachmentDesc,
             allowedDocType: ['image/png'],
             initialValue: '',

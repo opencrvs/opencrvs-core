@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoginState } from '@login/login/reducer'
 import { IStoreState } from '@login/store'
+import { ILoginBackground } from '@login/utils/authApi'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 const getPartialState = (store: IStoreState): LoginState => store.login
@@ -37,16 +37,25 @@ export function selectCountryLogo(store: IStoreState) {
   return getKey(store, 'config').COUNTRY_LOGO?.file
 }
 
-export function selectCountryBackground(store: IStoreState) {
+export function selectCountryBackground(store: IStoreState): ILoginBackground {
   const countryBackground = getKey(store, 'config').LOGIN_BACKGROUND
   if (countryBackground?.backgroundImage) {
     return {
+      backgroundColor: '',
       backgroundImage: countryBackground.backgroundImage,
       imageFit: countryBackground.imageFit
     }
   } else if (countryBackground?.backgroundColor) {
     return {
-      backgroundColor: countryBackground?.backgroundColor
+      backgroundColor: countryBackground?.backgroundColor,
+      backgroundImage: '',
+      imageFit: ''
+    }
+  } else {
+    return {
+      backgroundColor: '',
+      backgroundImage: '',
+      imageFit: ''
     }
   }
 }

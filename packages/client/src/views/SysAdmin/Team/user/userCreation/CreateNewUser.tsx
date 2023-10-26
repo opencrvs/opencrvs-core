@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormSection,
@@ -49,11 +48,11 @@ interface IMatchParams {
 
 type IUserProps = {
   userId?: string
-  section: IFormSection
-  activeGroup: IFormSectionGroup
-  nextSectionId: string
-  nextGroupId: string
-  formData: IFormSectionData
+  section?: IFormSection
+  activeGroup?: IFormSectionGroup
+  nextSectionId?: string
+  nextGroupId?: string
+  formData?: IFormSectionData
   submitting: boolean
   userDetailsStored?: boolean
   loadingRoles?: boolean
@@ -147,18 +146,26 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
       userDetailsStored,
       loadingRoles,
       userId,
-      match
+      activeGroup,
+      nextSectionId,
+      nextGroupId,
+      formData
     } = this.props
-    if (
-      submitting ||
-      (userId && !userDetailsStored) ||
-      (match.params.locationId && loadingRoles)
-    ) {
+    if (submitting || loadingRoles || (userId && !userDetailsStored)) {
       return this.renderLoadingPage()
     }
 
     if (section?.viewType === 'form') {
-      return <UserForm {...this.props} />
+      return (
+        <UserForm
+          {...this.props}
+          section={section}
+          formData={formData!}
+          activeGroup={activeGroup!}
+          nextSectionId={nextSectionId!}
+          nextGroupId={nextGroupId!}
+        />
+      )
     }
 
     if (section?.viewType === 'preview') {
@@ -166,6 +173,8 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
         <UserReviewForm
           client={this.props.client as ApolloClient<any>}
           {...this.props}
+          section={section}
+          formData={formData!}
         />
       )
     }

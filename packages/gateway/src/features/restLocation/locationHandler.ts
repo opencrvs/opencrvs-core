@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/utils'
 import * as Hapi from '@hapi/hapi'
@@ -124,6 +123,18 @@ export const requestSchema = Joi.alternatives().try(
   Joi.array().items(locationRequestSchema)
 )
 
+export const locationQuerySchema = Joi.object({
+  type: Joi.string().valid(
+    Code.ADMIN_STRUCTURE,
+    Code.CRVS_OFFICE,
+    Code.HEALTH_FACILITY
+  ),
+  identifier: Joi.string().regex(/^[a-zA-Z0-9_]+$/),
+  name: Joi.string().regex(/^[a-zA-Z0-9_,.\s]+$/),
+  status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE),
+  _count: Joi.number()
+}).or('type', 'identifier')
+
 export const updateSchema = Joi.object({
   name: Joi.string().optional(),
   alias: Joi.string().optional(),
@@ -132,7 +143,7 @@ export const updateSchema = Joi.object({
 })
 
 export const requestParamsSchema = Joi.object({
-  locationId: Joi.string()
+  locationId: Joi.string().uuid()
 })
 
 export async function fetchLocationHandler(

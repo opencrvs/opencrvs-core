@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 set -e
 print_usage_and_exit () {
     echo
@@ -59,13 +58,14 @@ echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::
 echo
 echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a config ::::::::\033[0m"
 
-echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
+echo -e "\033[32m:::::::::::::::::: Preparing database ::::::::::::::::::\033[0m"
 echo
-yarn db:clear:all --path_to_core=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY
+cd ../opencrvs-core
+yarn db:clear:all
+
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
 cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY
-cd ../
-cd opencrvs-countryconfig
+cd ../opencrvs-countryconfig
 yarn start

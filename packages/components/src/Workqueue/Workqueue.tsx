@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
@@ -191,34 +190,32 @@ export class WorkqueueComp extends React.Component<
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
-        {content.length > 0 &&
-          width > grid.breakpoints.lg &&
-          !hideTableHeader && (
-            <TableHeader>
-              {columns.map((preference, index) => (
-                <ColumnContainer
-                  key={index}
-                  width={preference.width}
-                  onClick={
-                    preference.sortFunction
-                      ? () => preference.sortFunction!(preference.key)
-                      : undefined
-                  }
-                  clickable={Boolean(preference.sortFunction)}
-                >
-                  <ColumnTitleWrapper>
-                    {preference.label && preference.label}
-                    {preference.sortFunction && (
-                      <SortIcon
-                        isSorted={Boolean(preference.isSorted)}
-                        isDescending={sortOrder === SORT_ORDER.DESCENDING}
-                      />
-                    )}
-                  </ColumnTitleWrapper>
-                </ColumnContainer>
-              ))}
-            </TableHeader>
-          )}
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
+          <TableHeader>
+            {columns.map((preference, index) => (
+              <ColumnContainer
+                key={index}
+                width={preference.width}
+                onClick={
+                  preference.sortFunction
+                    ? () => preference.sortFunction!(preference.key)
+                    : undefined
+                }
+                clickable={Boolean(preference.sortFunction)}
+              >
+                <ColumnTitleWrapper>
+                  {preference.label && preference.label}
+                  {preference.sortFunction && (
+                    <SortIcon
+                      isSorted={Boolean(preference.isSorted)}
+                      isDescending={sortOrder === SORT_ORDER.DESCENDING}
+                    />
+                  )}
+                </ColumnTitleWrapper>
+              </ColumnContainer>
+            ))}
+          </TableHeader>
+        )}
         {!isMobileView ? (
           <WorkqueueRowDesktop
             columns={this.props.columns}

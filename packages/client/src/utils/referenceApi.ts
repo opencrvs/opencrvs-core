@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
@@ -18,6 +17,7 @@ import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
 import { OPENCRVS_SPECIFICATION_URL } from '@client/utils/constants'
 
+import { IntlShape } from 'react-intl'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
@@ -206,6 +206,27 @@ export async function importConditionals(): Promise<LoadConditionalsResponse> {
   return conditionals
 }
 
+type InjectedUtilities = {
+  intl: IntlShape
+}
+
+export type LoadHandlebarHelpersResponse = Record<
+  string,
+  (injectedUtilities: InjectedUtilities) => Handlebars.HelperDelegate
+>
+
+async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
+  try {
+    // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+    const handlebars = await import(
+      /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+    )
+    return handlebars
+  } catch (error) {
+    return {}
+  }
+}
+
 async function loadContent(): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
@@ -353,5 +374,6 @@ export const referenceApi = {
   loadForms,
   importValidators,
   importConditionals,
+  importHandlebarHelpers,
   loadConfigAnonymousUser
 }

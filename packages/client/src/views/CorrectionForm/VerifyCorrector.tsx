@@ -6,16 +6,16 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import {
   modifyDeclaration,
   IDeclaration,
-  writeDeclaration
+  writeDeclaration,
+  IPrintableDeclaration
 } from '@client/declarations'
-import { ReviewSection } from '@client/forms'
+import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
   goBack,
@@ -39,7 +39,8 @@ import {
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { Event } from '@client/utils/gateway'
+import { draftToGqlTransformer } from '@client/transformer'
+import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 
 interface INameField {
   firstNamesField: string
@@ -55,6 +56,7 @@ interface ICertificateCorrectorField {
   identifierField: string
   nameFields: INameFields
   birthDateField?: string
+  ageOfPerson?: string
   nationalityField?: string
 }
 
@@ -70,6 +72,7 @@ interface IMatchParams {
 interface IStateProps {
   declaration: IDeclaration
   form: ICertificateCorrectorDefinition
+  registerForm: IForm
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -110,15 +113,20 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
-    const { intl, declaration, form } = this.props
+    const { intl, declaration, form, registerForm } = this.props
     const info = declaration.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
     const showInfoFor = ['mother', 'father', 'child', 'informant']
+
+    const eventRegistrationInput = draftToGqlTransformer(
+      registerForm,
+      declaration.data
+    )
     if (showInfoFor.includes(corrector)) {
       const fields = form[corrector]
-      const iD = info[fields.identifierField] as string
-      const iDType = (info[fields.identifierTypeField] ||
-        info[fields.identifierOtherTypeField]) as string
+      const iD = eventRegistrationInput?.[corrector]?.identifier?.[0]?.id
+      const iDType = eventRegistrationInput?.[corrector]?.identifier?.[0]
+        ?.type as string
 
       const firstNameIndex = (
         fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
@@ -141,6 +149,9 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         (fields.nationalityField &&
           (info[fields.nationalityField] as string)) ||
         ''
+      const age = isExactDobUnknownForIdVerifier
+        ? (info[fields.ageOfPerson as string] as string)
+        : ''
 
       return {
         iD,
@@ -148,7 +159,8 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         firstNames,
         familyName,
         birthDate,
-        nationality
+        nationality,
+        age
       }
     } else {
       return {
@@ -157,7 +169,8 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         firstNames: '',
         familyName: '',
         birthDate: '',
-        nationality: ''
+        nationality: '',
+        age: ''
       }
     }
   }
@@ -236,11 +249,12 @@ const mapStateToProps = (
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === declarationId
-  )
+  ) as IPrintableDeclaration
 
   return {
-    declaration: declaration as IDeclaration,
-    form: getVerifyCorrectorDefinition(declaration?.event ?? Event.Birth)
+    declaration: declaration,
+    form: getVerifyCorrectorDefinition(declaration.event),
+    registerForm: getEventRegisterForm(state, declaration.event)
   }
 }
 

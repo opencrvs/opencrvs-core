@@ -6,14 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Content, RadioSize } from '@opencrvs/components/lib'
+import { Content } from '@opencrvs/components/lib'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   modifyDeclaration,
@@ -28,61 +26,8 @@ import {
   goToVerifyIssueCollector
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { Event } from '@client/utils/gateway'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-
-const fields: IRadioGroupFormField[] = [
-  {
-    name: 'type',
-    type: RADIO_GROUP,
-    size: RadioSize.LARGE,
-    label: issueMessages.issueCertificate,
-    hideHeader: true,
-    required: true,
-    initialValue: '',
-    validator: [],
-    options: [
-      { value: 'MOTHER', label: issueMessages.issueToMother },
-      { value: 'FATHER', label: issueMessages.issueToFather },
-      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
-    ]
-  }
-]
-
-const commonFieldsForBirthAndDeath: IRadioGroupFormField[] = [
-  {
-    name: 'type',
-    type: RADIO_GROUP,
-    size: RadioSize.LARGE,
-    label: issueMessages.issueCertificate,
-    hideHeader: true,
-    required: true,
-    initialValue: '',
-    validator: [],
-    options: [
-      { value: 'INFORMANT', label: issueMessages.issueToInformant },
-      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
-    ]
-  }
-]
-
-const fieldsForMarriage: IRadioGroupFormField[] = [
-  {
-    name: 'type',
-    type: RADIO_GROUP,
-    size: RadioSize.LARGE,
-    label: issueMessages.issueCertificate,
-    hideHeader: true,
-    required: true,
-    initialValue: '',
-    validator: [],
-    options: [
-      { value: 'GROOM', label: issueMessages.issueToGroom },
-      { value: 'BRIDE', label: issueMessages.issueToBride },
-      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
-    ]
-  }
-]
+import { getIssueCertCollectorGroupForEvent } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
 export function IssueCollectorForm({
   declaration
@@ -118,43 +63,7 @@ export function IssueCollectorForm({
       })
     )
   }
-
-  const finalFields = (): IRadioGroupFormField[] => {
-    if (declaration.event === Event.Death) {
-      return commonFieldsForBirthAndDeath
-    } else if (declaration.event === Event.Marriage) {
-      return fieldsForMarriage
-    }
-    const declarationData = declaration.data
-    const filteredData = [{ ...fields[0] }]
-
-    const motherDataExists =
-      declarationData &&
-      declarationData.mother &&
-      declarationData.mother.detailsExist
-
-    const fatherDataExists =
-      declarationData &&
-      declarationData.father &&
-      declarationData.father.detailsExist
-
-    if (!fatherDataExists && !motherDataExists)
-      return commonFieldsForBirthAndDeath
-
-    if (!fatherDataExists) {
-      filteredData[0].options = filteredData[0].options.filter(
-        (option) => option.value !== 'FATHER'
-      )
-    }
-
-    if (!motherDataExists) {
-      filteredData[0].options = filteredData[0].options.filter(
-        (option) => option.value !== 'MOTHER'
-      )
-    }
-
-    return filteredData
-  }
+  const fields = getIssueCertCollectorGroupForEvent(declaration)
 
   function continueButtonHandler() {
     const relationship =
@@ -184,6 +93,7 @@ export function IssueCollectorForm({
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
+      showTitleOnMobile
     >
       <FormFieldGenerator
         id="collector"
@@ -193,7 +103,7 @@ export function IssueCollectorForm({
         }}
         setAllFieldsDirty={false}
         fields={replaceInitialValues(
-          finalFields(),
+          fields,
           (declaration &&
             declaration.data.registration.certificates &&
             declaration.data.registration.certificates[

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CHECKBOX_GROUP,
@@ -60,7 +59,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
+import { flattenDeep, get, clone, isEqual, isArray, camelCase } from 'lodash'
 import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import {
@@ -401,6 +400,21 @@ const getFormFieldValue = (
   return ''
 }
 
+export const addressFieldNames = [
+  'statePrimary',
+  'districtPrimary',
+  'cityUrbanOptionPrimary',
+  'internationalStatePrimary',
+  'internationalDistrictPrimary',
+  'internationalCityPrimary',
+  'stateSecondary',
+  'districtSecondary',
+  'cityUrbanOptionSecondary',
+  'internationalStateSecondary',
+  'internationalCitySecondary',
+  'internationalDistrictSecondary'
+]
+
 export const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -410,26 +424,17 @@ export const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const hasAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'cityUrbanOptionPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'internationalCityPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'cityUrbanOptionSecondary',
-      'internationalStateSecondary',
-      'internationalCitySecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name)
-  ) {
+  if (hasAddressField) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -437,9 +442,9 @@ export const renderValue = (
       dynamicOption.dependency = [
         'internationalStatePrimary',
         'statePrimary'
-      ].includes(field.name)
-        ? 'countryPrimary'
-        : 'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -451,7 +456,10 @@ export const renderValue = (
       )
     }
 
-    if (sectionData.countrySecondary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
@@ -459,9 +467,9 @@ export const renderValue = (
       dynamicOption.dependency = [
         'internationalStateSecondary',
         'stateSecondary'
-      ].includes(field.name)
-        ? 'countrySecondary'
-        : 'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,

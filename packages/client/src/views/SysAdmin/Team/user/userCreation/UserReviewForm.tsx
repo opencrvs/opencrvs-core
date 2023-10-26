@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
@@ -112,6 +111,10 @@ const Container = styled.div`
   }
 `
 
+const SignatureImage = styled.img`
+  max-width: 70%;
+`
+
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;
@@ -133,7 +136,7 @@ class UserReviewFormComponent extends React.Component<
   transformSectionData = () => {
     const { intl, userFormSection } = this.props
     let nameJoined = false,
-      fieldValue = ''
+      fieldValue
     const sections: ISectionData[] = []
     getVisibleSectionGroupsBasedOnConditions(
       userFormSection,
@@ -191,6 +194,20 @@ class UserReviewFormComponent extends React.Component<
               label = intl.formatMessage(constantsMessages.name)
               fieldValue = this.getName(group.fields)
               nameJoined = true
+            }
+
+            if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+              fieldValue = (
+                <SignatureImage
+                  src={
+                    (
+                      this.props.formData[field.name] as
+                        | IAttachmentValue
+                        | undefined
+                    )?.data
+                  }
+                />
+              )
             }
 
             sections[sections.length - 1].items.push({
@@ -353,12 +370,12 @@ class UserReviewFormComponent extends React.Component<
         }
         hideBackground={true}
       >
-        <Content title={intl.formatMessage(section.name)}>
+        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
           <Container>
             {this.transformSectionData().map((sec, index) => {
               return (
                 <React.Fragment key={index}>
-                  <ListViewSimplified>
+                  <ListViewSimplified bottomBorder>
                     {sec.items.map((item, index) => {
                       return (
                         <ListViewItemSimplified

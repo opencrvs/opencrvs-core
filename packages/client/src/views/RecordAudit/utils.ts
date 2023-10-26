@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
@@ -17,7 +16,7 @@ import {
   IContactPointPhone
 } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
-import { get, has } from 'lodash'
+import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -114,7 +113,10 @@ export const getFieldValue = (
   }
 
   if (has(fieldObj, 'dynamicOptions')) {
-    const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
+    const offlineIndex = get(
+      fieldObj,
+      'dynamicOptions.resource'
+    ) as unknown as PropertyPath
     const offlineResourceValues = get(offlineData, offlineIndex)
     const offlineResourceValue =
       original && get(offlineResourceValues, original)

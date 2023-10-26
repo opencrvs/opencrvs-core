@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { mergeConfig } from 'vite';
-import remarkGfm from 'remark-gfm';
-import type { StorybookConfig } from '@storybook/react-vite';
+import { mergeConfig } from 'vite'
+import remarkGfm from 'remark-gfm'
+import type { StorybookConfig } from '@storybook/react-vite'
 import BRAND_BLUE from './theme'
 
 const viteFinal = async (config: Record<string, any>) => {
@@ -44,7 +43,7 @@ const config: StorybookConfig = {
       options: {
         mdxPluginOptions: {
           mdxCompileOptions: {
-            remarkPlugins: [remarkGfm],
+            remarkPlugins: [remarkGfm]
           }
         }
       }

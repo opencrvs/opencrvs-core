@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export enum SortOrder {
   ASC = 'asc',
@@ -21,6 +20,7 @@ export interface IAdvancedSearchParam {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string

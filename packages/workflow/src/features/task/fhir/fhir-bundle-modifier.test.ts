@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -20,9 +19,9 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
-  taskResouceMock
+  taskResourceMock
 } from '@workflow/test/utils'
-import { Task } from '@opencrvs/commons/types'
+import { Bundle, Task } from '@opencrvs/commons/types'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
@@ -44,7 +43,7 @@ describe('Verify handler', () => {
 
   it('modifyTaskBundle returns correct bundle', async () => {
     fetch.mockResponses(
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -61,7 +60,10 @@ describe('Verify handler', () => {
     const clonedTestFhirTaskBundle = cloneDeep(testFhirTaskBundle)
     clonedTestFhirTaskBundle.entry[0].resource.businessStatus.coding[0].code =
       'REJECTED'
-    const payload = await modifyTaskBundle(clonedTestFhirTaskBundle, token)
+    const payload = await modifyTaskBundle(
+      clonedTestFhirTaskBundle as Bundle,
+      token
+    )
     if (
       payload &&
       payload.entry &&
@@ -113,6 +115,8 @@ describe('Verify handler', () => {
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }]
     )
-    expect(modifyTaskBundle(testFhirTaskBundle, token)).rejects.toThrowError()
+    expect(
+      modifyTaskBundle(testFhirTaskBundle as Bundle, token)
+    ).rejects.toThrowError()
   })
 })

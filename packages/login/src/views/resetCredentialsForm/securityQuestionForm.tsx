@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   FORGOTTEN_ITEMS,
@@ -215,6 +214,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
           <form id="security-question-form" onSubmit={this.handleContinue}>
             <Content
               title={intl.formatMessage(messages[this.state.questionKey])}
+              showTitleOnMobile
               subtitle={intl.formatMessage(
                 sharedMessages.securityQuestionFormBodySubheader
               )}

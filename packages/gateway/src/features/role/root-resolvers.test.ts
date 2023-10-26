@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/role/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -203,7 +202,7 @@ describe('Role root resolvers', () => {
     it('returns full role list', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyRoleList))
 
-      const response = await resolvers.Query.getSystemRoles(
+      const response = await resolvers.Query!.getSystemRoles(
         {},
         {},
         { headers: undefined }
@@ -214,7 +213,7 @@ describe('Role root resolvers', () => {
     it('returns filtered role list', async () => {
       fetch.mockResponseOnce(JSON.stringify([dummyRoleList[2]]))
 
-      const response = await resolvers.Query.getSystemRoles(
+      const response = await resolvers.Query!.getSystemRoles(
         {},
         {
           sortBy: '_id',
@@ -286,7 +285,7 @@ describe('system role update', () => {
       status: 200
     })
 
-    const response = await resolvers.Mutation.updateRole(
+    const response = await resolvers.Mutation!.updateRole(
       {},
       mockUpdateRoleRequest,
       { headers: authHeaderSysAdmin }

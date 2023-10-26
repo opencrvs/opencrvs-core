@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   setTrackingId,
@@ -256,14 +255,14 @@ describe('Verify fhir bundle modifier functions', () => {
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[3] &&
-          taskResource.extension[3].valueReference &&
-          taskResource.extension[3].valueReference.reference
+          taskResource.extension[4] &&
+          taskResource.extension[4].valueReference &&
+          taskResource.extension[4].valueReference.reference
         ) {
           expect(
-            taskResource.extension[3].valueReference.reference
+            taskResource.extension[4].valueReference.reference
           ).toBeDefined()
-          expect(taskResource.extension[3].valueReference.reference).toEqual(
+          expect(taskResource.extension[4].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -318,12 +317,12 @@ describe('Verify fhir bundle modifier functions', () => {
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[3] &&
-          taskResource.extension[3].valueReference &&
-          taskResource.extension[3].valueReference.reference
+          taskResource.extension[4] &&
+          taskResource.extension[4].valueReference &&
+          taskResource.extension[4].valueReference.reference
         ) {
           expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-          expect(taskResource.extension[3].valueReference.reference).toEqual(
+          expect(taskResource.extension[4].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -388,7 +387,7 @@ describe('Verify fhir bundle modifier functions', () => {
         JSON.parse(fieldAgentPractitionerMock)
       )
       if (taskResource && taskResource.extension && taskResource.extension[4]) {
-        expect(taskResource.extension[4]).toEqual({
+        expect(taskResource.extension[3]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
             reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -153,7 +152,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   informant: {
     id: 'correction.corrector.informant',
-    defaultMessage: 'Informant',
+    defaultMessage: 'Informant ({informant})',
     description: 'Label for informant option in certificate correction form'
   },
   whatWasTheReasonForCorrection: {
@@ -204,7 +203,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckTitle: {
     id: 'correction.certificate.corrector.idCheck',
-    defaultMessage: 'Check proof of ID',
+    defaultMessage: 'Verify their identity',
     description: 'The title for id check component'
   },
   otherIdCheckTitle: {
@@ -226,7 +225,7 @@ const messagesToDefine: ICorrectionMessages = {
   birthCorrectionNote: {
     id: 'correction.corrector.birth.note',
     defaultMessage:
-      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
+      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to their birth record.',
     description: 'Birth correction note'
   },
   proofOfLegalDocuments: {

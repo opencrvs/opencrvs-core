@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
 import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
@@ -54,7 +53,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      const user = await resolvers.Query.getUser(
+      const user = await resolvers.Query!.getUser(
         {},
         { userId: 'ba7022f0ff4822' },
         { headers: undefined }
@@ -183,7 +182,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      const response = await resolvers.Query.searchUsers(
+      const response = await resolvers.Query!.searchUsers(
         {},
         {},
         { headers: authHeaderSysAdmin }
@@ -201,7 +200,7 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent)
+        resolvers.Query!.searchUsers({}, {}, authHeaderFieldAgent)
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
       )
@@ -214,7 +213,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      const response = await resolvers.Query.searchUsers(
+      const response = await resolvers.Query!.searchUsers(
         {},
         {
           username: 'mohammad.ashraful',
@@ -343,7 +342,7 @@ describe('User root resolvers', () => {
         ])
       )
 
-      const response = await resolvers.Query.searchFieldAgents(
+      const response = await resolvers.Query!.searchFieldAgents(
         {},
         {
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -400,7 +399,7 @@ describe('User root resolvers', () => {
         ])
       )
 
-      const response = await resolvers.Query.searchFieldAgents(
+      const response = await resolvers.Query!.searchFieldAgents(
         {},
         {
           locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
@@ -447,7 +446,7 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Query.searchFieldAgents(
+        resolvers.Query!.searchFieldAgents(
           {},
           {
             locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
@@ -479,7 +478,7 @@ describe('User root resolvers', () => {
         ])
       )
 
-      const response = await resolvers.Query.searchFieldAgents(
+      const response = await resolvers.Query!.searchFieldAgents(
         {},
         {
           locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
@@ -510,7 +509,7 @@ describe('User root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
       return expect(
-        resolvers.Query.searchFieldAgents(
+        resolvers.Query!.searchFieldAgents(
           {},
           {
             locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
@@ -528,7 +527,7 @@ describe('User root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
       return expect(
-        resolvers.Query.searchFieldAgents(
+        resolvers.Query!.searchFieldAgents(
           {},
           {
             timeStart: '2019-03-31T18:00:00.000Z',
@@ -572,7 +571,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      const res = await resolvers.Query.verifyPasswordById(
+      const res = await resolvers.Query!.verifyPasswordById(
         {},
         { id: '123', password: 'test' },
         authHeaderUser
@@ -585,7 +584,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       try {
-        await resolvers.Query.verifyPasswordById(
+        await resolvers.Query!.verifyPasswordById(
           {},
           { id: '123', password: 'test' },
           authHeaderUser
@@ -607,7 +606,7 @@ describe('User root resolvers', () => {
         [JSON.stringify({})]
       )
 
-      const response = await resolvers.Mutation.activateUser(
+      const response = await resolvers.Mutation!.activateUser(
         {},
         {
           userId: 'ba7022f0ff4822',
@@ -629,7 +628,7 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Mutation.activateUser(
+        resolvers.Mutation!.activateUser(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -682,7 +681,7 @@ describe('User root resolvers', () => {
     it('changes password for loggedin user', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
-      const response = await resolvers.Mutation.changePassword(
+      const response = await resolvers.Mutation!.changePassword(
         {},
         {
           userId: 'ba7022f0ff4822',
@@ -698,7 +697,7 @@ describe('User root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
       return expect(
-        resolvers.Mutation.changePassword(
+        resolvers.Mutation!.changePassword(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -713,7 +712,7 @@ describe('User root resolvers', () => {
     })
     it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
       expect(
-        resolvers.Mutation.changePassword(
+        resolvers.Mutation!.changePassword(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -767,7 +766,7 @@ describe('User root resolvers', () => {
       const code = await generateAndStoreVerificationCode(nonce, mobile)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
-      const response = await resolvers.Mutation.changePhone(
+      const response = await resolvers.Mutation!.changePhone(
         {},
         {
           userId: 'ba7022f0ff4822',
@@ -788,7 +787,7 @@ describe('User root resolvers', () => {
       const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
-        resolvers.Mutation.changePhone(
+        resolvers.Mutation!.changePhone(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -808,7 +807,7 @@ describe('User root resolvers', () => {
       const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
-        resolvers.Mutation.changePhone(
+        resolvers.Mutation!.changePhone(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -881,7 +880,7 @@ describe('User root resolvers', () => {
         data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAAwICAgICAwICAgMDAwMEBgQEBAQECAYGBQYJCAoKCQgJCQoMDwwKCw4LCQkNEQ0ODxAQERAKDBITEhATDxAQEP/bAEMBAwMDBAMECAQECBALCQsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEP/AABEIAAEAAQMBIgACEQEDEQH/xAAVAAEBAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAVAQEBAAAAAAAAAAAAAAAAAAAFCP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AJngKoCP/9k='
       }
 
-      const response = await resolvers.Mutation.changeAvatar(
+      const response = await resolvers.Mutation!.changeAvatar(
         {},
         {
           userId: 'ba7022f0ff4822',
@@ -915,7 +914,7 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Mutation.changeAvatar(
+        resolvers.Mutation!.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -932,7 +931,7 @@ describe('User root resolvers', () => {
     })
     it("throws error if any user tries to update some other user's avatar", async () => {
       return expect(
-        resolvers.Mutation.changeAvatar(
+        resolvers.Mutation!.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
@@ -1001,7 +1000,7 @@ describe('User root resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.createOrUpdateUser(
+      const response = await resolvers.Mutation!.createOrUpdateUser(
         {},
         { user },
         { headers: authHeaderSysAdmin }
@@ -1019,7 +1018,7 @@ describe('User root resolvers', () => {
         }),
         { status: 201 }
       )
-      const response = await resolvers.Mutation.createOrUpdateUser(
+      const response = await resolvers.Mutation!.createOrUpdateUser(
         {},
         { user: { id: '123', ...user } },
         { headers: authHeaderSysAdmin }
@@ -1039,7 +1038,7 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderRegister)
+        resolvers.Mutation!.createOrUpdateUser({}, { user }, authHeaderRegister)
       ).rejects.toThrowError('Create user is only allowed for sysadmin')
     })
 
@@ -1052,7 +1051,7 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateUser(
+        resolvers.Mutation!.createOrUpdateUser(
           {},
           { user },
           { headers: authHeaderSysAdmin }
@@ -1099,7 +1098,7 @@ describe('User root resolvers', () => {
     it('audits user for sysadmin', async () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 200 })
 
-      const response = await resolvers.Mutation.auditUser(
+      const response = await resolvers.Mutation!.auditUser(
         {},
         {
           userId: '5bce8ujkf0fuib',
@@ -1114,7 +1113,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.auditUser(
+        resolvers.Mutation!.auditUser(
           {},
           {
             userId: '5bce8ujkf0fuib',
@@ -1132,7 +1131,7 @@ describe('User root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.auditUser(
+        resolvers.Mutation!.auditUser(
           {},
           {
             userId: '5bce8ujkf0fuib',
@@ -1182,7 +1181,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resendInvite(
+        resolvers.Mutation!.resendInvite(
           {},
           {
             userId: '123'
@@ -1198,7 +1197,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resendInvite(
+        resolvers.Mutation!.resendInvite(
           {},
           {
             userId: '123'
@@ -1213,7 +1212,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resendInvite(
+      const res = await resolvers.Mutation!.resendInvite(
         {},
         {
           userId: '123'
@@ -1260,7 +1259,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.usernameReminder(
+        resolvers.Mutation!.usernameReminder(
           {},
           {
             userId: '123'
@@ -1276,7 +1275,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.usernameReminder(
+        resolvers.Mutation!.usernameReminder(
           {},
           {
             userId: '123'
@@ -1291,7 +1290,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.usernameReminder(
+      const res = await resolvers.Mutation!.usernameReminder(
         {},
         {
           userId: '123'
@@ -1338,7 +1337,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resetPasswordInvite(
+        resolvers.Mutation!.resetPasswordInvite(
           {},
           {
             userId: '123'
@@ -1354,7 +1353,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resetPasswordInvite(
+        resolvers.Mutation!.resetPasswordInvite(
           {},
           {
             userId: '123'
@@ -1369,7 +1368,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resetPasswordInvite(
+      const res = await resolvers.Mutation!.resetPasswordInvite(
         {},
         {
           userId: '123'

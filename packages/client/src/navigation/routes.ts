@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 
@@ -42,7 +41,7 @@ export const CERTIFICATE_CORRECTION_REVIEW =
 export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
 
 export const SEARCH = '/search'
-export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
+export const SEARCH_RESULT = '/search-result'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'

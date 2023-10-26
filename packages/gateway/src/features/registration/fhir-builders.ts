@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
@@ -905,6 +904,32 @@ async function createInformantType(
         context
       )
     }
+  } else if (context.event === EVENT_TYPE.DEATH) {
+    if (fieldValue === 'MOTHER') {
+      setInformantReference(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'FATHER') {
+      setInformantReference(
+        FATHER_CODE,
+        FATHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'SPOUSE') {
+      setInformantReference(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    }
   } else if (context.event === EVENT_TYPE.MARRIAGE) {
     if (fieldValue === 'BRIDE') {
       setInformantReference(
@@ -1518,7 +1543,112 @@ export const builders: IFieldBuilders = {
       )
       spouse.id = fieldValue as string
     },
-    name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE)
+    gender: (fhirBundle, fieldValue, context) => {
+      const spouse = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      spouse.gender = fieldValue as string
+    },
+    identifier: createIDBuilder(SPOUSE_CODE, SPOUSE_TITLE),
+    name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE),
+    telecom: createTelecomBuilder(SPOUSE_CODE, SPOUSE_TITLE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const spouse = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      spouse.birthDate = fieldValue as string
+    },
+    maritalStatus: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createMaritalStatusBuilder(person, fieldValue as string)
+    },
+    occupation: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createOccupationBulder(person, fieldValue as string)
+    },
+    detailsExist: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      person.active = fieldValue as boolean
+    },
+    reasonNotApplying: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createReasonNotApplyingBuilder(person, fieldValue as string)
+    },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+    },
+    address: createAddressBuilder(SPOUSE_CODE, SPOUSE_TITLE),
+    photo: createPhotoBuilder(SPOUSE_CODE, SPOUSE_TITLE),
+    deceased: (fhirBundle, fieldValue, context) => {
+      const spouse = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      spouse.deceasedBoolean = fieldValue as boolean
+    },
+
+    nationality: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    educationalAttainment: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      return createEducationalAttainmentBuilder(person, fieldValue)
+    }
   },
   child: {
     _fhirID: (fhirBundle, fieldValue, context) => {
