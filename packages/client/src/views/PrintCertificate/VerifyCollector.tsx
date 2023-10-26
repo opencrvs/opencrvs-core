@@ -124,14 +124,18 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   getCollectorType = () => {
-    const informant = (
+    const informantType = (
       this.props.declaration.data.informant.informantType as string
     ).toLowerCase()
-    if (!['mother', 'father'].includes(informant)) {
-      const { collector } = this.props.match.params
-      return collector
+    const { collector } = this.props.match.params
+    // to extract the id of mother, father, bride, groom
+    if (
+      collector === 'informant' &&
+      ['bride', 'groom', 'mother', 'father'].includes(informantType)
+    ) {
+      return informantType
     } else {
-      return informant
+      return collector
     }
   }
 
