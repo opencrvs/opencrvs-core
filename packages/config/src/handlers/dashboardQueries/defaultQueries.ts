@@ -11,7 +11,7 @@
 import { PRODUCTION, QA_ENV } from '@config/config/constants'
 import { subMinutes } from 'date-fns'
 
-const taskQuery = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
+const registrations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
   collection: 'Task',
   aggregate: [
     {
@@ -476,7 +476,7 @@ const taskQuery = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
   ]
 })
 
-const taskHistoryQuery = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
+const declarations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
   collection: 'Task',
   aggregate: [
     {
@@ -639,7 +639,7 @@ const taskHistoryQuery = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
   ]
 })
 
-const locationQuery = () => ({
+const populationEstimatesPerDay = () => ({
   collection: 'Location',
   aggregate: [
     { $match: { 'identifier.1.value': 'STATE' } },
@@ -781,8 +781,8 @@ export function defaultQueries() {
   ).toISOString()
 
   return [
-    taskQuery({ lastUpdatedAt }),
-    taskHistoryQuery({ lastUpdatedAt }),
-    locationQuery()
+    registrations({ lastUpdatedAt }),
+    declarations({ lastUpdatedAt }),
+    populationEstimatesPerDay()
   ]
 }
