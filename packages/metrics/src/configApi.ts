@@ -10,6 +10,7 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
+import { Document } from 'mongoose'
 interface IBirth {
   REGISTRATION_TARGET: number
   LATE_REGISTRATION_TARGET: number
@@ -86,6 +87,27 @@ export async function getApplicationConfig(
     .catch((error) => {
       return Promise.reject(
         new Error(`Application config request failed: ${error.message}`)
+      )
+    })
+}
+
+export async function getDashboardQueries(
+  authorization: string
+): Promise<Array<{ collection: string; aggregate: Document[] }>> {
+  const token = authorization.replace('Bearer ', '')
+  return fetch(`${CONFIG_API_URL}/dashboardQueries`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Dashboard queries request failed: ${error.message}`)
       )
     })
 }

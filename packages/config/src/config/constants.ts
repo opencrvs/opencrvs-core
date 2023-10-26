@@ -30,6 +30,8 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
+export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const QA_ENV = process.env.QA_ENV || false
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
