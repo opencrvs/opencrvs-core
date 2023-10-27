@@ -37,7 +37,7 @@ const messagesToDefine = {
   validateDeclarationActionModalDescription: {
     id: 'validate.declaration.action.modal.description',
     defaultMessage:
-      'This declaration will be sent to the registrar for them to register'
+      'This declaration will be sent for approval prior to registration.'
   },
   informantsSignature: {
     defaultMessage: 'Signature of informant',
@@ -232,7 +232,7 @@ const messagesToDefine = {
   },
   validateConfirmationDesc: {
     defaultMessage:
-      'This declaration will be sent to the registrar for them to approve.',
+      'This declaration will be sent for approval prior to registration.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },
