@@ -16,8 +16,10 @@ import {
   CHECK_INVALID_TOKEN,
   CERT_PUBLIC_KEY_PATH,
   AUTH_URL,
-  CORS_WHITELIST,
-  DEFAULT_TIMEOUT
+  DEFAULT_TIMEOUT,
+  HOSTNAME,
+  LOGIN_URL,
+  CLIENT_APP_URL
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
@@ -30,8 +32,11 @@ import { Boom, badRequest } from '@hapi/boom'
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  const whitelist: string[] = CORS_WHITELIST as string[]
-  logger.info(`Whitelist: : ${JSON.stringify(whitelist)}`)
+  let whitelist: string[] = [HOSTNAME]
+  if (HOSTNAME[0] !== '*') {
+    whitelist = [LOGIN_URL, CLIENT_APP_URL]
+  }
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,

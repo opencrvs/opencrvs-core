@@ -13,8 +13,11 @@ import * as Hapi from '@hapi/hapi'
 import {
   AUTH_HOST,
   AUTH_PORT,
+  CLIENT_APP_URL,
+  COUNTRY_CONFIG_URL,
   DEFAULT_TIMEOUT,
-  CORS_WHITELIST
+  HOSTNAME,
+  LOGIN_URL
 } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
@@ -71,7 +74,10 @@ import anonymousTokenHandler, {
 } from './features/anonymousToken/handler'
 
 export async function createServer() {
-  const whitelist: string[] = CORS_WHITELIST as string[]
+  let whitelist: string[] = [HOSTNAME]
+  if (HOSTNAME[0] !== '*') {
+    whitelist = [COUNTRY_CONFIG_URL, LOGIN_URL, CLIENT_APP_URL]
+  }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: AUTH_HOST,
