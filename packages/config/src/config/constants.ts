@@ -11,12 +11,9 @@
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const HOST = process.env.HOST || 'localhost'
 export const HOSTNAME = process.env.DOMAIN || '*'
-export const LOGIN_URL = (
-  process.env.LOGIN_URL || 'http://localhost:3020/'
-).replace('https://', '')
-export const CLIENT_APP_URL = (
+export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
+export const CLIENT_APP_URL =
   process.env.CLIENT_APP_URL || 'http://localhost:3000/'
-).replace('https://', '')
 export const PORT = process.env.PORT || 2021
 // Services
 export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070/'

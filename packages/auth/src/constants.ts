@@ -17,15 +17,11 @@ export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 export const HOSTNAME = process.env.DOMAIN || '*'
-export const COUNTRY_CONFIG_URL = (
+export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040/'
-).replace('https://', '')
-export const LOGIN_URL = (
-  process.env.LOGIN_URL || 'http://localhost:3020/'
-).replace('https://', '')
-export const CLIENT_APP_URL = (
+export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
+export const CLIENT_APP_URL =
   process.env.CLIENT_APP_URL || 'http://localhost:3000/'
-).replace('https://', '')
 
 export const CERT_PRIVATE_KEY_PATH =
   (process.env.CERT_PRIVATE_KEY_PATH as string) ||
