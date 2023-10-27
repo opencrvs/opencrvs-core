@@ -24,6 +24,7 @@ import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
+import { SentryLink } from 'apollo-link-sentry'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
@@ -68,8 +69,6 @@ export const createClient = (
       store.dispatch(showSessionExpireConfirmation())
     } else if (error.graphQLErrors?.[0]?.extensions?.code === 'UNASSIGNED') {
       return error.forward(error.operation)
-    } else {
-      Sentry.captureException(error)
     }
   })
 
@@ -78,7 +77,14 @@ export const createClient = (
   const cache = restoredCache || new InMemoryCache()
 
   client = new ApolloClient({
-    link: from([errorLink, timeoutLink, authLink, persistLink, httpLink]),
+    link: from([
+      errorLink,
+      new SentryLink(),
+      timeoutLink,
+      authLink,
+      persistLink,
+      httpLink
+    ]),
     cache
   })
   return client
