@@ -31,7 +31,7 @@ ENV COUNTRY_CONFIG_URL=$COUNTRY_CONFIG_URL
 COPY --from=0 /app/packages/components/build/ /usr/share/nginx/html/
 
 COPY infrastructure/nginx-deploy-config.sh /
-COPY infrastructure/nginx-default.conf /app/etc/nginx/conf.d/default.conf
+COPY infrastructure/nginx-default.conf /etc/nginx/conf.d/default.conf
 
 RUN chmod +x /nginx-deploy-config.sh
 CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]

@@ -40,6 +40,10 @@ export const UserHeader = styled.table`
     width: 100%;
   }
 
+  thead tr:first-child {
+    text-transform: uppercase;
+  }
+
   /* Media query for mobile */
   @media screen and (max-width: 768px) {
     th:nth-child(2) {
