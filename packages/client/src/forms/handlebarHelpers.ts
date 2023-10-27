@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { referenceApi } from '@client/utils/referenceApi'
-import * as Handlebars from 'handlebars'
+import {
+  LoadHandlebarHelpersResponse,
+  referenceApi
+} from '@client/utils/referenceApi'
 
-export let handlebarHelpers: Record<string, Handlebars.HelperDelegate>
+let handlebarHelpers: LoadHandlebarHelpersResponse
 
 export async function initHandlebarHelpers() {
   handlebarHelpers = await referenceApi.importHandlebarHelpers()
 }
 
-export function registerHandlebarHelpers() {
-  if (handlebarHelpers) {
-    for (const funcName of Object.keys(handlebarHelpers)) {
-      const func = handlebarHelpers[funcName]
-      if (typeof func === 'function') {
-        Handlebars.registerHelper(funcName, func)
-      }
-    }
+export function getHandlebarHelpers() {
+  if (!handlebarHelpers) {
+    throw new Error(
+      'Handlebar helpers were requested before initialization. This should never happen.'
+    )
   }
+  return handlebarHelpers
 }
