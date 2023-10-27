@@ -51,6 +51,7 @@ export class RecordNotFoundError extends Error {
 function checkForUnresolvedReferences(bundle: Bundle) {
   const EXCLUDED_PATHS = [
     'Location.partOf.reference',
+    'Patient.address.extension',
     'Composition.relatesTo.targetReference.reference',
     'CompositionHistory.relatesTo.targetReference.reference'
   ]
