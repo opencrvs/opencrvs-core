@@ -80,7 +80,7 @@ export async function subscribeWebhooksHandler(
           hub: {
             mode: 'denied',
             topic: hub.topic,
-            reason: 'hub.secret is incorrrect'
+            reason: 'hub.secret is incorrect'
           }
         })
         .code(400)

@@ -229,7 +229,7 @@ describe('subscribeWebhooksHandler handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.result.hub.reason).toEqual('hub.secret is incorrrect')
+    expect(res.result.hub.reason).toEqual('hub.secret is incorrect')
     expect(res.statusCode).toBe(400)
   })
 })

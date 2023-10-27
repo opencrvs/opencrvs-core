@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ResourceIdentifier, URNReference } from '../fhir'
+import { ResourceIdentifier, URNReference, Location } from '../fhir'
 
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
@@ -213,7 +213,13 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/regLastLocation': {
     url: 'http://opencrvs.org/specs/extension/regLastLocation'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier<Location>
+    }
+  }
+  'http://opencrvs.org/specs/extension/part-of': {
+    url: 'http://opencrvs.org/specs/extension/part-of'
+    valueReference: {
+      reference: ResourceIdentifier<Location>
     }
   }
   'http://hl7.org/fhir/StructureDefinition/patient-nationality': {

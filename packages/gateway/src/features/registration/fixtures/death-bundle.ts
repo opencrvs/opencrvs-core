@@ -522,23 +522,20 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
             valueReference: {
-              reference:
-                'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as ResourceIdentifier
+              reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueString: 'Ibombo District Office',
             valueReference: {
-              reference:
-                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as ResourceIdentifier
+              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference:
-                'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f' as ResourceIdentifier
+              reference: 'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f'
             }
           },
           {

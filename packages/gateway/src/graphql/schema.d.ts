@@ -1725,6 +1725,7 @@ export interface GQLAddressInput {
   country?: string
   from?: GQLDate
   to?: GQLDate
+  partOf?: string
 }
 
 export interface GQLDeceasedInput {

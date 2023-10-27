@@ -300,16 +300,16 @@ export async function getdeclarationJurisdictionIds(
   if (!declarationLocationId) {
     return []
   }
-  const locationHirarchyIds = [declarationLocationId]
+  const locationHierarchyIds = [declarationLocationId]
   let locationId = `Location/${declarationLocationId}`
   while (locationId) {
     locationId = await fetchParentLocationByLocationID(locationId)
     if (locationId === 'Location/0') {
       break
     }
-    locationHirarchyIds.push(locationId.split('/')[1])
+    locationHierarchyIds.push(locationId.split('/')[1])
   }
-  return locationHirarchyIds
+  return locationHierarchyIds
 }
 
 export async function fetchTaskByCompositionIdFromHearth(id: string) {

@@ -236,6 +236,7 @@ input AddressInput {
   country: String
   from: Date # Not in BDRIS2 use Current/Permenant
   to: Date # Not in BDRIS2 use Current/Permenant
+  partOf: String
 }
 
 type Address { # -> Address (mostly the same property name except:)
