@@ -123,22 +123,6 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  getCollectorType = () => {
-    const informantType = (
-      this.props.declaration.data.informant.informantType as string
-    ).toLowerCase()
-    const { collector } = this.props.match.params
-    // to extract the id of mother, father, bride, groom
-    if (
-      collector === 'informant' &&
-      ['bride', 'groom', 'mother', 'father'].includes(informantType)
-    ) {
-      return informantType
-    } else {
-      return collector
-    }
-  }
-
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, declaration, registerForm } = this.props
     const info = declaration.data[collector]
@@ -147,13 +131,22 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       registerForm,
       declaration.data
     )
+
+    const informantType =
+      eventRegistrationInput.registration.informantType.toLowerCase()
+
     const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
 
-    const iD = eventRegistrationInput?.[collector]?.identifier?.[0]?.id
-    const iDType = eventRegistrationInput?.[collector]?.identifier?.[0]
-      ?.type as string
+    const iD =
+      (collector === 'informant'
+        ? eventRegistrationInput[informantType]?.identifier?.[0]?.id
+        : undefined) ?? eventRegistrationInput[collector]?.identifier?.[0]?.id
+    const iDType =
+      (collector === 'informant'
+        ? eventRegistrationInput[informantType]?.identifier?.[0]?.type
+        : undefined) ?? eventRegistrationInput[collector]?.identifier?.[0]?.type
 
     const firstNameIndex = (
       fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
@@ -192,7 +185,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const collector = this.getCollectorType()
+    const { collector } = this.props.match.params
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
