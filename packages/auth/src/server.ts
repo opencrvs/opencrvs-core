@@ -13,8 +13,11 @@ import * as Hapi from '@hapi/hapi'
 import {
   AUTH_HOST,
   AUTH_PORT,
+  CLIENT_APP_URL,
+  COUNTRY_CONFIG_URL,
   DEFAULT_TIMEOUT,
-  HOSTNAME
+  HOSTNAME,
+  LOGIN_URL
 } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
@@ -73,11 +76,7 @@ import anonymousTokenHandler, {
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
   if (HOSTNAME[0] !== '*') {
-    whitelist = [
-      `https://countryconfig.${HOSTNAME}`,
-      `https://login.${HOSTNAME}`,
-      `https://register.${HOSTNAME}`
-    ]
+    whitelist = [COUNTRY_CONFIG_URL, LOGIN_URL, CLIENT_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
