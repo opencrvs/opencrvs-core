@@ -37,14 +37,24 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper birth tracking id successfully', async () => {
-    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.BIRTH)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingId = await generateTrackingIdForEvents(
+      EVENT_TYPE.BIRTH,
+      {} as fhir.Bundle,
+      '123'
+    )
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^B/)
   })
 
   it('Generates proper death tracking id successfully', async () => {
-    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.DEATH)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingId = await generateTrackingIdForEvents(
+      EVENT_TYPE.DEATH,
+      {},
+      '123'
+    )
 
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
@@ -52,7 +62,12 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper marriage tracking id successfully', async () => {
-    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.MARRIAGE)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingId = await generateTrackingIdForEvents(
+      EVENT_TYPE.MARRIAGE,
+      {},
+      '123'
+    )
 
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
@@ -67,7 +82,8 @@ describe('Verify utility functions', () => {
   })
 
   it('send in-progress birth declaration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundle)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundle, '123')
     fetch.mockResponse(officeMock)
     expect(
       sendEventNotification(
@@ -81,7 +97,8 @@ describe('Verify utility functions', () => {
     ).resolves.not.toThrow()
   })
   it('send Birth declaration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundle)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundle, '123')
     fetch.mockResponse(officeMock)
     expect(
       sendEventNotification(
@@ -115,7 +132,8 @@ describe('Verify utility functions', () => {
     )
   })
   it('send mark birth registration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundle)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundle, '123')
     fetch.mockResponse(officeMock)
     //@ts-ignore
     fhirBundle.entry[1].resource.identifier.push({
@@ -152,7 +170,8 @@ describe('Verify utility functions', () => {
     )
   })
   it('send Birth rejection notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundle)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundle, '123')
     fetch.mockResponse(officeMock)
     expect(
       sendEventNotification(
@@ -166,7 +185,8 @@ describe('Verify utility functions', () => {
     ).toBeDefined()
   })
   it('send in-progress death declaration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponse(officeMock)
     expect(
       sendEventNotification(
@@ -180,7 +200,8 @@ describe('Verify utility functions', () => {
     ).toBeDefined()
   })
   it('send Death declaration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponse(officeMock)
     expect(
       sendEventNotification(
@@ -212,7 +233,8 @@ describe('Verify utility functions', () => {
     )
   })
   it('send mark death registration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     //@ts-ignore
     fhirBundle.entry[1].resource.identifier.push({
       system: 'http://opencrvs.org/specs/id/death-registration-number',
@@ -250,7 +272,8 @@ describe('Verify utility functions', () => {
     )
   })
   it('send Death rejection notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponses([officeMock, { status: 200 }])
     fetch.mockResponses([deathTaskMock, { status: 200 }])
     expect(
@@ -265,7 +288,8 @@ describe('Verify utility functions', () => {
     ).toBeDefined()
   })
   it('send Death declaration notification successfully', async () => {
-    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponseOnce(null, { status: 404 })
+    const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponses([officeMock, { status: 200 }])
     fetch.mockResponses([deathTaskMock, { status: 200 }])
     fetch.mockResponses([deathTaskMock, { status: 200 }])
@@ -283,6 +307,9 @@ describe('Verify utility functions', () => {
 })
 
 describe('getMosipUINToken functions', () => {
+  beforeAll(() => {
+    fetch.mockClear()
+  })
   it('Calls mosip token seeder function and returns success', async () => {
     fetch.mockResponse(mosipSuccessMock)
     const mosipResponse = await getMosipUINToken(mosipDeceasedPatientMock)
