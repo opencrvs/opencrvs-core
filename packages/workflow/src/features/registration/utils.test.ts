@@ -52,7 +52,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.DEATH,
-      {},
+      {} as fhir.Bundle,
       '123'
     )
 
@@ -65,7 +65,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.MARRIAGE,
-      {},
+      {} as fhir.Bundle,
       '123'
     )
 
