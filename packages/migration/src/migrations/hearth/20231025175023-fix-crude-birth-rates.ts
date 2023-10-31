@@ -15,12 +15,14 @@ export const up = async (db: Db, client: MongoClient) => {
   const locationExtensionURL =
     'http://opencrvs.org/specs/id/statistics-crude-birth-rates'
   const session = client.startSession()
-  const processLocation = 0
+  let processLocation = 0
 
   try {
     await session.withTransaction(async () => {
-      const locations = await db.collection('Locations').find({})
-      const locationsCount = await db.collection('Locations').countDocuments({})
+      const locations = await db
+        .collection('Location')
+        .find({ 'type.coding.0.code': 'ADMIN_STRUCTURE' })
+      const locationsCount = await db.collection('Location').countDocuments({})
       // eslint-disable-next-line no-console
       console.log(
         `Migration - Crude birth rates to be amended, total ${locationsCount} needs to be processed`
@@ -34,85 +36,31 @@ export const up = async (db: Db, client: MongoClient) => {
             100
           ).toFixed(2)}% ...`
         )
-        for (const extension of location.extension) {
-          if (extension.url === locationExtensionURL) {
-            const valuesArray = JSON.parse(extension.valueString)
-            valuesArray.forEach(function (obj) {
-              for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                  const value = obj[key]
-                  console.log('Key: ' + key + ', Value: ' + value)
-                }
+        const updatedExtension = location.extension
+        if (updatedExtension) {
+          for (const extension of updatedExtension) {
+            if (extension.url === locationExtensionURL) {
+              const valuesArray = JSON.parse(extension.valueString)
+              for (let j = 0; j < valuesArray.length; j++) {
+                const year = Object.keys(valuesArray[j])[0]
+                const value = valuesArray[j][year] * 2
+                valuesArray[j][year] = value
               }
-            })
+              extension.valueString = JSON.stringify(valuesArray)
+            }
           }
-          const updatedExtension = [
-            {
-              system: identifierTypeSystem,
-              code: identifier.type
-            }
-          ]
-          await db.collection('Patient').updateOne(
-            {
-              _id: patient._id,
-              'identifier.type': {
-                $in: EVENT_IDENTIFIER
-              }
-            },
-            {
-              $set: {
-                'identifier.$[].type': {
-                  coding: updatedCoding
-                }
-              }
-            }
-          )
-          processPatient++
         }
-      }
-
-      // eslint-disable-next-line no-console
-      console.log(
-        `Migration - Patient history identifier update with fhir Codeableconcept, total ${patientHistoryWithRNIdentifierCount} patient history needs to be processed`
-      )
-
-      for await (const patient of patientHistoryWithRNIdentifier) {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Processed ${
-            processPatientHistory + 1
-          }/${patientHistoryWithRNIdentifierCount} patient identifiter, progress ${(
-            ((processPatientHistory + 1) /
-              patientHistoryWithRNIdentifierCount) *
-            100
-          ).toFixed(2)}% ...`
+        await db.collection('Location').updateOne(
+          {
+            _id: location._id
+          },
+          {
+            $set: {
+              extension: updatedExtension
+            }
+          }
         )
-        for (const identifier of patient.identifier) {
-          if (EVENT_IDENTIFIER.includes(identifier.type)) {
-            const updatedCoding = [
-              {
-                system: identifierTypeSystem,
-                code: identifier.type
-              }
-            ]
-            await db.collection('Patient_history').updateOne(
-              {
-                _id: patient._id,
-                'identifier.type': {
-                  $in: EVENT_IDENTIFIER
-                }
-              },
-              {
-                $set: {
-                  'identifier.$[].type': {
-                    coding: updatedCoding
-                  }
-                }
-              }
-            )
-            processPatientHistory++
-          }
-        }
+        processLocation++
       }
     })
   } finally {

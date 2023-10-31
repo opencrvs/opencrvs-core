@@ -222,7 +222,7 @@ export function updateStatisticalExtensions(
         previousData[sourceStatistic.year] = sourceStatistic.crude_birth_rate
       } else {
         birthRates.push({
-          [sourceStatistic.year]: sourceStatistic.crude_birth_rate / 2
+          [sourceStatistic.year]: sourceStatistic.crude_birth_rate
         })
       }
     }

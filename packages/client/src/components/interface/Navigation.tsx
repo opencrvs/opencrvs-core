@@ -361,13 +361,7 @@ const NavigationView = (props: IFullProps) => {
     (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
-    if (
-      !userDetails ||
-      !loadWorkqueueStatuses ||
-      userDetails.systemRole === 'LOCAL_SYSTEM_ADMIN' ||
-      userDetails.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
-      userDetails.systemRole === 'PERFORMANCE_MANAGEMENT'
-    ) {
+    if (!userDetails || !loadWorkqueueStatuses) {
       return
     }
     updateRegistrarWorkqueue(

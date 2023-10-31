@@ -109,7 +109,7 @@ export const generateEmptyBirthKeyFigure = (
   }
 }
 
-function createEstimatesArray(
+export function createEstimatesArray(
   years: number[],
   output: number[],
   extension: fhir.Extension
@@ -117,26 +117,27 @@ function createEstimatesArray(
   const locationExtensions = JSON.parse(extension.valueString as string) as {
     [key: string]: number
   }[]
-  // Imagine that years searching: [2022,2023] & extensions is: [2017,2022]
+  // Imagine that years searching: [2022,2023] & extensions is: [{"2015": 17.2}, {"2022": 16}, {"2017": 17.2}]
   // We have no data for 2023 so we want to use 2022 estimates
+
   for (let i = 0; i < years.length; i++) {
-    let year = years[i]
-    let entryIndex = locationExtensions.findIndex((obj) =>
-      obj.hasOwnProperty(year.toString())
-    )
-    while (entryIndex === -1) {
-      // If no extensions entry for that year find immediately preceeding year's data and use it.
-      // Keep going through the while loop till you find a matching year
-      year--
-      entryIndex = locationExtensions.findIndex((obj) =>
-        obj.hasOwnProperty(year.toString())
-      )
+    /*
+   This code calculates the difference between each year in the array and the target year 2023, then 2022,
+   and then selects the item with the smallest difference.
+   The reduce function is used to iterate over each item in the array and compare the differences.
+   Finally, it returns the item with the closest year to 2023, then 2022.
+  */
+    const closestItem = locationExtensions.reduce((prev, curr) => {
+      const key = parseInt(Object.keys(curr)[0])
+      const prevKey = prev ? parseInt(Object.keys(prev)[0]) : Infinity
+      const currDiff = Math.abs(key - years[i])
+      const prevDiff = Math.abs(prevKey - years[i])
+      return currDiff < prevDiff ? curr : prev
+    }, null)
+    const closestValue = closestItem ? Object.values(closestItem)[0] : null
+    if (closestValue) {
+      output.push(closestValue)
     }
-    const entry = locationExtensions[entryIndex]
-    output.push(Number(entry[year]))
-    // If you use a preceeding year's data ensure that you remove that item from the years array
-    // so you dont revisit that year again in the loop
-    years.splice(entryIndex, 1)
   }
 }
 
@@ -221,8 +222,8 @@ export const fetchEstimateByLocation = async (
       crudArray.push(Number(crudeDeathRateResponse.crudeDeathRate))
     }
   }
+
   for (let i = 0; i < yearArray.length; i++) {
-    // for total estimations we multiply crude birth rate by 2 because it is halved for gender sp
     totalEstimation =
       totalEstimation +
       ((crudArray[i] * totalPopulationArray[i]) / 1000) *
