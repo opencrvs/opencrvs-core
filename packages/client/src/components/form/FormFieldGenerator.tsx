@@ -397,7 +397,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             label={fieldDefinition.label}
             name={fieldDefinition.name}
             value={String(value)}
-            selected={(value as string) === checkedValue}
+            selected={Boolean(value) === Boolean(checkedValue)}
             onChange={(event: { target: { value: string } }) =>
               onSetFieldValue(
                 fieldDefinition.name,
