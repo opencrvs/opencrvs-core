@@ -131,13 +131,22 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       registerForm,
       declaration.data
     )
+
+    const informantType =
+      eventRegistrationInput.registration.informantType.toLowerCase()
+
     const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
 
-    const iD = eventRegistrationInput?.[collector]?.identifier?.[0]?.id
-    const iDType = eventRegistrationInput?.[collector]?.identifier?.[0]
-      ?.type as string
+    const iD =
+      (collector === 'informant'
+        ? eventRegistrationInput[informantType]?.identifier?.[0]?.id
+        : undefined) ?? eventRegistrationInput[collector]?.identifier?.[0]?.id
+    const iDType =
+      (collector === 'informant'
+        ? eventRegistrationInput[informantType]?.identifier?.[0]?.type
+        : undefined) ?? eventRegistrationInput[collector]?.identifier?.[0]?.type
 
     const firstNameIndex = (
       fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]

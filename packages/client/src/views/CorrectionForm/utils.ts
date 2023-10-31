@@ -721,3 +721,9 @@ const getVisibleSections = (
       ).length > 0
   )
 }
+
+export function labelFormatterForInformant(inputString: string) {
+  return (
+    inputString.charAt(0) + inputString.slice(1).toLowerCase()
+  ).replaceAll('_', ' ')
+}
