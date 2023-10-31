@@ -38,6 +38,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface INameField {
   firstNamesField: string
@@ -1032,7 +1033,7 @@ function getCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
       param: {
-        informant: intl.formatMessage(selectInformantMessages[informant])
+        informant: labelFormatterForInformant(informant)
       }
     },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
@@ -1099,7 +1100,7 @@ export function getIssueCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
       param: {
-        informant: intl.formatMessage(selectInformantMessages[informant])
+        informant: labelFormatterForInformant(informant)
       }
     },
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
@@ -1150,7 +1151,9 @@ export function getFilteredRadioOptions(
     options.splice(1, 0, ...marriageForm)
   }
 
-  if (['BRIDE', 'GROOM', 'MOTHER', 'FATHER'].includes(informant)) {
+  if (
+    ['BRIDE', 'GROOM', 'MOTHER', 'FATHER', 'LEGAL_GUARDIAN'].includes(informant)
+  ) {
     options = options.filter((opt) => opt.value !== informant)
   }
 

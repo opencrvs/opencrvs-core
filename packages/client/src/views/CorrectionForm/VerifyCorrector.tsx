@@ -122,11 +122,21 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       registerForm,
       declaration.data
     )
+
+    const informantType =
+      eventRegistrationInput.registration.informantType.toLowerCase()
+
     if (showInfoFor.includes(corrector)) {
       const fields = form[corrector]
-      const iD = eventRegistrationInput?.[corrector]?.identifier?.[0]?.id
-      const iDType = eventRegistrationInput?.[corrector]?.identifier?.[0]
-        ?.type as string
+      const iD =
+        (corrector === 'informant'
+          ? eventRegistrationInput[informantType]?.identifier?.[0]?.id
+          : undefined) ?? eventRegistrationInput[corrector]?.identifier?.[0]?.id
+      const iDType =
+        (corrector === 'informant'
+          ? eventRegistrationInput[informantType]?.identifier?.[0]?.type
+          : undefined) ??
+        eventRegistrationInput[corrector]?.identifier?.[0]?.type
 
       const firstNameIndex = (
         fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
@@ -213,11 +223,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
           {
             <IDVerifier
               id="idVerifier"
-              title={
-                hasNoInfo
-                  ? intl.formatMessage(messages.otherIdCheckTitle)
-                  : intl.formatMessage(messages.idCheckTitle)
-              }
+              title={intl.formatMessage(messages.idCheckTitle)}
               correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
               actionProps={{
                 positiveAction: {
