@@ -47,6 +47,7 @@ import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
+import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -240,10 +241,7 @@ async function createDeceasedIndex(
   body.deathDate = deceased && deceased.deceasedDateTime
   body.gender = deceased && deceased.gender
   body.deceasedIdentifier =
-    deceased.identifier &&
-    deceased.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    deceased.identifier && getSubmittedIdentifier(deceased.identifier)
   body.deceasedDoB = deceased && deceased.birthDate
 }
 
@@ -372,10 +370,7 @@ function createInformantIndex(
     informantNameLocal.family[0]
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
-    informant.identifier &&
-    informant.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
 async function createDeclarationIndex(
