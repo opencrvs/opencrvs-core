@@ -49,3 +49,10 @@ export const setex = (key: string, ttl: number, value: string) =>
 
 export const del = (key: string) =>
   promisify(redisClient.del).bind(redisClient)(key)
+
+export const multi = (operations: Array<Array<string | number>>) => {
+  const multi = redisClient.multi(operations)
+  return promisify(multi.exec).call(multi)
+}
+
+export const getClient = () => redisClient

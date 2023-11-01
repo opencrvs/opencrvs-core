@@ -38,15 +38,19 @@ import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
+import { resolverRateLimit } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }, { dataSources }) {
-      const user = await dataSources.usersAPI.getUserById(userId!)
-      return user
-    },
+    getUser: resolverRateLimit(
+      { requestsPerMinute: 10 },
+      async (_, { userId }, { dataSources }) => {
+        const user = await dataSources.usersAPI.getUserById(userId!)
+        return user
+      }
+    ),
 
-    async getUserByMobile(_, { mobile }, { dataSources }) {
+    getUserByMobile: async (_, { mobile }, { dataSources }) => {
       return dataSources.usersAPI.getUserByMobile(mobile!)
     },
 
