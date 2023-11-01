@@ -50,6 +50,7 @@ import {
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
+import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -143,9 +144,8 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
-  body.childIdentifier = patient?.identifier?.find(
-    (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-  )?.value
+  body.childIdentifier =
+    patient?.identifier && getSubmittedIdentifier(patient.identifier)
 
   if (
     [
@@ -257,10 +257,7 @@ function createMotherIndex(
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
-    mother.identifier &&
-    mother.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    mother.identifier && getSubmittedIdentifier(mother.identifier)
 }
 
 function createFatherIndex(
@@ -291,10 +288,7 @@ function createFatherIndex(
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
-    father.identifier &&
-    father.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    father.identifier && getSubmittedIdentifier(father.identifier)
 }
 
 function createInformantIndex(
@@ -338,10 +332,7 @@ function createInformantIndex(
     informantNameLocal.family[0]
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
-    informant.identifier &&
-    informant.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
 async function createDeclarationIndex(
