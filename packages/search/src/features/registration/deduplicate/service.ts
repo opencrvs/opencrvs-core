@@ -66,7 +66,7 @@ export const searchForBirthDuplicates = async (
   // Names of length of 4 - 6 characters = 1 edit allowed
   // Names of length of >7 characters = 2 edits allowed
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
-  console.log('searchForBirthDuplicates BEFORE: ', JSON.stringify(body))
+
   if (
     (!body.childFirstNames && !body.childFamilyName) ||
     (!body.motherFirstNames && !body.motherFamilyName) ||
@@ -143,96 +143,91 @@ export const searchForBirthDuplicates = async (
       ].filter(Boolean)
     }
   }
-  const dedupequery = {
-    index: OPENCRVS_INDEX_NAME,
-    type: 'compositions',
-    body: {
-      query: {
-        bool: {
-          should: [
-            {
-              bool: {
-                must: [mothersDetailsMatch, birthWithin9Months]
-              }
-            },
-            {
-              bool: {
-                must: [
-                  {
-                    bool: {
-                      must: [
-                        body.childFirstNames && {
-                          match: {
-                            childFirstNames: {
-                              query: body.childFirstNames,
-                              fuzziness: FIRST_NAME_FUZZINESS
+
+  try {
+    const result = await client.search<ISearchResponse<IBirthCompositionBody>>({
+      index: OPENCRVS_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must: [mothersDetailsMatch, birthWithin9Months]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      bool: {
+                        must: [
+                          body.childFirstNames && {
+                            match: {
+                              childFirstNames: {
+                                query: body.childFirstNames,
+                                fuzziness: FIRST_NAME_FUZZINESS
+                              }
+                            }
+                          },
+                          body.childFamilyName && {
+                            match: {
+                              childFamilyName: {
+                                query: body.childFamilyName,
+                                fuzziness: FIRST_NAME_FUZZINESS,
+                                minimum_should_match: '100%'
+                              }
                             }
                           }
-                        },
-                        body.childFamilyName && {
-                          match: {
-                            childFamilyName: {
-                              query: body.childFamilyName,
-                              fuzziness: FIRST_NAME_FUZZINESS,
-                              minimum_should_match: '100%'
-                            }
-                          }
-                        }
-                      ].filter(Boolean)
-                    }
-                  },
-                  body.childDoB && {
-                    bool: {
-                      should: [
-                        {
-                          bool: {
-                            must: [
-                              {
-                                range: {
-                                  childDoB: {
-                                    gte: subYears(
-                                      new Date(body.childDoB),
-                                      3
+                        ].filter(Boolean)
+                      }
+                    },
+                    body.childDoB && {
+                      bool: {
+                        should: [
+                          {
+                            bool: {
+                              must: [
+                                {
+                                  range: {
+                                    childDoB: {
+                                      gte: subYears(
+                                        new Date(body.childDoB),
+                                        3
+                                      ).toISOString(),
+                                      lte: addYears(
+                                        new Date(body.childDoB),
+                                        3
+                                      ).toISOString()
+                                    }
+                                  }
+                                },
+                                {
+                                  distance_feature: {
+                                    field: 'childDoB',
+                                    pivot: '365d',
+                                    origin: new Date(
+                                      body.childDoB
                                     ).toISOString(),
-                                    lte: addYears(
-                                      new Date(body.childDoB),
-                                      3
-                                    ).toISOString()
+                                    boost: 1
                                   }
                                 }
-                              },
-                              {
-                                distance_feature: {
-                                  field: 'childDoB',
-                                  pivot: '365d',
-                                  origin: new Date(body.childDoB).toISOString(),
-                                  boost: 1
-                                }
-                              }
-                            ]
+                              ]
+                            }
                           }
-                        }
-                      ]
-                    }
-                  },
-                  mothersDetailsMatch
-                ].filter(Boolean)
+                        ]
+                      }
+                    },
+                    mothersDetailsMatch
+                  ].filter(Boolean)
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       }
-    }
-  }
-  console.log('searchForBirthDuplicates QUERY: ', JSON.stringify(dedupequery))
-  try {
-    const result = await client.search<ISearchResponse<IBirthCompositionBody>>(
-      dedupequery
-    )
-    console.log(
-      'searchForBirthDuplicates RESULT: ',
-      JSON.stringify(result.body.hits.hits)
-    )
+    })
     return result.body.hits.hits
   } catch (err) {
     logger.error(`searchBirthDuplicates error: ${err}`)
