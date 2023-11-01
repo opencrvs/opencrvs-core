@@ -748,10 +748,14 @@ export function getSubmittedIdentifier(identifiers: fhir.Identifier[]) {
     'OTHER',
     'SOCIAL_SECURITY_NO'
   ]
-  return identifiers.find((item) => {
+  let value = ''
+  identifiers.find((item) => {
     const coding = item.type?.coding || []
-    return coding.some((codeObj) => {
-      return codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
+    coding.some((codeObj) => {
+      codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
+        ? (value = `${item.value}`)
+        : (value = '')
     })
   })
+  return value
 }
