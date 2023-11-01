@@ -111,9 +111,9 @@ export const generateEmptyBirthKeyFigure = (
 
 export function createEstimatesArray(
   years: number[],
-  output: number[],
   extension: fhir.Extension
 ) {
+  const output: number[] = []
   const locationExtensions = JSON.parse(extension.valueString as string) as {
     [key: string]: number
   }[]
@@ -139,6 +139,7 @@ export function createEstimatesArray(
       output.push(closestValue)
     }
   }
+  return output
 }
 
 export const fetchEstimateByLocation = async (
@@ -184,23 +185,23 @@ export const fetchEstimateByLocation = async (
       event === EVENT_TYPE.BIRTH
     ) {
       estimateExtensionFound = true
-      createEstimatesArray(yearArray, crudArray, extension)
+      crudArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
     ) {
       estimateExtensionFound = true
-      createEstimatesArray(yearArray, totalPopulationArray, extension)
+      totalPopulationArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      createEstimatesArray(yearArray, malePopulationArray, extension)
+      malePopulationArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      createEstimatesArray(yearArray, femalePopulationArray, extension)
+      femalePopulationArray.push(...createEstimatesArray(yearArray, extension))
     }
   })
   if (!estimateExtensionFound) {

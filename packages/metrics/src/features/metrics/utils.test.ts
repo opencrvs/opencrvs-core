@@ -457,7 +457,7 @@ describe('verify metrics util', () => {
 
       const expectedOutput = [16, 16]
 
-      createEstimatesArray(yearsArray, crudArray, estimatesExtension)
+      crudArray.push(...createEstimatesArray(yearsArray, estimatesExtension))
 
       expect(crudArray).toEqual(expectedOutput)
     })
@@ -478,7 +478,7 @@ describe('verify metrics util', () => {
 
     const expectedOutput = [17.2, 17.5]
 
-    createEstimatesArray(yearsArray, crudArray, estimatesExtension)
+    crudArray.push(...createEstimatesArray(yearsArray, estimatesExtension))
 
     expect(crudArray).toEqual(expectedOutput)
   })
