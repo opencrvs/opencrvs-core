@@ -61,7 +61,8 @@ describe('User root resolvers', () => {
               }
             }
           }
-        }
+        },
+        { fieldName: 'getUser' }
       )
 
       expect(user).toBeDefined()
