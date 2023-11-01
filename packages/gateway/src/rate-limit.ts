@@ -47,7 +47,7 @@ const withRateLimit = <A extends any[], R>(
       onError()
     }
 
-    return fn(...args) as R
+    return fn(...args)
   }
 }
 
