@@ -89,6 +89,8 @@ function findDuplicates(arr: string[]): string[] {
     .map(([name, _]) => name)
 }
 
+const DECORATIVE_TYPES = ['DIVIDER', 'HEADING3', 'SUBSECTION_HEADER']
+
 const REQUIRED_SECTIONS = ['registration', 'documents'] as const
 
 const REQUIRED_EVENT_ADDRESS_FIELDS = ['country', 'state']
@@ -374,7 +376,7 @@ const form = z.object({
             const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
               group.fields
                 .filter(({ custom }) => !Boolean(custom))
-                .filter(({ type }) => type !== 'DIVIDER')
+                .filter(({ type }) => !DECORATIVE_TYPES.includes(type))
                 .filter(
                   ({ name }) =>
                     !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
@@ -394,7 +396,7 @@ const form = z.object({
             const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
               group.fields
                 .filter(({ custom }) => !Boolean(custom))
-                .filter(({ type }) => type !== 'DIVIDER')
+                .filter(({ type }) => !DECORATIVE_TYPES.includes(type))
                 .filter(
                   ({ name }) =>
                     !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
