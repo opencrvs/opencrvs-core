@@ -23,11 +23,25 @@ beforeEach(() => {
 describe('User root resolvers', () => {
   describe('getUser()', () => {
     it('returns a user object', async () => {
+      const declareToken = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      const authHeaderFieldAgent = {
+        Authorization: `Bearer ${declareToken}`
+      }
+
       const user = await resolvers.Query.getUser(
         {},
         { userId: 'ba7022f0ff4822' },
         {
-          headers: undefined,
+          headers: authHeaderFieldAgent,
           dataSources: {
             usersAPI: {
               getUserById: () => {
