@@ -23,9 +23,6 @@ const mock: IDatabaseConnector = {
   set: jest.fn().mockImplementation(async (key, value) => {
     database[key] = value
   }),
-  setex: jest.fn().mockImplementation(async (key, ttl, value) => {
-    database[key] = value
-  }),
   get: jest.fn().mockImplementation(async (key) => {
     return database[key] || null
   }),
@@ -34,6 +31,7 @@ const mock: IDatabaseConnector = {
     delete database[key]
     return keyExists ? 1 : 0
   }),
+  multi: jest.fn().mockImplementation(() => [0, 0]),
   start: jest.fn(),
   stop: jest.fn()
 }

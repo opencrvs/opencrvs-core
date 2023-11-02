@@ -19,9 +19,9 @@ export interface IDatabaseConnector {
   stop: () => void
   start: () => void
   set: (key: string, value: string) => Promise<void>
-  setex: (key: string, ttl: number, value: string) => Promise<void>
   get: (key: string) => Promise<string | null>
   del: (key: string) => Promise<number>
+  multi: (operations: Array<Array<string | number>>) => Promise<any>
 }
 
 export async function stop() {
@@ -43,9 +43,6 @@ export const get = (key: string) =>
 
 export const set = (key: string, value: string) =>
   promisify(redisClient.set).bind(redisClient)(key, value)
-
-export const setex = (key: string, ttl: number, value: string) =>
-  promisify(redisClient.setex).bind(redisClient)(key, ttl, value)
 
 export const del = (key: string) =>
   promisify(redisClient.del).bind(redisClient)(key)
