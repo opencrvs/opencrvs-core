@@ -719,16 +719,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'spouse'
       }
 
-      modifiedDeclaration = {
-        ...modifiedDeclaration,
-        data: {
-          ...modifiedDeclaration.data,
-          informant: {
-            ...modifiedDeclaration.data.informant
-          }
-        }
-      }
-
       if (informant) {
         modifiedDeclaration = {
           ...modifiedDeclaration,
