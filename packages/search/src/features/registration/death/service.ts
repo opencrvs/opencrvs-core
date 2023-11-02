@@ -217,16 +217,20 @@ async function createDeceasedIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const deceased = findEntry(
+  const deceased = findEntry<fhir.Patient>(
     DECEASED_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
+
+  if (!deceased) {
+    return
+  }
 
   await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
 
-  const deceasedName = deceased && findName(NAME_EN, deceased.name)
-  const deceasedNameLocal = deceased && findNameLocale(deceased.name)
+  const deceasedName = findName(NAME_EN, deceased.name)
+  const deceasedNameLocal = findNameLocale(deceased.name)
 
   body.deceasedFirstNames =
     deceasedName && deceasedName.given && deceasedName.given.join(' ')
@@ -238,11 +242,11 @@ async function createDeceasedIndex(
     deceasedNameLocal.given.join(' ')
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
-  body.deathDate = deceased && deceased.deceasedDateTime
-  body.gender = deceased && deceased.gender
+  body.deathDate = deceased.deceasedDateTime
+  body.gender = deceased.gender
   body.deceasedIdentifier =
     deceased.identifier && getSubmittedIdentifier(deceased.identifier)
-  body.deceasedDoB = deceased && deceased.birthDate
+  body.deceasedDoB = deceased.birthDate
 }
 
 function createMotherIndex(
@@ -250,11 +254,11 @@ function createMotherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const mother = findEntry(
+  const mother = findEntry<fhir.Patient>(
     MOTHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!mother) {
     return
@@ -278,11 +282,11 @@ function createFatherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const father = findEntry(
+  const father = findEntry<fhir.Patient>(
     FATHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!father) {
     return
@@ -306,11 +310,11 @@ function createSpouseIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const spouse = findEntry(
+  const spouse = findEntry<fhir.Patient>(
     SPOUSE_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!spouse) {
     return
@@ -334,20 +338,20 @@ function createInformantIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const informantRef = findEntry(
+  const informantRef = findEntry<fhir.RelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundleEntries
-  ) as fhir.RelatedPerson
+  )
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = findEntryResourceByUrl(
+  const informant = findEntryResourceByUrl<fhir.Patient>(
     informantRef.patient.reference,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!informant) {
     return
