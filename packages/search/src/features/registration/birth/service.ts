@@ -207,16 +207,16 @@ async function createChildIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const child = findEntry(
-    CHILD_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
+  const child = findEntry<fhir.Patient>(CHILD_CODE, composition, bundleEntries)
+
+  if (!child) {
+    return
+  }
 
   await addEventLocation(body, BIRTH_ENCOUNTER_CODE, composition)
 
-  const childName = child && findName(NAME_EN, child.name)
-  const childNameLocal = child && findNameLocale(child.name)
+  const childName = findName(NAME_EN, child.name)
+  const childNameLocal = findNameLocale(child.name)
 
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
@@ -225,8 +225,8 @@ async function createChildIndex(
     childNameLocal && childNameLocal.given && childNameLocal.given.join(' ')
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
-  body.childDoB = child && child.birthDate
-  body.gender = child && child.gender
+  body.childDoB = child.birthDate
+  body.gender = child.gender
 }
 
 function createMotherIndex(
@@ -234,11 +234,11 @@ function createMotherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const mother = findEntry(
+  const mother = findEntry<fhir.Patient>(
     MOTHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!mother) {
     return
@@ -268,11 +268,11 @@ function createFatherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const father = findEntry(
+  const father = findEntry<fhir.Patient>(
     FATHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!father) {
     return
@@ -302,20 +302,20 @@ function createInformantIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const informantRef = findEntry(
+  const informantRef = findEntry<fhir.RelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundleEntries
-  ) as fhir.RelatedPerson
+  )
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = findEntryResourceByUrl(
+  const informant = findEntryResourceByUrl<fhir.Patient>(
     informantRef.patient.reference,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!informant) {
     return
