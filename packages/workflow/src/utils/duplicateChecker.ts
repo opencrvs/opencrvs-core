@@ -53,8 +53,6 @@ const findBirthDuplicates = async (
   authHeader: IAuthHeader,
   criteria: BirthDuplicateSearchBody
 ) => {
-  console.log('criteria', criteria)
-
   try {
     const response = await fetch(`${SEARCH_URL}search/duplicates/birth`, {
       method: 'POST',
