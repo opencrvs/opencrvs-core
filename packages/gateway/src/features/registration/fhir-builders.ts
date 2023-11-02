@@ -1882,7 +1882,16 @@ export const builders: IFieldBuilders = {
     },
     _fhirIDPatient: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreateInformantResource(fhirBundle)
-      person.id = fieldValue as string
+
+      /*
+       * In case of the informant already exists, we should not change their id.
+       * If you imagine first storing a record with mother as the informant and then later on changing it to father
+       * then what would happen is "person" evaluates to father while _fhirPatient input still referring mother (as client doesn't know better).
+       */
+
+      if (!person.id) {
+        person.id = fieldValue as string
+      }
     },
     gender: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreateInformantResource(fhirBundle)
