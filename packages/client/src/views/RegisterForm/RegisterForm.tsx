@@ -742,11 +742,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         }
       }
       this.props.modifyDeclaration(modifiedDeclaration)
-      // this is to forcefully remount the component
-      // to reset the initial values of formik
-      // this.setState({
-      //   formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
-      // })
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
