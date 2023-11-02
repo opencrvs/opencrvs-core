@@ -16,8 +16,10 @@ import {
   CHECK_INVALID_TOKEN,
   CERT_PUBLIC_KEY_PATH,
   AUTH_URL,
+  DEFAULT_TIMEOUT,
   HOSTNAME,
-  DEFAULT_TIMEOUT
+  LOGIN_URL,
+  CLIENT_APP_URL
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
@@ -32,9 +34,9 @@ export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
   if (HOSTNAME[0] !== '*') {
-    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
+    whitelist = [LOGIN_URL, CLIENT_APP_URL]
   }
-  logger.info(`Whitelist: : ${JSON.stringify(whitelist)}`)
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,

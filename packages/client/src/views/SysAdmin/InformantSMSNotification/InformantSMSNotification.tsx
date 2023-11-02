@@ -68,7 +68,7 @@ const NotificationNames = [
   'deathRejectionSMS'
 ] as const
 
-type INotificationName = typeof NotificationNames[number]
+type INotificationName = (typeof NotificationNames)[number]
 
 type IState = Record<INotificationName, boolean>
 
