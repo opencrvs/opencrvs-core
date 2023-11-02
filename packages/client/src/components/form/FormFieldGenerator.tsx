@@ -389,8 +389,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === CHECKBOX) {
-      const { checkedValue = 'true', uncheckedValue = 'false' } =
-        fieldDefinition
+      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
       return (
         <InputField {...inputFieldProps}>
           <Checkbox
