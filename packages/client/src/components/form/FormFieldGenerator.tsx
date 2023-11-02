@@ -389,7 +389,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === CHECKBOX) {
-      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
+      const { checkedValue = 'true', uncheckedValue = 'false' } =
+        fieldDefinition
       return (
         <InputField {...inputFieldProps}>
           <Checkbox
@@ -397,7 +398,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             label={fieldDefinition.label}
             name={fieldDefinition.name}
             value={String(value)}
-            selected={Boolean(value) === Boolean(checkedValue)}
+            selected={(value as string) === checkedValue}
             onChange={(event: { target: { value: string } }) =>
               onSetFieldValue(
                 fieldDefinition.name,
@@ -909,7 +910,7 @@ class FormSectionComponent extends React.Component<Props> {
         this.props.setFieldValue(fieldToReset.name, '')
       }
 
-      this.resetDependentSelectValues(fieldToReset.name)
+      this.resetDependentSelectValues(fieldToReset.name, val)
     })
   }
 
