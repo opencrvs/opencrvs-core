@@ -84,6 +84,8 @@ export type CorrectionRequestedRecord = Nominal<
 >
 export type CertifiedRecord = Nominal<RecordBase, 'Certified'>
 export type IssuedRecord = Nominal<RecordBase, 'Issued'>
+export type InProgressRecord = Nominal<RecordBase, 'InProgress'>
+export type DeclaredRecord = Nominal<RecordBase, 'Declared'>
 
 export type ValidRecord =
   | WaitingForValidationRecord
@@ -94,6 +96,8 @@ export type ValidRecord =
   | IssuedRecord
 
 export type StateIdenfitiers = {
+  IN_PROGRESS: InProgressRecord
+  DECLARED: DeclaredRecord
   VALIDATED: ValidatedRecord
   REGISTERED: RegisteredRecord
   CORRECTION_REQUESTED: CorrectionRequestedRecord
