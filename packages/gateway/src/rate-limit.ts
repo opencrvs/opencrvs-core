@@ -13,6 +13,7 @@ import { ApolloError } from 'apollo-server-hapi'
 import { GraphQLResolveInfo } from 'graphql'
 import { Context } from '@gateway/graphql/context'
 import { getUserId } from '@gateway/features/user/utils/index'
+import { DISABLE_RATE_LIMIT } from './constants'
 
 class RateLimitError extends ApolloError {
   constructor(message: string) {
@@ -37,6 +38,10 @@ const withRateLimit = <A extends any[], R>(
   { key, requestsPerMinute, onError }: RouteOptions,
   fn: (...args: A) => R
 ) => {
+  if (DISABLE_RATE_LIMIT) {
+    return fn
+  }
+
   return async function (...args: A) {
     const [requests] = await client.multi([
       ['incr', key],
