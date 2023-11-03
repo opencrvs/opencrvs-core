@@ -19,7 +19,7 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 
-const createRequest = async <T = any>(
+export const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,

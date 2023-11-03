@@ -58,7 +58,7 @@ import { getRecordById } from '@workflow/records'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 
-function validateRequest<T extends z.ZodType>(
+export function validateRequest<T extends z.ZodType>(
   validator: T,
   payload: unknown
 ): z.infer<T> {
