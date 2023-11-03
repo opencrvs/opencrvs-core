@@ -11,6 +11,7 @@
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
+import { validateRoute } from '@workflow/records/routes/validate'
 
 export const getRoutes = () => {
   const routes = [
@@ -61,7 +62,8 @@ export const getRoutes = () => {
         description:
           'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
       }
-    }
+    },
+    ...validateRoute
   ]
 
   return routes
