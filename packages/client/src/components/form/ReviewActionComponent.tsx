@@ -183,7 +183,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -215,7 +215,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -232,7 +232,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.registerActionTitle,
               payload: { completeDeclaration: true }
             },
             description: {
@@ -246,7 +246,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.registerActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -272,7 +272,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.registerActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
