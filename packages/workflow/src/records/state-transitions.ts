@@ -25,6 +25,9 @@ import {
   Task,
   sortTasksDescending,
   RecordWithPreviousTask,
+  ValidatedRecord,
+  InProgressRecord,
+  DeclaredRecord,
   Attachment
 } from '@opencrvs/commons/types'
 import {
@@ -32,21 +35,21 @@ import {
   setupLastRegUser
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-
 import {
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput,
   MakeCorrectionRequestInput
-} from './correction-request'
+} from '@workflow/records/correction-request'
 import {
   createCorrectedTask,
   createCorrectionEncounter,
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createValidateTask,
   getTaskHistory
-} from './fhir'
+} from '@workflow/records/fhir'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -182,6 +185,36 @@ export async function toCorrectionApproved(
     'REGISTERED'
   ) as any as RecordWithPreviousTask<RegisteredRecord>
 }
+export async function toValidated(
+  record: InProgressRecord | DeclaredRecord,
+  practitioner: Practitioner
+): Promise<ValidatedRecord> {
+  const previousTask = getTaskFromBundle(record)
+  const validatedTask = createValidateTask(previousTask, practitioner)
+
+  const validatedTaskWithPractitionerExtensions = setupLastRegUser(
+    validatedTask,
+    practitioner
+  )
+
+  const validatedTaskWithLocationExtensions = await setupLastRegLocation(
+    validatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        { resource: validatedTaskWithLocationExtensions }
+      ]
+    },
+    'VALIDATED'
+  )
+}
 
 export async function toCorrectionRequested(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -280,7 +313,7 @@ export async function toCorrectionRejected(
     practitioner
   )
 
-  const taskHistory = await getTaskHistory(currentCorrectionRequestedTask.id)
+  const taskHistory = await getTaskHistory(currentCorrectionRequestedTask.id!)
 
   const previousTaskBeforeCorrection = sortTasksDescending(
     taskHistory.entry.map((x) => x.resource)
