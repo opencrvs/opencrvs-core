@@ -77,6 +77,7 @@ import {
   setCertificateCollector,
   uploadBase64AttachmentsToDocumentsStore
 } from './utils'
+import { createRequest } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
 async function getAnonymousToken() {
@@ -947,22 +948,22 @@ async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details?:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskEntry = await getTaskEntry(id, authHeader)
-
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskEntry
+  await createRequest<{ id: string }>(
+    'POST',
+    `/records/${id}/validate`,
+    authHeader,
+    {
+      id,
+      details,
+      event
     }
-  } else {
-    doc = await registrationToFHIR(event, details, authHeader)
-  }
-
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  )
+  return id
 }
 
 async function markEventAsRegistered(
