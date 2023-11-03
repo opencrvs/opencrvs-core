@@ -909,7 +909,7 @@ class FormSectionComponent extends React.Component<Props> {
         this.props.setFieldValue(fieldToReset.name, '')
       }
 
-      this.resetDependentSelectValues(fieldToReset.name)
+      this.resetDependentSelectValues(fieldToReset.name, val)
     })
   }
 

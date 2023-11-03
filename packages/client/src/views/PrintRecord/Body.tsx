@@ -345,7 +345,7 @@ function renderValue(
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return formatLongDate(value, intl.locale)
   }
 
   if (field.hideValueInPreview) {
@@ -832,7 +832,9 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     } else {
       return (
         <SignatureBox>
-          {formatMessage(props.intls, reviewMessages.informantsSignature)}
+          {formatMessage(props.intls, reviewMessages.informantsSignature, {
+            event: props.declaration.event
+          })}
         </SignatureBox>
       )
     }
