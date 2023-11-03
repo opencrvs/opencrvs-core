@@ -71,17 +71,6 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Create record endpoint'
       }
-    },
-    {
-      method: 'POST',
-      path: '/validate-record',
-      handler: () => {
-        return 'api working'
-      },
-      config: {
-        tags: ['api'],
-        description: 'Validate record endpoint'
-      }
     }
   ]
 

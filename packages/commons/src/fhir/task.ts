@@ -31,8 +31,7 @@ import {
   UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  findExtension,
-  isSaved
+  findExtension
 } from '.'
 import { UUID } from '..'
 
@@ -177,11 +176,10 @@ export function isTaskOrTaskHistory<T extends Resource>(
 ): resource is (T & TaskHistory) | (T & Task) {
   return ['TaskHistory', 'Task'].includes(resource.resourceType)
 }
-
 export function getTaskFromBundle<T extends Bundle>(bundle: T) {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
-  if (!task || !isSaved(task)) {
+  if (!task) {
     throw new Error('No task found in bundle')
   }
   return task

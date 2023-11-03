@@ -63,10 +63,9 @@ export default async function createRecordHandler(
     const token = getToken(request)
     const fromRegistrar = hasRegisterScope(request)
     const fromRegAgent = hasValidateScope(request)
-    const payload = validateRequest(requestSchema, request.payload)
-    const { details, event } = payload
-    const fhirBundle = buildFHIRBundle(details, event)
-    let bundle = await modifyRegistrationBundle(fhirBundle, token)
+    const { details, event } = validateRequest(requestSchema, request.payload)
+    const inputBundle = buildFHIRBundle(details, event)
+    let bundle = await modifyRegistrationBundle(inputBundle, token)
     if (fromRegistrar) {
       bundle = await markBundleAsWaitingValidation(bundle, token)
     } else if (fromRegAgent) {
@@ -104,6 +103,8 @@ export default async function createRecordHandler(
         isPotentiallyDuplicate: isDuplicate
       }
     }
+
+    // this is to fix in later PR
 
     /* sending notification to the contact */
     // const sms = await getSharedContactMsisdn(bundle)
