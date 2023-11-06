@@ -212,7 +212,7 @@ describe('User root resolvers', () => {
       expect(response.totalItems).toBe(3)
       expect(response.results).toEqual(dummyUserList)
     })
-    it('should return error for register', async () => {
+    it("doesn't allow field agent to search users", async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           totalItems: dummyUserList.length,
@@ -221,9 +221,14 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent, {
-          fieldName: 'searchUsers'
-        })
+        resolvers.Query.searchUsers(
+          {},
+          {},
+          { headers: authHeaderFieldAgent },
+          {
+            fieldName: 'searchUsers'
+          }
+        )
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
       )
@@ -463,7 +468,7 @@ describe('User root resolvers', () => {
         }
       ])
     })
-    it('should return error for register', async () => {
+    it("doesn't allow field agent to search field agents", async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           totalItems: dummyUserList.length,
@@ -479,7 +484,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderFieldAgent,
+          { headers: authHeaderFieldAgent },
           { fieldName: 'searchFieldAgents' }
         )
       ).rejects.toThrow(
@@ -604,7 +609,7 @@ describe('User root resolvers', () => {
       const res = await resolvers.Query.verifyPasswordById(
         {},
         { id: '123', password: 'test' },
-        authHeaderUser,
+        { headers: authHeaderUser },
         { fieldName: 'verifyPasswordById' }
       )
 
@@ -618,7 +623,7 @@ describe('User root resolvers', () => {
         await resolvers.Query.verifyPasswordById(
           {},
           { id: '123', password: 'test' },
-          authHeaderUser,
+          { headers: authHeaderUser },
           { fieldName: 'verifyPasswordById' }
         )
       } catch (e) {
