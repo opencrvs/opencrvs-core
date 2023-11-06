@@ -72,9 +72,16 @@ export const restRateLimit =
   ) =>
   (...args: A) => {
     const route = args[1].request.path
-    const userId = getUserId({
-      Authorization: args[1].request.headers.authorization
-    })
+
+    // IP address
+    let userId = args[1].request.info.remoteAddress
+
+    if (args[1].request.headers.authorization) {
+      // If logged in, use userId
+      userId = getUserId({
+        Authorization: args[1].request.headers.authorization
+      })
+    }
 
     return withRateLimit(
       {

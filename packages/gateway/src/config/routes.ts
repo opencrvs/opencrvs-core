@@ -141,6 +141,7 @@ export const getRoutes = () => {
         })
       }),
       options: {
+        auth: false,
         payload: {
           output: 'data',
           parse: false
