@@ -18,7 +18,7 @@ import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getDocumentUrl } from '@config/services/documents'
+// import { getDocumentUrl } from '@config/services/documents'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 
@@ -40,9 +40,7 @@ export default async function configHandler(
         Promise.all(
           certs.map(async (cert) => ({
             ...cert,
-            svgCode: await getDocumentUrl(cert.svgCode, {
-              Authorization: request.headers.authorization
-            })
+            svgCode: `http://localhost:3040/certificates/${cert.event}.svg`
           }))
         )
       ),
