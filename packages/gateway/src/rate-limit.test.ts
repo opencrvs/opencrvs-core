@@ -10,6 +10,7 @@
  */
 
 import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -18,6 +19,8 @@ import { clearRedisMock } from '../test/setupJest'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
+const locationResolvers = locationRootResolvers as any
+
 beforeEach(() => {
   fetch.resetMocks()
 })
@@ -92,6 +95,15 @@ describe('Rate limit', () => {
       )
     }
 
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        username: 'sakibal.hasan',
+        id: '123',
+        scope: ['declare'],
+        status: 'active'
+      })
+    )
+
     return expect(
       resolvers.Query.verifyPasswordById(
         {},
@@ -99,8 +111,18 @@ describe('Rate limit', () => {
         { headers: authHeaderRegAgent },
         { fieldName: 'verifyPasswordById' }
       )
-    ).rejects.not.toThrow(
-      'Too many requests within a minute. Please throttle your requests.'
-    )
+    ).resolves.not.toThrowError()
+  })
+
+  it('does not throw when a non-rate-limited route is being called 20 times', async () => {
+    for (let i = 1; i <= 20; i++) {
+      fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Location' }))
+      await locationResolvers.Query.locationById(
+        {},
+        { locationId: '1' },
+        { headers: authHeaderRegAgent },
+        { fieldName: 'locationById' }
+      )
+    }
   })
 })
