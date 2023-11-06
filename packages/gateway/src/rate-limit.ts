@@ -60,7 +60,7 @@ const withRateLimit = <A extends any[], R>(
   }
 }
 
-export const restRateLimit =
+export const rateLimitedRoute =
   <
     A extends Parameters<
       Lifecycle.Method<ReqRefDefaults, Lifecycle.ReturnValue<ReqRefDefaults>>
@@ -92,7 +92,7 @@ export const restRateLimit =
     )(...args)
   }
 
-export const resolverRateLimit =
+export const rateLimitedResolver =
   <A extends [any, any, Context, GraphQLResolveInfo], R>(
     { requestsPerMinute }: { requestsPerMinute: number },
     fn: (...args: A) => R

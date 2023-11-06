@@ -29,7 +29,7 @@ import {
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
 import { AUTH_URL } from '@gateway/constants'
-import { restRateLimit } from '@gateway/rate-limit'
+import { rateLimitedRoute } from '@gateway/rate-limit'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -135,7 +135,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/auth/{suffix}',
-      handler: restRateLimit({ requestsPerMinute: 10 }, (_, h) => {
+      handler: rateLimitedRoute({ requestsPerMinute: 10 }, (_, h) => {
         return h.proxy({
           uri: AUTH_URL + '/{suffix}{query}'
         })
