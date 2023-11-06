@@ -45,7 +45,7 @@ describe('Rate limit', () => {
     }
   })
 
-  it('allows 10 calls and then throws', async () => {
+  it('allows 10 calls and then throws RateLimitError', async () => {
     for (let i = 1; i <= 10; i++) {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -76,7 +76,7 @@ describe('Rate limit', () => {
     )
   })
 
-  it('does not throw when called exactly 10 times', async () => {
+  it('does not throw RateLimitError when called exactly 10 times', async () => {
     for (let i = 1; i <= 9; i++) {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -114,8 +114,8 @@ describe('Rate limit', () => {
     ).resolves.not.toThrowError()
   })
 
-  it('does not throw when a non-rate-limited route is being called 20 times', async () => {
-    for (let i = 1; i <= 20; i++) {
+  it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
+    const resolverCalls = Array.from({ length: 20 }, async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Location' }))
       await locationResolvers.Query.locationById(
         {},
@@ -123,6 +123,8 @@ describe('Rate limit', () => {
         { headers: authHeaderRegAgent },
         { fieldName: 'locationById' }
       )
-    }
+    })
+
+    return expect(() => Promise.all(resolverCalls)).not.toThrowError()
   })
 })
