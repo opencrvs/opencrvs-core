@@ -47,7 +47,7 @@ const withRateLimit = <A extends any[], R>(
   return async function (...args: A) {
     const [requests] = await client.incrementWithTTL(key, TTL_IN_MS)
 
-    if (requests > requestsPerMinute) {
+    if (requests > requestsPerMinute + 1) {
       throw new RateLimitError(
         'Too many requests within a minute. Please throttle your requests.'
       )

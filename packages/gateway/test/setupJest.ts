@@ -41,6 +41,10 @@ const mock: IDatabaseConnector = {
   stop: jest.fn()
 }
 
+export const clearRedisMock = () => {
+  for (const member in database) delete database[member]
+}
+
 jest.setMock('src/features/user/database', mock)
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
