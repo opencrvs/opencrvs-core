@@ -47,11 +47,6 @@ export const set = (key: string, value: string) =>
 export const del = (key: string) =>
   promisify(redisClient.del).bind(redisClient)(key)
 
-export const multi = (operations: Array<Array<string | number>>) => {
-  const multi = redisClient.multi(operations)
-  return promisify(multi.exec).call(multi)
-}
-
 export const incrementWithTTL = (key: string, ttl: number) => {
   const multi = redisClient.multi([
     ['incr', key],

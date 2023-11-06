@@ -45,10 +45,7 @@ const withRateLimit = <A extends any[], R>(
   }
 
   return async function (...args: A) {
-    const [requests] = await client.multi([
-      ['incr', key],
-      ['pexpire', key, TTL_IN_MS]
-    ])
+    const [requests] = await client.incrementWithTTL(key, TTL_IN_MS)
 
     if (requests > requestsPerMinute) {
       throw new RateLimitError(
