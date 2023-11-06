@@ -268,7 +268,13 @@ async function getPDFTemplateWithSVG(
     state
   )
 
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
+  }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate
