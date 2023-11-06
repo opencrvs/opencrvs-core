@@ -13,29 +13,18 @@ import { getToken } from '@workflow/utils/authUtils'
 import {
   BirthRegistration,
   buildFHIRBundle,
-  Bundle,
   DeathRegistration,
   EVENT_TYPE,
   MarriageRegistration,
   validateBundle
 } from '@opencrvs/commons/types'
-import {
-  markBundleAsDeclarationUpdated,
-  markBundleAsValidated
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
-import { postToHearth } from '@workflow/features/registration/fhir/fhir-utils'
-import { taskHasInput } from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
 import { z } from 'zod'
-// import { inspect } from 'util'
 import { indexBundle } from '@workflow/records/search'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toValidated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
-// import { getRecordById } from '../index'
-// import { RegStatus } from '@workflow/features/registration/fhir/constants'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -62,29 +51,7 @@ export const validateRoute = [
         const inputBundle = buildFHIRBundle(validationDetails, event)
         validateBundle(inputBundle)
 
-        const taskResource = getTaskResourceFromFhirBundle(
-          inputBundle as Bundle
-        )
-
-        let modifiedBundle
         const practitioner = await getLoggedInPractitionerResource(token)
-        console.log('practitioner', practitioner)
-
-        if (taskHasInput(taskResource)) {
-          modifiedBundle = await markBundleAsDeclarationUpdated(
-            inputBundle as Bundle,
-            getToken(request)
-          )
-
-          await postToHearth(modifiedBundle)
-
-          delete taskResource.input
-          delete taskResource.output
-        }
-        modifiedBundle = await markBundleAsValidated(
-          inputBundle as Bundle,
-          getToken(request)
-        )
 
         const recordInValidatedRequestedState = await toValidated(
           record,
