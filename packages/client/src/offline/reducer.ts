@@ -606,6 +606,10 @@ function reducer(
       }
     }
 
+    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
+      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
+    }
+
     /*
      * Locations
      */
