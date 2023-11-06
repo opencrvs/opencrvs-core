@@ -17,7 +17,7 @@ const f = jest.requireActual('node-fetch')
 
 jest.setMock('node-fetch', { default: fetch, Headers: f.Headers })
 
-const database: { [key: string]: string } = {}
+const database: { [key: string]: string | number } = {}
 
 const mock: IDatabaseConnector = {
   set: jest.fn().mockImplementation(async (key, value) => {
@@ -31,7 +31,12 @@ const mock: IDatabaseConnector = {
     delete database[key]
     return keyExists ? 1 : 0
   }),
-  multi: jest.fn().mockImplementation(() => [0, 0]),
+  /** Doesn't implement TTL. Amend if needed. */
+  incrementWithTTL: jest.fn().mockImplementation(async (key) => {
+    database[key] ||= 1
+    ;(database[key] as number)++
+    return [database[key]]
+  }),
   start: jest.fn(),
   stop: jest.fn()
 }

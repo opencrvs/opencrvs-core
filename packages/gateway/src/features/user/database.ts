@@ -21,7 +21,7 @@ export interface IDatabaseConnector {
   set: (key: string, value: string) => Promise<void>
   get: (key: string) => Promise<string | null>
   del: (key: string) => Promise<number>
-  multi: (operations: Array<Array<string | number>>) => Promise<any>
+  incrementWithTTL: (key: string, ttl: number) => Promise<any>
 }
 
 export async function stop() {
@@ -52,4 +52,10 @@ export const multi = (operations: Array<Array<string | number>>) => {
   return promisify(multi.exec).call(multi)
 }
 
-export const getClient = () => redisClient
+export const incrementWithTTL = (key: string, ttl: number) => {
+  const multi = redisClient.multi([
+    ['incr', key],
+    ['pexpire', key, ttl]
+  ])
+  return promisify(multi.exec).call(multi)
+}

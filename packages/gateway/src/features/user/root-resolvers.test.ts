@@ -205,7 +205,8 @@ describe('User root resolvers', () => {
       const response = await resolvers.Query.searchUsers(
         {},
         {},
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchUsers' }
       )
 
       expect(response.totalItems).toBe(3)
@@ -220,7 +221,9 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent)
+        resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent, {
+          fieldName: 'searchUsers'
+        })
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
       )
@@ -247,7 +250,8 @@ describe('User root resolvers', () => {
           skip: 0,
           sort: 'desc'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchUsers' }
       )
 
       expect(response.totalItems).toBe(1)
@@ -369,7 +373,8 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(2)
@@ -426,7 +431,8 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(2)
@@ -473,7 +479,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderFieldAgent
+          authHeaderFieldAgent,
+          { fieldName: 'searchFieldAgents' }
         )
       ).rejects.toThrow(
         'Search field agents is only allowed for sysadmin or registrar or registration agent'
@@ -506,7 +513,8 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(1)
@@ -536,7 +544,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          { headers: authHeaderSysAdmin }
+          { headers: authHeaderSysAdmin },
+          { fieldName: 'searchFieldAgents' }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -553,7 +562,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          { headers: authHeaderSysAdmin }
+          { headers: authHeaderSysAdmin },
+          { fieldName: 'searchFieldAgents' }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -594,7 +604,8 @@ describe('User root resolvers', () => {
       const res = await resolvers.Query.verifyPasswordById(
         {},
         { id: '123', password: 'test' },
-        authHeaderUser
+        authHeaderUser,
+        { fieldName: 'verifyPasswordById' }
       )
 
       expect(res.username).toBe('sakibal.hasan')
@@ -607,7 +618,8 @@ describe('User root resolvers', () => {
         await resolvers.Query.verifyPasswordById(
           {},
           { id: '123', password: 'test' },
-          authHeaderUser
+          authHeaderUser,
+          { fieldName: 'verifyPasswordById' }
         )
       } catch (e) {
         expect(e.message).toBe('Unauthorized to verify password')
