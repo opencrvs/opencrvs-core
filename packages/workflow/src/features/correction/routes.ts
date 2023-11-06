@@ -49,7 +49,6 @@ import {
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
-
 import { Request } from '@hapi/hapi'
 import { getAuthHeader } from '@opencrvs/commons'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'

@@ -76,7 +76,7 @@ import {
   removeDuplicatesFromComposition,
   setCertificateCollector,
   uploadBase64AttachmentsToDocumentsStore
-} from './utils'
+} from '@gateway/features/registration/utils'
 import { createRequest } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
