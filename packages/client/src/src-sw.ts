@@ -54,7 +54,11 @@ registerRoute(/http(.+)certificate-configuration$/, new NetworkFirst())
 // This caches font files fetched from country config
 registerRoute(/http(.+)fonts\/.*\.ttf$/, new NetworkFirst())
 // This caches validations fetched from country config
-registerRoute(/http(.+)validation\.js$/, new NetworkFirst())
+registerRoute(/http(.+)validators\.js$/, new NetworkFirst())
+// This caches handlebars fetched from country config
+registerRoute(/http(.+)handlebars\.js$/, new NetworkFirst())
+// This caches conditionals fetched from country config
+registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 // This caches config fetched from the config microservice
 registerRoute(/http(.+)config$/, new NetworkFirst())
 
