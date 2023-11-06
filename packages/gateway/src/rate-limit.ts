@@ -14,8 +14,12 @@ import { GraphQLResolveInfo } from 'graphql'
 import { Context } from '@gateway/graphql/context'
 import { getUserId } from '@gateway/features/user/utils/index'
 import { DISABLE_RATE_LIMIT } from './constants'
+import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 
-class RateLimitError extends ApolloError {
+/**
+ * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
+ */
+export class RateLimitError extends ApolloError {
   constructor(message: string) {
     super(message, 'RATE_LIMIT_ERROR')
     Object.defineProperty(this, 'name', { value: 'RateLimitError' })
@@ -27,15 +31,13 @@ interface RouteOptions {
   key: string
   /** Maximum number of requests within a minute */
   requestsPerMinute: number
-  /** On error callback */
-  onError: () => void
 }
 
 /** Time to live in milliseconds for every Redis entry */
 const TTL_IN_MS = 60 * 1000
 
 const withRateLimit = <A extends any[], R>(
-  { key, requestsPerMinute, onError }: RouteOptions,
+  { key, requestsPerMinute }: RouteOptions,
   fn: (...args: A) => R
 ) => {
   if (DISABLE_RATE_LIMIT) {
@@ -49,12 +51,39 @@ const withRateLimit = <A extends any[], R>(
     ])
 
     if (requests > requestsPerMinute) {
-      onError()
+      throw new RateLimitError(
+        'Too many requests within a minute. Please throttle your requests.'
+      )
     }
 
     return fn(...args)
   }
 }
+
+export const restRateLimit =
+  <
+    A extends Parameters<
+      Lifecycle.Method<ReqRefDefaults, Lifecycle.ReturnValue<ReqRefDefaults>>
+    >,
+    R
+  >(
+    { requestsPerMinute }: { requestsPerMinute: number },
+    fn: (...args: A) => R
+  ) =>
+  (...args: A) => {
+    const route = args[1].request.path
+    const userId = getUserId({
+      Authorization: args[1].request.headers.authorization
+    })
+
+    return withRateLimit(
+      {
+        key: `${userId}:${route}`,
+        requestsPerMinute
+      },
+      fn
+    )(...args)
+  }
 
 export const resolverRateLimit =
   <A extends [any, any, Context, GraphQLResolveInfo], R>(
@@ -68,12 +97,7 @@ export const resolverRateLimit =
     return withRateLimit(
       {
         key: `${userId}:${route}`,
-        requestsPerMinute,
-        onError: () => {
-          throw new RateLimitError(
-            'Too many requests within a minute. Please throttle your requests.'
-          )
-        }
+        requestsPerMinute
       },
       fn
     )(...args)

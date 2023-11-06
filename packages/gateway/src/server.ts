@@ -32,6 +32,7 @@ import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
 import { logger } from '@gateway/logger'
 import { badRequest, Boom } from '@hapi/boom'
+import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -95,6 +96,20 @@ export async function createServer() {
       req.setUrl(req.url)
     }
     return h.continue
+  })
+
+  app.ext('onPreResponse', (request, reply) => {
+    if (request.response instanceof RateLimitError) {
+      return reply
+        .response({
+          statusCode: 402,
+          error: 'Rate limit exceeded',
+          message: request.response.message
+        })
+        .code(402)
+    }
+
+    return reply.continue
   })
 
   /*
