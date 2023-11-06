@@ -245,6 +245,20 @@ async function loadCertificateConfiguration(): Promise<CertificateConfiguration>
     }
   })
 
+  // for backward compatibility, if the endpoint is unimplemented
+  if (res.status === 404) {
+    return {
+      fonts: {
+        notosans: {
+          normal: 'NotoSans-Light.ttf',
+          bold: 'NotoSans-Regular.ttf',
+          italics: 'NotoSans-Light.ttf',
+          bolditalics: 'NotoSans-Regular.ttf'
+        }
+      }
+    }
+  }
+
   if (!res.ok) {
     throw Error(res.statusText)
   }
