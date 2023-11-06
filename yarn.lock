@@ -4403,10 +4403,10 @@
   resolved "https://registry.yarnpkg.com/@hapi/file/-/file-3.0.0.tgz#f1fd824493ac89a6fceaf89c824afc5ae2121c09"
   integrity sha512-w+lKW+yRrLhJu620jT3y+5g2mHqnKfepreykvdOcl9/6up8GrQQn+l3FRTsjHTKbkbfQFkuksHpdv2EcpKcJ4Q==
 
-"@hapi/h2o2@^10.0.4":
-  version "10.0.4"
-  resolved "https://registry.yarnpkg.com/@hapi/h2o2/-/h2o2-10.0.4.tgz#9255328f851fcc6e647af68d5e0f464523a19133"
-  integrity sha512-dvD8+Y/Okc0fh0blqaYCLIrcy0+1LqIhMr7hjk8elLQZ9mkw2hKFB9dFKuRfWf+1nvHpGlW+PwccqkdebynQbg==
+"@hapi/h2o2@10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@hapi/h2o2/-/h2o2-10.0.1.tgz#a2576db653cbe91ff4902202eb0926225aaa6bb1"
+  integrity sha512-dcmVAzSn8jmjuTPejP/6VKbTHYh80mFUUuIPSyaRQBaQG2zXac11W5MNs0Xkk7TvJFPp8cB0LWQVZYpofpMN4g==
   dependencies:
     "@hapi/boom" "^10.0.1"
     "@hapi/hoek" "^11.0.2"
