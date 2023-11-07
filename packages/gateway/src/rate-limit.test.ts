@@ -15,21 +15,33 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 // eslint-disable-next-line import/no-relative-parent-imports
-import { clearRedisMock } from '../test/setupJest'
+import {
+  startContainer,
+  stopContainer,
+  flushAll
+} from './utils/redis-test-utils'
+import { StartedTestContainer } from 'testcontainers'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
 const locationResolvers = locationRootResolvers as any
 
-beforeEach(() => {
-  fetch.resetMocks()
+let container: StartedTestContainer
+
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterAll(async () => {
+  await stopContainer(container)
 })
 
 describe('Rate limit', () => {
   let authHeaderRegAgent: { Authorization: string }
 
-  beforeEach(() => {
-    clearRedisMock()
+  beforeEach(async () => {
+    await flushAll()
+    fetch.resetMocks()
+
     const validateToken = jwt.sign(
       { scope: ['validate'] },
       readFileSync('./test/cert.key'),
@@ -63,6 +75,15 @@ describe('Rate limit', () => {
         { fieldName: 'verifyPasswordById' }
       )
     }
+
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        username: 'sakibal.hasan',
+        id: '123',
+        scope: ['declare'],
+        status: 'active'
+      })
+    )
 
     return expect(
       resolvers.Query.verifyPasswordById(

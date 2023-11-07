@@ -29,7 +29,7 @@ import {
 } from 'apollo-server-hapi'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/features/user/database'
+import * as database from '@gateway/utils/redis'
 import { logger } from '@gateway/logger'
 import { badRequest, Boom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'

@@ -13,9 +13,21 @@ import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/han
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
+import { StartedTestContainer } from 'testcontainers'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
+
+let container: StartedTestContainer
+
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterAll(async () => {
+  await stopContainer(container)
+})
+
 beforeEach(() => {
   fetch.resetMocks()
 })

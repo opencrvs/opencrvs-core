@@ -15,23 +15,15 @@ import { logger } from '@gateway/logger'
 
 let redisClient: redis.RedisClient
 
-export interface IDatabaseConnector {
-  stop: () => void
-  start: () => void
-  set: (key: string, value: string) => Promise<void>
-  get: (key: string) => Promise<string | null>
-  del: (key: string) => Promise<number>
-  incrementWithTTL: (key: string, ttl: number) => Promise<any>
-}
-
 export async function stop() {
   redisClient.quit()
 }
 
-export async function start() {
-  logger.info(`REDIS_HOST, ${JSON.stringify(REDIS_HOST)}`)
+export async function start(host = REDIS_HOST, port?: number) {
+  logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
   redisClient = redis.createClient({
-    host: REDIS_HOST,
+    host: host,
+    port,
     retry_strategy: () => {
       return 1000
     }
@@ -54,3 +46,5 @@ export const incrementWithTTL = (key: string, ttl: number) => {
   ])
   return promisify(multi.exec).call(multi)
 }
+
+export const getClient = () => redisClient

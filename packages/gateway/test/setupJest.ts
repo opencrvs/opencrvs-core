@@ -10,42 +10,10 @@
  */
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
-// eslint-disable-next-line import/no-relative-parent-imports
-import { IDatabaseConnector } from '../src/features/user/database'
 
 const f = jest.requireActual('node-fetch')
 
 jest.setMock('node-fetch', { default: fetch, Headers: f.Headers })
-
-const database: { [key: string]: string | number } = {}
-
-const mock: IDatabaseConnector = {
-  set: jest.fn().mockImplementation(async (key, value) => {
-    database[key] = value
-  }),
-  get: jest.fn().mockImplementation(async (key) => {
-    return database[key] || null
-  }),
-  del: jest.fn().mockImplementation(async (key) => {
-    const keyExists = !!database[key]
-    delete database[key]
-    return keyExists ? 1 : 0
-  }),
-  /** Doesn't implement TTL. Amend if needed. */
-  incrementWithTTL: jest.fn().mockImplementation(async (key) => {
-    database[key] ||= 1
-    ;(database[key] as number)++
-    return [database[key]]
-  }),
-  start: jest.fn(),
-  stop: jest.fn()
-}
-
-export const clearRedisMock = () => {
-  for (const member in database) delete database[member]
-}
-
-jest.setMock('src/features/user/database', mock)
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY =
