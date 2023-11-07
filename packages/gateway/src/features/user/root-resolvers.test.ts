@@ -22,6 +22,7 @@ const resolvers = rootResolvers as any
 let container: StartedTestContainer
 
 beforeAll(async () => {
+  console.log('Hello?')
   try {
     container = await startContainer()
   } catch (e) {
@@ -30,6 +31,8 @@ beforeAll(async () => {
   console.log(typeof container)
 })
 afterAll(async () => {
+  console.log('Hello?test')
+
   console.log(typeof container)
   await stopContainer(container)
 })
