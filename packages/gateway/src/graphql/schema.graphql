@@ -1366,6 +1366,7 @@ input RegistrationInput {
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
+  changedValues: [CorrectionValueInput!]
 }
 
 input RelatedPersonInput {

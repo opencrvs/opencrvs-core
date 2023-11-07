@@ -1248,6 +1248,7 @@ export interface GQLRegistrationInput {
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
+  changedValues?: Array<GQLCorrectionValueInput>
 }
 
 export interface GQLRelatedPersonInput {
