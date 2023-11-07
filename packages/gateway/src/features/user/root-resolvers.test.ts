@@ -22,9 +22,15 @@ const resolvers = rootResolvers as any
 let container: StartedTestContainer
 
 beforeAll(async () => {
-  container = await startContainer()
+  try {
+    container = await startContainer()
+  } catch (e) {
+    console.log(e)
+  }
+  console.log(typeof container)
 })
 afterAll(async () => {
+  console.log(typeof container)
   await stopContainer(container)
 })
 
