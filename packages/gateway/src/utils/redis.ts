@@ -19,14 +19,19 @@ export async function stop() {
   redisClient.quit()
 }
 
-export async function start(host = REDIS_HOST, port?: number) {
-  logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
-  redisClient = redis.createClient({
-    host: host,
-    port,
-    retry_strategy: () => {
-      return 1000
-    }
+export function start(host = REDIS_HOST, port?: number) {
+  return new Promise<redis.RedisClient>((resolve) => {
+    logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
+    redisClient = redis.createClient({
+      host: host,
+      port,
+      retry_strategy: () => {
+        return 1000
+      }
+    })
+    redisClient.on('connect', () => {
+      resolve(redisClient)
+    })
   })
 }
 
