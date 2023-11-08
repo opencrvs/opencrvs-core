@@ -15,6 +15,7 @@ import { Context } from '@gateway/graphql/context'
 import { getUserId } from '@gateway/features/user/utils/index'
 import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
+import { get } from 'lodash'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -64,25 +65,29 @@ export const rateLimitedRoute =
     >,
     R
   >(
-    { requestsPerMinute }: { requestsPerMinute: number },
+    {
+      requestsPerMinute,
+      pathToKey
+    }: {
+      requestsPerMinute: number
+      /** Object key resolved using lodash get. Rate limiting a login could include "username" here. */
+      pathToKey: string
+    },
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
     const route = args[1].request.path
+    const payload = JSON.parse(args[0].payload.toString())
 
-    // IP address
-    let userId = args[1].request.info.remoteAddress
+    const key = get(payload, pathToKey)
 
-    if (args[1].request.headers.authorization) {
-      // If logged in, use userId
-      userId = getUserId({
-        Authorization: args[1].request.headers.authorization
-      })
+    if (!key) {
+      throw new Error("Couldn't find a rate limiting key in payload")
     }
 
     return withRateLimit(
       {
-        key: `${userId}:${route}`,
+        key: `${key}:${route}`,
         requestsPerMinute
       },
       fn

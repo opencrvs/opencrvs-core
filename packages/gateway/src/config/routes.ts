@@ -132,14 +132,33 @@ export const getRoutes = () => {
         }
       }
     },
+    // Catch-all route for authentication
     {
       method: 'POST',
       path: '/auth/{suffix}',
-      handler: rateLimitedRoute({ requestsPerMinute: 10 }, (_, h) => {
-        return h.proxy({
-          uri: AUTH_URL + '/{suffix}{query}'
-        })
-      }),
+      handler: (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/{suffix}'
+        }),
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    // Rate limited route for login
+    {
+      method: 'POST',
+      path: '/auth/authenticate',
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathToKey: 'username' },
+        (_, h) =>
+          h.proxy({
+            uri: AUTH_URL + '/authenticate'
+          })
+      ),
       options: {
         auth: false,
         payload: {
