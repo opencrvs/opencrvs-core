@@ -953,6 +953,17 @@ async function markEventAsValidated(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await createRequest('POST', `/records/${id}/update`, authHeader, {
+      id,
+      details,
+      event
+    })
+  }
+
   await createRequest<{ id: string }>(
     'POST',
     `/records/${id}/validate`,
@@ -963,6 +974,7 @@ async function markEventAsValidated(
       event
     }
   )
+
   return id
 }
 
