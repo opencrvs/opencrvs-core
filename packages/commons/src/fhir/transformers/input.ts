@@ -202,6 +202,7 @@ interface Registration {
   certificates?: Array<Certificate | null>
   location?: Location
   correction?: Correction
+  changedValues?: Array<CorrectionValue>
 }
 interface Certificate {
   collector?: RelatedPerson
