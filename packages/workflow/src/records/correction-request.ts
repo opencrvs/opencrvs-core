@@ -46,6 +46,14 @@ export const CorrectionRequestInput = z.object({
   otherReason: z.string(),
   note: z.string()
 })
+export const UpdateRequestInput = z.array(
+  z.object({
+    section: z.string(),
+    fieldName: z.string(),
+    oldValue: z.string(),
+    newValue: z.string()
+  })
+)
 
 export const MakeCorrectionRequestInput = CorrectionRequestInput
 export const ApproveRequestInput = CorrectionRequestInput.extend({
@@ -71,6 +79,7 @@ export const CorrectionRejectionInput = z.object({
   reason: z.string()
 })
 
+export type UpdateRequestInput = z.infer<typeof UpdateRequestInput>
 export type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
 export type CorrectionRequestPaymentInput = z.infer<
   typeof CorrectionRequestPaymentInput
