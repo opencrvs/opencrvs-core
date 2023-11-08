@@ -381,7 +381,8 @@ export async function sendRegisteredNotification(
       name,
       trackingId,
       registrationNumber,
-      crvsOffice
+      crvsOffice,
+      registrationLocation
     })
   }
 }

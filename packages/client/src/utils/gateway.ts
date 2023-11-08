@@ -668,11 +668,11 @@ export type DuplicatesInfo = {
 
 export type Estimation = {
   __typename?: 'Estimation'
-  femaleEstimation: Scalars['Int']
   locationId: Scalars['String']
   locationLevel: Scalars['String']
-  maleEstimation: Scalars['Int']
-  totalEstimation: Scalars['Int']
+  femaleEstimation: Scalars['Float']
+  maleEstimation: Scalars['Float']
+  totalEstimation: Scalars['Float']
 }
 
 export enum Event {

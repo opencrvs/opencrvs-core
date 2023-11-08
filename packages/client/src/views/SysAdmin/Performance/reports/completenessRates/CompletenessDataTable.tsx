@@ -93,9 +93,15 @@ function CompletenessDataTableComponent(props: ITableProps) {
     if (data && isLocationData(data)) {
       const locationContent = data.map((item) => ({
         location: item.locationName,
-        totalRegistered: String(item.total),
-        registeredWithinTargetd: String(item[props.completenessRateTime]),
-        estimated: String(item.estimated),
+        totalRegistered: String(Math.round(item.total)),
+        registeredWithinTargetd: String(
+          Math.round(item[props.completenessRateTime])
+        ),
+        estimated: String(
+          item.estimated < 10
+            ? item.estimated.toFixed(2)
+            : Math.round(item.estimated)
+        ),
         completenessRate: `${Number(
           (item[props.completenessRateTime] / item.estimated) * 100
         ).toFixed(2)}%`
@@ -112,9 +118,15 @@ function CompletenessDataTableComponent(props: ITableProps) {
           intl.locale,
           'MMMM yyyy'
         ),
-        totalRegistered: item.total,
-        registeredWithinTargetd: String(item[props.completenessRateTime]),
-        estimated: String(item.estimated),
+        totalRegistered: String(Math.round(item.total)),
+        registeredWithinTargetd: String(
+          Math.round(item[props.completenessRateTime])
+        ),
+        estimated: String(
+          item.estimated < 10
+            ? item.estimated.toFixed(2)
+            : Math.round(item.estimated)
+        ),
         completenessRate: `${Number(
           (item[props.completenessRateTime] / item.estimated) * 100
         ).toFixed(2)}%`
@@ -143,7 +155,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
     )
   }
 
-  const sortedContent = orderBy<typeof content[number]>(
+  const sortedContent = orderBy<(typeof content)[number]>(
     content,
     sortOrder.map(({ key }) => key),
     sortOrder.map(({ value }) => value)
