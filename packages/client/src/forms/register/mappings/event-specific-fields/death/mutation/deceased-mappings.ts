@@ -39,9 +39,9 @@ export const fieldToDeceasedDateTransformation =
       fieldValue = clonedTransformedData[sectionId][field.name]
     }
 
-    transformedData[
-      alternativeSectionId ? alternativeSectionId : sectionId
-    ].deceased = {
+    transformedData[alternativeSectionId ?? sectionId] ??= {}
+
+    transformedData[alternativeSectionId ?? sectionId].deceased = {
       deceased: true,
       deathDate: fieldValue
     }
