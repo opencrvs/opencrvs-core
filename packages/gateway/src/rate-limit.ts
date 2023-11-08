@@ -58,6 +58,20 @@ const withRateLimit = <A extends any[], R>(
   }
 }
 
+interface RateLimitedRouteOptions {
+  requestsPerMinute: number
+  /** e.g. "username" or "user.name" */
+  pathForKey: string
+  pathOptionsForKey?: never
+}
+
+interface RateLimitedRouteMultipleOptions {
+  requestsPerMinute: number
+  pathForKey?: never
+  /** Works the same as `pathForKey` but uses the first value that gets resolved of the keys */
+  pathOptionsForKey: string[]
+}
+
 export const rateLimitedRoute =
   <
     A extends Parameters<
@@ -67,19 +81,20 @@ export const rateLimitedRoute =
   >(
     {
       requestsPerMinute,
-      pathToKey
-    }: {
-      requestsPerMinute: number
-      /** Object key resolved using lodash get. Rate limiting a login could include "username" here. */
-      pathToKey: string
-    },
+      pathForKey,
+      pathOptionsForKey
+    }: RateLimitedRouteOptions | RateLimitedRouteMultipleOptions,
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
+    if (pathForKey) pathOptionsForKey = [pathForKey]
+
     const route = args[1].request.path
     const payload = JSON.parse(args[0].payload.toString())
 
-    const key = get(payload, pathToKey)
+    const key = pathOptionsForKey!.find(
+      (path) => get(payload, path) !== undefined
+    )
 
     if (!key) {
       throw new Error("Couldn't find a rate limiting key in payload")
