@@ -25,6 +25,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   draftDeclaration?: boolean
   completeDeclaration: boolean
+  hasErrorsOnFields?: boolean
   totalFileSizeExceeded: boolean
   declarationToBeValidated?: boolean
   declarationToBeRegistered?: boolean
@@ -310,7 +311,8 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl
+      intl,
+      hasErrorsOnFields
     } = this.props
 
     const background = !completeDeclaration
@@ -377,7 +379,7 @@ class ReviewActionComponent extends React.Component<
                 size="large"
                 id="submit_form"
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded}
+                disabled={!hasErrorsOnFields || totalFileSizeExceeded}
               >
                 <Upload />
                 {intl.formatMessage(
