@@ -74,6 +74,19 @@ export type WithUUID<T extends Resource> = Omit<T, 'id'> & {
   id: UUID
 }
 
+export type RegistrationStatus =
+  | 'ARCHIVED'
+  | 'CERTIFIED'
+  | 'CORRECTION_REQUESTED'
+  | 'DECLARATION_UPDATED'
+  | 'DECLARED'
+  | 'IN_PROGRESS'
+  | 'ISSUED'
+  | 'REGISTERED'
+  | 'REJECTED'
+  | 'VALIDATED'
+  | 'WAITING_VALIDATION'
+
 type SavedResource<T extends Resource> = T extends Encounter
   ? SavedEncounter
   : T extends RelatedPerson
@@ -152,7 +165,12 @@ export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
 }
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
-  coding: fhir3.Coding[]
+  coding: Array<
+    Omit<fhir3.Coding, 'code' | 'system'> & {
+      system: 'http://opencrvs.org/specs/reg-status'
+      code: RegistrationStatus
+    }
+  >
 }
 
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {

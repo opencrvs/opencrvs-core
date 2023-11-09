@@ -32,7 +32,8 @@ import {
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   findExtension,
-  isSaved
+  isSaved,
+  RegistrationStatus
 } from '.'
 import { UUID } from '..'
 
@@ -280,7 +281,7 @@ export function getActionFromTask(task: Task) {
  */
 export function updateFHIRTaskBundle(
   taskEntry: BundleEntry<Task>,
-  status: string,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -367,7 +368,7 @@ export function taskBundleWithExtension(
  */
 function updateTaskTemplate(
   task: Task,
-  status: string,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
