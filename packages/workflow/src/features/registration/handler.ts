@@ -35,7 +35,8 @@ import {
   getSharedContactEmail,
   getEmailAddress,
   getInformantName,
-  getCRVSOfficeName
+  getCRVSOfficeName,
+  getRegistrationLocation
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -365,6 +366,7 @@ export async function markEventAsRegisteredCallbackHandler(
       const informantName = await getInformantName(bundle, INFORMANT_CODE)
       const name = await getEventInformantName(composition, event)
       const crvsOffice = await getCRVSOfficeName(bundle)
+      const registrationLocation = await getRegistrationLocation(bundle)
 
       /* sending notification to the contact */
       if ((sms || email) && informantName) {
@@ -378,6 +380,7 @@ export async function markEventAsRegisteredCallbackHandler(
           trackingId,
           registrationNumber,
           crvsOffice,
+          registrationLocation,
           event,
           {
             Authorization: request.headers.authorization

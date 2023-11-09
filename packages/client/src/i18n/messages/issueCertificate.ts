@@ -42,22 +42,22 @@ const messagesToDefine: IIssueMessages = {
     id: 'constants.collectorDetails'
   },
   issueToMother: {
-    defaultMessage: 'Issue to informant (Mother)',
+    defaultMessage: 'Issue to mother',
     description: 'Issuing to mother',
     id: 'constants.issueToMother'
   },
   issueToFather: {
-    defaultMessage: 'Issue to informant (Father)',
+    defaultMessage: 'Issue to father',
     description: 'Issuing to father',
     id: 'constants.issueToFather'
   },
   issueToGroom: {
-    defaultMessage: 'Issue to informant (Groom)',
+    defaultMessage: 'Issue to groom',
     description: 'Issuing to groom',
     id: 'constants.issueToGroom'
   },
   issueToBride: {
-    defaultMessage: 'Issue to informant (Bride)',
+    defaultMessage: 'Issue to bride',
     description: 'Issuing to bride',
     id: 'constants.issueToBride'
   },
@@ -67,7 +67,7 @@ const messagesToDefine: IIssueMessages = {
     id: 'constants.issueToSomeoneElse'
   },
   issueToInformant: {
-    defaultMessage: 'Issue to informant',
+    defaultMessage: 'Issue to informant ({informant})',
     description: 'Issuance of death to informant',
     id: 'constants.issueToInformant'
   },

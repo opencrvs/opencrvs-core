@@ -21,9 +21,7 @@ import {
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockRoles,
-  mockOfflineDataDispatch,
-  getFileFromBase64String,
-  validImageB64String
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -362,7 +360,10 @@ describe('edit user tests', () => {
                 alias: 'স্যাম্পল লোকেশান'
               }
             ],
-            signature: null,
+            // without signature confirm button stays disabled
+            signature: new File(['(⌐□_□)'], 'chucknorris.png', {
+              type: 'image/png'
+            }),
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
           }
@@ -476,29 +477,14 @@ describe('edit user tests', () => {
     })
 
     it('clicking confirm button starts submitting the form', async () => {
-      await waitForElement(component, '#image_file_uploader_field')
+      await waitForElement(component, '#submit-edit-user-form')
       component.update()
-      const file = new File(['(⌐□_□)'], 'chucknorris.png', {
-        type: 'image/png'
-      })
-      component
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .first()
-        .simulate('change', { target: { files: [file] } })
 
-      await flushPromises()
-      component.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
       submitButton.hostNodes().simulate('click')
-      await flushPromises()
-      component.update()
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })

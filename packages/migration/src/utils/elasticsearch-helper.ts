@@ -41,9 +41,9 @@ export const updateComposition = async (
   return response
 }
 
-export const updateFieldNameByCompositionId = async (
-  newFieldName: string,
-  oldFieldName: string
+export const renameField = async (
+  oldFieldName: string,
+  newFieldName: string
 ) => {
   try {
     const response = await client.updateByQuery({

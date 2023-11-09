@@ -109,6 +109,7 @@ export interface ISelectOption {
 export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
+  param?: Record<string, string>
   conditionals?: RadioComponentOption['conditionals']
 }
 export interface ICheckboxOption {
@@ -370,7 +371,7 @@ export type IFormFieldQueryMapDescriptor<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -782,7 +783,7 @@ export type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
-  parameters: Params<typeof validators[T]>
+  parameters: Params<(typeof validators)[T]>
 }
 
 type ValidationDefaultOperation<
@@ -812,7 +813,7 @@ export type QueryFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -848,7 +849,7 @@ export type MutationFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof mutations[T]>,
+    Params<(typeof mutations)[T]>,
     IMutationDescriptor
   >
 }
@@ -864,7 +865,7 @@ export type IMutationDescriptor =
   | MutationDefaultOperation
 
 export type X = FunctionParamsToDescriptor<
-  Params<typeof mutations['eventLocationMutationTransformer']>,
+  Params<(typeof mutations)['eventLocationMutationTransformer']>,
   IMutationDescriptor
 >
 

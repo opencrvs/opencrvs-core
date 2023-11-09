@@ -507,21 +507,21 @@ type DeclarationsStartedMetrics {
 }
 
 type MonthWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  month: Int!
-  year: Int!
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  month: Float!
+  year: Float!
 }
 
 type LocationWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
   locationId: String!
   locationName: String!
 }
@@ -544,6 +544,7 @@ input AdvancedSearchParametersInput {
   dateOfEventStart: String
   dateOfEventEnd: String
   contactNumber: String
+  contactEmail: String
   nationalId: String
   registrationNumber: String
   trackingId: String
@@ -1114,9 +1115,9 @@ type SearchFieldAgentResponse {
 }
 
 type Estimation {
-  totalEstimation: Int!
-  maleEstimation: Int!
-  femaleEstimation: Int!
+  totalEstimation: Float!
+  maleEstimation: Float!
+  femaleEstimation: Float!
   locationId: String!
   locationLevel: String!
 }
@@ -1533,6 +1534,7 @@ type AdvancedSeachParameters {
   dateOfEventStart: String
   dateOfEventEnd: String
   contactNumber: String
+  contactEmail: String
   nationalId: String
   registrationNumber: String
   trackingId: String
@@ -1629,6 +1631,7 @@ type UserAuditLogItem implements AuditLogItemBase {
 type RegistrationSearchSet {
   status: String
   contactNumber: String
+  contactEmail: String
   contactRelationship: String
   dateOfDeclaration: Date
   trackingId: String

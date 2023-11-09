@@ -10,7 +10,6 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { badRequest, internal } from '@hapi/boom'
 import {
   AUTH_URL,
   SEARCH_URL,
@@ -47,55 +46,31 @@ enum Services {
   GATEWAY = 'gateway'
 }
 
+const SERVICES = {
+  [Services.AUTH]: `${AUTH_URL}/ping`,
+  [Services.SEARCH]: `${SEARCH_URL}ping`,
+  [Services.USER_MGNT]: `${USER_MANAGEMENT_URL}ping`,
+  [Services.METRICS]: `${METRICS_URL}/ping`,
+  [Services.NOTIFICATION]: `${NOTIFICATION_URL}ping`,
+  [Services.COUNTRY_CONFIG]: `${COUNTRY_CONFIG_URL}/ping`,
+  [Services.WORKFLOW]: `${WORKFLOW_URL}ping`
+}
+
 export default async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let service
-  if (request.query['service'] && request.query['service'][0]) {
-    service = request.query['service'][0]
-  } else {
-    throw badRequest('Received no service to check')
-  }
+  const responses = {}
 
-  let response
-
-  switch (service) {
-    case Services.GATEWAY:
-      response = true
-      break
-    case Services.AUTH:
-      response = await checkServiceHealth(`${AUTH_URL}/ping`)
-      break
-    case Services.SEARCH:
-      response = await checkServiceHealth(`${SEARCH_URL}ping`)
-      break
-    case Services.USER_MGNT:
-      response = await checkServiceHealth(`${USER_MANAGEMENT_URL}ping`)
-      break
-    case Services.METRICS:
-      response = await checkServiceHealth(`${METRICS_URL}/ping`)
-      break
-    case Services.NOTIFICATION:
-      response = await checkServiceHealth(`${NOTIFICATION_URL}ping`)
-      break
-    case Services.COUNTRY_CONFIG:
-      response = await checkServiceHealth(`${COUNTRY_CONFIG_URL}/ping`)
-      break
-    case Services.WORKFLOW:
-      response = await checkServiceHealth(`${WORKFLOW_URL}ping`)
-      break
-    default:
-      response = false
-  }
-
-  if (!response) {
-    throw internal('Service health check failed for: ', service)
-  } else {
-    return {
-      success: response
+  for (const [key, value] of Object.entries(SERVICES)) {
+    try {
+      const res = await checkServiceHealth(value)
+      responses[key] = res
+    } catch (err) {
+      responses[key] = false
     }
   }
+  return responses
 }
 
 export const querySchema = Joi.object({
@@ -113,7 +88,4 @@ export const querySchema = Joi.object({
       )
     )
     .single()
-})
-export const responseSchema = Joi.object({
-  success: Joi.boolean()
 })

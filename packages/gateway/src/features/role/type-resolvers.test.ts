@@ -74,7 +74,7 @@ describe('Role type resolvers', () => {
     creationDate: 1559054406433
   }
   it('return id type', () => {
-    const res = roleTypeResolvers.SystemRole.id(mockResponse)
+    const res = roleTypeResolvers.SystemRole!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
 })

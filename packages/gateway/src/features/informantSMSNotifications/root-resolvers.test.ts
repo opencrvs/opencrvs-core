@@ -68,7 +68,7 @@ describe('InformantSMSNotifications root resolvers', () => {
         status: 200
       })
 
-      const res = await resolvers.Query.informantSMSNotifications(
+      const res = await resolvers.Query!.informantSMSNotifications(
         {},
         [
           {
@@ -89,7 +89,7 @@ describe('InformantSMSNotifications root resolvers', () => {
       })
 
       await expect(
-        resolvers.Query.informantSMSNotifications(
+        resolvers.Query!.informantSMSNotifications(
           {},
           [
             {
@@ -109,7 +109,7 @@ describe('InformantSMSNotifications root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
       await expect(
-        resolvers.Query.informantSMSNotifications(
+        resolvers.Query!.informantSMSNotifications(
           {},
           [
             {
@@ -137,7 +137,7 @@ describe('toggleInformantSMSNotification mutation', () => {
       status: 201
     })
 
-    const response = await resolvers.Mutation.toggleInformantSMSNotification(
+    const response = await resolvers.Mutation!.toggleInformantSMSNotification(
       {},
       [
         {
@@ -158,7 +158,7 @@ describe('toggleInformantSMSNotification mutation', () => {
     })
 
     return expect(
-      resolvers.Mutation.toggleInformantSMSNotification(
+      resolvers.Mutation!.toggleInformantSMSNotification(
         {},
         [
           {

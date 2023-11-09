@@ -20,6 +20,7 @@ import { messageKeys } from '@notification/i18n/messages'
 export interface IInProgressPayload extends IEventMessageRecipient {
   trackingId: string
   crvsOffice: string
+  registrationLocation: string
   informantName: string
 }
 
@@ -27,6 +28,7 @@ export interface IDeclarationPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
   crvsOffice: string
+  registrationLocation: string
   informantName: string
 }
 
@@ -36,6 +38,7 @@ export interface IRegistrationPayload extends IEventMessageRecipient {
   registrationNumber: string
   trackingId: string
   crvsOffice: string
+  registrationLocation: string
 }
 
 export interface IRejectionPayload extends IEventMessageRecipient {
@@ -43,6 +46,7 @@ export interface IRejectionPayload extends IEventMessageRecipient {
   name: string
   informantName: string
   crvsOffice: string
+  registrationLocation: string
 }
 
 export async function sendBirthInProgressConfirmation(
@@ -70,6 +74,7 @@ export async function sendBirthInProgressConfirmation(
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       informantName: payload.informantName
     }
   )
@@ -95,6 +100,7 @@ export async function sendBirthDeclarationConfirmation(
     {
       name: payload.name,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       trackingId: payload.trackingId,
       informantName: payload.informantName
     }
@@ -123,6 +129,7 @@ export async function sendBirthRegistrationConfirmation(
       informantName: payload.informantName,
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       registrationNumber: payload.registrationNumber
     }
   )
@@ -150,6 +157,7 @@ export async function sendBirthRejectionConfirmation(
       name: payload.name,
       informantName: payload.informantName,
       crvsOffice: payload.crvsOffice,
+      registrationLocation: payload.registrationLocation,
       trackingId: payload.trackingId
     }
   )
@@ -163,6 +171,7 @@ export const inProgressNotificationSchema = Joi.object({
   }),
   trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required(),
+  registrationLocation: Joi.string().required(),
   informantName: Joi.string()
 })
 
@@ -173,6 +182,7 @@ export const declarationNotificationSchema = Joi.object({
   }),
   trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required(),
+  registrationLocation: Joi.string().required(),
   name: Joi.string().required(),
   informantName: Joi.string()
 })
@@ -185,6 +195,7 @@ export const registrationNotificationSchema = Joi.object({
   name: Joi.string().required(),
   informantName: Joi.string(),
   crvsOffice: Joi.string().required(),
+  registrationLocation: Joi.string().required(),
   trackingId: Joi.string().length(7).required(),
   registrationNumber: Joi.string().required()
 })
@@ -196,6 +207,7 @@ export const rejectionNotificationSchema = Joi.object({
   }),
   trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required(),
+  registrationLocation: Joi.string().required(),
   informantName: Joi.string(),
   name: Joi.string().required()
 })

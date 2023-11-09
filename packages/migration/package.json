@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.2",
-    "@types/minio": "^7.0.13",
+    "@types/lodash-es": "^4.17.0",
     "@types/uuid": "^3.4.3",
     "@elastic/elasticsearch": "7.17.13",
     "bcryptjs": "^2.4.3",
@@ -32,15 +32,14 @@
     "influx": "^5.0.7",
     "is-svg": "^4.3.2",
     "lodash-es": "^4.17.21",
-    "migrate-mongo": "^9.0.0",
-    "minio": "^7.0.30",
-    "@types/lodash-es": "^4.17.0",
-    "mongoose": "^6.6.1",
+    "migrate-mongo": "^10.0.0",
+    "minio": "^7.0.33",
+    "mongoose": "^6.11.3",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/fhir": "0.0.30",
-    "mongodb": "^4.4.1",
+    "mongodb": "^4.17.1",
     "prettier": "^2.5.0",
     "rimraf": "^2.6.2",
     "typescript": "^4.8.3"

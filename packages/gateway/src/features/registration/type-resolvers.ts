@@ -1363,8 +1363,12 @@ export const typeResolvers: GQLResolver = {
       const status = getStatusFromTask(task)
       if (
         action ||
-        (status !== GQLRegStatus.REGISTERED &&
-          status !== GQLRegStatus.VALIDATED)
+        ![
+          GQLRegStatus.REGISTERED,
+          GQLRegStatus.VALIDATED,
+          GQLRegStatus.DECLARED,
+          GQLRegStatus.IN_PROGRESS
+        ].includes(status as GQLRegStatus)
       ) {
         return null
       }

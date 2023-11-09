@@ -146,6 +146,7 @@ export type AdvancedSearchParametersInput = {
   childLastName?: InputMaybe<Scalars['String']>
   compositionType?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   contactNumber?: InputMaybe<Scalars['String']>
+  contactEmail?: InputMaybe<Scalars['String']>
   dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfEventEnd?: InputMaybe<Scalars['String']>
   dateOfEventStart?: InputMaybe<Scalars['String']>
@@ -667,11 +668,11 @@ export type DuplicatesInfo = {
 
 export type Estimation = {
   __typename?: 'Estimation'
-  femaleEstimation: Scalars['Int']
   locationId: Scalars['String']
   locationLevel: Scalars['String']
-  maleEstimation: Scalars['Int']
-  totalEstimation: Scalars['Int']
+  femaleEstimation: Scalars['Float']
+  maleEstimation: Scalars['Float']
+  totalEstimation: Scalars['Float']
 }
 
 export enum Event {

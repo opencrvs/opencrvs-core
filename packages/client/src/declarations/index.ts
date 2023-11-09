@@ -523,7 +523,7 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: formData,
+    originalData: status !== 'IN_PROGRESS' ? formData : {},
     localData: formData,
     review: true,
     event,

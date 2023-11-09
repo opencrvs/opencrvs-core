@@ -18,7 +18,7 @@ describe('Notification root resolvers', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
       // @ts-ignore
-      const compositions = await resolvers.Query.listNotifications(
+      const compositions = await resolvers.Query!.listNotifications(
         {},
         { status: 'preliminary' }
       )
@@ -31,7 +31,7 @@ describe('Notification root resolvers', () => {
   describe('createNotification', () => {
     it('posting the mutation', async () => {
       // @ts-ignore
-      const result = await resolvers.Mutation.createNotification(
+      const result = await resolvers.Mutation!.createNotification(
         {},
         { details: new Date() }
       )

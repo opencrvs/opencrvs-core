@@ -131,7 +131,7 @@ describe('Correction root resolvers', () => {
   describe('requestBirthRegistrationCorrection', () => {
     it('throws authentication error when user does not have register scope', async () => {
       try {
-        await resolvers.Mutation.requestBirthRegistrationCorrection(
+        await resolvers.Mutation!.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
           { headers: authHeaderDeclare }
@@ -159,7 +159,7 @@ describe('Correction root resolvers', () => {
       )
 
       const result =
-        await resolvers.Mutation.requestBirthRegistrationCorrection(
+        await resolvers.Mutation!.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
           { headers: authHeaderRegCert }
@@ -173,7 +173,7 @@ describe('Correction root resolvers', () => {
   describe('requestDeathRegistrationCorrection', () => {
     it('throws authentication error when user does not have register scope', async () => {
       try {
-        await resolvers.Mutation.requestDeathRegistrationCorrection(
+        await resolvers.Mutation!.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
           { headers: authHeaderDeclare }
@@ -214,7 +214,7 @@ describe('Correction root resolvers', () => {
       )
 
       const result =
-        await resolvers.Mutation.requestDeathRegistrationCorrection(
+        await resolvers.Mutation!.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
           { headers: authHeaderRegCert }
