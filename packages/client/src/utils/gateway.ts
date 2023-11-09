@@ -861,8 +861,8 @@ export type InputOutput = {
   __typename?: 'InputOutput'
   valueCode: Scalars['String']
   valueId: Scalars['String']
-  newValueString?: Maybe<Scalars['String']>
-  newValueNumber?: Maybe<Scalars['Int']>
+  valueString?: Maybe<Scalars['String']>
+  valueInteger?: Maybe<Scalars['Int']>
 }
 
 export type IntegratedSystem = {

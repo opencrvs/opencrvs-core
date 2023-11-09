@@ -245,8 +245,8 @@ export function createCorrectedTask(
           }
         ]
       },
-      newValueString: update.newValueString,
-      newValueNumber: update.newValueNumber
+      valueString: update.newValueString,
+      valueInteger: update.newValueNumber
     })),
     reason: {
       text: correctionDetails.reason,
@@ -342,8 +342,8 @@ export function createCorrectionRequestTask(
           }
         ]
       },
-      newValueString: update.newValueString,
-      newValueNumber: update.newValueNumber
+      valueString: update.newValueString,
+      valueInteger: update.newValueNumber
     })),
     reason: {
       text: correctionDetails.reason,

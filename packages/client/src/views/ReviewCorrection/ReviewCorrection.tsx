@@ -620,12 +620,12 @@ function applyCorrectionToData(record: IDeclaration) {
     (acc: Record<string, Record<string, IFormFieldValue>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
 
-      switch (typeof record.data[curr.valueCode]?.[curr.valueId]) {
-        case 'number':
-          acc[curr.valueCode][curr.valueId] = curr.newValueNumber
+      switch (true) {
+        case curr.valueString !== undefined:
+          acc[curr.valueCode][curr.valueId] = curr.valueString
           break
-        default:
-          acc[curr.valueCode][curr.valueId] = curr.newValueString
+        case curr.valueInteger !== undefined:
+          acc[curr.valueCode][curr.valueId] = curr.valueInteger
           break
       }
 
@@ -657,8 +657,8 @@ function applyCorrectionToData(record: IDeclaration) {
     requester: correctionRequestTask.requester!,
     values: correctionRequestTask.input.map((input) => ({
       fieldName: input!.valueId,
-      newValueNumber: input!.newValueNumber!,
-      newValueString: input!.newValueString!,
+      newValueNumber: input!.valueInteger!,
+      newValueString: input!.valueString!,
       section: input!.valueCode,
       oldValue: (record.data[input!.valueCode][input!.valueId] || '').toString()
     }))
