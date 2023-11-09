@@ -11,22 +11,31 @@
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import {
-  BirthRegistration,
-  DeathRegistration,
+  BirthRegistration as GQLBirthRegistration,
+  DeathRegistration as GQLDeathRegistration,
+  MarriageRegistration as GQLMarriageRegistration,
   EVENT_TYPE,
-  MarriageRegistration,
   updateFHIRBundle,
-  validateBundle
+  Registration
 } from '@opencrvs/commons/types'
 import { logger } from '@workflow/logger'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { toValidated } from '@workflow/records/state-transitions'
+import { toUpdated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
-import { inspect } from 'util'
 import { UpdateRequestInput } from '@workflow/records/correction-request'
+
+type BirthRegistration = Omit<GQLBirthRegistration, 'registration'> & {
+  registration: Registration
+}
+type DeathRegistration = Omit<GQLDeathRegistration, 'registration'> & {
+  registration: Registration
+}
+type MarriageRegistration = Omit<GQLMarriageRegistration, 'registration'> & {
+  registration: Registration
+}
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -41,45 +50,35 @@ export const updateRoute = [
     method: 'POST',
     path: '/records/{recordId}/update',
     allowedStartStates: ['IN_PROGRESS', 'DECLARED'],
-    // allowedStartStates: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED'],
-    action: 'VALIDATION',
+    action: 'DECLARATION_UPDATED',
     handler: async (request, record) => {
       try {
         const token = getToken(request)
-
         const payload = validateRequest(requestSchema, request.payload)
 
         const { details, event } = payload
-        const { registration, ...validationDetailsWithoutReg } = details
-        const { changedValues, ...restOfRegistration } = registration ?? {}
-        // const inputBundle = buildFHIRBundle(
-        //   { ...validationDetailsWithoutReg, registration: restOfRegistration },
-        //   event
-        // )
+        const { registration, ...regDetailsWithoutReg } = details
+        const { changedValues, ...restOfRegistration } = registration
         const updatedDetails = validateRequest(
           UpdateRequestInput,
-          details.registration?.changedValues
+          changedValues
         )
 
-        const updatedBundle = updateFHIRBundle(
-          record,
-          { ...validationDetailsWithoutReg, registration: restOfRegistration },
-          event
-        )
-        validateBundle(updatedBundle)
-
-        console.log('updated deets', inspect(updatedDetails, true, null, true))
-
-        const recordInValidatedRequestedState = await toValidated(
+        const recordInUpdatedState = await toUpdated(
           record,
           await getLoggedInPractitionerResource(token),
           updatedDetails
         )
-        throw new Error('manyyyy')
 
-        await sendBundleToHearth(recordInValidatedRequestedState)
-        await indexBundle(recordInValidatedRequestedState, token)
-        return recordInValidatedRequestedState
+        const updatedBundle = updateFHIRBundle(
+          recordInUpdatedState,
+          { ...regDetailsWithoutReg, registration: restOfRegistration },
+          event
+        )
+
+        await sendBundleToHearth(updatedBundle)
+        await indexBundle(updatedBundle, token)
+        return updatedBundle
       } catch (error) {
         logger.error(`Workflow/markAsValidatedHandler: error: ${error}`)
         throw new Error(error)

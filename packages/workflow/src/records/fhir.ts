@@ -20,14 +20,14 @@ import {
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-
 import { getUUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
   CorrectionRequestInput,
-  CorrectionRequestPaymentInput
-} from './correction-request'
+  CorrectionRequestPaymentInput,
+  UpdateRequestInput
+} from '@workflow/records/correction-request'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -337,6 +337,70 @@ export function createValidateTask(
     }
   }
 }
+
+export function createUpdatedTask(
+  previousTask: Task,
+  updatedDetails: UpdateRequestInput,
+  practitioner: Practitioner
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      )
+    ],
+    input: updatedDetails.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      valueString: update.oldValue
+    })),
+    output: updatedDetails.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      valueString: update.newValue
+    })),
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'DECLARATION_UPDATED'
+        }
+      ]
+    }
+  }
+}
+
 export function createCorrectionRequestTask(
   previousTask: Task,
   correctionDetails: CorrectionRequestInput,

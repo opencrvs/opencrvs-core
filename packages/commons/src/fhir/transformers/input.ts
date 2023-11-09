@@ -177,7 +177,7 @@ export interface AddressInput {
   from?: DateString
   to?: DateString
 }
-interface Registration {
+export interface Registration {
   _fhirID?: string
   draftId?: string
   trackingId?: string

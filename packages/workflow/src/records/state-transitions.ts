@@ -39,7 +39,8 @@ import {
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput,
-  MakeCorrectionRequestInput
+  MakeCorrectionRequestInput,
+  UpdateRequestInput
 } from '@workflow/records/correction-request'
 import {
   createCorrectedTask,
@@ -47,6 +48,7 @@ import {
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createUpdatedTask,
   createValidateTask,
   getTaskHistory
 } from '@workflow/records/fhir'
@@ -185,6 +187,42 @@ export async function toCorrectionApproved(
     'REGISTERED'
   ) as any as RecordWithPreviousTask<RegisteredRecord>
 }
+
+export async function toUpdated(
+  record: InProgressRecord | DeclaredRecord,
+  practitioner: Practitioner,
+  updatedDetails: UpdateRequestInput
+): Promise<InProgressRecord | DeclaredRecord> {
+  const previousTask = getTaskFromBundle(record)
+
+  const updatedTask = createUpdatedTask(
+    previousTask,
+    updatedDetails,
+    practitioner
+  )
+  const updatedTaskWithPractitionerExtensions = setupLastRegUser(
+    updatedTask,
+    practitioner
+  )
+
+  const updatedTaskWithLocationExtensions = await setupLastRegLocation(
+    updatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  let newEntries
+  newEntries = [
+    ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
+    { resource: updatedTaskWithLocationExtensions }
+  ]
+
+  const updatedRecord = {
+    ...record,
+    entry: newEntries
+  }
+  return updatedRecord
+}
+
 export async function toValidated(
   record: InProgressRecord | DeclaredRecord,
   practitioner: Practitioner
