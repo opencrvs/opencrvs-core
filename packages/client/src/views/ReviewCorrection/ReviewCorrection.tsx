@@ -622,11 +622,10 @@ function applyCorrectionToData(record: IDeclaration) {
 
       switch (typeof record.data[curr.valueCode]?.[curr.valueId]) {
         case 'number':
-          acc[curr.valueCode][curr.valueId] = Number(curr.valueString)
+          acc[curr.valueCode][curr.valueId] = curr.newValueNumber
           break
-
         default:
-          acc[curr.valueCode][curr.valueId] = curr.valueString
+          acc[curr.valueCode][curr.valueId] = curr.newValueString
           break
       }
 
@@ -658,7 +657,8 @@ function applyCorrectionToData(record: IDeclaration) {
     requester: correctionRequestTask.requester!,
     values: correctionRequestTask.input.map((input) => ({
       fieldName: input!.valueId,
-      newValue: input!.valueString,
+      newValueNumber: input!.newValueNumber!,
+      newValueString: input!.newValueString!,
       section: input!.valueCode,
       oldValue: (record.data[input!.valueCode][input!.valueId] || '').toString()
     }))

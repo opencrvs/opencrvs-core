@@ -29,7 +29,8 @@ export const CorrectionRequestInput = z.object({
       section: z.string(),
       fieldName: z.string(),
       oldValue: z.string(),
-      newValue: z.string()
+      newValueString: z.string(),
+      newValueNumber: z.number()
     })
   ),
   reason: z.string(),

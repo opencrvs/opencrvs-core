@@ -1215,7 +1215,8 @@ export interface GQLCorrectionValueInput {
   section: string
   fieldName: string
   oldValue: string
-  newValue: string
+  newValueString?: string
+  newValueNumber?: number
 }
 
 export interface GQLRegistrationInput {

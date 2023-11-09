@@ -538,7 +538,8 @@ export type CorrectionRejectionInput = {
 
 export type CorrectionValueInput = {
   fieldName: Scalars['String']
-  newValue: Scalars['String']
+  newValueString?: Scalars['String']
+  newValueNumber?: Scalars['Int']
   oldValue: Scalars['String']
   section: Scalars['String']
 }
@@ -860,7 +861,8 @@ export type InputOutput = {
   __typename?: 'InputOutput'
   valueCode: Scalars['String']
   valueId: Scalars['String']
-  valueString: Scalars['String']
+  newValueString?: Maybe<Scalars['String']>
+  newValueNumber?: Maybe<Scalars['Int']>
 }
 
 export type IntegratedSystem = {

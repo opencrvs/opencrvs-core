@@ -1333,7 +1333,8 @@ input CorrectionValueInput {
   section: String!
   fieldName: String!
   oldValue: String!
-  newValue: String!
+  newValueString: String
+  newValueNumber: Int
 }
 
 input RegistrationInput {
