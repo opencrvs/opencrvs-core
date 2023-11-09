@@ -22,7 +22,7 @@ import {
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-test.only('should build a minimal FHIR registration document without error', async () => {
+test('should build a minimal FHIR registration document without error', async () => {
   fetch.mockResponse(
     JSON.stringify({
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
