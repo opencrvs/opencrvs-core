@@ -10,29 +10,11 @@
  */
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
-import {
-  BirthRegistration,
-  buildFHIRBundle,
-  DeathRegistration,
-  EVENT_TYPE,
-  MarriageRegistration,
-  validateBundle
-} from '@opencrvs/commons/types'
 import { logger } from '@workflow/logger'
-import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toValidated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { validateRequest } from '@workflow/features/correction/routes'
-
-const requestSchema = z.object({
-  event: z.custom<EVENT_TYPE>(),
-  details: z.custom<
-    BirthRegistration | DeathRegistration | MarriageRegistration
-  >(),
-  id: z.custom<string>()
-})
 
 export const validateRoute = [
   createRoute({
@@ -44,13 +26,6 @@ export const validateRoute = [
       try {
         const token = getToken(request)
 
-        const payload = validateRequest(requestSchema, request.payload)
-
-        const { details: validationDetails, event } = payload
-
-        const inputBundle = buildFHIRBundle(validationDetails, event)
-        validateBundle(inputBundle)
-
         const practitioner = await getLoggedInPractitionerResource(token)
 
         const recordInValidatedRequestedState = await toValidated(
@@ -61,6 +36,7 @@ export const validateRoute = [
         await sendBundleToHearth(recordInValidatedRequestedState)
 
         await indexBundle(recordInValidatedRequestedState, token)
+
         return recordInValidatedRequestedState
       } catch (error) {
         logger.error(`Workflow/markAsValidatedHandler: error: ${error}`)

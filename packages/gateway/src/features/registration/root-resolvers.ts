@@ -958,23 +958,12 @@ async function markEventAsValidated(
     details.registration.changedValues.length > 0
   ) {
     await createRequest('POST', `/records/${id}/update`, authHeader, {
-      id,
       details,
       event
     })
   }
 
-  await createRequest<{ id: string }>(
-    'POST',
-    `/records/${id}/validate`,
-    authHeader,
-    {
-      id,
-      details,
-      event
-    }
-  )
-
+  await createRequest('POST', `/records/${id}/validate`, authHeader)
   return id
 }
 
