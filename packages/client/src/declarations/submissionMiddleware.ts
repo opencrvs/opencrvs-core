@@ -180,7 +180,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     if (isCorrectionAction(submissionAction)) {
       const changedValues = getChangedValues(form, declaration, offlineData)
       graphqlPayload.registration ??= {}
-      graphqlPayload.registration.correction ??= {}
+      graphqlPayload.registration.correction =
+        declaration.data.registration.correction ?? {}
       graphqlPayload.registration.correction.values = changedValues
     }
 
