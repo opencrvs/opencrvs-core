@@ -43,8 +43,6 @@ describe('Rate limit', () => {
   })
 
   beforeEach(async () => {
-    jest.resetModules() // Most important - it clears the cache
-    process.env = { ...OLD_ENV } // Make a copy
     await flushAll()
     fetch.resetMocks()
 
