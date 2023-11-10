@@ -28,17 +28,23 @@ const locationResolvers = locationRootResolvers as any
 
 let container: StartedTestContainer
 
-beforeAll(async () => {
-  container = await startContainer()
-})
-afterAll(async () => {
-  await stopContainer(container)
-})
-
 describe('Rate limit', () => {
+  const OLD_ENV = process.env
+
   let authHeaderRegAgent: { Authorization: string }
 
+  beforeAll(async () => {
+    container = await startContainer()
+    process.env = { ...OLD_ENV, DISABLE_RATE_LIMIT: 'false' }
+  })
+  afterAll(async () => {
+    await stopContainer(container)
+    process.env = OLD_ENV
+  })
+
   beforeEach(async () => {
+    jest.resetModules() // Most important - it clears the cache
+    process.env = { ...OLD_ENV } // Make a copy
     await flushAll()
     fetch.resetMocks()
 

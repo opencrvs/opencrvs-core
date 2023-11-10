@@ -34,7 +34,7 @@ export const COUNTRY_CONFIG_URL =
 export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
 /** Disables the Redis-based rate limiting globally. Enabled by default, as data seeding gets rate limited and we don't have a working solution for that yet. */
-export const DISABLE_RATE_LIMIT = true
+export const DISABLE_RATE_LIMIT = process.env.DISABLE_RATE_LIMIT === 'false'
 
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
