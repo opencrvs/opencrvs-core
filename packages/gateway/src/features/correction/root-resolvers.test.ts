@@ -67,13 +67,13 @@ describe('Correction root resolvers', () => {
               section: 'child',
               fieldName: 'name',
               oldValue: 'Khaby Lame',
-              newValue: 'Khaby Lame Corrected'
+              newValueString: 'Khaby Lame Corrected'
             },
             {
               section: 'mother',
               fieldName: 'name',
               oldValue: 'First Name Last Name',
-              newValue: 'Mother Family Name'
+              newValueString: 'Mother Family Name'
             }
           ]
         }
@@ -104,13 +104,13 @@ describe('Correction root resolvers', () => {
               section: 'deceased',
               fieldName: 'name',
               oldValue: 'Khaby Lame',
-              newValue: 'Khaby Lame Corrected'
+              newValueString: 'Khaby Lame Corrected'
             },
             {
               section: 'informant',
               fieldName: 'name',
               oldValue: 'First Name Last Name',
-              newValue: 'Mother Family Name'
+              newValueString: 'Mother Family Name'
             }
           ]
         }

@@ -38,6 +38,14 @@ import {
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
+interface ICorrection {
+  section: string
+  fieldName: string
+  oldValue: string
+  newValueString?: string
+  newValueNumber?: number
+}
+
 const nestedFieldsMapping = (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -89,7 +97,7 @@ const transformRegistrationCorrection = (
       transformedData.registration.correction.values.push({
         section: section.id,
         fieldName: valuePath,
-        newValue: stringifyFieldValue(
+        newValueString: stringifyFieldValue(
           fieldDef,
           newFieldValue,
           draftData[section.id]
@@ -115,7 +123,7 @@ const transformRegistrationCorrection = (
       transformedData.registration.correction.values.push({
         section: section.id,
         fieldName: fieldDef.name,
-        newValue: selectedRadioOption,
+        newValueString: selectedRadioOption,
         oldValue: selectedRadioOptionOld
       })
     }
@@ -136,20 +144,28 @@ const transformRegistrationCorrection = (
       }
     }
   } else {
-    transformedData.registration.correction.values.push({
+    const payload: ICorrection = {
       section: section.id,
       fieldName: fieldDef.name,
-      newValue: stringifyFieldValue(
-        fieldDef,
-        draftData[section.id][fieldDef.name],
-        draftData[section.id]
-      ),
       oldValue: stringifyFieldValue(
         fieldDef,
         originalDraftData[section.id][fieldDef.name],
         originalDraftData[section.id]
       )
-    })
+    }
+
+    if (typeof originalDraftData[section.id][fieldDef.name] === 'number') {
+      if (originalDraftData[section.id][fieldDef.name])
+        payload.newValueNumber = Number(draftData[section.id][fieldDef.name])
+    } else {
+      payload.newValueString = stringifyFieldValue(
+        fieldDef,
+        draftData[section.id][fieldDef.name],
+        draftData[section.id]
+      )
+    }
+
+    transformedData.registration.correction.values.push(payload)
   }
 }
 
