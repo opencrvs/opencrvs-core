@@ -26,6 +26,8 @@ import {
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
+import { AUTH_URL } from '@gateway/constants'
+import { rateLimitedRoute } from '@gateway/rate-limit'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -122,6 +124,76 @@ export const getRoutes = () => {
         validate: {
           payload: fhirBundleSchema,
           failAction: validationFailedAction
+        }
+      }
+    },
+    // Authentication routes. These are proxied to the auth service
+    {
+      method: 'POST',
+      path: '/auth/{suffix}',
+      handler: (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/{suffix}'
+        }),
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/authenticate',
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathForKey: 'username' },
+        (_, h) =>
+          h.proxy({
+            uri: AUTH_URL + '/authenticate'
+          })
+      ),
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/authenticate-super-user',
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathForKey: 'username' },
+        (_, h) =>
+          h.proxy({
+            uri: AUTH_URL + '/authenticate-super-user'
+          })
+      ),
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/verifyUser',
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathOptionsForKey: ['mobile', 'email'] },
+        (_, h) =>
+          h.proxy({
+            uri: AUTH_URL + '/verifyUser'
+          })
+      ),
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
         }
       }
     }

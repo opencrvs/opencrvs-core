@@ -17,7 +17,7 @@ import {
   PRODUCTION,
   QA_ENV
 } from '@gateway/constants'
-import { del, get, set } from '@gateway/features/user/database'
+import { del, get, set } from '@gateway/utils/redis'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'

@@ -2936,6 +2936,16 @@
   resolved "https://registry.yarnpkg.com/@hapi/file/-/file-3.0.0.tgz#f1fd824493ac89a6fceaf89c824afc5ae2121c09"
   integrity sha512-w+lKW+yRrLhJu620jT3y+5g2mHqnKfepreykvdOcl9/6up8GrQQn+l3FRTsjHTKbkbfQFkuksHpdv2EcpKcJ4Q==
 
+"@hapi/h2o2@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@hapi/h2o2/-/h2o2-9.1.0.tgz#b223f4978b6f2b0d7d9db10a84a567606c4c3551"
+  integrity sha512-B7E58bMhxmpiDI22clxTexoAaVShNBk1Ez6S8SQjQZu5FxxD6Tqa44sXeZQBtWrdJF7ZRbsY60/C8AHLRxagNA==
+  dependencies:
+    "@hapi/boom" "9.x.x"
+    "@hapi/hoek" "9.x.x"
+    "@hapi/validate" "1.x.x"
+    "@hapi/wreck" "17.x.x"
+
 "@hapi/hapi@^20.0.1", "@hapi/hapi@^20.2.1":
   version "20.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hapi/-/hapi-20.3.0.tgz#1d620005afeebcb2c8170352286a4664b0107c15"
@@ -3266,7 +3276,7 @@
   dependencies:
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/wreck@17.x.x":
+"@hapi/wreck@17.x.x", "@hapi/wreck@^17.0.0":
   version "17.2.0"
   resolved "https://registry.yarnpkg.com/@hapi/wreck/-/wreck-17.2.0.tgz#a5b69b724fa8fa25550fb02f55c649becfc59f63"
   integrity sha512-pJ5kjYoRPYDv+eIuiLQqhGon341fr2bNIYZjuotuPJG/3Ilzr/XtI+JAp0A86E2bYfsS3zBPABuS2ICkaXFT8g==
@@ -7127,7 +7137,17 @@
   resolved "https://registry.yarnpkg.com/@types/hapi__catbox/-/hapi__catbox-10.2.5.tgz#4eb5e2fbb966acd2a3c2e86f935b7de95aceb7dd"
   integrity sha512-vomIMP6dUDSbiasbPglH5LJvnnl8jFmRTjPgPl4l9Vi1L9fto3VXJQZtl8LzyIQUUoocyT5bmvWeYWsVgxAHQg==
 
-"@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
+"@types/hapi__h2o2@8.3.3":
+  version "8.3.3"
+  resolved "https://registry.yarnpkg.com/@types/hapi__h2o2/-/hapi__h2o2-8.3.3.tgz#f6c5ac480a6fd421025f7d0f78dfa916703511b7"
+  integrity sha512-+qWZVFVGc5Y0wuNZvVe876VJjUBCJ8eQdXovg4Rg9laHpeERQejluI7aw31xXWfLojTuHz3ThZzC6Orqras05Q==
+  dependencies:
+    "@hapi/boom" "^9.0.0"
+    "@hapi/wreck" "^17.0.0"
+    "@types/hapi__hapi" "*"
+    "@types/node" "*"
+
+"@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
   version "20.0.13"
   resolved "https://registry.yarnpkg.com/@types/hapi__hapi/-/hapi__hapi-20.0.13.tgz#ea8ce83c192f6e8106f6e76e40f795e7e36d0615"
   integrity sha512-LP4IPfhIO5ZPVOrJo7H8c8Slc0WYTFAUNQX1U0LBPKyXioXhH5H2TawIgxKujIyOhbwoBbpvOsBf6o5+ToJIrQ==
