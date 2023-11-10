@@ -1690,7 +1690,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const hasValidationErrors =
       flatten(Object.values(badInputErrors).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0
+      ).length > 0
 
     const textAreaProps = {
       id: 'additional_comments',
