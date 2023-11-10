@@ -17,8 +17,19 @@ import {
 } from '@gateway/routes/verifyCode/handler'
 
 import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from '@gateway/constants'
+import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
+import { StartedTestContainer } from 'testcontainers'
 
 const nonce = '12345'
+
+let container: StartedTestContainer
+
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterAll(async () => {
+  await stopContainer(container)
+})
 
 describe('verifyCode service', () => {
   describe('generateAndStoreVerificationCode', () => {

@@ -15,26 +15,23 @@ import { logger } from '@gateway/logger'
 
 let redisClient: redis.RedisClient
 
-export interface IDatabaseConnector {
-  stop: () => void
-  start: () => void
-  set: (key: string, value: string) => Promise<void>
-  setex: (key: string, ttl: number, value: string) => Promise<void>
-  get: (key: string) => Promise<string | null>
-  del: (key: string) => Promise<number>
-}
-
 export async function stop() {
   redisClient.quit()
 }
 
-export async function start() {
-  logger.info(`REDIS_HOST, ${JSON.stringify(REDIS_HOST)}`)
-  redisClient = redis.createClient({
-    host: REDIS_HOST,
-    retry_strategy: () => {
-      return 1000
-    }
+export function start(host = REDIS_HOST, port?: number) {
+  return new Promise<redis.RedisClient>((resolve) => {
+    logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
+    redisClient = redis.createClient({
+      host: host,
+      port,
+      retry_strategy: () => {
+        return 1000
+      }
+    })
+    redisClient.on('connect', () => {
+      resolve(redisClient)
+    })
   })
 }
 
@@ -44,8 +41,15 @@ export const get = (key: string) =>
 export const set = (key: string, value: string) =>
   promisify(redisClient.set).bind(redisClient)(key, value)
 
-export const setex = (key: string, ttl: number, value: string) =>
-  promisify(redisClient.setex).bind(redisClient)(key, ttl, value)
-
 export const del = (key: string) =>
   promisify(redisClient.del).bind(redisClient)(key)
+
+export const incrementWithTTL = (key: string, ttl: number) => {
+  const multi = redisClient.multi([
+    ['incr', key],
+    ['pexpire', key, ttl]
+  ])
+  return promisify(multi.exec).call(multi)
+}
+
+export const getClient = () => redisClient

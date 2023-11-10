@@ -4403,6 +4403,16 @@
   resolved "https://registry.yarnpkg.com/@hapi/file/-/file-3.0.0.tgz#f1fd824493ac89a6fceaf89c824afc5ae2121c09"
   integrity sha512-w+lKW+yRrLhJu620jT3y+5g2mHqnKfepreykvdOcl9/6up8GrQQn+l3FRTsjHTKbkbfQFkuksHpdv2EcpKcJ4Q==
 
+"@hapi/h2o2@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@hapi/h2o2/-/h2o2-9.1.0.tgz#b223f4978b6f2b0d7d9db10a84a567606c4c3551"
+  integrity sha512-B7E58bMhxmpiDI22clxTexoAaVShNBk1Ez6S8SQjQZu5FxxD6Tqa44sXeZQBtWrdJF7ZRbsY60/C8AHLRxagNA==
+  dependencies:
+    "@hapi/boom" "9.x.x"
+    "@hapi/hoek" "9.x.x"
+    "@hapi/validate" "1.x.x"
+    "@hapi/wreck" "17.x.x"
+
 "@hapi/hapi@^20.0.1", "@hapi/hapi@^20.2.1":
   version "20.2.2"
   resolved "https://registry.npmjs.org/@hapi/hapi/-/hapi-20.2.2.tgz"
@@ -4738,7 +4748,7 @@
   dependencies:
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/wreck@17.x.x":
+"@hapi/wreck@17.x.x", "@hapi/wreck@^17.0.0":
   version "17.2.0"
   resolved "https://registry.npmjs.org/@hapi/wreck/-/wreck-17.2.0.tgz"
   integrity sha512-pJ5kjYoRPYDv+eIuiLQqhGon341fr2bNIYZjuotuPJG/3Ilzr/XtI+JAp0A86E2bYfsS3zBPABuS2ICkaXFT8g==
@@ -7838,6 +7848,16 @@
   version "10.2.4"
   resolved "https://registry.npmjs.org/@types/hapi__catbox/-/hapi__catbox-10.2.4.tgz"
   integrity sha512-A6ivRrXD5glmnJna1UAGw87QNZRp/vdFO9U4GS+WhOMWzHnw+oTGkMvg0g6y1930CbeheGOCm7A1qHsqH7AXqg==
+
+"@types/hapi__h2o2@8.3.3":
+  version "8.3.3"
+  resolved "https://registry.yarnpkg.com/@types/hapi__h2o2/-/hapi__h2o2-8.3.3.tgz#f6c5ac480a6fd421025f7d0f78dfa916703511b7"
+  integrity sha512-+qWZVFVGc5Y0wuNZvVe876VJjUBCJ8eQdXovg4Rg9laHpeERQejluI7aw31xXWfLojTuHz3ThZzC6Orqras05Q==
+  dependencies:
+    "@hapi/boom" "^9.0.0"
+    "@hapi/wreck" "^17.0.0"
+    "@types/hapi__hapi" "*"
+    "@types/node" "*"
 
 "@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.0":
   version "20.0.13"
