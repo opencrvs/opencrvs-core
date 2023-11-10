@@ -687,20 +687,16 @@ export const isDateField = (
   return field.type === DATE
 }
 
-export const stringifyFieldValue = (
+export const serializeFieldValue = (
   field: IFormField,
   fieldValue: IFormFieldValue,
   sectionData: IFormSectionData
-): string => {
-  if (!fieldValue) {
-    return ''
-  }
-
+) => {
   if (isDateField(field, sectionData)) {
     return fieldValue.toString()
   }
 
-  return fieldValue.toString()
+  return fieldValue
 }
 
 export const getSelectedRadioOptionWithNestedFields = (

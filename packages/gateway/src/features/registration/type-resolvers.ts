@@ -1220,6 +1220,18 @@ export const typeResolvers: GQLResolver = {
       )
     }
   },
+  InputOutput: {
+    value: (inputOutput: fhir.TaskInput) => {
+      if (inputOutput.valueBoolean !== undefined) {
+        return inputOutput.valueBoolean
+      }
+      if (inputOutput.valueInteger !== undefined) {
+        return inputOutput.valueInteger
+      }
+
+      return inputOutput.valueString
+    }
+  },
   History: {
     documents: async (
       task: fhir.Task,

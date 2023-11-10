@@ -17,12 +17,13 @@ import {
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
   IFormSectionData,
-  IFormSection
+  IFormSection,
+  IFormFieldValue
 } from '@client/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions,
-  stringifyFieldValue,
+  serializeFieldValue,
   isRadioGroupWithNestedField,
   getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
@@ -41,9 +42,8 @@ import { UserDetails } from '@client/utils/userUtils'
 interface ICorrection {
   section: string
   fieldName: string
-  oldValue: string
-  newValueString?: string
-  newValueNumber?: number
+  oldValue: IFormFieldValue
+  newValue: IFormFieldValue
 }
 
 const nestedFieldsMapping = (
@@ -95,14 +95,14 @@ const transformRegistrationCorrection = (
     const oldFieldValue = get(originalDraftData[section.id], valuePath)
     if (newFieldValue !== oldFieldValue) {
       transformedData.registration.correction.values.push({
-        section: section.id,
-        fieldName: valuePath,
-        newValueString: stringifyFieldValue(
+        newFieldValue: serializeFieldValue(
           fieldDef,
           newFieldValue,
           draftData[section.id]
         ),
-        oldValue: stringifyFieldValue(
+        section: section.id,
+        fieldName: valuePath,
+        oldValue: serializeFieldValue(
           fieldDef,
           oldFieldValue,
           originalDraftData[section.id]
@@ -144,24 +144,15 @@ const transformRegistrationCorrection = (
       }
     }
   } else {
+    const value = draftData[section.id][fieldDef.name]
     const payload: ICorrection = {
       section: section.id,
       fieldName: fieldDef.name,
-      oldValue: stringifyFieldValue(
+      newValue: serializeFieldValue(fieldDef, value, draftData[section.id]),
+      oldValue: serializeFieldValue(
         fieldDef,
         originalDraftData[section.id][fieldDef.name],
         originalDraftData[section.id]
-      )
-    }
-
-    if (typeof originalDraftData[section.id][fieldDef.name] === 'number') {
-      if (originalDraftData[section.id][fieldDef.name])
-        payload.newValueNumber = Number(draftData[section.id][fieldDef.name])
-    } else {
-      payload.newValueString = stringifyFieldValue(
-        fieldDef,
-        draftData[section.id][fieldDef.name],
-        draftData[section.id]
       )
     }
 
