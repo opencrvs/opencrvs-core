@@ -12,6 +12,8 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { Practitioner } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 
 export async function getUser(
   userId: string,
@@ -64,7 +66,7 @@ export async function getSystem(
 // @todo remove this as it's not used anywhere (other than tests)
 export async function getLoggedInPractitionerPrimaryLocation(
   token: string
-): Promise<fhir.Location> {
+): Promise<fhir3.Location> {
   return getPrimaryLocationFromLocationList(
     await getLoggedInPractitionerLocations(token)
   )
@@ -72,7 +74,7 @@ export async function getLoggedInPractitionerPrimaryLocation(
 
 export async function getPractitionerPrimaryLocation(
   practitionerId: string
-): Promise<fhir.Location> {
+): Promise<fhir3.Location> {
   return getPrimaryLocationFromLocationList(
     await getPractitionerLocations(practitionerId)
   )
@@ -80,15 +82,15 @@ export async function getPractitionerPrimaryLocation(
 
 export async function getPractitionerOffice(
   practitionerId: string
-): Promise<fhir.Location> {
+): Promise<fhir3.Location> {
   return getOfficeLocationFromLocationList(
     await getPractitionerLocations(practitionerId)
   )
 }
 
 export function getPrimaryLocationFromLocationList(
-  locations: [fhir.Location]
-): fhir.Location {
+  locations: [fhir3.Location]
+): fhir3.Location {
   const primaryOffice = getOfficeLocationFromLocationList(locations)
   const primaryLocationId =
     primaryOffice &&
@@ -110,10 +112,10 @@ export function getPrimaryLocationFromLocationList(
 }
 
 function getOfficeLocationFromLocationList(
-  locations: fhir.Location[]
-): fhir.Location {
-  let office: fhir.Location | undefined
-  locations.forEach((location: fhir.Location) => {
+  locations: fhir3.Location[]
+): fhir3.Location {
+  let office: fhir3.Location | undefined
+  locations.forEach((location: fhir3.Location) => {
     if (location.type && location.type.coding) {
       location.type.coding.forEach((code) => {
         if (code.code === 'CRVS_OFFICE') {
@@ -122,6 +124,7 @@ function getOfficeLocationFromLocationList(
       })
     }
   })
+
   if (!office) {
     throw new Error('No CRVS office found')
   }
@@ -130,7 +133,7 @@ function getOfficeLocationFromLocationList(
 
 export async function getLoggedInPractitionerLocations(
   token: string
-): Promise<[fhir.Location]> {
+): Promise<[fhir3.Location]> {
   const practitionerResource = await getLoggedInPractitionerResource(token)
 
   if (!practitionerResource || !practitionerResource.id) {
@@ -142,7 +145,7 @@ export async function getLoggedInPractitionerLocations(
 
 export async function getLoggedInPractitionerResource(
   token: string
-): Promise<fhir.Practitioner> {
+): Promise<Practitioner> {
   const tokenPayload = getTokenPayload(token)
   const isNotificationAPIUser =
     tokenPayload.scope.indexOf('notification-api') > -1
@@ -164,7 +167,7 @@ export async function getLoggedInPractitionerResource(
 
 export async function getPractitionerLocations(
   practitionerId: string
-): Promise<[fhir.Location]> {
+): Promise<[fhir3.Location]> {
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
@@ -175,7 +178,7 @@ export async function getPractitionerLocations(
   const locList = []
   for (const location of roleEntry.location) {
     const splitRef = location.reference.split('/')
-    const locationResponse: fhir.Location = await getFromFhir(
+    const locationResponse: fhir3.Location = await getFromFhir(
       `/Location/${splitRef[1]}`
     )
     if (!locationResponse) {
@@ -183,12 +186,14 @@ export async function getPractitionerLocations(
     }
     locList.push(locationResponse)
   }
-  return locList as [fhir.Location]
+  return locList as [fhir3.Location]
 }
 
-export function getPractitionerRef(practitioner: fhir.Practitioner): string {
+export function getPractitionerRef(practitioner: Practitioner) {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  return `Practitioner/${practitioner.id}`
+  return `Practitioner/${
+    practitioner.id as UUID /* @todo move to practitioner */
+  }` as const
 }

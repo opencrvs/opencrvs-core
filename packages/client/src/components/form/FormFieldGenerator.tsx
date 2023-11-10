@@ -635,10 +635,13 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
+      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
+        inputProps
+
       return (
         <input
           type="hidden"
-          {...inputProps}
+          {...allowedInputProps}
           value={inputProps.value as string}
         />
       )
@@ -982,7 +985,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === SELECT_WITH_DYNAMIC_OPTIONS
@@ -992,7 +996,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS

@@ -45,7 +45,7 @@ import {
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
+import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -53,7 +53,7 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   ApolloClient,
   ApolloError,
@@ -136,10 +136,11 @@ export enum SUBMISSION_STATUS {
   ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK',
-  IN_PROGRESS = 'IN_PROGRESS'
+  IN_PROGRESS = 'IN_PROGRESS',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
+  REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
 export enum DOWNLOAD_STATUS {
@@ -167,8 +168,10 @@ export const processingStates = [
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.CORRECTION_REQUESTED,
   SUBMISSION_STATUS.READY_TO_ISSUE,
-  SUBMISSION_STATUS.ISSUING
+  SUBMISSION_STATUS.ISSUING,
+  SUBMISSION_STATUS.REJECT_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3

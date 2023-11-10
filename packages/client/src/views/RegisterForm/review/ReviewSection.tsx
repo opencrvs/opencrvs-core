@@ -164,12 +164,18 @@ const ErrorField = styled.p`
   margin-bottom: 0;
 `
 
-const Row = styled.div`
+const Row = styled.div<{
+  position?: 'left' | 'center'
+  background?: 'white' | 'background'
+}>`
   display: flex;
   gap: 24px;
   width: 100%;
-  justify-content: center;
-  background-color: ${({ theme }) => theme.colors.background};
+  justify-content: ${({ position }) => position || 'center'};
+  background-color: ${({ theme, background }) =>
+    !background || background === 'background'
+      ? theme.colors.background
+      : theme.colors.white};
   flex-direction: row;
   padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -188,15 +194,20 @@ const RightColumn = styled.div`
 const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
-  margin-bottom: 200px;
-  border-radius: 4px;
   overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     margin: 0;
+  }
+`
+
+const Card = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
+  margin-bottom: 40px;
+  &:last-child {
+    margin-bottom: 200px;
   }
 `
 
@@ -231,8 +242,8 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
+const ReviewContainter = styled.div<{ paddingT?: boolean }>`
+  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px 24px;
   }
@@ -283,6 +294,7 @@ interface IProps {
   documentsSection: IFormSection
   userDetails?: UserDetails | null
   viewRecord?: boolean
+  reviewSummaryHeader?: React.ReactNode
 }
 
 type State = {
@@ -1126,6 +1138,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           accum || this.hasFieldChanged(field, data, originalData),
         false
       )
+
       const draftOriginalData = draft.originalData
       if (draftOriginalData && hasAnyFieldChanged && !hasErrors) {
         const previousValues = taggedFields
@@ -1239,6 +1252,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     if (!originalData[field.name] && data[field.name] === '') {
       return false
     }
+
     const hasChanged = data[field.name] !== originalData[field.name]
     this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
     return hasChanged
@@ -1631,7 +1645,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineCountryConfiguration,
       draft: { event },
       onContinue,
-      viewRecord
+      viewRecord,
+      reviewSummaryHeader
     } = this.props
     const isDuplicate = Boolean(declaration.duplicates?.length)
     const formSections =
@@ -1814,187 +1829,209 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <Wrapper>
         <Row>
           <LeftColumn>
-            {!isCorrection(declaration) && isDuplicate && (
-              <DuplicateForm declaration={declaration} />
-            )}
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              title={intl.formatMessage(messages.govtName)}
-              subject={
-                informantName
-                  ? intl.formatMessage(messages.headerSubjectWithName, {
-                      eventType: event,
-                      name: informantName
-                    })
-                  : intl.formatMessage(messages.headerSubjectWithoutName, {
-                      eventType: event
-                    })
-              }
-            />
-            <FormData>
-              <ReviewContainter>
-                {transformedSectionData
-                  .filter((sec) => sec.items.length > 0)
-                  .map((sec, index) => {
-                    return (
-                      <DeclarationDataContainer key={index}>
-                        <Accordion
-                          name={sec.id}
-                          label={sec.title}
-                          action={
-                            sec.action && (
-                              <Link font="reg16" onClick={sec.action.handler}>
-                                {sec.action.label}
-                              </Link>
-                            )
-                          }
-                          labelForHideAction={intl.formatMessage(
-                            messages.hideLabel
-                          )}
-                          labelForShowAction={intl.formatMessage(
-                            messages.showLabel
-                          )}
-                          expand={true}
-                        >
-                          <ListViewSimplified id={'Section_' + sec.id}>
-                            {sec.items.map((item, index) => {
-                              return (
-                                <ListViewItemSimplified
-                                  key={index}
-                                  label={
-                                    item.type === SUBSECTION_HEADER ? (
-                                      <StyledLabel>{item.label}</StyledLabel>
-                                    ) : (
-                                      <Label>{item.label}</Label>
-                                    )
-                                  }
-                                  value={
-                                    <Value id={item.label.split(' ')[0]}>
-                                      {item.value}
-                                    </Value>
-                                  }
-                                  actions={
-                                    !item?.action?.disabled && (
-                                      <LinkButton
-                                        id={item.action.id}
-                                        disabled={item.action.disabled}
-                                        onClick={item.action.handler}
-                                      >
-                                        {item.action.label}
-                                      </LinkButton>
-                                    )
-                                  }
-                                />
+            {reviewSummaryHeader}
+            <Card>
+              {!isCorrection(declaration) && isDuplicate && (
+                <DuplicateForm declaration={declaration} />
+              )}
+              <ReviewHeader
+                id="review_header"
+                logoSource={
+                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                }
+                title={intl.formatMessage(messages.govtName)}
+                subject={
+                  informantName
+                    ? intl.formatMessage(messages.headerSubjectWithName, {
+                        eventType: event,
+                        name: informantName
+                      })
+                    : intl.formatMessage(messages.headerSubjectWithoutName, {
+                        eventType: event
+                      })
+                }
+              />
+              <FormData>
+                <ReviewContainter>
+                  {transformedSectionData
+                    .filter((sec) => sec.items.length > 0)
+                    .map((sec, index) => {
+                      return (
+                        <DeclarationDataContainer key={index}>
+                          <Accordion
+                            name={sec.id}
+                            label={sec.title}
+                            action={
+                              sec.action &&
+                              declaration.registrationStatus !==
+                                SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                <Link font="reg16" onClick={sec.action.handler}>
+                                  {sec.action.label}
+                                </Link>
                               )
-                            })}
-                          </ListViewSimplified>
-                        </Accordion>
-                      </DeclarationDataContainer>
-                    )
-                  })}
-                <Accordion
-                  name="supporting-documents"
-                  label={intl.formatMessage(messages.supportingDocuments)}
-                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
-                  labelForShowAction={intl.formatMessage(messages.showLabel)}
-                  action={
-                    viewRecord || isDuplicate ? null : (
-                      <Link
-                        font="reg16"
-                        element="button"
-                        onClick={() =>
-                          this.editLinkClickHandlerForDraft(
-                            documentsSection.id,
-                            documentsSection.groups[0].id!
-                          )
-                        }
-                      >
-                        {intl.formatMessage(messages.editDocuments)}
-                      </Link>
-                    )
-                  }
-                  expand={true}
-                >
-                  {this.getAllAttachmentInPreviewList(declaration)}
-                </Accordion>
-
-                {(!isCorrection(declaration) || viewRecord) && (
+                            }
+                            labelForHideAction={intl.formatMessage(
+                              messages.hideLabel
+                            )}
+                            labelForShowAction={intl.formatMessage(
+                              messages.showLabel
+                            )}
+                            expand={true}
+                          >
+                            <ListViewSimplified id={'Section_' + sec.id}>
+                              {sec.items.map((item, index) => {
+                                return (
+                                  <ListViewItemSimplified
+                                    key={index}
+                                    label={
+                                      item.type === SUBSECTION_HEADER ? (
+                                        <StyledLabel>{item.label}</StyledLabel>
+                                      ) : (
+                                        <Label>{item.label}</Label>
+                                      )
+                                    }
+                                    value={
+                                      <Value id={item.label.split(' ')[0]}>
+                                        {item.value}
+                                      </Value>
+                                    }
+                                    actions={
+                                      !item?.action?.disabled &&
+                                      declaration.registrationStatus !==
+                                        SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                        <LinkButton
+                                          id={item.action.id}
+                                          disabled={item.action.disabled}
+                                          onClick={item.action.handler}
+                                        >
+                                          {item.action.label}
+                                        </LinkButton>
+                                      )
+                                    }
+                                  />
+                                )
+                              })}
+                            </ListViewSimplified>
+                          </Accordion>
+                        </DeclarationDataContainer>
+                      )
+                    })}
                   <Accordion
-                    name="additional_comments"
-                    label={intl.formatMessage(messages.additionalComments)}
+                    name="supporting-documents"
+                    label={intl.formatMessage(messages.supportingDocuments)}
                     labelForHideAction={intl.formatMessage(messages.hideLabel)}
                     labelForShowAction={intl.formatMessage(messages.showLabel)}
+                    action={
+                      viewRecord ||
+                      isDuplicate ||
+                      declaration.registrationStatus ===
+                        SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                        <Link
+                          font="reg16"
+                          element="button"
+                          onClick={() =>
+                            this.editLinkClickHandlerForDraft(
+                              documentsSection.id,
+                              documentsSection.groups[0].id!
+                            )
+                          }
+                        >
+                          {intl.formatMessage(messages.editDocuments)}
+                        </Link>
+                      )
+                    }
                     expand={true}
                   >
-                    <InputField
-                      id="additional_comments"
-                      touched={false}
-                      required={false}
-                    >
-                      <TextArea
-                        {...{
-                          ...textAreaProps,
-                          disabled: viewRecord || isDuplicate
-                        }}
-                      />
-                    </InputField>
+                    {this.getAllAttachmentInPreviewList(declaration)}
                   </Accordion>
-                )}
 
-                {!isCorrection(declaration) &&
-                  !isDuplicate &&
-                  !viewRecord &&
-                  getSignature(declaration?.event as Event)}
-                {totalFileSizeExceeded && (
-                  <StyledAlert type="warning">
-                    {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
-                      fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
-                    })}
-                  </StyledAlert>
-                )}
-              </ReviewContainter>
-              {viewRecord || isDuplicate ? null : (
-                <>
-                  {!isCorrection(declaration) ? (
-                    <>
-                      {isDuplicate && (
-                        <DuplicateWarning
-                          duplicateIds={declaration.duplicates?.map(
-                            (duplicate) => duplicate.compositionId
-                          )}
-                        />
+                  {(!isCorrection(declaration) || viewRecord) && (
+                    <Accordion
+                      name="additional_comments"
+                      label={intl.formatMessage(messages.additionalComments)}
+                      labelForHideAction={intl.formatMessage(
+                        messages.hideLabel
                       )}
-                      <ReviewAction
-                        completeDeclaration={isComplete}
-                        totalFileSizeExceeded={totalFileSizeExceeded}
-                        declarationToBeValidated={this.userHasValidateScope()}
-                        declarationToBeRegistered={this.userHasRegisterScope()}
-                        alreadyRejectedDeclaration={
-                          this.props.draft.registrationStatus === REJECTED
-                        }
-                        draftDeclaration={draft}
-                        declaration={declaration}
-                        submitDeclarationAction={submitClickEvent}
-                        rejectDeclarationAction={rejectDeclarationClickEvent}
-                      />
-                    </>
-                  ) : (
-                    <FooterArea>
-                      <Button
-                        type="primary"
-                        size="large"
-                        id="continue_button"
-                        onClick={onContinue}
-                        disabled={!isComplete || !this.hasChangesBeenMade}
+                      labelForShowAction={intl.formatMessage(
+                        messages.showLabel
+                      )}
+                      expand={true}
+                    >
+                      <InputField
+                        id="additional_comments"
+                        touched={false}
+                        required={false}
                       >
-                        {intl.formatMessage(buttonMessages.continueButton)}
-                      </Button>
-                    </FooterArea>
+                        <TextArea
+                          {...{
+                            ...textAreaProps,
+                            disabled: viewRecord || isDuplicate
+                          }}
+                        />
+                      </InputField>
+                    </Accordion>
                   )}
-                </>
-              )}
-            </FormData>
+
+                  {!isCorrection(declaration) &&
+                    !isDuplicate &&
+                    !viewRecord &&
+                    getSignature(declaration?.event as Event)}
+                  {totalFileSizeExceeded && (
+                    <StyledAlert type="warning">
+                      {intl.formatMessage(
+                        constantsMessages.totalFileSizeExceed,
+                        {
+                          fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                        }
+                      )}
+                    </StyledAlert>
+                  )}
+                </ReviewContainter>
+                {viewRecord ||
+                isDuplicate ||
+                declaration.registrationStatus ===
+                  SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                  <>
+                    {!isCorrection(declaration) ? (
+                      <>
+                        {isDuplicate && (
+                          <DuplicateWarning
+                            duplicateIds={declaration.duplicates?.map(
+                              (duplicate) => duplicate.compositionId
+                            )}
+                          />
+                        )}
+                        <ReviewAction
+                          completeDeclaration={isComplete}
+                          totalFileSizeExceeded={totalFileSizeExceeded}
+                          declarationToBeValidated={this.userHasValidateScope()}
+                          declarationToBeRegistered={this.userHasRegisterScope()}
+                          alreadyRejectedDeclaration={
+                            this.props.draft.registrationStatus === REJECTED
+                          }
+                          draftDeclaration={draft}
+                          declaration={declaration}
+                          submitDeclarationAction={submitClickEvent}
+                          rejectDeclarationAction={rejectDeclarationClickEvent}
+                        />
+                      </>
+                    ) : (
+                      <FooterArea>
+                        <Button
+                          type="primary"
+                          size="large"
+                          id="continue_button"
+                          onClick={onContinue}
+                          disabled={!isComplete || !this.hasChangesBeenMade}
+                        >
+                          {intl.formatMessage(buttonMessages.continueButton)}
+                        </Button>
+                      </FooterArea>
+                    )}
+                  </>
+                )}
+              </FormData>
+            </Card>
           </LeftColumn>
           <RightColumn>
             <ResponsiveDocumentViewer
@@ -2006,7 +2043,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               >
                 <ZeroDocument id={`zero_document`}>
                   {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord || isDuplicate ? null : (
+                  {viewRecord ||
+                  isDuplicate ||
+                  declaration.registrationStatus ===
+                    SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={isCorrection(declaration)}

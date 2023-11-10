@@ -17,7 +17,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -66,7 +66,8 @@ import {
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  goToPageGroup as goToPageGroupAction
+  goToPageGroup as goToPageGroupAction,
+  goToPrintRecordView
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
@@ -151,6 +152,7 @@ interface IFormProps {
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
+  reviewSummaryHeader?: React.ReactNode
 }
 
 export type RouteProps = RouteComponentProps<{
@@ -169,6 +171,7 @@ type DispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
+  goToPrintRecord: typeof goToPrintRecordView
 }
 
 type Props = {
@@ -212,13 +215,15 @@ function FormAppBar({
   declaration,
   duplicate,
   modifyDeclarationMethod,
-  deleteDeclarationMethod
+  deleteDeclarationMethod,
+  printDeclarationMethod
 }: {
   duplicate: boolean | undefined
   section: IFormSection
   declaration: IDeclaration
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
+  printDeclarationMethod: (declarationId: string) => void
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -310,23 +315,25 @@ function FormAppBar({
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
       return
     }
-    const [exitModalTitle, exitModalDescription] = isCorrection(declaration)
-      ? [
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordDescription
-          )
-        ]
-      : [
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalDescription
-          )
-        ]
+    const [exitModalTitle, exitModalDescription] =
+      isCorrection(declaration) ||
+      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+        ? [
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordDescription
+            )
+          ]
+        : [
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalDescription
+            )
+          ]
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -445,17 +452,31 @@ function FormAppBar({
             }
             desktopRight={
               <>
-                {!duplicate && !isCorrection(declaration) && (
-                  <Button
-                    id="save-exit-btn"
-                    type="primary"
-                    size="small"
-                    onClick={handleSaveAndExit}
-                  >
-                    <Icon name="DownloadSimple" />
-                    {intl.formatMessage(buttonMessages.saveExitButton)}
-                  </Button>
-                )}
+                {!duplicate &&
+                  !isCorrection(declaration) &&
+                  declaration.registrationStatus !==
+                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    <>
+                      <Button
+                        id="save-exit-btn"
+                        type="primary"
+                        size="small"
+                        onClick={handleSaveAndExit}
+                      >
+                        <Icon name="DownloadSimple" />
+                        {intl.formatMessage(buttonMessages.saveExitButton)}
+                      </Button>
+                      <Button
+                        id="print-btn"
+                        type="secondary"
+                        size="small"
+                        onClick={() => printDeclarationMethod(declaration.id)}
+                      >
+                        <Icon name="Printer" />
+                        {intl.formatMessage(buttonMessages.printDeclaration)}
+                      </Button>
+                    </>
+                  )}
                 <Button
                   id="exit-btn"
                   type="secondary"
@@ -524,6 +545,17 @@ function FormAppBar({
                   >
                     <Icon name="DownloadSimple" />
                     {intl.formatMessage(buttonMessages.saveExitButton)}
+                  </Button>
+                )}
+                {section.viewType === 'preview' && (
+                  <Button
+                    id="print-btn"
+                    type="secondary"
+                    size="small"
+                    onClick={() => printDeclarationMethod(declaration.id)}
+                  >
+                    <Icon name="Printer" />
+                    {intl.formatMessage(buttonMessages.printDeclaration)}
                   </Button>
                 )}
                 <Button type="secondary" size="small" onClick={handleExit}>
@@ -955,6 +987,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicate,
       activeSection,
       activeSectionGroup,
+      reviewSummaryHeader,
       userDetails
     } = this.props
 
@@ -986,6 +1019,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               duplicate={duplicate}
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
+              printDeclarationMethod={this.props.goToPrintRecord}
             />
           }
           key={activeSection.id}
@@ -1026,6 +1060,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      reviewSummaryHeader={reviewSummaryHeader}
                       userDetails={userDetails}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
@@ -1432,5 +1467,6 @@ export const RegisterForm = connect<
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  toggleDraftSavedNotification
+  toggleDraftSavedNotification,
+  goToPrintRecord: goToPrintRecordView
 })(injectIntl<'intl', FullProps>(RegisterFormView))

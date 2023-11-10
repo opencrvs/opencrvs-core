@@ -6,32 +6,46 @@
   "main": "./build/dist/index.js",
   "exports": {
     ".": "./build/dist/index.js",
-    "./monitoring": "./build/dist/monitoring.js"
+    "./monitoring": "./build/dist/monitoring.js",
+    "./types": "./build/dist/types.js"
   },
   "scripts": {
+    "start": "yarn build:watch",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
+    "build:watch": "tsc --watch",
     "build:clean": "rm -rf build"
   },
   "private": true,
   "dependencies": {
     "@hapi/hapi": "^20.0.1",
+    "@types/fhir": "^0.0.37",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
+    "@types/lodash": "4.14.197",
     "@types/node-fetch": "^2.5.12",
+    "@types/uuid": "^9.0.3",
     "elastic-apm-node": "^3.29.0",
     "jest": "26.6.0",
     "lint-staged": "^7.1.0",
+    "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
     "pkg-up": "^3.1.0",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.3",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "jest-fetch-mock": "^2.1.2",
-    "ts-jest": "^26.4.4"
+    "ts-jest": "^26.4.4",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "@typescript-eslint/parser": "^4.5.0"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

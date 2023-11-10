@@ -26,7 +26,7 @@ const taskBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -280,7 +280,7 @@ const mosipBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -457,7 +457,7 @@ describe('Webhook transformBirthBundle for national id integration', () => {
         [JSON.stringify(documentResource), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:webhooks-user'
@@ -496,7 +496,7 @@ describe('webhook transformBirthBundle for webhook permissions integrations ', (
       [JSON.stringify(documentResource), { status: 200 }]
     )
 
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:webhooks-user'

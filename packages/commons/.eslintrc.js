@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export interface IAuthHeader {
-  Authorization: string
-  'x-correlation-id'?: string
-  'x-real-ip'?: string
-  'x-real-user-agent'?: string
+module.exports = {
+  extends: ['../../.eslintrc.js'],
+  rules: {
+    'import/no-relative-parent-imports': 'off'
+  }
 }

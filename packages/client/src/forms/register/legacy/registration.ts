@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloQueryResult, gql } from '@apollo/client'
-import {
+import type {
   GQLQuery,
   GQLBirthRegistration
-} from '@opencrvs/gateway/src/graphql/schema.d'
+} from '@client/utils/gateway-deprecated-do-not-use.d'
 
 export const FETCH_REGISTRATION = gql`
   query queryRegistrationByIdentifier($identifier: ID!) {

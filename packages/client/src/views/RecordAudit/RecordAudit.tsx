@@ -49,7 +49,7 @@ import {
   modifyDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
-import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Toast } from '@opencrvs/components/lib/Toast'
@@ -208,6 +208,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   VALIDATED: 'grey',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
+  CORRECTION_REQUESTED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
   SUBMITTING: 'orange',
@@ -314,7 +315,9 @@ function RecordAuditBody({
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
-  const [actionDetailsData, setActionDetailsData] = React.useState({})
+
+  const [actionDetailsData, setActionDetailsData] = React.useState<History>()
+
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
 
@@ -341,7 +344,7 @@ function RecordAuditBody({
   if (
     isDownloaded &&
     declaration.type !== Event.Marriage &&
-    userHasRegisterScope &&
+    (userHasRegisterScope || userHasValidateScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.CERTIFIED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
@@ -430,8 +433,11 @@ function RecordAuditBody({
   }
 
   if (
-    (declaration.status === SUBMISSION_STATUS.DECLARED ||
-      declaration.status === SUBMISSION_STATUS.VALIDATED) &&
+    [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.VALIDATED,
+      SUBMISSION_STATUS.CORRECTION_REQUESTED
+    ].includes(declaration.status as SUBMISSION_STATUS) &&
     userDetails?.systemRole &&
     !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
   ) {
@@ -635,7 +641,12 @@ function RecordAuditBody({
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
-      <ActionDetailsModal {...actionDetailsModalProps} />
+      {actionDetailsModalProps.actionDetailsData && (
+        <ActionDetailsModal
+          {...actionDetailsModalProps}
+          actionDetailsData={actionDetailsModalProps.actionDetailsData}
+        />
+      )}
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)

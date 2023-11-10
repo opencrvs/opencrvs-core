@@ -20,10 +20,10 @@
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
     "lint": "lerna run lint",
     "test": "CI=true lerna run test --stream",
-    "compose:deps:demo": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.demo-deps.yml up",
-    "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
-    "compose:deps:detached": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
-    "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
+    "compose:deps:demo": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.demo-deps.yml up",
+    "compose:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
+    "compose:deps:detached": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
+    "compose:down:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
     "db:clear:all": "bash development-environment/clear-all-data.sh",
@@ -44,7 +44,7 @@
     "js-yaml": "^3.13.1",
     "lerna": "^5.6.2",
     "lint-staged": "^7.1.0",
-    "prettier": "^2.5.1"
+    "prettier": "2.8.8"
   },
   "dependencies": {
     "@types/react-signature-canvas": "^1.0.2",

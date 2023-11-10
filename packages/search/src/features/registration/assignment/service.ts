@@ -51,6 +51,7 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
         resource,
         'http://opencrvs.org/specs/extension/regLastOffice'
       )
+
       const body: ICompositionBody = {}
       body.modifiedAt = Date.now().toString()
       body.assignment = {} as IAssignment

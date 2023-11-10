@@ -104,6 +104,7 @@ export async function addEventLocation(
     data = await getFromFhir(
       `/Encounter/${encounterSection.entry[0].reference}`
     )
+
     if (data && data.location && data.location[0].location) {
       location = await getFromFhir(`/${data.location[0].location.reference}`)
     }
@@ -299,16 +300,16 @@ export async function getdeclarationJurisdictionIds(
   if (!declarationLocationId) {
     return []
   }
-  const locationHirarchyIds = [declarationLocationId]
+  const locationHierarchyIds = [declarationLocationId]
   let locationId = `Location/${declarationLocationId}`
   while (locationId) {
     locationId = await fetchParentLocationByLocationID(locationId)
     if (locationId === 'Location/0') {
       break
     }
-    locationHirarchyIds.push(locationId.split('/')[1])
+    locationHierarchyIds.push(locationId.split('/')[1])
   }
-  return locationHirarchyIds
+  return locationHierarchyIds
 }
 
 export async function fetchTaskByCompositionIdFromHearth(id: string) {

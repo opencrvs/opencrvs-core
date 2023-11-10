@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/metrics/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/metrics/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
-
+const resolvers = rootResolvers as any
 const fetch = fetchAny as any
 beforeEach(() => {
   fetch.resetMocks()

@@ -6,9 +6,9 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "yarn build && ./runMigrations.sh",
-    "revert": "./revertMigrations.sh",
-    "start:prod": "./runMigrations.sh",
+    "start": "yarn build && ./run-migrations.sh",
+    "revert": "./revert-migrations.sh",
+    "start:prod": "./run-migrations.sh",
     "create:hearth": "./create-migrations.sh hearth",
     "create:openhim": "./create-migrations.sh openhim",
     "create:performance": "./create-migrations.sh performance",
@@ -43,7 +43,7 @@
     "mongodb": "^4.17.1",
     "prettier": "^2.5.0",
     "rimraf": "^2.6.2",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.3"
   },
   "lint-staged": {
     "src/**/*.{ts}": [

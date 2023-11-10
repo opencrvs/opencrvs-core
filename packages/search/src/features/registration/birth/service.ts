@@ -57,6 +57,10 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
+function getTypeFromTask(task: fhir.Task) {
+  return task?.businessStatus?.coding?.[0]?.code
+}
+
 export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as fhir.Bundle
   const bundleEntries = bundle.entry
@@ -120,12 +124,9 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   const body: ICompositionBody = {
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
-  body.type =
-    task &&
-    task.businessStatus &&
-    task.businessStatus.coding &&
-    task.businessStatus.coding[0].code
+  body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
+
   if (body.type === REJECTED_STATUS) {
     const rejectAnnotation: fhir.Annotation = (task &&
       task.note &&
@@ -176,6 +177,7 @@ async function indexAndSearchComposition(
         result.body.hits.hits.length > 0 &&
         result.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
+    modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
@@ -404,11 +406,7 @@ async function createDeclarationIndex(
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.contactEmail = emailExtension && emailExtension.valueString
-  body.type =
-    task &&
-    task.businessStatus &&
-    task.businessStatus.coding &&
-    task.businessStatus.coding[0].code
+  body.type = task && getTypeFromTask(task)
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =

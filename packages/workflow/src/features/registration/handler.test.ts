@@ -12,43 +12,54 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 // eslint-disable-next-line import/no-relative-parent-imports
-import { createServer } from '../../server'
 import {
-  testFhirBundle,
-  testFhirTaskBundle,
-  testFhirBundleWithIds,
-  mockFormDraft,
-  userMock,
-  fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
-  testDeathFhirBundle,
-  testFhirBundleWithIdsForDeath,
-  motherMock,
-  patientMock,
-  compositionMock,
-  deathCompositionMock,
-  testInProgressFhirBundle,
-  testInProgressDeathFhirBundle,
-  taskResourceMock,
-  deathTaskMock,
-  relatedPersonMock,
-  hearthResponseMock,
-  userResponseMock,
-  wrapInBundle,
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
+  Bundle,
+  Composition,
+  Encounter,
+  Location,
+  Observation,
+  Patient,
+  RelatedPerson,
+  Task,
+  TrackingID,
+  URNReference
+} from '@opencrvs/commons/types'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
-import * as fetchAny from 'jest-fetch-mock'
 import {
   ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL
+  DOWNLOADED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { createServer } from '@workflow/server'
+import {
+  compositionMock,
+  deathCompositionMock,
+  deathTaskMock,
+  districtMock,
+  fieldAgentPractitionerMock,
+  fieldAgentPractitionerRoleMock,
+  hearthResponseMock,
+  informantSMSNotificationMock,
+  mockFormDraft,
+  motherMock,
+  officeMock,
+  patientMock,
+  relatedPersonMock,
+  taskResourceMock,
+  testFhirBundle,
+  testFhirBundleWithIds,
+  testFhirBundleWithIdsForDeath,
+  testFhirTaskBundle,
+  testInProgressDeathFhirBundle,
+  testInProgressFhirBundle,
+  unionMock,
+  upazilaMock,
+  userMock,
+  userResponseMock,
+  wrapInBundle
+} from '@workflow/test/utils'
+import * as fetchAny from 'jest-fetch-mock'
+import { cloneDeep } from 'lodash'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -176,7 +187,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -212,7 +223,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -224,42 +235,6 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testInProgressFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('returns OK for a correctly authenticated user with death declaration', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-      jest
-        .spyOn(require('./utils'), 'sendEventNotification')
-        .mockReturnValue('')
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -284,7 +259,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -331,7 +306,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -343,53 +318,6 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('returns OK for a correctly authenticated user death validation', async () => {
-      fetch.mockResponses(
-        [userMock, { status: 200 }],
-        [fieldAgentPractitionerMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
-        ]
-      )
-
-      const token = jwt.sign(
-        { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -420,7 +348,7 @@ describe('Verify handler', () => {
                 fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -468,7 +396,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -487,48 +415,12 @@ describe('Verify handler', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('returns OK for a correctly authenticated user for death', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-      jest
-        .spyOn(require('./utils'), 'sendEventNotification')
-        .mockReturnValue('')
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testDeathFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -565,7 +457,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -595,7 +487,7 @@ describe('Verify handler', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -634,7 +526,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -656,7 +548,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -678,7 +570,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundle with input output as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -699,7 +591,7 @@ describe('markEventAsValidatedHandler handler', () => {
   it('returns OK with full fhir bundl with input outpute as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -746,7 +638,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -762,7 +654,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -807,7 +699,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -823,7 +715,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -858,7 +750,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with task entry as payload for birth', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -902,7 +794,7 @@ describe('markEventAsRegisteredHandler handler', () => {
           fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             focus: {
               reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
             },
@@ -949,7 +841,7 @@ describe('markEventAsRegisteredHandler handler', () => {
   it('returns OK with task entry as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1010,7 +902,7 @@ describe('markEventAsRegisteredHandler handler', () => {
           fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             focus: {
               reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
             },
@@ -1050,15 +942,11 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   let server: any
   let token: any
   beforeEach(async () => {
-    token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['register'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
     fetch.resetMocks()
     server = await createServer()
 
@@ -1167,7 +1055,7 @@ describe('downloaded action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1221,7 +1109,7 @@ describe('assigned action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1275,7 +1163,7 @@ describe('unassigned action handler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1320,7 +1208,7 @@ describe('markEventAsWaitingValidationHandler', () => {
   it('returns OK with full fhir bundle as payload', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1341,7 +1229,7 @@ describe('markEventAsWaitingValidationHandler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1361,195 +1249,6 @@ describe('markEventAsWaitingValidationHandler', () => {
   })
 })
 
-describe('markEventAsRequestedForCorrection handler', () => {
-  let server: any
-  let testCorrectionBundleBirth: any
-  let testCorrectionBundleDeath: any
-
-  beforeEach(async () => {
-    fetch.resetMocks()
-    server = await createServer()
-    fetch.mockResponses(
-      [userMock, { status: 200 }],
-      [patientMock, { status: 200 }],
-      [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResourceMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }]
-    )
-
-    testCorrectionBundleBirth = cloneDeep(testFhirBundleWithIds)
-    testCorrectionBundleDeath = cloneDeep(testFhirBundleWithIdsForDeath)
-
-    const correctionEncounterSection = {
-      title: 'Birth correction encounters',
-      code: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/doc-sections',
-            code: 'birth-correction-encounters'
-          }
-        ],
-        text: 'Birth correction encounters'
-      },
-      entry: [
-        {
-          reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
-        }
-      ]
-    }
-
-    testCorrectionBundleBirth.entry[0].resource.section?.push(
-      correctionEncounterSection
-    )
-
-    testCorrectionBundleDeath.entry[0].resource.section?.push(
-      correctionEncounterSection
-    )
-
-    testCorrectionBundleBirth.entry[1].resource.identifier?.push({
-      system: 'http://opencrvs.org/specs/id/birth-registration-number',
-      value: 'B5WGYJE'
-    })
-
-    testCorrectionBundleDeath.entry[1].resource.identifier?.push({
-      system: 'http://opencrvs.org/specs/id/death-registration-number',
-      value: 'B5WGYJE'
-    })
-  })
-
-  it('returns OK with full fhir bundle as payload', async () => {
-    const token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-            resource: {
-              resourceType: 'Task',
-              status: 'requested',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'birth-registration'
-                  }
-                ]
-              },
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/paper-form-id',
-                  value: '12345678'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                  value: 'B5WGYJE'
-                }
-              ],
-              extension: [
-                {
-                  url: 'http://opencrvs.org/specs/extension/contact-person',
-                  valueString: 'MOTHER'
-                }
-              ],
-              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-            }
-          }
-        ]
-      })
-    )
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCorrectionBundleBirth,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
-  })
-
-  it('returns OK with full fhir bundle as payload for death', async () => {
-    const token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-            resource: {
-              resourceType: 'Task',
-              status: 'requested',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'death-registration'
-                  }
-                ]
-              },
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/death-tracking-id',
-                  value: 'D5WGYJE'
-                }
-              ],
-              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-            }
-          }
-        ]
-      })
-    )
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCorrectionBundleDeath,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
-  })
-})
-
 describe('fhirWorkflowEventHandler', () => {
   let server: any
 
@@ -1560,7 +1259,7 @@ describe('fhirWorkflowEventHandler', () => {
   it('returns un-authorized response when scope does not match event', async () => {
     const token = jwt.sign(
       { scope: ['???'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1589,7 +1288,7 @@ describe('fhirWorkflowEventHandler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1616,7 +1315,7 @@ describe('fhirWorkflowEventHandler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1678,7 +1377,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for birth', async () => {
     const token = jwt.sign(
       { scope: ['certify'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1705,7 +1404,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
       testCertificateFhirBundle.entry[1].resource.identifier
     ) {
       const identifiers = testCertificateFhirBundle.entry[1].resource
-        .identifier as fhir.Identifier[]
+        .identifier as fhir3.Identifier[]
       identifiers.push({
         system: 'http://opencrvs.org/specs/id/birth-registration-number',
         value: '12345678'
@@ -1724,7 +1423,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
       { scope: ['certify'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1748,10 +1447,10 @@ describe('markBirthAsCertifiedHandler handler', () => {
       testCertificateFhirBundle.entry &&
       testCertificateFhirBundle.entry[1] &&
       testCertificateFhirBundle.entry[1].resource &&
-      testCertificateFhirBundle.entry[1].resource.identifier
+      (testCertificateFhirBundle.entry[1].resource as Task).identifier
     ) {
-      const identifiers = testCertificateFhirBundle.entry[1].resource
-        .identifier as fhir.Identifier[]
+      const identifiers = (testCertificateFhirBundle.entry[1].resource as Task)
+        .identifier as fhir3.Identifier[]
       identifiers.push({
         system: 'http://opencrvs.org/specs/id/death-registration-number',
         value: '12345678'
@@ -1796,7 +1495,7 @@ describe('Register handler', () => {
 
     const token = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -1818,15 +1517,24 @@ describe('Register handler', () => {
 
 describe('populateCompositionWithID', () => {
   it('Populates payload with response ID and response encounter ID for DECLARED status', () => {
-    const payload = {
+    const payload: Bundle<
+      | Composition
+      | Task
+      | Patient
+      | RelatedPerson
+      | Location
+      | Encounter
+      | Observation
+    > = {
       resourceType: 'Bundle',
       type: 'document',
       entry: [
         {
-          fullUrl: 'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234',
+          fullUrl:
+            'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234' as URNReference,
           resource: {
-            identifier: { system: 'urn:ietf:rfc:3986', value: 'BVORKPB' },
             resourceType: 'Composition',
+            identifier: { system: 'urn:ietf:rfc:3986', value: 'BVORKPB' },
             status: 'preliminary',
             type: {
               coding: [
@@ -1860,7 +1568,10 @@ describe('populateCompositionWithID', () => {
                   text: 'Child details'
                 },
                 entry: [
-                  { reference: 'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' }
+                  {
+                    reference:
+                      'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' as URNReference
+                  }
                 ]
               },
               {
@@ -1875,7 +1586,10 @@ describe('populateCompositionWithID', () => {
                   text: "Mother's details"
                 },
                 entry: [
-                  { reference: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' }
+                  {
+                    reference:
+                      'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference
+                  }
                 ]
               },
               {
@@ -1890,7 +1604,10 @@ describe('populateCompositionWithID', () => {
                   text: "Informant's details"
                 },
                 entry: [
-                  { reference: 'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' }
+                  {
+                    reference:
+                      'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' as URNReference
+                  }
                 ]
               },
               {
@@ -1905,7 +1622,10 @@ describe('populateCompositionWithID', () => {
                   text: 'Birth encounter'
                 },
                 entry: [
-                  { reference: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' }
+                  {
+                    reference:
+                      'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference
+                  }
                 ]
               }
             ],
@@ -1915,17 +1635,19 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a',
+          fullUrl:
+            'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a' as URNReference,
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
               ]
             },
             focus: {
-              reference: 'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234'
+              reference:
+                'urn:uuid:cdf941b2-8d83-44a5-b1a2-6f6135fc1234' as URNReference
             },
             identifier: [
               {
@@ -1934,7 +1656,7 @@ describe('populateCompositionWithID', () => {
               },
               {
                 system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                value: 'BVORKPB'
+                value: 'BVORKPB' as TrackingID
               }
             ],
             extension: [
@@ -1985,7 +1707,8 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd',
+          fullUrl:
+            'urn:uuid:b293edd6-1b93-40af-a3f0-419011034fdd' as URNReference,
           resource: {
             resourceType: 'Patient',
             active: true,
@@ -1996,11 +1719,17 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e',
+          fullUrl:
+            'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference,
           resource: {
             resourceType: 'Patient',
             active: true,
-            identifier: [{ value: '123456789', type: 'NATIONAL_ID' }],
+            identifier: [
+              {
+                value: '123456789',
+                type: { coding: [{ code: 'NATIONAL_ID' }] }
+              }
+            ],
             name: [{ use: 'en', family: ['Rahman'] }],
             maritalStatus: {
               coding: [
@@ -2052,7 +1781,8 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f',
+          fullUrl:
+            'urn:uuid:cd435236-3a55-449b-a929-fb930d1c274f' as URNReference,
           resource: {
             resourceType: 'RelatedPerson',
             relationship: {
@@ -2065,26 +1795,30 @@ describe('populateCompositionWithID', () => {
               ]
             },
             patient: {
-              reference: 'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e'
+              reference:
+                'urn:uuid:4dd311c2-657e-4ca0-9469-34e680c2cc4e' as URNReference
             }
           }
         },
         {
-          fullUrl: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd',
+          fullUrl:
+            'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference,
           resource: {
             resourceType: 'Encounter',
             status: 'finished',
             location: [
               {
                 location: {
-                  reference: 'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8'
+                  reference:
+                    'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8' as URNReference
                 }
               }
             ]
           }
         },
         {
-          fullUrl: 'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8',
+          fullUrl:
+            'urn:uuid:9a452153-45fb-4cde-aeec-c82b7e7382b8' as URNReference,
           resource: {
             resourceType: 'Location',
             mode: 'instance',
@@ -2107,12 +1841,14 @@ describe('populateCompositionWithID', () => {
           }
         },
         {
-          fullUrl: 'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad',
+          fullUrl:
+            'urn:uuid:e29c9d7c-261c-4a9b-8797-b902866bf9ad' as URNReference,
           resource: {
             resourceType: 'Observation',
             status: 'final',
             context: {
-              reference: 'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd'
+              reference:
+                'urn:uuid:16f054d9-1a3c-4fd1-b151-9c3222f84cfd' as URNReference
             },
             category: [
               {
@@ -2201,7 +1937,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       type: 'transaction-response'
-    }
+    } as Bundle
     populateCompositionWithID(payload, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',
@@ -2302,7 +2038,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c88a38e2-5e99-419a-8942-5ae7d7cda21a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
@@ -2384,7 +2120,12 @@ describe('populateCompositionWithID', () => {
           resource: {
             resourceType: 'Patient',
             active: true,
-            identifier: [{ value: '123456789', type: 'NATIONAL_ID' }],
+            identifier: [
+              {
+                value: '123456789',
+                type: { coding: [{ code: 'NATIONAL_ID' }] }
+              }
+            ],
             name: [{ use: 'en', family: ['Rahman'] }],
             maritalStatus: {
               coding: [
@@ -2677,7 +2418,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c85509d2-004c-435b-b710-64a688e241e1',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
@@ -2918,8 +2659,8 @@ describe('populateCompositionWithID', () => {
         }
       ],
       type: 'transaction-response'
-    }
-    populateCompositionWithID(payload, response)
+    } as Bundle
+    populateCompositionWithID(payload as any, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',
       type: 'document',
@@ -3069,7 +2810,7 @@ describe('populateCompositionWithID', () => {
           fullUrl: 'urn:uuid:c85509d2-004c-435b-b710-64a688e241e1',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }

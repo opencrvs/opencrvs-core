@@ -39,11 +39,11 @@ import {
   IColumn,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
-import {
+import type {
   GQLEventProgressSet,
   GQLHumanName,
   GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'

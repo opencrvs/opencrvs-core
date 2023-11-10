@@ -33,7 +33,7 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/tokenTest',
-      handler: (request: any, h: any) => {
+      handler: () => {
         return 'success'
       }
     },

@@ -23,14 +23,14 @@ import {
   generateLocationName,
   generateFullLocation
 } from '@client/utils/locationUtils'
-import {
+import type {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLHumanName,
   GQLAssignmentData,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'

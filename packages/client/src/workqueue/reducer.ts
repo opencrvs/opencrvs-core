@@ -24,7 +24,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -57,7 +57,8 @@ export const EVENT_STATUS = {
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION'
+  WAITING_VALIDATION: 'WAITING_VALIDATION',
+  CORRECTION_REQUESTED: 'CORRECTION_REQUESTED'
 }
 
 export interface IWorkqueue {
@@ -218,7 +219,11 @@ async function getWorkqueueData(
   const scope = getScope(state)
   const reviewStatuses =
     scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      ? [
+          EVENT_STATUS.DECLARED,
+          EVENT_STATUS.VALIDATED,
+          EVENT_STATUS.CORRECTION_REQUESTED
+        ]
       : [EVENT_STATUS.DECLARED]
 
   const {

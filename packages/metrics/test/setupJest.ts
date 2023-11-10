@@ -67,7 +67,7 @@ jest.mock('@metrics/configApi', () => {
 })
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
-process.env.NODE_ENV = 'TEST'
+process.env.NODE_ENV = 'test'
 
 beforeEach(() => {
   jest.clearAllMocks()
