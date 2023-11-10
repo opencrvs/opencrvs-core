@@ -232,7 +232,11 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
               })}
             </LegendDataLabel>
             <br />
-            <LegendDataValue>{activeTotalEstimate.value}</LegendDataValue>
+            <LegendDataValue>
+              {activeTotalEstimate.value < 10
+                ? activeTotalEstimate.value.toFixed(2)
+                : Math.round(activeTotalEstimate.value)}
+            </LegendDataValue>
           </LegendData>
         </LegendDetails>
         <LegendDetails>

@@ -15,12 +15,24 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
+import { IntlShape } from 'react-intl'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
+
+type FontFamilyTypes = {
+  normal: string
+  bold: string
+  italics: string
+  bolditalics: string
+}
+
+export type CertificateConfiguration = Partial<{
+  fonts: Record<string, FontFamilyTypes>
+}>
 export interface IContentResponse {
   languages: ILanguage[]
 }
@@ -203,17 +215,52 @@ export async function importConditionals(): Promise<LoadConditionalsResponse> {
   return conditionals
 }
 
+type InjectedUtilities = {
+  intl: IntlShape
+}
+
 export type LoadHandlebarHelpersResponse = Record<
   string,
-  Handlebars.HelperDelegate
+  (injectedUtilities: InjectedUtilities) => Handlebars.HelperDelegate
 >
-async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
-  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const handlebars = await import(
-    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
-  )
 
-  return handlebars
+async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
+  try {
+    // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+    const handlebars = await import(
+      /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+    )
+    return handlebars
+  } catch (error) {
+    return {}
+  }
+}
+async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  // for backward compatibility, if the endpoint is unimplemented
+  if (res.status === 404) {
+    return {
+      fonts: {
+        notosans: {
+          normal: 'NotoSans-Light.ttf',
+          bold: 'NotoSans-Regular.ttf',
+          italics: 'NotoSans-Light.ttf',
+          bolditalics: 'NotoSans-Regular.ttf'
+        }
+      }
+    }
+  }
+
+  if (!res.ok) {
+    throw Error(res.statusText)
+  }
+
+  return res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -353,6 +400,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
+  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,

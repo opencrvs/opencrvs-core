@@ -32,6 +32,7 @@ import updateInformantSMSNotificationHandler, {
 } from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
+import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -252,6 +253,15 @@ export default function getRoutes() {
         validate: {
           payload: updateInformantSMSNotificationReqSchema
         }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/dashboardQueries',
+      handler: getDashboardQueries,
+      config: {
+        tags: ['api'],
+        description: 'Fetch dashboard queries from country config'
       }
     }
   ]

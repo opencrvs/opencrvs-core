@@ -351,36 +351,42 @@ export function VerifyCertificatePage() {
       return data.deceased.gender
   }
 
-  const getLocation = (data: any) => {
+  // This function currently supports upto two location levels
+  const getLocation = (data: BirthRegistration | DeathRegistration) => {
     const location = data.eventLocation
-    if (location?.type === 'HEALTH_FACILITY') return location?.name
 
-    const countryName =
+    if (location?.type === 'HEALTH_FACILITY') {
+      return location?.name ?? EMPTY_STRING
+    }
+
+    const country =
       location?.address?.country &&
       intl.formatMessage(countryMessages[location?.address?.country])
-    const city = location?.address?.city
-      ? location?.address?.city + ', '
-      : EMPTY_STRING
+
+    const city = location?.address?.city ?? EMPTY_STRING
 
     if (location?.address?.country === window.config.COUNTRY) {
-      return (
-        city +
-        offlineData.locations[location?.address?.district].name +
-        ', ' +
-        offlineData.locations[location?.address?.state].name +
-        ', ' +
-        countryName
-      )
-    } else {
-      return (
-        city +
-        location?.address?.district +
-        ', ' +
-        location?.address?.state +
-        ', ' +
-        countryName
-      )
+      const district =
+        location.address.district &&
+        offlineData.locations[location.address.district].name
+      const state =
+        location.address.state &&
+        offlineData.locations[location.address.state].name
+      return [city, district, state, country]
+        .filter((label) => Boolean(label))
+        .join(', ')
     }
+
+    //international address
+
+    return [
+      city,
+      location?.address?.district,
+      location?.address?.state,
+      country
+    ]
+      .filter((label) => Boolean(label))
+      .join(', ')
   }
 
   const getRegistarData = (data: any) => {

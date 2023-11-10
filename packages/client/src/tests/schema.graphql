@@ -458,21 +458,24 @@ input CommentInput {
   createdAt: Date
 }
 
-input ComparisonInput {
-  eq: String
-  gt: String
-  lt: String
-  gte: String
-  lte: String
-  in: [String!]
-  ne: String
-  nin: [String!]
+type MonthWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  month: Int!
+  year: Int!
 }
 
-type ContactPoint {
-  system: String
-  value: String
-  use: String
+type LocationWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  locationId: String!
+  locationName: String!
 }
 
 input ContactPointInput {

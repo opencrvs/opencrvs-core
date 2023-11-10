@@ -93,6 +93,13 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
 }))
 
+vi.mock('@client/forms/handlebarHelpers', async () => {
+  return {
+    initHandlebarHelpers: () => Promise.resolve(),
+    getHandlebarHelpers: () => ({})
+  }
+})
+
 vi.mock('@client/forms/conditionals', async () => {
   const actual = (await vi.importActual('@client/forms/conditionals')) as any
   return {
@@ -189,6 +196,7 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadCertificateConfiguration: () => Promise.resolve({}),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),

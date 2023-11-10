@@ -19,7 +19,7 @@ export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
-  fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  fonts: Record<string, TFontFamilyTypes>
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
 }
