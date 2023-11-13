@@ -35,7 +35,7 @@ describe('Rate limit', () => {
 
   beforeAll(async () => {
     container = await startContainer()
-    process.env = { ...OLD_ENV, DISABLE_RATE_LIMIT: 'false' }
+    process.env = { ...OLD_ENV, ENABLE_RATE_LIMIT: 'true' }
   })
   afterAll(async () => {
     await stopContainer(container)
