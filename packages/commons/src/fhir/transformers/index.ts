@@ -3279,7 +3279,6 @@ export function updateFHIRBundle<T extends Bundle>(
     event: eventType,
     _index: {}
   }
-  console.log('builders', builders)
 
   return transformObj(
     recordDetails as Record<string, unknown>,

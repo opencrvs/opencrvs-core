@@ -57,7 +57,7 @@ export const updateRoute = [
         const payload = validateRequest(requestSchema, request.payload)
 
         const { details, event } = payload
-        const { registration, ...regDetailsWithoutReg } = details
+        const { registration, ...detailsWithoutReg } = details
         const { changedValues, ...restOfRegistration } = registration
         const updatedDetails = validateRequest(
           UpdateRequestInput,
@@ -72,7 +72,7 @@ export const updateRoute = [
 
         const updatedBundle = updateFHIRBundle(
           recordInUpdatedState,
-          { ...regDetailsWithoutReg, registration: restOfRegistration },
+          { ...detailsWithoutReg, registration: restOfRegistration },
           event
         )
 
