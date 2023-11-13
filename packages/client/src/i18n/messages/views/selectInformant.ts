@@ -167,6 +167,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for option Daughter in law',
     id: 'form.field.label.informantRelation.daughterInLaw'
   },
+  FIELD_AGENT: {
+    defaultMessage: 'Field Agent',
+    description: 'Label for other family member relation',
+    id: 'form.field.label.informantRelation.fieldAgent'
+  },
   GRANDDAUGHTER: {
     defaultMessage: 'Granddaughter',
     description: 'Label for option Granddaughter',

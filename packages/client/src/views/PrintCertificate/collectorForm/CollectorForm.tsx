@@ -470,7 +470,8 @@ const mapStateToProps = (
     registrationId: string
     eventType: string
     groupId: string
-  }>
+  }> &
+    IntlShapeProps
 ) => {
   const { registrationId, eventType, groupId } = props.match.params
   const event = getEvent(eventType)
@@ -483,7 +484,8 @@ const mapStateToProps = (
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const certFormSection = getCertificateCollectorFormSection(
-    declaration as IDeclaration
+    declaration as IDeclaration,
+    props.intl
   )
 
   const isAllowPrintInAdvance =
@@ -542,14 +544,16 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(mapStateToProps, {
-  goBack,
-  goToHomeTab,
-  storeDeclaration,
-  writeDeclaration,
-  modifyDeclaration,
-  goToPrintCertificate,
-  goToVerifyCollector,
-  goToReviewCertificate,
-  goToPrintCertificatePayment
-})(injectIntl(withTheme(CollectorFormComponent)))
+export const CollectorForm = injectIntl(
+  connect(mapStateToProps, {
+    goBack,
+    goToHomeTab,
+    storeDeclaration,
+    writeDeclaration,
+    modifyDeclaration,
+    goToPrintCertificate,
+    goToVerifyCollector,
+    goToReviewCertificate,
+    goToPrintCertificatePayment
+  })(withTheme(CollectorFormComponent))
+)

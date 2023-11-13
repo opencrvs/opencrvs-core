@@ -29,11 +29,12 @@ import { fieldValidationDescriptorToValidationFunction } from '@client/forms/des
 import { validators } from '@client/forms/validators'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
+import { messages as selectInformantMessages } from '@client/i18n/messages/views/selectInformant'
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityNameMapper } from './messages'
-import { MessageDescriptor } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
@@ -1020,7 +1021,8 @@ const marriageIssueCollectorFormOptions = [
 ]
 
 function getCertCollectorGroupForEvent(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  intl: IntlShape
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1030,7 +1032,7 @@ function getCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
       param: {
-        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+        informant: intl.formatMessage(selectInformantMessages[informant])
       }
     },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
@@ -1069,7 +1071,8 @@ function getCertCollectorGroupForEvent(
 }
 
 export function getCertificateCollectorFormSection(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  intl: IntlShape
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1077,7 +1080,7 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(declaration),
+      getCertCollectorGroupForEvent(declaration, intl),
       otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]
@@ -1085,7 +1088,8 @@ export function getCertificateCollectorFormSection(
 }
 
 export function getIssueCertCollectorGroupForEvent(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  intl: IntlShape
 ): IRadioGroupFormField[] {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1095,7 +1099,7 @@ export function getIssueCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
       param: {
-        informant: informant.charAt(0) + informant.slice(1).toLowerCase()
+        informant: intl.formatMessage(selectInformantMessages[informant])
       }
     },
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
