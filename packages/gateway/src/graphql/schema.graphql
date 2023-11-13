@@ -1328,8 +1328,8 @@ input CorrectionPaymentInput {
 input CorrectionValueInput {
   section: String!
   fieldName: String!
-  oldValue: String!
-  newValue: String!
+  oldValue: FieldValue!
+  newValue: FieldValue!
 }
 
 input FHIRIDMap {
@@ -1597,7 +1597,7 @@ type Comment {
 type InputOutput {
   valueCode: String!
   valueId: String!
-  valueString: String!
+  value: FieldValue!
 }
 
 type Payment {
@@ -1868,6 +1868,8 @@ enum PaymentOutcomeType {
   ERROR
   PARTIAL
 }
+
+scalar FieldValue
 
 input ObservationFHIRIDS {
   maleDependentsOfDeceased: String

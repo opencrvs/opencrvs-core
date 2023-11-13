@@ -102,6 +102,7 @@ import {
 
 import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
+import { TaskInput } from 'fhir/r3'
 
 function findRelatedPerson(
   patientCode:
@@ -1296,6 +1297,18 @@ export const typeResolvers: GQLResolver = {
           encounterParticipant.period.start) ||
         null
       )
+    }
+  },
+  InputOutput: {
+    value: (inputOutput: TaskInput) => {
+      if (inputOutput.valueBoolean !== undefined) {
+        return inputOutput.valueBoolean
+      }
+      if (inputOutput.valueInteger !== undefined) {
+        return inputOutput.valueInteger
+      }
+
+      return inputOutput.valueString
     }
   },
   History: {
