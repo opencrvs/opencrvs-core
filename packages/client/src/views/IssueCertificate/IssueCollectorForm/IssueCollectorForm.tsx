@@ -63,7 +63,7 @@ export function IssueCollectorForm({
       })
     )
   }
-  const fields = getIssueCertCollectorGroupForEvent(declaration)
+  const fields = getIssueCertCollectorGroupForEvent(declaration, intl)
 
   function continueButtonHandler() {
     const relationship =
