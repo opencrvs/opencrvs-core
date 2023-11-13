@@ -49,7 +49,7 @@ export interface ICorrection {
   section: string
   fieldName: string
   oldValue: string
-  newValue: string
+  newValue: string | number | boolean
 }
 
 export interface IAssignment {
@@ -438,15 +438,23 @@ function updateOperationHistoryWithCorrection(
     for (let i = 0; i < task.input.length; i += 1) {
       const section = task.input[i].valueCode || ''
       const fieldName = task.input[i].valueId || ''
-      const oldValue = task.input[i].valueString || ''
-      const newValue = task.output[i].valueString || ''
+      const oldValue =
+        task.input[i].valueString ||
+        task.output[i].valueInteger?.toString() ||
+        ''
+      const newValueString = task.output[i].valueString
+      const newValueNumber = task.output[i].valueInteger
 
-      operationHistory.correction?.push({
+      const payload: ICorrection = {
         section,
         fieldName,
         oldValue,
-        newValue
-      })
+        newValue: (newValueNumber !== undefined
+          ? newValueNumber
+          : newValueString)! // On of these the values always exist
+      }
+
+      operationHistory.correction?.push(payload)
     }
   }
 }

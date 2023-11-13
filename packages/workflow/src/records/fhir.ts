@@ -19,6 +19,22 @@ import {
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getUUID } from '@opencrvs/commons'
 
+function getFHIRValueField(value: unknown) {
+  if (typeof value === 'string') {
+    return { valueString: value }
+  }
+
+  if (typeof value === 'number') {
+    return { valueInteger: value }
+  }
+
+  if (typeof value === 'boolean') {
+    return { valueBoolean: value }
+  }
+
+  throw new Error('Invalid value type')
+}
+
 export function createCorrectionProofOfLegalCorrectionDocument(
   subjectReference: string,
   attachmentURL: string,
@@ -245,7 +261,7 @@ export function createCorrectedTask(
           }
         ]
       },
-      valueString: update.newValue
+      ...getFHIRValueField(update.newValue)
     })),
     reason: {
       text: correctionDetails.reason,
@@ -341,7 +357,7 @@ export function createCorrectionRequestTask(
           }
         ]
       },
-      valueString: update.newValue
+      ...getFHIRValueField(update.newValue)
     })),
     reason: {
       text: correctionDetails.reason,
