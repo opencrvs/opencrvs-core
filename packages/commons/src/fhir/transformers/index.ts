@@ -2049,6 +2049,24 @@ const builders: IFieldBuilders = {
           context
         )
       },
+      partOf: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          [
+            {
+              url: 'http://opencrvs.org/specs/extension/part-of',
+              valueReference: {
+                reference: `Location/${fieldValue}`
+              }
+            }
+          ],
+          'extension',
+          context
+        )
+      },
       country: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         setObjectPropInResourceArray(
