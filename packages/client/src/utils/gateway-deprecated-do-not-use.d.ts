@@ -1608,6 +1608,7 @@ export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
+  contactEmail?: string
   contactRelationship?: string
   dateOfDeclaration?: GQLDate
   trackingId?: string

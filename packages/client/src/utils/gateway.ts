@@ -7,6 +7,7 @@
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ *
  */
 
 /*
@@ -65,6 +66,7 @@ export type AddressInput = {
   district?: InputMaybe<Scalars['String']>
   from?: InputMaybe<Scalars['Date']>
   line?: InputMaybe<Array<Scalars['String']>>
+  partOf?: InputMaybe<Scalars['String']>
   postalCode?: InputMaybe<Scalars['String']>
   state?: InputMaybe<Scalars['String']>
   text?: InputMaybe<Scalars['String']>
@@ -95,8 +97,10 @@ export type AdvancedSeachParameters = {
   childDoBStart?: Maybe<Scalars['String']>
   childFirstNames?: Maybe<Scalars['String']>
   childGender?: Maybe<Scalars['String']>
+  childIdentifier?: Maybe<Scalars['String']>
   childLastName?: Maybe<Scalars['String']>
   compositionType?: Maybe<Array<Maybe<Scalars['String']>>>
+  contactEmail?: Maybe<Scalars['String']>
   contactNumber?: Maybe<Scalars['String']>
   dateOfEvent?: Maybe<Scalars['String']>
   dateOfEventEnd?: Maybe<Scalars['String']>
@@ -158,10 +162,11 @@ export type AdvancedSearchParametersInput = {
   childDoBStart?: InputMaybe<Scalars['String']>
   childFirstNames?: InputMaybe<Scalars['String']>
   childGender?: InputMaybe<Scalars['String']>
+  childIdentifier?: InputMaybe<Scalars['String']>
   childLastName?: InputMaybe<Scalars['String']>
   compositionType?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
-  contactNumber?: InputMaybe<Scalars['String']>
   contactEmail?: InputMaybe<Scalars['String']>
+  contactNumber?: InputMaybe<Scalars['String']>
   dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfEventEnd?: InputMaybe<Scalars['String']>
   dateOfEventStart?: InputMaybe<Scalars['String']>
@@ -290,18 +295,17 @@ export type AttachmentInput = {
   data?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<AttachmentStatus>
+  status?: InputMaybe<AttachmentInputStatus>
   subject?: InputMaybe<Scalars['String']>
   systemFileName?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
   uri?: InputMaybe<Scalars['String']>
 }
 
-export enum AttachmentStatus {
-  Amended = 'AMENDED',
-  EnteredInError = 'ENTERED_IN_ERROR',
-  Final = 'FINAL',
-  Preliminary = 'PRELIMINARY'
+export enum AttachmentInputStatus {
+  Approved = 'approved',
+  Deleted = 'deleted',
+  Validated = 'validated'
 }
 
 export type AuditLogItemBase = {
@@ -334,6 +338,7 @@ export type Birth = {
 export type BirthEventSearchSet = EventSearchSet & {
   __typename?: 'BirthEventSearchSet'
   childGender?: Maybe<Scalars['String']>
+  childIdentifier?: Maybe<Scalars['String']>
   childName?: Maybe<Array<Maybe<HumanName>>>
   dateOfBirth?: Maybe<Scalars['Date']>
   fatherDateOfBirth?: Maybe<Scalars['String']>
@@ -707,9 +712,9 @@ export type DuplicatesInfo = {
 
 export type Estimation = {
   __typename?: 'Estimation'
+  femaleEstimation: Scalars['Float']
   locationId: Scalars['String']
   locationLevel: Scalars['String']
-  femaleEstimation: Scalars['Float']
   maleEstimation: Scalars['Float']
   totalEstimation: Scalars['Float']
 }
@@ -970,13 +975,13 @@ export type LocationStatisticsResponse = {
 
 export type LocationWiseEstimationMetric = {
   __typename?: 'LocationWiseEstimationMetric'
-  estimated: Scalars['Int']
+  estimated: Scalars['Float']
   locationId: Scalars['String']
   locationName: Scalars['String']
-  total: Scalars['Int']
-  within1Year: Scalars['Int']
-  within5Years: Scalars['Int']
-  withinTarget: Scalars['Int']
+  total: Scalars['Float']
+  within1Year: Scalars['Float']
+  within5Years: Scalars['Float']
+  withinTarget: Scalars['Float']
 }
 
 export type LoginBackground = {
@@ -1082,13 +1087,13 @@ export type MixedTotalMetricsResult =
 
 export type MonthWiseEstimationMetric = {
   __typename?: 'MonthWiseEstimationMetric'
-  estimated: Scalars['Int']
-  month: Scalars['Int']
-  total: Scalars['Int']
-  within1Year: Scalars['Int']
-  within5Years: Scalars['Int']
-  withinTarget: Scalars['Int']
-  year: Scalars['Int']
+  estimated: Scalars['Float']
+  month: Scalars['Float']
+  total: Scalars['Float']
+  within1Year: Scalars['Float']
+  within5Years: Scalars['Float']
+  withinTarget: Scalars['Float']
+  year: Scalars['Float']
 }
 
 export type Mutation = {
@@ -1854,6 +1859,7 @@ export type QuerySearchEventsArgs = {
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
   sort?: InputMaybe<Scalars['String']>
+  sortBy?: InputMaybe<Array<SortBy>>
   sortColumn?: InputMaybe<Scalars['String']>
   userId?: InputMaybe<Scalars['String']>
 }
@@ -2028,6 +2034,7 @@ export type RegistrationSearchSet = {
   __typename?: 'RegistrationSearchSet'
   assignment?: Maybe<AssignmentData>
   comment?: Maybe<Scalars['String']>
+  contactEmail?: Maybe<Scalars['String']>
   contactNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   createdAt?: Maybe<Scalars['String']>
@@ -2194,6 +2201,11 @@ export type Signature = {
 export type SignatureInput = {
   data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
+}
+
+export type SortBy = {
+  column: Scalars['String']
+  order: Scalars['String']
 }
 
 export enum Status {
@@ -3005,6 +3017,7 @@ export type SearchEventsQuery = {
             __typename?: 'RegistrationSearchSet'
             status?: string | null
             contactNumber?: string | null
+            contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
@@ -3054,6 +3067,7 @@ export type SearchEventsQuery = {
             __typename?: 'RegistrationSearchSet'
             status?: string | null
             contactNumber?: string | null
+            contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
@@ -3109,6 +3123,7 @@ export type SearchEventsQuery = {
             __typename?: 'RegistrationSearchSet'
             status?: string | null
             contactNumber?: string | null
+            contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
@@ -4330,31 +4345,127 @@ export type FetchDeathRegistrationForReviewQuery = {
     father?: {
       __typename?: 'Person'
       id?: string | null
+      birthDate?: string | null
+      maritalStatus?: string | null
+      occupation?: string | null
+      detailsExist?: boolean | null
+      reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      educationalAttainment?: string | null
+      nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: string | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
       } | null> | null
     } | null
     mother?: {
       __typename?: 'Person'
       id?: string | null
+      birthDate?: string | null
+      maritalStatus?: string | null
+      occupation?: string | null
+      detailsExist?: boolean | null
+      reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      educationalAttainment?: string | null
+      nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: string | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
+      } | null> | null
     } | null
     spouse?: {
       __typename?: 'Person'
       id?: string | null
+      birthDate?: string | null
+      maritalStatus?: string | null
+      occupation?: string | null
+      detailsExist?: boolean | null
+      reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      educationalAttainment?: string | null
+      nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: string | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
       } | null> | null
     } | null
     medicalPractitioner?: {
@@ -8932,31 +9043,127 @@ export type FetchViewRecordByCompositionQuery = {
         father?: {
           __typename?: 'Person'
           id?: string | null
+          birthDate?: string | null
+          maritalStatus?: string | null
+          occupation?: string | null
+          detailsExist?: boolean | null
+          reasonNotApplying?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          dateOfMarriage?: any | null
+          educationalAttainment?: string | null
+          nationality?: Array<string | null> | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+          } | null> | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: string | null
+            otherType?: string | null
+            fieldsModifiedByIdentity?: Array<string | null> | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: string | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
           } | null> | null
         } | null
         mother?: {
           __typename?: 'Person'
           id?: string | null
+          birthDate?: string | null
+          maritalStatus?: string | null
+          occupation?: string | null
+          detailsExist?: boolean | null
+          reasonNotApplying?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          dateOfMarriage?: any | null
+          educationalAttainment?: string | null
+          nationality?: Array<string | null> | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
           } | null> | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: string | null
+            otherType?: string | null
+            fieldsModifiedByIdentity?: Array<string | null> | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: string | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+          } | null> | null
         } | null
         spouse?: {
           __typename?: 'Person'
           id?: string | null
+          birthDate?: string | null
+          maritalStatus?: string | null
+          occupation?: string | null
+          detailsExist?: boolean | null
+          reasonNotApplying?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          dateOfMarriage?: any | null
+          educationalAttainment?: string | null
+          nationality?: Array<string | null> | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+          } | null> | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: string | null
+            otherType?: string | null
+            fieldsModifiedByIdentity?: Array<string | null> | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: string | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
           } | null> | null
         } | null
         medicalPractitioner?: {
