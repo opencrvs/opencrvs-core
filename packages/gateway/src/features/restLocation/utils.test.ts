@@ -47,7 +47,7 @@ describe('location utils function testing', () => {
           male_population: 1234,
           female_population: 4321,
           population: 5555,
-          crude_birth_rate: 2.0
+          crude_birth_rate: 2
         },
         mockFhirLocation.extension as any
       )
@@ -73,7 +73,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":1}]'
+          valueString: '[{"2020":13.675},{"2021":2}]'
         }
       ])
     })
@@ -110,7 +110,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":6.9875},{"2022":0.75}]'
+          valueString: '[{"2020":13.675},{"2021":13.975},{"2022":1.5}]'
         }
       ])
     })

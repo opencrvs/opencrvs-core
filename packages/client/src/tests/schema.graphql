@@ -475,6 +475,26 @@ type ContactPoint {
   use: String
 }
 
+type MonthWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  month: Int!
+  year: Int!
+}
+
+type LocationWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  locationId: String!
+  locationName: String!
+}
+
 input ContactPointInput {
   system: TelecomSystem
   value: String
@@ -896,16 +916,6 @@ type LocationStatisticsResponse {
   offices: Int!
 }
 
-type LocationWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  locationId: String!
-  locationName: String!
-}
-
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1003,15 +1013,6 @@ union MixedTotalMetricsResult =
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
-type MonthWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  month: Int!
-  year: Int!
-}
 
 type Mutation {
   createNotification(details: NotificationInput!): Notification!

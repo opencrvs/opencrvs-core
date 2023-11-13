@@ -72,11 +72,11 @@ describe('User type resolvers', () => {
     device: ''
   }
   it('return id type', () => {
-    const res = userTypeResolvers.User.id(mockResponse)
+    const res = userTypeResolvers.User!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
   it('return userMgntUserID type', () => {
-    const res = userTypeResolvers.User.userMgntUserID(mockResponse)
+    const res = userTypeResolvers.User!.userMgntUserID(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
   it('return suspicious user flag', () => {
@@ -90,11 +90,11 @@ describe('User type resolvers', () => {
         reason: 'SUSPICIOUS'
       }
     ]
-    const res = userTypeResolvers.User.underInvestigation(mockResponse)
+    const res = userTypeResolvers.User!.underInvestigation(mockResponse)
     expect(res).toBeTruthy()
   })
   it('return user identifier', () => {
-    const res = userTypeResolvers.User.identifier(mockResponse)
+    const res = userTypeResolvers.User!.identifier(mockResponse)
     expect(res).toEqual({
       system: mockResponse.identifiers[0].system,
       value: mockResponse.identifiers[0].value
@@ -133,7 +133,7 @@ describe('User type resolvers', () => {
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
     mockGet.mockResolvedValueOnce(mockOffice)
-    const res = await userTypeResolvers.User.primaryOffice(
+    const res = await userTypeResolvers.User!.primaryOffice(
       mockResponse,
       undefined,
       {
@@ -393,7 +393,7 @@ describe('User type resolvers', () => {
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
-    const response = await userTypeResolvers.User.localRegistrar(
+    const response = await userTypeResolvers.User!.localRegistrar(
       mockResponse,
       undefined,
       {
@@ -443,7 +443,7 @@ describe('User type resolvers', () => {
     const userResponse = mockResponse
     userResponse.scope!.push('register')
 
-    const response = await userTypeResolvers.User.localRegistrar(
+    const response = await userTypeResolvers.User!.localRegistrar(
       userResponse,
       undefined,
       {

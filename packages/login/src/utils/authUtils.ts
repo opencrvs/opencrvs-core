@@ -46,15 +46,15 @@ export function maskEmail(email: string) {
   const username = parts[0]
   const domain = parts[1]
 
-  const maskedUsername = maskString(username)
+  const maskedUsername = maskString(username, 6)
   const maskedDomain =
     maskString(domain.split('.')[0]) + '.' + maskString(domain.split('.')[1])
 
   return maskedUsername + '@' + maskedDomain
 }
 
-export function maskString(s: string) {
-  const maskPercentage = 0.6
+export function maskString(s: string, limit = 5) {
+  const maskPercentage = s.length > 30 ? 0.7 : 0.6
   const emailLength = s.length || 0
   const unmaskedEmailLength =
     emailLength - Math.ceil(maskPercentage * emailLength)
@@ -62,7 +62,7 @@ export function maskString(s: string) {
   const endBefore = unmaskedEmailLength - startFrom
   const maskedEmail = s.replace(
     s.slice(startFrom, emailLength - endBefore),
-    '*'.repeat(emailLength - startFrom - endBefore)
+    '*'.repeat(Math.min(emailLength - startFrom - endBefore, limit))
   )
   return maskedEmail
 }

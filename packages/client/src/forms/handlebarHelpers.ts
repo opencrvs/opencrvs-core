@@ -8,23 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-type Request = {
-  headers: {
-    host: string
-  }
-  protocol: string
-  method: string
-  path: string
+
+import {
+  LoadHandlebarHelpersResponse,
+  referenceApi
+} from '@client/utils/referenceApi'
+
+let handlebarHelpers: LoadHandlebarHelpersResponse
+
+export async function initHandlebarHelpers() {
+  handlebarHelpers = await referenceApi.importHandlebarHelpers()
 }
 
-declare module 'minio/dist/main/signing' {
-  export function presignSignatureV4(
-    request: Request,
-    accessKey: string,
-    secretKey: string,
-    sessionToken?: string,
-    region: string,
-    requestDate: Date,
-    expires: number
-  ): string
+export function getHandlebarHelpers() {
+  if (!handlebarHelpers) {
+    throw new Error(
+      'Handlebar helpers were requested before initialization. This should never happen.'
+    )
+  }
+  return handlebarHelpers
 }

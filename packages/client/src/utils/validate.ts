@@ -10,11 +10,7 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import {
-  IFormFieldValue,
-  IFormData,
-  IFormField
-} from '@opencrvs/client/src/forms'
+import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -224,6 +220,10 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
+export const isDateNotPastLimit = (date: string, limit: Date) => {
+  return new Date(date) >= limit
+}
+
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   const birthDate = drafts.deceased && drafts.deceased.birthDate
   return birthDate
@@ -285,11 +285,13 @@ export const isValidBirthDate: Validation = (
 
 export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   const childBirthDate = value as string
+  const pastDateLimit = new Date(1900, 0, 1)
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
       isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate)
+      isDateNotInFuture(childBirthDate) &&
+      isDateNotPastLimit(childBirthDate, pastDateLimit)
     ? undefined
     : { message: messages.isValidBirthDate }
 }
@@ -479,6 +481,17 @@ export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
     return { message: messages.dateFormat }
   }
 }
+
+export const dateNotPastLimit =
+  (limit: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (isDateNotPastLimit(cast, new Date(limit))) {
+      return undefined
+    } else {
+      return { message: messages.dateFormat }
+    }
+  }
 
 export const dateNotToday = (date: string): boolean => {
   const today = new Date().setHours(0, 0, 0, 0)

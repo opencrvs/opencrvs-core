@@ -144,64 +144,19 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it('Tests the health check with a valid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=search'
-    })
-    expect(res.result).toEqual({
-      success: true
-    })
-  })
-  it('Fails the health check with a missing parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
+  it('Tests the health check for all the service', async () => {
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-    expect(res.statusCode).toBe(400)
-  })
-  it('Rejects the health check with an invalid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=nonsense'
+    expect(res.result).toEqual({
+      auth: false,
+      search: false,
+      'user-mgnt': false,
+      metrics: false,
+      notification: false,
+      countryconfig: false,
+      workflow: false
     })
-    expect(res.result.message).toEqual(
-      `"service" must be one of [auth, user-mgnt, metrics, notification, countryconfig, search, workflow, gateway]`
-    )
-  })
-  it('Fails the health check for a failed health check on a running service', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: false
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
-  })
-  it('Fails the health check for a failed and not running service', async () => {
-    fetch.mockReject(new Error('An internal server error occurred'))
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
   })
 })

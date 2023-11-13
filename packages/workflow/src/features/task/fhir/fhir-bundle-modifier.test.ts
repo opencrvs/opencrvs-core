@@ -19,7 +19,7 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
-  taskResouceMock
+  taskResourceMock
 } from '@workflow/test/utils'
 import { Task } from '@opencrvs/commons/types'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
@@ -39,7 +39,7 @@ describe('Verify handler', () => {
 
   it('modifyTaskBundle returns correct bundle', async () => {
     fetch.mockResponses(
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],

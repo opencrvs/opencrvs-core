@@ -68,9 +68,8 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(
         JSON.stringify(mockObservations.causeOfDeathMethod)
       )
-
       const causeOfDeathMethod =
-        await typeResolvers.DeathRegistration.causeOfDeathMethod(
+        await typeResolvers.DeathRegistration!.causeOfDeathMethod(
           {
             entry: [
               { resource: mockDeathComposition },

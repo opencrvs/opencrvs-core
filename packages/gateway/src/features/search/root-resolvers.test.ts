@@ -64,7 +64,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -89,7 +89,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -114,7 +114,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -139,7 +139,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -166,7 +166,7 @@ describe('Search root resolvers', () => {
       )
 
       await expect(
-        resolvers.Query.searchEvents(
+        resolvers.Query!.searchEvents(
           {},
           {
             advancedSearchParameters: {}
@@ -186,7 +186,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -211,7 +211,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -237,7 +237,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -259,7 +259,7 @@ describe('Search root resolvers', () => {
           body: { hits: null }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -285,7 +285,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -345,7 +345,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         {
           declarationJurisdictionId: 'dummy_loc_id_parent',
@@ -363,7 +363,7 @@ describe('Search root resolvers', () => {
     })
     it('throws an error for unauthorized user', async () => {
       await expect(
-        resolvers.Query.getEventsWithProgress(
+        resolvers.Query!.getEventsWithProgress(
           {},
           {},
           { headers: unauthorizedUser }
@@ -378,7 +378,7 @@ describe('Search root resolvers', () => {
           entry: []
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         { declarationJurisdictionId: null },
         { headers: authorizedUser }

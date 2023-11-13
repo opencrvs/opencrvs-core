@@ -10,17 +10,15 @@
  */
 import * as glob from 'glob'
 import { join, resolve } from 'path'
-import healthCheckHandler, {
-  querySchema as healthCheckQuerySchema,
-  responseSchema as healthCheckResponseSchema
-} from '@gateway/features/healthCheck/handler'
+import healthCheckHandler from '@gateway/features/healthCheck/handler'
 import {
   createLocationHandler,
   requestSchema,
   updateLocationHandler,
   updateSchema,
   fetchLocationHandler,
-  requestParamsSchema
+  requestParamsSchema,
+  locationQuerySchema
 } from '@gateway/features/restLocation/locationHandler'
 import {
   eventNotificationHandler,
@@ -49,13 +47,7 @@ export const getRoutes = () => {
       options: {
         auth: false,
         description: 'Checks the health of all services.',
-        notes: 'Pass the service as a query param: service',
-        validate: {
-          query: healthCheckQuerySchema
-        },
-        response: {
-          schema: healthCheckResponseSchema
-        }
+        notes: 'Pass the service as a query param: service'
       }
     },
     // get all locations
@@ -66,7 +58,10 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         auth: false,
-        description: 'Get all locations'
+        description: 'Get all locations',
+        validate: {
+          query: locationQuerySchema
+        }
       }
     },
     {

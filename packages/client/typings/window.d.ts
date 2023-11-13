@@ -49,6 +49,7 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
+    DEATH_REGISTRATION: boolean
     MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
@@ -72,6 +73,7 @@ interface Window {
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string
+    SIGNATURE_REQUIRED_FOR_ROLES: string[]
   }
   __localeId__: string
   __WB_MANIFEST: Array<{ url: string; revision: string }>

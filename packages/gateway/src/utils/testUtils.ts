@@ -1873,7 +1873,7 @@ export const mockFhirLocation = {
     },
     {
       url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-      valueString: '[{"2020":6.8375},{"2021":6.9875}]'
+      valueString: '[{"2020":13.675},{"2021":13.975}]'
     }
   ],
   meta: {

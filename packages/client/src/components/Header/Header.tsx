@@ -44,7 +44,8 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES
+  PERFORMANCE_MANAGEMENT_ROLES,
+  EMAIL
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -366,6 +367,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+      })
+    }
+    if (fieldNames.includes('registrationEmail')) {
+      searchTypeList.push({
+        label: intl.formatMessage(messages.email),
+        value: EMAIL,
+        icon: <Icon name="Envelope" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })
     }
 

@@ -43,6 +43,7 @@ import {
 import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
+import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -212,11 +213,7 @@ async function createBrideIndex(
   }
 
   body.brideIdentifier =
-    bride &&
-    bride.identifier &&
-    bride.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    bride && bride.identifier && getSubmittedIdentifier(bride.identifier)
   body.brideDoB = bride && bride.birthDate
 }
 
@@ -254,11 +251,7 @@ async function createGroomIndex(
   }
 
   body.groomIdentifier =
-    groom &&
-    groom.identifier &&
-    groom.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    groom && groom.identifier && getSubmittedIdentifier(groom.identifier)
   body.groomDoB = groom && groom.birthDate
 }
 
@@ -392,7 +385,7 @@ async function createDeclarationIndex(
       (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.contactRelationship =
+  body.informantType =
     (contactPersonRelationshipExtention &&
       contactPersonRelationshipExtention.valueString) ||
     (contactPersonExtention && contactPersonExtention.valueString)

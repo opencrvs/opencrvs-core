@@ -124,7 +124,7 @@ export interface ICompositionBody {
   compositionType?: string
   event?: EVENT
   type?: string
-  contactRelationship?: string
+  informantType?: string
   contactNumber?: string
   contactEmail?: string
   dateOfDeclaration?: string

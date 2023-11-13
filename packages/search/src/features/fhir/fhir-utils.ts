@@ -78,17 +78,17 @@ export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
   )
 }
 
-export function findEntry(
+export function findEntry<T extends fhir.Resource = fhir.Resource>(
   code: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
-): fhir.Resource | undefined {
+): T | undefined {
   const patientSection = findCompositionSection(code, composition)
   if (!patientSection || !patientSection.entry) {
     return undefined
   }
   const reference = patientSection.entry[0].reference
-  return findEntryResourceByUrl(reference, bundleEntries)
+  return findEntryResourceByUrl(reference, bundleEntries) as T
 }
 
 export async function addEventLocation(
@@ -147,14 +147,14 @@ export async function addEventLocation(
   }
 }
 
-export function findEntryResourceByUrl(
+export function findEntryResourceByUrl<T extends fhir.Resource = fhir.Resource>(
   url?: string,
   bundleEntries?: fhir.BundleEntry[]
-) {
+): T | undefined {
   const bundleEntry =
     bundleEntries &&
     bundleEntries.find((obj: fhir.BundleEntry) => obj.fullUrl === url)
-  return bundleEntry && bundleEntry.resource
+  return bundleEntry && (bundleEntry.resource as T)
 }
 
 export function findName(code: string, names: fhir.HumanName[] | undefined) {
