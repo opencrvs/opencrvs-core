@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils'
-import { defaultFieldResolver, GraphQLSchema } from 'graphql'
+import {
+  Kind,
+  GraphQLScalarType,
+  defaultFieldResolver,
+  GraphQLSchema
+} from 'graphql'
 
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
@@ -88,7 +93,43 @@ const resolvers: StringIndexed<IResolvers> = merge(
   bookmarkAdvancedSearchResolvers as IResolvers,
   informantSMSNotificationResolvers as IResolvers,
   informantSMSNotiTypeResolvers as IResolvers,
-  OIDPUserInfoResolvers as IResolvers
+  OIDPUserInfoResolvers as IResolvers,
+  {
+    FieldValue: new GraphQLScalarType({
+      name: 'FieldValue',
+      description: 'String, Number or Boolean',
+      serialize(value) {
+        if (!['string', 'number', 'boolean'].includes(typeof value)) {
+          throw new Error('Value must be either a String, Boolean or an number')
+        }
+
+        return value
+      },
+      parseValue(value) {
+        if (!['string', 'number', 'boolean'].includes(typeof value)) {
+          throw new Error('Value must be either a String, Boolean or an number')
+        }
+
+        return value
+      },
+      parseLiteral(ast) {
+        switch (ast.kind) {
+          case Kind.INT:
+            return parseInt(ast.value, 10)
+          case Kind.FLOAT:
+            return parseFloat(ast.value)
+          case Kind.BOOLEAN:
+            return ast.value
+          case Kind.STRING:
+            return ast.value
+          default:
+            throw new Error(
+              'Value must be either a String, Boolean or an number'
+            )
+        }
+      }
+    })
+  }
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
