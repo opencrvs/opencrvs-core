@@ -458,6 +458,23 @@ input CommentInput {
   createdAt: Date
 }
 
+input ComparisonInput {
+  eq: String
+  gt: String
+  lt: String
+  gte: String
+  lte: String
+  in: [String!]
+  ne: String
+  nin: [String!]
+}
+
+type ContactPoint {
+  system: String
+  value: String
+  use: String
+}
+
 type MonthWiseEstimationMetric {
   total: Float!
   withinTarget: Float!
@@ -899,16 +916,6 @@ type LocationStatisticsResponse {
   offices: Int!
 }
 
-type LocationWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  locationId: String!
-  locationName: String!
-}
-
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1006,15 +1013,6 @@ union MixedTotalMetricsResult =
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
-type MonthWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  month: Int!
-  year: Int!
-}
 
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
