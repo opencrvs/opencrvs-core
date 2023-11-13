@@ -38,8 +38,8 @@ export const CorrectionRequestInput = z.object({
     z.object({
       section: z.string(),
       fieldName: z.string(),
-      oldValue: z.string(),
-      newValue: z.string()
+      oldValue: z.union([z.string(), z.number(), z.boolean()]),
+      newValue: z.union([z.string(), z.number(), z.boolean()])
     })
   ),
   reason: z.string(),

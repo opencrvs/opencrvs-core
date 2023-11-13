@@ -302,10 +302,8 @@ const ActionDetailsModalListTable = ({
       ) as IFormSection
 
       if (section.id === 'documents') {
-        item.valueString = EMPTY_STRING
-        editedValue.valueString = intl.formatMessage(
-          dynamicConstantsMessages.updated
-        )
+        item.value = EMPTY_STRING
+        editedValue.value = intl.formatMessage(dynamicConstantsMessages.updated)
       }
 
       const indexes = item?.valueId?.split('.')
@@ -326,18 +324,8 @@ const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       } else {
         const [parentField] = indexes
@@ -350,18 +338,8 @@ const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       }
     })

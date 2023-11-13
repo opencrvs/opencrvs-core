@@ -29,6 +29,22 @@ import {
   CorrectionRequestPaymentInput
 } from './correction-request'
 
+function getFHIRValueField(value: unknown) {
+  if (typeof value === 'string') {
+    return { valueString: value }
+  }
+
+  if (typeof value === 'number') {
+    return { valueInteger: value }
+  }
+
+  if (typeof value === 'boolean') {
+    return { valueBoolean: value }
+  }
+
+  throw new Error('Invalid value type')
+}
+
 export function createCorrectionProofOfLegalCorrectionDocument(
   subjectReference: URNReference,
   attachmentURL: string,
@@ -254,7 +270,7 @@ export function createCorrectedTask(
           }
         ]
       },
-      valueString: update.newValue
+      ...getFHIRValueField(update.newValue)
     })),
     reason: {
       text: correctionDetails.reason,
@@ -356,7 +372,7 @@ export function createCorrectionRequestTask(
           }
         ]
       },
-      valueString: update.newValue
+      ...getFHIRValueField(update.newValue)
     })),
     reason: {
       text: correctionDetails.reason,
