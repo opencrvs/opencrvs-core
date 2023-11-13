@@ -95,6 +95,8 @@ export type ValidRecord =
   | CertifiedRecord
   | IssuedRecord
 
+export type UnregisteredSavedRecord = InProgressRecord | DeclaredRecord
+
 export type StateIdenfitiers = {
   IN_PROGRESS: InProgressRecord
   DECLARED: DeclaredRecord

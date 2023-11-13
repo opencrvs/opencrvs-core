@@ -18,7 +18,8 @@ import {
   StateIdenfitiers,
   IssuedRecord,
   InProgressRecord,
-  DeclaredRecord
+  DeclaredRecord,
+  UnregisteredSavedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -66,11 +67,7 @@ export type StateTree =
       RegisteredRecord | CertifiedRecord | IssuedRecord
     >
   // Update declaration
-  | Transition<
-      InProgressRecord | DeclaredRecord,
-      Update,
-      InProgressRecord | DeclaredRecord
-    >
+  | Transition<UnregisteredSavedRecord, Update, UnregisteredSavedRecord>
 
 /*
  * Internals

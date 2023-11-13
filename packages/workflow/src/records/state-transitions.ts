@@ -26,9 +26,8 @@ import {
   sortTasksDescending,
   RecordWithPreviousTask,
   ValidatedRecord,
-  InProgressRecord,
-  DeclaredRecord,
-  Attachment
+  Attachment,
+  UnregisteredSavedRecord
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -189,10 +188,10 @@ export async function toCorrectionApproved(
 }
 
 export async function toUpdated(
-  record: InProgressRecord | DeclaredRecord,
+  record: UnregisteredSavedRecord,
   practitioner: Practitioner,
   updatedDetails: UpdateRequestInput
-): Promise<InProgressRecord | DeclaredRecord> {
+): Promise<UnregisteredSavedRecord> {
   const previousTask = getTaskFromBundle(record)
 
   const updatedTask = createUpdatedTask(
@@ -224,7 +223,7 @@ export async function toUpdated(
 }
 
 export async function toValidated(
-  record: InProgressRecord | DeclaredRecord,
+  record: UnregisteredSavedRecord,
   practitioner: Practitioner
 ): Promise<ValidatedRecord> {
   const previousTask = getTaskFromBundle(record)
