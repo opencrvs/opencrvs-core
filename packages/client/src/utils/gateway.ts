@@ -7,7 +7,6 @@
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
- *
  */
 
 /*
