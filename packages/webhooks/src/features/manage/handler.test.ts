@@ -20,7 +20,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '123',
     algorithm: 'RS256',
@@ -229,7 +229,7 @@ describe('subscribeWebhooksHandler handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.result.hub.reason).toEqual('hub.secret is incorrrect')
+    expect(res.result.hub.reason).toEqual('hub.secret is incorrect')
     expect(res.statusCode).toBe(400)
   })
 })

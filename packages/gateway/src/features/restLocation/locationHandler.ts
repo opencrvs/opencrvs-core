@@ -19,6 +19,14 @@ import {
   updateStatisticalExtensions
 } from './utils'
 import { v4 as uuid } from 'uuid'
+import {
+  Bundle,
+  BundleEntry,
+  Saved,
+  URLReference,
+  Location as FhirLocation,
+  URNReference
+} from '@opencrvs/commons/types'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -90,7 +98,7 @@ const locationStatisticSchema = Joi.object({
   female_population: Joi.number().required(),
   population: Joi.number().required(),
   crude_birth_rate: Joi.number().required()
-})
+}).label('YearStatistics')
 
 function instanceOfJurisdiction(object: any): object is Location {
   return 'statistics' in object
@@ -115,8 +123,11 @@ const locationRequestSchema = Joi.object({
       JurisdictionType.LOCATION_LEVEL_5
     )
     .optional(),
-  statistics: Joi.array().items(locationStatisticSchema).optional()
-})
+  statistics: Joi.array()
+    .items(locationStatisticSchema)
+    .optional()
+    .label('Statistics')
+}).label('LocationPayload')
 
 export const requestSchema = Joi.alternatives().try(
   locationRequestSchema,
@@ -140,7 +151,7 @@ export const updateSchema = Joi.object({
   alias: Joi.string().optional(),
   status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE).optional(),
   statistics: locationStatisticSchema.optional()
-})
+}).label('UpdateLocationPayload')
 
 export const requestParamsSchema = Joi.object({
   locationId: Joi.string().uuid()
@@ -155,9 +166,9 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth<fhir.Bundle>(`/Location/${locationId}`)
+    response = await fetchFromHearth<Saved<Bundle>>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth<fhir.Bundle>(`/Location${searchParam}`)
+    response = await fetchFromHearth<Saved<Bundle>>(`/Location${searchParam}`)
   }
 
   response.link = response.link?.map((link) => ({
@@ -171,7 +182,7 @@ export async function fetchLocationHandler(
     ...entry,
     fullUrl: entry.fullUrl
       ?.replace(entry.fullUrl.split('/Location')[0], `${request.url.origin}`)
-      .replace('Location', 'location')
+      .replace('Location', 'location') as URLReference
   }))
 
   return response
@@ -181,7 +192,7 @@ function batchLocationsHandler(locations: Location[]) {
   const locationsMap = new Map(
     locations.map((location) => [
       location.statisticalID,
-      { ...location, uid: `urn:uuid:${uuid()}` }
+      { ...location, uid: `urn:uuid:${uuid()}` as URNReference }
     ])
   )
   const locationsBundle = {
@@ -196,7 +207,7 @@ function batchLocationsHandler(locations: Location[]) {
           location.partOf
       }))
       .map(
-        (location): fhir.BundleEntry => ({
+        (location): BundleEntry<FhirLocation> => ({
           fullUrl: locationsMap.get(location.statisticalID)!.uid,
           resource: {
             ...composeFhirLocation(location),
@@ -218,7 +229,7 @@ export async function createLocationHandler(
     return batchLocationsHandler(request.payload as Location[])
   }
   const payload = request.payload as Location | Facility
-  const newLocation: fhir.Location = composeFhirLocation(payload)
+  const newLocation = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
   const locations = [

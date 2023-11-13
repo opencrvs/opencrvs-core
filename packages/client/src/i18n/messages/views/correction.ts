@@ -34,6 +34,7 @@ interface ICorrectionMessages
   materialError: MessageDescriptor
   materialOmission: MessageDescriptor
   judicialOrder: MessageDescriptor
+  otherReason: MessageDescriptor
   reasonForChangeError: MessageDescriptor
   idCheckTitle: MessageDescriptor
   otherIdCheckTitle: MessageDescriptor
@@ -65,6 +66,10 @@ interface ICorrectionMessages
   correctionSummaryProofOfPayment: MessageDescriptor
   correctionSummaryTotalPaymentLabel: MessageDescriptor
   correctionRequiredLabel: MessageDescriptor
+  correctionForApprovalDialogTitle: MessageDescriptor
+  correctionSummarySubmitter: MessageDescriptor
+  correctionSummaryOffice: MessageDescriptor
+  correctionSummaryRequestedOn: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -185,6 +190,11 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.reason.judicialOrder',
     defaultMessage: 'Requested to do so by the court (Judicial order)',
     description: 'Label for judicial order for correction reason form'
+  },
+  otherReason: {
+    id: 'correction.reason.other',
+    defaultMessage: 'Other',
+    description: 'Label for other for correction reason form'
   },
   reasonForChangeError: {
     id: 'correction.reason.error',
@@ -363,6 +373,46 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.required',
     defaultMessage: 'Required for correction',
     description: 'Payment and proof of payment input error'
+  },
+  correctionForApprovalDialogTitle: {
+    id: 'correction.correctionForApprovalDialog.title',
+    defaultMessage: 'Send record correction for approval ?',
+    description:
+      'The title for the dialog when record correction sent by registration agent for approval'
+  },
+  correctionForApprovalDialogCancel: {
+    defaultMessage: 'Cancel',
+    description:
+      'The cancel button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.cancel'
+  },
+  correctionForApprovalDialogConfirm: {
+    defaultMessage: 'Confirm',
+    description:
+      'The send button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.send'
+  },
+  correctionForApprovalDialogDescription: {
+    defaultMessage:
+      'The Registrar will be notified of this correction request and a record of this request will be recorded',
+    description:
+      'The description for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.description'
+  },
+  correctionSummarySubmitter: {
+    id: 'correction.summary.submitter',
+    defaultMessage: 'Submitter',
+    description: 'Submitter of certificate correction summary'
+  },
+  correctionSummaryOffice: {
+    id: 'correction.summary.office',
+    defaultMessage: 'Office',
+    description: 'Office where certificate correction summary was submitted'
+  },
+  correctionSummaryRequestedOn: {
+    id: 'correction.summary.requestedOn',
+    defaultMessage: 'Requested on',
+    description: 'Date when certificate correction summary was submitted'
   }
 }
 

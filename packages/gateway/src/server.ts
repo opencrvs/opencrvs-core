@@ -31,9 +31,10 @@ import {
 } from 'apollo-server-hapi'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/features/user/database'
+import * as database from '@gateway/utils/redis'
 import { logger } from '@gateway/logger'
 import { badRequest, Boom } from '@hapi/boom'
+import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -90,6 +91,28 @@ export async function createServer() {
 
   const routes = getRoutes()
   app.route(routes)
+
+  app.ext('onRequest', (req, h) => {
+    if (req.url.pathname.startsWith('/v1')) {
+      req.url.pathname = req.url.pathname.replace('/v1', '')
+      req.setUrl(req.url)
+    }
+    return h.continue
+  })
+
+  app.ext('onPreResponse', (request, reply) => {
+    if (request.response instanceof RateLimitError) {
+      return reply
+        .response({
+          statusCode: 402,
+          error: 'Rate limit exceeded',
+          message: request.response.message
+        })
+        .code(402)
+    }
+
+    return reply.continue
+  })
 
   /*
    * For debugging sent declarations on pre-prod environments.

@@ -113,7 +113,13 @@ sleep_if_non_ci 5
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
+if  [ -n "$(uname -r | grep microsoft-standard-WSL2)" ] && [ -n "$(cat /etc/os-release | grep Ubuntu)" ]; then
+  wslKernelWithUbuntu=true
+  echo -e "\033[32m:::::::::::::::: You are running Windows Subsystem for Linux .  Checking distro ::::::::::::::::\033[0m"
+  echo
+fi
+
+if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
   echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
   echo
 
@@ -142,35 +148,6 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     else
         echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     fi
-
-    echo
-    if [  -n "$(google-chrome --version | grep Chrome)" ]; then
-      echo -e "Chrome is \033[32minstalled!\033[0m :)"
-      echo
-    else
-      echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-      echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-      echo
-      echo "We think that you do not have Chrome installed."
-      echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-      echo
-    fi
-  fi
-elif [ "$(uname)" == "Darwin" ]; then
-  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
-  echo
-  OS="MAC"
-  if [  -n "$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | grep Chrome)" ]; then
-    echo -e "Chrome is \033[32minstalled!\033[0m :)"
-    echo
-  else
-    echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-    echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-    echo
-    echo "We think that you do not have Chrome installed, or it is not available on this path: "
-    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-    echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-    echo
   fi
 else
   echo "Sorry your operating system is not supported."
@@ -186,7 +163,7 @@ echo
 
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
-  dependencies+=("docker-compose" "google-chrome")
+  dependencies+=("docker compose")
 fi
 for i in "${dependencies[@]}"
 do
@@ -207,9 +184,9 @@ do
                 echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
             fi
         fi
-        if [ $i == "docker-compose" ] ; then
+        if [ $i == "docker compose" ] ; then
             if [ $OS == "UBUNTU" ]; then
-                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker-compose installation."
+                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker compose installation."
                 echo "Please follow the documentation here: https://docs.docker.com/compose/install/"
             else
                 echo "You need to install Docker Desktop for Mac, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker installation."
@@ -237,14 +214,6 @@ do
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
            echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
-        fi
-        if [ $i == "google-chrome" ] ; then
-          echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-          echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-          echo
-          echo "We think that you do not have Chrome installed."
-          echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-          echo
         fi
         if [ $i == "tmux" ] ; then
           if [ $OS == "UBUNTU" ]; then

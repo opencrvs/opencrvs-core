@@ -18,7 +18,7 @@ import {
   getPrimaryLocationIdOfOffice
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLDeclarationsStartedMetrics } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'

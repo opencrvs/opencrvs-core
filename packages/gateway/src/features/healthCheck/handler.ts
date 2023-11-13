@@ -19,7 +19,7 @@ import {
   COUNTRY_CONFIG_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 
 export async function checkServiceHealth(url: string) {
   const res = await fetch(url, {
@@ -60,14 +60,14 @@ export default async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const responses = {}
+  const responses = {} as Record<keyof typeof SERVICES, boolean>
 
   for (const [key, value] of Object.entries(SERVICES)) {
     try {
       const res = await checkServiceHealth(value)
-      responses[key] = res
+      responses[key as keyof typeof SERVICES] = res
     } catch (err) {
-      responses[key] = false
+      responses[key as keyof typeof SERVICES] = false
     }
   }
   return responses

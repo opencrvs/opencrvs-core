@@ -34,7 +34,6 @@ import {
   markValidatedHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
-  requestCorrectionHandler,
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
@@ -48,7 +47,8 @@ import {
   newEventRegistrationHandler,
   markIssuedHandler,
   markedAsDuplicate,
-  markedAsNotDuplicate
+  markedAsNotDuplicate,
+  correctionEventHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -316,8 +316,21 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
+      path: '/events/{event}/make-correction',
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
+      config: {
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/{event}/request-correction',
-      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
       config: {
         tags: ['api'],
         validate: {

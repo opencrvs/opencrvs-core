@@ -58,7 +58,7 @@ input RelatedPersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String # Not in BDRIS2 - keep as optional
@@ -115,12 +115,19 @@ type Deceased {
   deathDate: String
 }
 
+enum Gender {
+  male
+  female
+  other
+  unknown
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String # Not in BDRIS2 - keep as optional
@@ -163,13 +170,30 @@ type Person { # -> Patient
   exactDateOfBirthUnknown: Boolean
 }
 
+enum TelecomSystem {
+  other
+  phone
+  fax
+  email
+  pager
+  url
+  sms
+}
+enum TelecomUse {
+  home
+  work
+  temp
+  old
+  mobile
+}
+
 input ContactPointInput {
   # phone | fax | email | pager | url | sms | other
-  system: String
+  system: TelecomSystem
   # The actual contact point details
   value: String
   # home | work | temp | old | mobile - purpose of this contact point
-  use: String
+  use: TelecomUse
 }
 
 type ContactPoint { # -> ContactPoint
@@ -186,11 +210,25 @@ type Identifier {
   value: String
 }
 
+enum AddressUse {
+  home
+  work
+  temp
+  old
+}
+enum AddressType {
+  PRIMARY_ADDRESS
+  SECONDARY_ADDRESS
+  postal
+  physical
+  both
+}
+
 input AddressInput {
-  use: String
-  type: String
+  use: AddressUse
+  type: AddressType
   text: String # Reserve for geo-code
-  line: [String]
+  line: [String!]
   city: String
   district: String
   state: String
@@ -198,6 +236,7 @@ input AddressInput {
   country: String
   from: Date # Not in BDRIS2 use Current/Permenant
   to: Date # Not in BDRIS2 use Current/Permenant
+  partOf: String
 }
 
 type Address { # -> Address (mostly the same property name except:)

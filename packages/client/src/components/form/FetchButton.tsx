@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,

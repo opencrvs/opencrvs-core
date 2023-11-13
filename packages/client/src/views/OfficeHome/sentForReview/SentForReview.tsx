@@ -28,7 +28,7 @@ import {
   ColumnContentAlignment,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -223,6 +223,10 @@ class SentForReviewComponent extends React.Component<
         sentForApproval =
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
             RegStatus.Declared
           ) ||
           getPreviousOperationDateByOperationType(
@@ -235,7 +239,12 @@ class SentForReviewComponent extends React.Component<
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
             RegStatus.Validated
-          ) || ''
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          ''
       }
 
       const dateOfEvent =

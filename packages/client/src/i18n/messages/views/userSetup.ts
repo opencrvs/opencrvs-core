@@ -59,6 +59,9 @@ interface IUserSetupMessages
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
   correctedAuditAction: MessageDescriptor
+  requestedCorrectionAuditAction: MessageDescriptor
+  approvedCorrectionAuditAction: MessageDescriptor
+  rejectedCorrectedAuditAction: MessageDescriptor
   archivedAuditAction: MessageDescriptor
   loggedInAuditAction: MessageDescriptor
   loggedOutAuditAction: MessageDescriptor
@@ -321,6 +324,21 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Corrected Record',
     description: 'Description for declaration corrected',
     id: 'user.profile.auditList.corrected'
+  },
+  requestedCorrectionAuditAction: {
+    defaultMessage: 'Requested correction',
+    description: 'Description for record correction being requested',
+    id: 'user.profile.auditList.requestedCorrectionAuditAction'
+  },
+  approvedCorrectionAuditAction: {
+    defaultMessage: 'Approved correction request',
+    description: 'Description for record correction being approved',
+    id: 'user.profile.auditList.approvedCorrectionAuditAction'
+  },
+  rejectedCorrectedAuditAction: {
+    defaultMessage: 'Rejected correction request',
+    description: 'Description for record correction being rejected',
+    id: 'user.profile.auditList.rejectedCorrectedAuditAction'
   },
   archivedAuditAction: {
     defaultMessage: 'Archived',

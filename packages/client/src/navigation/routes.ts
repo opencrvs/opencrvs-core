@@ -27,8 +27,11 @@ export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${E
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
+
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:declarationId/events/:event/parent/:pageId/group/:groupId'
+
+export const REVIEW_CORRECTION = '/review-correction/:declarationId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:declarationId/:pageId'
 
@@ -101,3 +104,5 @@ export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
 
 export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'
+
+export const PRINT_RECORD = '/print-record/:declarationId'

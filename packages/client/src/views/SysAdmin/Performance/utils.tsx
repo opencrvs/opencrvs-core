@@ -11,11 +11,11 @@
 import React from 'react'
 
 import styled from 'styled-components'
-import {
+import type {
   GQLLocation,
   GQLIdentifier,
   GQLPaymentMetric
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
@@ -289,6 +289,18 @@ export const StatusMapping: IStatusMapping = {
     color: colors.blue
   },
   REQUESTED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  CORRECTED: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  APPROVED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  REJECTED_CORRECTION: {
     labelDescriptor: statusMessages.requestedCorrection,
     color: colors.blue
   },

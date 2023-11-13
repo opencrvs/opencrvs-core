@@ -8,13 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
 import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
+import { StartedTestContainer } from 'testcontainers'
 
 const fetch = fetchAny as any
+const resolvers = rootResolvers as any
+
+let container: StartedTestContainer
+
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterAll(async () => {
+  await stopContainer(container)
+})
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -23,40 +35,60 @@ beforeEach(() => {
 describe('User root resolvers', () => {
   describe('getUser()', () => {
     it('returns a user object', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          _id: 'ba7022f0ff4822',
-          name: [
-            {
-              use: 'en',
-              given: ['Sakib Al'],
-              family: ['Hasan']
-            }
-          ],
-          username: 'sakibal.hasan',
-          mobile: '+8801711111111',
-          email: 'test@test.org',
-          passwordHash:
-            'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-          salt: '12345',
-          systemRole: 'FIELD_AGENT',
-          status: 'active',
-          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-          catchmentAreaIds: [
-            'b21ce04e-7ccd-4d65-929f-453bc193a736',
-            '95754572-ab6f-407b-b51a-1636cb3d0683',
-            '7719942b-16a7-474a-8af1-cd0c94c730d2',
-            '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-          ],
-          creationDate: 1559054406433
-        })
+      const declareToken = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
       )
+      const authHeaderFieldAgent = {
+        Authorization: `Bearer ${declareToken}`
+      }
 
-      const user = await resolvers.Query!.getUser(
+      const user = await resolvers.Query.getUser(
         {},
         { userId: 'ba7022f0ff4822' },
-        { headers: undefined }
+        {
+          headers: authHeaderFieldAgent,
+          dataSources: {
+            usersAPI: {
+              getUserById: () => {
+                return {
+                  _id: 'ba7022f0ff4822',
+                  name: [
+                    {
+                      use: 'en',
+                      given: ['Sakib Al'],
+                      family: ['Hasan']
+                    }
+                  ],
+                  username: 'sakibal.hasan',
+                  mobile: '+8801711111111',
+                  email: 'test@test.org',
+                  passwordHash:
+                    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
+                  salt: '12345',
+                  systemRole: 'FIELD_AGENT',
+                  status: 'active',
+                  practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+                  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+                  catchmentAreaIds: [
+                    'b21ce04e-7ccd-4d65-929f-453bc193a736',
+                    '95754572-ab6f-407b-b51a-1636cb3d0683',
+                    '7719942b-16a7-474a-8af1-cd0c94c730d2',
+                    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+                  ],
+                  creationDate: 1559054406433
+                }
+              }
+            }
+          }
+        },
+        { fieldName: 'getUser' }
       )
 
       expect(user).toBeDefined()
@@ -69,7 +101,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -82,7 +114,7 @@ describe('User root resolvers', () => {
       }
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -185,13 +217,14 @@ describe('User root resolvers', () => {
       const response = await resolvers.Query!.searchUsers(
         {},
         {},
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchUsers' }
       )
 
       expect(response.totalItems).toBe(3)
       expect(response.results).toEqual(dummyUserList)
     })
-    it('should return error for register', async () => {
+    it("doesn't allow field agent to search users", async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           totalItems: dummyUserList.length,
@@ -200,7 +233,14 @@ describe('User root resolvers', () => {
       )
 
       return expect(
-        resolvers.Query!.searchUsers({}, {}, authHeaderFieldAgent)
+        resolvers.Query.searchUsers(
+          {},
+          {},
+          { headers: authHeaderFieldAgent },
+          {
+            fieldName: 'searchUsers'
+          }
+        )
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
       )
@@ -227,7 +267,8 @@ describe('User root resolvers', () => {
           skip: 0,
           sort: 'desc'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchUsers' }
       )
 
       expect(response.totalItems).toBe(1)
@@ -242,7 +283,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -255,7 +296,7 @@ describe('User root resolvers', () => {
       }
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -349,7 +390,8 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(2)
@@ -406,7 +448,8 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(2)
@@ -437,7 +480,7 @@ describe('User root resolvers', () => {
         }
       ])
     })
-    it('should return error for register', async () => {
+    it("doesn't allow field agent to search field agents", async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           totalItems: dummyUserList.length,
@@ -453,7 +496,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderFieldAgent
+          { headers: authHeaderFieldAgent },
+          { fieldName: 'searchFieldAgents' }
         )
       ).rejects.toThrow(
         'Search field agents is only allowed for sysadmin or registrar or registration agent'
@@ -486,7 +530,8 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        { headers: authHeaderSysAdmin }
+        { headers: authHeaderSysAdmin },
+        { fieldName: 'searchFieldAgents' }
       )
 
       expect(response.totalItems).toBe(1)
@@ -516,7 +561,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          { headers: authHeaderSysAdmin }
+          { headers: authHeaderSysAdmin },
+          { fieldName: 'searchFieldAgents' }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -533,7 +579,8 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          { headers: authHeaderSysAdmin }
+          { headers: authHeaderSysAdmin },
+          { fieldName: 'searchFieldAgents' }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -548,7 +595,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -574,7 +621,8 @@ describe('User root resolvers', () => {
       const res = await resolvers.Query!.verifyPasswordById(
         {},
         { id: '123', password: 'test' },
-        authHeaderUser
+        { headers: authHeaderUser },
+        { fieldName: 'verifyPasswordById' }
       )
 
       expect(res.username).toBe('sakibal.hasan')
@@ -587,7 +635,8 @@ describe('User root resolvers', () => {
         await resolvers.Query!.verifyPasswordById(
           {},
           { id: '123', password: 'test' },
-          authHeaderUser
+          { headers: authHeaderUser },
+          { fieldName: 'verifyPasswordById' }
         )
       } catch (e) {
         expect(e.message).toBe('Unauthorized to verify password')
@@ -653,7 +702,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -666,7 +715,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -735,7 +784,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -748,7 +797,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -763,7 +812,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation!.changePhone(
@@ -784,7 +833,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation!.changePhone(
@@ -804,7 +853,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateAndStoreVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce)
 
       return expect(
         resolvers.Mutation!.changePhone(
@@ -831,7 +880,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const validUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -844,7 +893,7 @@ describe('User root resolvers', () => {
       }
       const inValidUserToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -955,7 +1004,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -968,7 +1017,7 @@ describe('User root resolvers', () => {
       }
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1069,7 +1118,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1082,7 +1131,7 @@ describe('User root resolvers', () => {
       }
       const regsiterToken = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1153,7 +1202,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1166,7 +1215,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1231,7 +1280,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1244,7 +1293,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1309,7 +1358,7 @@ describe('User root resolvers', () => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -1322,7 +1371,7 @@ describe('User root resolvers', () => {
       }
       const validateToken = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',

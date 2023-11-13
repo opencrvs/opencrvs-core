@@ -18,7 +18,7 @@ import {
   ListContainer,
   ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLPaymentMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { getAmountWithCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'

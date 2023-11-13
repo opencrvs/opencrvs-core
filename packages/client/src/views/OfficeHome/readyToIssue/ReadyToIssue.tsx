@@ -21,7 +21,7 @@ import {
   COLUMNS,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { useIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'

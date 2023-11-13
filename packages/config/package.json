@@ -45,8 +45,14 @@
     "mockingoose": "^2.15.2",
     "nodemon": "^2.0.22",
     "prettier": "^2.5.0",
+    "eslint": "^7.11.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "@typescript-eslint/parser": "^4.5.0",
     "ts-node": "^6.1.1",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.3"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

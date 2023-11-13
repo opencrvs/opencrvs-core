@@ -343,13 +343,16 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  offlineCountryConfig: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
 ) => {
   if (field.type === SELECT_WITH_OPTIONS) {
     if (field.optionCondition) {
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
-      return field.options.filter(conditionEvaluator)
+      return field.options.filter((field) =>
+        conditionEvaluator({ field, values, declaration })
+      )
     }
 
     return field.options
