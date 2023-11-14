@@ -536,8 +536,8 @@ input CorrectionRejectionInput {
 input CorrectionValueInput {
   section: String!
   fieldName: String!
-  oldValue: String!
-  newValue: String!
+  oldValue: FieldValue!
+  newValue: FieldValue!
 }
 
 type CountryLogo {
@@ -567,6 +567,7 @@ input CurrencyInput {
 }
 
 scalar Date
+scalar FieldValue
 
 type Death {
   REGISTRATION_TARGET: Int
@@ -849,7 +850,7 @@ enum ImageFit {
 type InputOutput {
   valueCode: String!
   valueId: String!
-  valueString: String!
+  value: String!
 }
 
 type IntegratedSystem {

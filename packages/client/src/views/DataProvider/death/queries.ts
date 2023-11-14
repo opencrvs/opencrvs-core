@@ -348,12 +348,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
@@ -607,12 +607,12 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument

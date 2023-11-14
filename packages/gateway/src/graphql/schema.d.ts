@@ -1210,8 +1210,8 @@ export interface GQLCorrectionPaymentInput {
 export interface GQLCorrectionValueInput {
   section: string
   fieldName: string
-  oldValue: string
-  newValue: string
+  oldValue: GQLFieldValue
+  newValue: GQLFieldValue
 }
 
 export interface GQLFHIRIDMap {
@@ -1479,7 +1479,7 @@ export interface GQLComment {
 export interface GQLInputOutput {
   valueCode: string
   valueId: string
-  valueString: string
+  value: GQLFieldValue
 }
 
 export interface GQLPayment {
@@ -1751,6 +1751,8 @@ export const enum GQLPaymentOutcomeType {
   ERROR = 'ERROR',
   PARTIAL = 'PARTIAL'
 }
+
+export type GQLFieldValue = any
 
 export interface GQLObservationFHIRIDS {
   maleDependentsOfDeceased?: string
@@ -2030,6 +2032,7 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
+  FieldValue?: GraphQLScalarType
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
@@ -9497,7 +9500,7 @@ export interface CommentToCreatedAtResolver<TParent = any, TResult = any> {
 export interface GQLInputOutputTypeResolver<TParent = any> {
   valueCode?: InputOutputToValueCodeResolver<TParent>
   valueId?: InputOutputToValueIdResolver<TParent>
-  valueString?: InputOutputToValueStringResolver<TParent>
+  value?: InputOutputToValueResolver<TParent>
 }
 
 export interface InputOutputToValueCodeResolver<TParent = any, TResult = any> {
@@ -9518,10 +9521,7 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface InputOutputToValueStringResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface InputOutputToValueResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

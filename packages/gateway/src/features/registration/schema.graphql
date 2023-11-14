@@ -139,7 +139,7 @@ type DuplicatesInfo {
 type InputOutput {
   valueCode: String!
   valueId: String!
-  valueString: String!
+  value: FieldValue!
 }
 
 type IntegratedSystem {
@@ -337,8 +337,8 @@ type MarriageRegistration implements EventRegistration { # -> Composition
 input CorrectionValueInput {
   section: String!
   fieldName: String!
-  oldValue: String!
-  newValue: String!
+  oldValue: FieldValue!
+  newValue: FieldValue!
 }
 
 input CorrectionInput {
