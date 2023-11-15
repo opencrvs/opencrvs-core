@@ -693,7 +693,7 @@ export const serializeFieldValue = (
   sectionData: IFormSectionData
 ) => {
   if (isDateField(field, sectionData)) {
-    return fieldValue.toString()
+    return fieldValue?.toString()
   }
 
   return fieldValue

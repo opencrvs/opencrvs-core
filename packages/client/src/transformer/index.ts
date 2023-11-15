@@ -78,8 +78,6 @@ const transformRegistrationCorrection = (
   transformedData: TransformedData,
   nestedFieldDef: IFormField | null = null
 ): void => {
-  const values: CorrectionValueInput[] = []
-
   if (!transformedData.registration) {
     transformedData.registration = {}
   }
@@ -89,6 +87,7 @@ const transformRegistrationCorrection = (
       ? { ...(draftData.registration.correction as IFormSectionData) }
       : {}
   }
+  const values: CorrectionValueInput[] = []
 
   if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
@@ -160,7 +159,7 @@ const transformRegistrationCorrection = (
     values.push(payload)
   }
 
-  transformedData.registration.correction.values = values
+  transformedData.registration.correction.values.push(...values)
 }
 
 export function addCorrectionDetails(
