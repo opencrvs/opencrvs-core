@@ -10,7 +10,13 @@
  */
 
 import { Db, MongoClient } from 'mongodb'
-import { removeChannel } from '../../utils/openhim-helpers.js'
+import {
+  Channel,
+  newChannelTemplate,
+  removeChannel,
+  routeTemplate,
+  upsertChannel
+} from '../../utils/openhim-helpers.js'
 
 const channelsToRemove = [
   'Birth Validation',
@@ -18,6 +24,94 @@ const channelsToRemove = [
   'Marriage Validation',
   'Declaration Updated'
 ]
+
+const birthValidationChannel: Channel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      ...routeTemplate,
+      name: 'Search -> Birth Validation',
+      host: 'search',
+      port: 9090,
+      primary: true
+    },
+    {
+      ...routeTemplate,
+      name: 'Metrics > Birth Validation',
+      host: 'metrics',
+      port: 1050,
+      primary: false
+    }
+  ],
+  name: 'Birth Validation',
+  urlPattern: '^/events/birth/mark-validated$'
+}
+
+const deathValidationChannel: Channel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      ...routeTemplate,
+      name: 'Search -> Death Validation',
+      host: 'search',
+      port: 9090,
+      primary: true
+    },
+    {
+      ...routeTemplate,
+      name: 'Metrics > Death Validation',
+      host: 'metrics',
+      port: 1050,
+      primary: false
+    }
+  ],
+  name: 'Death Validation',
+  urlPattern: '^/events/death/mark-validated$'
+}
+
+const marriageValidationChannel: Channel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      ...routeTemplate,
+      name: 'Search -> Marriage Validation',
+      host: 'search',
+      port: 9090,
+      primary: true
+    },
+    {
+      ...routeTemplate,
+      name: 'Metrics -> Marriage Validation',
+      host: 'metrics',
+      port: 1050,
+      primary: false
+    }
+  ],
+  name: 'Marriage Validation',
+  urlPattern: '^/events/marriage/mark-validated$'
+}
+
+const declarationUpdatedChannel: Channel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      type: 'http',
+      status: 'enabled',
+      forwardAuthHeader: true,
+      name: 'Metrics -> Declaration Updated',
+      secured: false,
+      host: 'metrics',
+      port: 1050,
+      path: '',
+      pathTransform: '',
+      primary: true,
+      username: '',
+      password: ''
+    }
+  ],
+  name: 'Declaration Updated',
+  urlPattern: '^/events/declaration-updated$'
+}
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
@@ -36,4 +130,18 @@ export const up = async (db: Db, client: MongoClient) => {
   }
 }
 
-export const down = async (db: Db, client: MongoClient) => {}
+export const down = async (db: Db, client: MongoClient) => {
+  const session = client.startSession()
+  try {
+    await session.withTransaction(async () => {
+      await upsertChannel(db, birthValidationChannel)
+      await upsertChannel(db, deathValidationChannel)
+      await upsertChannel(db, marriageValidationChannel)
+      await upsertChannel(db, declarationUpdatedChannel)
+    })
+  } catch (err) {
+    console.log(err)
+  } finally {
+    await session.endSession()
+  }
+}
