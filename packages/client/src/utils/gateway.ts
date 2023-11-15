@@ -167,7 +167,6 @@ export type AdvancedSearchParametersInput = {
   compositionType?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   contactEmail?: InputMaybe<Scalars['String']>
   contactNumber?: InputMaybe<Scalars['String']>
-  contactEmail?: InputMaybe<Scalars['String']>
   dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfEventEnd?: InputMaybe<Scalars['String']>
   dateOfEventStart?: InputMaybe<Scalars['String']>
