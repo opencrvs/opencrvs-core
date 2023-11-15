@@ -13,7 +13,7 @@ import { ApolloError } from 'apollo-server-hapi'
 import { GraphQLResolveInfo } from 'graphql'
 import { Context } from '@gateway/graphql/context'
 import { getUserId } from '@gateway/features/user/utils/index'
-import { DISABLE_RATE_LIMIT } from './constants'
+import { ENABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
 
@@ -41,7 +41,7 @@ const withRateLimit = <A extends any[], R>(
   { key, requestsPerMinute }: RouteOptions,
   fn: (...args: A) => R
 ) => {
-  if (DISABLE_RATE_LIMIT) {
+  if (!ENABLE_RATE_LIMIT) {
     return fn
   }
 
