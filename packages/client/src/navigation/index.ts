@@ -269,18 +269,20 @@ export function goToSearchResult(
   mobile?: boolean
 ) {
   return mobile
-    ? replace(
-        formatUrl(SEARCH_RESULT, {
+    ? replace({
+        pathname: SEARCH_RESULT,
+        search: stringify({
           searchText,
           searchType
         })
-      )
-    : push(
-        formatUrl(SEARCH_RESULT, {
+      })
+    : push({
+        pathname: SEARCH_RESULT,
+        search: stringify({
           searchText,
           searchType
         })
-      )
+      })
 }
 
 export function goToAdvancedSearchResult(mobile?: boolean) {

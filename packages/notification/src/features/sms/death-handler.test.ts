@@ -44,6 +44,7 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'B123456'
         },
         headers: {
@@ -75,6 +76,7 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
         headers: {
@@ -110,6 +112,7 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'B123456'
         },
         headers: {
@@ -146,6 +149,7 @@ describe('Verify death handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -179,6 +183,7 @@ describe('Verify death handlers', () => {
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -216,6 +221,7 @@ describe('Verify death handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -253,6 +259,7 @@ describe('Verify death handlers', () => {
           trackingId: 'D123456',
           registrationNumber: '20196816020000129',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -319,6 +326,7 @@ describe('Verify death handlers', () => {
           trackingId: 'D123456',
           registrationNumber: '20196816020000129',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -354,6 +362,7 @@ describe('Verify death handlers', () => {
           },
           name: 'অনিক',
           trackingId: 'B123456',
+          registrationLocation: 'Blah',
           crvsOffice: 'ALASKA',
           informantName: 'Sadman Anik'
         },
@@ -387,6 +396,7 @@ describe('Verify death handlers', () => {
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -424,6 +434,7 @@ describe('Verify death handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {

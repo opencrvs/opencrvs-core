@@ -30,6 +30,7 @@ import {
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { createServer } from '@workflow/server'
 import {
   compositionMock,
   deathCompositionMock,
@@ -44,7 +45,7 @@ import {
   officeMock,
   patientMock,
   relatedPersonMock,
-  taskResouceMock,
+  taskResourceMock,
   testFhirBundle,
   testFhirBundleWithIds,
   testFhirBundleWithIdsForDeath,
@@ -59,7 +60,6 @@ import {
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
-import { createServer } from '@workflow/server'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -131,7 +131,7 @@ bundleWithInputOutputDeath.entry[1].resource.output = mockOutput
 const getMarkBundleAndPostToHearthMockResponses = [
   [userMock, { status: 200 }],
   [fieldAgentPractitionerMock, { status: 200 }],
-  [taskResouceMock, { status: 200 }],
+  [taskResourceMock, { status: 200 }],
   [fieldAgentPractitionerRoleMock, { status: 200 }],
   [districtMock, { status: 200 }],
   [upazilaMock, { status: 200 }],
@@ -620,7 +620,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -762,7 +762,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -853,7 +853,7 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
+      [taskResourceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -977,8 +977,9 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(taskResouceMock), { status: 200 }],
+      [wrapInBundle(taskResourceMock), { status: 200 }],
       [compositionMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [patientMock, { status: 200 }],
@@ -1005,6 +1006,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify([]), { status: 200 }],
       [JSON.stringify([]), { status: 200 }],
       [patientMock, { status: 200 }],
       [motherMock, { status: 200 }],

@@ -15,7 +15,7 @@ import {
   fetchDocuments,
   uploadBase64ToMinio
 } from '@gateway/features/documents/service'
-import { getTokenPayload, getUser } from '../user/utils'
+import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,

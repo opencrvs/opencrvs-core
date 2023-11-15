@@ -59,7 +59,7 @@ describe('Advanced search resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.bookmarkAdvancedSearch(
+      const response = await resolvers.Mutation!.bookmarkAdvancedSearch(
         {},
         {
           bookmarkSearchInput: {
@@ -78,7 +78,7 @@ describe('Advanced search resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.bookmarkAdvancedSearch(
+        resolvers.Mutation!.bookmarkAdvancedSearch(
           {},
           {
             bookmarkSearchInput: {
@@ -100,7 +100,7 @@ describe('Advanced search resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.bookmarkAdvancedSearch(
+        resolvers.Mutation!.bookmarkAdvancedSearch(
           {},
           {
             bookmarkSearchInput: {
@@ -153,7 +153,7 @@ describe('Advanced search resolvers', () => {
         { status: 200 }
       )
 
-      const response = await resolvers.Mutation.removeBookmarkedAdvancedSearch(
+      const response = await resolvers.Mutation!.removeBookmarkedAdvancedSearch(
         {},
         {
           removeBookmarkedSearchInput: {
@@ -169,7 +169,7 @@ describe('Advanced search resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.removeBookmarkedAdvancedSearch(
+        resolvers.Mutation!.removeBookmarkedAdvancedSearch(
           {},
           {
             removeBookmarkedSearchInput: {
@@ -188,7 +188,7 @@ describe('Advanced search resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.removeBookmarkedAdvancedSearch(
+        resolvers.Mutation!.removeBookmarkedAdvancedSearch(
           {},
           {
             removeBookmarkedSearchInput: {

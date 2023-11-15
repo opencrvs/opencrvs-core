@@ -39,6 +39,7 @@ interface ICertificateMessages
   manualPaymentMethod: MessageDescriptor
   mother: MessageDescriptor
   nationality: MessageDescriptor
+  age: MessageDescriptor
   next: MessageDescriptor
   noLabel: MessageDescriptor
   number: MessageDescriptor
@@ -191,17 +192,17 @@ const messagesToDefine: ICertificateMessages = {
       'The title for the dialog when details of the collector not verified for correction'
   },
   idCheckTitle: {
-    defaultMessage: 'Check proof of ID',
+    defaultMessage: 'Verify their identity',
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
   idCheckVerify: {
-    defaultMessage: 'ID verified',
+    defaultMessage: 'Verified',
     description: 'The label for id check component action when verify details',
     id: 'print.cert.coll.idCheck.actions.ver'
   },
   idCheckWithoutVerify: {
-    defaultMessage: 'No ID match',
+    defaultMessage: 'Identity does not match',
     description:
       'The label for id check component action when does not verify details',
     id: 'print.cert.coll.idCheck.actions.noVer'
@@ -232,6 +233,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Nationality',
     description: 'Parent Nationality',
     id: 'certificate.parent.details.label.nationality'
+  },
+  age: {
+    defaultMessage: 'Age',
+    description: 'Person age',
+    id: 'certificate.parent.details.label.age'
   },
   next: {
     defaultMessage: 'Next',

@@ -416,6 +416,7 @@ export interface GQLAdvancedSearchParametersInput {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
@@ -1209,8 +1210,8 @@ export interface GQLCorrectionPaymentInput {
 export interface GQLCorrectionValueInput {
   section: string
   fieldName: string
-  oldValue: string
-  newValue: string
+  oldValue: GQLFieldValue
+  newValue: GQLFieldValue
 }
 
 export interface GQLFHIRIDMap {
@@ -1478,7 +1479,7 @@ export interface GQLComment {
 export interface GQLInputOutput {
   valueCode: string
   valueId: string
-  valueString: string
+  value: GQLFieldValue
 }
 
 export interface GQLPayment {
@@ -1503,6 +1504,7 @@ export interface GQLAdvancedSeachParameters {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
@@ -1600,6 +1602,7 @@ export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
+  contactEmail?: string
   contactRelationship?: string
   dateOfDeclaration?: GQLDate
   trackingId?: string
@@ -1748,6 +1751,8 @@ export const enum GQLPaymentOutcomeType {
   ERROR = 'ERROR',
   PARTIAL = 'PARTIAL'
 }
+
+export type GQLFieldValue = any
 
 export interface GQLObservationFHIRIDS {
   maleDependentsOfDeceased?: string
@@ -2027,6 +2032,7 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
+  FieldValue?: GraphQLScalarType
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
@@ -9494,7 +9500,7 @@ export interface CommentToCreatedAtResolver<TParent = any, TResult = any> {
 export interface GQLInputOutputTypeResolver<TParent = any> {
   valueCode?: InputOutputToValueCodeResolver<TParent>
   valueId?: InputOutputToValueIdResolver<TParent>
-  valueString?: InputOutputToValueStringResolver<TParent>
+  value?: InputOutputToValueResolver<TParent>
 }
 
 export interface InputOutputToValueCodeResolver<TParent = any, TResult = any> {
@@ -9515,10 +9521,7 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface InputOutputToValueStringResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface InputOutputToValueResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9621,6 +9624,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   dateOfEventStart?: AdvancedSeachParametersToDateOfEventStartResolver<TParent>
   dateOfEventEnd?: AdvancedSeachParametersToDateOfEventEndResolver<TParent>
   contactNumber?: AdvancedSeachParametersToContactNumberResolver<TParent>
+  contactEmail?: AdvancedSeachParametersToContactEmailResolver<TParent>
   nationalId?: AdvancedSeachParametersToNationalIdResolver<TParent>
   registrationNumber?: AdvancedSeachParametersToRegistrationNumberResolver<TParent>
   trackingId?: AdvancedSeachParametersToTrackingIdResolver<TParent>
@@ -9744,6 +9748,18 @@ export interface AdvancedSeachParametersToDateOfEventEndResolver<
 }
 
 export interface AdvancedSeachParametersToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToContactEmailResolver<
   TParent = any,
   TResult = any
 > {
@@ -10710,6 +10726,7 @@ export interface UserAuditLogItemToPractitionerIdResolver<
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
+  contactEmail?: RegistrationSearchSetToContactEmailResolver<TParent>
   contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
   dateOfDeclaration?: RegistrationSearchSetToDateOfDeclarationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
@@ -10737,6 +10754,18 @@ export interface RegistrationSearchSetToStatusResolver<
 }
 
 export interface RegistrationSearchSetToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationSearchSetToContactEmailResolver<
   TParent = any,
   TResult = any
 > {

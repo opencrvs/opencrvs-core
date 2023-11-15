@@ -18,9 +18,11 @@ import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-
 import { logger } from '@workflow/logger'
 import {
   testFhirBundle,
-  testFhirBundleWithIdsForDeath,
   officeMock,
+  taskResourceMock,
+  deathTaskMock,
   mosipDeceasedPatientMock,
+  testFhirBundleWithIdsForDeath,
   mosipSuccessMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/utils'
@@ -96,6 +98,8 @@ describe('Verify utility functions', () => {
     const logSpy = jest.spyOn(logger, 'error')
 
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
 
     await sendEventNotification(
@@ -132,6 +136,8 @@ describe('Verify utility functions', () => {
   it('send Birth registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundle,
@@ -190,6 +196,8 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundleWithIdsForDeath,
@@ -211,6 +219,7 @@ describe('Verify utility functions', () => {
       value: '20196816020000129'
     })
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,
@@ -225,6 +234,8 @@ describe('Verify utility functions', () => {
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundleWithIdsForDeath,
@@ -241,6 +252,7 @@ describe('Verify utility functions', () => {
   it('send Death rejection notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,
@@ -255,6 +267,8 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,

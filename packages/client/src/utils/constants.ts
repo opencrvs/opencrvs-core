@@ -31,6 +31,7 @@ export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 export const TRACKING_ID_TEXT = 'tracking-id'
 export const NATIONAL_ID_TEXT = 'national-id'
 export const BRN_DRN_TEXT = 'brn-drn'
+export const EMAIL = 'email'
 export const ADVANCED_SEARCH_TEXT = 'advanced-search'
 export const PHONE_TEXT = 'phone'
 export const NAME_TEXT = 'name'
@@ -83,5 +84,5 @@ export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
-export const APPLICATION_VERSION = 'v1.3.0'
+export const APPLICATION_VERSION = 'v1.3.2'
 export const IS_PROD_ENVIRONMENT = import.meta.env.PROD

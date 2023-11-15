@@ -20,7 +20,7 @@ import * as H2o2 from '@hapi/h2o2'
 
 export const getPlugins = () => {
   if (SENTRY_DSN) {
-    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.HOSTNAME })
+    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.DOMAIN })
   }
 
   const swaggerOptions: HapiSwagger.RegisterOptions = {

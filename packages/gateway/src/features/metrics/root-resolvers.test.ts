@@ -40,7 +40,7 @@ describe('get total metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.getTotalMetrics(
+    const data = await resolvers.Query!.getTotalMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -65,7 +65,7 @@ describe('get declarations started metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.getDeclarationsStartedMetrics(
+    const data = await resolvers.Query!.getDeclarationsStartedMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -104,7 +104,7 @@ describe('get month wise event estimation metrics', () => {
       ])
     )
 
-    const data = await resolvers.Query.fetchMonthWiseEventMetrics(
+    const data = await resolvers.Query!.fetchMonthWiseEventMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -145,7 +145,7 @@ describe('get location wise event estimation metrics', () => {
       ])
     )
 
-    const data = await resolvers.Query.fetchLocationWiseEventMetrics(
+    const data = await resolvers.Query!.fetchLocationWiseEventMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',

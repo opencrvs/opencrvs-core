@@ -54,7 +54,7 @@ export interface IRoleRequest {
 
 export interface ISystemRolesRequest {
   id: string
-  value?: typeof SYSTEM_ROLE_TYPES[number]
+  value?: (typeof SYSTEM_ROLE_TYPES)[number]
   roles?: IRoleRequest[]
   active?: boolean
 }

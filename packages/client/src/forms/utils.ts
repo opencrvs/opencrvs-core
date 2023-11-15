@@ -97,7 +97,10 @@ export const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(opt.label)
+      label: intl.formatMessage(
+        opt.label,
+        'param' in opt ? opt.param : undefined
+      )
     }
   })
 }
@@ -543,7 +546,8 @@ export const getConditionalActionsForField = (
    */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -683,20 +687,16 @@ export const isDateField = (
   return field.type === DATE
 }
 
-export const stringifyFieldValue = (
+export const serializeFieldValue = (
   field: IFormField,
   fieldValue: IFormFieldValue,
   sectionData: IFormSectionData
-): string => {
-  if (!fieldValue) {
-    return ''
-  }
-
+) => {
   if (isDateField(field, sectionData)) {
     return fieldValue.toString()
   }
 
-  return fieldValue.toString()
+  return fieldValue
 }
 
 export const getSelectedRadioOptionWithNestedFields = (

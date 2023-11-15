@@ -198,7 +198,7 @@ describe('Registration root resolvers', () => {
   describe('searchBirthRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
       return expect(
-        resolvers.Query.searchBirthRegistrations(
+        resolvers.Query!.searchBirthRegistrations(
           {},
           {
             fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -251,7 +251,7 @@ describe('Registration root resolvers', () => {
         ]
       )
 
-      const compositions = await resolvers.Query.searchBirthRegistrations(
+      const compositions = await resolvers.Query!.searchBirthRegistrations(
         {},
         {
           fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -269,7 +269,7 @@ describe('Registration root resolvers', () => {
   describe('searchDeathRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
       return expect(
-        resolvers.Query.searchDeathRegistrations(
+        resolvers.Query!.searchDeathRegistrations(
           {},
           {
             fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -322,7 +322,7 @@ describe('Registration root resolvers', () => {
         ]
       )
 
-      const compositions = await resolvers.Query.searchDeathRegistrations(
+      const compositions = await resolvers.Query!.searchDeathRegistrations(
         {},
         {
           fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -439,7 +439,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchBirthRegistration(
+        resolvers.Query!.fetchBirthRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -550,7 +550,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchDeathRegistration(
+        resolvers.Query!.fetchDeathRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -661,7 +661,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchMarriageRegistration(
+        resolvers.Query!.fetchMarriageRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -676,7 +676,7 @@ describe('Registration root resolvers', () => {
           id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
         })
       )
-      const composition = await resolvers.Query.fetchRegistration(
+      const composition = await resolvers.Query!.fetchRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
         mockContext
@@ -737,7 +737,7 @@ describe('Registration root resolvers', () => {
         ]
       )
 
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         { headers: undefined }
@@ -801,7 +801,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createDeathRegistration(
+      const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
         { headers: undefined }
@@ -918,7 +918,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createDeathRegistration(
+      const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
         {
@@ -979,7 +979,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         { headers: undefined }
@@ -1098,7 +1098,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         {
@@ -1142,7 +1142,7 @@ describe('Registration root resolvers', () => {
         ]
       )
       await expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           { details },
           { headers: undefined }
@@ -1160,7 +1160,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           { details },
           { headers: undefined }
@@ -1191,7 +1191,7 @@ describe('Registration root resolvers', () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
-      const result = await resolvers.Mutation.markEventAsVoided(
+      const result = await resolvers.Mutation!.markEventAsVoided(
         {},
         { id, reason, comment },
         { headers: authHeaderRegCert }
@@ -1213,7 +1213,7 @@ describe('Registration root resolvers', () => {
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
       await expect(
-        resolvers.Mutation.markEventAsVoided(
+        resolvers.Mutation!.markEventAsVoided(
           {},
           { id, reason, comment },
           { headers: authHeaderNotRegCert }
@@ -1230,7 +1230,7 @@ describe('Registration root resolvers', () => {
         [JSON.stringify('ok'), { status: 200 }]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markEventAsArchived(
+      const result = await resolvers.Mutation!.markEventAsArchived(
         {},
         { id },
         { headers: authHeaderRegCert }
@@ -1249,7 +1249,7 @@ describe('Registration root resolvers', () => {
       ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markEventAsArchived(
+        resolvers.Mutation!.markEventAsArchived(
           {},
           { id },
           { headers: authHeaderNotRegCert }
@@ -1271,7 +1271,7 @@ describe('Registration root resolvers', () => {
         [JSON.stringify(taskHistoryBundle), { status: 200 }],
         [JSON.stringify({}), { status: 200 }]
       )
-      await resolvers.Mutation.markEventAsReinstated(
+      await resolvers.Mutation!.markEventAsReinstated(
         {},
         { id: archivedTaskBundle.id },
         { headers: authHeaderRegCert }
@@ -1291,7 +1291,7 @@ describe('Registration root resolvers', () => {
       ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markEventAsReinstated(
+        resolvers.Mutation!.markEventAsReinstated(
           {},
           { id },
           { headers: authHeaderNotRegCert }
@@ -1391,7 +1391,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markBirthAsValidated(
+      const result = await resolvers.Mutation!.markBirthAsValidated(
         {},
         { id: compositionID, details: compositionDetails },
         { headers: authHeaderValidate }
@@ -1519,7 +1519,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markBirthAsValidated(
+      const result = await resolvers.Mutation!.markBirthAsValidated(
         {},
         { id: compositionID },
         { headers: authHeaderValidate }
@@ -1557,7 +1557,7 @@ describe('Registration root resolvers', () => {
         })
       )
       expect(
-        resolvers.Mutation.markBirthAsValidated(
+        resolvers.Mutation!.markBirthAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderValidate }
@@ -1572,7 +1572,7 @@ describe('Registration root resolvers', () => {
       ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markBirthAsValidated(
+        resolvers.Mutation!.markBirthAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1754,7 +1754,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markDeathAsValidated(
+      const result = await resolvers.Mutation!.markDeathAsValidated(
         {},
         { id: compositionID, details: compositionDetails },
         { headers: authHeaderValidate }
@@ -1874,7 +1874,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markDeathAsValidated(
+      const result = await resolvers.Mutation!.markDeathAsValidated(
         {},
         { id: compositionID },
         { headers: authHeaderValidate }
@@ -1912,7 +1912,7 @@ describe('Registration root resolvers', () => {
         })
       )
       return expect(
-        resolvers.Mutation.markDeathAsValidated(
+        resolvers.Mutation!.markDeathAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderValidate }
@@ -1927,7 +1927,7 @@ describe('Registration root resolvers', () => {
       ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markDeathAsValidated(
+        resolvers.Mutation!.markDeathAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1945,7 +1945,7 @@ describe('Registration root resolvers', () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
 
       expect(
-        resolvers.Mutation.markBirthAsRegistered(
+        resolvers.Mutation!.markBirthAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1960,7 +1960,7 @@ describe('Registration root resolvers', () => {
       ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markBirthAsRegistered(
+        resolvers.Mutation!.markBirthAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderNotRegCert }
@@ -1976,7 +1976,7 @@ describe('Registration root resolvers', () => {
       ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markDeathAsRegistered(
+        resolvers.Mutation!.markDeathAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderNotRegCert }
@@ -2009,7 +2009,7 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      const result = await resolvers.Mutation.updateBirthRegistration(
+      const result = await resolvers.Mutation!.updateBirthRegistration(
         {},
         { details },
         { headers: authHeaderRegCert }
@@ -2026,7 +2026,7 @@ describe('Registration root resolvers', () => {
     it("throws error when user doesn't have a register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.updateBirthRegistration(
+        resolvers.Mutation!.updateBirthRegistration(
           {},
           { details },
           { headers: authHeaderNotRegCert }
@@ -2042,7 +2042,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Mutation.updateBirthRegistration(
+        resolvers.Mutation!.updateBirthRegistration(
           {},
           { details },
           { headers: authHeaderRegCert }
@@ -2094,7 +2094,7 @@ describe('Registration root resolvers', () => {
         ]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markBirthAsCertified(
+      const result = await resolvers.Mutation!.markBirthAsCertified(
         {},
         { id, details },
         { headers: authHeaderRegCert }
@@ -2121,7 +2121,7 @@ describe('Registration root resolvers', () => {
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markBirthAsCertified(
+        resolvers.Mutation!.markBirthAsCertified(
           {},
           { id, details },
           { headers: authHeaderRegCert }
@@ -2132,7 +2132,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the user doesn't have a certify scope", async () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markBirthAsCertified(
+        resolvers.Mutation!.markBirthAsCertified(
           {},
           { id, details },
           { headers: authHeaderNotRegCert }
@@ -2184,7 +2184,7 @@ describe('Registration root resolvers', () => {
         ]
       )
 
-      const result = await resolvers.Mutation.markDeathAsCertified(
+      const result = await resolvers.Mutation!.markDeathAsCertified(
         {},
         { details },
         { headers: authHeaderRegCert }
@@ -2204,7 +2204,7 @@ describe('Registration root resolvers', () => {
         [JSON.stringify(mockUserDetails), { status: 200 }]
       )
       await expect(
-        resolvers.Mutation.markDeathAsCertified(
+        resolvers.Mutation!.markDeathAsCertified(
           {},
           { details },
           authHeaderNotRegCert
@@ -2253,7 +2253,7 @@ describe('Registration root resolvers', () => {
         ]
       )
       // @ts-ignore
-      const result = await resolvers.Mutation.markEventAsNotDuplicate(
+      const result = await resolvers.Mutation!.markEventAsNotDuplicate(
         {},
         {
           id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2272,7 +2272,7 @@ describe('Registration root resolvers', () => {
       ])
 
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2310,7 +2310,7 @@ describe('Registration root resolvers', () => {
       )
 
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2323,7 +2323,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2362,7 +2362,7 @@ describe('Registration root resolvers', () => {
           { status: 200 }
         ]
       )
-      const composition = await resolvers.Query.queryRegistrationByIdentifier(
+      const composition = await resolvers.Query!.queryRegistrationByIdentifier(
         {},
         { identifier: '2019333494BAQFYEG6' },
         { headers: authHeaderRegCert }
@@ -2373,7 +2373,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           { headers: authHeaderRegCert }
@@ -2397,7 +2397,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           { headers: authHeaderRegCert }
@@ -2407,7 +2407,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have register or validate scope", async () => {
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
@@ -2452,7 +2452,7 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      const composition = await resolvers.Query.queryPersonByIdentifier(
+      const composition = await resolvers.Query!.queryPersonByIdentifier(
         {},
         { identifier: '1234567898765' },
         { headers: authHeaderRegCert }
@@ -2463,7 +2463,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Query.queryPersonByIdentifier(
+        resolvers.Query!.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
           { headers: authHeaderRegCert }
@@ -2475,7 +2475,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.queryPersonByIdentifier(
+        resolvers.Query!.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
           authHeaderCertify
@@ -2506,7 +2506,7 @@ describe('Registration root resolvers', () => {
 
     it('returns person with name and gender', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
-      const data = await resolvers.Query.queryPersonByNidIdentifier(
+      const data = await resolvers.Query!.queryPersonByNidIdentifier(
         {},
         {
           dob: '1992-12-30',
@@ -2531,7 +2531,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Query.queryPersonByNidIdentifier(
+        resolvers.Query!.queryPersonByNidIdentifier(
           {},
           {
             dob: '1992-12-30',
@@ -2546,7 +2546,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.queryPersonByNidIdentifier(
+        resolvers.Query!.queryPersonByNidIdentifier(
           {},
           {
             dob: '1992-12-30',
@@ -2580,7 +2580,7 @@ describe('Registration root resolvers', () => {
 
     it('returns status wise registration counts', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
-      const data = await resolvers.Query.fetchRegistrationCountByStatus(
+      const data = await resolvers.Query!.fetchRegistrationCountByStatus(
         {},
         {
           locationId: '123',
@@ -2595,7 +2595,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.fetchRegistrationCountByStatus(
+        resolvers.Query!.fetchRegistrationCountByStatus(
           {},
           {
             locationId: '123',
@@ -2610,7 +2610,7 @@ describe('Registration root resolvers', () => {
   describe('AttachmentInput type only accepts image/* mime type', () => {
     it('throws an error if a non-supported file is uploaded', async () => {
       return expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           {
             details: {
@@ -2633,7 +2633,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error if file base64 headers are manipulated', async () => {
       return expect(
-        resolvers.Mutation.createDeathRegistration(
+        resolvers.Mutation!.createDeathRegistration(
           {},
           {
             details: {
@@ -2661,7 +2661,7 @@ describe('markEventAsUnassigned()', () => {
       [JSON.stringify(mockTaskBundle), { status: 200 }]
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-    const result = await resolvers.Mutation.markEventAsUnassigned(
+    const result = await resolvers.Mutation!.markEventAsUnassigned(
       {},
       { id },
       { headers: authHeaderRegCert }
@@ -2683,7 +2683,11 @@ describe('markEventAsUnassigned()', () => {
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
     await expect(
-      resolvers.Mutation.markEventAsUnassigned({}, { id }, authHeaderNotRegCert)
+      resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        authHeaderNotRegCert
+      )
     ).rejects.toThrowError('User does not have a register or validate scope')
   })
 })

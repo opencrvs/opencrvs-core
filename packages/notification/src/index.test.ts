@@ -53,6 +53,7 @@ describe('Route authorization', () => {
         name: 'test',
         trackingId: 'B123456',
         crvsOffice: 'ALASKA',
+        registrationLocation: 'ALASKA',
         informantName: 'SADMAN ANIK'
       },
       headers: {

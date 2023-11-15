@@ -25,7 +25,8 @@ import {
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   ICertificateTemplateData,
-  referenceApi
+  referenceApi,
+  CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -46,6 +47,7 @@ import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -81,6 +83,7 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
+    fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
     certificates?: {
@@ -221,6 +224,14 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   failActionCreator: actions.configFailed
 })
 
+const CERTIFICATE_CONFIG_CMD = Cmd.run(
+  () => referenceApi.loadCertificateConfiguration(),
+  {
+    successActionCreator: actions.certificateConfigurationLoaded,
+    failActionCreator: actions.certificateConfigurationLoadFailed
+  }
+)
+
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
@@ -234,6 +245,11 @@ const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
 const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
   successActionCreator: actions.validatorsLoaded,
   failActionCreator: actions.validatorsFailed
+})
+
+const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
+  successActionCreator: actions.handlebarsLoaded,
+  failActionCreator: actions.handlebarsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -250,8 +266,10 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
+    CERTIFICATE_CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
+    HANDLEBARS_CMD,
     FORMS_CMD,
     CONTENT_CMD
   ])
@@ -513,6 +531,7 @@ function reducer(
         const newOfflineData = {
           ...state.offlineData,
           templates: {
+            ...state.offlineData.templates,
             certificates: certificatesTemplates
           }
         }
@@ -572,6 +591,23 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            fonts: action.payload.fonts
+          }
+        }
+      }
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
+      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*

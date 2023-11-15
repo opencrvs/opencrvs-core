@@ -56,7 +56,7 @@ import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
 import fetch from 'node-fetch'
-import { getEventType } from '../registration/utils'
+import { getEventType } from '@workflow/features/registration/utils'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,

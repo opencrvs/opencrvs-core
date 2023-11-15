@@ -19,7 +19,7 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { markRecordAsDownloadedBySystem } from '../registration/root-resolvers'
+import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
 
 // Complete definition of the Search response
 interface IShardsResponse {

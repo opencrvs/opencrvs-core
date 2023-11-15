@@ -339,7 +339,7 @@ export function clearActionExtension(task: Task) {
     extension: (task.extension ?? []).filter(
       (ext) =>
         !TaskActionExtension.includes(
-          ext.url as typeof TaskActionExtension[number]
+          ext.url as (typeof TaskActionExtension)[number]
         )
     )
   }

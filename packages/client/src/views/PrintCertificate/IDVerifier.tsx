@@ -46,6 +46,7 @@ export interface ICollectorInfo {
   familyName: string
   birthDate?: string
   nationality: string
+  age?: string
 }
 
 const Container = styled.div`
@@ -123,13 +124,24 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        {collectorInformation.birthDate && (
+        {
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(
-              collectorInformation.birthDate as string,
-              intl.locale
-            )}
+            value={
+              collectorInformation.birthDate
+                ? formatLongDate(
+                    collectorInformation.birthDate as string,
+                    intl.locale
+                  )
+                : '-'
+            }
+          />
+        }
+
+        {collectorInformation.age && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.age)}
+            value={String(collectorInformation.age as string)}
           />
         )}
 

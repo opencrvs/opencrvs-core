@@ -63,12 +63,15 @@ import {
 
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
-import { hasBirthDuplicates, hasDeathDuplicates } from '../search/service'
+import {
+  hasBirthDuplicates,
+  hasDeathDuplicates
+} from '@gateway/features/search/service'
 import {
   ISystemModelData,
   IUserModelData,
   isSystem
-} from '../user/type-resolvers'
+} from '@gateway/features/user/type-resolvers'
 import {
   removeDuplicatesFromComposition,
   setCertificateCollector,

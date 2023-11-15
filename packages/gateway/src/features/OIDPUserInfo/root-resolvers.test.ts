@@ -213,7 +213,7 @@ describe('get user info from OIDP national id integration', () => {
         })
       )
 
-    const data = await resolvers.Query.getOIDPUserInfo(
+    const data = await resolvers.Query!.getOIDPUserInfo(
       {},
       {
         code: 'some-code',
@@ -251,7 +251,7 @@ describe('get user info from OIDP national id integration', () => {
     )
 
     try {
-      await resolvers.Query.getOIDPUserInfo(
+      await resolvers.Query!.getOIDPUserInfo(
         {},
         {
           code: 'some-code',

@@ -24,7 +24,9 @@ import {
   IApplicationConfigAnonymous,
   LoadFormsResponse,
   LoadValidatorsResponse,
-  LoadConditionalsResponse
+  LoadConditionalsResponse,
+  LoadHandlebarHelpersResponse,
+  CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -124,6 +126,21 @@ type CertificatesLoadFailedAction = {
   type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
+
+export const CERTIFICATE_CONFIGURATION_LOADED =
+  'OFFLINE/CERTIFICATE_CONFIGURATION_LOADED'
+type CertificateConfigurationLoadedAction = {
+  type: typeof CERTIFICATE_CONFIGURATION_LOADED
+  payload: CertificateConfiguration
+}
+
+export const CERTIFICATE_CONFIGURATION_LOAD_FAILED =
+  'OFFLINE/CERTIFICATE_CONFIGURATION_LOAD_FAILED'
+type CertificateConfigurationLoadFailedAction = {
+  type: typeof CERTIFICATE_CONFIGURATION_LOAD_FAILED
+  payload: Error
+}
+
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
@@ -274,6 +291,20 @@ export const certificatesLoaded = (
   payload
 })
 
+export const certificateConfigurationLoaded = (
+  payload: CertificateConfiguration
+): CertificateConfigurationLoadedAction => ({
+  type: CERTIFICATE_CONFIGURATION_LOADED,
+  payload
+})
+
+export const certificateConfigurationLoadFailed = (
+  payload: CertificateConfigurationLoadFailedAction['payload']
+): CertificateConfigurationLoadFailedAction => ({
+  type: CERTIFICATE_CONFIGURATION_LOAD_FAILED,
+  payload
+})
+
 export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   type: APPLICATION_CONFIG_FAILED,
   payload: error
@@ -324,6 +355,16 @@ export const validatorsFailed = (error: Error) => ({
   payload: error
 })
 
+export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
+  type: 'OFFLINE/HANDLEBARS_LOADED' as const,
+  payload: payload
+})
+
+export const handlebarsFailed = (error: Error) => ({
+  type: 'OFFLINE/HANDLEBARS_FAILED' as const,
+  payload: error
+})
+
 export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
   type: 'OFFLINE/CONDITIONALS_LOADED' as const,
   payload: payload
@@ -357,6 +398,8 @@ export type Action =
   | CertificateLoadFailedAction
   | CertificatesLoadedAction
   | CertificatesLoadFailedAction
+  | CertificateConfigurationLoadedAction
+  | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
   | UpdateOfflineCertificateAction
   | IFilterLocationsAction
@@ -367,3 +410,5 @@ export type Action =
   | ReturnType<typeof validatorsFailed>
   | ReturnType<typeof conditionalsLoaded>
   | ReturnType<typeof conditionalsFailed>
+  | ReturnType<typeof handlebarsLoaded>
+  | ReturnType<typeof handlebarsFailed>

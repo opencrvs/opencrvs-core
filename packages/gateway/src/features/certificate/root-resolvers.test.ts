@@ -40,7 +40,7 @@ describe('Certificate root resolvers', () => {
         )
         .once(JSON.stringify({ presignedURL: 'presigend-url' }))
 
-      const certificateSVG = await resolvers.Query.getCertificateSVG(
+      const certificateSVG = await resolvers.Query!.getCertificateSVG(
         {},
         { user: 'jonathan.campbell' },
         { headers: undefined }
@@ -80,7 +80,7 @@ describe('Certificate root resolvers', () => {
         .once(JSON.stringify({ presignedURL: 'presigend-url' }))
         .once(JSON.stringify({ presignedURL: 'presigend-url-2' }))
 
-      const certificateSVG = await resolvers.Query.getActiveCertificatesSVG(
+      const certificateSVG = await resolvers.Query!.getActiveCertificatesSVG(
         {},
         { user: 'jonathan.campbell' },
         { headers: undefined }
@@ -139,7 +139,7 @@ describe('Certificate root resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.createOrUpdateCertificateSVG(
+      const response = await resolvers.Mutation!.createOrUpdateCertificateSVG(
         {},
         { certificateSVG },
         { headers: authHeaderNatlSYSAdmin }
@@ -160,7 +160,7 @@ describe('Certificate root resolvers', () => {
       )
 
       return expect(
-        resolvers.Mutation.createOrUpdateCertificateSVG(
+        resolvers.Mutation!.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
           { headers: authHeaderRegister }
@@ -179,7 +179,7 @@ describe('Certificate root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateCertificateSVG(
+        resolvers.Mutation!.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
           { headers: authHeaderNatlSYSAdmin }

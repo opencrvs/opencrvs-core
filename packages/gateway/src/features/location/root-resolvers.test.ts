@@ -18,7 +18,7 @@ describe('Location root resolvers', () => {
     it('returns an array of location results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
       // @ts-ignore
-      const compositions = await resolvers.Query.locationsByParent(
+      const compositions = await resolvers.Query!.locationsByParent(
         {},
         { parentId: '1' },
         { headers: undefined }
@@ -33,7 +33,7 @@ describe('Location root resolvers', () => {
     it('returns a location object', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Location' }))
       // @ts-ignore
-      const composition = await resolvers.Query.locationById(
+      const composition = await resolvers.Query!.locationById(
         {},
         { locationId: '1' },
         { headers: undefined }
@@ -54,7 +54,7 @@ describe('Location root resolvers', () => {
         })
       )
       // @ts-ignore
-      const composition = await resolvers.Query.hasChildLocation(
+      const composition = await resolvers.Query!.hasChildLocation(
         {},
         { parentId: '1' },
         { headers: undefined }

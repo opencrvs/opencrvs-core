@@ -79,6 +79,7 @@ import {
   refresh
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV } from '@metrics/constants'
+import * as Hapi from '@hapi/hapi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -95,16 +96,18 @@ export enum EventType {
  * after a user action, you most likely need to add this wrapper to some
  * new endpoint handler here.
  */
-function analyticsDataRefreshingRoute<T extends Array<any>, U>(
-  handler: (...args: T) => U
-) {
+function analyticsDataRefreshingRoute<
+  Request extends Hapi.Request<Hapi.ReqRefDefaults>,
+  Response extends Hapi.ResponseToolkit,
+  U
+>(handler: (request: Request, response: Response) => U) {
   // Do not use await for the refresh operation. This operation can take minutes or more.
   // Consider triggering this a task that will be left to be run in the background.
-  return (...params: T) => {
+  return (request: Request, response: Response) => {
     if (!PRODUCTION || QA_ENV) {
-      refresh()
+      refresh(request.headers.authorization)
     }
-    return handler(...params)
+    return handler(request, response)
   }
 }
 

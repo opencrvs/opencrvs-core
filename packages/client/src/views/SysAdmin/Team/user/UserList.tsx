@@ -680,8 +680,8 @@ function UserListComponent(props: IProps) {
                   value: content.value,
                   actions: content.actions ? [content.actions] : []
                 }))}
-                labelHeader="USER"
-                valueHeader="ROLE"
+                labelHeader={intl.formatMessage(constantsMessages.user)}
+                valueHeader={intl.formatMessage(constantsMessages.labelRole)}
               />
             )}
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (

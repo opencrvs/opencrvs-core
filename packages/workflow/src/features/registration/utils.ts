@@ -22,7 +22,8 @@ import {
   getCRVSOfficeName,
   getRegistrationNumber,
   concatenateName,
-  getInformantName
+  getInformantName,
+  getRegistrationLocation
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
@@ -60,6 +61,7 @@ interface INotificationPayload {
   name?: string
   trackingId?: string
   crvsOffice?: string
+  registrationLocation?: string
   registrationNumber?: string
 }
 
@@ -118,6 +120,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             informantName: await getInformantName(
               fhirBundle,
               INFORMANT_SECTION_CODE
@@ -142,6 +145,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
             informantName: await getInformantName(
               fhirBundle,
@@ -166,6 +170,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
             informantName: await getInformantName(
               fhirBundle,
@@ -194,6 +199,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
             informantName: await getInformantName(
               fhirBundle,
@@ -218,6 +224,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             informantName: await getInformantName(
               fhirBundle,
               INFORMANT_SECTION_CODE
@@ -242,6 +249,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             informantName: await getInformantName(
               fhirBundle,
               INFORMANT_SECTION_CODE
@@ -266,6 +274,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             registrationNumber: getRegistrationNumber(
               getTaskResourceFromFhirBundle(fhirBundle as Bundle),
@@ -294,6 +303,7 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
+            registrationLocation: await getRegistrationLocation(fhirBundle),
             name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             informantName: await getInformantName(
               fhirBundle,
@@ -315,6 +325,7 @@ export async function sendRegisteredNotification(
   trackingId: string,
   registrationNumber: string,
   crvsOffice: string,
+  registrationLocation: string,
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
@@ -333,7 +344,8 @@ export async function sendRegisteredNotification(
       name,
       trackingId,
       registrationNumber,
-      crvsOffice
+      crvsOffice,
+      registrationLocation
     })
   } else if (
     eventType === EVENT_TYPE.DEATH &&
@@ -347,7 +359,8 @@ export async function sendRegisteredNotification(
       name,
       trackingId,
       registrationNumber,
-      crvsOffice
+      crvsOffice,
+      registrationLocation
     })
   }
 }
@@ -364,6 +377,7 @@ async function sendNotification(
     informantName?: string
     trackingId?: string
     crvsOffice?: string
+    registrationLocation?: string
     registrationNumber?: string
   }
 ) {

@@ -91,7 +91,8 @@ import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
 import * as validateUUID from 'uuid-validate'
-import { fetchTaskByCompositionIdFromHearth } from '../fhir/service'
+import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
+import { TaskInput } from 'fhir/r3'
 
 function findRelatedPerson(
   patientCode:
@@ -152,7 +153,7 @@ function findPatient(
   }
 }
 
-export const typeResolvers = {
+export const typeResolvers: GQLResolver = {
   EventRegistration: {
     __resolveType(record: Saved<ValidRecord>) {
       return getEventLabelFromBundle(record)
@@ -1340,6 +1341,18 @@ export const typeResolvers = {
       )
     }
   },
+  InputOutput: {
+    value: (inputOutput: TaskInput) => {
+      if (inputOutput.valueBoolean !== undefined) {
+        return inputOutput.valueBoolean
+      }
+      if (inputOutput.valueInteger !== undefined) {
+        return inputOutput.valueInteger
+      }
+
+      return inputOutput.valueString
+    }
+  },
   History: {
     documents: async (task: Task, _, context) => {
       const encounter = task.encounter?.reference
@@ -1563,7 +1576,13 @@ export const typeResolvers = {
       const status = getStatusFromTask(task)
       if (
         action ||
-        (status !== TaskStatus.REGISTERED && status !== TaskStatus.VALIDATED)
+        (status &&
+          ![
+            TaskStatus.REGISTERED,
+            TaskStatus.VALIDATED,
+            TaskStatus.DECLARED,
+            TaskStatus.IN_PROGRESS
+          ].includes(status))
       ) {
         return null
       }
@@ -2028,7 +2047,7 @@ export const typeResolvers = {
         .sort(sortDescending)
     }
   }
-} satisfies GQLResolver
+}
 
 function sortDescending(
   a: Resource & { lastModified: string },

@@ -16,7 +16,7 @@ import {
   IContactPointPhone
 } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
-import { get, has } from 'lodash'
+import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -113,7 +113,10 @@ export const getFieldValue = (
   }
 
   if (has(fieldObj, 'dynamicOptions')) {
-    const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
+    const offlineIndex = get(
+      fieldObj,
+      'dynamicOptions.resource'
+    ) as unknown as PropertyPath
     const offlineResourceValues = get(offlineData, offlineIndex)
     const offlineResourceValue =
       original && get(offlineResourceValues, original)

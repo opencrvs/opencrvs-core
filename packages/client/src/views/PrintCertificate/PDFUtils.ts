@@ -31,6 +31,7 @@ import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
+import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -97,6 +98,20 @@ export function executeHandlebarsTemplate(
     },
     cache
   )
+
+  const customHelpers = getHandlebarHelpers()
+
+  for (const helperName of Object.keys(customHelpers)) {
+    /*
+     * Note for anyone adding new context variables to handlebar helpers:
+     * Everything you expose to country config's here will become API surface area,
+     * This means that countries will become dependant on it and it will be hard to remove or rename later on.
+     * If you need to expose the full record, please consider only exposing the specific values you know are needed.
+     * Otherwise what happens is that we lose the ability to refactor and remove things later on.
+     */
+    const helper = customHelpers[helperName]({ intl })
+    Handlebars.registerHelper(helperName, helper)
+  }
 
   Handlebars.registerHelper(
     'intl',
@@ -253,7 +268,13 @@ async function getPDFTemplateWithSVG(
     state
   )
 
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
+  }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate

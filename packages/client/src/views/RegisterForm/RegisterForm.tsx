@@ -712,6 +712,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
         informant = 'mother'
       } else if (declaration?.data?.informant?.informantType === 'FATHER') {
         informant = 'father'
+      } else if (declaration?.data?.informant?.informantType === 'SPOUSE') {
+        informant = 'spouse'
       }
 
       modifiedDeclaration = {

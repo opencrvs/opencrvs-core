@@ -27,7 +27,7 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 
-import { fetchFHIR } from '../fhir/service'
+import { fetchFHIR } from '@gateway/features/fhir/service'
 
 interface IAuditHistory {
   auditedBy: string
