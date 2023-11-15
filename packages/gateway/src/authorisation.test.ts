@@ -21,7 +21,7 @@ describe('checkUserAssignment()', () => {
   const fetch = fetchMock as fetchMock.FetchMock
   const registerCertifyToken = jwt.sign(
     { scope: ['register', 'certify'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: '121221',
       algorithm: 'RS256',
