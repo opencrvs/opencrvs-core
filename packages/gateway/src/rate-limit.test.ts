@@ -27,19 +27,22 @@ const resolvers = rootResolvers as any
 const locationResolvers = locationRootResolvers as any
 
 let container: StartedTestContainer
-
+jest.mock('./constants', () => {
+  const originalModule = jest.requireActual('./constants')
+  return {
+    __esModule: true,
+    ...originalModule,
+    ENABLE_RATE_LIMIT: 'true'
+  }
+})
 describe('Rate limit', () => {
-  const OLD_ENV = process.env
-
   let authHeaderRegAgent: { Authorization: string }
 
   beforeAll(async () => {
     container = await startContainer()
-    process.env = { ...OLD_ENV, DISABLE_RATE_LIMIT: 'false' }
   })
   afterAll(async () => {
     await stopContainer(container)
-    process.env = OLD_ENV
   })
 
   beforeEach(async () => {
