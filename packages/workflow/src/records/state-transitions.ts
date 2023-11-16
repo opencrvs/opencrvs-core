@@ -39,7 +39,7 @@ import {
   CorrectionRejectionInput,
   CorrectionRequestInput,
   MakeCorrectionRequestInput,
-  UpdateRequestInput
+  ChangedValuesInput
 } from '@workflow/records/correction-request'
 import {
   createCorrectedTask,
@@ -190,7 +190,7 @@ export async function toCorrectionApproved(
 export async function toUpdated(
   record: UnregisteredSavedRecord,
   practitioner: Practitioner,
-  updatedDetails: UpdateRequestInput
+  updatedDetails: ChangedValuesInput
 ): Promise<UnregisteredSavedRecord> {
   const previousTask = getTaskFromBundle(record)
 
