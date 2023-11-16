@@ -86,6 +86,7 @@ jobs:
           done
 
       - name: Verify every file has a license header
+        if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
       - name: Runs dependency installation
