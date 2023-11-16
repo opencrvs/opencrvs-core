@@ -26,7 +26,7 @@ import {
   ApproveRequestInput,
   CorrectionRequestInput,
   CorrectionRequestPaymentInput,
-  UpdateRequestInput
+  ChangedValuesInput
 } from '@workflow/records/correction-request'
 
 function getFHIRValueField(value: unknown) {
@@ -340,7 +340,7 @@ export function createValidateTask(
 
 export function createUpdatedTask(
   previousTask: Task,
-  updatedDetails: UpdateRequestInput,
+  updatedDetails: ChangedValuesInput,
   practitioner: Practitioner
 ): Task {
   return {
@@ -374,7 +374,7 @@ export function createUpdatedTask(
           }
         ]
       },
-      valueString: update.oldValue
+      ...getFHIRValueField(update.oldValue)
     })),
     output: updatedDetails.map((update) => ({
       valueCode: update.section,
@@ -387,7 +387,7 @@ export function createUpdatedTask(
           }
         ]
       },
-      valueString: update.newValue
+      ...getFHIRValueField(update.newValue)
     })),
     lastModified: new Date().toISOString(),
     businessStatus: {
