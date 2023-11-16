@@ -25,7 +25,7 @@ import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUpdated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
-import { UpdateRequestInput } from '@workflow/records/correction-request'
+import { ChangedValuesInput } from '@workflow/records/correction-request'
 
 type BirthRegistration = Omit<GQLBirthRegistration, 'registration'> & {
   registration: Registration
@@ -60,7 +60,7 @@ export const updateRoute = [
         const { registration, ...detailsWithoutReg } = details
         const { changedValues, ...restOfRegistration } = registration
         const updatedDetails = validateRequest(
-          UpdateRequestInput,
+          ChangedValuesInput,
           changedValues
         )
 
@@ -80,7 +80,7 @@ export const updateRoute = [
         await indexBundle(updatedBundle, token)
         return updatedBundle
       } catch (error) {
-        logger.error(`Workflow/markAsValidatedHandler: error: ${error}`)
+        logger.error(`Workflow/updatedHandler: error: ${error}`)
         throw new Error(error)
       }
     }

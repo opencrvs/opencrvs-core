@@ -10,6 +10,14 @@
  */
 import { z } from 'zod'
 
+export const ChangedValuesInput = z.array(
+  z.object({
+    section: z.string(),
+    fieldName: z.string(),
+    oldValue: z.union([z.string(), z.number(), z.boolean()]),
+    newValue: z.union([z.string(), z.number(), z.boolean()])
+  })
+)
 export const CorrectionRequestPaymentInput = z.object({
   type: z.string(),
   amount: z.number(),
@@ -34,26 +42,11 @@ export const CorrectionRequestInput = z.object({
   location: z.object({
     _fhirID: z.string()
   }),
-  values: z.array(
-    z.object({
-      section: z.string(),
-      fieldName: z.string(),
-      oldValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-      newValue: z.union([z.string(), z.number(), z.boolean()])
-    })
-  ),
+  values: ChangedValuesInput,
   reason: z.string(),
   otherReason: z.string(),
   note: z.string()
 })
-export const UpdateRequestInput = z.array(
-  z.object({
-    section: z.string(),
-    fieldName: z.string(),
-    oldValue: z.string(),
-    newValue: z.string()
-  })
-)
 
 export const MakeCorrectionRequestInput = CorrectionRequestInput
 export const ApproveRequestInput = CorrectionRequestInput.extend({
@@ -79,7 +72,7 @@ export const CorrectionRejectionInput = z.object({
   reason: z.string()
 })
 
-export type UpdateRequestInput = z.infer<typeof UpdateRequestInput>
+export type ChangedValuesInput = z.infer<typeof ChangedValuesInput>
 export type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
 export type CorrectionRequestPaymentInput = z.infer<
   typeof CorrectionRequestPaymentInput
