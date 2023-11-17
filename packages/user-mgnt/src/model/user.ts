@@ -10,6 +10,7 @@
  */
 import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import { userScopes } from '@opencrvs/commons/user-management'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -307,7 +308,7 @@ const userSchema = new Schema({
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
-  scope: { type: [String], required: true },
+  scope: { type: [String], enum: Object.values(userScopes), required: true },
   status: {
     type: String,
     enum: [
