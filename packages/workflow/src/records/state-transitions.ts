@@ -50,6 +50,7 @@ import {
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createRegisterTask,
   createUpdatedTask,
   createValidateTask,
   getTaskHistory
@@ -228,6 +229,37 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toRegistered(
+  record: UnregisteredSavedRecord | ValidatedRecord,
+  practitioner: Practitioner
+): Promise<RegisteredRecord> {
+  const previousTask = getTaskFromBundle(record)
+  const registeredTask = createRegisterTask(previousTask, practitioner)
+
+  const registerTaskWithPractitionerExtensions = setupLastRegUser(
+    registeredTask,
+    practitioner
+  )
+
+  const registeredTaskWithLocationExtensions = await setupLastRegLocation(
+    registerTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        { resource: registeredTaskWithLocationExtensions }
+      ]
+    },
+    'REGISTERED'
+  )
 }
 
 export async function toValidated(
