@@ -861,13 +861,18 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await createRequest('POST', `/records/${id}/update`, authHeader, {
+      details,
+      event
+    })
+  }
 
-  // return the full composition
-  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
-
-  return composition
+  await createRequest('POST', `/records/${id}/register`, authHeader)
+  return id
 }
 
 async function markEventAsCertified(
