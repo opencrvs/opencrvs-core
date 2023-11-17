@@ -25,6 +25,7 @@ import { getRecordById } from './records'
 export type Certify = Nominal<{}, 'Certify'>
 export type Validate = Nominal<{}, 'Validate'>
 export type Update = Nominal<{}, 'Update'>
+export type Register = Nominal<{}, 'Register'>
 export type Issue = Nominal<{}, 'Issue'>
 export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
@@ -39,6 +40,7 @@ export type ActionIdentifiers = {
   CERTIFY: Certify
   VALIDATION: Validate
   DECLARATION_UPDATED: Update
+  REGISTERED: Register
 }
 
 /*
@@ -68,6 +70,8 @@ export type StateTree =
       Update,
       InProgressRecord | ReadyForReviewRecord
     >
+  // Register declaration
+  | Transition<DeclaredRecord | ValidatedRecord, Register, RegisteredRecord>
 
 /*
  * Internals

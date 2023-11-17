@@ -12,6 +12,7 @@ import { routes as correctionRoutes } from '@workflow/features/correction/routes
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import createRecordHandler from '@workflow/records/handler/create'
+import { registerRoute } from '@workflow/records/handler/register'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 
@@ -75,7 +76,8 @@ export const getRoutes = () => {
       }
     },
     ...validateRoute,
-    ...updateRoute
+    ...updateRoute,
+    ...registerRoute
   ]
 
   return routes
