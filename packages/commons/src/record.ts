@@ -121,6 +121,7 @@ export type StateIdenfitiers = {
   CORRECTION_REQUESTED: CorrectionRequestedRecord
   CERTIFIED: CertifiedRecord
   ISSUED: IssuedRecord
+  WAITING_VALIDATION: WaitingForValidationRecord
 }
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(

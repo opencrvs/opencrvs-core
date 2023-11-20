@@ -30,7 +30,8 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   Encounter,
-  SavedBundleEntry
+  SavedBundleEntry,
+  WaitingForValidationRecord
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -53,6 +54,7 @@ import {
   createRegisterTask,
   createUpdatedTask,
   createValidateTask,
+  createWaitingForValidationTask,
   getTaskHistory
 } from '@workflow/records/fhir'
 
@@ -231,11 +233,46 @@ export async function toUpdated(
   return updatedRecord
 }
 
+export async function toWaitingForExternalValidationState(
+  record: ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner
+): Promise<WaitingForValidationRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const waitForValidationTask = createWaitingForValidationTask(
+    previousTask,
+    practitioner
+  )
+
+  const waitForValidationTaskWithPractitionerExtensions = setupLastRegUser(
+    waitForValidationTask,
+    practitioner
+  )
+
+  const waitForValidationTaskWithLocationExtensions =
+    await setupLastRegLocation(
+      waitForValidationTaskWithPractitionerExtensions,
+      practitioner
+    )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        { resource: waitForValidationTaskWithLocationExtensions }
+      ]
+    },
+    'WAITING_VALIDATION'
+  )
+}
+
 export async function toRegistered(
-  record: UnregisteredSavedRecord | ValidatedRecord,
+  record: ReadyForReviewRecord | ValidatedRecord,
   practitioner: Practitioner
 ): Promise<RegisteredRecord> {
-  const previousTask = getTaskFromBundle(record)
+  const previousTask = getTaskFromSavedBundle(record)
   const registeredTask = createRegisterTask(previousTask, practitioner)
 
   const registerTaskWithPractitionerExtensions = setupLastRegUser(

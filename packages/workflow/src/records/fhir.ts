@@ -340,6 +340,46 @@ export function createValidateTask(
   }
 }
 
+export function createWaitingForValidationTask(
+  previousTask: Task,
+  practitioner: Practitioner
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'WAITING_VALIDATION'
+        }
+      ]
+    }
+  }
+}
+
 export function createRegisterTask(
   previousTask: Task,
   practitioner: Practitioner
