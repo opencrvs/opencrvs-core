@@ -231,7 +231,7 @@ export const typeResolvers: GQLResolver = {
         address.extension
       )
 
-      return partOfExtension?.valueReference?.reference?.split('/')?.[1] ?? null
+      return partOfExtension?.valueReference.reference.split('/')[1] ?? null
     }
   },
   Person: {
