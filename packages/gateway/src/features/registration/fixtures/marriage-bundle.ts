@@ -378,7 +378,15 @@ export const MARRIAGE_BUNDLE: Saved<
             ],
             district: 'e66643ac-9ea9-4314-b842-f4fb3ad9e83a',
             state: '1cfe40fa-7b43-4c1e-aa05-4281e5122d9b',
-            country: 'FAR'
+            country: 'FAR',
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/part-of',
+                valueReference: {
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                }
+              }
+            ]
           }
         ],
         meta: {
@@ -477,7 +485,15 @@ export const MARRIAGE_BUNDLE: Saved<
             ],
             district: 'e66643ac-9ea9-4314-b842-f4fb3ad9e83a',
             state: '1cfe40fa-7b43-4c1e-aa05-4281e5122d9b',
-            country: 'FAR'
+            country: 'FAR',
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/part-of',
+                valueReference: {
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                }
+              }
+            ]
           }
         ],
         meta: {
@@ -858,7 +874,15 @@ export const MARRIAGE_BUNDLE: Saved<
           district: 'bbee20e1-68c4-4e0c-a0cd-44336341e005',
           state: '1cfe40fa-7b43-4c1e-aa05-4281e5122d9b',
           postalCode: '',
-          country: 'FAR'
+          country: 'FAR',
+          extension: [
+            {
+              url: 'http://opencrvs.org/specs/extension/part-of',
+              valueReference: {
+                reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+              }
+            }
+          ]
         },
         meta: {
           lastUpdated: '2023-09-22T08:54:49.685+00:00',

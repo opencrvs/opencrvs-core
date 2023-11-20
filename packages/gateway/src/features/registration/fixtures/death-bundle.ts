@@ -368,7 +368,15 @@ export const DEATH_BUNDLE: SavedBundle<
             district: 'e66643ac-9ea9-4314-b842-f4fb3ad9e83a',
             state: '1cfe40fa-7b43-4c1e-aa05-4281e5122d9b',
             postalCode: '09840-0103',
-            country: 'FAR'
+            country: 'FAR',
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/part-of',
+                valueReference: {
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                }
+              }
+            ]
           }
         ],
         deceasedDateTime: '2023-07-24',
@@ -622,7 +630,15 @@ export const DEATH_BUNDLE: SavedBundle<
             district: 'e66643ac-9ea9-4314-b842-f4fb3ad9e83a',
             state: '1cfe40fa-7b43-4c1e-aa05-4281e5122d9b',
             postalCode: '24575',
-            country: 'FAR'
+            country: 'FAR',
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/part-of',
+                valueReference: {
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                }
+              }
+            ]
           }
         ],
 
