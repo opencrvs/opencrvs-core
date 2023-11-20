@@ -97,7 +97,8 @@ import {
   isTaskOrTaskHistory,
   isURLReference,
   resourceIdentifierToUUID,
-  urlReferenceToUUID
+  urlReferenceToUUID,
+  Address
 } from '@opencrvs/commons/types'
 
 import { Context } from '@gateway/graphql/context'
@@ -221,6 +222,16 @@ export const typeResolvers: GQLResolver = {
           return location.name
         })
       )
+    },
+    partOf: (address: Address) => {
+      if (!address.extension) return null
+
+      const partOfExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/part-of`,
+        address.extension
+      )
+
+      return partOfExtension?.valueReference?.reference?.split('/')?.[1] ?? null
     }
   },
   Person: {

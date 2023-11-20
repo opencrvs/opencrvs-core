@@ -1066,6 +1066,7 @@ type Address {
   country: String
   from: Date
   to: Date
+  partOf: String
 }
 
 type Attachment {
