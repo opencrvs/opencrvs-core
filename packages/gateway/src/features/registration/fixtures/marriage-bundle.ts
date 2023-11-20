@@ -879,7 +879,7 @@ export const MARRIAGE_BUNDLE: Saved<
             {
               url: 'http://opencrvs.org/specs/extension/part-of',
               valueReference: {
-                reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                reference: 'Location/bbee20e1-68c4-4e0c-a0cd-44336341e005'
               }
             }
           ]
