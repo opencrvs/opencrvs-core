@@ -924,6 +924,7 @@ export interface GQLAddress {
   country?: string
   from?: GQLDate
   to?: GQLDate
+  partOf?: string
 }
 
 export interface GQLAttachment {
@@ -7663,6 +7664,7 @@ export interface GQLAddressTypeResolver<TParent = any> {
   country?: AddressToCountryResolver<TParent>
   from?: AddressToFromResolver<TParent>
   to?: AddressToToResolver<TParent>
+  partOf?: AddressToPartOfResolver<TParent>
 }
 
 export interface AddressToUseResolver<TParent = any, TResult = any> {
@@ -7783,6 +7785,15 @@ export interface AddressToFromResolver<TParent = any, TResult = any> {
 }
 
 export interface AddressToToResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AddressToPartOfResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

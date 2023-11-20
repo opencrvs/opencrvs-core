@@ -255,6 +255,7 @@ type Address { # -> Address (mostly the same property name except:)
   country: String
   from: Date # -> .period.start
   to: Date # -> .period.end
+  partOf: String
 }
 
 enum AuthorizationStatus {
