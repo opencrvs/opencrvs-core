@@ -32,7 +32,7 @@ import {
   clearActionExtension,
   resourceIdentifierToUUID,
   getStatusFromTask,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
@@ -983,7 +983,7 @@ export function insertActionToBundle(
   user: IUserModelData | ISystemModelData,
   office?: Saved<Location>
 ) {
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
   const bundleEntry = record.entry.find(
     (entry) => entry.resource.id === task.id
   )!
@@ -1086,7 +1086,7 @@ export async function markRecordAsDownloadedBySystem(
   authHeader: IAuthHeader
 ) {
   const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
 
   if (!businessStatus) {
@@ -1121,7 +1121,7 @@ export async function markRecordAsDownloadedOrAssigned(
   authHeader: IAuthHeader
 ) {
   const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
 
   if (!businessStatus) {
