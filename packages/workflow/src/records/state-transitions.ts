@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
 import {
   BundleEntry,
   CertifiedRecord,
@@ -31,13 +32,26 @@ import {
   ReadyForReviewRecord,
   Encounter,
   SavedBundleEntry,
-  WaitingForValidationRecord
+  WaitingForValidationRecord,
+  EVENT_TYPE,
+  getComposition,
+  getFromBundleById,
+  OPENCRVS_SPECIFICATION_URL,
+  RegistrationNumber
 } from '@opencrvs/commons/types'
 import {
+  REG_NUMBER_SYSTEM,
+  SECTION_CODE
+} from '@workflow/features/events/utils'
+import {
   setupLastRegLocation,
-  setupLastRegUser
+  setupLastRegUser,
+  updatePatientIdentifierWithRN,
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { IEventRegistrationCallbackPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
   ApproveRequestInput,
   CorrectionRejectionInput,
@@ -269,8 +283,11 @@ export async function toWaitingForExternalValidationState(
 }
 
 export async function toRegistered(
-  record: ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner
+  request: Hapi.Request,
+  record: WaitingForValidationRecord,
+  practitioner: Practitioner,
+  registrationNumber: IEventRegistrationCallbackPayload['compositionId'],
+  childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTask = createRegisterTask(previousTask, practitioner)
@@ -280,16 +297,69 @@ export async function toRegistered(
     practitioner
   )
 
+  const event = getTaskEventType(registeredTask) as EVENT_TYPE
+  const composition = getComposition(record)
+  const patients = updatePatientIdentifierWithRN(
+    record,
+    //@ts-ignore
+    composition,
+    SECTION_CODE[event],
+    REG_NUMBER_SYSTEM[event],
+    registrationNumber
+  )
+
+  /* Setting registration number here */
+  const system = `${OPENCRVS_SPECIFICATION_URL}id/${
+    event.toLowerCase() as Lowercase<typeof event>
+  }-registration-number` as const
+
+  if (registeredTask) {
+    registeredTask.identifier.push({
+      system,
+      value: registrationNumber as RegistrationNumber
+    })
+  }
+
+  if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
+    // For birth event patients[0] is child and it should
+    // already be initialized with the RN identifier
+    childIdentifiers.forEach((childIdentifier) => {
+      const previousIdentifier = patients[0].identifier!.find(
+        ({ type }) => type?.coding?.[0].code === childIdentifier.type
+      )
+      if (!previousIdentifier) {
+        patients[0].identifier!.push({
+          type: {
+            coding: [{ code: childIdentifier.type }]
+          },
+          value: childIdentifier.value
+        })
+      } else {
+        previousIdentifier.value = childIdentifier.value
+      }
+    })
+  }
+
+  if (event === EVENT_TYPE.DEATH) {
+    /** using first patient because for death event there is only one patient */
+    patients[0] = await validateDeceasedDetails(patients[0], {
+      Authorization: request.headers.authorization
+    })
+  }
+
   const registeredTaskWithLocationExtensions = await setupLastRegLocation(
     registerTaskWithPractitionerExtensions,
     practitioner
   )
 
+  const entriesWithUpdatedPatients = [
+    ...patients.map((p) => getFromBundleById(record, p.id))
+  ]
   return changeState(
     {
       ...record,
       entry: [
-        ...record.entry.filter(
+        ...entriesWithUpdatedPatients.filter(
           (entry) => entry.resource.id !== previousTask.id
         ),
         { resource: registeredTaskWithLocationExtensions }

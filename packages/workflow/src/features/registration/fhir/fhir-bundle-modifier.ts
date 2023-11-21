@@ -18,7 +18,11 @@ import {
   Saved,
   Task,
   findExtension,
-  RegistrationStatus
+  RegistrationStatus,
+  WaitingForValidationRecord,
+  urlReferenceToUUID,
+  URLReference,
+  getResourceFromBundleById
 } from '@opencrvs/commons/types'
 import {
   APPLICATION_CONFIG_URL,
@@ -614,41 +618,42 @@ export async function checkForDuplicateStatusUpdate(taskResource: Task) {
   }
 }
 
-export async function updatePatientIdentifierWithRN(
+export function updatePatientIdentifierWithRN(
+  record: WaitingForValidationRecord,
   composition: Composition,
   sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<Patient[]> {
-  return await Promise.all(
-    sectionCodes.map(async (sectionCode) => {
-      const section = getSectionEntryBySectionCode(composition, sectionCode)
-      const patient = await getFromFhir(`/${section.reference}`)
-      if (!patient.identifier) {
-        patient.identifier = []
-      }
-      const rnIdentifier = patient.identifier.find(
-        (identifier: fhir3.Identifier) =>
-          identifier.type?.coding?.[0].code === identifierType
-      )
-      if (rnIdentifier) {
-        rnIdentifier.value = registrationNumber
-      } else {
-        patient.identifier.push({
-          type: {
-            coding: [
-              {
-                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-                code: identifierType
-              }
-            ]
-          },
-          value: registrationNumber
-        })
-      }
-      return patient
-    })
-  )
+): Saved<Patient>[] {
+  return sectionCodes.map((sectionCode) => {
+    const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
+    const patientId = urlReferenceToUUID(sectionEntry.reference as URLReference)
+    const patient = getResourceFromBundleById<Patient>(record, patientId)
+
+    if (!patient.identifier) {
+      patient.identifier = []
+    }
+    const rnIdentifier = patient.identifier.find(
+      (identifier: fhir3.Identifier) =>
+        identifier.type?.coding?.[0].code === identifierType
+    )
+    if (rnIdentifier) {
+      rnIdentifier.value = registrationNumber
+    } else {
+      patient.identifier.push({
+        type: {
+          coding: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+              code: identifierType
+            }
+          ]
+        },
+        value: registrationNumber
+      })
+    }
+    return patient
+  })
 }
 
 interface Integration {
@@ -665,9 +670,9 @@ const statuses = {
 }
 
 export async function validateDeceasedDetails(
-  patient: Patient,
+  patient: Saved<Patient>,
   authHeader: { Authorization: string }
-): Promise<Patient> {
+): Promise<Saved<Patient>> {
   /*
     In OCRVS-1637 https://github.com/opencrvs/opencrvs-core/pull/964 we attempted to create a longitudinal
     record of life events by an attempt to use an existing person in gateway if an identifier is supplied that we already

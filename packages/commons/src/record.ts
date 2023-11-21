@@ -62,7 +62,19 @@ type RecordBase = Bundle
 export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
 
 export type WaitingForValidationRecord = Nominal<
-  RecordBase,
+  SavedBundle<
+    | Composition
+    | DocumentReference
+    | Encounter
+    | Patient
+    | RelatedPerson
+    | PaymentReconciliation
+    | Task
+    | Practitioner
+    | PractitionerRole
+    | Location
+    | Observation
+  >,
   'WaitingForValidation'
 >
 
