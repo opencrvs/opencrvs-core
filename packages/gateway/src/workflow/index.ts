@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
+import { EVENT_TYPE } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
@@ -19,7 +20,7 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 
-export const createRequest = async <T = any>(
+const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,
@@ -102,4 +103,15 @@ export function rejectRegistrationCorrection(
     authHeader,
     details
   )
+}
+
+export function createRegistration(
+  record:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest('POST', '/create-record', authHeader, { record, event })
 }

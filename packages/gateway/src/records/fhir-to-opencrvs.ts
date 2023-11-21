@@ -20,7 +20,7 @@ import { addResolversToSchema } from '@graphql-tools/schema'
 import { Bundle, Saved, getEventLabelFromBundle } from '@opencrvs/commons/types'
 import { ApolloServer } from 'apollo-server-hapi'
 
-export type Registration =
+type Registration =
   | GQLBirthRegistration
   | GQLDeathRegistration
   | GQLMarriageRegistration

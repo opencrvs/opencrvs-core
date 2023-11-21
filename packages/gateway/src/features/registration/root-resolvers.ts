@@ -9,13 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-import {
-  fetchFHIR,
-  getCompositionIdFromResponse,
-  getDeclarationIds,
-  getDeclarationIdsFromResponse,
-  getIDFromResponse
-} from '@gateway/features/fhir/service'
+import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
 import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
@@ -58,7 +52,6 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -72,7 +65,7 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from './utils'
 import { getRecordById } from '@gateway/records'
-import { createRequest } from '@gateway/workflow/index'
+import { createRegistration } from '@gateway/workflow'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -444,7 +437,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
+      return createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -453,7 +446,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
+      return createRegistration(details, EVENT_TYPE.DEATH, authHeader)
     },
     async createMarriageRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -462,14 +455,14 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.MARRIAGE)
+      return createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
     },
     async updateBirthRegistration(_, { details }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
+        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -601,7 +594,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
+      const newTaskBundle = updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.REJECTED,
         reason,
@@ -628,7 +621,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
+      const newTaskBundle = updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.ARCHIVED,
         reason,
@@ -664,7 +657,7 @@ export const resolvers: GQLResolver = {
         { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
       ]
 
-      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
+      const newTaskBundle = updateFHIRTaskBundle(taskEntry, prevRegStatus)
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
 
@@ -833,17 +826,6 @@ async function registrationToFHIR(
     await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
 
   return buildFHIRBundle(recordWithAttachmentsUploaded, event)
-}
-
-async function createEventRegistration(
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader,
-  event: EVENT_TYPE
-) {
-  return createRequest('POST', '/create-record', authHeader, { details, event })
 }
 
 export async function lookForComposition(
