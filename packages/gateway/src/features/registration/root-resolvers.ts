@@ -1073,7 +1073,7 @@ function getDownloadedOrAssignedExtension(
 ): Action[number] {
   if (
     inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === TaskStatus.VALIDATED)
+    (hasScope(authHeader, 'validate') && status === 'VALIDATED')
   ) {
     return `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
   }

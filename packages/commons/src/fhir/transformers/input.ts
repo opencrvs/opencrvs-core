@@ -97,7 +97,7 @@ const enum RegistrationType {
 }
 
 interface RegWorkflow {
-  type?: EnumToStringUnion<typeof TaskStatus>
+  type?: TaskStatus
   user?: User
   timestamp?: DateString
   reason?: string

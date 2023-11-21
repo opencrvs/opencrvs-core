@@ -14,7 +14,6 @@ import {
   ASSIGNED_EXTENSION_URL,
   Bundle,
   BundleEntry,
-  BusinessStatus,
   Coding,
   DOWNLOADED_EXTENSION_URL,
   DUPLICATE_TRACKING_ID,
@@ -103,7 +102,14 @@ export type Task = Omit<
   lastModified: string
   status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
   extension: Array<Extension>
-  businessStatus: BusinessStatus
+  businessStatus: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code' | 'system'> & {
+        system: 'http://opencrvs.org/specs/reg-status'
+        code: TaskStatus
+      }
+    >
+  }
   intent?: fhir3.Task['intent']
   identifier: Array<TaskIdentifier>
   code: Omit<fhir3.CodeableConcept, 'coding'> & {
@@ -211,26 +217,25 @@ export const enum TaskAction {
   FLAGGED_AS_POTENTIAL_DUPLICATE = 'FLAGGED_AS_POTENTIAL_DUPLICATE'
 }
 
-export const enum TaskStatus {
-  IN_PROGRESS = 'IN_PROGRESS',
-  ARCHIVED = 'ARCHIVED',
-  DECLARED = 'DECLARED',
-  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
-  WAITING_VALIDATION = 'WAITING_VALIDATION',
-  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
-  VALIDATED = 'VALIDATED',
-  REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED',
-  ISSUED = 'ISSUED'
-}
+export type TaskStatus =
+  | 'IN_PROGRESS'
+  | 'ARCHIVED'
+  | 'DECLARED'
+  | 'DECLARATION_UPDATED'
+  | 'WAITING_VALIDATION'
+  | 'CORRECTION_REQUESTED'
+  | 'VALIDATED'
+  | 'REGISTERED'
+  | 'CERTIFIED'
+  | 'REJECTED'
+  | 'ISSUED'
 
 export function getStatusFromTask(task: Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return statusType && (statusType.code as TaskStatus)
+  return statusType?.code
 }
 
 export function getActionFromTask(task: Task) {
@@ -280,7 +285,7 @@ export function getActionFromTask(task: Task) {
  */
 export function updateFHIRTaskBundle(
   taskEntry: BundleEntry<Task>,
-  status: string,
+  status: TaskStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -367,7 +372,7 @@ export function taskBundleWithExtension(
  */
 function updateTaskTemplate(
   task: Task,
-  status: string,
+  status: TaskStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string

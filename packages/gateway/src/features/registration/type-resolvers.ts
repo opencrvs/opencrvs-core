@@ -66,7 +66,6 @@ import {
   SPOUSE_CODE,
   Saved,
   Task,
-  TaskStatus,
   ValidRecord,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
@@ -1588,12 +1587,9 @@ export const typeResolvers: GQLResolver = {
       if (
         action ||
         (status &&
-          ![
-            TaskStatus.REGISTERED,
-            TaskStatus.VALIDATED,
-            TaskStatus.DECLARED,
-            TaskStatus.IN_PROGRESS
-          ].includes(status))
+          !['REGISTERED', 'VALIDATED', 'DECLARED', 'IN_PROGRESS'].includes(
+            status
+          ))
       ) {
         return null
       }

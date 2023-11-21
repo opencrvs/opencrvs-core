@@ -151,10 +151,6 @@ export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
   >
 }
 
-export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
-  coding: fhir3.Coding[]
-}
-
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {
   section: Array<CompositionSection>
   relatesTo?: Array<
