@@ -337,7 +337,7 @@ type MarriageRegistration implements EventRegistration { # -> Composition
 input CorrectionValueInput {
   section: String!
   fieldName: String!
-  oldValue: FieldValue!
+  oldValue: FieldValue
   newValue: FieldValue!
 }
 
