@@ -1211,7 +1211,7 @@ export interface GQLCorrectionPaymentInput {
 export interface GQLCorrectionValueInput {
   section: string
   fieldName: string
-  oldValue: GQLFieldValue
+  oldValue?: GQLFieldValue
   newValue: GQLFieldValue
 }
 

@@ -11,6 +11,7 @@
 scalar FieldValue
 scalar Date
 scalar Map
+scalar FieldValue
 
 input HumanNameInput {
   use: String # bn | en - the language the name text is written in
