@@ -57,6 +57,10 @@ export function getEventLabelFromBundle(bundle: Bundle) {
 }
 
 type RecordBase = Bundle
+
+export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
+
 export type WaitingForValidationRecord = Nominal<
   RecordBase,
   'WaitingForValidation'
@@ -87,6 +91,8 @@ export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 
 export type ValidRecord =
+  | InProgressRecord
+  | ReadyForReviewRecord
   | ValidatedRecord
   | RegisteredRecord
   | CorrectionRequestedRecord
@@ -94,6 +100,8 @@ export type ValidRecord =
   | IssuedRecord
 
 export type StateIdenfitiers = {
+  IN_PROGRESS: InProgressRecord
+  READY_FOR_REVIEW: ReadyForReviewRecord
   VALIDATED: ValidatedRecord
   REGISTERED: RegisteredRecord
   CORRECTION_REQUESTED: CorrectionRequestedRecord

@@ -15,133 +15,154 @@ import {
   EVENT_TYPE,
   MarriageRegistration,
   buildFHIRBundle,
-  getTrackingId,
-  WaitingForValidationRecord
+  Bundle,
+  getComposition,
+  isTask
+  //urlReferenceToUUID
 } from '@opencrvs/commons/types'
 import {
-  modifyRegistrationBundle,
-  markBundleAsWaitingValidation,
-  markBundleAsValidated
+  setupLastRegUser,
+  setupLastRegLocation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 // import {
 //   getSharedContactMsisdn,
 //   getSharedContactEmail
 // } from '@workflow/features/registration/fhir/fhir-utils'
-import { populateCompositionWithID } from '@workflow/features/registration/handler'
 // import { sendCreateRecordNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
-import {
-  getToken,
-  hasRegisterScope,
-  hasValidateScope
-} from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/authUtils'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { z } from 'zod'
 // import { createNewAuditEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
+// import {
+//   hasBirthDuplicates,
+//   hasDeathDuplicates
+// } from '@workflow/utils/duplicateChecker'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
-  hasBirthDuplicates,
-  hasDeathDuplicates
-} from '@workflow/utils/duplicateChecker'
+  generateTrackingIdForEvents,
+  isEventNotification,
+  isInProgressDeclaration
+} from '@workflow/features/registration/utils'
+import { getRecordById } from '@workflow/records'
+import { auditEvent } from '@workflow/records/audit'
 
 export const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
-  details: z.custom<
+  record: z.custom<
     BirthRegistration | DeathRegistration | MarriageRegistration
   >()
 })
 
-function getCompositionIDFromResponse(
-  resBody: fhir3.Bundle<fhir3.BundleEntryResponse>
-): string | undefined {
-  const compositionValidEntry = resBody.entry?.find(
-    (e) =>
-      e.response?.location?.startsWith('/fhir/Composition/') &&
-      e.response.status === '201'
-  )
-
-  // return the Composition's id
-  return compositionValidEntry?.response?.location?.split('/')[3]
+function findTask(bundle: Bundle) {
+  const task = bundle.entry.map((e) => e.resource).find(isTask)
+  if (!task) {
+    throw new Error('Task not found in bundle')
+  }
+  return task
 }
 
 export default async function createRecordHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  _: Hapi.ResponseToolkit
 ) {
   try {
     const token = getToken(request)
-    const fromRegistrar = hasRegisterScope(request)
-    const fromRegAgent = hasValidateScope(request)
-    const { details, event } = validateRequest(requestSchema, request.payload)
-    const inputBundle = buildFHIRBundle(details, event)
-    let bundle = await modifyRegistrationBundle(inputBundle, token)
-    if (fromRegistrar) {
-      bundle = await markBundleAsWaitingValidation(bundle, token)
-    } else if (fromRegAgent) {
-      bundle = await markBundleAsValidated(bundle, token)
-    }
-    const isDuplicate =
-      event === EVENT_TYPE.BIRTH
-        ? await hasBirthDuplicates(
-            { Authorization: request.headers.authorization },
-            details
-          )
-        : event === EVENT_TYPE.DEATH
-        ? await hasDeathDuplicates(
-            { Authorization: request.headers.authorization },
-            details
-          )
-        : false
-
-    const trackingId = getTrackingId(bundle as WaitingForValidationRecord)
-    const resBundle = await sendBundleToHearth(bundle)
-    populateCompositionWithID(bundle, resBundle)
-    const compositionId = getCompositionIDFromResponse(
-      resBundle as fhir3.Bundle<fhir3.BundleEntryResponse>
+    const { record: recordDetails, event } = validateRequest(
+      requestSchema,
+      request.payload
     )
-    if (!compositionId) {
-      throw new Error(`FHIR did not return a valid compostion entry`)
-    }
-    // await createNewAuditEvent(bundle, token)
-    await indexBundle(bundle, token)
+    const inputBundle = buildFHIRBundle(recordDetails, event)
+    const practitioner = await getLoggedInPractitionerResource(token)
+    const trackingId = generateTrackingIdForEvents(event)
+    const composition = getComposition(inputBundle)
+    const inProgress = isInProgressDeclaration(inputBundle)
 
-    if (fromRegistrar) {
-      return {
-        compositionId,
-        trackingId,
-        isPotentiallyDuplicate: isDuplicate
+    composition.identifier = {
+      system: 'urn:ietf:rfc:3986',
+      value: trackingId
+    }
+    const task = findTask(inputBundle)
+
+    task.identifier ??= []
+
+    task.identifier.push({
+      system: `http://opencrvs.org/specs/id/${
+        event.toLowerCase() as Lowercase<EVENT_TYPE>
+      }-tracking-id`,
+      value: trackingId
+    })
+
+    task.code = {
+      coding: [
+        {
+          system: `http://opencrvs.org/specs/types`,
+          code: event
+        }
+      ]
+    }
+    task.businessStatus = {
+      coding: [
+        {
+          system: `http://opencrvs.org/specs/reg-status`,
+          code: inProgress ? 'IN_PROGRESS' : 'DECLARED'
+        }
+      ]
+    }
+    const taskWithUser = setupLastRegUser(task, practitioner)
+
+    const taskWithLocation = isEventNotification(inputBundle)
+      ? await setupLastRegLocation(taskWithUser, practitioner)
+      : taskWithUser
+
+    inputBundle.entry = inputBundle.entry.map((e) => {
+      if (e.resource.resourceType !== 'Task') {
+        return e
       }
+      return {
+        ...e,
+        resource: taskWithLocation
+      }
+    })
+
+    const responseBundle = await sendBundleToHearth(inputBundle)
+    const ok = responseBundle.entry.every((e) => e.response.status === '201')
+    if (!ok) {
+      throw new Error(
+        'Hearth was unable to create all the entires in the bundle'
+      )
+    }
+    const compositionLocation = responseBundle.entry
+      .map((e) => e.response.location)
+      .find((l) => l.includes('Composition'))
+
+    if (!compositionLocation) {
+      throw new Error('Unable to find Composition location in response bundle')
     }
 
-    // this is to fix in later PR
+    // fetching the new record to send to search/metrics
+    const record = await getRecordById(
+      compositionLocation.split('/')[3],
+      token,
+      ['IN_PROGRESS', 'READY_FOR_REVIEW']
+    )
 
-    /* sending notification to the contact */
-    // const sms = await getSharedContactMsisdn(bundle)
-    // const email = await getSharedContactEmail(bundle)
-    // if (!sms && !email) {
-    //   logger.info('createRecordHandler could not send event notification')
-    //   return {
-    //     resBundle,
-    //     payloadForInvokingValidation: bundle,
-    //     isPotentiallyDuplicate: isDuplicate
-    //   }
-    // }
-    // logger.info('createRecordHandler sending event notification')
+    await indexBundle(record, token)
+    await auditEvent(
+      inProgress ? 'in-progress-declaration' : 'new-declaration',
+      record,
+      token
+    )
 
-    // sendCreateRecordNotification(
-    //   bundle,
-    //   event,
-    //   { sms, email },
-    //   {
-    //     Authorization: request.headers.authorization
-    //   }
-    // )
+    // TODO: CHECK FOR DUPLICATE
+    // TODO: SEND NOTIFICATION
 
     return {
-      compositionId,
+      compositionId: getComposition(record).id,
       trackingId,
-      isPotentiallyDuplicate: isDuplicate
+      isPotentiallyDuplicate: false
     }
   } catch (error) {
     logger.error(`Workflow/createRecordHandler: error: ${error}`)

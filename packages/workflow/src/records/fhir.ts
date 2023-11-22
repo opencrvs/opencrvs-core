@@ -16,7 +16,8 @@ import {
   PaymentReconciliation,
   Practitioner,
   Task,
-  URNReference
+  URNReference,
+  URLReference
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -400,7 +401,19 @@ export function createCorrectionRequestTask(
   }
 }
 
-export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
+type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
+  entry: Array<
+    Omit<fhir3.BundleEntry, 'response'> & {
+      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
+        location: URLReference
+      }
+    }
+  >
+}
+
+export async function sendBundleToHearth(
+  payload: Bundle
+): Promise<ResponseBundleEntry> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
