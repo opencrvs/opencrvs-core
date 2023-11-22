@@ -17,8 +17,8 @@ import {
   buildFHIRBundle,
   Bundle,
   getComposition,
-  isTask
-  //urlReferenceToUUID
+  isTask,
+  urlReferenceToUUID
 } from '@opencrvs/commons/types'
 import {
   setupLastRegUser,
@@ -142,12 +142,13 @@ export default async function createRecordHandler(
       throw new Error('Unable to find Composition location in response bundle')
     }
 
+    const compositionId = urlReferenceToUUID(compositionLocation)
+
     // fetching the new record to send to search/metrics
-    const record = await getRecordById(
-      compositionLocation.split('/')[3],
-      token,
-      ['IN_PROGRESS', 'READY_FOR_REVIEW']
-    )
+    const record = await getRecordById(compositionId, token, [
+      'IN_PROGRESS',
+      'READY_FOR_REVIEW'
+    ])
 
     await indexBundle(record, token)
     await auditEvent(
@@ -160,7 +161,7 @@ export default async function createRecordHandler(
     // TODO: SEND NOTIFICATION
 
     return {
-      compositionId: getComposition(record).id,
+      compositionId,
       trackingId,
       isPotentiallyDuplicate: false
     }
