@@ -99,7 +99,7 @@ const DocumentTypeBox = styled.div`
 
 const AvoidBreak = styled.div`
   @media print {
-    break-inside: avoid;
+    page-break-after: avoid;
   }
 `
 

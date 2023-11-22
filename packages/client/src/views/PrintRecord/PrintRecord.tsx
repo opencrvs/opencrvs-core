@@ -40,6 +40,12 @@ const Container = styled.div`
 const Content = styled.div`
   max-width: 1024px;
 `
+
+const AvoidBreak = styled.div`
+  @media print {
+    page-break-after: avoid;
+  }
+`
 export function PrintRecord() {
   const languages = useSelector(getLanguages)
   const offlineData = useSelector(getOfflineData)
@@ -68,30 +74,32 @@ export function PrintRecord() {
   return (
     <Container>
       <Content>
-        <Header
-          logoSrc={offlineData.config.COUNTRY_LOGO.file}
-          title={formatMessage(intls, reviewMessages.govtName)}
-          heading={formatMessage(
-            intls,
-            printRecordMessages.civilRegistrationCentre
-          )}
-          subject={formatMessage(
-            intls,
-            reviewMessages.headerSubjectWithoutName,
-            {
-              eventType: declaration.event
+        <AvoidBreak>
+          <Header
+            logoSrc={offlineData.config.COUNTRY_LOGO.file}
+            title={formatMessage(intls, reviewMessages.govtName)}
+            heading={formatMessage(
+              intls,
+              printRecordMessages.civilRegistrationCentre
+            )}
+            subject={formatMessage(
+              intls,
+              reviewMessages.headerSubjectWithoutName,
+              {
+                eventType: declaration.event
+              }
+            )}
+            info={
+              declaration.data?.registration?.trackingId
+                ? {
+                    label: formatMessage(intls, constantsMessages.trackingId),
+                    value: declaration.data.registration.trackingId as string
+                  }
+                : undefined
             }
-          )}
-          info={
-            declaration.data?.registration?.trackingId
-              ? {
-                  label: formatMessage(intls, constantsMessages.trackingId),
-                  value: declaration.data.registration.trackingId as string
-                }
-              : undefined
-          }
-          subjectColor={getEventwiseSubjectColor(declaration.event)}
-        />
+            subjectColor={getEventwiseSubjectColor(declaration.event)}
+          />
+        </AvoidBreak>
         <Body declaration={declaration} intls={intls} />
       </Content>
     </Container>
