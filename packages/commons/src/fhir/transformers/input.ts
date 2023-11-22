@@ -282,8 +282,8 @@ interface CorrectionPayment {
 interface CorrectionValue {
   section: string
   fieldName: string
-  oldValue: string
-  newValue: string
+  oldValue?: string | number | boolean
+  newValue: string | number | boolean
 }
 
 interface Correction {
