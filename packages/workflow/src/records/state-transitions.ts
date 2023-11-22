@@ -37,7 +37,8 @@ import {
   getComposition,
   getFromBundleById,
   OPENCRVS_SPECIFICATION_URL,
-  RegistrationNumber
+  RegistrationNumber,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import {
   REG_NUMBER_SYSTEM,
@@ -66,6 +67,7 @@ import {
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
   createRegisterTask,
+  createRejectTask,
   createUpdatedTask,
   createValidateTask,
   createWaitingForValidationTask,
@@ -245,6 +247,42 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toRejected(
+  record: ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner,
+  statusReason: fhir3.CodeableConcept
+): Promise<RejectedRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const rejectedTask = createRejectTask(
+    previousTask,
+    practitioner,
+    statusReason
+  )
+
+  const rejectedTaskWithPractitionerExtensions = setupLastRegUser(
+    rejectedTask,
+    practitioner
+  )
+
+  const rejectedTaskWithLocationExtensions = await setupLastRegLocation(
+    rejectedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        { resource: rejectedTaskWithLocationExtensions }
+      ]
+    },
+    'REJECTED'
+  )
 }
 
 export async function toWaitingForExternalValidationState(

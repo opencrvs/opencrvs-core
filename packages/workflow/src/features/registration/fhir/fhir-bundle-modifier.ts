@@ -28,9 +28,7 @@ import {
   APPLICATION_CONFIG_URL,
   RESOURCE_SERVICE_URL
 } from '@workflow/constants'
-import { triggerEvent } from '@workflow/features/events/handler'
 import {
-  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -46,12 +44,9 @@ import {
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  fetchTaskByCompositionIdFromHearth,
   generateTrackingIdForEvents,
-  getComposition,
   getEventType,
   getMosipUINToken,
-  getVoidEvent,
   isEventNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -141,72 +136,20 @@ export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
   headers: Record<string, string>,
   token: string
-): Promise<{ bundle: Bundle; regValidationError?: boolean }> {
-  try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
-      method: 'POST',
-      body: JSON.stringify(bundle),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    })
-    if (!res.ok) {
-      const errorData = await res.json()
-      throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
+): Promise<{ bundle: Bundle }> {
+  const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
+    method: 'POST',
+    body: JSON.stringify(bundle),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
     }
-    return { bundle }
-  } catch (err) {
-    const eventType = getEventType(bundle)
-    const composition = getComposition(bundle)
-    if (!composition) {
-      throw new Error('Cant get composition in bundle')
-    }
-    const taskResource = await fetchTaskByCompositionIdFromHearth(
-      composition.id!
-    )
-    const practitioner = await getLoggedInPractitionerResource(token)
-
-    if (
-      !taskResource ||
-      !taskResource.businessStatus ||
-      !taskResource.businessStatus.coding ||
-      !taskResource.businessStatus.coding[0] ||
-      !taskResource.businessStatus.coding[0].code
-    ) {
-      throw new Error('taskResource has no businessStatus code')
-    }
-    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
-
-    const statusReason: fhir3.CodeableConcept = {
-      text: `${JSON.stringify(err)} - ${BIRTH_REG_NUMBER_GENERATION_FAILED}`
-    }
-    taskResource.statusReason = statusReason
-    taskResource.lastModified = new Date().toISOString()
-
-    /* setting registration workflow status here */
-    await setupRegistrationWorkflow(
-      taskResource,
-      getTokenPayload(token),
-      RegStatus.REJECTED
-    )
-
-    /* setting lastRegLocation here */
-    await setupLastRegLocation(taskResource, practitioner)
-
-    /* setting lastRegUser here */
-    setupLastRegUser(taskResource, practitioner)
-
-    await updateResourceInHearth(taskResource)
-
-    await triggerEvent(
-      getVoidEvent(eventType),
-      { resourceType: 'Bundle', entry: [{ resource: taskResource }] },
-      headers
-    )
-
-    return { bundle, regValidationError: true }
+  })
+  if (!res.ok) {
+    const errorData = await res.json()
+    throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
+  return { bundle }
 }
 
 export async function markBundleAsWaitingValidation<T extends Bundle>(
