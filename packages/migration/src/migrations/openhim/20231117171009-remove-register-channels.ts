@@ -149,8 +149,6 @@ export const up = async (db: Db, client: MongoClient) => {
         )
       )
     })
-  } catch (err) {
-    console.log(err)
   } finally {
     await session.endSession()
   }
@@ -164,8 +162,6 @@ export const down = async (db: Db, client: MongoClient) => {
       await upsertChannel(db, deathRegistrationChannel)
       await upsertChannel(db, marriageRegistrationChannel)
     })
-  } catch (err) {
-    console.log(err)
   } finally {
     await session.endSession()
   }
