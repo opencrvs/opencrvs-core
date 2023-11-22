@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
-import * as fetchMock from 'jest-fetch-mock'
-const fetch = fetchMock as fetchMock.FetchMock
 import * as jwt from 'jsonwebtoken'
 import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
 import { ContextFunction } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-hapi'
+
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 describe('Test apollo server config', () => {
   const token = jwt.sign(
@@ -80,6 +81,7 @@ describe('Test apollo server config', () => {
       h: {}
     })
     expect(context).toStrictEqual({
+      presignDocumentUrls: true,
       request,
       headers: {
         Authorization: `Bearer ${token}`,

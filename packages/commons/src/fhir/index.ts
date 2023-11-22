@@ -288,7 +288,7 @@ type ItemType<T> = T extends Array<infer U> ? U : never
 export type TelecomSystem = ItemType<Patient['telecom']>['system']
 export type CodeableConcept = fhir3.CodeableConcept
 
-export function markSaved<T extends Resource>(resource: T, id: UUID) {
+export function markSaved<T extends Resource>(resource: T, id: UUID | string) {
   return {
     ...resource,
     id
@@ -382,3 +382,4 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
     ? CompositionHistory
     : never
 }
+export { updateFHIRBundle, buildFHIRBundle } from './transformers'

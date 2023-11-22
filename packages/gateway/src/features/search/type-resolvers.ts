@@ -12,7 +12,7 @@ import { AVATAR_API, NATIVE_LANGUAGE } from '@gateway/constants'
 import {
   IEventDurationResponse,
   getEventDurationsFromMetrics
-} from '@gateway/features/fhir/utils'
+} from '@gateway/features/metrics/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
   GQLOperationHistorySearchSet,
@@ -424,13 +424,16 @@ export const searchTypeResolvers: GQLResolver = {
     async avatarURL(
       assignmentData: IAssignment,
       _,
-      { dataSources, headers: authHeader }
+      { dataSources, headers: authHeader, presignDocumentUrls }
     ) {
       const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
         assignmentData.userId
       )
 
       if (avatarURI) {
+        if (!presignDocumentUrls) {
+          return avatarURI
+        }
         const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
         return avatarURL
       }

@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { getMetrics, postMetrics } from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
+import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
 import {
   getSystem,
   getTokenPayload,
@@ -20,6 +19,7 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
+import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
 
 // Complete definition of the Search response
 interface IShardsResponse {

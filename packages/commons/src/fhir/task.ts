@@ -8,34 +8,33 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { Nominal } from '../nominal'
 import {
+  ASSIGNED_EXTENSION_URL,
   Bundle,
   BundleEntry,
   BusinessStatus,
   Coding,
-  Extension,
-  Resource,
-  ResourceIdentifier,
-  Saved,
-  findExtension,
-  isSaved
-} from '.'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
+  DUPLICATE_TRACKING_ID,
+  Extension,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
   MAKE_CORRECTION_EXTENSION_URL,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
+  OPENCRVS_SPECIFICATION_URL,
   REINSTATED_EXTENSION_URL,
-  DUPLICATE_TRACKING_ID,
+  Resource,
+  ResourceIdentifier,
+  Saved,
   UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
-} from './constants'
-import { Nominal } from '../nominal'
-import { UUID } from '../uuid'
+  VIEWED_EXTENSION_URL,
+  findExtension,
+  isSaved
+} from '.'
+import { UUID } from '..'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -86,17 +85,22 @@ export type TaskIdentifier =
       value: string
     }
 
+export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
+
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
 type AllSystems = ExtractSystem<TaskIdentifier>
+
 type AfterLastSlash<S extends string> =
   S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
+
 export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
   fhir3.Task,
-  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier'
+  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier' | 'status'
 > & {
   lastModified: string
+  status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
   extension: Array<Extension>
   businessStatus: BusinessStatus
   intent?: fhir3.Task['intent']
@@ -266,7 +270,6 @@ export function getActionFromTask(task: Task) {
       return TaskAction.REJECTED_CORRECTION
     }
   }
-
   return null
 }
 
@@ -336,7 +339,7 @@ export function clearActionExtension(task: Task) {
     extension: (task.extension ?? []).filter(
       (ext) =>
         !TaskActionExtension.includes(
-          ext.url as typeof TaskActionExtension[number]
+          ext.url as (typeof TaskActionExtension)[number]
         )
     )
   }

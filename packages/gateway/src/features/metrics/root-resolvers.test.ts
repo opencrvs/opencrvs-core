@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers as rootResolvers } from '@gateway/features/metrics/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/metrics/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
-const resolvers = rootResolvers as any
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
+
 const fetch = fetchAny as any
 beforeEach(() => {
   fetch.resetMocks()
 })
-
 describe('get total metrics', () => {
   it('returns estimated data for event', async () => {
     fetch.mockResponseOnce(

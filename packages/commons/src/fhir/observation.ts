@@ -10,20 +10,23 @@
  */
 import { Bundle, Resource, Saved, getEncounterFromRecord } from '.'
 
-const BODY_WEIGHT_CODE = '3141-9'
-const BIRTH_TYPE_CODE = '57722-1'
-const BIRTH_ATTENDANT_CODE = '73764-3'
-const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
-const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
-const LAST_LIVE_BIRTH_CODE = '68499-3'
-const DEATH_DESCRIPTION_CODE = 'lay-reported-or-verbal-autopsy-description'
-const CAUSE_OF_DEATH_ESTABLISHED_CODE = 'cause-of-death-established'
-const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
-const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
-const CAUSE_OF_DEATH_CODE = 'ICD10'
-const MALE_DEPENDENTS_ON_DECEASED_CODE = 'num-male-dependents-on-deceased'
-const FEMALE_DEPENDENTS_ON_DECEASED_CODE = 'num-female-dependents-on-deceased'
-const MARRIAGE_TYPE_CODE = 'partnership'
+export const BODY_WEIGHT_CODE = '3141-9'
+export const BIRTH_TYPE_CODE = '57722-1'
+export const BIRTH_ATTENDANT_CODE = '73764-3'
+export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
+export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
+export const LAST_LIVE_BIRTH_CODE = '68499-3'
+export const DEATH_DESCRIPTION_CODE =
+  'lay-reported-or-verbal-autopsy-description'
+export const CAUSE_OF_DEATH_ESTABLISHED_CODE = 'cause-of-death-established'
+export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
+export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
+export const CAUSE_OF_DEATH_CODE = 'ICD10'
+export const MALE_DEPENDENTS_ON_DECEASED_CODE =
+  'num-male-dependents-on-deceased'
+export const FEMALE_DEPENDENTS_ON_DECEASED_CODE =
+  'num-female-dependents-on-deceased'
+export const MARRIAGE_TYPE_CODE = 'partnership'
 
 type ObservationCode =
   | typeof BODY_WEIGHT_CODE

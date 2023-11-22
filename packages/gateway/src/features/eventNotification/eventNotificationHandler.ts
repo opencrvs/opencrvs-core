@@ -11,11 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
-import {
-  fetchFHIR,
-  fetchFromHearth,
-  findExtension
-} from '@gateway/features/fhir/utils'
+import { fetchFHIR, fetchFromHearth } from '@gateway/features/fhir/service'
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
@@ -27,7 +23,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Patient,
   Resource,
-  Task
+  Task,
+  findExtension
 } from '@opencrvs/commons/types'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 

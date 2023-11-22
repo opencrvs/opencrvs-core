@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+
+import { Bundle } from '..'
+import { IsNominal } from '../../nominal'
+import { EVENT_TYPE } from '../../record'
 import {
-  GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
-} from '@gateway/graphql/schema'
-import { IAuthHeader } from '@opencrvs/commons'
-import { Bundle } from '@opencrvs/commons/types'
+  BirthRegistration,
+  DeathRegistration,
+  MarriageRegistration
+} from './input'
 
 export type Context<A extends string | number | symbol = never> = {
-  authHeader: IAuthHeader
   event: EVENT_TYPE
   _index: { [Key in A]: number }
 }
@@ -31,11 +31,11 @@ export type IFieldBuilderFunction<
   context: Context<Key>
 ) => Promise<Bundle | void | boolean> | Bundle | void | boolean
 
-type AllInputs = GQLBirthRegistrationInput &
-  GQLDeathRegistrationInput &
-  GQLMarriageRegistrationInput
+type AllInputs = BirthRegistration & DeathRegistration & MarriageRegistration
 
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
+
+type IsDate<T> = T extends Date ? true : false
 
 export type IFieldBuilders<
   RootKey extends string | number | symbol = '',
@@ -51,6 +51,13 @@ export type IFieldBuilders<
         ? IFieldBuilders<RootKey | Key, NonNullable<Item>>
         : // Otherwise expect a builder function
           IFieldBuilderFunction<RootKey | Key, Item>
+      : // Check for nominal Date
+      IsDate<NonNullable<Root[Key]>> extends true
+      ? IFieldBuilderFunction<RootKey | Key, Root[Key]>
+      : // Check for nominal type
+      IsNominal<NonNullable<Root[Key]>> extends true
+      ? // Otherwise expect a builder function
+        IFieldBuilderFunction<RootKey | Key, Root[Key]>
       : // If it's not an array, but a record instead
       NonNullable<Root[Key]> extends Record<any, any>
       ? // Keep on recursing
@@ -72,7 +79,7 @@ function isBuilderFunction(
   return typeof x === 'function'
 }
 
-async function transformField(
+function transformField(
   sourceVal: any,
   targetObj: any,
   fieldBuilderForVal: IFieldBuilderFunction<any, any> | IFieldBuilders,
@@ -81,7 +88,7 @@ async function transformField(
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      const result = await transformObj(
+      const result = transformObj(
         sourceVal,
         targetObj,
         fieldBuilderForVal,
@@ -104,7 +111,7 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    const result = await fieldBuilderForVal(targetObj, sourceVal, context)
+    const result = fieldBuilderForVal(targetObj, sourceVal, context)
     if (result) {
       targetObj = result
     }
@@ -120,10 +127,7 @@ async function transformField(
   )
 }
 
-/**
- * Transforms the inputted GQL types (`sourceObj`) into a FHIR Bundle
- */
-export default async function transformObj(
+export default function transformObj(
   sourceObj: Record<string, unknown>,
   bundle: Bundle,
   fieldBuilders: IFieldBuilders,
@@ -143,7 +147,7 @@ export default async function transformObj(
         ).entries()) {
           context._index = { ...context._index, [currentPropName]: index }
 
-          const result = await transformField(
+          const result = transformField(
             arrayVal,
             targetObj,
             fieldBuilders[currentPropName as keyof typeof fieldBuilders] as any,
@@ -158,7 +162,7 @@ export default async function transformObj(
         continue
       }
 
-      const result = await transformField(
+      const result = transformField(
         sourceObj[currentPropName],
         targetObj,
         fieldBuilders[currentPropName as keyof typeof fieldBuilders] as any,

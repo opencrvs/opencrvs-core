@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './fhir'
+export * from './fhir/transformers/input'
 export * from './record'
 export * from './test-resources'
 export * from './nominal'

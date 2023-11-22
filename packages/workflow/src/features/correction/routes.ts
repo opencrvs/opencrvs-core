@@ -10,20 +10,28 @@
  */
 import { badRequest, conflict } from '@hapi/boom'
 import {
+  BirthRegistration,
   Bundle,
   CertifiedRecord,
   CorrectionRequestedRecord,
+  DeathRegistration,
   IssuedRecord,
+  MarriageRegistration,
   OpenCRVSPractitionerName,
   RegisteredRecord,
+  changeState,
   getPractitioner,
-  isTask,
-  withOnlyLatestTask,
   getPractitionerContactDetails,
+  getTrackingId,
   isCorrectionRequestedTask,
-  getTrackingId
+  isTask,
+  updateFHIRBundle,
+  withOnlyLatestTask
 } from '@opencrvs/commons/types'
-import { uploadBase64ToMinio } from '@workflow/documents'
+import {
+  uploadBase64AttachmentsToDocumentsStore,
+  uploadBase64ToMinio
+} from '@workflow/documents'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import {
   ApproveRequestInput,
@@ -42,12 +50,13 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
+import { Request } from '@hapi/hapi'
+import { getAuthHeader } from '@opencrvs/commons'
+import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
-import { getAuthHeader } from '@opencrvs/commons'
-import { Request } from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import { getEventType } from '@workflow/features/registration/utils'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -188,9 +197,14 @@ export const routes = [
     allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
     action: 'MAKE_CORRECTION',
     handler: async (request, record): Promise<RegisteredRecord> => {
+      const recordInput = request.payload as
+        | BirthRegistration
+        | DeathRegistration
+        | MarriageRegistration
+
       const correctionDetails = validateRequest(
         CorrectionRequestInput,
-        request.payload
+        recordInput.registration?.correction
       )
       const token = getToken(request)
 
@@ -201,22 +215,19 @@ export const routes = [
       }
       const practitioner = await getLoggedInPractitionerResource(token)
 
-      const paymentAttachmentUrl =
-        correctionDetails.payment?.attachmentData &&
-        (await uploadBase64ToMinio(
-          correctionDetails.payment.attachmentData,
+      const recordInputWithUploadedAttachments =
+        await uploadBase64AttachmentsToDocumentsStore(
+          recordInput,
           getAuthHeader(request)
-        ))
+        )
 
-      const proofOfLegalCorrectionAttachments = await Promise.all(
-        correctionDetails.attachments.map(async (attachment) => ({
-          type: attachment.type,
-          url: await uploadBase64ToMinio(
-            attachment.data,
-            getAuthHeader(request)
-          )
-        }))
-      )
+      const paymentAttachmentUrl =
+        recordInputWithUploadedAttachments?.registration?.correction?.payment
+          ?.attachmentData
+
+      const proofOfLegalCorrectionAttachments =
+        recordInputWithUploadedAttachments?.registration?.correction
+          ?.attachments ?? []
 
       const recordInCorrectedState = await toCorrected(
         record,
@@ -226,17 +237,20 @@ export const routes = [
         paymentAttachmentUrl
       )
 
-      await sendBundleToHearth(recordInCorrectedState)
-      await createNewAuditEvent(recordInCorrectedState, token)
-      await indexBundle(recordInCorrectedState, token)
+      const { correction, ...registration } =
+        recordInputWithUploadedAttachments.registration!
 
-      const updatedRecord = await getRecordById(
-        request.params.recordId,
-        request.headers.authorization,
-        ['REGISTERED']
+      const recordWithUpdatedValues = updateFHIRBundle(
+        recordInCorrectedState,
+        { ...recordInputWithUploadedAttachments, registration },
+        getEventType(record)
       )
 
-      return updatedRecord
+      await indexBundle(recordWithUpdatedValues, token)
+      await sendBundleToHearth(recordWithUpdatedValues)
+      await createNewAuditEvent(recordWithUpdatedValues, token)
+
+      return changeState(recordWithUpdatedValues, 'REGISTERED')
     }
   }),
   createRoute({
@@ -245,10 +259,22 @@ export const routes = [
     allowedStartStates: ['CORRECTION_REQUESTED'],
     action: 'APPROVE_CORRECTION',
     handler: async (request, record): Promise<RegisteredRecord> => {
+      const recordInput = request.payload as
+        | BirthRegistration
+        | DeathRegistration
+        | MarriageRegistration
+
       const correctionDetails = validateRequest(
         ApproveRequestInput,
-        request.payload
+        recordInput.registration?.correction
       )
+
+      const recordInputWithUploadedAttachments =
+        await uploadBase64AttachmentsToDocumentsStore(
+          recordInput,
+          getAuthHeader(request)
+        )
+
       const token = getToken(request)
       const correctionRequest = findActiveCorrectionRequest(record)
 
@@ -265,15 +291,23 @@ export const routes = [
         approvingPractitioner,
         correctionDetails
       )
+      const { correction, ...registration } =
+        recordInputWithUploadedAttachments.registration!
+
+      const recordWithUpdatedValues = updateFHIRBundle(
+        recordInCorrectedState,
+        { ...recordInputWithUploadedAttachments, registration },
+        getEventType(record)
+      )
 
       /*
        * Saves the previous task in the "approved" state and the new task (record put to Registered state)
        */
 
-      await sendBundleToHearth(recordInCorrectedState)
+      await sendBundleToHearth(recordWithUpdatedValues)
 
       const recordWithOnlyTheNewTask = withOnlyLatestTask(
-        recordInCorrectedState
+        recordWithUpdatedValues
       )
 
       /*
@@ -307,18 +341,7 @@ export const routes = [
         }
       )
 
-      /*
-       * Return the updated bundle to gateway for further processing using the user inputted changes.
-       * The reason we're just not returning recordWithOnlyTheNewTask is that it might contain new FHIR resources with temporary IDs
-       */
-
-      const updatedRecord = await getRecordById(
-        request.params.recordId,
-        request.headers.authorization,
-        ['REGISTERED']
-      )
-
-      return updatedRecord
+      return recordWithOnlyTheNewTask
     }
   })
 ]
