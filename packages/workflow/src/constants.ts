@@ -20,8 +20,8 @@ export const NOTIFICATION_SERVICE_URL =
 
 export const MOSIP_TOKEN_SEEDER_URL =
   process.env.MOSIP_TOKEN_SEEDER_URL || 'http://localhost:8085'
-export const RESOURCE_SERVICE_URL =
-  process.env.RESOURCE_SERVICE_URL || `http://localhost:3040/`
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || `http://localhost:3040/`
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'

@@ -128,8 +128,9 @@ describe('Verify getCRVSOfficeName', () => {
 })
 
 describe('Verify getTrackingId', () => {
-  it('Returned tracking id properly for birth', () => {
-    const trackingid = getTrackingId(setTrackingId(testFhirBundle))
+  it('Returned tracking id properly for birth', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(await setTrackingId(testFhirBundle, '123'))
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
       expect(trackingid.length).toBe(7)
@@ -138,8 +139,11 @@ describe('Verify getTrackingId', () => {
     }
   })
 
-  it('Returned tracking id properly for death', () => {
-    const trackingid = getTrackingId(setTrackingId(testDeathFhirBundle))
+  it('Returned tracking id properly for death', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(
+      await setTrackingId(testDeathFhirBundle, '123')
+    )
     if (trackingid) {
       expect(trackingid).toMatch(/^D/)
       expect(trackingid.length).toBe(7)
@@ -148,8 +152,11 @@ describe('Verify getTrackingId', () => {
     }
   })
 
-  it('Returned tracking id properly for marriage', () => {
-    const trackingid = getTrackingId(setTrackingId(testMarriageFhirBundle))
+  it('Returned tracking id properly for marriage', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(
+      await setTrackingId(testMarriageFhirBundle, '123')
+    )
     if (trackingid) {
       expect(trackingid).toMatch(/^M/)
       expect(trackingid.length).toBe(7)

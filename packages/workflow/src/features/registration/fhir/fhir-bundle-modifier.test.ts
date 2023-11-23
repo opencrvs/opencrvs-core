@@ -46,8 +46,9 @@ const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
   describe('setTrackingId', () => {
-    it('Successfully modified the provided fhirBundle with birth trackingid', () => {
-      const fhirBundle = setTrackingId(testFhirBundle)
+    it('Successfully modified the provided fhirBundle with birth trackingid', async () => {
+      fetch.mockResponses(['B123456'])
+      const fhirBundle = await setTrackingId(testFhirBundle, '1234')
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -75,8 +76,9 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     })
 
-    it('Successfully modified the provided fhirBundle with death trackingid', () => {
-      const fhirBundle = setTrackingId(testDeathFhirBundle)
+    it('Successfully modified the provided fhirBundle with death trackingid', async () => {
+      fetch.mockResponses(['D123456'])
+      const fhirBundle = await setTrackingId(testDeathFhirBundle, '1234')
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -103,8 +105,9 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     })
 
-    it('Successfully modified the provided fhirBundle with marriage trackingid', () => {
-      const fhirBundle = setTrackingId(testMarriageFhirBundle)
+    it('Successfully modified the provided fhirBundle with marriage trackingid', async () => {
+      fetch.mockResponses(['M123456'])
+      const fhirBundle = await setTrackingId(testMarriageFhirBundle, '1234')
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -131,31 +134,35 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     })
 
-    it('Throws error if invalid fhir bundle is provided', () => {
+    it('Throws error if invalid fhir bundle is provided', async () => {
       const invalidData = { ...testFhirBundle, entry: [] }
-      expect(() => setTrackingId(invalidData)).toThrowError(
+      await expect(setTrackingId(invalidData, '1234')).rejects.toThrowError(
         'Invalid FHIR bundle found'
       )
     })
 
-    it('Will push the composite resource identifier if it is missing on fhirDoc', () => {
-      const fhirBundle = setTrackingId({
-        ...testFhirBundle,
-        entry: [
-          {
-            resource: {
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'BIRTH'
-                  }
-                ]
+    it('Will push the composite resource identifier if it is missing on fhirDoc', async () => {
+      fetch.mockResponses(['B123456'])
+      const fhirBundle = await setTrackingId(
+        {
+          ...testFhirBundle,
+          entry: [
+            {
+              resource: {
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: 'BIRTH'
+                    }
+                  ]
+                }
               }
             }
-          }
-        ]
-      })
+          ]
+        },
+        '1234'
+      )
 
       if (
         fhirBundle &&

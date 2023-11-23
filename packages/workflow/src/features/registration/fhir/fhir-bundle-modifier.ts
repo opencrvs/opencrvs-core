@@ -45,10 +45,7 @@ import {
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import * as Hapi from '@hapi/hapi'
-import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   getToken,
   getTokenPayload,
@@ -76,7 +73,7 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = setTrackingId(fhirBundle)
+  fhirBundle = await setTrackingId(fhirBundle, token)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   const eventType = getEventType(fhirBundle)
@@ -165,7 +162,7 @@ export async function invokeRegistrationValidation(
   token: string
 ): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
+    const res = await fetch(`${COUNTRY_CONFIG_URL}event-registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -388,9 +385,16 @@ export async function touchBundle(
   return bundle
 }
 
-export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
+export async function setTrackingId(
+  fhirBundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
   const eventType = getEventType(fhirBundle)
-  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingId = await generateTrackingIdForEvents(
+    eventType,
+    fhirBundle,
+    token
+  )
   const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
 
   if (
