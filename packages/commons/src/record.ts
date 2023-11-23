@@ -78,22 +78,6 @@ export type WaitingForValidationRecord = Nominal<
   'WaitingForValidation'
 >
 
-export type RejectedRecord = Nominal<
-  SavedBundle<
-    | Composition
-    | DocumentReference
-    | Encounter
-    | Patient
-    | RelatedPerson
-    | PaymentReconciliation
-    | Task
-    | Practitioner
-    | PractitionerRole
-    | Location
-    | Observation
-  >,
-  'Rejected'
->
 export type ValidatedRecord = Nominal<SavedBundle, 'Validated'>
 export type RegisteredRecord = Nominal<
   SavedBundle<
@@ -118,6 +102,7 @@ export type CorrectionRequestedRecord = Nominal<
 export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type RejectedRecord = Nominal<SavedBundle, 'Rejected'>
 
 export type ValidRecord =
   | InProgressRecord
@@ -127,6 +112,8 @@ export type ValidRecord =
   | CorrectionRequestedRecord
   | CertifiedRecord
   | IssuedRecord
+  | RejectedRecord
+  | WaitingForValidationRecord
 
 export type RegistrationStatus =
   | 'ARCHIVED'

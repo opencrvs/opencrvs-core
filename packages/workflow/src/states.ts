@@ -19,7 +19,8 @@ import {
   IssuedRecord,
   InProgressRecord,
   ReadyForReviewRecord,
-  WaitingForValidationRecord
+  WaitingForValidationRecord,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -83,7 +84,7 @@ export type StateTree =
   | Transition<
       ReadyForReviewRecord | ValidatedRecord,
       WaitForExternalValidation,
-      WaitingForValidationRecord
+      WaitingForValidationRecord | RejectedRecord
     >
 
 /*
