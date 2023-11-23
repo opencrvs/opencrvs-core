@@ -11,6 +11,7 @@ RUN rm -rf /app/packages/*
 # Copy packages
 COPY packages/client /app/packages/client
 COPY packages/components /app/packages/components
+COPY packages/commons /app/packages/commons
 
 RUN apk update && apk add make python3 g++
 
