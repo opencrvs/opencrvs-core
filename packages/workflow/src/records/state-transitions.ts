@@ -351,12 +351,10 @@ export async function toRegistered(
     event.toLowerCase() as Lowercase<typeof event>
   }-registration-number` as const
 
-  if (registeredTask) {
-    registeredTask.identifier.push({
-      system,
-      value: registrationNumber as RegistrationNumber
-    })
-  }
+  registeredTask.identifier.push({
+    system,
+    value: registrationNumber as RegistrationNumber
+  })
 
   if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
     // For birth event patients[0] is child and it should
