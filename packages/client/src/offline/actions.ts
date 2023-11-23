@@ -25,7 +25,8 @@ import {
   LoadFormsResponse,
   LoadValidatorsResponse,
   LoadConditionalsResponse,
-  LoadHandlebarHelpersResponse
+  LoadHandlebarHelpersResponse,
+  CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -125,6 +126,21 @@ type CertificatesLoadFailedAction = {
   type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
+
+export const CERTIFICATE_CONFIGURATION_LOADED =
+  'OFFLINE/CERTIFICATE_CONFIGURATION_LOADED'
+type CertificateConfigurationLoadedAction = {
+  type: typeof CERTIFICATE_CONFIGURATION_LOADED
+  payload: CertificateConfiguration
+}
+
+export const CERTIFICATE_CONFIGURATION_LOAD_FAILED =
+  'OFFLINE/CERTIFICATE_CONFIGURATION_LOAD_FAILED'
+type CertificateConfigurationLoadFailedAction = {
+  type: typeof CERTIFICATE_CONFIGURATION_LOAD_FAILED
+  payload: Error
+}
+
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
@@ -275,6 +291,20 @@ export const certificatesLoaded = (
   payload
 })
 
+export const certificateConfigurationLoaded = (
+  payload: CertificateConfiguration
+): CertificateConfigurationLoadedAction => ({
+  type: CERTIFICATE_CONFIGURATION_LOADED,
+  payload
+})
+
+export const certificateConfigurationLoadFailed = (
+  payload: CertificateConfigurationLoadFailedAction['payload']
+): CertificateConfigurationLoadFailedAction => ({
+  type: CERTIFICATE_CONFIGURATION_LOAD_FAILED,
+  payload
+})
+
 export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   type: APPLICATION_CONFIG_FAILED,
   payload: error
@@ -368,6 +398,8 @@ export type Action =
   | CertificateLoadFailedAction
   | CertificatesLoadedAction
   | CertificatesLoadFailedAction
+  | CertificateConfigurationLoadedAction
+  | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
   | UpdateOfflineCertificateAction
   | IFilterLocationsAction
