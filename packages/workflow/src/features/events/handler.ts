@@ -35,8 +35,7 @@ import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
   markEventAsIssuedHandler,
-  markEventAsValidatedHandler,
-  markEventAsWaitingValidationHandler
+  markEventAsValidatedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -213,7 +212,6 @@ export async function fhirWorkflowEventHandler(
   }
 
   let response
-  let validationResponse
 
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
@@ -238,22 +236,6 @@ export async function fhirWorkflowEventHandler(
       const { resBundle } = await createRegistrationHandler(request, h, event)
       response = resBundle
       await triggerEvent(event, request.payload, request.headers)
-      break
-    }
-    case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION: {
-      const { resBundle, payloadForInvokingValidation } =
-        await markEventAsWaitingValidationHandler(request, h, event)
-      response = resBundle
-      validationResponse = await invokeRegistrationValidation(
-        payloadForInvokingValidation,
-        request.headers,
-        getToken(request)
-      )
-      if (!validationResponse.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
       break
     }
     case Events.BIRTH_MAKE_CORRECTION:
@@ -307,19 +289,6 @@ export async function fhirWorkflowEventHandler(
     case Events.MARRIAGE_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
-      break
-    case Events.BIRTH_MARK_REG:
-    case Events.DEATH_MARK_REG:
-    case Events.MARRIAGE_MARK_REG:
-      response = await markEventAsWaitingValidationHandler(request, h, event)
-      validationResponse = await invokeRegistrationValidation(
-        response.payloadForInvokingValidation,
-        request.headers,
-        getToken(request)
-      )
-      if (!validationResponse.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
       break
 
     case Events.BIRTH_MARK_CERT:
