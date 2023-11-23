@@ -13,5 +13,8 @@ export * from './fhir/transformers/input'
 export * from './record'
 export * from './test-resources'
 export * from './nominal'
+export * from './fixtures/birth-bundle'
+export * from './fixtures/death-bundle'
+export * from './fixtures/marriage-bundle'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '..'
 import {
   Composition,
   DocumentReference,
@@ -26,7 +26,7 @@ import {
   Task,
   TrackingID,
   URLReference
-} from '@opencrvs/commons/types'
+} from 'src/types'
 
 export const DEATH_BUNDLE: SavedBundle<
   Saved<
@@ -191,7 +191,7 @@ export const DEATH_BUNDLE: SavedBundle<
         subject: {},
         date: '2023-08-16T06:55:19.000Z',
         author: [],
-        id: 'a959c616-934a-4139-a123-37bb4a1be39e' as UUID as UUID,
+        id: 'a959c616-934a-4139-a123-37bb4a1be39e' as UUID,
         extension: [
           {
             url: 'http://opencrvs.org/specs/duplicate',
@@ -210,7 +210,7 @@ export const DEATH_BUNDLE: SavedBundle<
       resource: {
         resourceType: 'Encounter',
         status: 'finished',
-        id: 'e668f0dc-aacd-45be-bd5f-2a81c3161593' as UUID as UUID,
+        id: 'e668f0dc-aacd-45be-bd5f-2a81c3161593' as UUID,
         location: [
           {
             location: {

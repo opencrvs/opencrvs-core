@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '..'
 import {
   Bundle,
   Composition,
@@ -25,7 +25,7 @@ import {
   Task,
   TrackingID,
   URLReference
-} from '@opencrvs/commons/types'
+} from 'src/types'
 
 export const MARRIAGE_BUNDLE: Saved<
   Bundle<

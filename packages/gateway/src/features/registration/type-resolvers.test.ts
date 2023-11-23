@@ -20,9 +20,9 @@ import { generateQueryForType } from '@gateway/graphql/query-generator'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { BIRTH_BUNDLE } from './fixtures/birth-bundle'
-import { DEATH_BUNDLE } from './fixtures/death-bundle'
-import { MARRIAGE_BUNDLE } from './fixtures/marriage-bundle'
+import { BIRTH_BUNDLE } from '@opencrvs/commons/types'
+import { DEATH_BUNDLE } from '@opencrvs/commons/types'
+import { MARRIAGE_BUNDLE } from '@opencrvs/commons/types'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },

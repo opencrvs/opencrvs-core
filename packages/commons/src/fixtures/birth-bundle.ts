@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '..'
 import {
   Composition,
   Encounter,
@@ -25,7 +25,7 @@ import {
   Task,
   TrackingID,
   URLReference
-} from '@opencrvs/commons/types'
+} from '../types'
 
 export const BIRTH_BUNDLE: SavedBundle<
   Saved<
@@ -612,7 +612,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           coding: [
             {
               system: 'http://opencrvs.org/specs/reg-status',
-              code: 'REGISTERED'
+              code: 'WAITING_VALIDATION'
             }
           ]
         },

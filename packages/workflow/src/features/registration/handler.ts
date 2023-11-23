@@ -266,12 +266,16 @@ export async function markEventAsRegisteredCallbackHandler(
       ['WAITING_VALIDATION']
     )
     if (!savedRecord) {
-      throw new Error('Could not find record in elastic!')
+      throw new Error('Could not find record in elastic search!')
     }
+    const practitioner = await getLoggedInPractitionerResource(
+      getToken(request)
+    )
+
     const registeredBundle = await toRegistered(
       request,
       savedRecord,
-      await getLoggedInPractitionerResource(getToken(request)),
+      practitioner,
       registrationNumber,
       childIdentifiers
     )
