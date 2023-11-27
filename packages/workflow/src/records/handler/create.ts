@@ -33,13 +33,9 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { z } from 'zod'
-// import { createNewAuditEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
-// import {
-//   hasBirthDuplicates,
-//   hasDeathDuplicates
-// } from '@workflow/utils/duplicateChecker'
+import { hasDuplicates } from '@workflow/utils/duplicateChecker'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
   generateTrackingIdForEvents,
@@ -157,13 +153,16 @@ export default async function createRecordHandler(
       token
     )
 
-    // TODO: CHECK FOR DUPLICATE
     // TODO: SEND NOTIFICATION
 
     return {
       compositionId,
       trackingId,
-      isPotentiallyDuplicate: false
+      isPotentiallyDuplicate: hasDuplicates(
+        recordDetails,
+        { Authorization: token },
+        event
+      )
     }
   } catch (error) {
     logger.error(`Workflow/createRecordHandler: error: ${error}`)

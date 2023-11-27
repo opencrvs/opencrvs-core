@@ -12,8 +12,9 @@ import nodeFetch from 'node-fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
   BirthRegistration,
-  DeathRegistration
-} from '@workflow/../../commons/build/dist/types'
+  DeathRegistration,
+  EVENT_TYPE
+} from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 
 type DeathDuplicateSearchBody = {
@@ -80,7 +81,7 @@ const findBirthDuplicates = async (
   }
 }
 
-export async function hasBirthDuplicates(
+async function hasBirthDuplicates(
   authHeader: IAuthHeader,
   birthRegDetails: BirthRegistration
 ) {
@@ -101,7 +102,7 @@ export async function hasBirthDuplicates(
   return !res || res.length > 0
 }
 
-export async function hasDeathDuplicates(
+async function hasDeathDuplicates(
   authHeader: IAuthHeader,
   deathRegDetails: DeathRegistration
 ) {
@@ -118,4 +119,24 @@ export async function hasDeathDuplicates(
   })
 
   return !res || res.length > 0
+}
+
+export async function hasDuplicates(
+  registrationDetails: BirthRegistration | DeathRegistration,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  if (event === EVENT_TYPE.BIRTH) {
+    return hasBirthDuplicates(
+      authHeader,
+      registrationDetails as BirthRegistration
+    )
+  } else if (event === EVENT_TYPE.DEATH) {
+    return hasDeathDuplicates(
+      authHeader,
+      registrationDetails as DeathRegistration
+    )
+  }
+  // NOT IMPLEMENTED FOR MARRIAGE
+  return false
 }
