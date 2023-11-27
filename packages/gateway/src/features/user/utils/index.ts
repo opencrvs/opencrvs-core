@@ -17,7 +17,7 @@ import {
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { UserScope } from '@opencrvs/commons/user-management'
+import { UserScope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
+import type * as Hapi from '@hapi/hapi'
 import { uniqueId } from 'lodash'
 
 export interface IAuthHeader {

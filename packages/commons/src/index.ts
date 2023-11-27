@@ -10,5 +10,4 @@
  */
 export * from './token-verifier'
 export * from './uuid'
-export * from './auth'
 export * from './documents'

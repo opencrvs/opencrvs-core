@@ -51,7 +51,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
 import { Request } from '@hapi/hapi'
-import { getAuthHeader } from '@opencrvs/commons'
+import { getAuthHeader } from '@opencrvs/commons/http'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'

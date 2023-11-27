@@ -147,8 +147,7 @@
     ],
     "moduleNameMapper": {
       "@gateway/(.*)": "<rootDir>/src/$1",
-      "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types",
-      "@opencrvs/commons/monitoring": "@opencrvs/commons/build/dist/monitoring"
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "coverageReporters": [
       "json",

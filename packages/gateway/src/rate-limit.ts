@@ -16,7 +16,7 @@ import { getUserId, hasScope } from '@gateway/features/user/utils'
 import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
-import { userScopes } from '@opencrvs/commons/user-management'
+import { userScopes } from '@opencrvs/commons/authentication'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)

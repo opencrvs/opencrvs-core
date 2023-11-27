@@ -10,7 +10,10 @@
  */
 import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { userScopes } from '@opencrvs/commons/user-management'
+import {
+  UserRole as CommonUserRole,
+  userScopes
+} from '@opencrvs/commons/authentication'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -130,7 +133,7 @@ export interface IUser {
   passwordHash: string
   oldPasswordHash?: string
   salt: string
-  systemRole: string
+  systemRole: CommonUserRole
   role: Types.ObjectId
   practitionerId: string
   primaryOfficeId: string
