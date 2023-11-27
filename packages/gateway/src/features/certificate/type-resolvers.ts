@@ -27,7 +27,14 @@ export const certificateTypeResolvers: GQLResolver = {
     id(certificate: ICertificateSVG) {
       return certificate._id
     },
-    svgCode: (certificate: ICertificateSVG, _, { headers: authHeader }) => {
+    svgCode: (
+      certificate: ICertificateSVG,
+      _,
+      { headers: authHeader, presignDocumentUrls }
+    ) => {
+      if (!presignDocumentUrls) {
+        return certificate.svgCode
+      }
       return getPresignedUrlFromUri(certificate.svgCode, authHeader)
     }
   }

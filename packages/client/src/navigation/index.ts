@@ -689,7 +689,7 @@ export function goToOrganisationView(userDetails: UserDetails) {
 }
 
 export function goToPrintRecordView(declarationId: string) {
-  return push(formatUrl(PRINT_RECORD, { declarationId }))
+  window.open(`/print-record/${declarationId}`, '_blank')
 }
 export type INavigationState = undefined
 

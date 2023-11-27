@@ -13,15 +13,15 @@ import { ApolloServer } from 'apollo-server-hapi'
 
 jest.useFakeTimers('modern').setSystemTime(new Date('2023-10-11T07:24:55.108Z'))
 
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { getApolloConfig } from '@gateway/graphql/config'
+import { Context } from '@gateway/graphql/context'
 import { generateQueryForType } from '@gateway/graphql/query-generator'
+import { getAuthHeader } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { BIRTH_BUNDLE } from './fixtures/birth-bundle'
-import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { DEATH_BUNDLE } from './fixtures/death-bundle'
-import { Context } from '@gateway/graphql/context'
-import { getAuthHeader } from '@opencrvs/commons'
 import { MARRIAGE_BUNDLE } from './fixtures/marriage-bundle'
 
 const MOCK_TOKEN = jwt.sign(
@@ -222,8 +222,8 @@ jest.mock('@gateway/features/registration/utils', () => {
   }
 })
 
-jest.mock('@gateway/features/fhir/utils', () => {
-  const originalModule = jest.requireActual('@gateway/features/fhir/utils')
+jest.mock('@gateway/features/fhir/service', () => {
+  const originalModule = jest.requireActual('@gateway/features/fhir/service')
   return {
     ...originalModule,
     fetchFHIR: (url: string, headers: Headers, method: 'PUT' | 'GET') => {
@@ -243,8 +243,8 @@ jest.mock('@gateway/features/user/utils', () => {
     getUser: () => Promise.resolve(MOCK_USER)
   }
 })
-jest.mock('@gateway/search', () => {
-  const originalModule = jest.requireActual('@gateway/search')
+jest.mock('@gateway/records', () => {
+  const originalModule = jest.requireActual('@gateway/records')
   return {
     ...originalModule,
     getRecordById: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
@@ -308,7 +308,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/search').getRecordById.mockImplementation(() =>
+  require('@gateway/records').getRecordById.mockImplementation(() =>
     Promise.resolve(DEATH_BUNDLE)
   )
   const testServer = new ApolloServer({
@@ -317,7 +317,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
       return {
         request,
         headers: getAuthHeader(request),
-
+        presignDocumentUrls: true,
         record: DEATH_BUNDLE as any
       }
     }
@@ -354,7 +354,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a M
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/search').getRecordById.mockImplementation(() =>
+  require('@gateway/records').getRecordById.mockImplementation(() =>
     Promise.resolve(MARRIAGE_BUNDLE)
   )
   const testServer = new ApolloServer({
@@ -363,6 +363,7 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a M
       return {
         request,
         headers: getAuthHeader(request),
+        presignDocumentUrls: true,
         record: MARRIAGE_BUNDLE
       }
     }

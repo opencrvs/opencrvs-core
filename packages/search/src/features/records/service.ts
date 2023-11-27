@@ -690,6 +690,12 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     // Get RelatedPersons from DocumentReferences -> extension -> http://opencrvs.org/specs/extension/collector
     {
       $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    // Get RelatedPersons from DocumentReferences -> extension -> http://opencrvs.org/specs/extension/collector
+    {
+      $addFields: {
         documentReferenceIds: flattenArray({
           $map: {
             input: filterByType(['DocumentReference']),
@@ -710,6 +716,57 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
             }
           }
         })
+      }
+    },
+    ...joinCollections('documentReferenceIds', [
+      'RelatedPerson',
+      'PaymentReconciliation'
+    ]),
+    {
+      $addFields: {
+        /*
+         * Creates a list "relatedPerson" of all patient references inside RelatedPerson
+         */
+        relatedPersonPatientIds: {
+          $map: {
+            input: filterByType(['RelatedPerson']),
+            as: 'relatedPerson',
+            in: {
+              $arrayElemAt: [
+                { $split: ['$$relatedPerson.patient.reference', '/'] },
+                1
+              ]
+            }
+          }
+        }
+      }
+    },
+    // Get Patients & RelatedPatients RelatedPersonIds
+    ...joinCollections('relatedPersonPatientIds', ['RelatedPerson', 'Patient']),
+
+    // Get PractitionerRoles for all found practitioners
+    {
+      $addFields: {
+        practitionerIds: {
+          $map: {
+            input: filterByType(['DocumentReference']),
+            as: 'documentReference',
+            in: {
+              $map: {
+                input: '$$documentReference.extension',
+                as: 'extension',
+                in: {
+                  $arrayElemAt: [
+                    {
+                      $split: ['$$extension.valueReference.reference', '/']
+                    },
+                    1
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     ...joinCollections('documentReferenceIds', [
@@ -800,6 +857,57 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
           {
             $addFields: {
               bundle: { $concatArrays: ['$bundle', '$practitionerRoleHistory'] }
+            }
+          }
+        ]
+      : []),
+    ...(includeHistoryResources
+      ? [
+          // Get CompositionHistory for the composition
+          {
+            $addFields: {
+              compositionIds: {
+                $map: {
+                  input: filterByType(['Composition']),
+                  as: 'composition',
+                  in: '$$composition.id'
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'Composition_history',
+              localField: 'compositionIds',
+              foreignField: 'id',
+              as: 'compositionHistory'
+            }
+          },
+          {
+            $set: {
+              compositionHistory: {
+                $map: {
+                  input: '$compositionHistory',
+                  as: 'composition',
+                  in: {
+                    $mergeObjects: [
+                      '$$composition',
+                      {
+                        /*
+                         * Custom resource type that forces history items
+                         * to be dealt with separately to avoid conflicts.
+                         */
+                        resourceType: 'CompositionHistory'
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              bundle: { $concatArrays: ['$bundle', '$compositionHistory'] }
             }
           }
         ]

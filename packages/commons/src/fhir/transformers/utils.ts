@@ -34,48 +34,15 @@ import {
   createRelatedPersonTemplate,
   createSupportingDocumentsSection,
   createTaskRefTemplate
-} from '@gateway/features/fhir/templates'
+} from './templates'
 
-import {
-  DOCUMENTS_URL,
-  FHIR_URL,
-  HEARTH_URL,
-  METRICS_URL,
-  SEARCH_URL
-} from '@gateway/constants'
-import {
-  ASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  EVENT_TYPE,
-  FHIR_OBSERVATION_CATEGORY_URL,
-  FLAGGED_AS_POTENTIAL_DUPLICATE,
-  MAKE_CORRECTION_EXTENSION_URL,
-  MARKED_AS_DUPLICATE,
-  MARKED_AS_NOT_DUPLICATE,
-  REINSTATED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
-import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-import {
-  GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput,
-  GQLRegAction,
-  GQLRegStatus
-} from '@gateway/graphql/schema'
-import { logger } from '@gateway/logger'
-import { IAuthHeader, getUUID } from '@opencrvs/commons'
+import { getUUID } from '../../uuid'
 import {
   Bundle,
   BundleEntry,
   CERTIFICATE_DOCS_CODE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
   CodeableConcept,
-  Coding,
-  Composition,
   CompositionSection,
   CompositionSectionCode,
   CompositionSectionEncounterReference,
@@ -86,7 +53,6 @@ import {
   Location,
   OPENCRVS_SPECIFICATION_URL,
   Observation,
-  PartialBy,
   Patient,
   PaymentReconciliation,
   Practitioner,
@@ -103,19 +69,15 @@ import {
   findExtension,
   getComposition,
   isObservation
-} from '@opencrvs/commons/types'
-import { URLSearchParams } from 'url'
+} from '..'
 
-import fetch from '@gateway/fetch'
-
-export interface ITimeLoggedResponse {
-  status?: string
-  timeSpentEditing: number
-}
-export interface IEventDurationResponse {
-  status: string
-  durationInSeconds: number
-}
+import { PartialBy } from '../../types'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  EVENT_TYPE,
+  FHIR_OBSERVATION_CATEGORY_URL,
+  MAKE_CORRECTION_EXTENSION_URL
+} from './constants'
 
 export function findCompositionSectionInBundle<T extends Bundle>(
   code: string,
@@ -195,6 +157,7 @@ export function selectOrCreateEncounterResource(
 
     unsavedComposition.section.push(encounterSection)
     const encounterEntry = createEncounter(ref)
+
     fhirBundle.entry.push(encounterEntry)
     return encounterEntry.resource
   }
@@ -387,7 +350,7 @@ export function selectOrCreateLocationRefResource(
     fhirBundle.entry.push(locationEntry)
     encounter.location = []
     encounter.location.push({
-      location: { reference: `urn:uuid:${locationRef}` as const }
+      location: { reference: `urn:uuid:${locationRef}` as URNReference }
     })
     return locationEntry.resource
   }
@@ -436,7 +399,7 @@ export function selectOrCreateEncounterPartitioner(
   ) {
     const ref = getUUID()
     encounterParticipant.individual = {
-      reference: `urn:uuid:${ref}`
+      reference: `urn:uuid:${ref}` as URNReference
     }
     practitioner = createPractitionerEntryTemplate(ref)
     fhirBundle.entry.push(practitioner)
@@ -508,7 +471,7 @@ export function selectOrCreateDocRefResource(
     if (!docSectionEntry) {
       const ref = getUUID()
       section.entry[context._index[indexKey]] = {
-        reference: `urn:uuid:${ref}` as const
+        reference: `urn:uuid:${ref}` as URNReference
       }
       docRef = createDocRefTemplate(ref)
       fhirBundle.entry.push(docRef)
@@ -521,7 +484,7 @@ export function selectOrCreateDocRefResource(
         docRef = createDocRefTemplate(ref)
         fhirBundle.entry.push(docRef)
         section.entry[context._index[indexKey]] = {
-          reference: `urn:uuid:${ref}` as const
+          reference: `urn:uuid:${ref}` as URNReference
         }
       }
     }
@@ -547,6 +510,7 @@ export function selectOrCreateCertificateDocRefResource(
         title: CERTIFICATE_DOCS_TITLE,
         indexKey: CERTIFICATE_CONTEXT_KEY
       } as const)
+
   const docRef = selectOrCreateDocRefResource(
     certificate.code,
     certificate.title,
@@ -876,6 +840,7 @@ export function selectOrCreateTaskRefResource(
     if (!taskResource.focus) {
       taskResource.focus = { reference: '' }
     }
+
     taskResource.focus.reference = fhirBundle.entry[0].fullUrl
     fhirBundle.entry.push(unsavedTaskEntry)
     return unsavedTaskEntry.resource
@@ -984,121 +949,12 @@ export function setArrayPropInResourceObject<
   resource[label][propName as keyof T[L]] = value as T[L][keyof T[L]]
 }
 
-export { findExtension } from '@opencrvs/commons/types'
-
 export function getDownloadedExtensionStatus(task: Task) {
   const extension =
     task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
   return extension?.valueString
 }
-export async function setCertificateCollector(
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader
-) {
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  const userId = tokenPayload.sub
-  const userDetails = await getUser({ userId }, authHeader)
-  const name = userDetails.name.map((nameItem) => ({
-    use: nameItem.use,
-    familyName: nameItem.family,
-    firstNames: nameItem.given.join(' ')
-  }))
-  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
 
-  details?.registration?.certificates?.forEach((certificate) => {
-    if (!certificate) return
-    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-      certificate.collector = {
-        name,
-        relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: role
-      }
-    }
-    return certificate
-  })
-
-  return details
-}
-export async function getCertificatesFromTask(
-  task: Task,
-  _: any,
-  authHeader: IAuthHeader
-) {
-  if (!task.focus) {
-    throw new Error(
-      'Task resource does not have a focus property necessary to lookup the composition'
-    )
-  }
-
-  const compositionBundle = await fetchFHIR<Saved<Bundle<Composition>>>(
-    `/${task.focus.reference}/_history`,
-    authHeader
-  )
-
-  if (!compositionBundle || !compositionBundle.entry) {
-    return null
-  }
-
-  return compositionBundle.entry.map(async (compositionEntry) => {
-    const certSection = findCompositionSection(
-      CERTIFICATE_DOCS_CODE,
-      compositionEntry.resource
-    )
-    if (!certSection || !certSection.entry || !(certSection.entry.length > 0)) {
-      return null
-    }
-    return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
-  })
-}
-export function getActionFromTask(task: Task) {
-  const extensions = task.extension || []
-
-  if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.DOWNLOADED
-  } else if (findExtension(ASSIGNED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.ASSIGNED
-  } else if (findExtension(UNASSIGNED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.UNASSIGNED
-  } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.VERIFIED
-  } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.REINSTATED
-  } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
-    return GQLRegAction.VIEWED
-  } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
-    return GQLRegAction.MARKED_AS_DUPLICATE
-  } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
-    return GQLRegAction.MARKED_AS_NOT_DUPLICATE
-  } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
-    return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
-  } else if (findExtension(MAKE_CORRECTION_EXTENSION_URL, extensions)) {
-    return GQLRegAction.CORRECTED
-  }
-  if (
-    task.businessStatus?.coding?.find(
-      (coding: Coding) => coding.code === 'CORRECTION_REQUESTED'
-    )
-  ) {
-    if (task.status === 'requested') {
-      return GQLRegAction.REQUESTED_CORRECTION
-    } else if (task.status === 'accepted') {
-      return GQLRegAction.APPROVED_CORRECTION
-    } else if (task.status === 'rejected') {
-      return GQLRegAction.REJECTED_CORRECTION
-    }
-  }
-  return null
-}
-export function getStatusFromTask(task: Task) {
-  const statusType = task.businessStatus?.coding?.find(
-    (coding: Coding) =>
-      coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-  )
-  return statusType && (statusType.code as GQLRegStatus)
-}
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {
     case 'SINGLE':
@@ -1116,342 +972,6 @@ export function getMaritalStatusCode(fieldValue: string) {
     default:
       return 'UNK'
   }
-}
-
-export async function removeDuplicatesFromComposition(
-  composition: Composition,
-  compositionId: string,
-  duplicateId?: string
-) {
-  if (duplicateId) {
-    const removeAllDuplicates = compositionId === duplicateId
-    const updatedRelatesTo =
-      composition.relatesTo &&
-      composition.relatesTo.filter((relatesTo) => {
-        return (
-          relatesTo.code !== 'duplicate' ||
-          (!removeAllDuplicates &&
-            relatesTo.targetReference &&
-            relatesTo.targetReference.reference !==
-              `Composition/${duplicateId}`)
-        )
-      })
-    composition.relatesTo = updatedRelatesTo
-    return composition
-  } else {
-    composition.relatesTo = []
-    return composition
-  }
-}
-
-export const fetchFHIR = <T = any>(
-  suffix: string,
-  authHeader: IAuthHeader,
-  method = 'GET',
-  body: string | undefined = undefined
-): Promise<T> => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      ...authHeader
-    },
-    body
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
-}
-
-export const fetchFromHearth = <T = any>(
-  suffix: string,
-  method = 'GET',
-  body: string | undefined = undefined
-): Promise<T> => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    },
-    body
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`FHIR with Hearth request failed: ${error.message}`)
-      )
-    })
-}
-
-export const sendToFhir = async (
-  body: string,
-  suffix: string,
-  method: string,
-  token: string
-) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    body,
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      Authorization: `${token}`
-    }
-  })
-    .then((response) => {
-      return response
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`FHIR ${method} failed: ${error.message}`)
-      )
-    })
-}
-
-export async function postAssignmentSearch(
-  authHeader: IAuthHeader,
-  compositionId: string
-) {
-  return fetch(`${SEARCH_URL}search/assignment`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify({ compositionId })
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search assignment failed: ${error.message}`)
-      )
-    })
-}
-
-type BirthDuplicateSearchBody = {
-  childFirstNames?: string
-  childFamilyName?: string
-  childDoB?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherIdentifier?: string
-}
-
-export const findBirthDuplicates = (
-  authHeader: IAuthHeader,
-  criteria: BirthDuplicateSearchBody
-) => {
-  return fetch(`${SEARCH_URL}search/duplicates/birth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
-      )
-    })
-}
-
-type DeathDuplicateSearchBody = {
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deceasedIdentifier?: string
-  deceasedDoB?: string
-  deathDate?: string
-}
-export const findDeathDuplicates = (
-  authHeader: IAuthHeader,
-  criteria: DeathDuplicateSearchBody
-) => {
-  return fetch(`${SEARCH_URL}search/duplicates/death`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
-      )
-    })
-}
-
-export const getMetrics = (
-  prefix: string,
-  params: IMetricsParam,
-  authHeader: IAuthHeader
-) => {
-  const paramsWithUndefined = Object.fromEntries(
-    Object.entries(params).filter(([, value]) => value !== undefined)
-  )
-  return fetch(
-    `${METRICS_URL}${prefix}?` +
-      new URLSearchParams({ ...paramsWithUndefined }),
-    {
-      method: 'GET',
-      headers: {
-        ...authHeader
-      }
-    }
-  )
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Metrics request failed: ${error.message}`)
-      )
-    })
-}
-
-export const postMetrics = (
-  prefix: string,
-  payload: IMetricsParam,
-  authHeader: IAuthHeader
-) => {
-  return fetch(`${METRICS_URL}${prefix}`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Metrics request failed: ${error.message}`)
-      )
-    })
-}
-
-export const getTimeLoggedFromMetrics = async (
-  authHeader: IAuthHeader,
-  compositionId: string,
-  status?: string
-): Promise<ITimeLoggedResponse | ITimeLoggedResponse[]> => {
-  const params = new URLSearchParams({ compositionId })
-  return fetch(`${METRICS_URL}/timeLogged?` + params, {
-    method: 'GET',
-    headers: {
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Time logged from metrics request failed: ${error.message}`)
-      )
-    })
-}
-
-export const getEventDurationsFromMetrics = async (
-  authHeader: IAuthHeader,
-  compositionId: string
-): Promise<IEventDurationResponse | IEventDurationResponse[]> => {
-  const params = new URLSearchParams({ compositionId })
-  return fetch(`${METRICS_URL}/eventDuration?` + params, {
-    method: 'GET',
-    headers: {
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(
-          `Event Durations from metrics request failed: ${error.message}`
-        )
-      )
-    })
-}
-
-export function getCompositionFromBundle(bundle: Bundle): Composition {
-  const composition = bundle.entry
-    ?.map(({ resource }) => resource)
-    ?.filter((resource): resource is Resource => Boolean(resource))
-    .find(
-      (resource): resource is Composition =>
-        resource.resourceType === 'Composition'
-    )
-
-  if (!composition) {
-    throw new Error('Composition not found in bundle')
-  }
-
-  return composition
-}
-
-export async function getDeclarationIdsFromResponse(
-  resBody: Bundle,
-  authHeader: IAuthHeader,
-  compId?: string
-) {
-  const compositionId = compId || getIDFromResponse(resBody)
-  return getDeclarationIds(compositionId, authHeader)
-}
-
-export async function getDeclarationIds(
-  compositionId: string,
-  authHeader: IAuthHeader
-) {
-  const compositionBundle = await fetchFHIR(
-    `/Composition/${compositionId}`,
-    authHeader
-  )
-  if (!compositionBundle || !compositionBundle.identifier) {
-    throw new Error(
-      'getTrackingId: Invalid composition or composition has no identifier'
-    )
-  }
-  return { trackingId: compositionBundle.identifier.value, compositionId }
-}
-
-export async function getCompositionIdFromResponse(
-  resBody: Bundle,
-  eventType: EVENT_TYPE,
-  authHeader: IAuthHeader
-) {
-  return { compositionId: getIDFromResponse(resBody) }
-}
-
-export function getIDFromResponse(resBody: Bundle): string {
-  if (
-    !resBody ||
-    !resBody.entry ||
-    !resBody.entry[0] ||
-    !resBody.entry[0].response ||
-    !resBody.entry[0].response.location
-  ) {
-    throw new Error(`FHIR did not send a valid response`)
-  }
-  // return the Composition's id
-  return resBody.entry[0].response.location.split('/')[3]
 }
 
 export function setInformantReference(
@@ -1472,7 +992,6 @@ export function setInformantReference(
       entry.fullUrl === personSectionEntry.reference
   )
   if (!personEntry) {
-    logger.error('Expected person entry not found on the bundle')
     return
   }
   relatedPerson.patient = {
@@ -1485,50 +1004,4 @@ export function hasRequestCorrectionExtension(task: Task) {
     task.extension &&
     findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
   return extension
-}
-export const fetchDocuments = async <T = any>(
-  suffix: string,
-  authHeader: IAuthHeader,
-  method = 'GET',
-  body: string | undefined = undefined
-): Promise<T> => {
-  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
-    method,
-    headers: {
-      ...authHeader,
-      'Content-Type': 'application/json'
-    },
-    body
-  })
-  const res = await result.json()
-  return res
-}
-
-export async function uploadBase64ToMinio(
-  fileData: string,
-  authHeader: IAuthHeader
-): Promise<string> {
-  const docUploadResponse = await fetchDocuments(
-    '/upload',
-    authHeader,
-    'POST',
-    JSON.stringify({ fileData: fileData })
-  )
-
-  return docUploadResponse.refUrl
-}
-
-export function isBase64FileString(str: string) {
-  if (str === '' || str.trim() === '') {
-    return false
-  }
-  const strSplit = str.split(':')
-  return strSplit.length > 0 && strSplit[0] === 'data'
-}
-
-export async function fetchTaskByCompositionIdFromHearth(id: string) {
-  const task = await fetchFromHearth<Bundle<Task>>(
-    `/Task?focus=Composition/${id}`
-  )
-  return task
 }

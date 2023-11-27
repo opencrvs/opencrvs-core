@@ -13,7 +13,7 @@ import { ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
-import { Extension } from './extension'
+import { Extension, KnownExtensionType } from './extension'
 import { Patient } from './patient'
 import { CompositionSection, SavedCompositionSection } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
@@ -144,8 +144,11 @@ export type StrictBundle<T extends Resource[]> = Omit<Bundle, 'entry'> & {
   entry: { [Property in keyof T]: BundleEntry<T[Property]> }
 }
 
-export type Address = Omit<fhir3.Address, 'type'> & {
+export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
   type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
+  extension?: Array<
+    KnownExtensionType['http://opencrvs.org/specs/extension/part-of']
+  >
 }
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
@@ -285,7 +288,7 @@ type ItemType<T> = T extends Array<infer U> ? U : never
 export type TelecomSystem = ItemType<Patient['telecom']>['system']
 export type CodeableConcept = fhir3.CodeableConcept
 
-export function markSaved<T extends Resource>(resource: T, id: UUID) {
+export function markSaved<T extends Resource>(resource: T, id: UUID | string) {
   return {
     ...resource,
     id
@@ -379,3 +382,4 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
     ? CompositionHistory
     : never
 }
+export { updateFHIRBundle, buildFHIRBundle } from './transformers'

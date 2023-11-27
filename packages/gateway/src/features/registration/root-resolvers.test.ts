@@ -12,20 +12,22 @@ import {
   resolvers as appResolvers,
   lookForComposition
 } from '@gateway/features/registration/root-resolvers'
+import { mockTaskBundle } from '@gateway/utils/testUtils'
 import {
+  ASSIGNED_EXTENSION_URL,
+  Bundle,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import * as jwt from 'jsonwebtoken'
+  findExtension,
+  getStatusFromTask,
+  isTask
+} from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
-import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 import { UserInputError } from 'apollo-server-hapi'
-import { Bundle, isTask } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
@@ -1935,126 +1937,6 @@ describe('Registration root resolvers', () => {
   })
 
   describe('markBirthAsRegistered()', () => {
-    it('updates status successfully when only composition id is sent', async () => {
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      const resultingComposition = {
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: '097e0133-520c-4645-97d6-acda7d010e05'
-        },
-        resourceType: 'Composition',
-        status: 'preliminary',
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-types',
-              code: 'birth-declaration'
-            }
-          ],
-          text: 'Birth Declaration'
-        },
-        class: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-classes',
-              code: 'crvs-document'
-            }
-          ],
-          text: 'CRVS Document'
-        },
-        title: 'Birth Declaration',
-        section: [
-          {
-            title: 'Birth encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'birth-encounter'
-                }
-              ],
-              text: 'Birth encounter'
-            },
-            entry: [
-              {
-                reference: 'Encounter/f81a64c1-bbf4-4ffc-b992-8c6d28804de8'
-              }
-            ]
-          },
-          {
-            title: 'Child details',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'child-details'
-                }
-              ],
-              text: 'Child details'
-            },
-            entry: [
-              {
-                reference: 'Patient/9ee30e57-98c5-46ef-93f9-f3cfe775fb1a'
-              }
-            ]
-          },
-          {
-            title: "Mother's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'mother-details'
-                }
-              ],
-              text: "Mother's details"
-            },
-            entry: [
-              {
-                reference: 'Patient/2f2b7f28-a420-41f5-916c-92c4669caba5'
-              }
-            ]
-          }
-        ],
-        subject: {},
-        date: '2019-11-06T07:02:01.382Z',
-        author: [],
-        id: '3a68141b-0382-4362-89b0-2fa2610b48f6',
-        meta: {
-          lastUpdated: '2019-11-06T07:02:01.901+00:00',
-          versionId: '17d09268-d82c-44a6-8325-f0391c7453ee'
-        }
-      }
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
-        [
-          // Response for when the status is updated
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Task/12423/_history/1' }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        // Response for refetching the composition
-        [JSON.stringify(resultingComposition), { status: 200 }]
-      )
-      const result = await resolvers.Mutation!.markBirthAsRegistered(
-        {},
-        { id: compositionID },
-        { headers: authHeaderRegCert }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual(resultingComposition)
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ method: 'POST' })
-      )
-    })
     it('throws error if has no assigned user id', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockTaskBundle), { status: 200 }],
@@ -2087,125 +1969,6 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('markDeathAsRegistered', () => {
-    it('updates status successfully when only composition id is sent', async () => {
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      const resultingComposition = {
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: 'DAUJP9D'
-        },
-        resourceType: 'Composition',
-        status: 'preliminary',
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-types',
-              code: 'death-declaration'
-            }
-          ],
-          text: 'Death Declaration'
-        },
-        class: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-classes',
-              code: 'crvs-document'
-            }
-          ],
-          text: 'CRVS Document'
-        },
-        title: 'Death Declaration',
-        section: [
-          {
-            title: 'Deceased details',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'deceased-details'
-                }
-              ],
-              text: 'Deceased details'
-            },
-            entry: [
-              {
-                reference: 'Patient/398372dd-9cb8-47ef-a46b-89b3f8c5b027'
-              }
-            ]
-          },
-          {
-            title: "Informant's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'informant-details'
-                }
-              ],
-              text: "Informant's details"
-            },
-            entry: [
-              {
-                reference: 'RelatedPerson/53737437-423f-4a0f-898c-23b36ffcf885'
-              }
-            ]
-          },
-          {
-            title: 'Death encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'death-encounter'
-                }
-              ],
-              text: 'Death encounter'
-            },
-            entry: [
-              {
-                reference: 'Encounter/6e3481b1-4783-4e75-b50b-dc2ff56bdb1d'
-              }
-            ]
-          }
-        ],
-        subject: {},
-        date: '2019-11-06T09:04:20.268Z',
-        author: [],
-        meta: {
-          lastUpdated: '2019-11-06T09:04:21.700+00:00',
-          versionId: 'adaefdf1-10d5-4ffb-a4ce-4684c796d28d'
-        },
-        id: '02ffb3a5-303f-4828-b63f-5847d4a4eff7'
-      }
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Task/12423/_history/1' }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [JSON.stringify(resultingComposition), { status: 200 }]
-      )
-      const result = await resolvers.Mutation!.markDeathAsRegistered(
-        {},
-        { id: compositionID },
-        { headers: authHeaderRegCert }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual(resultingComposition)
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ method: 'POST' })
-      )
-    })
-
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponses([
         JSON.stringify({ userId: '121221' }),
@@ -2236,7 +1999,6 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2313,8 +2075,6 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }],
-        ['[]', { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2405,8 +2165,6 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',

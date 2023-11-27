@@ -60,6 +60,7 @@ export type WaitingForValidationRecord = Nominal<
   RecordBase,
   'WaitingForValidation'
 >
+
 export type ValidatedRecord = Nominal<RecordBase, 'Validated'>
 export type RegisteredRecord = Nominal<
   Bundle<

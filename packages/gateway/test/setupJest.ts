@@ -14,6 +14,7 @@ import * as fetch from 'jest-fetch-mock'
 const f = jest.requireActual('node-fetch')
 
 jest.setMock('node-fetch', { default: fetch, Headers: f.Headers })
+jest.setMock('@opencrvs/commons/monitoring')
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY =

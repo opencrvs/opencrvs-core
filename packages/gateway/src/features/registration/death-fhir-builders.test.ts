@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { EVENT_TYPE, buildFHIRBundle } from '@opencrvs/commons/types'
+
 import * as fetchMock from 'jest-fetch-mock'
 import {
   GQLAddressType,
@@ -28,7 +28,8 @@ test('should build a minimal FHIR registration document without error', async ()
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = (await buildFHIRBundle(
+
+  const fhir = buildFHIRBundle(
     {
       deceased: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
@@ -205,9 +206,8 @@ test('should build a minimal FHIR registration document without error', async ()
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
       }
     },
-    'DEATH' as EVENT_TYPE,
-    {} as any
-  )) as any
+    'DEATH' as EVENT_TYPE
+  ) as any
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(8)
   expect(fhir.entry[0].resource.date).toBeDefined()
@@ -241,7 +241,7 @@ test('should build a minimal FHIR registration document without error', async ()
       refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
     })
   )
-  const fhir = (await buildFHIRBundle(
+  const fhir = buildFHIRBundle(
     {
       deceased: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
@@ -269,9 +269,8 @@ test('should build a minimal FHIR registration document without error', async ()
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }]
       }
     },
-    'DEATH' as EVENT_TYPE,
-    {} as any
-  )) as any
+    'DEATH' as EVENT_TYPE
+  ) as any
   expect(fhir).toBeDefined()
   // informant relationship
   expect(fhir.entry[3].resource.relationship.coding[0].code).toEqual('OTHER')

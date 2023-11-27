@@ -8,8 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
-import { Bundle } from '@opencrvs/commons/types'
+
+import { Bundle } from '..'
+import transformObj, { IFieldBuilders } from './transformer'
+
 const mockContext = { authHeader: { Authorization: '' } }
 
 describe('Object transformation module', () => {
@@ -50,17 +52,10 @@ describe('Object transformation module', () => {
 
   it('converts an object using async field builders', async () => {
     const fieldBuilders = {
-      gender: async (accumulatedObj: any, fieldValue: any) => {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 0)
-        })
+      gender: (accumulatedObj: any, fieldValue: any) => {
         accumulatedObj.gender = fieldValue === 'm' ? 'male' : 'female'
       },
-      name: async (accumulatedObj: any, fieldValue: any) => {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 0)
-        })
-
+      name: (accumulatedObj: any, fieldValue: any) => {
         if (!accumulatedObj.name) {
           accumulatedObj.name = []
         }
@@ -70,7 +65,7 @@ describe('Object transformation module', () => {
     }
 
     const initialObject = { id: '123' }
-    await transformObj(
+    transformObj(
       { gender: 'm', name: 'John Smith' },
       // transformObj is now strictly typed as a FHIR bundle
       // as in reality, that's what it's solely used for. These tests were
@@ -105,7 +100,7 @@ describe('Object transformation module', () => {
     }
 
     const initialObject = { id: '123' }
-    await transformObj(
+    transformObj(
       { gender: 'm', name: ['John Smith', 'John D Smith'] },
       // transformObj is now strictly typed as a FHIR bundle
       // as in reality, that's what it's solely used for. These tests were
@@ -147,7 +142,7 @@ describe('Object transformation module', () => {
     }
 
     const initialObject = { id: '123' }
-    await transformObj(
+    transformObj(
       {
         name: { given: 'John', family: 'Smith' },
         this: {
@@ -184,7 +179,7 @@ describe('Object transformation module', () => {
     } as any
 
     const initialObject = {}
-    expect(
+    expect(() =>
       transformObj(
         {
           name: ''
@@ -199,7 +194,7 @@ describe('Object transformation module', () => {
         fieldBuilders,
         mockContext as any
       )
-    ).rejects.toThrowError(/.*to be a FieldBuilderFunction.*/)
+    ).toThrowError(/.*to be a FieldBuilderFunction.*/)
   })
 
   it('throws an Error when field builder is an function instead of an object', async () => {
@@ -208,7 +203,7 @@ describe('Object transformation module', () => {
     } as any
 
     const initialObject = {}
-    expect(
+    expect(() =>
       transformObj(
         {
           name: {
@@ -225,14 +220,14 @@ describe('Object transformation module', () => {
         fieldBuilders,
         mockContext as any
       )
-    ).rejects.toThrowError(/.*to be a FieldBuilder object.*/)
+    ).toThrowError(/.*to be a FieldBuilder object.*/)
   })
 
   it("throws an Error when field builder function doesn't exist for a field", async () => {
     const fieldBuilders: IFieldBuilders = {}
 
     const initialObject = {}
-    expect(
+    expect(() =>
       transformObj(
         {
           name: {
@@ -249,6 +244,6 @@ describe('Object transformation module', () => {
         fieldBuilders,
         mockContext as any
       )
-    ).rejects.toThrowError(/.*to be a FieldBuilder object.*/)
+    ).toThrowError(/.*to be a FieldBuilder object.*/)
   })
 })

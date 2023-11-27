@@ -8,26 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  DUPLICATE_TRACKING_ID,
-  EVENT_TYPE
-} from '@gateway/features/fhir/constants'
-import { UUID } from '@opencrvs/commons'
+
 import {
   BundleEntry,
-  CodeableConcept,
   Composition,
   CompositionSectionCode,
   CompositionSectionEncounterReference,
   DocumentReference,
   Encounter,
+  Location,
   Observation,
+  Patient,
   PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
+  RelatedPerson,
   Section,
   Task
-} from '@opencrvs/commons/types'
+} from '..'
+import { EVENT_TYPE, PartialBy } from '../../types'
+import { UUID } from '../../uuid'
 
 export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
 export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
@@ -100,7 +100,7 @@ export function createPersonSection<T extends CompositionSectionCode>(
   }
 }
 
-export function createLocationResource(refUuid: UUID) {
+export function createLocationResource(refUuid: UUID): BundleEntry<Location> {
   return {
     fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
@@ -157,15 +157,13 @@ export function createEncounter(refUuid: UUID): BundleEntry<Encounter> {
   }
 }
 
-export function createRelatedPersonTemplate(
-  refUuid: UUID
-) /*: BundleEntry<PartialBy<RelatedPerson, 'patient'>> */ {
+export function createRelatedPersonTemplate(refUuid: UUID) {
   return {
     fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'RelatedPerson' as const
     }
-  }
+  } satisfies BundleEntry<PartialBy<RelatedPerson, 'patient'>>
 }
 
 export function createPaymentReconciliationTemplate(refUuid: UUID) {
@@ -174,8 +172,8 @@ export function createPaymentReconciliationTemplate(refUuid: UUID) {
     resource: {
       resourceType: 'PaymentReconciliation',
       status: 'active'
-    } as PaymentReconciliation
-  }
+    }
+  } satisfies BundleEntry<PaymentReconciliation>
 }
 
 export function createCompositionTemplate(
@@ -231,43 +229,6 @@ export function createCompositionTemplate(
   }
 }
 
-export function updateTaskTemplate(
-  task: Task,
-  status: string,
-  reason?: string,
-  comment?: string,
-  duplicateTrackingId?: string
-): Task {
-  if (
-    !task ||
-    !task.businessStatus ||
-    !task.businessStatus.coding ||
-    !task.businessStatus.coding[0] ||
-    !task.businessStatus.coding[0].code
-  ) {
-    throw new Error('Task has no businessStatus code')
-  }
-  task.businessStatus.coding[0].code = status
-  if (!task.reason) {
-    task.reason = {
-      text: ''
-    }
-  }
-  task.reason.text = reason || ''
-  const statusReason: CodeableConcept = {
-    text: comment || ''
-  }
-  task.statusReason = statusReason
-  if (duplicateTrackingId) {
-    task.extension = task.extension || []
-    task.extension.push({
-      url: DUPLICATE_TRACKING_ID,
-      valueString: duplicateTrackingId
-    })
-  }
-  return task
-}
-
 export function createPersonEntryTemplate(refUuid: UUID) {
   return {
     fullUrl: `urn:uuid:${refUuid}` as const,
@@ -277,7 +238,7 @@ export function createPersonEntryTemplate(refUuid: UUID) {
       active: true,
       name: []
     }
-  }
+  } satisfies BundleEntry<Patient>
 }
 
 export function createPractitionerEntryTemplate(
@@ -372,13 +333,41 @@ export function createTaskRefTemplate(
     }
   }
 }
-export function createQuestionnaireResponseTemplate(refUuid: UUID) {
+export function createQuestionnaireResponseTemplate(
+  refUuid: UUID
+): BundleEntry<QuestionnaireResponse> {
   return {
     fullUrl: `urn:uuid:${refUuid}` as const,
     resource: {
       resourceType: 'QuestionnaireResponse',
       extension: [],
       status: 'completed'
-    } as QuestionnaireResponse
+    }
+  }
+}
+
+export async function removeDuplicatesFromComposition(
+  composition: Composition,
+  compositionId: string,
+  duplicateId?: string
+) {
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
   }
 }

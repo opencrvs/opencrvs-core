@@ -38,7 +38,7 @@ export const CorrectionRequestInput = z.object({
     z.object({
       section: z.string(),
       fieldName: z.string(),
-      oldValue: z.union([z.string(), z.number(), z.boolean()]),
+      oldValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
       newValue: z.union([z.string(), z.number(), z.boolean()])
     })
   ),

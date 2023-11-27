@@ -8,13 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers as rootResolvers } from '@gateway/features/systems/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/systems/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { TestResolvers } from '@gateway/utils/testUtils'
 
-const fetch = fetchAny as any
-const resolvers = rootResolvers as any
+const fetch = fetchAny as fetchAny.FetchMock
+const resolvers = typeResolvers as unknown as TestResolvers
+
 let authHeaderSysAdmin: { Authorization: string }
 let authHeaderRegister: { Authorization: string }
 
@@ -56,7 +58,7 @@ describe('Integrations root resolvers', () => {
           JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
-        [JSON.stringify({})]
+        [JSON.stringify({}), { status: 200 }]
       )
 
       const response = await resolvers.Mutation!.reactivateSystem(
@@ -78,7 +80,7 @@ describe('Integrations root resolvers', () => {
           JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
-        [JSON.stringify({})]
+        [JSON.stringify({}), { status: 200 }]
       )
 
       const response = await resolvers.Mutation!.deactivateSystem(
@@ -101,11 +103,7 @@ describe('Integrations root resolvers', () => {
         { status: 400 }
       )
       fetch.mockResponseOnce(
-        [
-          JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
-          { status: 400 }
-        ],
-        [JSON.stringify({})]
+        JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' })
       )
       expect(
         resolvers.Mutation!.deactivateSystem(
@@ -126,11 +124,7 @@ describe('Integrations root resolvers', () => {
       { status: 400 }
     )
     fetch.mockResponseOnce(
-      [
-        JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
-        { status: 400 }
-      ],
-      [JSON.stringify({})]
+      JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' })
     )
     expect(
       resolvers.Mutation!.reactivateSystem(

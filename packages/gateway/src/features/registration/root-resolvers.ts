@@ -10,36 +10,42 @@
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import {
-  ASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  DUPLICATE_TRACKING_ID,
-  EVENT_TYPE,
-  FLAGGED_AS_POTENTIAL_DUPLICATE,
-  MAKE_CORRECTION_EXTENSION_URL,
-  MARKED_AS_DUPLICATE,
-  MARKED_AS_NOT_DUPLICATE,
-  REINSTATED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import {
   fetchFHIR,
   getCompositionIdFromResponse,
   getDeclarationIds,
   getDeclarationIdsFromResponse,
-  getIDFromResponse,
-  removeDuplicatesFromComposition,
-  setCertificateCollector
-} from '@gateway/features/fhir/utils'
-import {
-  buildFHIRBundle,
-  checkUserAssignment,
-  taskBundleWithExtension,
-  updateFHIRTaskBundle
-} from '@gateway/features/registration/fhir-builders'
+  getIDFromResponse
+} from '@gateway/features/fhir/service'
 import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+import {
+  Bundle,
+  Composition,
+  EVENT_TYPE,
+  Extension,
+  Location,
+  OPENCRVS_SPECIFICATION_URL,
+  Patient,
+  Saved,
+  SavedBundleEntry,
+  Task,
+  TaskActionExtension,
+  TaskHistory,
+  TaskStatus,
+  addExtensionsToTask,
+  buildFHIRBundle,
+  clearActionExtension,
+  getComposition,
+  getStatusFromTask,
+  getTaskFromBundle,
+  isComposition,
+  resourceIdentifierToUUID,
+  resourceToBundleEntry,
+  taskBundleWithExtension,
+  toHistoryResource,
+  updateFHIRTaskBundle
+} from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -48,44 +54,30 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import { getRecordById } from '@gateway/search'
 import { UnassignError } from '@gateway/utils/unassignError'
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-import { IAuthHeader, UUID } from '@opencrvs/commons'
-import {
-  Bundle,
-  Composition,
-  Extension,
-  Location,
-  Patient,
-  Saved,
-  SavedBundleEntry,
-  Task,
-  getTaskFromBundle,
-  isComposition,
-  resourceToBundleEntry,
-  TaskActionExtension,
-  TaskHistory,
-  TaskStatus,
-  getStatusFromTask,
-  clearActionExtension,
-  addExtensionsToTask,
-  resourceIdentifierToUUID,
-  toHistoryResource,
-  OPENCRVS_SPECIFICATION_URL
-} from '@opencrvs/commons/types'
 
+import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
-
+import {
+  hasBirthDuplicates,
+  hasDeathDuplicates
+} from '@gateway/features/search/service'
 import {
   ISystemModelData,
   IUserModelData,
   isSystem
 } from '@gateway/features/user/type-resolvers'
+import {
+  removeDuplicatesFromComposition,
+  setCertificateCollector,
+  uploadBase64AttachmentsToDocumentsStore
+} from './utils'
+import { getRecordById } from '@gateway/records'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -433,7 +425,7 @@ export const resolvers: GQLResolver = {
         const taskEntry = await getTaskEntry(id, authHeader)
 
         const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: VERIFIED_EXTENSION_URL,
+          url: 'http://opencrvs.org/specs/extension/regVerified',
           valueString: headers['x-real-ip']!
         })
         await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
@@ -482,7 +474,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
+        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -674,7 +666,7 @@ export const resolvers: GQLResolver = {
 
       taskEntry.resource.extension = [
         ...(taskEntry.resource.extension ?? []),
-        { url: REINSTATED_EXTENSION_URL }
+        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
       ]
 
       const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
@@ -755,7 +747,9 @@ export const resolvers: GQLResolver = {
 
         const taskEntry = await getTaskEntry(id, authHeader)
 
-        const extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const extension = {
+          url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
+        }
         const taskBundle = taskBundleWithExtension(taskEntry, extension)
         const payloadBundle: Bundle = {
           ...taskBundle,
@@ -782,7 +776,7 @@ export const resolvers: GQLResolver = {
       }
       const taskEntry = await getTaskEntry(id, authHeader)
       const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: UNASSIGNED_EXTENSION_URL
+        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
       })
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
@@ -807,7 +801,7 @@ export const resolvers: GQLResolver = {
 
       const taskEntry = await getTaskEntry(id, authHeader)
       const extension = {
-        url: MARKED_AS_DUPLICATE,
+        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
         valueString: duplicateTrackingId
       }
 
@@ -832,6 +826,20 @@ export const resolvers: GQLResolver = {
   }
 }
 
+async function registrationToFHIR(
+  event: EVENT_TYPE,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  authHeader: IAuthHeader
+) {
+  const recordWithAttachmentsUploaded =
+    await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
+
+  return buildFHIRBundle(recordWithAttachmentsUploaded, event)
+}
+
 async function createEventRegistration(
   details:
     | GQLBirthRegistrationInput
@@ -840,7 +848,33 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
+
+  let isADuplicate = false
+  if (event === EVENT_TYPE.BIRTH) {
+    isADuplicate = await hasBirthDuplicates(
+      authHeader,
+      details as GQLBirthRegistrationInput
+    )
+  } else if (event === EVENT_TYPE.DEATH) {
+    isADuplicate = await hasDeathDuplicates(
+      authHeader,
+      details as GQLDeathRegistrationInput
+    )
+  }
+
+  const composition = getComposition(doc)
+  const hasBeenFlaggedAsDuplicate = composition.extension?.find(
+    (x) => x.url === `${OPENCRVS_SPECIFICATION_URL}duplicate`
+  )
+  if (isADuplicate && !hasBeenFlaggedAsDuplicate) {
+    composition.extension = composition.extension || []
+    composition.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
+      valueBoolean: true
+    })
+  }
+
   const draftId =
     details && details.registration && details.registration.draftId
 
@@ -925,7 +959,7 @@ async function markEventAsValidated(
       entry: taskEntry
     }
   } else {
-    doc = await buildFHIRBundle(details, event, authHeader)
+    doc = await registrationToFHIR(event, details, authHeader)
   }
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
@@ -940,7 +974,7 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
@@ -955,7 +989,7 @@ async function markEventAsCertified(
   event: EVENT_TYPE
 ) {
   await setCertificateCollector(details, authHeader)
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
@@ -967,23 +1001,23 @@ async function markEventAsIssued(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = await registrationToFHIR(event, details, authHeader)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   return getIDFromResponse(res)
 }
 
-const ACTION_EXTENSIONS = [
-  ASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  MAKE_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
-  DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
+const ACTION_EXTENSIONS: Extension['url'][] = [
+  'http://opencrvs.org/specs/extension/regAssigned',
+  'http://opencrvs.org/specs/extension/regVerified',
+  'http://opencrvs.org/specs/extension/regUnassigned',
+  'http://opencrvs.org/specs/extension/regDownloaded',
+  'http://opencrvs.org/specs/extension/regReinstated',
+  'http://opencrvs.org/specs/extension/makeCorrection',
+  'http://opencrvs.org/specs/extension/regViewed',
+  'http://opencrvs.org/specs/extension/markedAsNotDuplicate',
+  'http://opencrvs.org/specs/extension/markedAsDuplicate',
+  'http://opencrvs.org/specs/extension/duplicateTrackingId',
+  'http://opencrvs.org/specs/extension/flaggedAsPotentialDuplicate'
 ]
 
 type ACTION_EXTENSION_TYPE = typeof ACTION_EXTENSIONS

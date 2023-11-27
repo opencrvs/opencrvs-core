@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
 
 import {
@@ -22,10 +21,13 @@ import {
   Bundle,
   Extension,
   OPENCRVS_SPECIFICATION_URL,
+  findExtension,
   PractitionerRole,
   ResourceIdentifier,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
+
+import { fetchFHIR } from '@gateway/features/fhir/service'
 
 interface IAuditHistory {
   auditedBy: string

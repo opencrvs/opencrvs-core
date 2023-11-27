@@ -8,19 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
-import { fetchDocuments } from '@gateway/features/documents/service'
-
-export async function getPresignedMinioURLHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const fileUri = request.params.fileUri
-  const response = await fetchDocuments(
-    '/presigned-url',
-    { Authorization: request.headers.authorization },
-    'POST',
-    JSON.stringify({ fileUri })
-  )
-  return response
+export function isBase64FileString(str: string) {
+  if (str === '' || str.trim() === '') {
+    return false
+  }
+  const strSplit = str.split(':')
+  return strSplit.length > 0 && strSplit[0] === 'data'
 }

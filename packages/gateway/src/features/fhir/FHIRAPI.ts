@@ -94,7 +94,6 @@ export default class FHIRAPI extends RESTDataSource<Context> {
     if (!this.context.record) {
       throw new Error('No record in context. This should never happen')
     }
-
     const reference = this.context.record.entry
       .map(({ resource }) => resource)
       .filter(isDocumentReference)

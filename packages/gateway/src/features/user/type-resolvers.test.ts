@@ -10,10 +10,15 @@
  */
 import {
   IUserModelData,
-  userTypeResolvers as resolvers
+  userTypeResolvers as typeResolvers
 } from '@gateway/features/user/type-resolvers'
-import * as fetchAny from 'jest-fetch-mock'
+
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import { TestResolvers } from '@gateway/utils/testUtils'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
+
+const userTypeResolvers = typeResolvers as unknown as TestResolvers
 
 const mockGet = jest.fn()
 jest.mock('apollo-datasource-rest', () => {
@@ -24,8 +29,6 @@ jest.mock('apollo-datasource-rest', () => {
     RESTDataSource: MockRESTDataSource
   }
 })
-const fetch = fetchAny as fetchAny.FetchMock
-const userTypeResolvers = resolvers as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -133,7 +136,11 @@ describe('User type resolvers', () => {
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
     mockGet.mockResolvedValueOnce(mockOffice)
-    const res = await userTypeResolvers.User!.primaryOffice(
+    const locationsAPI = new LocationsAPI()
+    locationsAPI.context = {
+      record: null
+    }
+    const res = await userTypeResolvers.User.primaryOffice(
       mockResponse,
       undefined,
       {

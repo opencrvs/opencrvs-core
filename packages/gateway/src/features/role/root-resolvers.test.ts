@@ -12,9 +12,10 @@ import { resolvers as rootResolvers } from '@gateway/features/role/root-resolver
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { TestResolvers } from '@gateway/utils/testUtils'
 
+const resolvers = rootResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
-const resolvers = rootResolvers as any
 
 beforeEach(() => {
   fetch.resetMocks()

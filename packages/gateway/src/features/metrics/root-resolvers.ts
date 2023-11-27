@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { getMetrics } from '@gateway/features/fhir/utils'
+
 import { inScope } from '@gateway/features/user/utils'
+import { getMetrics } from './service'
 
 export interface IMetricsParam {
   timeStart?: string

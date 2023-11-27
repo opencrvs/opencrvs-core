@@ -6845,24 +6845,24 @@
     "@types/node" "*"
 
 "@types/code@^4.0.3":
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/@types/code/-/code-4.0.7.tgz#8131d8c1ccdc81b311639681517a6b107d09541d"
-  integrity sha512-aBIm9pMXzya+872Rlwd3CUKZJ8b7s1sEcu2lr1dNbf2tThB8kY0yGEoCAytyBUIK2EpEoj8d+luEYHsTS2vyVA==
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/@types/code/-/code-4.0.8.tgz#ff35ba09d29332fd6ee281561c0788336627dc65"
+  integrity sha512-eOxey9CsajWlP0h66P2ZaGHoGx0CpjNHlgirEFctZYDQ3frlIoHp/yV5Nq8cQMjKNvs5hySCE2JtFEvhXpOj6g==
 
 "@types/command-line-args@^5.0.0":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@types/command-line-args/-/command-line-args-5.2.2.tgz#ca93ae7045305a2b7c60936bfcb1ebc897b42270"
-  integrity sha512-9aZ7KzLDOBYyqH5J2bvB9edvsMXusX+H/aS8idAJOpWNmscZG5RqO1CVJPFa4Q0/1xKgvxcweXunFVx2l/dYFA==
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@types/command-line-args/-/command-line-args-5.2.3.tgz#553ce2fd5acf160b448d307649b38ffc60d39639"
+  integrity sha512-uv0aG6R0Y8WHZLTamZwtfsDLVRnOa+n+n5rEvFWL5Na5gZ8V2Teab/duDPFzIIIhs9qizDpcavCusCLJZu62Kw==
 
 "@types/command-line-usage@^5.0.1":
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/@types/command-line-usage/-/command-line-usage-5.0.3.tgz#ff7ad6b8b36cc2592afcc46683692f97c07a90e5"
-  integrity sha512-ZESq+MDjR7QpvFfuanzfoAwfzA9e/wUUH/5uEyaZpGwqEnNddBpsyzJWltUIMgXYy97//wD0aJFgKStoZ6o1SQ==
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/@types/command-line-usage/-/command-line-usage-5.0.4.tgz#374e4c62d78fbc5a670a0f36da10235af879a0d5"
+  integrity sha512-BwR5KP3Es/CSht0xqBcUXS3qCAUVXwpRKsV2+arxeb65atasuXG9LykC9Ab10Cw3s2raH92ZqOeILaQbsB2ACg==
 
 "@types/connect@*":
-  version "3.4.37"
-  resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.37.tgz#c66a96689fd3127c8772eb3e9e5c6028ec1a9af5"
-  integrity sha512-zBUSRqkfZ59OcwXon4HVxhx5oWCJmc0OtBTK05M+p0dYjgN6iTwIL2T/WbsQZrEsdnwaF9cWQ+azOnpPvIqY3Q==
+  version "3.4.38"
+  resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.38.tgz#5ba7f3bc4fbbdeaff8dded952e5ff2cc53f8d858"
+  integrity sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==
   dependencies:
     "@types/node" "*"
 

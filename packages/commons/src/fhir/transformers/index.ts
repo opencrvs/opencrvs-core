@@ -8,11 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  EVENT_TYPE,
-  FHIR_SPECIFICATION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT
-} from '@gateway/features/fhir/constants'
+import { HAS_SHOWED_VERIFIED_DOCUMENT } from './constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
   ATTACHMENT_DOCS_TITLE,
@@ -47,15 +43,11 @@ import {
   SPOUSE_TITLE,
   WITNESS_ONE_TITLE,
   WITNESS_TWO_TITLE,
-  createCompositionTemplate,
-  updateTaskTemplate
-} from '@gateway/features/fhir/templates'
+  createCompositionTemplate
+} from './templates'
+import transformObj, { Context, IFieldBuilders } from './transformer'
 import {
-  findBirthDuplicates,
-  findDeathDuplicates,
   getMaritalStatusCode,
-  isBase64FileString,
-  postAssignmentSearch,
   selectOrCreateCertificateDocRefResource,
   selectOrCreateCollectorPersonResource,
   selectOrCreateDocRefResource,
@@ -76,37 +68,20 @@ import {
   setCertificateCollectorReference,
   setInformantReference,
   setObjectPropInResourceArray,
-  setQuestionnaireItem,
-  uploadBase64ToMinio
-} from '@gateway/features/fhir/utils'
-import transformObj, {
-  Context,
-  IFieldBuilders
-} from '@gateway/features/transformation'
-import { getTokenPayload } from '@gateway/features/user/utils'
-import {
-  GQLAddressInput,
-  GQLAttachmentInput,
-  GQLBirthRegistrationInput,
-  GQLContactPointInput,
-  GQLDeathRegistrationInput,
-  GQLHumanName,
-  GQLIdentityType,
-  GQLMarriageRegistrationInput,
-  GQLQuestionnaireQuestionInput
-} from '@gateway/graphql/schema'
-import { IAuthHeader, UUID, getUUID } from '@opencrvs/commons'
+  setQuestionnaireItem
+} from './utils'
+
 import {
   ATTACHMENT_DOCS_CODE,
   BRIDE_CODE,
   Bundle,
-  BundleEntry,
   CHILD_CODE,
   CompositionSectionCode,
   DECEASED_CODE,
   EncounterParticipant,
   Extension,
   FATHER_CODE,
+  FHIR_SPECIFICATION_URL,
   GROOM_CODE,
   INFORMANT_CODE,
   KnownExtensionType,
@@ -116,7 +91,6 @@ import {
   Patient,
   ResourceIdentifier,
   SPOUSE_CODE,
-  Saved,
   StringExtensionType,
   Task,
   TaskIdentifier,
@@ -125,9 +99,21 @@ import {
   WITNESS_TWO_CODE,
   findExtension,
   getComposition,
-  markSaved,
-  replaceFromBundle
-} from '@opencrvs/commons/types'
+  markSaved
+} from '..'
+import { getUUID } from '../..'
+import { EVENT_TYPE, replaceFromBundle } from '../../record'
+import {
+  AddressInput,
+  Attachment,
+  BirthRegistration,
+  ContactPoint,
+  DeathRegistration,
+  HumanName,
+  IdentityType,
+  MarriageRegistration,
+  QuestionnaireQuestion
+} from './input'
 
 type StringReplace<
   T extends string,
@@ -138,7 +124,7 @@ type StringReplace<
   ? StringReplace<R, S, D, `${A}${L}${D}`>
   : `${A}${T}`
 
-export enum SignatureExtensionPostfix {
+enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
   GROOM = 'groom-signature',
   BRIDE = 'bride-signature',
@@ -149,7 +135,7 @@ export enum SignatureExtensionPostfix {
 function createNameBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'name', GQLHumanName> {
+): IFieldBuilders<'name', HumanName> {
   return {
     use: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -207,9 +193,9 @@ function createNameBuilder(
 function createIDBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'identifier', GQLIdentityType> {
+): IFieldBuilders<'identifier', IdentityType> {
   return {
-    id: async (fhirBundle, fieldValue, context) => {
+    id: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
         sectionTitle,
@@ -271,7 +257,7 @@ function createIDBuilder(
 function createTelecomBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'telecom', GQLContactPointInput> {
+): IFieldBuilders<'telecom', ContactPoint> {
   return {
     system: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -321,7 +307,7 @@ function createTelecomBuilder(
 function createPhotoBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'photo', GQLAttachmentInput> {
+): IFieldBuilders<'photo', Attachment> {
   return {
     contentType: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -351,7 +337,7 @@ function createPhotoBuilder(
 function createAddressBuilder(
   sectionCode: CompositionSectionCode,
   sectionTitle: string
-): IFieldBuilders<'address', GQLAddressInput> {
+): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -520,7 +506,7 @@ function createAddressBuilder(
 
 function createLocationAddressBuilder(
   sectionCode: string
-): IFieldBuilders<'address', GQLAddressInput> {
+): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
       const location = selectOrCreateLocationRefResource(
@@ -849,7 +835,7 @@ function createInformantShareContactNumber(resource: Task, fieldValue: string) {
     valueString: fieldValue
   })
 }
-async function createInformantType(
+function createInformantType(
   fhirBundle: Bundle,
   fieldValue: string,
   context: Context
@@ -938,7 +924,7 @@ async function createInformantType(
   }
 }
 
-async function createOtherInformantType(
+function createOtherInformantType(
   fhirBundle: Bundle,
   fieldValue: string,
   context: Context
@@ -998,10 +984,12 @@ function setResourceIdentifier(
   if (!resource.identifier) {
     resource.identifier = []
   }
-  resource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
+  const identifier = {
+    system: `http://opencrvs.org/specs/id/${identifierName}` as const,
     value: fieldValue
-  } as TaskIdentifier)
+  } as TaskIdentifier
+
+  resource.identifier.push(identifier)
 }
 
 function createRegStatusComment(
@@ -1037,7 +1025,7 @@ function createRegStatusCommentTimeStamp(
 
 function createQuestionnaireBuilder(): IFieldBuilders<
   'questionnaire',
-  GQLQuestionnaireQuestionInput
+  QuestionnaireQuestion
 > {
   return {
     fieldId: (fhirBundle, fieldValue, context) => {
@@ -1067,7 +1055,7 @@ function createQuestionnaireBuilder(): IFieldBuilders<
   }
 }
 
-export const builders: IFieldBuilders = {
+const builders: IFieldBuilders = {
   _fhirIDMap: {
     composition: (fhirBundle, fieldValue, context) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
@@ -1090,7 +1078,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       femaleDependentsOfDeceased: (fhirBundle, fieldValue, context) => {
@@ -1103,7 +1091,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       mannerOfDeath: (fhirBundle, fieldValue, context) => {
@@ -1116,7 +1104,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       deathDescription: (fhirBundle, fieldValue, context) => {
@@ -1129,7 +1117,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathEstablished: (fhirBundle, fieldValue, context) => {
@@ -1142,7 +1130,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeathMethod: (fhirBundle, fieldValue, context) => {
@@ -1155,7 +1143,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       causeOfDeath: (fhirBundle, fieldValue, context) => {
@@ -1168,7 +1156,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       birthType: (fhirBundle, fieldValue, context) => {
@@ -1181,7 +1169,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       typeOfMarriage: (fhirBundle, fieldValue, context) => {
@@ -1194,7 +1182,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       weightAtBirth: (fhirBundle, fieldValue, context) => {
@@ -1207,7 +1195,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       attendantAtBirth: (fhirBundle, fieldValue, context) => {
@@ -1220,7 +1208,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       childrenBornAliveToMother: (fhirBundle, fieldValue, context) => {
@@ -1233,7 +1221,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       foetalDeathsToMother: (fhirBundle, fieldValue, context) => {
@@ -1246,7 +1234,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       },
       lastPreviousLiveBirth: (fhirBundle, fieldValue, context) => {
@@ -1259,7 +1247,7 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        const savedObservation = markSaved(observation, fieldValue as UUID)
+        const savedObservation = markSaved(observation, fieldValue)
         return replaceFromBundle(fhirBundle, observation, savedObservation)
       }
     },
@@ -2070,6 +2058,24 @@ export const builders: IFieldBuilders = {
           context
         )
       },
+      partOf: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          [
+            {
+              url: 'http://opencrvs.org/specs/extension/part-of',
+              valueReference: {
+                reference: `Location/${fieldValue}`
+              }
+            }
+          ],
+          'extension',
+          context
+        )
+      },
       country: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         setObjectPropInResourceArray(
@@ -2119,9 +2125,9 @@ export const builders: IFieldBuilders = {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createEducationalAttainmentBuilder(person, fieldValue)
     },
-    relationship: async (fhirBundle, fieldValue, context) =>
+    relationship: (fhirBundle, fieldValue, context) =>
       createInformantType(fhirBundle, fieldValue, context),
-    otherRelationship: async (fhirBundle, fieldValue, context) =>
+    otherRelationship: (fhirBundle, fieldValue, context) =>
       createOtherInformantType(fhirBundle, fieldValue, context)
   },
   bride: {
@@ -2273,7 +2279,7 @@ export const builders: IFieldBuilders = {
         )
       }
     },
-    relationship: async (fhirBundle, fieldValue, context) => {
+    relationship: (fhirBundle, fieldValue, context) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_ONE_CODE,
         WITNESS_ONE_TITLE,
@@ -2366,7 +2372,7 @@ export const builders: IFieldBuilders = {
         )
       }
     },
-    relationship: async (fhirBundle, fieldValue, context) => {
+    relationship: (fhirBundle, fieldValue, context) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_TWO_CODE,
         WITNESS_TWO_TITLE,
@@ -2409,75 +2415,45 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       taskResource.id = fieldValue as string
     },
-    informantsSignature: async (fhirBundle, fieldValue, context) => {
+    informantsSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      if (isBase64FileString(fieldValue)) {
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
-        fieldValue = docUploadResponse
-      }
+
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.INFORMANT
       )
     },
-    groomSignature: async (fhirBundle, fieldValue, context) => {
+    groomSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      if (isBase64FileString(fieldValue)) {
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
-        fieldValue = docUploadResponse
-      }
+
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.GROOM
       )
     },
-    brideSignature: async (fhirBundle, fieldValue, context) => {
+    brideSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      if (isBase64FileString(fieldValue)) {
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
-        fieldValue = docUploadResponse
-      }
+
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.BRIDE
       )
     },
-    witnessOneSignature: async (fhirBundle, fieldValue, context) => {
+    witnessOneSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      if (isBase64FileString(fieldValue)) {
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
-        fieldValue = docUploadResponse
-      }
+
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_ONE
       )
     },
-    witnessTwoSignature: async (fhirBundle, fieldValue, context) => {
+    witnessTwoSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      if (isBase64FileString(fieldValue)) {
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
-        fieldValue = docUploadResponse
-      }
+
       return createInformantsSignature(
         taskResource,
         fieldValue,
@@ -2492,9 +2468,9 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareEmail(taskResource, fieldValue)
     },
-    informantType: async (fhirBundle, fieldValue, context) =>
+    informantType: (fhirBundle, fieldValue, context) =>
       createInformantType(fhirBundle, fieldValue, context),
-    otherInformantType: async (fhirBundle, fieldValue, context) =>
+    otherInformantType: (fhirBundle, fieldValue, context) =>
       createOtherInformantType(fhirBundle, fieldValue, context),
     draftId: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
@@ -2602,7 +2578,7 @@ export const builders: IFieldBuilders = {
           context,
           ATTACHMENT_CONTEXT_KEY
         )
-        docRef.id = fieldValue as string
+        docRef.id = fieldValue
       },
       originalFileName: (fhirBundle, fieldValue, context) => {
         const docRef = selectOrCreateDocRefResource(
@@ -2702,7 +2678,7 @@ export const builders: IFieldBuilders = {
         }
         docRef.content[0].attachment.contentType = fieldValue
       },
-      data: async (fhirBundle, fieldValue, context) => {
+      data: (fhirBundle, fieldValue, context) => {
         const docRef = selectOrCreateDocRefResource(
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
@@ -2720,13 +2696,6 @@ export const builders: IFieldBuilders = {
           ]
         }
 
-        if (isBase64FileString(fieldValue)) {
-          const docUploadResponse = await uploadBase64ToMinio(
-            fieldValue,
-            context.authHeader
-          )
-          fieldValue = docUploadResponse
-        }
         docRef.content[0].attachment.data = fieldValue
       },
       subject: (fhirBundle, fieldValue, context) => {
@@ -2742,7 +2711,7 @@ export const builders: IFieldBuilders = {
         }
         docRef.subject.display = fieldValue
       },
-      uri: async (fhirBundle, fieldValue, context) => {
+      uri: (fhirBundle, fieldValue, context) => {
         const docRef = selectOrCreateDocRefResource(
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
@@ -2764,7 +2733,7 @@ export const builders: IFieldBuilders = {
     },
     certificates: {
       collector: {
-        relationship: async (fhirBundle, fieldValue, context) => {
+        relationship: (fhirBundle, fieldValue, context) => {
           const relatedPersonResource = selectOrCreateRelatedPersonResource(
             fhirBundle,
             context,
@@ -2786,35 +2755,35 @@ export const builders: IFieldBuilders = {
           }
           /* if mother/father is collecting then we will just put the person ref here */
           if (fieldValue === 'MOTHER') {
-            await setCertificateCollectorReference(
+            setCertificateCollectorReference(
               MOTHER_CODE,
               relatedPersonResource,
               fhirBundle,
               context
             )
           } else if (fieldValue === 'FATHER') {
-            await setCertificateCollectorReference(
+            setCertificateCollectorReference(
               FATHER_CODE,
               relatedPersonResource,
               fhirBundle,
               context
             )
           } else if (fieldValue === 'INFORMANT') {
-            await setCertificateCollectorReference(
+            setCertificateCollectorReference(
               INFORMANT_CODE,
               relatedPersonResource,
               fhirBundle,
               context
             )
           } else if (fieldValue === 'BRIDE') {
-            await setCertificateCollectorReference(
+            setCertificateCollectorReference(
               BRIDE_CODE,
               relatedPersonResource,
               fhirBundle,
               context
             )
           } else if (fieldValue === 'GROOM') {
-            await setCertificateCollectorReference(
+            setCertificateCollectorReference(
               GROOM_CODE,
               relatedPersonResource,
               fhirBundle,
@@ -2822,7 +2791,7 @@ export const builders: IFieldBuilders = {
             )
           }
         },
-        otherRelationship: async (fhirBundle, fieldValue, context) => {
+        otherRelationship: (fhirBundle, fieldValue, context) => {
           const relatedPersonResource = selectOrCreateRelatedPersonResource(
             fhirBundle,
             context,
@@ -2862,7 +2831,7 @@ export const builders: IFieldBuilders = {
               }
             }
           },
-          data: async (fhirBundle, fieldValue, context) => {
+          data: (fhirBundle, fieldValue, context) => {
             const relatedPersonResource = selectOrCreateRelatedPersonResource(
               fhirBundle,
               context,
@@ -2876,13 +2845,7 @@ export const builders: IFieldBuilders = {
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
-            if (isBase64FileString(fieldValue)) {
-              const docUploadResponse = await uploadBase64ToMinio(
-                fieldValue,
-                context.authHeader
-              )
-              fieldValue = docUploadResponse
-            }
+
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
@@ -3092,20 +3055,13 @@ export const builders: IFieldBuilders = {
           }
         }
       },
-      data: async (fhirBundle, fieldValue, context) => {
+      data: (fhirBundle, fieldValue, context) => {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
           context.event
         )
 
-        if (isBase64FileString(fieldValue)) {
-          const docUploadResponse = await uploadBase64ToMinio(
-            fieldValue,
-            context.authHeader
-          )
-          fieldValue = docUploadResponse
-        }
         if (!certDocResource.content?.[0]) {
           certDocResource.content = [
             {
@@ -3127,7 +3083,8 @@ export const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-      encounterLocationRef.reference = `Location/${fieldValue as UUID}`
+      encounterLocationRef.reference =
+        `Location/${fieldValue}` as ResourceIdentifier
     },
     type: (fhirBundle, fieldValue, context) => {
       let location
@@ -3435,42 +3392,32 @@ export const builders: IFieldBuilders = {
   }
 }
 
-export async function updateFHIRBundle(
-  existingBundle: Bundle,
-  recordDetails:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  eventType: EVENT_TYPE,
-  authHeader: IAuthHeader
+export function updateFHIRBundle<T extends Bundle>(
+  existingBundle: T,
+  recordDetails: BirthRegistration | DeathRegistration | MarriageRegistration,
+  eventType: EVENT_TYPE
 ) {
   const context = {
     event: eventType,
-    authHeader: authHeader,
     _index: {}
   }
 
-  return await transformObj(
+  return transformObj(
     recordDetails as Record<string, unknown>,
     existingBundle,
     builders,
     context
-  )
+  ) as T
 }
 
-export async function buildFHIRBundle(
-  reg:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  eventType: EVENT_TYPE,
-  authHeader: IAuthHeader
-): Promise<Bundle> {
+export function buildFHIRBundle(
+  reg: BirthRegistration | DeathRegistration | MarriageRegistration,
+  eventType: EVENT_TYPE
+): Bundle {
   const ref = getUUID()
   const context = {
     _index: {},
-    event: eventType,
-    authHeader: authHeader
+    event: eventType
   }
 
   const initialFHIRBundle: Bundle = {
@@ -3479,127 +3426,12 @@ export async function buildFHIRBundle(
     entry: [createCompositionTemplate(ref, context)]
   }
 
-  const newFHIRBundle = await transformObj(
+  const newFHIRBundle = transformObj(
     reg as Record<string, unknown>,
     initialFHIRBundle,
     builders,
     context
   )
 
-  const composition = getComposition(newFHIRBundle)
-
-  let isADuplicate = false
-  if (eventType === EVENT_TYPE.BIRTH) {
-    isADuplicate = await hasBirthDuplicates(
-      authHeader,
-      reg as GQLBirthRegistrationInput
-    )
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    isADuplicate = await hasDeathDuplicates(
-      authHeader,
-      reg as GQLDeathRegistrationInput
-    )
-  }
-
-  if (isADuplicate) {
-    composition.extension = composition.extension || []
-    composition.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
-      valueBoolean: true
-    })
-  }
   return newFHIRBundle
-}
-
-async function hasBirthDuplicates(
-  authHeader: IAuthHeader,
-  bundle: GQLBirthRegistrationInput
-) {
-  if (!bundle || !bundle.child) {
-    return false
-  }
-
-  const res = await findBirthDuplicates(authHeader, {
-    motherIdentifier: bundle.mother?.identifier?.[0]?.id,
-    childFirstNames: bundle.child.name?.[0]?.firstNames,
-    childFamilyName: bundle.child.name?.[0]?.familyName,
-    childDoB: bundle.child.birthDate,
-    motherFirstNames: bundle.mother?.name?.[0]?.firstNames,
-    motherFamilyName: bundle.mother?.name?.[0]?.familyName,
-    motherDoB: bundle.mother?.birthDate
-  })
-
-  return !res || res.length > 0
-}
-
-async function hasDeathDuplicates(
-  authHeader: IAuthHeader,
-  bundle: GQLDeathRegistrationInput
-) {
-  if (!bundle || !bundle.deceased) {
-    return false
-  }
-
-  const res = await findDeathDuplicates(authHeader, {
-    deceasedFirstNames: bundle.deceased?.name?.[0]?.firstNames,
-    deceasedFamilyName: bundle.deceased?.name?.[0]?.familyName,
-    deceasedIdentifier: bundle.deceased?.identifier?.[0]?.id,
-    deceasedDoB: bundle.deceased?.birthDate,
-    deathDate: bundle.deceased?.deceased?.deathDate
-  })
-
-  return !res || res.length > 0
-}
-
-export async function updateFHIRTaskBundle(
-  taskEntry: BundleEntry<Task>,
-  status: string,
-  reason?: string,
-  comment?: string,
-  duplicateTrackingId?: string
-) {
-  const taskResource = taskEntry.resource
-  taskEntry.resource = updateTaskTemplate(
-    taskResource,
-    status,
-    reason,
-    comment,
-    duplicateTrackingId
-  )
-  taskEntry.resource.lastModified = new Date().toISOString()
-  const fhirBundle: Bundle<Task> = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: [taskEntry]
-  }
-  return fhirBundle
-}
-
-export function taskBundleWithExtension(
-  taskEntry: BundleEntry<Task> | Saved<BundleEntry<Task>>,
-  extension: Extension
-) {
-  const task = taskEntry.resource
-  task.lastModified = new Date().toISOString()
-  task.extension = [...(task.extension ?? []), extension]
-  const fhirBundle: Bundle<Task> = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: [taskEntry]
-  }
-  return fhirBundle
-}
-
-export async function checkUserAssignment(
-  id: string,
-  authHeader: IAuthHeader
-): Promise<boolean> {
-  if (!authHeader || !authHeader.Authorization) {
-    return false
-  }
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  const userId = tokenPayload.sub
-  const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
-
-  return userId === res?.userId
 }

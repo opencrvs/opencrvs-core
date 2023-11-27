@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/utils'
+import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/service'
 import * as Hapi from '@hapi/hapi'
 import { badRequest, conflict } from '@hapi/boom'
 import * as Joi from 'joi'

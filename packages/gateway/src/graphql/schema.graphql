@@ -1066,6 +1066,7 @@ type Address {
   country: String
   from: Date
   to: Date
+  partOf: String
 }
 
 type Attachment {
@@ -1328,7 +1329,7 @@ input CorrectionPaymentInput {
 input CorrectionValueInput {
   section: String!
   fieldName: String!
-  oldValue: FieldValue!
+  oldValue: FieldValue
   newValue: FieldValue!
 }
 
