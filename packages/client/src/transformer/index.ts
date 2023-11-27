@@ -78,7 +78,8 @@ const transformRegistrationCorrection = (
   transformedData: TransformedData,
   nestedFieldDef: IFormField | null = null
 ): void => {
-  const values: CorrectionValueInput[] = []
+  const values: CorrectionValueInput[] =
+    transformedData.registration.correction?.values ?? []
 
   if (!transformedData.registration) {
     transformedData.registration = {}
