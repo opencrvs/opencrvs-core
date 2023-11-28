@@ -71,7 +71,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@user-mgnt/(.*)": "<rootDir>/src/$1"
+      "@user-mgnt/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "setupFiles": [
       "./test/setupJest.ts"

@@ -32,7 +32,7 @@ jest.mock('./constants', () => {
   return {
     __esModule: true,
     ...originalModule,
-    ENABLE_RATE_LIMIT: 'true'
+    DISABLE_RATE_LIMIT: false
   }
 })
 describe('Rate limit', () => {

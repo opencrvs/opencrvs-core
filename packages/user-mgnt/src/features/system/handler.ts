@@ -11,6 +11,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { systemRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
@@ -26,7 +27,7 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
 import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
-import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import * as uuid from 'uuid/v4'
 
@@ -87,11 +88,11 @@ export async function registerSystem(
     if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
       throw new Error('System with NATIONAL_ID already exists !')
     }
-    if (!systemScopeMapping[type]) {
+    if (!systemRoleScopes[type]) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = systemScopeMapping[type]
+    const systemScopes: string[] = systemRoleScopes[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&

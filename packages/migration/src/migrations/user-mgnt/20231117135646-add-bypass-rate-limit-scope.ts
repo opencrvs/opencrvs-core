@@ -8,7 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
+
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
+  await db
+    .collection('users')
+    .updateOne(
+      { username: 'o.admin' },
+      { $addToSet: { scope: 'bypassratelimit' } }
+    )
+}
+
+export const down = async (db: Db, client: MongoClient) => {
+  await db
+    .collection('users')
+    .updateOne({ username: 'o.admin' }, { $pull: { scope: 'bypassratelimit' } })
+}
