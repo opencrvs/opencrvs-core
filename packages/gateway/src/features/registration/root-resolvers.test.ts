@@ -692,17 +692,14 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify({}), { status: 200 }],
-        [
-          JSON.stringify({
-            compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-            isPotentiallyDuplicate: false,
-            trackingId: 'DewpkiM'
-          }),
-          { status: 200 }
-        ]
-      )
+      fetch.mockResponses([
+        JSON.stringify({
+          compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          isPotentiallyDuplicate: false,
+          trackingId: 'DewpkiM'
+        }),
+        { status: 200 }
+      ])
       const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
