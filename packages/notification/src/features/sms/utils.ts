@@ -57,7 +57,7 @@ export async function sendNotification(
     sms?: string | null
   },
   type: 'user' | 'informant',
-  variables: Record<string, string>
+  variables: Record<string, unknown>
 ) {
   const token = request.headers.authorization
   const locale = getDefaultLanguage()

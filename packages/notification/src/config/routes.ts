@@ -41,6 +41,9 @@ import {
   sendResetPasswordInvite,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
+import { ServerRoute, ReqRefDefaults } from '@hapi/hapi'
+import * as Joi from 'joi'
+import { inProgressNotification } from '@notification/features/inProgress/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -50,19 +53,21 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin'
 }
 
-export default function getRoutes() {
+const eventSchema = Joi.string().valid('birth', 'death')
+
+export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
   return [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: (request, h) => {
         // Perform any health checks and return true or false for success prop
         return {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -72,7 +77,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/authenticationCode',
       handler: sendUserAuthenticationCode,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with auth code',
         validate: {
@@ -82,9 +87,25 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
+      path: '/{event}/in-progress',
+      handler: inProgressNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for in-progress declaration',
+        validate: {
+          payload: Joi.object(),
+          params: Joi.object({
+            event: eventSchema
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/birthInProgressSMS',
       handler: sendBirthInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for birth in-progress entry',
         auth: {
@@ -104,7 +125,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthDeclarationSMS',
       handler: sendBirthDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth declaration entry',
@@ -125,7 +146,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRegistrationSMS',
       handler: sendBirthRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth registration entry',
@@ -141,7 +162,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRejectionSMS',
       handler: sendBirthRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth declaration rejection entry',
@@ -157,7 +178,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathInProgressSMS',
       handler: sendDeathInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for death in-progress entry',
@@ -178,7 +199,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathDeclarationSMS',
       handler: sendDeathDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for death declaration entry',
@@ -199,7 +220,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRegistrationSMS',
       handler: sendDeathRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
@@ -214,7 +235,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRejectionSMS',
       handler: sendDeathRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms to a user for death declaration rejection entry',
@@ -230,7 +251,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/userCredentialsInvite',
       handler: sendUserCredentials,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
@@ -245,7 +266,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/rejectCorrectionRequest',
       handler: sendCorrectionRejectedNotification,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
@@ -260,7 +281,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/approveCorrectionRequest',
       handler: sendCorrectionApprovedNotification,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
@@ -275,7 +296,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/resetPasswordInvite',
       handler: sendResetPasswordInvite,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
@@ -290,7 +311,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/retrieveUserName',
       handler: retrieveUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with username',
         validate: {
@@ -302,7 +323,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/updateUserNameSMS',
       handler: updateUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new username',
         validate: {
