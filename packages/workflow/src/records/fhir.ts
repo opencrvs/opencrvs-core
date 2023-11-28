@@ -17,7 +17,8 @@ import {
   Practitioner,
   Task,
   URNReference,
-  URLReference
+  URLReference,
+  SavedTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -425,6 +426,27 @@ export async function sendBundleToHearth(
   if (!res.ok) {
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+
+  return res.json()
+}
+
+export async function findTaskFromIdentifier(
+  identifier: string
+): Promise<Bundle<SavedTask>> {
+  const res = await fetch(
+    new URL(`/fhir/Task?identifier=${identifier}`, HEARTH_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching task history from Hearth failed with [${res.status}] body: ${res.statusText}`
     )
   }
 

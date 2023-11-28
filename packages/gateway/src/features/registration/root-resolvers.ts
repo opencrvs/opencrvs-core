@@ -828,29 +828,6 @@ async function registrationToFHIR(
   return buildFHIRBundle(recordWithAttachmentsUploaded, event)
 }
 
-export async function lookForComposition(
-  identifier: string,
-  authHeader: IAuthHeader
-) {
-  const taskBundle = await fetchFHIR<Bundle>(
-    `/Task?identifier=${identifier}`,
-    authHeader
-  )
-
-  const task =
-    taskBundle &&
-    taskBundle.entry &&
-    taskBundle.entry[0] &&
-    (taskBundle.entry[0].resource as Task)
-
-  return (
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-  )
-}
-
 async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,

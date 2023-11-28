@@ -31,7 +31,10 @@ import {
 // import { sendCreateRecordNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
-import { sendBundleToHearth } from '@workflow/records/fhir'
+import {
+  findTaskFromIdentifier,
+  sendBundleToHearth
+} from '@workflow/records/fhir'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
@@ -44,6 +47,7 @@ import {
 } from '@workflow/features/registration/utils'
 import { getRecordById } from '@workflow/records'
 import { auditEvent } from '@workflow/records/audit'
+import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
 
 export const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -60,6 +64,21 @@ function findTask(bundle: Bundle) {
   return task
 }
 
+async function findExistingDeclarationIds(draftId: string) {
+  const taskBundle = await findTaskFromIdentifier(draftId)
+  if (taskBundle.entry.length > 0) {
+    const trackingId = getTrackingId(taskBundle)
+    if (!trackingId) {
+      throw new Error('No trackingID found for existing declaration')
+    }
+    return {
+      compositionId: taskBundle.entry[0].resource.focus.reference.split('/')[1],
+      trackingId
+    }
+  }
+  return null
+}
+
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
@@ -70,6 +89,15 @@ export default async function createRecordHandler(
       requestSchema,
       request.payload
     )
+    const existingDeclarationIds =
+      recordDetails.registration?.draftId &&
+      (await findExistingDeclarationIds(recordDetails.registration.draftId))
+    if (existingDeclarationIds) {
+      return {
+        ...existingDeclarationIds,
+        isPotentiallyDuplicate: false
+      }
+    }
     const inputBundle = buildFHIRBundle(recordDetails, event)
     const practitioner = await getLoggedInPractitionerResource(token)
     const trackingId = generateTrackingIdForEvents(event)
@@ -158,7 +186,7 @@ export default async function createRecordHandler(
     return {
       compositionId,
       trackingId,
-      isPotentiallyDuplicate: hasDuplicates(
+      isPotentiallyDuplicate: await hasDuplicates(
         recordDetails,
         { Authorization: token },
         event
