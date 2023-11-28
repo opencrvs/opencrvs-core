@@ -79,6 +79,42 @@ async function findExistingDeclarationIds(draftId: string) {
   return null
 }
 
+function createInProgressOrReadyForReviewTask(
+  previousTask: ReturnType<typeof findTask>,
+  event: EVENT_TYPE,
+  trackingId: ReturnType<typeof generateTrackingIdForEvents>,
+  inProgress: boolean
+): ReturnType<typeof findTask> {
+  return {
+    ...previousTask,
+    identifier: [
+      ...previousTask.identifier,
+      {
+        system: `http://opencrvs.org/specs/id/${
+          event.toLowerCase() as Lowercase<EVENT_TYPE>
+        }-tracking-id`,
+        value: trackingId
+      }
+    ],
+    code: {
+      coding: [
+        {
+          system: `http://opencrvs.org/specs/types`,
+          code: event
+        }
+      ]
+    },
+    businessStatus: {
+      coding: [
+        {
+          system: `http://opencrvs.org/specs/reg-status`,
+          code: inProgress ? 'IN_PROGRESS' : 'DECLARED'
+        }
+      ]
+    }
+  }
+}
+
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
@@ -89,6 +125,7 @@ export default async function createRecordHandler(
       requestSchema,
       request.payload
     )
+
     const existingDeclarationIds =
       recordDetails.registration?.draftId &&
       (await findExistingDeclarationIds(recordDetails.registration.draftId))
@@ -98,6 +135,7 @@ export default async function createRecordHandler(
         isPotentiallyDuplicate: false
       }
     }
+
     const inputBundle = buildFHIRBundle(recordDetails, event)
     const practitioner = await getLoggedInPractitionerResource(token)
     const trackingId = generateTrackingIdForEvents(event)
@@ -108,33 +146,14 @@ export default async function createRecordHandler(
       system: 'urn:ietf:rfc:3986',
       value: trackingId
     }
-    const task = findTask(inputBundle)
 
-    task.identifier ??= []
+    const task = createInProgressOrReadyForReviewTask(
+      findTask(inputBundle),
+      event,
+      trackingId,
+      inProgress
+    )
 
-    task.identifier.push({
-      system: `http://opencrvs.org/specs/id/${
-        event.toLowerCase() as Lowercase<EVENT_TYPE>
-      }-tracking-id`,
-      value: trackingId
-    })
-
-    task.code = {
-      coding: [
-        {
-          system: `http://opencrvs.org/specs/types`,
-          code: event
-        }
-      ]
-    }
-    task.businessStatus = {
-      coding: [
-        {
-          system: `http://opencrvs.org/specs/reg-status`,
-          code: inProgress ? 'IN_PROGRESS' : 'DECLARED'
-        }
-      ]
-    }
     const taskWithUser = setupLastRegUser(task, practitioner)
 
     const taskWithLocation = isEventNotification(inputBundle)
