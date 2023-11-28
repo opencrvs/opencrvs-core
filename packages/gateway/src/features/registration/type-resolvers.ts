@@ -66,7 +66,6 @@ import {
   SPOUSE_CODE,
   Saved,
   Task,
-  TaskStatus,
   ValidRecord,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
@@ -76,7 +75,7 @@ import {
   getEncounterFromRecord,
   getEventLabelFromBundle,
   getResourceFromBundleById,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   isDocumentReference,
   isObservation,
   isPatient,
@@ -1588,12 +1587,9 @@ export const typeResolvers: GQLResolver = {
       if (
         action ||
         (status &&
-          ![
-            TaskStatus.REGISTERED,
-            TaskStatus.VALIDATED,
-            TaskStatus.DECLARED,
-            TaskStatus.IN_PROGRESS
-          ].includes(status))
+          !['REGISTERED', 'VALIDATED', 'DECLARED', 'IN_PROGRESS'].includes(
+            status
+          ))
       ) {
         return null
       }
@@ -1710,7 +1706,7 @@ export const typeResolvers: GQLResolver = {
     spouse: findPatient(SPOUSE_CODE),
 
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async eventLocation(record: Saved<Bundle>) {
       const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
@@ -1868,7 +1864,7 @@ export const typeResolvers: GQLResolver = {
     child: findPatient(CHILD_CODE),
     informant: findRelatedPerson(INFORMANT_CODE),
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async weightAtBirth(record: Saved<Bundle>) {
       return findObservationByCode(record, BODY_WEIGHT_CODE)?.valueQuantity
@@ -2004,7 +2000,7 @@ export const typeResolvers: GQLResolver = {
     witnessTwo: findRelatedPerson(WITNESS_TWO_CODE),
 
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)

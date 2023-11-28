@@ -13,8 +13,6 @@ import {
   CertifiedRecord,
   CorrectionRequestedRecord,
   RegisteredRecord,
-  ValidatedRecord,
-  WaitingForValidationRecord,
   Nominal,
   StateIdenfitiers,
   IssuedRecord
@@ -45,7 +43,6 @@ export type Action = RequestCorrection | Certify | Validate
  */
 
 export type StateTree =
-  | Transition<WaitingForValidationRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
   // Corrections

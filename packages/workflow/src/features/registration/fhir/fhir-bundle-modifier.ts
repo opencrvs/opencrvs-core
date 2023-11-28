@@ -17,7 +17,8 @@ import {
   RegistrationNumber,
   Saved,
   Task,
-  findExtension
+  findExtension,
+  TaskStatus
 } from '@opencrvs/commons/types'
 import {
   APPLICATION_CONFIG_URL,
@@ -76,7 +77,6 @@ export async function modifyRegistrationBundle<T extends Bundle>(
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
-    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
@@ -159,7 +159,7 @@ export async function invokeRegistrationValidation(
       throw new Error('Cant get composition in bundle')
     }
     const taskResource = await fetchTaskByCompositionIdFromHearth(
-      composition.id
+      composition.id!
     )
     const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -434,7 +434,7 @@ export function setupRegistrationType(
 export async function setupRegistrationWorkflow(
   taskResource: Task,
   tokenpayload: ITokenPayload,
-  defaultStatus?: string
+  defaultStatus?: TaskStatus
 ): Promise<Task> {
   const regStatusCodeString = defaultStatus
     ? defaultStatus
@@ -608,7 +608,10 @@ export async function checkForDuplicateStatusUpdate(taskResource: Task) {
   const existingRegStatusCode = await fetchExistingRegStatusCode(
     taskResource.id
   )
-  if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
+  if (
+    existingRegStatusCode &&
+    existingRegStatusCode.code === regStatusCode.code
+  ) {
     logger.error(`Declaration is already in ${regStatusCode} state`)
     throw new Error(`Declaration is already in ${regStatusCode} state`)
   }

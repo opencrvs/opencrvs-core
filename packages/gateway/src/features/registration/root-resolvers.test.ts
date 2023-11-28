@@ -8,10 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  resolvers as appResolvers,
-  lookForComposition
-} from '@gateway/features/registration/root-resolvers'
+import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 import {
   ASSIGNED_EXTENSION_URL,
@@ -685,81 +682,6 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('duplicate entry', () => {
-    const details = {
-      child: {
-        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
-      },
-      mother: {
-        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
-        telecom: [{ system: 'phone', value: '+8801622688231' }]
-      },
-      father: {
-        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
-      },
-      registration: {
-        informantType: 'FATHER',
-        draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
-      }
-    }
-    it('checks duplicate draftId', async () => {
-      fetch.mockResponses(
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                resource: {
-                  resourceType: 'Task',
-
-                  focus: {
-                    reference:
-                      'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
-                  },
-                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'BewpkiM'
-            }
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const result = await resolvers.Mutation!.createBirthRegistration(
-        {},
-        { details },
-        { headers: undefined }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual({
-        compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
-        trackingId: 'BewpkiM'
-      })
-    })
-    it('checks no task entry with draftId', async () => {
-      fetch.mockResponses([JSON.stringify({}), { status: 200 }])
-
-      const result = await lookForComposition(
-        '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        {} as any
-      )
-
-      expect(result).toBeUndefined()
-    })
-  })
   describe('createDeathRegistration()', () => {
     const details = {
       deceased: {
@@ -770,37 +692,14 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify({}), { status: 200 }],
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: {
-                  status: '201',
-                  location:
-                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
-                }
-              }
-            ],
-            type: 'transaction-response'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'DewpkiM'
-            }
-          }),
-          { status: 200 }
-        ]
-      )
+      fetch.mockResponses([
+        JSON.stringify({
+          compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          isPotentiallyDuplicate: false,
+          trackingId: 'DewpkiM'
+        }),
+        { status: 200 }
+      ])
       const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
@@ -820,119 +719,6 @@ describe('Registration root resolvers', () => {
         expect.objectContaining({ method: 'POST' })
       )
     })
-    it('posts a fhir bundle as registrar', async () => {
-      const token = jwt.sign(
-        { scope: ['register'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:gateway-user'
-        }
-      )
-      fetch.mockResponses(
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                resource: {
-                  resourceType: 'Task',
-
-                  focus: {
-                    reference:
-                      'Composition/9633042c-ca34-4b9f-959b-9d16909fd85c'
-                  },
-                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'ready',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'DEATH'
-                      }
-                    ]
-                  },
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: { reference: 'DUMMY' }
-                    }
-                  ],
-                  lastModified: '2018-11-28T15:13:57.492Z',
-                  note: [
-                    {
-                      text: '',
-                      time: '2018-11-28T15:13:57.492Z',
-                      authorString: 'DUMMY'
-                    }
-                  ],
-                  focus: {
-                    reference:
-                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/death-tracking-id',
-                      value: 'D1mW7jA'
-                    },
-                    {
-                      system:
-                        'http://opencrvs.org/specs/id/death-registration-number',
-                      value: '2019123265B1234569'
-                    }
-                  ],
-                  businessStatus: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/reg-status',
-                        code: 'REJECTED'
-                      }
-                    ]
-                  },
-                  meta: {
-                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
-                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
-                  },
-                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-      const result = await resolvers.Mutation!.createDeathRegistration(
-        {},
-        { details },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
-      })
-    })
   })
   describe('createBirthRegistration()', () => {
     const details = {
@@ -949,36 +735,14 @@ describe('Registration root resolvers', () => {
       registration: { informantType: 'MOTHER' }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: {
-                  status: '201',
-                  location:
-                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
-                }
-              }
-            ],
-            type: 'transaction-response'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'BewpkiM'
-            }
-          }),
-          { status: 200 }
-        ]
-      )
+      fetch.mockResponses([
+        JSON.stringify({
+          compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          trackingId: 'BewpkiM',
+          isPotentiallyDuplicate: false
+        }),
+        { status: 200 }
+      ])
       const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
@@ -997,175 +761,6 @@ describe('Registration root resolvers', () => {
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
-    })
-
-    it('posts a fhir bundle as registrar', async () => {
-      const token = jwt.sign(
-        { scope: ['register'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:gateway-user'
-        }
-      )
-      fetch.mockResponses(
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: {
-                  status: '201',
-                  location:
-                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
-                }
-              }
-            ],
-            type: 'transaction-response'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'ready',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'BIRTH'
-                      }
-                    ]
-                  },
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/contact-person',
-                      valueString: 'MOTHER'
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: { reference: 'DUMMY' }
-                    }
-                  ],
-                  lastModified: '2018-11-28T15:13:57.492Z',
-                  note: [
-                    {
-                      text: '',
-                      time: '2018-11-28T15:13:57.492Z',
-                      authorString: 'DUMMY'
-                    }
-                  ],
-                  focus: {
-                    reference:
-                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                      value: 'B1mW7jA'
-                    },
-                    {
-                      system:
-                        'http://opencrvs.org/specs/id/birth-registration-number',
-                      value: '2019123265B1234569'
-                    }
-                  ],
-                  businessStatus: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/reg-status',
-                        code: 'REJECTED'
-                      }
-                    ]
-                  },
-                  meta: {
-                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
-                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
-                  },
-                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-      const result = await resolvers.Mutation!.createBirthRegistration(
-        {},
-        { details },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
-      })
-    })
-
-    it('throws an error when invalid composition is returned', async () => {
-      fetch.mockResponses(
-        [JSON.stringify([]), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: {
-                  status: '201',
-                  location:
-                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
-                }
-              }
-            ],
-            type: 'transaction-response'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition'
-          }),
-          { status: 200 }
-        ]
-      )
-      await expect(
-        resolvers.Mutation!.createBirthRegistration(
-          {},
-          { details },
-          { headers: undefined }
-        )
-      ).rejects.toThrowError(
-        'getTrackingId: Invalid composition or composition has no identifier'
-      )
-    })
-
-    it("throws an error when the response isn't what we expect", async () => {
-      fetch.mockResponse(JSON.stringify({}))
-      fetch.mockResponse(
-        JSON.stringify({
-          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-        })
-      )
-      await expect(
-        resolvers.Mutation!.createBirthRegistration(
-          {},
-          { details },
-          { headers: undefined }
-        )
-      ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
   describe('markEventAsVoided()', () => {

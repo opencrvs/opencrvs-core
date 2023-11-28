@@ -11,6 +11,7 @@
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
+import createRecordHandler from '@workflow/records/handler/create'
 
 export const getRoutes = () => {
   const routes = [
@@ -60,6 +61,15 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/create-record',
+      handler: createRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
       }
     }
   ]

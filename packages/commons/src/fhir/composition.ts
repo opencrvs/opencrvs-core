@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Reference, ResourceIdentifier, SavedReference, URNReference } from '.'
+import { Reference, URLReference, SavedReference, URNReference } from '.'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -45,58 +45,38 @@ export type CompositionSectionEncounterReference =
 type ReferenceType =
   | {
       code: typeof ATTACHMENT_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
   | {
       code: typeof CORRECTION_CERTIFICATE_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
   | {
       code: typeof CERTIFICATE_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
   | {
-      code: typeof BIRTH_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      code: CompositionSectionEncounterReference
+      reference: URLReference | URNReference
     }
-  | {
-      code: typeof MARRIAGE_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
-    }
-  | {
-      code: typeof DEATH_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
-    }
-  | {
-      code: typeof BIRTH_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
-    }
-  | {
-      code: typeof DEATH_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
-    }
-  | {
-      code: typeof MARRIAGE_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
-    }
-  | { code: typeof MOTHER_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof FATHER_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof CHILD_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof DECEASED_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof SPOUSE_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof BRIDE_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof GROOM_CODE; reference: ResourceIdentifier | URNReference }
+  | { code: typeof MOTHER_CODE; reference: URLReference | URNReference }
+  | { code: typeof FATHER_CODE; reference: URLReference | URNReference }
+  | { code: typeof CHILD_CODE; reference: URLReference | URNReference }
+  | { code: typeof DECEASED_CODE; reference: URLReference | URNReference }
+  | { code: typeof SPOUSE_CODE; reference: URLReference | URNReference }
+  | { code: typeof BRIDE_CODE; reference: URLReference | URNReference }
+  | { code: typeof GROOM_CODE; reference: URLReference | URNReference }
   | {
       code: typeof INFORMANT_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
   | {
       code: typeof WITNESS_ONE_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
   | {
       code: typeof WITNESS_TWO_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: URLReference | URNReference
     }
 
 export type CompositionSectionCode = ReferenceType['code']
