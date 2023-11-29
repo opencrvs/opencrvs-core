@@ -15,6 +15,7 @@ import {
   findExtension,
   getComposition,
   getResourceFromBundleById,
+  getStatusFromTask,
   getTaskFromSavedBundle,
   getTrackingId,
   InProgressRecord,
@@ -25,6 +26,12 @@ import {
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
+
+function error(record: InProgressRecord, message: string): never {
+  const task = getTaskFromSavedBundle(record)
+  const taskStatus = getStatusFromTask(task)
+  throw new Error(`${message} in ${taskStatus} record`)
+}
 
 function getOfficeName(record: InProgressRecord) {
   const task = getTaskFromSavedBundle(record)
@@ -44,25 +51,25 @@ function getInformantName(record: InProgressRecord) {
   if (!informantSection) {
     return null
   }
-  const informant = getResourceFromBundleById<Patient>(
+  const informant: Partial<Patient> = getResourceFromBundleById<Patient>(
     record,
     urlReferenceToUUID(informantSection.entry[0].reference)
   )
-  const name = informant.name.find(({ use }) => use === 'en')
+  const name = informant.name?.find(({ use }) => use === 'en')
   if (!name) {
     return null
   }
   return [name.given?.join(' '), name.family.join(' ')].join(' ')
 }
 
-async function getRegistrationLocation(record: InProgressRecord) {
+function getRegistrationLocation(record: InProgressRecord) {
   const task = getTaskFromSavedBundle(record)
   const locationExtension = findExtension(
     'http://opencrvs.org/specs/extension/regLastLocation',
     task.extension
   )
   if (!locationExtension) {
-    throw new Error('No last registration office found on the bundle')
+    error(record, 'no last registration office found')
   }
   const location = getResourceFromBundleById<Location>(
     record,
@@ -72,7 +79,7 @@ async function getRegistrationLocation(record: InProgressRecord) {
   return (
     (language === 'en'
       ? location.name
-      : (location.alias && location.alias[0]) || location.name) || ''
+      : location.alias?.[0] ?? location.name) ?? ''
   )
 }
 

@@ -102,7 +102,7 @@ function getRegistrationLocation(record: ReadyForReviewRecord) {
   return (
     (language === 'en'
       ? location.name
-      : (location.alias && location.alias[0]) || location.name) || ''
+      : location.alias?.[0] ?? location.name) ?? ''
   )
 }
 
