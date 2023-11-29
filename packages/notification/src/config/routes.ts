@@ -44,6 +44,7 @@ import {
 import { ServerRoute, ReqRefDefaults } from '@hapi/hapi'
 import * as Joi from 'joi'
 import { inProgressNotification } from '@notification/features/inProgress/handler'
+import { readyForReviewNotification } from '@notification/features/readyForReview/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -93,6 +94,22 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description:
           'Sends a notification to country-config for in-progress declaration',
+        validate: {
+          payload: Joi.object(),
+          params: Joi.object({
+            event: eventSchema
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/{event}/ready-for-review',
+      handler: readyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for ready for review declaration',
         validate: {
           payload: Joi.object(),
           params: Joi.object({
