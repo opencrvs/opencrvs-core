@@ -10,8 +10,12 @@
  */
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
-import { ValidRecord } from '@opencrvs/commons/types'
+import { EVENT_TYPE, ValidRecord } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import {
+  getInformantSMSNotification,
+  InformantNotificationName
+} from '@workflow/features/registration/smsNotificationUtils'
 
 type NotificationEvent = 'in-progress' | 'ready-for-review'
 
@@ -40,4 +44,41 @@ export async function sendNotification(
     )
   }
   return res
+}
+
+//NOT SENDING ANY NOTIFICATIONS if failed to retrieve flags
+async function getNotificationFlags(token: string) {
+  try {
+    return await getInformantSMSNotification(token)
+  } catch {
+    return []
+  }
+}
+
+type SupportedEvents = Exclude<EVENT_TYPE, 'MARRIAGE'>
+
+const MAPPING: Record<
+  SupportedEvents,
+  Record<NotificationEvent, InformantNotificationName>
+> = {
+  [EVENT_TYPE.BIRTH]: {
+    'in-progress': InformantNotificationName.birthInProgressSMS,
+    'ready-for-review': InformantNotificationName.birthDeclarationSMS
+  },
+  [EVENT_TYPE.DEATH]: {
+    'in-progress': InformantNotificationName.deathInProgressSMS,
+    'ready-for-review': InformantNotificationName.deathDeclarationSMS
+  }
+}
+
+export async function isNotificationEnabled(
+  action: NotificationEvent,
+  event: SupportedEvents,
+  token: string
+) {
+  const notificationFlags = await getNotificationFlags(token)
+  return (
+    notificationFlags.find(({ name }) => name === MAPPING[event][action])
+      ?.enabled ?? false
+  )
 }
