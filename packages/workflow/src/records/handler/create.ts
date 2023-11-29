@@ -137,6 +137,7 @@ export default async function createRecordHandler(
     const trackingId = generateTrackingIdForEvents(event)
     const composition = getComposition(inputBundle)
     const inProgress = isInProgressDeclaration(inputBundle)
+    const eventNotification = isEventNotification(inputBundle)
 
     composition.identifier = {
       system: 'urn:ietf:rfc:3986',
@@ -152,9 +153,9 @@ export default async function createRecordHandler(
 
     const taskWithUser = setupLastRegUser(task, practitioner)
 
-    const taskWithLocation = isEventNotification(inputBundle)
-      ? await setupLastRegLocation(taskWithUser, practitioner)
-      : taskWithUser
+    const taskWithLocation = eventNotification
+      ? taskWithUser
+      : await setupLastRegLocation(taskWithUser, practitioner)
 
     inputBundle.entry = inputBundle.entry.map((e) => {
       if (e.resource.resourceType !== 'Task') {
@@ -195,11 +196,16 @@ export default async function createRecordHandler(
       record,
       token
     )
-    await sendNotification(
-      inProgress ? 'in-progress' : 'ready-for-review',
-      record,
-      token
-    )
+
+    // Notification not implemented for marriage yet
+    // don't forward hospital notifications
+    if (event !== EVENT_TYPE.MARRIAGE && !eventNotification) {
+      await sendNotification(
+        inProgress ? 'in-progress' : 'ready-for-review',
+        record,
+        token
+      )
+    }
 
     return {
       compositionId,
