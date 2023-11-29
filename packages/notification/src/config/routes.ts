@@ -41,10 +41,16 @@ import {
   sendResetPasswordInvite,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
-import { ServerRoute, ReqRefDefaults } from '@hapi/hapi'
+import { ServerRoute, ReqRefDefaults, RouteOptionsValidate } from '@hapi/hapi'
 import * as Joi from 'joi'
-import { inProgressNotification } from '@notification/features/inProgress/handler'
-import { readyForReviewNotification } from '@notification/features/readyForReview/handler'
+import {
+  birthInProgressNotification,
+  deathInProgressNotification
+} from '@notification/features/inProgress/handler'
+import {
+  birthReadyForReviewNotification,
+  deathReadyForReviewNotification
+} from '@notification/features/readyForReview/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -54,7 +60,9 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin'
 }
 
-const eventSchema = Joi.string().valid('birth', 'death')
+const recordValidation: RouteOptionsValidate = {
+  payload: Joi.object()
+}
 
 export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
   return [
@@ -88,34 +96,46 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/{event}/in-progress',
-      handler: inProgressNotification,
+      path: '/birth/in-progress',
+      handler: birthInProgressNotification,
       options: {
         tags: ['api'],
         description:
-          'Sends a notification to country-config for in-progress declaration',
-        validate: {
-          payload: Joi.object(),
-          params: Joi.object({
-            event: eventSchema
-          })
-        }
+          'Sends a notification to country-config for birth in-progress declaration',
+        validate: recordValidation
       }
     },
     {
       method: 'POST',
-      path: '/{event}/ready-for-review',
-      handler: readyForReviewNotification,
+      path: '/death/in-progress',
+      handler: deathInProgressNotification,
       options: {
         tags: ['api'],
         description:
-          'Sends a notification to country-config for ready for review declaration',
-        validate: {
-          payload: Joi.object(),
-          params: Joi.object({
-            event: eventSchema
-          })
-        }
+          'Sends a notification to country-config for death in-progress declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/ready-for-review',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/ready-for-review',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth ready for review declaration',
+        validate: recordValidation
       }
     },
     {

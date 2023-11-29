@@ -65,6 +65,26 @@ function getInformantName(record: ReadyForReviewRecord) {
   return [name.given?.join(' '), name.family.join(' ')].join(' ')
 }
 
+function getDeceasedName(record: ReadyForReviewRecord) {
+  const composition = getComposition(record)
+  const deceasedSection = findCompositionSection(
+    'deceased-details',
+    composition
+  )
+  if (!deceasedSection) {
+    error(record, 'deceased section not found')
+  }
+  const deceased = getResourceFromBundleById<Patient>(
+    record,
+    urlReferenceToUUID(deceasedSection.entry[0].reference)
+  )
+  const name = deceased.name.find(({ use }) => use === 'en')
+  if (!name) {
+    error(record, 'name not found in deceased patient resource')
+  }
+  return [name.given?.join(' '), name.family.join(' ')].join(' ')
+}
+
 function getRegistrationLocation(record: ReadyForReviewRecord) {
   const task = getTaskFromSavedBundle(record)
   const locationExtension = findExtension(
@@ -104,13 +124,11 @@ function getContactEmail(record: ReadyForReviewRecord) {
   return emailExtension?.valueString
 }
 
-export async function readyForReviewNotification(
+export async function birthReadyForReviewNotification(
   req: Request,
   h: ResponseToolkit
 ) {
   const readyForReviewRecord = req.payload as ReadyForReviewRecord
-  const phoneNo = getContactPhoneNo(readyForReviewRecord)
-  const email = getContactEmail(readyForReviewRecord)
   await sendNotification(
     req,
     {
@@ -118,14 +136,41 @@ export async function readyForReviewNotification(
       email: messageKeys.birthInProgressNotification
     },
     {
-      sms: phoneNo,
-      email: email
+      sms: getContactPhoneNo(readyForReviewRecord),
+      email: getContactEmail(readyForReviewRecord)
     },
     'informant',
     {
       trackingId: getTrackingId(readyForReviewRecord),
       crvsOffice: getOfficeName(readyForReviewRecord),
       registrationLocation: getRegistrationLocation(readyForReviewRecord),
+      informantName: getInformantName(readyForReviewRecord)
+    }
+  )
+  return h.response().code(200)
+}
+
+export async function deathReadyForReviewNotification(
+  req: Request,
+  h: ResponseToolkit
+) {
+  const readyForReviewRecord = req.payload as ReadyForReviewRecord
+  await sendNotification(
+    req,
+    {
+      sms: messageKeys.birthInProgressNotification,
+      email: messageKeys.birthInProgressNotification
+    },
+    {
+      sms: getContactPhoneNo(readyForReviewRecord),
+      email: getContactEmail(readyForReviewRecord)
+    },
+    'informant',
+    {
+      trackingId: getTrackingId(readyForReviewRecord),
+      crvsOffice: getOfficeName(readyForReviewRecord),
+      registrationLocation: getRegistrationLocation(readyForReviewRecord),
+      name: getDeceasedName(readyForReviewRecord),
       informantName: getInformantName(readyForReviewRecord)
     }
   )

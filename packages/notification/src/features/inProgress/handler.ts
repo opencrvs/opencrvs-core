@@ -94,10 +94,11 @@ function getContactEmail(record: InProgressRecord) {
   return emailExtension?.valueString
 }
 
-export async function inProgressNotification(req: Request, h: ResponseToolkit) {
+export async function birthInProgressNotification(
+  req: Request,
+  h: ResponseToolkit
+) {
   const inProgressRecord = req.payload as InProgressRecord
-  const phoneNo = getContactPhoneNo(inProgressRecord)
-  const email = getContactEmail(inProgressRecord)
   await sendNotification(
     req,
     {
@@ -105,8 +106,34 @@ export async function inProgressNotification(req: Request, h: ResponseToolkit) {
       email: messageKeys.birthInProgressNotification
     },
     {
-      sms: phoneNo,
-      email: email
+      sms: getContactPhoneNo(inProgressRecord),
+      email: getContactEmail(inProgressRecord)
+    },
+    'informant',
+    {
+      trackingId: getTrackingId(inProgressRecord),
+      crvsOffice: getOfficeName(inProgressRecord),
+      registrationLocation: getRegistrationLocation(inProgressRecord),
+      informantName: getInformantName(inProgressRecord)
+    }
+  )
+  return h.response().code(200)
+}
+
+export async function deathInProgressNotification(
+  req: Request,
+  h: ResponseToolkit
+) {
+  const inProgressRecord = req.payload as InProgressRecord
+  await sendNotification(
+    req,
+    {
+      sms: messageKeys.birthInProgressNotification,
+      email: messageKeys.birthInProgressNotification
+    },
+    {
+      sms: getContactPhoneNo(inProgressRecord),
+      email: getContactEmail(inProgressRecord)
     },
     'informant',
     {
