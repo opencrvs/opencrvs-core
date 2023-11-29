@@ -183,7 +183,7 @@ export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient?: {
+  patient: {
     reference: URLReference
   }
 }
