@@ -10,7 +10,6 @@
  */
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
-import { logger } from '@workflow/logger'
 import { indexBundle } from '@workflow/records/search'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toValidated } from '@workflow/records/state-transitions'
@@ -23,25 +22,20 @@ export const validateRoute = [
     allowedStartStates: ['IN_PROGRESS', 'DECLARED'],
     action: 'VALIDATION',
     handler: async (request, record) => {
-      try {
-        const token = getToken(request)
+      const token = getToken(request)
 
-        const practitioner = await getLoggedInPractitionerResource(token)
+      const practitioner = await getLoggedInPractitionerResource(token)
 
-        const recordInValidatedRequestedState = await toValidated(
-          record,
-          practitioner
-        )
+      const recordInValidatedRequestedState = await toValidated(
+        record,
+        practitioner
+      )
 
-        await sendBundleToHearth(recordInValidatedRequestedState)
+      await sendBundleToHearth(recordInValidatedRequestedState)
 
-        await indexBundle(recordInValidatedRequestedState, token)
+      await indexBundle(recordInValidatedRequestedState, token)
 
-        return recordInValidatedRequestedState
-      } catch (error) {
-        logger.error(`Workflow/markAsValidatedHandler: error: ${error}`)
-        throw new Error(error)
-      }
+      return recordInValidatedRequestedState
     }
   })
 ]

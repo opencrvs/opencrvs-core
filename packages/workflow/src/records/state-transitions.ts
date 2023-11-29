@@ -210,8 +210,7 @@ export async function toUpdated(
     practitioner
   )
 
-  let newEntries
-  newEntries = [
+  const newEntries = [
     ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
     { resource: updatedTaskWithLocationExtensions }
   ]

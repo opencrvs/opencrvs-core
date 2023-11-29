@@ -18,7 +18,6 @@ import {
   updateFHIRBundle,
   Registration
 } from '@opencrvs/commons/types'
-import { logger } from '@workflow/logger'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
@@ -52,37 +51,29 @@ export const updateRoute = [
     allowedStartStates: ['IN_PROGRESS', 'DECLARED'],
     action: 'DECLARATION_UPDATED',
     handler: async (request, record) => {
-      try {
-        const token = getToken(request)
-        const payload = validateRequest(requestSchema, request.payload)
+      const token = getToken(request)
+      const payload = validateRequest(requestSchema, request.payload)
 
-        const { details, event } = payload
-        const { registration, ...detailsWithoutReg } = details
-        const { changedValues, ...restOfRegistration } = registration
-        const updatedDetails = validateRequest(
-          ChangedValuesInput,
-          changedValues
-        )
+      const { details, event } = payload
+      const { registration, ...detailsWithoutReg } = details
+      const { changedValues, ...restOfRegistration } = registration
+      const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
 
-        const recordInUpdatedState = await toUpdated(
-          record,
-          await getLoggedInPractitionerResource(token),
-          updatedDetails
-        )
+      const recordInUpdatedState = await toUpdated(
+        record,
+        await getLoggedInPractitionerResource(token),
+        updatedDetails
+      )
 
-        const updatedBundle = updateFHIRBundle(
-          recordInUpdatedState,
-          { ...detailsWithoutReg, registration: restOfRegistration },
-          event
-        )
+      const updatedBundle = updateFHIRBundle(
+        recordInUpdatedState,
+        { ...detailsWithoutReg, registration: restOfRegistration },
+        event
+      )
 
-        await sendBundleToHearth(updatedBundle)
-        await indexBundle(updatedBundle, token)
-        return updatedBundle
-      } catch (error) {
-        logger.error(`Workflow/updatedHandler: error: ${error}`)
-        throw new Error(error)
-      }
+      await sendBundleToHearth(updatedBundle)
+      await indexBundle(updatedBundle, token)
+      return updatedBundle
     }
   })
 ]
