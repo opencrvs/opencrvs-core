@@ -24,11 +24,6 @@ import {
   setupLastRegUser,
   setupLastRegLocation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-// import {
-//   getSharedContactMsisdn,
-//   getSharedContactEmail
-// } from '@workflow/features/registration/fhir/fhir-utils'
-// import { sendCreateRecordNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import {
@@ -48,6 +43,7 @@ import {
 import { getRecordById } from '@workflow/records'
 import { auditEvent } from '@workflow/records/audit'
 import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
+import { sendNotification } from '@workflow/records/notification'
 
 export const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -199,8 +195,11 @@ export default async function createRecordHandler(
       record,
       token
     )
-
-    // TODO: SEND NOTIFICATION
+    await sendNotification(
+      inProgress ? 'in-progress' : 'ready-for-review',
+      record,
+      token
+    )
 
     return {
       compositionId,
