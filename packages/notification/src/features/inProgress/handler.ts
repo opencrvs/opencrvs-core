@@ -70,7 +70,7 @@ function getInformantName(record: InProgressRecord) {
   if (!name) {
     return null
   }
-  return [name.given?.join(' '), name.family.join(' ')].join(' ')
+  return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
 }
 
 function getRegistrationLocation(record: InProgressRecord) {

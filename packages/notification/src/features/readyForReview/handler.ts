@@ -67,7 +67,7 @@ function getInformantName(record: ReadyForReviewRecord) {
   if (!name) {
     error(record, 'name not found in informant patient resource')
   }
-  return [name.given?.join(' '), name.family.join(' ')].join(' ')
+  return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
 }
 
 function getDeceasedName(record: ReadyForReviewRecord) {
@@ -87,7 +87,7 @@ function getDeceasedName(record: ReadyForReviewRecord) {
   if (!name) {
     error(record, 'name not found in deceased patient resource')
   }
-  return [name.given?.join(' '), name.family.join(' ')].join(' ')
+  return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
 }
 
 function getRegistrationLocation(record: ReadyForReviewRecord) {
