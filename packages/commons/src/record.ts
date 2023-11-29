@@ -97,6 +97,19 @@ export type ValidRecord =
   | InProgressRecord
   | DeclaredRecord
 
+export type RegistrationStatus =
+  | 'ARCHIVED'
+  | 'CERTIFIED'
+  | 'CORRECTION_REQUESTED'
+  | 'DECLARATION_UPDATED'
+  | 'DECLARED'
+  | 'IN_PROGRESS'
+  | 'ISSUED'
+  | 'REGISTERED'
+  | 'REJECTED'
+  | 'VALIDATED'
+  | 'WAITING_VALIDATION'
+
 export type StateIdenfitiers = {
   IN_PROGRESS: InProgressRecord
   DECLARED: DeclaredRecord

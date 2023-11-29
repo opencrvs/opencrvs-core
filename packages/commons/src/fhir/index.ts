@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ValidRecord } from '../record'
+import { RegistrationStatus, ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
@@ -73,19 +73,6 @@ export type Bundle<T extends Resource = Resource> = Omit<
 export type WithUUID<T extends Resource> = Omit<T, 'id'> & {
   id: UUID
 }
-
-export type RegistrationStatus =
-  | 'ARCHIVED'
-  | 'CERTIFIED'
-  | 'CORRECTION_REQUESTED'
-  | 'DECLARATION_UPDATED'
-  | 'DECLARED'
-  | 'IN_PROGRESS'
-  | 'ISSUED'
-  | 'REGISTERED'
-  | 'REJECTED'
-  | 'VALIDATED'
-  | 'WAITING_VALIDATION'
 
 type SavedResource<T extends Resource> = T extends Encounter
   ? SavedEncounter
