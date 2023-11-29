@@ -13,6 +13,7 @@ import { getDefaultLanguage } from '@notification/i18n/utils'
 import {
   findCompositionSection,
   findExtension,
+  findResourceFromBundleById,
   getComposition,
   getResourceFromBundleById,
   getStatusFromTask,
@@ -21,7 +22,9 @@ import {
   InProgressRecord,
   Location,
   Patient,
+  RelatedPerson,
   resourceIdentifierToUUID,
+  SavedRelatedPerson,
   urlReferenceToUUID
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
@@ -51,11 +54,19 @@ function getInformantName(record: InProgressRecord) {
   if (!informantSection) {
     return null
   }
-  const informant: Partial<Patient> = getResourceFromBundleById<Patient>(
+  const informantRelation: Partial<SavedRelatedPerson> =
+    getResourceFromBundleById<RelatedPerson>(
+      record,
+      urlReferenceToUUID(informantSection.entry[0].reference)
+    )
+  if (!informantRelation.patient?.reference) {
+    return null
+  }
+  const informant = findResourceFromBundleById<Patient>(
     record,
-    urlReferenceToUUID(informantSection.entry[0].reference)
+    urlReferenceToUUID(informantRelation.patient.reference)
   )
-  const name = informant.name?.find(({ use }) => use === 'en')
+  const name = informant?.name?.find(({ use }) => use === 'en')
   if (!name) {
     return null
   }

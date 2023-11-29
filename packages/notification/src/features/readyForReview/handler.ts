@@ -22,7 +22,8 @@ import {
   Patient,
   resourceIdentifierToUUID,
   urlReferenceToUUID,
-  getStatusFromTask
+  getStatusFromTask,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
@@ -54,9 +55,13 @@ function getInformantName(record: ReadyForReviewRecord) {
   if (!informantSection) {
     error(record, 'informant section not found')
   }
-  const informant = getResourceFromBundleById<Patient>(
+  const informantRelation = getResourceFromBundleById<RelatedPerson>(
     record,
     urlReferenceToUUID(informantSection.entry[0].reference)
+  )
+  const informant = getResourceFromBundleById<Patient>(
+    record,
+    urlReferenceToUUID(informantRelation.patient.reference)
   )
   const name = informant.name.find(({ use }) => use === 'en')
   if (!name) {
