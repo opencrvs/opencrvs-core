@@ -18,8 +18,7 @@ import {
   StateIdenfitiers,
   IssuedRecord,
   InProgressRecord,
-  DeclaredRecord,
-  UnregisteredSavedRecord
+  DeclaredRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -42,15 +41,12 @@ export type ActionIdentifiers = {
   DECLARATION_UPDATED: Update
 }
 
-export type Action = RequestCorrection | Certify | Validate
-
 /*
  * Amend this state tree to allow more state transitions
  */
 
 export type StateTree =
-  | Transition<InProgressRecord, Validate, ValidatedRecord>
-  | Transition<DeclaredRecord, Validate, ValidatedRecord>
+  | Transition<InProgressRecord | DeclaredRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
   // Corrections
@@ -67,7 +63,11 @@ export type StateTree =
       RegisteredRecord | CertifiedRecord | IssuedRecord
     >
   // Update declaration
-  | Transition<UnregisteredSavedRecord, Update, UnregisteredSavedRecord>
+  | Transition<
+      InProgressRecord | DeclaredRecord,
+      Update,
+      InProgressRecord | DeclaredRecord
+    >
 
 /*
  * Internals

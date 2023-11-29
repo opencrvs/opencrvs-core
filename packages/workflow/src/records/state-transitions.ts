@@ -27,7 +27,8 @@ import {
   RecordWithPreviousTask,
   ValidatedRecord,
   Attachment,
-  UnregisteredSavedRecord
+  InProgressRecord,
+  DeclaredRecord
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -188,10 +189,10 @@ export async function toCorrectionApproved(
 }
 
 export async function toUpdated(
-  record: UnregisteredSavedRecord,
+  record: InProgressRecord | DeclaredRecord,
   practitioner: Practitioner,
   updatedDetails: ChangedValuesInput
-): Promise<UnregisteredSavedRecord> {
+): Promise<InProgressRecord | DeclaredRecord> {
   const previousTask = getTaskFromBundle(record)
 
   const updatedTask = createUpdatedTask(
@@ -223,7 +224,7 @@ export async function toUpdated(
 }
 
 export async function toValidated(
-  record: UnregisteredSavedRecord,
+  record: InProgressRecord | DeclaredRecord,
   practitioner: Practitioner
 ): Promise<ValidatedRecord> {
   const previousTask = getTaskFromBundle(record)
