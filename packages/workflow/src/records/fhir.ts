@@ -402,7 +402,7 @@ export function createCorrectionRequestTask(
   }
 }
 
-type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
+export type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
   entry: Array<
     Omit<fhir3.BundleEntry, 'response'> & {
       response: Omit<fhir3.BundleEntryResponse, 'location'> & {

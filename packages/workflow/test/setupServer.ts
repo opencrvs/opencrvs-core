@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import pino from 'pino'
-export const logger = pino()
+import { setupServer } from 'msw/node'
+import handlers from './handlers'
 
-const level = process.env.NODE_ENV === 'test' ? 'error' : process.env.LOG_LEVEL
-if (level) {
-  logger.level = level
-}
+// This configures a request mocking server with the given request handlers.
+export const server = setupServer(...handlers)

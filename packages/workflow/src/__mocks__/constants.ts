@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import pino from 'pino'
-export const logger = pino()
-
-const level = process.env.NODE_ENV === 'test' ? 'error' : process.env.LOG_LEVEL
-if (level) {
-  logger.level = level
-}
+export const HEARTH_URL = 'http://localhost:3447/fhir'
+export const CERT_PUBLIC_KEY_PATH = './test/cert.key.pub'
+export const USER_MANAGEMENT_URL = 'http://localhost:3030/'
+export const SEARCH_URL = 'http://localhost:9090/'
+export const METRICS_URL = 'http://localhost:1050/'
+export const NOTIFICATION_SERVICE_URL = 'http://localhost:2020/'
+export const APPLICATION_CONFIG_URL = 'http://localhost:2021/'
