@@ -230,7 +230,7 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
     )
     pageContent = (
       <>
-        <FixedNavigation />
+        <FixedNavigation loadWorkqueueStatuses={false} />
         <BodyContainer>
           <DynamicContainer
             marginLeft={props.marginLeft}

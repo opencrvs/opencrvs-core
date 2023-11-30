@@ -162,7 +162,7 @@ const messagesToDefine = {
     id: 'review.actions.desc.regConfNotToBeRegistered'
   },
   registerActionTitle: {
-    defaultMessage: 'Ready to register?',
+    defaultMessage: 'Register event',
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
@@ -183,8 +183,7 @@ const messagesToDefine = {
     id: 'misc.description.inComplete'
   },
   approvalActionTitle: {
-    defaultMessage:
-      'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
+    defaultMessage: 'Send for approval?',
     description: 'Title for review action component',
     id: 'misc.title.declarationStatus'
   },

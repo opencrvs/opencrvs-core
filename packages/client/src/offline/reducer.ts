@@ -25,7 +25,8 @@ import {
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   ICertificateTemplateData,
-  referenceApi
+  referenceApi,
+  CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -83,6 +84,7 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
+    fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
     certificates?: {
@@ -223,6 +225,14 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   failActionCreator: actions.configFailed
 })
 
+const CERTIFICATE_CONFIG_CMD = Cmd.run(
+  () => referenceApi.loadCertificateConfiguration(),
+  {
+    successActionCreator: actions.certificateConfigurationLoaded,
+    failActionCreator: actions.certificateConfigurationLoadFailed
+  }
+)
+
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
@@ -257,6 +267,7 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
+    CERTIFICATE_CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
     HANDLEBARS_CMD,
@@ -521,6 +532,7 @@ function reducer(
         const newOfflineData = {
           ...state.offlineData,
           templates: {
+            ...state.offlineData.templates,
             certificates: certificatesTemplates
           }
         }
@@ -580,6 +592,23 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            fonts: action.payload.fonts
+          }
+        }
+      }
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
+      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*

@@ -72,7 +72,7 @@ import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 const SCREEN_LOCK = 'screenLock'
 
 type Keys = keyof typeof WORKQUEUE_TABS
-export type IWORKQUEUE_TABS = typeof WORKQUEUE_TABS[Keys]
+export type IWORKQUEUE_TABS = (typeof WORKQUEUE_TABS)[Keys]
 
 export const WORKQUEUE_TABS = {
   inProgress: 'progress',

@@ -10,7 +10,7 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Upload } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -184,7 +184,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -216,7 +216,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -233,7 +233,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.registerActionTitle,
               payload: { completeDeclaration: true }
             },
             description: {

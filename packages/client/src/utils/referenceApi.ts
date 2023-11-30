@@ -24,6 +24,17 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
+
+type FontFamilyTypes = {
+  normal: string
+  bold: string
+  italics: string
+  bolditalics: string
+}
+
+export type CertificateConfiguration = Partial<{
+  fonts: Record<string, FontFamilyTypes>
+}>
 export interface IContentResponse {
   languages: ILanguage[]
 }
@@ -226,6 +237,33 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
     return {}
   }
 }
+async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  // for backward compatibility, if the endpoint is unimplemented
+  if (res.status === 404) {
+    return {
+      fonts: {
+        notosans: {
+          normal: 'NotoSans-Light.ttf',
+          bold: 'NotoSans-Regular.ttf',
+          italics: 'NotoSans-Light.ttf',
+          bolditalics: 'NotoSans-Regular.ttf'
+        }
+      }
+    }
+  }
+
+  if (!res.ok) {
+    throw Error(res.statusText)
+  }
+
+  return res.json()
+}
 
 async function loadContent(): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
@@ -369,6 +407,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
+  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,

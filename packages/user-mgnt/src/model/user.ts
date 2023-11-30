@@ -300,7 +300,7 @@ const userSchema = new Schema({
   identifiers: [IdentifierSchema],
   email: { type: String },
   emailForNotification: { type: String, unique: true, sparse: true },
-  mobile: { type: String, unique: true },
+  mobile: { type: String, unique: true, sparse: true },
   passwordHash: { type: String, required: true },
   oldPasswordHash: { type: String },
   salt: { type: String, required: true },

@@ -21,7 +21,7 @@ export const SYSTEM_ROLE_TYPES = [
 ] as const
 
 interface ISystemRole {
-  value: typeof SYSTEM_ROLE_TYPES[number]
+  value: (typeof SYSTEM_ROLE_TYPES)[number]
   roles: Types.ObjectId[]
   active: boolean
   creationDate: number

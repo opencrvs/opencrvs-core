@@ -16,15 +16,5 @@ export const certificateBaseTemplate = {
     },
     content: []
   },
-  fonts: {
-    en: {
-      arial: {
-        normal: 'Arial.ttf',
-        bold: 'Arial-Bold.ttf',
-        italics: 'Arial-Italic.ttf',
-        bolditalics: 'Arial-BoldItalic.ttf'
-      }
-    }
-  },
-  vfs: {}
+  fonts: {}
 }

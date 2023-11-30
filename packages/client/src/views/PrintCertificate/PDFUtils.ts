@@ -439,7 +439,6 @@ async function getPDFTemplateWithSVG(
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
-  const fonts = getFontsFromSVG(svgTemplate)
 
   const resolvedSignatures = await Promise.all(
     MARRIAGE_SIGNATURE_KEYS.map((k) => ({
@@ -464,11 +463,12 @@ async function getPDFTemplateWithSVG(
     state
   )
 
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
-  pdfTemplate.vfs = getVFSFromFonts(fonts)
-  pdfTemplate.fonts.en = {
-    ...certificateBaseTemplate.fonts.en,
-    ...getTemplateFonts(fonts)
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
   }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
