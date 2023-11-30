@@ -16,6 +16,7 @@ import {
   getInformantSMSNotification,
   InformantNotificationName
 } from '@workflow/features/registration/smsNotificationUtils'
+import { internal } from '@hapi/boom'
 
 type NotificationEvent = 'in-progress' | 'ready-for-review'
 
@@ -37,7 +38,7 @@ export async function sendNotification(
     }
   )
   if (!res.ok) {
-    throw new Error(
+    throw internal(
       `Forwarding bundle to notification service failed with [${
         res.status
       }] body: ${await res.text()}`

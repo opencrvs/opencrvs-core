@@ -29,11 +29,12 @@ import {
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
+import { badRequest as boomBadRequest } from '@hapi/boom'
 
-function error(record: InProgressRecord, message: string): never {
+function badRequest(record: InProgressRecord, message: string): never {
   const task = getTaskFromSavedBundle(record)
   const taskStatus = getStatusFromTask(task)
-  throw new Error(`${message} in ${taskStatus} record`)
+  throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
 function getOfficeName(record: InProgressRecord) {
@@ -80,7 +81,7 @@ function getRegistrationLocation(record: InProgressRecord) {
     task.extension
   )
   if (!locationExtension) {
-    error(record, 'no last registration office found')
+    badRequest(record, 'no last registration office found')
   }
   const location = getResourceFromBundleById<Location>(
     record,

@@ -27,11 +27,12 @@ import {
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
+import { badRequest as boomBadRequest } from '@hapi/boom'
 
 function error(record: ReadyForReviewRecord, message: string): never {
   const task = getTaskFromSavedBundle(record)
   const taskStatus = getStatusFromTask(task)
-  throw new Error(`${message} in ${taskStatus} record`)
+  throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
 function getOfficeName(record: ReadyForReviewRecord) {
