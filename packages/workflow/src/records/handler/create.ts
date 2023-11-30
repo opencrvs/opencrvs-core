@@ -24,11 +24,6 @@ import {
   setupLastRegUser,
   setupLastRegLocation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-// import {
-//   getSharedContactMsisdn,
-//   getSharedContactEmail
-// } from '@workflow/features/registration/fhir/fhir-utils'
-// import { sendCreateRecordNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import {
@@ -48,6 +43,10 @@ import {
 import { getRecordById } from '@workflow/records'
 import { auditEvent } from '@workflow/records/audit'
 import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  isNotificationEnabled,
+  sendNotification
+} from '@workflow/records/notification'
 
 export const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -141,6 +140,7 @@ export default async function createRecordHandler(
     const trackingId = generateTrackingIdForEvents(event)
     const composition = getComposition(inputBundle)
     const inProgress = isInProgressDeclaration(inputBundle)
+    const eventNotification = isEventNotification(inputBundle)
 
     composition.identifier = {
       system: 'urn:ietf:rfc:3986',
@@ -156,9 +156,9 @@ export default async function createRecordHandler(
 
     const taskWithUser = setupLastRegUser(task, practitioner)
 
-    const taskWithLocation = isEventNotification(inputBundle)
-      ? await setupLastRegLocation(taskWithUser, practitioner)
-      : taskWithUser
+    const taskWithLocation = eventNotification
+      ? taskWithUser
+      : await setupLastRegLocation(taskWithUser, practitioner)
 
     inputBundle.entry = inputBundle.entry.map((e) => {
       if (e.resource.resourceType !== 'Task') {
@@ -200,7 +200,23 @@ export default async function createRecordHandler(
       token
     )
 
-    // TODO: SEND NOTIFICATION
+    // Notification not implemented for marriage yet
+    // don't forward hospital notifications
+    if (
+      event !== EVENT_TYPE.MARRIAGE &&
+      !eventNotification &&
+      (await isNotificationEnabled(
+        inProgress ? 'in-progress' : 'ready-for-review',
+        event,
+        token
+      ))
+    ) {
+      await sendNotification(
+        inProgress ? 'in-progress' : 'ready-for-review',
+        record,
+        token
+      )
+    }
 
     return {
       compositionId,

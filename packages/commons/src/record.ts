@@ -29,7 +29,8 @@ import {
   isCorrectionRequestedTask,
   isTask,
   sortTasksDescending,
-  SavedBundle
+  SavedBundle,
+  TrackingID
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -174,7 +175,7 @@ export function getTrackingId(record: ValidRecord) {
     throw new Error('No tracking id found from task')
   }
 
-  return identifier.value
+  return identifier.value as TrackingID
 }
 
 export function replaceFromBundle(

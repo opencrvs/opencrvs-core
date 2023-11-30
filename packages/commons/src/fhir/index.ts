@@ -15,7 +15,11 @@ import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
 import { Extension, KnownExtensionType } from './extension'
 import { Patient } from './patient'
-import { CompositionSection, SavedCompositionSection } from './composition'
+import {
+  CompositionSection,
+  CompositionSectionCode,
+  SavedCompositionSection
+} from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
 
 export * from './practitioner'
@@ -179,7 +183,7 @@ export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient?: {
+  patient: {
     reference: URLReference
   }
 }
@@ -335,17 +339,17 @@ export function getFromBundleById<T extends Resource = Resource>(
 }
 
 export function findCompositionSection<T extends SavedComposition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): SavedCompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): CompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ) {
   return (composition.section &&
