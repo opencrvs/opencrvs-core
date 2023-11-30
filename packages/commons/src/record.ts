@@ -25,10 +25,12 @@ import {
   Task,
   getBusinessStatus,
   getComposition,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   isCorrectionRequestedTask,
   isTask,
-  sortTasksDescending
+  sortTasksDescending,
+  SavedBundle,
+  TrackingID
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -56,14 +58,17 @@ export function getEventLabelFromBundle(bundle: Bundle) {
 }
 
 type RecordBase = Bundle
+
+export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
+
 export type WaitingForValidationRecord = Nominal<
   RecordBase,
   'WaitingForValidation'
 >
 
-export type ValidatedRecord = Nominal<RecordBase, 'Validated'>
+export type ValidatedRecord = Nominal<SavedBundle, 'Validated'>
 export type RegisteredRecord = Nominal<
-  Bundle<
+  SavedBundle<
     | Composition
     | DocumentReference
     | Encounter
@@ -79,22 +84,22 @@ export type RegisteredRecord = Nominal<
   'Registered'
 >
 export type CorrectionRequestedRecord = Nominal<
-  RecordBase,
+  SavedBundle,
   'CorrectionRequested'
 >
-export type CertifiedRecord = Nominal<RecordBase, 'Certified'>
-export type IssuedRecord = Nominal<RecordBase, 'Issued'>
-export type InProgressRecord = Nominal<RecordBase, 'InProgress'>
-export type DeclaredRecord = Nominal<RecordBase, 'Declared'>
+export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
+export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
+export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type DeclaredRecord = Nominal<SavedBundle, 'Declared'>
 
 export type ValidRecord =
-  | WaitingForValidationRecord
+  | InProgressRecord
+  | ReadyForReviewRecord
   | ValidatedRecord
   | RegisteredRecord
   | CorrectionRequestedRecord
   | CertifiedRecord
   | IssuedRecord
-  | InProgressRecord
   | DeclaredRecord
 
 export type RegistrationStatus =
@@ -112,6 +117,7 @@ export type RegistrationStatus =
 
 export type StateIdenfitiers = {
   IN_PROGRESS: InProgressRecord
+  READY_FOR_REVIEW: ReadyForReviewRecord
   DECLARED: DeclaredRecord
   VALIDATED: ValidatedRecord
   REGISTERED: RegisteredRecord
@@ -135,8 +141,10 @@ export function getState(record: RecordBase) {
   return getBusinessStatus(task) as keyof StateIdenfitiers
 }
 
-export function getCorrectionRequestedTask(record: CorrectionRequestedRecord) {
-  const task: CorrectionRequestedTask | undefined = record.entry
+export function getCorrectionRequestedTask(
+  record: CorrectionRequestedRecord
+): CorrectionRequestedTask {
+  const task = record.entry
     .map((entry) => entry.resource)
     .filter(isTask)
     .find(isCorrectionRequestedTask)
@@ -144,7 +152,7 @@ export function getCorrectionRequestedTask(record: CorrectionRequestedRecord) {
   if (!task) {
     throw new Error('No correction requested task found')
   }
-  return task
+  return task as CorrectionRequestedTask
 }
 
 export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
@@ -173,7 +181,7 @@ export function withOnlyLatestTask<
 }
 
 export function getTrackingId(record: ValidRecord) {
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
 
   const identifier = task.identifier.find((identifier) =>
     identifier.system.endsWith('tracking-id')
@@ -183,7 +191,7 @@ export function getTrackingId(record: ValidRecord) {
     throw new Error('No tracking id found from task')
   }
 
-  return identifier.value
+  return identifier.value as TrackingID
 }
 
 export function replaceFromBundle(

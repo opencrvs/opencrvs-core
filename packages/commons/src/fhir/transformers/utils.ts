@@ -80,12 +80,12 @@ import {
 } from './constants'
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ): CompositionSection | undefined
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ) {
   return findCompositionSection(code, getComposition(fhirBundle))
@@ -181,7 +181,7 @@ export function selectOrCreateEncounterResource(
 }
 
 export function selectOrCreateObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   categoryCode: string,
   categoryDescription: string,
   observationCode: string,
@@ -302,7 +302,7 @@ export async function removeObservationResource(
 }
 
 export function createObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): Observation {
@@ -705,7 +705,7 @@ export function selectOrCreateCollectorPersonResource(
 }
 
 export async function setCertificateCollectorReference(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
   fhirBundle: Bundle,
   context: any
@@ -779,7 +779,7 @@ export function selectOrCreatePaymentReconciliationResource(
 }
 
 export function selectOrCreateQuestionnaireResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): QuestionnaireResponse {

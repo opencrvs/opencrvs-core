@@ -16,7 +16,9 @@ import {
   PaymentReconciliation,
   Practitioner,
   Task,
-  URNReference
+  URNReference,
+  URLReference,
+  SavedTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -339,10 +341,10 @@ export function createValidateTask(
 }
 
 export function createUpdatedTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   updatedDetails: ChangedValuesInput,
   practitioner: Practitioner
-): Task {
+): SavedTask {
   return {
     resourceType: 'Task',
     status: 'accepted',
@@ -504,7 +506,19 @@ export function createCorrectionRequestTask(
   }
 }
 
-export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
+type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
+  entry: Array<
+    Omit<fhir3.BundleEntry, 'response'> & {
+      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
+        location: URLReference
+      }
+    }
+  >
+}
+
+export async function sendBundleToHearth(
+  payload: Bundle
+): Promise<ResponseBundleEntry> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -516,6 +530,27 @@ export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
   if (!res.ok) {
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+
+  return res.json()
+}
+
+export async function findTaskFromIdentifier(
+  identifier: string
+): Promise<Bundle<SavedTask>> {
+  const res = await fetch(
+    new URL(`/fhir/Task?identifier=${identifier}`, HEARTH_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching task history from Hearth failed with [${res.status}] body: ${res.statusText}`
     )
   }
 

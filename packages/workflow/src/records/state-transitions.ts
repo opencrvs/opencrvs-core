@@ -16,7 +16,7 @@ import {
   Extension,
   findExtension,
   getCorrectionRequestedTask,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   IssuedRecord,
   isPaymentReconciliationBundleEntry,
   PaymentReconciliation,
@@ -28,7 +28,9 @@ import {
   ValidatedRecord,
   Attachment,
   InProgressRecord,
-  DeclaredRecord
+  DeclaredRecord,
+  Encounter,
+  SavedBundleEntry
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -60,7 +62,7 @@ export async function toCorrected(
   proofOfLegalCorrectionAttachments: Attachment[],
   paymentAttachmentURL?: string
 ): Promise<RegisteredRecord> {
-  const previousTask = getTaskFromBundle(record)
+  const previousTask = getTaskFromSavedBundle(record)
 
   let correctionPaymentBundleEntries: BundleEntry[] = []
 
@@ -134,7 +136,7 @@ export async function toCorrectionApproved(
   }
 
   const correctionEncounter = record.entry.find(
-    (resource): resource is BundleEntry<fhir3.Encounter> =>
+    (resource): resource is SavedBundleEntry<Encounter> =>
       resource.resource.id ===
       currentCorrectionRequestedTask.encounter.reference.split('/')[1]
   )
@@ -147,14 +149,13 @@ export async function toCorrectionApproved(
     currentCorrectionRequestedTask.extension
   )
 
-  const paymentReconciliation: BundleEntry<PaymentReconciliation> | undefined =
-    correctionPaymentId
-      ? record.entry.find(
-          (resource): resource is BundleEntry<PaymentReconciliation> =>
-            resource.resource.id ===
-            correctionPaymentId.valueReference.reference.split('/')[1]
-        )
-      : undefined
+  const paymentReconciliation = correctionPaymentId
+    ? record.entry.find(
+        (resource): resource is SavedBundleEntry<PaymentReconciliation> =>
+          resource.resource.id ===
+          correctionPaymentId.valueReference.reference.split('/')[1]
+      )
+    : undefined
 
   const correctedTask = createCorrectedTask(
     correctionAcceptedTask,
@@ -193,7 +194,7 @@ export async function toUpdated(
   practitioner: Practitioner,
   updatedDetails: ChangedValuesInput
 ): Promise<InProgressRecord | DeclaredRecord> {
-  const previousTask = getTaskFromBundle(record)
+  const previousTask = getTaskFromSavedBundle(record)
 
   const updatedTask = createUpdatedTask(
     previousTask,
@@ -211,8 +212,17 @@ export async function toUpdated(
   )
 
   const newEntries = [
-    ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
-    { resource: updatedTaskWithLocationExtensions }
+    ...record.entry.map((entry) => {
+      const { fullUrl, ...restOfResources } = entry
+
+      if (restOfResources.resource.id !== previousTask.id) {
+        return entry
+      }
+      return {
+        fullUrl,
+        resource: updatedTaskWithLocationExtensions
+      }
+    })
   ]
 
   const updatedRecord = {
@@ -226,7 +236,7 @@ export async function toValidated(
   record: InProgressRecord | DeclaredRecord,
   practitioner: Practitioner
 ): Promise<ValidatedRecord> {
-  const previousTask = getTaskFromBundle(record)
+  const previousTask = getTaskFromSavedBundle(record)
   const validatedTask = createValidateTask(previousTask, practitioner)
 
   const validatedTaskWithPractitionerExtensions = setupLastRegUser(
@@ -260,7 +270,7 @@ export async function toCorrectionRequested(
   proofOfLegalCorrectionAttachments: Array<{ type: string; url: string }>,
   paymentAttachmentURL?: string
 ): Promise<CorrectionRequestedRecord> {
-  const previousTask = getTaskFromBundle(record)
+  const previousTask = getTaskFromSavedBundle(record)
 
   let correctionPaymentBundleEntries: BundleEntry[] = []
 
@@ -327,7 +337,7 @@ export async function toCorrectionRejected(
 ): Promise<
   RecordWithPreviousTask<RegisteredRecord | CertifiedRecord | IssuedRecord>
 > {
-  const currentCorrectionRequestedTask = getTaskFromBundle(record)
+  const currentCorrectionRequestedTask = getTaskFromSavedBundle(record)
 
   const correctionRejectionTask: Task = {
     ...currentCorrectionRequestedTask,

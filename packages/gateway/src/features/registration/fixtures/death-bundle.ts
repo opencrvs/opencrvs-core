@@ -47,7 +47,7 @@ export const DEATH_BUNDLE: SavedBundle<
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Composition/a959c616-934a-4139-a123-37bb4a1be39e/913175fd-b4d6-4636-b8be-2216106d403c' as URLReference,
+        '/fhir/Composition/a959c616-934a-4139-a123-37bb4a1be39e/_history/913175fd-b4d6-4636-b8be-2216106d403c' as URLReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -89,7 +89,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593/02a4ebde-26ec-4192-8cfc-d032f47b8ec8' as URLReference
+                  '/fhir/Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593/_history/02a4ebde-26ec-4192-8cfc-d032f47b8ec8' as URLReference
               }
             ]
           },
@@ -107,7 +107,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d/50cef67d-a167-436b-af68-384393949b9f' as URLReference
+                  '/fhir/RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d/_history/50cef67d-a167-436b-af68-384393949b9f' as URLReference
               }
             ]
           },
@@ -125,11 +125,11 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c/f38dcdd1-5329-4922-a959-0c5405933eca' as URLReference
+                  '/fhir/DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c/_history/f38dcdd1-5329-4922-a959-0c5405933eca' as URLReference
               },
               {
                 reference:
-                  'http://localhost:3447/fhir/DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735/e1f017d5-f4e4-4aef-bff9-d27c118c1b82' as URLReference
+                  '/fhir/DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735/_history/e1f017d5-f4e4-4aef-bff9-d27c118c1b82' as URLReference
               }
             ]
           },
@@ -147,7 +147,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Patient/d55283fe-b5bc-497d-86f3-5370957b0642/dcd40b11-003a-4ea5-8f14-11052f549e3d' as URLReference
+                  '/fhir/Patient/d55283fe-b5bc-497d-86f3-5370957b0642/_history/dcd40b11-003a-4ea5-8f14-11052f549e3d' as URLReference
               }
             ]
           },
@@ -165,7 +165,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c/e5401779-ca79-49e5-9011-91115560f4c1' as URLReference
+                  '/fhir/Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c/_history/e5401779-ca79-49e5-9011-91115560f4c1' as URLReference
               }
             ]
           },
@@ -183,7 +183,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7/6e50611f-ccf5-4560-a67c-b0e9f1f58363' as URLReference
+                  '/fhir/Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7/_history/6e50611f-ccf5-4560-a67c-b0e9f1f58363' as URLReference
               }
             ]
           }
@@ -206,7 +206,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593/02a4ebde-26ec-4192-8cfc-d032f47b8ec8' as URLReference,
+        '/fhir/Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593/_history/02a4ebde-26ec-4192-8cfc-d032f47b8ec8' as URLReference,
       resource: {
         resourceType: 'Encounter',
         status: 'finished',
@@ -215,7 +215,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             location: {
               reference:
-                'http://localhost:3447/fhir/Location/4ba43b39-547b-41a8-8af1-c515786f36e5/c0bb92c4-1dc9-4d78-aaac-8ea8cd8965cc' as URLReference
+                '/fhir/Location/4ba43b39-547b-41a8-8af1-c515786f36e5/_history/c0bb92c4-1dc9-4d78-aaac-8ea8cd8965cc' as URLReference
             }
           }
         ],
@@ -227,7 +227,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d/50cef67d-a167-436b-af68-384393949b9f' as URLReference,
+        '/fhir/RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d/_history/50cef67d-a167-436b-af68-384393949b9f' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -242,7 +242,7 @@ export const DEATH_BUNDLE: SavedBundle<
         id: '7106d752-1e34-47fe-8726-a9fd11042a4d' as UUID,
         patient: {
           reference:
-            'http://localhost:3447/fhir/Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e/02480691-fba2-4a6d-8b04-4b28deeae3ca' as URLReference
+            '/fhir/Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e/_history/02480691-fba2-4a6d-8b04-4b28deeae3ca' as URLReference
         },
         meta: {
           lastUpdated: '2023-09-13T12:39:48.106+00:00',
@@ -252,7 +252,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c/e5401779-ca79-49e5-9011-91115560f4c1' as URLReference,
+        '/fhir/Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c/_history/e5401779-ca79-49e5-9011-91115560f4c1' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -273,7 +273,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/d55283fe-b5bc-497d-86f3-5370957b0642/dcd40b11-003a-4ea5-8f14-11052f549e3d' as URLReference,
+        '/fhir/Patient/d55283fe-b5bc-497d-86f3-5370957b0642/_history/dcd40b11-003a-4ea5-8f14-11052f549e3d' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -388,7 +388,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7/6e50611f-ccf5-4560-a67c-b0e9f1f58363' as URLReference,
+        '/fhir/Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7/_history/6e50611f-ccf5-4560-a67c-b0e9f1f58363' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -409,7 +409,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735/e1f017d5-f4e4-4aef-bff9-d27c118c1b82' as URLReference,
+        '/fhir/DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735/_history/e1f017d5-f4e4-4aef-bff9-d27c118c1b82' as URLReference,
       resource: {
         resourceType: 'DocumentReference',
         masterIdentifier: {
@@ -446,7 +446,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c/f38dcdd1-5329-4922-a959-0c5405933eca' as URLReference,
+        '/fhir/DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c/_history/f38dcdd1-5329-4922-a959-0c5405933eca' as URLReference,
       resource: {
         resourceType: 'DocumentReference',
         masterIdentifier: {
@@ -483,7 +483,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Task/b1a6925a-47ae-431e-8f61-4cd0929e8518/c047e6ad-d615-4d51-986f-92f2c80e59a9' as URLReference,
+        '/fhir/Task/b1a6925a-47ae-431e-8f61-4cd0929e8518/_history/c047e6ad-d615-4d51-986f-92f2c80e59a9' as URLReference,
       resource: {
         resourceType: 'Task',
         status: 'ready',
@@ -567,7 +567,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e/02480691-fba2-4a6d-8b04-4b28deeae3ca' as URLReference,
+        '/fhir/Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e/_history/02480691-fba2-4a6d-8b04-4b28deeae3ca' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -650,7 +650,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/3d196967-7c4a-4807-ad42-13b4b2ca43a3/de3aaad3-002c-4d26-a393-e0843d9d43f9' as URLReference,
+        '/fhir/Observation/3d196967-7c4a-4807-ad42-13b4b2ca43a3/_history/de3aaad3-002c-4d26-a393-e0843d9d43f9' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -694,7 +694,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/d5c9d991-69c1-4269-baec-77b5667f2eea/ef12ac6e-ab73-457a-8221-ae5e9fedb386' as URLReference,
+        '/fhir/Observation/d5c9d991-69c1-4269-baec-77b5667f2eea/_history/ef12ac6e-ab73-457a-8221-ae5e9fedb386' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -730,7 +730,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/ff9a538b-c551-4edc-9631-fa2169a37f20/b6b4f8e4-6363-4392-a0f0-38b70fa378d1' as URLReference,
+        '/fhir/Observation/ff9a538b-c551-4edc-9631-fa2169a37f20/_history/b6b4f8e4-6363-4392-a0f0-38b70fa378d1' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -774,7 +774,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/fb98ff5b-3aa1-40c2-87bf-4bd6df091dd2/9362f1f8-2e9f-49ee-a65e-7851b246b28f' as URLReference,
+        '/fhir/Observation/fb98ff5b-3aa1-40c2-87bf-4bd6df091dd2/_history/9362f1f8-2e9f-49ee-a65e-7851b246b28f' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -818,7 +818,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/3cae74a3-042c-4faf-9dde-8b716d094033/2d331243-3674-4edc-99c3-c74764d726b2' as URLReference,
+        '/fhir/Observation/3cae74a3-042c-4faf-9dde-8b716d094033/_history/2d331243-3674-4edc-99c3-c74764d726b2' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -862,7 +862,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/5965002b-52a6-40b4-b95e-5e84b48e3042/98c0a9b1-bba4-47e8-a977-ed8ab288bf8b' as URLReference,
+        '/fhir/Observation/5965002b-52a6-40b4-b95e-5e84b48e3042/_history/98c0a9b1-bba4-47e8-a977-ed8ab288bf8b' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -899,7 +899,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/fbaa8c21-2b9f-48c7-bb09-b15911685b31/55c1d789-3a56-4075-b8d5-4c81eb7bab3b' as URLReference,
+        '/fhir/Observation/fbaa8c21-2b9f-48c7-bb09-b15911685b31/_history/55c1d789-3a56-4075-b8d5-4c81eb7bab3b' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -936,7 +936,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f/079ca353-4f47-426d-ae60-feb517e66e71' as URLReference,
+        '/fhir/Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f/_history/079ca353-4f47-426d-ae60-feb517e66e71' as URLReference,
       resource: {
         resourceType: 'Practitioner',
         identifier: [],
@@ -966,7 +966,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a/df1ba3bc-0ec3-4f5f-81ee-8a635019de0c' as URLReference,
+        '/fhir/Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a/_history/df1ba3bc-0ec3-4f5f-81ee-8a635019de0c' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -1042,7 +1042,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4/ebe887c3-35fd-4af3-9163-c4decf93797f' as URLReference,
+        '/fhir/Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4/_history/ebe887c3-35fd-4af3-9163-c4decf93797f' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -1084,7 +1084,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/4ba43b39-547b-41a8-8af1-c515786f36e5/c0bb92c4-1dc9-4d78-aaac-8ea8cd8965cc' as URLReference,
+        '/fhir/Location/4ba43b39-547b-41a8-8af1-c515786f36e5/_history/c0bb92c4-1dc9-4d78-aaac-8ea8cd8965cc' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -1126,7 +1126,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/PractitionerRole/42ed0f8d-38b0-448d-992f-a85283e32bcf/6e28e902-c96e-4139-9b59-ce1fdcd757f1' as URLReference,
+        '/fhir/PractitionerRole/42ed0f8d-38b0-448d-992f-a85283e32bcf/_history/6e28e902-c96e-4139-9b59-ce1fdcd757f1' as URLReference,
       resource: {
         resourceType: 'PractitionerRole',
         practitioner: {
@@ -1170,7 +1170,7 @@ export const DEATH_BUNDLE: SavedBundle<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/1cfe40fa-7b43-4c1e-aa05-4281e5122d9b/585dad70-a478-43af-8bb6-07b7f67f998d' as URLReference,
+        '/fhir/Location/1cfe40fa-7b43-4c1e-aa05-4281e5122d9b/_history/585dad70-a478-43af-8bb6-07b7f67f998d' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [

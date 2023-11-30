@@ -15,7 +15,11 @@ import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
 import { Extension, KnownExtensionType } from './extension'
 import { Patient } from './patient'
-import { CompositionSection, SavedCompositionSection } from './composition'
+import {
+  CompositionSection,
+  CompositionSectionCode,
+  SavedCompositionSection
+} from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
 
 export * from './practitioner'
@@ -40,16 +44,16 @@ export type ResourceIdentifier<
   }
 > = `${Resource['resourceType']}/${UUID}`
 
-// http://localhost:3447/fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
+// /fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
 
 export function isURLReference(id: string): id is URLReference {
-  return id.startsWith('http:')
+  return id.startsWith('/fhir')
 }
 
 export function urlReferenceToUUID(reference: URLReference) {
   const urlParts = reference.split('/')
-  return urlParts[urlParts.length - 2] as UUID
+  return urlParts[urlParts.length - 3] as UUID
 }
 
 export function resourceIdentifierToUUID(
@@ -188,7 +192,7 @@ export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient?: {
+  patient: {
     reference: URLReference
   }
 }
@@ -318,7 +322,9 @@ export function findResourceFromBundleById<T extends Resource = Resource>(
   }
 }
 
-export function isSaved(resource: Resource): resource is Saved<Resource> {
+export function isSaved<T extends Resource>(
+  resource: T
+): resource is T & Saved<T> {
   return resource.id !== undefined
 }
 
@@ -344,17 +350,17 @@ export function getFromBundleById<T extends Resource = Resource>(
 }
 
 export function findCompositionSection<T extends SavedComposition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): SavedCompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): CompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ) {
   return (composition.section &&

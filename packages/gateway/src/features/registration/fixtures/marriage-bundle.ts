@@ -45,7 +45,7 @@ export const MARRIAGE_BUNDLE: Saved<
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Composition/b2e4d436-d7fb-4b0f-9674-628b5af8f42e/11b58bf1-72db-4d24-ac7e-678594445f16' as URLReference,
+        '/fhir/Composition/b2e4d436-d7fb-4b0f-9674-628b5af8f42e/_history/11b58bf1-72db-4d24-ac7e-678594445f16' as URLReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -87,7 +87,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Encounter/669cb7d8-5963-4b49-b647-7463d9e135b5/0914aaa0-0489-4a76-9cb9-a6b7f094d608' as URLReference
+                  '/fhir/Encounter/669cb7d8-5963-4b49-b647-7463d9e135b5/_history/0914aaa0-0489-4a76-9cb9-a6b7f094d608' as URLReference
               }
             ]
           },
@@ -105,7 +105,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/RelatedPerson/4065eb20-d02b-48d7-a783-5d7e452c7a7d/020d755a-56f7-4de4-b04b-d9f3aac9d75e' as URLReference
+                  '/fhir/RelatedPerson/4065eb20-d02b-48d7-a783-5d7e452c7a7d/_history/020d755a-56f7-4de4-b04b-d9f3aac9d75e' as URLReference
               }
             ]
           },
@@ -123,7 +123,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference
+                  '/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/_history/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference
               }
             ]
           },
@@ -141,7 +141,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/Patient/5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16/4446ab01-3a79-44e4-97bc-880b4d79963d' as URLReference
+                  '/fhir/Patient/5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16/_history/4446ab01-3a79-44e4-97bc-880b4d79963d' as URLReference
               }
             ]
           },
@@ -159,7 +159,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/RelatedPerson/d2f33008-1486-4f09-845e-ceae40c05b48/22b3b1bf-5140-4186-9ff1-f1e1da7c4509' as URLReference
+                  '/fhir/RelatedPerson/d2f33008-1486-4f09-845e-ceae40c05b48/_history/22b3b1bf-5140-4186-9ff1-f1e1da7c4509' as URLReference
               }
             ]
           },
@@ -177,7 +177,7 @@ export const MARRIAGE_BUNDLE: Saved<
             entry: [
               {
                 reference:
-                  'http://localhost:3447/fhir/RelatedPerson/ef774525-966c-4136-b0b8-753ca0eccfb7/b0ef1364-8763-4b9b-9de9-eed75b2ef4e0' as URLReference
+                  '/fhir/RelatedPerson/ef774525-966c-4136-b0b8-753ca0eccfb7/_history/b0ef1364-8763-4b9b-9de9-eed75b2ef4e0' as URLReference
               }
             ]
           }
@@ -194,7 +194,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Encounter/669cb7d8-5963-4b49-b647-7463d9e135b5/0914aaa0-0489-4a76-9cb9-a6b7f094d608' as URLReference,
+        '/fhir/Encounter/669cb7d8-5963-4b49-b647-7463d9e135b5/_history/0914aaa0-0489-4a76-9cb9-a6b7f094d608' as URLReference,
       resource: {
         resourceType: 'Encounter',
         status: 'finished',
@@ -203,7 +203,7 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             location: {
               reference:
-                'http://localhost:3447/fhir/Location/461a4ba8-5592-4b1a-a30b-747150a01623/37be7f2e-03aa-429b-9e4a-2d4fb699f3dd' as URLReference
+                '/fhir/Location/461a4ba8-5592-4b1a-a30b-747150a01623/_history/37be7f2e-03aa-429b-9e4a-2d4fb699f3dd' as URLReference
             }
           }
         ],
@@ -215,7 +215,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/RelatedPerson/4065eb20-d02b-48d7-a783-5d7e452c7a7d/020d755a-56f7-4de4-b04b-d9f3aac9d75e' as URLReference,
+        '/fhir/RelatedPerson/4065eb20-d02b-48d7-a783-5d7e452c7a7d/_history/020d755a-56f7-4de4-b04b-d9f3aac9d75e' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -229,7 +229,7 @@ export const MARRIAGE_BUNDLE: Saved<
         },
         patient: {
           reference:
-            'http://localhost:3447/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference
+            '/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/_history/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference
         },
         id: '4065eb20-d02b-48d7-a783-5d7e452c7a7d' as UUID,
         meta: {
@@ -240,13 +240,13 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/RelatedPerson/d2f33008-1486-4f09-845e-ceae40c05b48/22b3b1bf-5140-4186-9ff1-f1e1da7c4509' as URLReference,
+        '/fhir/RelatedPerson/d2f33008-1486-4f09-845e-ceae40c05b48/_history/22b3b1bf-5140-4186-9ff1-f1e1da7c4509' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         id: 'd2f33008-1486-4f09-845e-ceae40c05b48' as UUID,
         patient: {
           reference:
-            'http://localhost:3447/fhir/Patient/4512feb1-a96d-40b4-bfdc-7f437993bfa8/8feb1472-5547-45da-8227-6df716a210e6' as URLReference
+            '/fhir/Patient/4512feb1-a96d-40b4-bfdc-7f437993bfa8/_history/8feb1472-5547-45da-8227-6df716a210e6' as URLReference
         },
         relationship: {
           coding: [
@@ -265,13 +265,13 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/RelatedPerson/ef774525-966c-4136-b0b8-753ca0eccfb7/b0ef1364-8763-4b9b-9de9-eed75b2ef4e0' as URLReference,
+        '/fhir/RelatedPerson/ef774525-966c-4136-b0b8-753ca0eccfb7/_history/b0ef1364-8763-4b9b-9de9-eed75b2ef4e0' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         id: 'ef774525-966c-4136-b0b8-753ca0eccfb7' as UUID,
         patient: {
           reference:
-            'http://localhost:3447/fhir/Patient/93de5304-f816-493e-968a-86c3a3d5ee7a/9563955b-2b6d-4099-9a2e-f2e62939c3cd' as URLReference
+            '/fhir/Patient/93de5304-f816-493e-968a-86c3a3d5ee7a/_history/9563955b-2b6d-4099-9a2e-f2e62939c3cd' as URLReference
         },
         relationship: {
           coding: [
@@ -290,7 +290,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference,
+        '/fhir/Patient/1a5ad72e-9241-4358-a937-861cfdf44f4d/_history/97bff9b3-4e8f-4833-a0e5-edc7abb1f1ce' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -397,7 +397,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16/4446ab01-3a79-44e4-97bc-880b4d79963d' as URLReference,
+        '/fhir/Patient/5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16/_history/4446ab01-3a79-44e4-97bc-880b4d79963d' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -504,7 +504,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Task/6cc01269-6b36-4aa5-9bb0-21944d685e42/55bf4dc2-a905-4092-98d5-37834ee5ce57' as URLReference,
+        '/fhir/Task/6cc01269-6b36-4aa5-9bb0-21944d685e42/_history/55bf4dc2-a905-4092-98d5-37834ee5ce57' as URLReference,
       resource: {
         resourceType: 'Task',
         status: 'ready',
@@ -603,7 +603,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/4512feb1-a96d-40b4-bfdc-7f437993bfa8/8feb1472-5547-45da-8227-6df716a210e6' as URLReference,
+        '/fhir/Patient/4512feb1-a96d-40b4-bfdc-7f437993bfa8/_history/8feb1472-5547-45da-8227-6df716a210e6' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -623,7 +623,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Patient/93de5304-f816-493e-968a-86c3a3d5ee7a/9563955b-2b6d-4099-9a2e-f2e62939c3cd' as URLReference,
+        '/fhir/Patient/93de5304-f816-493e-968a-86c3a3d5ee7a/_history/9563955b-2b6d-4099-9a2e-f2e62939c3cd' as URLReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -643,7 +643,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Observation/c01c802f-e5fe-46d8-b35c-deffe87a6fd9/464b6c78-e306-4987-9f97-465a1d66282d' as URLReference,
+        '/fhir/Observation/c01c802f-e5fe-46d8-b35c-deffe87a6fd9/_history/464b6c78-e306-4987-9f97-465a1d66282d' as URLReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
@@ -682,7 +682,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Practitioner/48455871-1636-46a1-8279-aaa76dec03d4/11f94e98-4492-4834-8371-0bf75d58c8ad' as URLReference,
+        '/fhir/Practitioner/48455871-1636-46a1-8279-aaa76dec03d4/_history/11f94e98-4492-4834-8371-0bf75d58c8ad' as URLReference,
       resource: {
         resourceType: 'Practitioner',
         identifier: [],
@@ -728,7 +728,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a/df1ba3bc-0ec3-4f5f-81ee-8a635019de0c' as URLReference,
+        '/fhir/Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a/_history/df1ba3bc-0ec3-4f5f-81ee-8a635019de0c' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -805,7 +805,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4/ebe887c3-35fd-4af3-9163-c4decf93797f' as URLReference,
+        '/fhir/Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4/_history/ebe887c3-35fd-4af3-9163-c4decf93797f' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -848,7 +848,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/461a4ba8-5592-4b1a-a30b-747150a01623/37be7f2e-03aa-429b-9e4a-2d4fb699f3dd' as URLReference,
+        '/fhir/Location/461a4ba8-5592-4b1a-a30b-747150a01623/_history/37be7f2e-03aa-429b-9e4a-2d4fb699f3dd' as URLReference,
       resource: {
         resourceType: 'Location',
         mode: 'instance',
@@ -894,7 +894,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/PractitionerRole/5f675c08-9494-462f-9fac-043755b865ad/e51b99bc-c7e6-4672-af5e-7d5496c5b8eb' as URLReference,
+        '/fhir/PractitionerRole/5f675c08-9494-462f-9fac-043755b865ad/_history/e51b99bc-c7e6-4672-af5e-7d5496c5b8eb' as URLReference,
       resource: {
         resourceType: 'PractitionerRole',
         practitioner: {
@@ -938,7 +938,7 @@ export const MARRIAGE_BUNDLE: Saved<
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/1cfe40fa-7b43-4c1e-aa05-4281e5122d9b/585dad70-a478-43af-8bb6-07b7f67f998d' as URLReference,
+        '/fhir/Location/1cfe40fa-7b43-4c1e-aa05-4281e5122d9b/_history/585dad70-a478-43af-8bb6-07b7f67f998d' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [

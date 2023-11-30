@@ -95,7 +95,7 @@ export function getIDFromResponse(resBody: Bundle): string {
   return resBody.entry[0].response.location.split('/')[3]
 }
 
-export async function getDeclarationIds(
+async function getDeclarationIds(
   compositionId: string,
   authHeader: IAuthHeader
 ) {

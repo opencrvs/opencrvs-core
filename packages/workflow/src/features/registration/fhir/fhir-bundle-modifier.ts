@@ -77,7 +77,6 @@ export async function modifyRegistrationBundle<T extends Bundle>(
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
-    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
@@ -160,7 +159,7 @@ export async function invokeRegistrationValidation(
       throw new Error('Cant get composition in bundle')
     }
     const taskResource = await fetchTaskByCompositionIdFromHearth(
-      composition.id
+      composition.id!
     )
     const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -465,10 +464,10 @@ export async function setupRegistrationWorkflow(
   return taskResource
 }
 
-export async function setupLastRegLocation(
-  taskResource: Task,
+export async function setupLastRegLocation<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Promise<Task> {
+): Promise<T> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
@@ -549,10 +548,10 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   })
 }
 
-export function setupLastRegUser(
-  taskResource: Task,
+export function setupLastRegUser<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Task {
+): T {
   if (!taskResource.extension) {
     taskResource.extension = []
   }

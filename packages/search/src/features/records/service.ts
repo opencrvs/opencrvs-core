@@ -956,11 +956,11 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
               // Add fullUrl to all entries
               fullUrl: {
                 $concat: [
-                  'http://localhost:3447/fhir/',
+                  '/fhir/',
                   '$$resource.resourceType',
                   '/',
                   '$$resource.id',
-                  '/',
+                  '/_history/',
                   '$$resource.meta.versionId'
                 ]
               },
