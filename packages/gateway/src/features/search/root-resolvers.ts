@@ -20,6 +20,14 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
+import { ApolloError } from 'apollo-server-hapi'
+
+export class RateLimitError extends ApolloError {
+  constructor(message: string) {
+    super(message, 'DAILY_QUOTA_EXCEEDED')
+    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
+  }
+}
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -126,7 +134,9 @@ export const resolvers: GQLResolver = {
           authHeader
         )
         if (getTotalRequest.total >= system.settings.dailyQuota) {
-          return await Promise.reject(new Error('Daily search quota exceeded'))
+          return await Promise.reject(
+            new RateLimitError('Daily search quota exceeded')
+          )
         }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
