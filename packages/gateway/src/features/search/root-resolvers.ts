@@ -97,6 +97,24 @@ export const resolvers: GQLResolver = {
         )
       }
 
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
+      }
+      if (userId) {
+        searchCriteria.createdBy = userId
+      }
+      if (sortColumn) {
+        searchCriteria.sortColumn = sortColumn
+      }
+      if (sortBy) {
+        searchCriteria.sortBy = sortBy.map((sort) => ({
+          [sort.column]: sort.order
+        }))
+      }
+
       const isExternalAPI = hasScope(authHeader, 'recordsearch')
       if (isExternalAPI) {
         const payload = getTokenPayload(authHeader.Authorization)
@@ -146,24 +164,6 @@ export const resolvers: GQLResolver = {
 
         if (!hasAtLeastOneParam) {
           return await Promise.reject(new Error('There is no param to search '))
-        }
-
-        if (count) {
-          searchCriteria.size = count
-        }
-        if (skip) {
-          searchCriteria.from = skip
-        }
-        if (userId) {
-          searchCriteria.createdBy = userId
-        }
-        if (sortColumn) {
-          searchCriteria.sortColumn = sortColumn
-        }
-        if (sortBy) {
-          searchCriteria.sortBy = sortBy.map((sort) => ({
-            [sort.column]: sort.order
-          }))
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
