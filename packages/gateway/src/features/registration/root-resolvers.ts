@@ -438,7 +438,24 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
+      const response = await createRegistration(
+        details,
+        EVENT_TYPE.BIRTH,
+        authHeader
+      )
+
+      if (
+        hasScope(authHeader, 'validate') &&
+        !response.isPotentiallyDuplicate
+      ) {
+        await createRequest(
+          'POST',
+          `/records/${response.compositionId}/validate`,
+          authHeader
+        )
+      }
+
+      return response
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {

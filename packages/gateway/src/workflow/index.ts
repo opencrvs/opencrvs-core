@@ -113,5 +113,9 @@ export function createRegistration(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  return createRequest('POST', '/create-record', authHeader, { record, event })
+  return createRequest<{
+    compositionId: string
+    trackingId: string
+    isPotentiallyDuplicate: boolean
+  }>('POST', '/create-record', authHeader, { record, event })
 }
