@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -60,62 +59,20 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroupWithVisibleFields(
-  section: IFormSection,
-  declaration: IDeclaration
-) {
-  const event = declaration.event
-  const group = { ...section.groups[0] }
-  group.fields = group.fields.map((orgField, fieldIndex) => {
-    if (fieldIndex > 0) return orgField
-    const field = {
-      ...orgField
-    } as IRadioGroupWithNestedFieldsFormField
-    if (event === Event.Birth) {
-      const declarationData = declaration.data
-
-      const motherDataExists =
-        declarationData &&
-        declarationData.mother &&
-        declarationData.mother.detailsExist
-
-      const fatherDataExists =
-        declarationData &&
-        declarationData.father &&
-        declarationData.father.detailsExist
-
-      if (!fatherDataExists) {
-        field.options = field.options.filter(
-          (option) => option.value !== 'FATHER'
-        )
-      }
-
-      if (!motherDataExists) {
-        field.options = field.options.filter(
-          (option) => option.value !== 'MOTHER'
-        )
-      }
-    }
-    return field
-  })
-
-  return {
-    ...group,
-    fields: replaceInitialValues(
-      group.fields,
-      declaration.data[section.id] || {},
-      declaration.data
-    )
-  }
-}
-
 function CorrectorFormComponent(props: IFullProps) {
   const { declaration, intl } = props
 
-  const section = getCorrectorSection(declaration.event)
+  const section = getCorrectorSection(declaration)
 
   const group = React.useMemo(
-    () => getGroupWithVisibleFields(section, declaration),
+    () => ({
+      ...section.groups[0],
+      fields: replaceInitialValues(
+        section.groups[0].fields,
+        declaration.data[section.id] || {},
+        declaration.data
+      )
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )

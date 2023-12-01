@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 
@@ -28,8 +27,11 @@ export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${E
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
+
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:declarationId/events/:event/parent/:pageId/group/:groupId'
+
+export const REVIEW_CORRECTION = '/review-correction/:declarationId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:declarationId/:pageId'
 
@@ -39,7 +41,7 @@ export const CERTIFICATE_CORRECTION_REVIEW =
 export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
 
 export const SEARCH = '/search'
-export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
+export const SEARCH_RESULT = '/search-result'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
@@ -102,3 +104,5 @@ export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
 
 export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'
+
+export const PRINT_RECORD = '/print-record/:declarationId'

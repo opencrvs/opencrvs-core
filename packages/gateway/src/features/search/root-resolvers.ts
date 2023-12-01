@@ -6,17 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import {
-  getMetrics,
-  postAdvancedSearch,
-  postMetrics
-} from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
-import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
+import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
 import {
   getSystem,
   getTokenPayload,
@@ -25,6 +18,8 @@ import {
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
+import { ISearchCriteria, postAdvancedSearch } from './utils'
+import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -76,7 +71,8 @@ export const resolvers: GQLResolver = {
         count,
         skip,
         sortColumn,
-        sort = 'desc'
+        sort = 'desc',
+        sortBy
       },
       { headers: authHeader }
     ) {
@@ -118,17 +114,13 @@ export const resolvers: GQLResolver = {
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
 
-        if (
-          searchResult &&
-          searchResult.statusCode &&
-          searchResult.statusCode >= 400
-        ) {
+        if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
           return await Promise.reject(new Error(errMsg.message))
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
+          await markRecordAsDownloadedBySystem(hit._id, system, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {
@@ -168,14 +160,19 @@ export const resolvers: GQLResolver = {
         if (sortColumn) {
           searchCriteria.sortColumn = sortColumn
         }
+        if (sortBy) {
+          searchCriteria.sortBy = sortBy.map((sort) => ({
+            [sort.column]: sort.order
+          }))
+        }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
         return {
-          totalItems: searchResult?.body?.hits?.total?.value || 0,
-          results: searchResult?.body?.hits?.hits || []
+          totalItems: searchResult?.body?.hits?.total?.value ?? 0,
+          results: searchResult?.body?.hits?.hits ?? []
         }
       }
     },

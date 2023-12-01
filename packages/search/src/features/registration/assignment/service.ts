@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { updateComposition } from '@search/elasticsearch/dbhelper'
 import {
@@ -52,6 +51,7 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
         resource,
         'http://opencrvs.org/specs/extension/regLastOffice'
       )
+
       const body: ICompositionBody = {}
       body.modifiedAt = Date.now().toString()
       body.assignment = {} as IAssignment

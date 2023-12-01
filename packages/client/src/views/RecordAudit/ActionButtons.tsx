@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -32,6 +31,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   DRAFT_MARRIAGE_FORM_PAGE,
+  REVIEW_CORRECTION,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
@@ -384,8 +384,16 @@ export const ShowReviewButton = ({
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [],
     REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
-    DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
-    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
+    DISTRICT_REGISTRAR: [
+      EVENT_STATUS.VALIDATED,
+      EVENT_STATUS.DECLARED,
+      EVENT_STATUS.CORRECTION_REQUESTED
+    ],
+    LOCAL_REGISTRAR: [
+      EVENT_STATUS.VALIDATED,
+      EVENT_STATUS.DECLARED,
+      EVENT_STATUS.CORRECTION_REQUESTED
+    ],
     NATIONAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
   }
 
@@ -416,8 +424,14 @@ export const ShowReviewButton = ({
         size={'medium'}
         id={`review-btn-${id}`}
         onClick={() => {
-          goToPage &&
+          if (!goToPage) {
+            return
+          }
+          if (declaration.status === EVENT_STATUS.CORRECTION_REQUESTED) {
+            goToPage(REVIEW_CORRECTION, id, 'review', type)
+          } else {
             goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+          }
         }}
       >
         {intl.formatMessage(constantsMessages.review)}

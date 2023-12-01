@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   connectRouter,
@@ -24,12 +23,7 @@ import {
   StoreEnhancer
 } from 'redux'
 import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
-
 import { declarationsReducer, IDeclarationsState } from '@client/declarations'
-import {
-  IPrintFormState,
-  printReducer
-} from '@client/forms/certificate/printReducer'
 import {
   IRegisterFormState,
   registerFormReducer
@@ -67,7 +61,6 @@ export interface IStoreState {
   navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
-  printCertificateForm: IPrintFormState
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
@@ -93,7 +86,6 @@ export const createStore = <T>(
     navigation: navigationReducer,
     notification: notificationReducer,
     reviewForm: reviewReducer,
-    printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,

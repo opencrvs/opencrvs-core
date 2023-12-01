@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -48,6 +47,7 @@ import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
+import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -61,12 +61,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -84,7 +85,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
+
   const compositionId =
     task &&
     task.focus &&
@@ -210,16 +217,20 @@ async function createDeceasedIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const deceased = findEntry(
+  const deceased = findEntry<fhir.Patient>(
     DECEASED_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
+
+  if (!deceased) {
+    return
+  }
 
   await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
 
-  const deceasedName = deceased && findName(NAME_EN, deceased.name)
-  const deceasedNameLocal = deceased && findNameLocale(deceased.name)
+  const deceasedName = findName(NAME_EN, deceased.name)
+  const deceasedNameLocal = findNameLocale(deceased.name)
 
   body.deceasedFirstNames =
     deceasedName && deceasedName.given && deceasedName.given.join(' ')
@@ -231,14 +242,11 @@ async function createDeceasedIndex(
     deceasedNameLocal.given.join(' ')
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
-  body.deathDate = deceased && deceased.deceasedDateTime
-  body.gender = deceased && deceased.gender
+  body.deathDate = deceased.deceasedDateTime
+  body.gender = deceased.gender
   body.deceasedIdentifier =
-    deceased.identifier &&
-    deceased.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
-  body.deceasedDoB = deceased && deceased.birthDate
+    deceased.identifier && getSubmittedIdentifier(deceased.identifier)
+  body.deceasedDoB = deceased.birthDate
 }
 
 function createMotherIndex(
@@ -246,11 +254,11 @@ function createMotherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const mother = findEntry(
+  const mother = findEntry<fhir.Patient>(
     MOTHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!mother) {
     return
@@ -274,11 +282,11 @@ function createFatherIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const father = findEntry(
+  const father = findEntry<fhir.Patient>(
     FATHER_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!father) {
     return
@@ -302,11 +310,11 @@ function createSpouseIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const spouse = findEntry(
+  const spouse = findEntry<fhir.Patient>(
     SPOUSE_CODE,
     composition,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!spouse) {
     return
@@ -330,20 +338,20 @@ function createInformantIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const informantRef = findEntry(
+  const informantRef = findEntry<fhir.RelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundleEntries
-  ) as fhir.RelatedPerson
+  )
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = findEntryResourceByUrl(
+  const informant = findEntryResourceByUrl<fhir.Patient>(
     informantRef.patient.reference,
     bundleEntries
-  ) as fhir.Patient
+  )
 
   if (!informant) {
     return
@@ -366,10 +374,7 @@ function createInformantIndex(
     informantNameLocal.family[0]
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
-    informant.identifier &&
-    informant.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
 async function createDeclarationIndex(
@@ -425,7 +430,7 @@ async function createDeclarationIndex(
       (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.contactRelationship =
+  body.informantType =
     (contactPersonRelationshipExtention &&
       contactPersonRelationshipExtention.valueString) ||
     (contactPersonExtention && contactPersonExtention.valueString)

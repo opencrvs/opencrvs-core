@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -24,6 +23,11 @@ import {
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
 export enum Events {
+  // Correction events
+  BIRTH_MAKE_CORRECTION = '/events/birth/make-correction',
+  DEATH_MAKE_CORRECTION = '/events/death/make-correction',
+  MARRIAGE_MAKE_CORRECTION = '/events/marriage/make-correction',
+
   BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress declaration
   BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed declaration
   BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/birth/request-for-registrar-validation', // Registration agent new declaration
@@ -36,7 +40,6 @@ export enum Events {
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
-  BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress declaration
   DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed declaration
   DEATH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/death/request-for-registrar-validation', // Registration agent new declaration
@@ -49,7 +52,6 @@ export enum Events {
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
-  DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   MARRIAGE_IN_PROGRESS_DEC = '/events/marriage/in-progress-declaration', /// Field agent or DHIS2in progress declaration
   MARRIAGE_NEW_DEC = '/events/marriage/new-declaration', // Field agent completed declaration
   MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/marriage/request-for-registrar-validation', // Registration agent new declaration
@@ -62,7 +64,6 @@ export enum Events {
   MARRIAGE_MARK_VOID = '/events/marriage/mark-voided',
   MARRIAGE_MARK_ARCHIVED = '/events/marriage/mark-archived',
   MARRIAGE_MARK_REINSTATED = '/events/marriage/mark-reinstated',
-  MARRIAGE_REQUEST_CORRECTION = '/events/marriage/request-correction',
   DECLARATION_UPDATED = '/events/declaration-updated', // Registration agent or registrar updating declaration before validating/registering
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',

@@ -6,37 +6,58 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
+import {
+  Bundle,
+  Composition,
+  isTask,
+  validateBundle
+} from '@opencrvs/commons/types'
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
+import { Events } from '@workflow/features/events/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import {
-  hasRegistrationNumber,
+  invokeRegistrationValidation,
+  setupSystemIdentifier
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  forwardEntriesToHearth,
   forwardToHearth,
-  forwardEntriesToHearth
+  hasRegistrationNumber
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  createRegistrationHandler,
-  markEventAsCertifiedHandler,
-  markEventAsRequestedForCorrectionHandler,
-  markEventAsValidatedHandler,
-  markEventAsWaitingValidationHandler,
   actionEventHandler,
   anonymousActionEventHandler,
-  markEventAsIssuedHandler
+  createRegistrationHandler,
+  markEventAsCertifiedHandler,
+  markEventAsIssuedHandler,
+  markEventAsValidatedHandler,
+  markEventAsWaitingValidationHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
   hasCertificateDataInDocRef,
-  hasCorrectionEncounterSection,
+  hasCorrectionExtension,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
+  ASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  REINSTATED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
+import {
   hasExtension,
-  isRejectedTask,
-  isArchiveTask
+  isArchiveTask,
+  isRejectedTask
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -45,36 +66,21 @@ import {
   hasRegisterScope,
   hasValidateScope
 } from '@workflow/utils/authUtils'
-import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import {
-  ASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
-  VERIFIED_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
-import {
-  invokeRegistrationValidation,
-  setupSystemIdentifier
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { Events } from '@workflow/features/events/utils'
 
 function detectEvent(request: Hapi.Request): Events {
-  const fhirBundle = request.payload as fhir.Bundle
+  const fhirBundle = request.payload as Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
+    validateBundle(request.payload)
+
     const firstEntry = fhirBundle.entry?.[0]?.resource
     if (firstEntry) {
       const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
-        const composition = firstEntry as fhir.Composition
+        const composition = firstEntry as Composition
         const isADuplicate = composition?.extension?.find(
           (ext) =>
             ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
@@ -91,11 +97,15 @@ function detectEvent(request: Hapi.Request): Events {
               return Events[`${eventType}_WAITING_EXTERNAL_RESOURCE_VALIDATION`]
             }
           } else {
+            const tasks = fhirBundle.entry
+              .map((entry) => entry.resource)
+              .filter(isTask)
+
             if (
               hasRegisterScope(request) &&
-              hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              tasks.some(hasCorrectionExtension)
             ) {
-              return Events[`${eventType}_REQUEST_CORRECTION`]
+              return Events[`${eventType}_MAKE_CORRECTION`]
             } else if (!hasCertificateDataInDocRef(fhirBundle)) {
               return Events[`${eventType}_MARK_ISSUE`]
             } else {
@@ -136,7 +146,9 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const taskResource = getTaskResource(fhirBundle)
+    validateBundle(request.payload)
+
+    const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
 
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
@@ -179,7 +191,12 @@ export async function fhirWorkflowEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const event = detectEvent(request)
+  let event: Events
+  try {
+    event = detectEvent(request)
+  } catch (error) {
+    return h.response().code(400)
+  }
 
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
@@ -192,7 +209,7 @@ export async function fhirWorkflowEventHandler(
   }
 
   if (event !== Events.UNKNOWN && event !== Events.EVENT_NOT_DUPLICATE) {
-    setupSystemIdentifier(request)
+    await setupSystemIdentifier(request)
   }
 
   let response
@@ -239,11 +256,29 @@ export async function fhirWorkflowEventHandler(
       }
       break
     }
-    case Events.BIRTH_REQUEST_CORRECTION:
-    case Events.DEATH_REQUEST_CORRECTION:
-    case Events.MARRIAGE_REQUEST_CORRECTION:
-      response = await markEventAsRequestedForCorrectionHandler(request, h)
+    case Events.BIRTH_MAKE_CORRECTION:
+    case Events.DEATH_MAKE_CORRECTION:
+    case Events.MARRIAGE_MAKE_CORRECTION:
+      // Invoke event triggers so search and metrics are notified
       await triggerEvent(event, request.payload, request.headers)
+      // forward as-is to hearth
+
+      /*
+       * Temporary fix for task being saved again after correction. Currently the flow is
+       * 1. Workflow receives the updated task from the gateway, saves it to Heath, Search and Metrics (task saved once)
+       * 2. Bundle returns to gateway, gateway updates the bundle using the inputs from the client, sends it to Hearth
+       * 3. We land here, and forward the bundle to Hearth again (task saved twice)
+       *
+       * Remove the following lines after workflow is refactored to handle the correction approval / creation flows completely
+       */
+
+      const bundle = request.payload as Bundle
+      const bundleWithoutTask = {
+        ...bundle,
+        entry: bundle.entry?.filter((entry) => !isTask(entry.resource))
+      }
+
+      response = await forwardToHearth(request, h, bundleWithoutTask)
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
@@ -361,16 +396,12 @@ export async function triggerEvent(
   payload: Hapi.Request['payload'],
   headers: Record<string, string> = {}
 ) {
-  try {
-    await fetch(`${OPENHIM_URL}${event}`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to forward to openhim for error : ${err}`)
-  }
+  return fetch(`${OPENHIM_URL}${event}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    }
+  })
 }

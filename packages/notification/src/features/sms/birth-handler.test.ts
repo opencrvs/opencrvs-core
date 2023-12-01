@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -27,7 +26,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -45,6 +44,7 @@ describe('Verify birth handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'B123456'
         },
         headers: {
@@ -57,7 +57,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -75,6 +75,7 @@ describe('Verify birth handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
         headers: {
@@ -92,7 +93,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -110,6 +111,7 @@ describe('Verify birth handlers', () => {
             email: 'email@email.com'
           },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
+          registrationLocation: 'Blah',
           trackingId: 'B123456'
         },
         headers: {
@@ -126,7 +128,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -146,6 +148,7 @@ describe('Verify birth handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -158,7 +161,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -178,6 +181,7 @@ describe('Verify birth handlers', () => {
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -195,7 +199,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -215,6 +219,7 @@ describe('Verify birth handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -231,7 +236,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -252,6 +257,7 @@ describe('Verify birth handlers', () => {
           trackingId: 'B123456',
           registrationNumber: '20196816020000129',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -264,7 +270,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid data', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -297,7 +303,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -318,6 +324,7 @@ describe('Verify birth handlers', () => {
           trackingId: 'B123456',
           registrationNumber: '20196816020000129',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -334,7 +341,7 @@ describe('Verify birth handlers', () => {
     it('returns OK the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -354,6 +361,7 @@ describe('Verify birth handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -366,7 +374,7 @@ describe('Verify birth handlers', () => {
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -386,6 +394,7 @@ describe('Verify birth handlers', () => {
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {
@@ -403,7 +412,7 @@ describe('Verify birth handlers', () => {
 
       const token = jwt.sign(
         { scope: ['validate'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -423,6 +432,7 @@ describe('Verify birth handlers', () => {
           name: 'অনিক',
           trackingId: 'B123456',
           crvsOffice: 'ALASKA',
+          registrationLocation: 'Blah',
           informantName: 'Sadman Anik'
         },
         headers: {

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -44,6 +43,7 @@ import {
 import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
+import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -56,12 +56,13 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task, authHeader)
-      return
-    }
+  const isCompositionInBundle = bundleEntries?.some(
+    ({ resource }) => resource?.resourceType === 'Composition'
+  )
+
+  if (!isCompositionInBundle) {
+    await updateEvent(bundle, authHeader)
+    return
   }
 
   const composition = (bundleEntries &&
@@ -79,7 +80,12 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task, authHeader: string) {
+/**
+ * Updates the search index with the latest information of the composition
+ * Supports 1 task and 1 patient maximum
+ */
+async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
+  const task = findTask(bundle.entry)
   const compositionId =
     task &&
     task.focus &&
@@ -207,11 +213,7 @@ async function createBrideIndex(
   }
 
   body.brideIdentifier =
-    bride &&
-    bride.identifier &&
-    bride.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    bride && bride.identifier && getSubmittedIdentifier(bride.identifier)
   body.brideDoB = bride && bride.birthDate
 }
 
@@ -249,11 +251,7 @@ async function createGroomIndex(
   }
 
   body.groomIdentifier =
-    groom &&
-    groom.identifier &&
-    groom.identifier.find(
-      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    )?.value
+    groom && groom.identifier && getSubmittedIdentifier(groom.identifier)
   body.groomDoB = groom && groom.birthDate
 }
 
@@ -387,7 +385,7 @@ async function createDeclarationIndex(
       (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.contactRelationship =
+  body.informantType =
     (contactPersonRelationshipExtention &&
       contactPersonRelationshipExtention.valueString) ||
     (contactPersonExtention && contactPersonExtention.valueString)

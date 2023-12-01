@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -17,8 +16,10 @@ import {
   CHECK_INVALID_TOKEN,
   CERT_PUBLIC_KEY_PATH,
   AUTH_URL,
+  DEFAULT_TIMEOUT,
   HOSTNAME,
-  DEFAULT_TIMEOUT
+  LOGIN_URL,
+  CLIENT_APP_URL
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
@@ -26,20 +27,34 @@ import * as database from '@config/config/database'
 import { validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import { logger } from '@config/logger'
+import { Boom, badRequest } from '@hapi/boom'
 
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
   if (HOSTNAME[0] !== '*') {
-    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
+    whitelist = [LOGIN_URL, CLIENT_APP_URL]
   }
-  logger.info(`Whitelist: : ${JSON.stringify(whitelist)}`)
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,
     routes: {
       cors: { origin: whitelist },
+      validate: {
+        failAction: async (_, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`ValidationError: ${err.message}`)
+            throw badRequest(`Invalid request payload input`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(err.message)
+            throw err
+          }
+        }
+      },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })

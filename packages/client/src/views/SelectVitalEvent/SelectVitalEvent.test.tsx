@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
@@ -42,7 +41,7 @@ describe('when user is selecting the vital event', () => {
       })
       it('takes user to the event info view', async () => {
         expect(app.find('#content-name').hostNodes().first().text()).toBe(
-          'Who is applying for birth registration?'
+          'Introduce the birth registration process to the informant'
         )
       })
     })

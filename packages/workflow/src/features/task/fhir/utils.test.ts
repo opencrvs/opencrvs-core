@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   filterTaskExtensions,
@@ -24,6 +23,7 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { cloneDeep } from 'lodash'
+import { Task } from '@opencrvs/commons/types'
 
 const task = testFhirTaskBundle.entry[0].resource
 
@@ -73,7 +73,10 @@ describe('hasExtension()', () => {
       ]
     }
     expect(
-      hasExtension(taskWithReinstatedExtension, REINSTATED_EXTENSION_URL)
+      hasExtension(
+        taskWithReinstatedExtension as unknown as Task,
+        REINSTATED_EXTENSION_URL
+      )
     ).toBeTruthy()
   })
 })

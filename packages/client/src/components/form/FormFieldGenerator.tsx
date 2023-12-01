@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -87,12 +86,11 @@ import {
   INidVerificationButton,
   DIVIDER,
   HEADING3,
-  SUBSECTION_HEADER
+  SUBSECTION_HEADER,
+  HIDDEN
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
-import { SubSectionHeader } from '@client/components/form/SubSectionHeader'
-
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -144,7 +142,7 @@ import {
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
 import { BulletList, Divider } from '@opencrvs/components'
-import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
+import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -486,8 +484,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
         <>
-          <SubSectionHeader label={fieldDefinition.label} />
-          <Divider />
+          <Heading2>{fieldDefinition.label}</Heading2>
         </>
       )
     }
@@ -495,16 +492,19 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
-      const label = fieldDefinition.label as unknown as MessageDescriptor
+      const label = fieldDefinition.label as unknown as MessageDescriptor & {
+        values: Record<string, string>
+      }
+      const values = label.values || {}
+
+      const message = intl.formatMessage(label, {
+        ...values,
+        [fieldDefinition.name]: value as any
+      })
 
       return (
         <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
-          <FormattedMessage
-            {...label}
-            values={{
-              [fieldDefinition.name]: value as any
-            }}
-          />
+          <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
       )
     }
@@ -634,6 +634,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
+    if (fieldDefinition.type === HIDDEN) {
+      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
+        inputProps
+
+      return (
+        <input
+          type="hidden"
+          {...allowedInputProps}
+          value={inputProps.value as string}
+        />
+      )
+    }
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -913,6 +925,7 @@ class FormSectionComponent extends React.Component<Props> {
       offlineCountryConfig,
       intl,
       draftData,
+      userDetails,
       setValues,
       dynamicDispatch
     } = this.props
@@ -938,7 +951,8 @@ class FormSectionComponent extends React.Component<Props> {
             field,
             { ...draftData?.[sectionName], ...values },
             offlineCountryConfig,
-            draftData
+            draftData,
+            userDetails
           )
 
           if (conditionalActions.includes('hide')) {
@@ -971,7 +985,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === SELECT_WITH_DYNAMIC_OPTIONS
@@ -981,7 +996,8 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    offlineCountryConfig
+                    offlineCountryConfig,
+                    draftData
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS

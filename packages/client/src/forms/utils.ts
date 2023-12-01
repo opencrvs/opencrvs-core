@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
@@ -44,7 +43,9 @@ import {
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
-  BULLET_LIST
+  BULLET_LIST,
+  HIDDEN,
+  Ii18nHiddenFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -70,6 +71,7 @@ import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
+import { UserDetails } from '@client/utils/userUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -95,7 +97,10 @@ export const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(opt.label)
+      label: intl.formatMessage(
+        opt.label,
+        'param' in opt ? opt.param : undefined
+      )
     }
   })
 }
@@ -120,6 +125,10 @@ export const internationaliseFieldObject = (
     unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
+  }
+
+  if (base.type === HIDDEN) {
+    return base as Ii18nHiddenFormField
   }
 
   if (
@@ -285,12 +294,14 @@ export function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
     declaration.data[fromSection.id] || {},
-    declaration.data
+    declaration.data,
+    userDetails
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
@@ -303,7 +314,8 @@ export function getNextSectionIds(
         getVisibleSectionGroupsBasedOnConditions(
           section,
           declaration.data[fromSection.id] || {},
-          declaration.data
+          declaration.data,
+          userDetails
         ).length > 0
     )
 
@@ -331,13 +343,16 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  offlineCountryConfig: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
 ) => {
   if (field.type === SELECT_WITH_OPTIONS) {
     if (field.optionCondition) {
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
-      return field.options.filter(conditionEvaluator)
+      return field.options.filter((field) =>
+        conditionEvaluator({ field, values, declaration })
+      )
     }
 
     return field.options
@@ -531,7 +546,8 @@ export const getConditionalActionsForField = (
    */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -547,7 +563,8 @@ export const getConditionalActionsForField = (
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
   sectionData: IFormSectionData,
-  draftData?: IFormData
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
@@ -670,20 +687,16 @@ export const isDateField = (
   return field.type === DATE
 }
 
-export const stringifyFieldValue = (
+export const serializeFieldValue = (
   field: IFormField,
   fieldValue: IFormFieldValue,
   sectionData: IFormSectionData
-): string => {
-  if (!fieldValue) {
-    return ''
-  }
-
+) => {
   if (isDateField(field, sectionData)) {
-    return fieldValue.toString()
+    return fieldValue?.toString()
   }
 
-  return fieldValue.toString()
+  return fieldValue
 }
 
 export const getSelectedRadioOptionWithNestedFields = (

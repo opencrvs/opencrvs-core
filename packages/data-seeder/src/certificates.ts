@@ -6,16 +6,16 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST } from './constants'
+import { COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import fetch from 'node-fetch'
 import { parseGQLResponse, raise } from './utils'
 import { TypeOf, z } from 'zod'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
 
 type CertificateMeta = TypeOf<typeof CertificateSchema>[number]
 
@@ -28,7 +28,7 @@ const CertificateSchema = z.array(
 )
 
 async function getCertificate() {
-  const url = new URL('certificates', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('certificates', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the certificates from ${url}`)
@@ -36,7 +36,7 @@ async function getCertificate() {
   const parsedCertificates = CertificateSchema.safeParse(await res.json())
   if (!parsedCertificates.success) {
     raise(
-      `Getting certificates from country-config errored with: ${JSON.stringify(
+      `Getting certificates from country-config errored with: ${inspect(
         parsedCertificates.error.issues
       )}`
     )
@@ -73,7 +73,7 @@ async function certificatesAlreadyExist(
   event: CertificateMeta['event'],
   token: string
 ) {
-  const res = await fetch(GATEWAY_GQL_HOST, {
+  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ async function uploadCertificate(token: string, certificate: CertificateInput) {
     )
     return
   }
-  const res = await fetch(GATEWAY_GQL_HOST, {
+  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

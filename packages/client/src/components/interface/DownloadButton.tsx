@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -31,7 +30,7 @@ import {
   useApolloClient
 } from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import {

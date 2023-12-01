@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   loop,
@@ -26,7 +25,8 @@ import {
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   ICertificateTemplateData,
-  referenceApi
+  referenceApi,
+  CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -43,6 +43,11 @@ import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
 import { initConditionals } from '@client/forms/conditionals'
 import { initValidators } from '@client/forms/validators'
+import {
+  Action as NotificationAction,
+  configurationErrorNotification
+} from '@client/notification/actions'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -78,6 +83,7 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
+    fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
     certificates?: {
@@ -100,6 +106,8 @@ export type IOfflineDataState = {
   loadingError: boolean
   userDetails?: UserDetails
 }
+
+type Action = actions.Action | NotificationAction
 
 const initialState: IOfflineDataState = {
   offlineData: {},
@@ -156,7 +164,7 @@ async function loadCertificates(
 
 function checkIfDone(
   oldState: IOfflineDataState,
-  loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
+  loopOrState: IOfflineDataState | Loop<IOfflineDataState, Action>
 ) {
   const loopWithState = liftState(loopOrState)
   const newState = getModel(loopWithState)
@@ -216,6 +224,14 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   failActionCreator: actions.configFailed
 })
 
+const CERTIFICATE_CONFIG_CMD = Cmd.run(
+  () => referenceApi.loadCertificateConfiguration(),
+  {
+    successActionCreator: actions.certificateConfigurationLoaded,
+    failActionCreator: actions.certificateConfigurationLoadFailed
+  }
+)
+
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
@@ -229,6 +245,11 @@ const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
 const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
   successActionCreator: actions.validatorsLoaded,
   failActionCreator: actions.validatorsFailed
+})
+
+const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
+  successActionCreator: actions.handlebarsLoaded,
+  failActionCreator: actions.handlebarsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -245,8 +266,10 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
+    CERTIFICATE_CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
+    HANDLEBARS_CMD,
     FORMS_CMD,
     CONTENT_CMD
   ])
@@ -280,7 +303,7 @@ function errorIfDataNotLoaded(state: IOfflineDataState) {
 function reducer(
   state: IOfflineDataState,
   action: actions.Action | profileActions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   switch (action.type) {
     // ENTRYPOINT - called from profile reducer
     case profileActions.USER_DETAILS_AVAILABLE: {
@@ -508,6 +531,7 @@ function reducer(
         const newOfflineData = {
           ...state.offlineData,
           templates: {
+            ...state.offlineData.templates,
             certificates: certificatesTemplates
           }
         }
@@ -523,6 +547,20 @@ function reducer(
 
     case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(
+            configurationErrorNotification(
+              payload.message + ' to load application configuration properly'
+            )
+          )
+        )
+      }
       return loop(
         {
           ...state,
@@ -553,6 +591,23 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            fonts: action.payload.fonts
+          }
+        }
+      }
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
+      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*
@@ -592,6 +647,16 @@ function reducer(
       }
     }
     case actions.FORMS_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(configurationErrorNotification(payload.message))
+        )
+      }
       return loop(
         {
           ...state,
@@ -665,7 +730,7 @@ function reducer(
 export function offlineDataReducer(
   state: IOfflineDataState | undefined = initialState,
   action: actions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   const newState = reducer(state, action)
   if (action.type !== actions.READY) {
     return checkIfDone(state, newState)

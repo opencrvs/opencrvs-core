@@ -6,19 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  MINIO_BUCKET,
-  USER_NOTIFICATION_DELIVERY_METHOD
-} from '@gateway/constants'
+import { MINIO_BUCKET } from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput,
-  GQLUserInput
+  GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
@@ -55,18 +50,6 @@ export async function validateAttachments(
     if (!type.mime.startsWith('image/')) {
       throw new Error(`File type doesn't match image/*`)
     }
-  }
-}
-
-export async function validateNotificationDeliveryMethod(user: GQLUserInput) {
-  const notificationMethodMap = {
-    sms: 'mobile',
-    email: 'email'
-  }
-  if (!user[notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]]) {
-    throw new Error(
-      `${notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]} is required`
-    )
   }
 }
 

@@ -5,44 +5,108 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
 name: Lint and run unit tests
 
 on: [pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-20.04
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get list of packages
+        id: set-matrix
+        run: |
+          PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
+          echo "Found packages: $PACKAGES"
+          echo "::set-output name=matrix::${PACKAGES}"
+
+  test:
+    needs: setup
+    runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [16.20.0]
+        package: ${{fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Verify every file has a license header
+        run: npx license-check-and-add check -f license-config.json
+
+      - name: Check package.json and scripts
+        id: check-scripts
+        run: |
+          if [ ! -f "${{ matrix.package }}/package.json" ]; then
+            echo "No package.json found for ${{ matrix.package }}. Stopping pipeline."
+            echo "::set-output name=skip::true"
+          else
+            echo "::set-output name=skip::false"
+
+            if ! grep -q "\"test\":" "${{ matrix.package }}/package.json"; then
+              echo "Test not found in ${{ matrix.package }}"
+              echo "::set-output name=skip-test::true"
+            else
+              echo "::set-output name=skip-test::false"
+            fi
+
+            if ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
+              echo "Lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
+              echo "::set-output name=skip-lint::true"
+            else
+              echo "::set-output name=skip-lint::false"
+            fi
+          fi
+
+      - name: Use Node.js 16.20
+        if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '16.20'
           cache: 'npm'
 
+      - name: Remove other package directories
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: |
+          for dir in packages/*; do
+            if [ "$dir" != "${{ matrix.package }}" ] && [ "$dir" != "packages/commons" ] && [ "$dir" != "packages/components" ]; then
+              if [ "${{ matrix.package }}" == "packages/client" ] && [ "$dir" == "packages/gateway" ] ; then
+                echo "Skipping $dir"
+              else
+                echo "Removing $dir"
+                rm -rf "$dir"
+              fi
+            fi
+          done
+
       - name: Runs dependency installation
-        run: yarn
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: CI="" yarn
+
+      - name: Build common package
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: cd packages/commons && yarn build
+
+      - name: Build components client and login
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: |
+          if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
+            cd packages/components && yarn build
+          fi
 
       - name: Run linting
-        run: yarn lint
-
-      - name: Build components
-        run: yarn build:components
+        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
+        run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
-        run: yarn test
-
-      - name: Run code coverage
-        run: |
-          npm install codecov
-          ./node_modules/.bin/codecov
+        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        run: cd ${{ matrix.package }} && yarn test

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { storage } from '@client/storage'
 import { IUserData } from './declarations'
@@ -94,6 +93,13 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
 }))
 
+vi.mock('@client/forms/handlebarHelpers', async () => {
+  return {
+    initHandlebarHelpers: () => Promise.resolve(),
+    getHandlebarHelpers: () => ({})
+  }
+})
+
 vi.mock('@client/forms/conditionals', async () => {
   const actual = (await vi.importActual('@client/forms/conditionals')) as any
   return {
@@ -109,6 +115,17 @@ vi.mock('@client/forms/validators', async () => {
     ...actual,
     validators: await vi.importActual('@client/utils/validate'),
     initValidators: () => Promise.resolve()
+  }
+})
+
+vi.mock('@client/forms/handlebarHelpers', async () => {
+  const actual = (await vi.importActual(
+    '@client/forms/handlebarHelpers'
+  )) as any
+  return {
+    ...actual,
+    handlebarHelpers: {},
+    initHandlebarHelpers: () => Promise.resolve()
   }
 })
 
@@ -179,10 +196,12 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadCertificateConfiguration: () => Promise.resolve({}),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),
-      importValidators: () => Promise.resolve({})
+      importValidators: () => Promise.resolve({}),
+      importHandlebarHelpers: () => Promise.resolve({})
     }
   })
 )

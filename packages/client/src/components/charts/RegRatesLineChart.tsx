@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
@@ -233,7 +232,11 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
               })}
             </LegendDataLabel>
             <br />
-            <LegendDataValue>{activeTotalEstimate.value}</LegendDataValue>
+            <LegendDataValue>
+              {activeTotalEstimate.value < 10
+                ? activeTotalEstimate.value.toFixed(2)
+                : Math.round(activeTotalEstimate.value)}
+            </LegendDataValue>
           </LegendData>
         </LegendDetails>
         <LegendDetails>

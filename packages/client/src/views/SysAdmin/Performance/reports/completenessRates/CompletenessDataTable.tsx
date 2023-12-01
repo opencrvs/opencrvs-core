@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
@@ -21,10 +20,10 @@ import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import {
+import type {
   GQLLocationWiseEstimationMetric,
   GQLMonthWiseEstimationMetric
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -94,9 +93,15 @@ function CompletenessDataTableComponent(props: ITableProps) {
     if (data && isLocationData(data)) {
       const locationContent = data.map((item) => ({
         location: item.locationName,
-        totalRegistered: String(item.total),
-        registeredWithinTargetd: String(item[props.completenessRateTime]),
-        estimated: String(item.estimated),
+        totalRegistered: String(Math.round(item.total)),
+        registeredWithinTargetd: String(
+          Math.round(item[props.completenessRateTime])
+        ),
+        estimated: String(
+          item.estimated < 10
+            ? item.estimated.toFixed(2)
+            : Math.round(item.estimated)
+        ),
         completenessRate: `${Number(
           (item[props.completenessRateTime] / item.estimated) * 100
         ).toFixed(2)}%`
@@ -113,9 +118,15 @@ function CompletenessDataTableComponent(props: ITableProps) {
           intl.locale,
           'MMMM yyyy'
         ),
-        totalRegistered: item.total,
-        registeredWithinTargetd: String(item[props.completenessRateTime]),
-        estimated: String(item.estimated),
+        totalRegistered: String(Math.round(item.total)),
+        registeredWithinTargetd: String(
+          Math.round(item[props.completenessRateTime])
+        ),
+        estimated: String(
+          item.estimated < 10
+            ? item.estimated.toFixed(2)
+            : Math.round(item.estimated)
+        ),
         completenessRate: `${Number(
           (item[props.completenessRateTime] / item.estimated) * 100
         ).toFixed(2)}%`
@@ -144,7 +155,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
     )
   }
 
-  const sortedContent = orderBy<typeof content[number]>(
+  const sortedContent = orderBy<(typeof content)[number]>(
     content,
     sortOrder.map(({ key }) => key),
     sortOrder.map(({ value }) => value)

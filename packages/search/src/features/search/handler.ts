@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
@@ -42,6 +41,7 @@ export async function searchAssignment(
   const payload = request.payload as IAssignmentPayload
   try {
     const results = await searchByCompositionId(payload.compositionId, client)
+
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined

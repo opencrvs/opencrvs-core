@@ -61,6 +61,14 @@ export interface GQLQuery {
 export interface GQLMutation {
   createNotification: GQLNotification
   voidNotification?: GQLNotification
+  requestRegistrationCorrection: string
+  rejectRegistrationCorrection: string
+  approveBirthRegistrationCorrection: string
+  approveDeathRegistrationCorrection: string
+  approveMarriageRegistrationCorrection: string
+  createBirthRegistrationCorrection: string
+  createDeathRegistrationCorrection: string
+  createMarriageRegistrationCorrection: string
   createBirthRegistration: GQLCreatedIds
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
@@ -68,7 +76,6 @@ export interface GQLMutation {
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markBirthAsIssued: string
-  requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
   markEventAsNotDuplicate: string
@@ -80,14 +87,12 @@ export interface GQLMutation {
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   markDeathAsIssued: string
-  requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
   createMarriageRegistration: GQLCreatedIds
   markMarriageAsValidated?: string
   markMarriageAsRegistered: GQLMarriageRegistration
   markMarriageAsCertified: string
   markMarriageAsIssued: string
-  requestMarriageRegistrationCorrection: string
   markEventAsDuplicate: string
   createOrUpdateUser: GQLUser
   activateUser?: string
@@ -411,6 +416,7 @@ export interface GQLAdvancedSearchParametersInput {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
@@ -433,6 +439,7 @@ export interface GQLAdvancedSearchParametersInput {
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  childIdentifier?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
@@ -472,6 +479,11 @@ export interface GQLAdvancedSearchParametersInput {
   informantDoBEnd?: string
   informantIdentifier?: string
   compositionType?: Array<string | null>
+}
+
+export interface GQLSortBy {
+  column: string
+  order: string
 }
 
 export interface GQLEventProgressResultSet {
@@ -555,14 +567,26 @@ export interface GQLNotificationInput {
   updatedAt?: GQLDate
 }
 
-export interface GQLCreatedIds {
-  compositionId?: string
-  trackingId?: string
-  isPotentiallyDuplicate?: boolean
+export interface GQLCorrectionInput {
+  requester: string
+  requesterOther?: string
+  hasShowedVerifiedDocument: boolean
+  noSupportingDocumentationRequired: boolean
+  attachments: Array<GQLAttachmentInput>
+  payment?: GQLCorrectionPaymentInput
+  values: Array<GQLCorrectionValueInput>
+  location: GQLLocationInput
+  reason: string
+  otherReason: string
+  note: string
+}
+
+export interface GQLCorrectionRejectionInput {
+  reason: string
 }
 
 export interface GQLBirthRegistrationInput {
-  _fhirIDMap?: GQLMap
+  _fhirIDMap?: GQLFHIRIDMap
   registration?: GQLRegistrationInput
   child?: GQLPersonInput
   mother?: GQLPersonInput
@@ -581,13 +605,8 @@ export interface GQLBirthRegistrationInput {
   updatedAt?: GQLDate
 }
 
-export interface GQLReinstated {
-  taskEntryResourceID: string
-  registrationStatus?: GQLRegStatus
-}
-
 export interface GQLDeathRegistrationInput {
-  _fhirIDMap?: GQLMap
+  _fhirIDMap?: GQLFHIRIDMap
   registration?: GQLRegistrationInput
   deceased?: GQLPersonInput
   informant?: GQLRelatedPersonInput
@@ -609,7 +628,7 @@ export interface GQLDeathRegistrationInput {
 }
 
 export interface GQLMarriageRegistrationInput {
-  _fhirIDMap?: GQLMap
+  _fhirIDMap?: GQLFHIRIDMap
   registration?: GQLRegistrationInput
   informant?: GQLRelatedPersonInput
   bride?: GQLPersonInput
@@ -623,6 +642,17 @@ export interface GQLMarriageRegistrationInput {
   updatedAt?: GQLDate
 }
 
+export interface GQLCreatedIds {
+  compositionId?: string
+  trackingId?: string
+  isPotentiallyDuplicate?: boolean
+}
+
+export interface GQLReinstated {
+  taskEntryResourceID: string
+  registrationStatus?: GQLRegStatus
+}
+
 export interface GQLUserInput {
   id?: string
   name: Array<GQLHumanNameInput>
@@ -630,6 +660,7 @@ export interface GQLUserInput {
   username?: string
   mobile?: string
   password?: string
+  status?: GQLStatus
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -690,6 +721,8 @@ export interface GQLApplicationConfiguration {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackground
 }
@@ -707,6 +740,8 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
@@ -825,12 +860,15 @@ export interface GQLHistory {
   regStatus?: GQLRegStatus
   ipAddress?: string
   action?: GQLRegAction
+  note?: string
   statusReason?: GQLStatusReason
   reason?: string
   requester?: string
+  requesterOther?: string
   hasShowedVerifiedDocument?: boolean
+  noSupportingDocumentationRequired?: boolean
   otherReason?: string
-  system?: GQLSystem
+  system?: GQLIntegratedSystem
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -839,6 +877,8 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  payment?: GQLPayment
+  documents: Array<GQLAttachment>
   duplicateOf?: string
   potentialDuplicates?: Array<string>
 }
@@ -884,6 +924,7 @@ export interface GQLAddress {
   country?: string
   from?: GQLDate
   to?: GQLDate
+  partOf?: string
 }
 
 export interface GQLAttachment {
@@ -1110,7 +1151,7 @@ export interface GQLPersonInput {
   identifier?: Array<GQLIdentityInput | null>
   name?: Array<GQLHumanNameInput | null>
   telecom?: Array<GQLContactPointInput | null>
-  gender?: string
+  gender?: GQLGender
   birthDate?: string
   age?: number
   maritalStatus?: string
@@ -1144,6 +1185,44 @@ export interface GQLLocationInput {
   geoData?: string
 }
 
+export interface GQLAttachmentInput {
+  _fhirID?: string
+  contentType?: string
+  data?: string
+  uri?: string
+  status?: GQLAttachmentInputStatus
+  originalFileName?: string
+  systemFileName?: string
+  type?: string
+  description?: string
+  subject?: string
+  createdAt?: GQLDate
+}
+
+export interface GQLCorrectionPaymentInput {
+  _fhirID?: string
+  attachmentData?: string
+  type: GQLPaymentType
+  amount: number
+  outcome: GQLPaymentOutcomeType
+  date: GQLDate
+}
+
+export interface GQLCorrectionValueInput {
+  section: string
+  fieldName: string
+  oldValue?: GQLFieldValue
+  newValue: GQLFieldValue
+}
+
+export interface GQLFHIRIDMap {
+  composition?: string
+  encounter?: string
+  eventLocation?: string
+  questionnaireResponse?: string
+  observation?: GQLObservationFHIRIDS
+}
+
 export interface GQLRegistrationInput {
   _fhirID?: string
   draftId?: string
@@ -1160,8 +1239,6 @@ export interface GQLRegistrationInput {
   witnessTwoSignature?: string
   informantType?: string
   otherInformantType?: string
-  contact?: string
-  contactRelationship?: string
   contactPhoneNumber?: string
   contactEmail?: string
   status?: Array<GQLRegWorkflowInput | null>
@@ -1184,7 +1261,7 @@ export interface GQLRelatedPersonInput {
   identifier?: Array<GQLIdentityInput | null>
   name?: Array<GQLHumanNameInput | null>
   telecom?: Array<GQLContactPointInput | null>
-  gender?: string
+  gender?: GQLGender
   birthDate?: string
   age?: number
   maritalStatus?: string
@@ -1206,23 +1283,24 @@ export interface GQLQuestionnaireQuestionInput {
   value?: string
 }
 
+export interface GQLMedicalPractitionerInput {
+  name?: string
+  qualification?: string
+  lastVisitDate?: GQLDate
+}
+
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   ARCHIVED = 'ARCHIVED',
   DECLARED = 'DECLARED',
   DECLARATION_UPDATED = 'DECLARATION_UPDATED',
   WAITING_VALIDATION = 'WAITING_VALIDATION',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
   ISSUED = 'ISSUED'
-}
-
-export interface GQLMedicalPractitionerInput {
-  name?: string
-  qualification?: string
-  lastVisitDate?: GQLDate
 }
 
 export interface GQLHumanNameInput {
@@ -1372,6 +1450,9 @@ export const enum GQLRegAction {
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  APPROVED_CORRECTION = 'APPROVED_CORRECTION',
+  REJECTED_CORRECTION = 'REJECTED_CORRECTION',
+  CORRECTED = 'CORRECTED',
   DOWNLOADED = 'DOWNLOADED',
   VIEWED = 'VIEWED',
   MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE',
@@ -1383,6 +1464,12 @@ export interface GQLStatusReason {
   text?: string
 }
 
+export interface GQLIntegratedSystem {
+  name?: string
+  username?: string
+  type?: string
+}
+
 export interface GQLComment {
   id: string
   user?: GQLUser
@@ -1391,9 +1478,18 @@ export interface GQLComment {
 }
 
 export interface GQLInputOutput {
-  valueCode?: string
-  valueId?: string
-  valueString?: string
+  valueCode: string
+  valueId: string
+  value: GQLFieldValue
+}
+
+export interface GQLPayment {
+  id: string
+  type: GQLPaymentType
+  amount: number
+  outcome: GQLPaymentOutcomeType
+  date: GQLDate
+  attachmentURL?: string
 }
 
 export interface GQLRoleLabel {
@@ -1409,6 +1505,7 @@ export interface GQLAdvancedSeachParameters {
   dateOfEventStart?: string
   dateOfEventEnd?: string
   contactNumber?: string
+  contactEmail?: string
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
@@ -1430,6 +1527,7 @@ export interface GQLAdvancedSeachParameters {
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  childIdentifier?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
@@ -1505,6 +1603,7 @@ export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
+  contactEmail?: string
   contactRelationship?: string
   dateOfDeclaration?: GQLDate
   trackingId?: string
@@ -1536,6 +1635,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   id: string
   type?: string
   childName?: Array<GQLHumanName | null>
+  childIdentifier?: string
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
@@ -1605,16 +1705,23 @@ export interface GQLIdentityInput {
 }
 
 export interface GQLContactPointInput {
-  system?: string
+  system?: GQLTelecomSystem
   value?: string
-  use?: string
+  use?: GQLTelecomUse
+}
+
+export const enum GQLGender {
+  male = 'male',
+  female = 'female',
+  other = 'other',
+  unknown = 'unknown'
 }
 
 export interface GQLAddressInput {
-  use?: string
-  type?: string
+  use?: GQLAddressUse
+  type?: GQLAddressType
   text?: string
-  line?: Array<string | null>
+  line?: Array<string>
   city?: string
   district?: string
   state?: string
@@ -1622,25 +1729,47 @@ export interface GQLAddressInput {
   country?: string
   from?: GQLDate
   to?: GQLDate
-}
-
-export interface GQLAttachmentInput {
-  _fhirID?: string
-  contentType?: string
-  data?: string
-  uri?: string
-  status?: string
-  originalFileName?: string
-  systemFileName?: string
-  type?: string
-  description?: string
-  subject?: string
-  createdAt?: GQLDate
+  partOf?: string
 }
 
 export interface GQLDeceasedInput {
   deceased?: boolean
   deathDate?: string
+}
+
+export const enum GQLAttachmentInputStatus {
+  approved = 'approved',
+  validated = 'validated',
+  deleted = 'deleted'
+}
+
+export const enum GQLPaymentType {
+  MANUAL = 'MANUAL'
+}
+
+export const enum GQLPaymentOutcomeType {
+  COMPLETED = 'COMPLETED',
+  ERROR = 'ERROR',
+  PARTIAL = 'PARTIAL'
+}
+
+export type GQLFieldValue = any
+
+export interface GQLObservationFHIRIDS {
+  maleDependentsOfDeceased?: string
+  femaleDependentsOfDeceased?: string
+  mannerOfDeath?: string
+  deathDescription?: string
+  causeOfDeathEstablished?: string
+  causeOfDeathMethod?: string
+  causeOfDeath?: string
+  birthType?: string
+  typeOfMarriage?: string
+  weightAtBirth?: string
+  attendantAtBirth?: string
+  childrenBornAliveToMother?: string
+  foetalDeathsToMother?: string
+  lastPreviousLiveBirth?: string
 }
 
 export interface GQLRegWorkflowInput {
@@ -1658,20 +1787,6 @@ export interface GQLCertificateInput {
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPaymentInput | null>
   data?: string
-}
-
-export interface GQLCorrectionInput {
-  requester?: string
-  hasShowedVerifiedDocument?: boolean
-  attestedAndCopied?: boolean
-  noSupportingDocumentationRequired?: boolean
-  payments?: Array<GQLPaymentInput | null>
-  values?: Array<GQLCorrectionValueInput | null>
-  location?: GQLLocationInput
-  data?: string
-  reason?: string
-  otherReason?: string
-  note?: string
 }
 
 export interface GQLLabelInput {
@@ -1716,15 +1831,6 @@ export interface GQLMarriageFeeInput {
   DELAYED?: number
 }
 
-export interface GQLPayment {
-  paymentId?: string
-  type?: GQLPaymentType
-  total?: number
-  amount?: number
-  outcome?: GQLPaymentOutcomeType
-  date?: GQLDate
-}
-
 export interface GQLAuditLogItemBase {
   time: string
   ipAddress: string
@@ -1749,6 +1855,39 @@ export interface GQLAdditionalIdWithCompositionId {
   trackingId: string
 }
 
+export const enum GQLTelecomSystem {
+  other = 'other',
+  phone = 'phone',
+  fax = 'fax',
+  email = 'email',
+  pager = 'pager',
+  url = 'url',
+  sms = 'sms'
+}
+
+export const enum GQLTelecomUse {
+  home = 'home',
+  work = 'work',
+  temp = 'temp',
+  old = 'old',
+  mobile = 'mobile'
+}
+
+export const enum GQLAddressUse {
+  home = 'home',
+  work = 'work',
+  temp = 'temp',
+  old = 'old'
+}
+
+export const enum GQLAddressType {
+  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
+  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS',
+  postal = 'postal',
+  physical = 'physical',
+  both = 'both'
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1763,23 +1902,6 @@ export interface GQLPaymentInput {
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
   data?: string
-}
-
-export interface GQLCorrectionValueInput {
-  section?: string
-  fieldName?: string
-  oldValue?: string
-  newValue?: string
-}
-
-export const enum GQLPaymentType {
-  MANUAL = 'MANUAL'
-}
-
-export const enum GQLPaymentOutcomeType {
-  COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR',
-  PARTIAL = 'PARTIAL'
 }
 
 /*********************************
@@ -1892,8 +2014,10 @@ export interface GQLResolver {
   Certificate?: GQLCertificateTypeResolver
   DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
+  IntegratedSystem?: GQLIntegratedSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  Payment?: GQLPaymentTypeResolver
   RoleLabel?: GQLRoleLabelTypeResolver
   AdvancedSeachParameters?: GQLAdvancedSeachParametersTypeResolver
   EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
@@ -1909,10 +2033,10 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
+  FieldValue?: GraphQLScalarType
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
-  Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
@@ -2530,6 +2654,7 @@ export interface QueryToSearchEventsArgs {
   skip?: number
   sort?: string
   sortColumn?: string
+  sortBy?: Array<GQLSortBy>
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
@@ -2647,6 +2772,14 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
 export interface GQLMutationTypeResolver<TParent = any> {
   createNotification?: MutationToCreateNotificationResolver<TParent>
   voidNotification?: MutationToVoidNotificationResolver<TParent>
+  requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
+  rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
+  approveBirthRegistrationCorrection?: MutationToApproveBirthRegistrationCorrectionResolver<TParent>
+  approveDeathRegistrationCorrection?: MutationToApproveDeathRegistrationCorrectionResolver<TParent>
+  approveMarriageRegistrationCorrection?: MutationToApproveMarriageRegistrationCorrectionResolver<TParent>
+  createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
+  createDeathRegistrationCorrection?: MutationToCreateDeathRegistrationCorrectionResolver<TParent>
+  createMarriageRegistrationCorrection?: MutationToCreateMarriageRegistrationCorrectionResolver<TParent>
   createBirthRegistration?: MutationToCreateBirthRegistrationResolver<TParent>
   updateBirthRegistration?: MutationToUpdateBirthRegistrationResolver<TParent>
   markBirthAsVerified?: MutationToMarkBirthAsVerifiedResolver<TParent>
@@ -2654,7 +2787,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
-  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
   markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
@@ -2666,14 +2798,12 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   markDeathAsIssued?: MutationToMarkDeathAsIssuedResolver<TParent>
-  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
   createMarriageRegistration?: MutationToCreateMarriageRegistrationResolver<TParent>
   markMarriageAsValidated?: MutationToMarkMarriageAsValidatedResolver<TParent>
   markMarriageAsRegistered?: MutationToMarkMarriageAsRegisteredResolver<TParent>
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
-  requestMarriageRegistrationCorrection?: MutationToRequestMarriageRegistrationCorrectionResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
@@ -2724,6 +2854,134 @@ export interface MutationToVoidNotificationResolver<
   (
     parent: TParent,
     args: MutationToVoidNotificationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestRegistrationCorrectionArgs {
+  id: string
+  details: GQLCorrectionInput
+}
+export interface MutationToRequestRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRejectRegistrationCorrectionArgs {
+  id: string
+  details: GQLCorrectionRejectionInput
+}
+export interface MutationToRejectRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRejectRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToApproveBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToApproveDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveDeathRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToApproveMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveMarriageRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToCreateBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToCreateDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateDeathRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToCreateMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateMarriageRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -2835,22 +3093,6 @@ export interface MutationToMarkBirthAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsIssuedArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestBirthRegistrationCorrectionArgs {
-  id: string
-  details: GQLBirthRegistrationInput
-}
-export interface MutationToRequestBirthRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestBirthRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -3032,22 +3274,6 @@ export interface MutationToMarkDeathAsIssuedResolver<
   ): TResult
 }
 
-export interface MutationToRequestDeathRegistrationCorrectionArgs {
-  id: string
-  details: GQLDeathRegistrationInput
-}
-export interface MutationToRequestDeathRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestDeathRegistrationCorrectionArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface MutationToMarkEventAsUnassignedArgs {
   id: string
 }
@@ -3137,22 +3363,6 @@ export interface MutationToMarkMarriageAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkMarriageAsIssuedArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestMarriageRegistrationCorrectionArgs {
-  id: string
-  details: GQLMarriageRegistrationInput
-}
-export interface MutationToRequestMarriageRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestMarriageRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6023,6 +6233,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
+  USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
   LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
@@ -6172,6 +6384,30 @@ export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
 }
 
 export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<
   TParent = any,
   TResult = any
 > {
@@ -6977,10 +7213,13 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   regStatus?: HistoryToRegStatusResolver<TParent>
   ipAddress?: HistoryToIpAddressResolver<TParent>
   action?: HistoryToActionResolver<TParent>
+  note?: HistoryToNoteResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
   requester?: HistoryToRequesterResolver<TParent>
+  requesterOther?: HistoryToRequesterOtherResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
+  noSupportingDocumentationRequired?: HistoryToNoSupportingDocumentationRequiredResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
   system?: HistoryToSystemResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
@@ -6991,6 +7230,8 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  payment?: HistoryToPaymentResolver<TParent>
+  documents?: HistoryToDocumentsResolver<TParent>
   duplicateOf?: HistoryToDuplicateOfResolver<TParent>
   potentialDuplicates?: HistoryToPotentialDuplicatesResolver<TParent>
 }
@@ -7040,6 +7281,15 @@ export interface HistoryToActionResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface HistoryToNoteResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
@@ -7067,7 +7317,28 @@ export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface HistoryToRequesterOtherResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToNoSupportingDocumentationRequiredResolver<
   TParent = any,
   TResult = any
 > {
@@ -7164,6 +7435,24 @@ export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToPaymentResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToDocumentsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -7375,6 +7664,7 @@ export interface GQLAddressTypeResolver<TParent = any> {
   country?: AddressToCountryResolver<TParent>
   from?: AddressToFromResolver<TParent>
   to?: AddressToToResolver<TParent>
+  partOf?: AddressToPartOfResolver<TParent>
 }
 
 export interface AddressToUseResolver<TParent = any, TResult = any> {
@@ -7495,6 +7785,15 @@ export interface AddressToFromResolver<TParent = any, TResult = any> {
 }
 
 export interface AddressToToResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AddressToPartOfResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9130,6 +9429,42 @@ export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface GQLIntegratedSystemTypeResolver<TParent = any> {
+  name?: IntegratedSystemToNameResolver<TParent>
+  username?: IntegratedSystemToUsernameResolver<TParent>
+  type?: IntegratedSystemToTypeResolver<TParent>
+}
+
+export interface IntegratedSystemToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLCommentTypeResolver<TParent = any> {
   id?: CommentToIdResolver<TParent>
   user?: CommentToUserResolver<TParent>
@@ -9176,7 +9511,7 @@ export interface CommentToCreatedAtResolver<TParent = any, TResult = any> {
 export interface GQLInputOutputTypeResolver<TParent = any> {
   valueCode?: InputOutputToValueCodeResolver<TParent>
   valueId?: InputOutputToValueIdResolver<TParent>
-  valueString?: InputOutputToValueStringResolver<TParent>
+  value?: InputOutputToValueResolver<TParent>
 }
 
 export interface InputOutputToValueCodeResolver<TParent = any, TResult = any> {
@@ -9197,10 +9532,70 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface InputOutputToValueStringResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface InputOutputToValueResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLPaymentTypeResolver<TParent = any> {
+  id?: PaymentToIdResolver<TParent>
+  type?: PaymentToTypeResolver<TParent>
+  amount?: PaymentToAmountResolver<TParent>
+  outcome?: PaymentToOutcomeResolver<TParent>
+  date?: PaymentToDateResolver<TParent>
+  attachmentURL?: PaymentToAttachmentURLResolver<TParent>
+}
+
+export interface PaymentToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToAmountResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToAttachmentURLResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9240,6 +9635,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   dateOfEventStart?: AdvancedSeachParametersToDateOfEventStartResolver<TParent>
   dateOfEventEnd?: AdvancedSeachParametersToDateOfEventEndResolver<TParent>
   contactNumber?: AdvancedSeachParametersToContactNumberResolver<TParent>
+  contactEmail?: AdvancedSeachParametersToContactEmailResolver<TParent>
   nationalId?: AdvancedSeachParametersToNationalIdResolver<TParent>
   registrationNumber?: AdvancedSeachParametersToRegistrationNumberResolver<TParent>
   trackingId?: AdvancedSeachParametersToTrackingIdResolver<TParent>
@@ -9261,6 +9657,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   childDoBStart?: AdvancedSeachParametersToChildDoBStartResolver<TParent>
   childDoBEnd?: AdvancedSeachParametersToChildDoBEndResolver<TParent>
   childGender?: AdvancedSeachParametersToChildGenderResolver<TParent>
+  childIdentifier?: AdvancedSeachParametersToChildIdentifierResolver<TParent>
   deceasedFirstNames?: AdvancedSeachParametersToDeceasedFirstNamesResolver<TParent>
   deceasedFamilyName?: AdvancedSeachParametersToDeceasedFamilyNameResolver<TParent>
   deceasedGender?: AdvancedSeachParametersToDeceasedGenderResolver<TParent>
@@ -9362,6 +9759,18 @@ export interface AdvancedSeachParametersToDateOfEventEndResolver<
 }
 
 export interface AdvancedSeachParametersToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToContactEmailResolver<
   TParent = any,
   TResult = any
 > {
@@ -9614,6 +10023,18 @@ export interface AdvancedSeachParametersToChildDoBEndResolver<
 }
 
 export interface AdvancedSeachParametersToChildGenderResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToChildIdentifierResolver<
   TParent = any,
   TResult = any
 > {
@@ -10316,6 +10737,7 @@ export interface UserAuditLogItemToPractitionerIdResolver<
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
+  contactEmail?: RegistrationSearchSetToContactEmailResolver<TParent>
   contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
   dateOfDeclaration?: RegistrationSearchSetToDateOfDeclarationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
@@ -10343,6 +10765,18 @@ export interface RegistrationSearchSetToStatusResolver<
 }
 
 export interface RegistrationSearchSetToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationSearchSetToContactEmailResolver<
   TParent = any,
   TResult = any
 > {
@@ -10635,6 +11069,7 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   id?: BirthEventSearchSetToIdResolver<TParent>
   type?: BirthEventSearchSetToTypeResolver<TParent>
   childName?: BirthEventSearchSetToChildNameResolver<TParent>
+  childIdentifier?: BirthEventSearchSetToChildIdentifierResolver<TParent>
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
   operationHistories?: BirthEventSearchSetToOperationHistoriesResolver<TParent>
@@ -10672,6 +11107,18 @@ export interface BirthEventSearchSetToTypeResolver<
 }
 
 export interface BirthEventSearchSetToChildNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToChildIdentifierResolver<
   TParent = any,
   TResult = any
 > {
@@ -11319,69 +11766,6 @@ export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLPaymentTypeResolver<TParent = any> {
-  paymentId?: PaymentToPaymentIdResolver<TParent>
-  type?: PaymentToTypeResolver<TParent>
-  total?: PaymentToTotalResolver<TParent>
-  amount?: PaymentToAmountResolver<TParent>
-  outcome?: PaymentToOutcomeResolver<TParent>
-  date?: PaymentToDateResolver<TParent>
-}
-
-export interface PaymentToPaymentIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToTotalResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToAmountResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToDateResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

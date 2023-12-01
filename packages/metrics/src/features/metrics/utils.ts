@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   differenceInDays,
@@ -110,6 +109,39 @@ export const generateEmptyBirthKeyFigure = (
   }
 }
 
+export function createEstimatesArray(
+  years: number[],
+  extension: fhir.Extension
+) {
+  const output: number[] = []
+  const locationExtensions = JSON.parse(extension.valueString as string) as {
+    [key: string]: number
+  }[]
+  // Imagine that years searching: [2022,2023] & extensions is: [{"2015": 17.2}, {"2022": 16}, {"2017": 17.2}]
+  // We have no data for 2023 so we want to use 2022 estimates
+
+  for (let i = 0; i < years.length; i++) {
+    /*
+   This code calculates the difference between each year in the array and the target year 2023, then 2022,
+   and then selects the item with the smallest difference.
+   The reduce function is used to iterate over each item in the array and compare the differences.
+   Finally, it returns the item with the closest year to 2023, then 2022.
+  */
+    const closestItem = locationExtensions.reduce((prev, curr) => {
+      const key = parseInt(Object.keys(curr)[0])
+      const prevKey = prev ? parseInt(Object.keys(prev)[0]) : Infinity
+      const currDiff = Math.abs(key - years[i])
+      const prevDiff = Math.abs(prevKey - years[i])
+      return currDiff < prevDiff ? curr : prev
+    }, null)
+    const closestValue = closestItem ? Object.values(closestItem)[0] : null
+    if (closestValue) {
+      output.push(closestValue)
+    }
+  }
+  return output
+}
+
 export const fetchEstimateByLocation = async (
   locationData: Location,
   event: EVENT_TYPE,
@@ -153,71 +185,23 @@ export const fetchEstimateByLocation = async (
       event === EVENT_TYPE.BIRTH
     ) {
       estimateExtensionFound = true
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          crudArray.push(Number(entry[year]))
-        } else {
-          crudArray.push(0)
-        }
-      }
+      crudArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
     ) {
       estimateExtensionFound = true
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          totalPopulationArray.push(Number(entry[year]))
-        } else {
-          totalPopulationArray.push(0)
-        }
-      }
+      totalPopulationArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          malePopulationArray.push(Number(entry[year]))
-        } else {
-          malePopulationArray.push(0)
-        }
-      }
+      malePopulationArray.push(...createEstimatesArray(yearArray, extension))
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      const valueArray = JSON.parse(extension.valueString as string) as {
-        [key: string]: number
-      }[]
-
-      for (let i = 0; i < yearArray.length; i++) {
-        const year = yearArray[i].toString()
-        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
-        if (entry) {
-          femalePopulationArray.push(Number(entry[year]))
-        } else {
-          femalePopulationArray.push(0)
-        }
-      }
+      femalePopulationArray.push(...createEstimatesArray(yearArray, extension))
     }
   })
   if (!estimateExtensionFound) {
@@ -239,6 +223,7 @@ export const fetchEstimateByLocation = async (
       crudArray.push(Number(crudeDeathRateResponse.crudeDeathRate))
     }
   }
+
   for (let i = 0; i < yearArray.length; i++) {
     totalEstimation =
       totalEstimation +
@@ -257,9 +242,9 @@ export const fetchEstimateByLocation = async (
   }
 
   return {
-    totalEstimation: Math.round(totalEstimation),
-    maleEstimation: Math.round(maleEstimation),
-    femaleEstimation: Math.round(femaleEstimation),
+    totalEstimation,
+    maleEstimation,
+    femaleEstimation,
     locationId: locationData.id,
     locationLevel: getLocationLevelFromLocationData(locationData)
   }

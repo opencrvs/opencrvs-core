@@ -6,12 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -110,12 +110,12 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
@@ -346,6 +346,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             firstNames
             familyName
           }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
         }
         mother {
           id
@@ -354,6 +383,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             firstNames
             familyName
           }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
         }
         spouse {
           id
@@ -361,6 +419,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             use
             firstNames
             familyName
+          }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
           }
         }
         medicalPractitioner {
@@ -549,7 +636,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
 async function fetchDuplicateDeclarations(id: string) {
   return (
     client &&
-    client.query({
+    client.query<FetchViewRecordByCompositionQuery>({
       query: FETCH_VIEW_RECORD_BY_COMPOSITION,
       variables: { id },
       fetchPolicy: 'network-only'

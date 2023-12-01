@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { UserSection, CorrectionSection } from '@client/forms'
@@ -57,6 +56,7 @@ import {
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
+  PRINT_RECORD,
   SELECT_DEATH_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_MARRIAGE_FORM,
@@ -269,18 +269,20 @@ export function goToSearchResult(
   mobile?: boolean
 ) {
   return mobile
-    ? replace(
-        formatUrl(SEARCH_RESULT, {
+    ? replace({
+        pathname: SEARCH_RESULT,
+        search: stringify({
           searchText,
           searchType
         })
-      )
-    : push(
-        formatUrl(SEARCH_RESULT, {
+      })
+    : push({
+        pathname: SEARCH_RESULT,
+        search: stringify({
           searchText,
           searchType
         })
-      )
+      })
 }
 
 export function goToAdvancedSearchResult(mobile?: boolean) {
@@ -686,6 +688,9 @@ export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 
+export function goToPrintRecordView(declarationId: string) {
+  window.open(`/print-record/${declarationId}`, '_blank')
+}
 export type INavigationState = undefined
 
 export function navigationReducer(state: INavigationState, action: any) {

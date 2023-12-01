@@ -6,15 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/systems/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/systems/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { TestResolvers } from '@gateway/utils/testUtils'
 
-const fetch = fetchAny as any
+const fetch = fetchAny as fetchAny.FetchMock
+const resolvers = typeResolvers as unknown as TestResolvers
+
 let authHeaderSysAdmin: { Authorization: string }
 let authHeaderRegister: { Authorization: string }
 
@@ -22,7 +24,7 @@ beforeEach(() => {
   fetch.resetMocks()
   const sysAdminToken = jwt.sign(
     { scope: ['natlsysadmin'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
       algorithm: 'RS256',
@@ -32,7 +34,7 @@ beforeEach(() => {
   )
   const registerToken = jwt.sign(
     { scope: ['register'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
       algorithm: 'RS256',
@@ -56,10 +58,10 @@ describe('Integrations root resolvers', () => {
           JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
-        [JSON.stringify({})]
+        [JSON.stringify({}), { status: 200 }]
       )
 
-      const response = await resolvers.Mutation.reactivateSystem(
+      const response = await resolvers.Mutation!.reactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -78,10 +80,10 @@ describe('Integrations root resolvers', () => {
           JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
-        [JSON.stringify({})]
+        [JSON.stringify({}), { status: 200 }]
       )
 
-      const response = await resolvers.Mutation.deactivateSystem(
+      const response = await resolvers.Mutation!.deactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -101,14 +103,10 @@ describe('Integrations root resolvers', () => {
         { status: 400 }
       )
       fetch.mockResponseOnce(
-        [
-          JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
-          { status: 400 }
-        ],
-        [JSON.stringify({})]
+        JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' })
       )
       expect(
-        resolvers.Mutation.deactivateSystem(
+        resolvers.Mutation!.deactivateSystem(
           {},
           {
             clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -126,14 +124,10 @@ describe('Integrations root resolvers', () => {
       { status: 400 }
     )
     fetch.mockResponseOnce(
-      [
-        JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
-        { status: 400 }
-      ],
-      [JSON.stringify({})]
+      JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' })
     )
     expect(
-      resolvers.Mutation.reactivateSystem(
+      resolvers.Mutation!.reactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -151,7 +145,7 @@ describe('generate refresh token', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -164,7 +158,7 @@ describe('generate refresh token', () => {
     }
     const registerToken = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -191,7 +185,7 @@ describe('generate refresh token', () => {
     }
     fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
 
-    const response = await resolvers.Mutation.refreshSystemSecret(
+    const response = await resolvers.Mutation!.refreshSystemSecret(
       {},
       { clientId: '1231234' },
       { headers: authHeaderSysAdmin }
@@ -203,7 +197,7 @@ describe('generate refresh token', () => {
   it('should throw error for register user', async () => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
-    const response = resolvers.Mutation.refreshSystemSecret(
+    const response = resolvers.Mutation!.refreshSystemSecret(
       {},
       { clientId: '1231234' },
       { headers: authHeaderRegister }
@@ -221,7 +215,7 @@ describe('delete system integration', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -234,7 +228,7 @@ describe('delete system integration', () => {
     }
     const registerToken = jwt.sign(
       { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',
@@ -260,7 +254,7 @@ describe('delete system integration', () => {
     }
     fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
 
-    const response = await resolvers.Mutation.deleteSystem(
+    const response = await resolvers.Mutation!.deleteSystem(
       {},
       { clientId: '1231234' },
       { headers: authHeaderSysAdmin }
@@ -272,7 +266,7 @@ describe('delete system integration', () => {
   it('should throw error for register user', async () => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
-    const response = resolvers.Mutation.deleteSystem(
+    const response = resolvers.Mutation!.deleteSystem(
       {},
       { clientId: '1231234' },
       { headers: authHeaderRegister }

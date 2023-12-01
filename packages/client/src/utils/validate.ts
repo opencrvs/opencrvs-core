@@ -6,24 +6,19 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import {
-  IFormFieldValue,
-  IFormData,
-  IFormField
-} from '@opencrvs/client/src/forms'
+import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE
+  INFORMANT_MINIMUM_AGE,
+  NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
-import { NATIONAL_ID } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'
@@ -225,6 +220,10 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
+export const isDateNotPastLimit = (date: string, limit: Date) => {
+  return new Date(date) >= limit
+}
+
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   const birthDate = drafts.deceased && drafts.deceased.birthDate
   return birthDate
@@ -286,11 +285,13 @@ export const isValidBirthDate: Validation = (
 
 export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   const childBirthDate = value as string
+  const pastDateLimit = new Date(1900, 0, 1)
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
       isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate)
+      isDateNotInFuture(childBirthDate) &&
+      isDateNotPastLimit(childBirthDate, pastDateLimit)
     ? undefined
     : { message: messages.isValidBirthDate }
 }
@@ -480,6 +481,17 @@ export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
     return { message: messages.dateFormat }
   }
 }
+
+export const dateNotPastLimit =
+  (limit: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (isDateNotPastLimit(cast, new Date(limit))) {
+      return undefined
+    } else {
+      return { message: messages.dateFormat }
+    }
+  }
 
 export const dateNotToday = (date: string): boolean => {
   const today = new Date().setHours(0, 0, 0, 0)

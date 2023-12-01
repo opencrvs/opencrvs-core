@@ -6,14 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import { OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jose from 'jose'
-
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as fetchAny.FetchMock
 
 beforeEach(() => {
@@ -213,7 +213,7 @@ describe('get user info from OIDP national id integration', () => {
         })
       )
 
-    const data = await resolvers.Query.getOIDPUserInfo(
+    const data = await resolvers.Query!.getOIDPUserInfo(
       {},
       {
         code: 'some-code',
@@ -251,7 +251,7 @@ describe('get user info from OIDP national id integration', () => {
     )
 
     try {
-      await resolvers.Query.getOIDPUserInfo(
+      await resolvers.Query!.getOIDPUserInfo(
         {},
         {
           code: 'some-code',

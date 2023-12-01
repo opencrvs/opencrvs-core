@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IDeclaration } from '@client/declarations'
 import { IntlShape, MessageDescriptor } from 'react-intl'
@@ -20,7 +19,7 @@ export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
-  fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  fonts: Record<string, TFontFamilyTypes>
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
 }

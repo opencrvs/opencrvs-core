@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -53,7 +52,6 @@ export default defineConfig(({ mode }) => {
           }
         ]
       },
-      registerType: 'autoUpdate',
       devOptions: {
         enabled: false
       }
@@ -63,6 +61,7 @@ export default defineConfig(({ mode }) => {
     // This changes the out put dir from dist to build
     build: {
       outDir: 'build',
+      sourcemap: true,
       commonjsOptions: {
         transformMixedEsModules: true
       }

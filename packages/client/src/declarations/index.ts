@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   Action as DeclarationAction,
@@ -20,7 +19,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
+import {
+  Attachment,
+  Event,
+  History,
+  Query,
+  SystemRoleType
+} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -40,7 +45,7 @@ import {
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
+import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -48,7 +53,7 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   ApolloClient,
   ApolloError,
@@ -131,10 +136,11 @@ export enum SUBMISSION_STATUS {
   ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK',
-  IN_PROGRESS = 'IN_PROGRESS'
+  IN_PROGRESS = 'IN_PROGRESS',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
+  REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
 export enum DOWNLOAD_STATUS {
@@ -162,8 +168,10 @@ export const processingStates = [
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.CORRECTION_REQUESTED,
   SUBMISSION_STATUS.READY_TO_ISSUE,
-  SUBMISSION_STATUS.ISSUING
+  SUBMISSION_STATUS.ISSUING,
+  SUBMISSION_STATUS.REJECT_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -212,6 +220,7 @@ export interface IDeclaration {
   data: IFormData
   duplicates?: IDuplicates[]
   originalData?: IFormData
+  localData?: IFormData
   savedOn?: number
   createdAt?: string
   modifiedOn?: number
@@ -517,7 +526,8 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: formData,
+    originalData: status !== 'IN_PROGRESS' ? formData : {},
+    localData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -1039,9 +1049,24 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data)
       }
+      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
+        data.data
+      )
+
+      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
+        .map(
+          (declaration) =>
+            declaration.data.fetchRegistrationForViewing?.registration
+        )
+        .flatMap((registration) => registration?.attachments)
+        .map((attachment) => attachment?.data)
+        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data)
+        ...getSignatureUrls(data.data),
+        ...getProfileIconUrls(data.data),
+        ...allduplicateDeclarationsAttachments
       ]
 
       await Promise.all(
@@ -1053,6 +1078,20 @@ function requestWithStateWrapper(
       reject(error)
     }
   })
+}
+
+function getProfileIconUrls(queryResultData: Query) {
+  const history =
+    queryResultData.fetchBirthRegistration?.history ||
+    queryResultData.fetchDeathRegistration?.history ||
+    queryResultData.fetchMarriageRegistration?.history
+
+  const userAvatars = (history ?? [])
+    .filter((h): h is History => Boolean(h))
+    .map((h) => h.user?.avatar?.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+  return [...new Set(userAvatars).values()]
 }
 
 function getAttachmentUrls(queryResultData: Query) {
@@ -1877,7 +1916,7 @@ export function getMinioUrlsFromDeclaration(
         'user' in history
       ) {
         const user = history.user as { avatar?: { data?: string } }
-        return user.avatar?.data
+        return user?.avatar?.data
       }
       return null
     })

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloError } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
@@ -125,6 +124,18 @@ describe('Submission middleware', () => {
 
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
+      if (
+        event === Event.Marriage &&
+        [
+          SubmissionAction.APPROVE_CORRECTION,
+          SubmissionAction.REJECT_CORRECTION,
+          SubmissionAction.MAKE_CORRECTION,
+          SubmissionAction.REQUEST_CORRECTION
+        ].includes(submissionAction)
+      ) {
+        return
+      }
+
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
         mockDeclarationData.registration.certificates[0] = {
           collector: {

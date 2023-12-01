@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   generateTrackingIdForEvents,
@@ -19,9 +18,11 @@ import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-
 import { logger } from '@workflow/logger'
 import {
   testFhirBundle,
-  testFhirBundleWithIdsForDeath,
   officeMock,
+  taskResourceMock,
+  deathTaskMock,
   mosipDeceasedPatientMock,
+  testFhirBundleWithIdsForDeath,
   mosipSuccessMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/utils'
@@ -97,6 +98,8 @@ describe('Verify utility functions', () => {
     const logSpy = jest.spyOn(logger, 'error')
 
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
 
     await sendEventNotification(
@@ -133,6 +136,8 @@ describe('Verify utility functions', () => {
   it('send Birth registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundle,
@@ -191,6 +196,8 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundleWithIdsForDeath,
@@ -212,6 +219,7 @@ describe('Verify utility functions', () => {
       value: '20196816020000129'
     })
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([taskResourceMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,
@@ -226,6 +234,8 @@ describe('Verify utility functions', () => {
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundleWithIdsForDeath,
@@ -242,6 +252,7 @@ describe('Verify utility functions', () => {
   it('send Death rejection notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,
@@ -256,6 +267,8 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     fetch.mockResponses([officeMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMock, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,

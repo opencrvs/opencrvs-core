@@ -6,10 +6,9 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,
@@ -17,7 +16,8 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
+import { Scope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -74,7 +74,7 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   }
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: string) {
+export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -82,7 +82,7 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: string[]) {
+export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }

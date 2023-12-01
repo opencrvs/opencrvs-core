@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -22,6 +21,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/utils'
+import { Bundle, Task } from '@opencrvs/commons/types'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
@@ -30,12 +30,9 @@ export default async function updateTaskHandler(
 ) {
   try {
     const token = getToken(request)
-    const payload = await modifyTaskBundle(
-      request.payload as fhir.Bundle,
-      token
-    )
+    const payload = await modifyTaskBundle(request.payload as Bundle, token)
     const taskId = getEntryId(payload)
-    const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
+    const taskResource = payload.entry?.[0].resource as Task | undefined
     if (!taskResource) {
       throw new Error('TaskBundle has no entry')
     }

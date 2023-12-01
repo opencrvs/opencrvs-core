@@ -9,7 +9,7 @@
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
     "lib": ["esnext.asynciterable", "es6", "es2019", "DOM.Iterable"],
     "forceConsistentCasingInFileNames": true,
@@ -17,18 +17,10 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "types": ["fhir", "jest"]
   },
   "include": ["src/**/*.ts", "typings"],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }
