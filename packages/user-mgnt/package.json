@@ -38,7 +38,7 @@
     "crypto": "^1.0.1"
   },
   "devDependencies": {
-    "@types/fhir": "^0.0.30",
+    "@types/fhir": "^0.0.40",
     "@types/hapi__boom": "^9.0.1",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/hapi__hapi": "^20.0.0",

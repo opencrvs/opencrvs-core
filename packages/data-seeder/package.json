@@ -18,7 +18,7 @@
     "prettier": "2.8.8"
   },
   "dependencies": {
-    "@types/fhir": "^0.0.37",
+    "@types/fhir": "^0.0.40",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",
     "node-fetch": "^2.6.1",

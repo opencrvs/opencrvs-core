@@ -111,7 +111,7 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "@types/fhir": "^0.0.30",
+    "@types/fhir": "^0.0.40",
     "@opencrvs/commons": "^1.3.0",
     "@opencrvs/gateway": "^1.3.0",
     "@graphql-codegen/add": "^3.1.1",

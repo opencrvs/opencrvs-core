@@ -23,7 +23,7 @@
   },
   "private": true,
   "dependencies": {
-    "@types/fhir": "^0.0.37",
+    "@types/fhir": "^0.0.40",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
     "@types/lodash": "4.14.197",
