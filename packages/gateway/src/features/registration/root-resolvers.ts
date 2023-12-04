@@ -64,7 +64,10 @@ import {
   setCertificateCollector,
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
-import { createRequest } from '@gateway/workflow/index'
+import {
+  updateRegistration,
+  validateRegistration
+} from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { createRegistration } from '@gateway/workflow'
 
@@ -438,24 +441,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      const response = await createRegistration(
-        details,
-        EVENT_TYPE.BIRTH,
-        authHeader
-      )
-
-      if (
-        hasScope(authHeader, 'validate') &&
-        !response.isPotentiallyDuplicate
-      ) {
-        await createRequest(
-          'POST',
-          `/records/${response.compositionId}/validate`,
-          authHeader
-        )
-      }
-
-      return response
+      await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -859,13 +845,10 @@ async function markEventAsValidated(
     details?.registration?.changedValues &&
     details.registration.changedValues.length > 0
   ) {
-    await createRequest('POST', `/records/${id}/update`, authHeader, {
-      details,
-      event
-    })
+    await updateRegistration(id, authHeader, details, event)
   }
 
-  await createRequest('POST', `/records/${id}/validate`, authHeader)
+  await validateRegistration(id, authHeader)
   return id
 }
 
