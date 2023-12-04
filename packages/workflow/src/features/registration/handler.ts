@@ -218,42 +218,6 @@ export async function createRegistrationHandler(
   }
 }
 
-export async function markEventAsValidatedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    let payload: Bundle
-
-    const taskResource = getTaskResourceFromFhirBundle(
-      request.payload as Bundle
-    )
-
-    // In case the record was updated then there will be input output in payload
-    if (taskHasInput(taskResource)) {
-      payload = await markBundleAsDeclarationUpdated(
-        request.payload as Bundle,
-        getToken(request)
-      )
-      await postToHearth(payload)
-      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
-      delete taskResource.input
-      delete taskResource.output
-    }
-
-    payload = await markBundleAsValidated(
-      request.payload as Bundle,
-      getToken(request)
-    )
-
-    return await postToHearth(payload)
-  } catch (error) {
-    logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
 export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
