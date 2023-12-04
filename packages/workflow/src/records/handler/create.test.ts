@@ -87,32 +87,6 @@ describe('Create record endpoint', () => {
       )
     )
 
-    // indexBundle
-    mswServer.use(
-      rest.post('http://localhost:9090/record', (_, res, ctx) => {
-        return res(ctx.status(200))
-      })
-    )
-
-    // auditEvent
-    mswServer.use(
-      rest.post(
-        'http://localhost:1050/events/birth/new-declaration',
-        (_, res, ctx) => {
-          return res(ctx.status(200))
-        }
-      )
-    )
-
-    // sendNotification
-    mswServer.use(
-      rest.post(
-        'http://localhost:2020/birth/ready-for-review',
-        (_, res, ctx) => {
-          return res(ctx.status(200))
-        }
-      )
-    )
     const res = await server.server.inject({
       method: 'POST',
       url: '/create-record',
