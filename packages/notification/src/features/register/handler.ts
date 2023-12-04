@@ -12,7 +12,7 @@
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import { messageKeys } from '@notification/i18n/messages'
 import { getTrackingId, RegisteredRecord } from '@opencrvs/commons/types'
-import { sendNotification } from '../sms/utils'
+import { sendNotification } from '@notification/features/sms/utils'
 import {
   getContactEmail,
   getContactPhoneNo,
@@ -21,7 +21,7 @@ import {
   getOfficeName,
   getRegistrationLocation,
   getRegistrationNumber
-} from '../utils'
+} from '@notification/features/utils'
 
 export async function birthRegisterNotification(
   req: Request,

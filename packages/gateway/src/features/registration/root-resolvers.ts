@@ -65,6 +65,7 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
+  registerDeclaration,
   updateRegistration,
   validateRegistration
 } from '@gateway/workflow/index'
@@ -865,13 +866,10 @@ async function markEventAsRegistered(
     details?.registration?.changedValues &&
     details.registration.changedValues.length > 0
   ) {
-    await createRequest('POST', `/records/${id}/update`, authHeader, {
-      details,
-      event
-    })
+    await updateRegistration(id, authHeader, details, event)
   }
 
-  await createRequest('POST', `/records/${id}/register`, authHeader, { event })
+  await registerDeclaration(id, authHeader, event)
   return id
 }
 
