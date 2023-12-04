@@ -28,7 +28,7 @@ import {
   ValidatedRecord,
   Attachment,
   InProgressRecord,
-  DeclaredRecord,
+  ReadyForReviewRecord,
   Encounter,
   SavedBundleEntry
 } from '@opencrvs/commons/types'
@@ -190,10 +190,10 @@ export async function toCorrectionApproved(
 }
 
 export async function toUpdated(
-  record: InProgressRecord | DeclaredRecord,
+  record: InProgressRecord | ReadyForReviewRecord,
   practitioner: Practitioner,
   updatedDetails: ChangedValuesInput
-): Promise<InProgressRecord | DeclaredRecord> {
+): Promise<InProgressRecord | ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
 
   const updatedTask = createUpdatedTask(
@@ -219,7 +219,7 @@ export async function toUpdated(
         return entry
       }
       return {
-        fullUrl,
+        ...entry,
         resource: updatedTaskWithLocationExtensions
       }
     })
@@ -233,7 +233,7 @@ export async function toUpdated(
 }
 
 export async function toValidated(
-  record: InProgressRecord | DeclaredRecord,
+  record: InProgressRecord | ReadyForReviewRecord,
   practitioner: Practitioner
 ): Promise<ValidatedRecord> {
   const previousTask = getTaskFromSavedBundle(record)
@@ -360,7 +360,7 @@ export async function toCorrectionRejected(
     practitioner
   )
 
-  const taskHistory = await getTaskHistory(currentCorrectionRequestedTask.id!)
+  const taskHistory = await getTaskHistory(currentCorrectionRequestedTask.id)
 
   const previousTaskBeforeCorrection = sortTasksDescending(
     taskHistory.entry.map((x) => x.resource)

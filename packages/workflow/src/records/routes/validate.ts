@@ -19,7 +19,7 @@ export const validateRoute = [
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/validate',
-    allowedStartStates: ['IN_PROGRESS', 'DECLARED'],
+    allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
     action: 'VALIDATION',
     handler: async (request, record) => {
       const token = getToken(request)
