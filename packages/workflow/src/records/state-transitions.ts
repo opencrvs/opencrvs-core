@@ -35,7 +35,6 @@ import {
   WaitingForValidationRecord,
   EVENT_TYPE,
   getComposition,
-  getFromBundleById,
   OPENCRVS_SPECIFICATION_URL,
   RegistrationNumber,
   RejectedRecord
@@ -339,7 +338,6 @@ export async function toRegistered(
   const composition = getComposition(record)
   const patients = updatePatientIdentifierWithRN(
     record,
-    //@ts-ignore
     composition,
     SECTION_CODE[event],
     REG_NUMBER_SYSTEM[event],
@@ -387,9 +385,18 @@ export async function toRegistered(
     registerTaskWithPractitionerExtensions,
     practitioner
   )
+  const patientIds = patients.map((p) => p.id)
 
   const entriesWithUpdatedPatients = [
-    ...patients.map((p) => getFromBundleById(record, p.id))
+    ...record.entry.map((e) => {
+      if (!patientIds.includes(e.resource.id)) {
+        return e
+      }
+      return {
+        ...e,
+        resource: patients.find(({ id }) => id === e.resource.id)!
+      }
+    })
   ]
   return changeState(
     {
