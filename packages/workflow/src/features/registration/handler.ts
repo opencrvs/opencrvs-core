@@ -28,7 +28,9 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  getEventType,
+  isEventNotification
 } from '@workflow/features/registration/utils'
 import { taskHasInput } from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
@@ -38,11 +40,15 @@ import fetch from 'node-fetch'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import { Events } from '@workflow/features/events/utils'
-import { Bundle, BundleEntry, Saved } from '@opencrvs/commons/types'
+import { Bundle, BundleEntry, EVENT_TYPE, Saved } from '@opencrvs/commons/types'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { indexBundle } from '@workflow/records/search'
+import {
+  isNotificationEnabled,
+  sendNotification
+} from '@workflow/records/notification'
 
 export interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -252,6 +258,7 @@ export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const token = getToken(request)
   const { registrationNumber, error, childIdentifiers, compositionId } =
     request.payload as IEventRegistrationCallbackPayload
 
@@ -272,6 +279,9 @@ export async function markEventAsRegisteredCallbackHandler(
       getToken(request)
     )
 
+    const event = getEventType(savedRecord)
+    const eventNotification = isEventNotification(savedRecord)
+
     const registeredBundle = await toRegistered(
       request,
       savedRecord,
@@ -285,6 +295,16 @@ export async function markEventAsRegisteredCallbackHandler(
     }
     await sendBundleToHearth(registeredBundle)
     await indexBundle(registeredBundle, getToken(request))
+
+    // Notification not implemented for marriage yet
+    // don't forward hospital notifications
+    if (
+      event !== EVENT_TYPE.MARRIAGE &&
+      !eventNotification &&
+      (await isNotificationEnabled('register', event, token))
+    ) {
+      await sendNotification('register', registeredBundle, token)
+    }
 
     return h.response(registeredBundle).code(200)
   } catch (error) {

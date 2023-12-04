@@ -871,7 +871,7 @@ async function markEventAsRegistered(
     })
   }
 
-  await createRequest('POST', `/records/${id}/register`, authHeader)
+  await createRequest('POST', `/records/${id}/register`, authHeader, { event })
   return id
 }
 

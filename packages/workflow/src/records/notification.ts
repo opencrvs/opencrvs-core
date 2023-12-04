@@ -18,7 +18,7 @@ import {
 } from '@workflow/features/registration/smsNotificationUtils'
 import { internal } from '@hapi/boom'
 
-type NotificationEvent = 'in-progress' | 'ready-for-review'
+type NotificationEvent = 'in-progress' | 'ready-for-review' | 'register'
 
 export async function sendNotification(
   action: NotificationEvent,
@@ -64,11 +64,13 @@ const MAPPING: Record<
 > = {
   [EVENT_TYPE.BIRTH]: {
     'in-progress': InformantNotificationName.birthInProgressSMS,
-    'ready-for-review': InformantNotificationName.birthDeclarationSMS
+    'ready-for-review': InformantNotificationName.birthDeclarationSMS,
+    register: InformantNotificationName.birthRegistrationSMS
   },
   [EVENT_TYPE.DEATH]: {
     'in-progress': InformantNotificationName.deathInProgressSMS,
-    'ready-for-review': InformantNotificationName.deathDeclarationSMS
+    'ready-for-review': InformantNotificationName.deathDeclarationSMS,
+    register: InformantNotificationName.deathRegistrationSMS
   }
 }
 
