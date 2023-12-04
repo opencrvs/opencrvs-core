@@ -134,9 +134,7 @@ export const resolvers: GQLResolver = {
           authHeader
         )
         if (getTotalRequest.total >= system.settings.dailyQuota) {
-          return await Promise.reject(
-            new RateLimitError('Daily search quota exceeded')
-          )
+          throw new RateLimitError('Daily search quota exceeded')
         }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
