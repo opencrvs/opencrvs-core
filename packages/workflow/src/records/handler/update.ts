@@ -48,7 +48,7 @@ export const updateRoute = [
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/update',
-    allowedStartStates: ['IN_PROGRESS', 'DECLARED'],
+    allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
     action: 'DECLARATION_UPDATED',
     handler: async (request, record) => {
       const token = getToken(request)
