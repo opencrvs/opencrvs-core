@@ -23,12 +23,8 @@ import {
   generateSaltedHash,
   generateRandomPassword
 } from '@user-mgnt/utils/hash'
-import {
-  statuses,
-  roleScopeMapping,
-  hasDemoScope,
-  getUserId
-} from '@user-mgnt/utils/userUtils'
+import { statuses, hasDemoScope, getUserId } from '@user-mgnt/utils/userUtils'
+import { userRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -67,7 +63,7 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = roleScopeMapping[user.systemRole]
+    const userScopes: string[] = userRoleScopes[user.systemRole]
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -76,15 +72,6 @@ export default async function createUser(
     }
     user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
-
-    if (
-      user.systemRole === 'NOTIFICATION_API_USER' ||
-      user.systemRole === 'VALIDATOR_API_USER' ||
-      user.systemRole === 'AGE_VERIFICATION_API_USER'
-    ) {
-      // Immediately active API users
-      user.status = statuses.ACTIVE
-    }
 
     password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
