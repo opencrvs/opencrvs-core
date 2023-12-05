@@ -13,21 +13,21 @@
 // so it always returns
 
 import {
-  BundleEntry,
   Location,
   Practitioner,
   REGISTERED_RECORD,
+  SavedBundleEntry,
   Task
 } from '@opencrvs/commons/types'
 import { toCorrectionRequested } from './state-transitions'
 
 const practitioner = REGISTERED_RECORD.entry.find(
-  (entry): entry is BundleEntry<Practitioner> =>
+  (entry): entry is SavedBundleEntry<Practitioner> =>
     entry.resource.resourceType === 'Practitioner'
 )!.resource
 
 const practitionerRole = REGISTERED_RECORD.entry.find(
-  (entry): entry is BundleEntry<Practitioner> =>
+  (entry): entry is SavedBundleEntry<Practitioner> =>
     entry.resource.resourceType === 'PractitionerRole'
 )
 
@@ -43,7 +43,8 @@ jest.mock('@workflow/features/registration/fhir/fhir-utils', () => {
         const id = suffix.replace('/Location/', '')
 
         return REGISTERED_RECORD.entry.find(
-          (entry): entry is BundleEntry<Location> => entry.resource.id === id
+          (entry): entry is SavedBundleEntry<Location> =>
+            entry.resource.id === id
         )?.resource
       }
       switch (suffix) {
@@ -106,9 +107,9 @@ describe('functions that take record from one state to another', () => {
             !REGISTERED_RECORD.entry.find(
               (entry) => entry.resource === resource
             )
-        )
+        ) as unknown as Task[]
 
-      const withoutDynamicIdentifiers = changedResources.map((task: Task) => {
+      const withoutDynamicIdentifiers = changedResources.map((task) => {
         return {
           ...task,
           lastModified: 'STATIC',

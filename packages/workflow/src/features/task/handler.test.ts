@@ -282,7 +282,7 @@ describe('Verify handler', () => {
     const taskBundle = cloneDeep(testFhirTaskBundle)
 
     taskBundle.entry[0].resource.businessStatus.coding[0].code =
-      'WAITING_FOR_VERIFICATION'
+      'WAITING_VALIDATION'
 
     const res = await server.server.inject({
       method: 'PUT',
@@ -323,7 +323,7 @@ describe('Verify handler', () => {
     const taskBundle = cloneDeep(testFhirTaskBundle)
 
     taskBundle.entry[0].resource.businessStatus.coding[0].code =
-      'WAITING_FOR_VERIFICATION'
+      'WAITING_VALIDATION'
     taskBundle.entry[0].resource.code.coding[0].code = 'DEATH'
 
     const res = await server.server.inject({

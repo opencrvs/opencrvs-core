@@ -150,7 +150,7 @@ export const testFhirBundle: StrictBundle<
         businessStatus: {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/status',
+              system: 'http://opencrvs.org/specs/reg-status',
               code: 'DECLARED'
             }
           ]
@@ -1891,7 +1891,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
         businessStatus: {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/status',
+              system: 'http://opencrvs.org/specs/reg-status',
               code: 'IN_PROGRESS'
             }
           ]

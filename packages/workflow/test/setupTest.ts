@@ -8,10 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import pino from 'pino'
-export const logger = pino()
+import { server } from './setupServer'
 
-const level = process.env.NODE_ENV === 'test' ? 'error' : process.env.LOG_LEVEL
-if (level) {
-  logger.level = level
-}
+jest.mock('@workflow/constants')
+// Establish API mocking before all tests.
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' })
+})
+
+// Reset any request handlers that we may add during the tests,
+// so they don't affect other tests.
+afterEach(() => server.resetHandlers())
+
+// Clean up after the tests are finished.
+afterAll(() => server.close())
