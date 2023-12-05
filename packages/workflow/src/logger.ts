@@ -11,7 +11,7 @@
 import pino from 'pino'
 export const logger = pino()
 
-const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
+const level = process.env.NODE_ENV === 'test' ? 'error' : process.env.LOG_LEVEL
 if (level) {
   logger.level = level
 }

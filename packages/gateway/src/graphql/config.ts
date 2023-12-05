@@ -59,7 +59,7 @@ import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
 import { Context } from '@gateway/graphql/context'
 import PatientAPI from '@gateway/features/fhir/patientAPI'
 import MinioAPI from '@gateway/features/fhir/minioAPI'
-import { getAuthHeader } from '@opencrvs/commons'
+import { getAuthHeader } from '@opencrvs/commons/http'
 import { UsersAPI } from '@gateway/features/user/usersAPI'
 import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 

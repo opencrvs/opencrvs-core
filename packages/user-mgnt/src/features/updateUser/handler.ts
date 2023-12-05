@@ -20,11 +20,12 @@ import {
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
-import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
+import { getUserId } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { userRoleScopes } from '@opencrvs/commons/authentication'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -74,7 +75,7 @@ export default async function updateUser(
     existingUser.systemRole = user.systemRole
     // Updating user scope
     const userScopes: string[] =
-      roleScopeMapping[existingUser.systemRole || 'FIELD_AGENT']
+      userRoleScopes[existingUser.systemRole || 'FIELD_AGENT']
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')

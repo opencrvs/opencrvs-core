@@ -19,31 +19,8 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-interface IRoleScopeMapping {
-  [key: string]: string[]
-}
-
 export interface IAuthHeader {
   Authorization: string
-}
-
-export const roleScopeMapping: IRoleScopeMapping = {
-  FIELD_AGENT: ['declare'],
-  REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
-  LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
-  LOCAL_SYSTEM_ADMIN: ['sysadmin'],
-  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'natlsysadmin'],
-  PERFORMANCE_MANAGEMENT: ['performance'],
-  NATIONAL_REGISTRAR: ['register', 'performance', 'certify', 'config', 'teams']
-}
-
-export const systemScopeMapping: IRoleScopeMapping = {
-  HEALTH: ['declare', 'notification-api'],
-  NATIONAL_ID: ['nationalId'],
-  EXTERNAL_VALIDATION: ['validator-api'],
-  AGE_CHECK: ['declare', 'age-verification-api'],
-  RECORD_SEARCH: ['recordsearch'],
-  WEBHOOK: ['webhook']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {
