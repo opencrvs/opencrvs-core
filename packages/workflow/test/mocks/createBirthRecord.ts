@@ -8,7 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { BirthRegistration } from '@opencrvs/commons/types'
+import {
+  Composition,
+  Encounter,
+  Location,
+  Observation,
+  Patient,
+  Practitioner,
+  PractitionerRole,
+  RelatedPerson,
+  SavedBundle,
+  Task,
+  BirthRegistration,
+  TrackingID,
+  URLReference
+} from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 
 export const createBirthRegistrationPayload: BirthRegistration = {
   createdAt: '2023-11-30T12:36:27.043Z',
@@ -71,13 +86,23 @@ export const createBirthRegistrationPayload: BirthRegistration = {
   }
 }
 
-export const readyForReviewBundle = {
+export const READY_FOR_REVIEW_RECORD: SavedBundle<
+  | Composition
+  | Encounter
+  | Patient
+  | RelatedPerson
+  | Task
+  | Practitioner
+  | PractitionerRole
+  | Location
+  | Observation
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
       fullUrl:
-        '/fhir/Composition/c8b8e843-c5e0-49b5-96d9-a702ddb46454/_history/eb73319c-4fab-41c5-a508-5eac6154b370',
+        '/fhir/Composition/c8b8e843-c5e0-49b5-96d9-a702ddb46454/_history/eb73319c-4fab-41c5-a508-5eac6154b370' as URLReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -119,7 +144,7 @@ export const readyForReviewBundle = {
             entry: [
               {
                 reference:
-                  '/fhir/RelatedPerson/fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501/_history/bcd08d79-afa7-4af9-bb5f-872fd4e1dcbb'
+                  '/fhir/RelatedPerson/fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501/_history/bcd08d79-afa7-4af9-bb5f-872fd4e1dcbb' as URLReference
               }
             ]
           },
@@ -137,7 +162,7 @@ export const readyForReviewBundle = {
             entry: [
               {
                 reference:
-                  '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b'
+                  '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b' as URLReference
               }
             ]
           },
@@ -155,7 +180,7 @@ export const readyForReviewBundle = {
             entry: [
               {
                 reference:
-                  '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/32cfc449-29ce-4a14-a806-3f007b7890c8'
+                  '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/32cfc449-29ce-4a14-a806-3f007b7890c8' as URLReference
               }
             ]
           },
@@ -173,7 +198,7 @@ export const readyForReviewBundle = {
             entry: [
               {
                 reference:
-                  '/fhir/Patient/c42efef3-56c1-4d77-8a2f-b0df78f31a56/_history/caf97872-2cab-48e3-bc08-a9f71f386504'
+                  '/fhir/Patient/c42efef3-56c1-4d77-8a2f-b0df78f31a56/_history/caf97872-2cab-48e3-bc08-a9f71f386504' as URLReference
               }
             ]
           },
@@ -191,7 +216,7 @@ export const readyForReviewBundle = {
             entry: [
               {
                 reference:
-                  '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/1b0874ba-2895-4ad2-955a-93f582d3224a'
+                  '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/1b0874ba-2895-4ad2-955a-93f582d3224a' as URLReference
               }
             ]
           }
@@ -203,20 +228,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-30T12:36:27.267+00:00',
           versionId: 'eb73319c-4fab-41c5-a508-5eac6154b370'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.267Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'c8b8e843-c5e0-49b5-96d9-a702ddb46454'
+        id: 'c8b8e843-c5e0-49b5-96d9-a702ddb46454' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/1b0874ba-2895-4ad2-955a-93f582d3224a',
+        '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/1b0874ba-2895-4ad2-955a-93f582d3224a' as URLReference,
       resource: {
         resourceType: 'Encounter',
         status: 'finished',
@@ -224,7 +241,7 @@ export const readyForReviewBundle = {
           {
             location: {
               reference:
-                '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/95c12c54-4060-4acc-ae47-94b1639e2c3f'
+                '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/95c12c54-4060-4acc-ae47-94b1639e2c3f' as URLReference
             }
           }
         ],
@@ -232,20 +249,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-30T12:36:27.318+00:00',
           versionId: '1b0874ba-2895-4ad2-955a-93f582d3224a'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.318Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: '2e5b37ef-c3c2-4071-af56-d20a16e87891'
+        id: '2e5b37ef-c3c2-4071-af56-d20a16e87891' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/RelatedPerson/fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501/_history/bcd08d79-afa7-4af9-bb5f-872fd4e1dcbb',
+        '/fhir/RelatedPerson/fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501/_history/bcd08d79-afa7-4af9-bb5f-872fd4e1dcbb' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -259,26 +268,18 @@ export const readyForReviewBundle = {
         },
         patient: {
           reference:
-            '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b'
+            '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b' as URLReference
         },
         meta: {
           lastUpdated: '2023-11-30T12:36:27.284+00:00',
           versionId: 'bcd08d79-afa7-4af9-bb5f-872fd4e1dcbb'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.284Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501'
+        id: 'fdd5e232-9a8c-4e0f-bd0c-ec5fb80f7501' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/32cfc449-29ce-4a14-a806-3f007b7890c8',
+        '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/32cfc449-29ce-4a14-a806-3f007b7890c8' as URLReference,
       resource: {
         resourceType: 'Patient',
         extension: [],
@@ -292,30 +293,16 @@ export const readyForReviewBundle = {
         ],
         gender: 'male',
         birthDate: '2022-11-10',
-        _transforms: {
-          matching: {
-            name: {
-              given: [['SLM', 'SLM']],
-              family: [['AMT', 'AMT']]
-            }
-          },
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.313Z'
-          }
-        },
         meta: {
           lastUpdated: '2023-11-30T12:36:27.313+00:00',
           versionId: '32cfc449-29ce-4a14-a806-3f007b7890c8'
         },
-        _request: {
-          method: 'POST'
-        },
-        id: '8cb74e54-1c02-41a7-86a3-415c4031c9ba'
+        id: '8cb74e54-1c02-41a7-86a3-415c4031c9ba' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Patient/c42efef3-56c1-4d77-8a2f-b0df78f31a56/_history/caf97872-2cab-48e3-bc08-a9f71f386504',
+        '/fhir/Patient/c42efef3-56c1-4d77-8a2f-b0df78f31a56/_history/caf97872-2cab-48e3-bc08-a9f71f386504' as URLReference,
       resource: {
         resourceType: 'Patient',
         extension: [
@@ -330,20 +317,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-30T12:36:27.316+00:00',
           versionId: 'caf97872-2cab-48e3-bc08-a9f71f386504'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.316Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'c42efef3-56c1-4d77-8a2f-b0df78f31a56'
+        id: 'c42efef3-56c1-4d77-8a2f-b0df78f31a56' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b',
+        '/fhir/Patient/cf60f3c7-9ab9-491e-83cd-b6aadc772aa4/_history/4104a428-d7fd-4b71-aa36-ce165fe9a80b' as URLReference,
       resource: {
         resourceType: 'Patient',
         extension: [
@@ -426,30 +405,16 @@ export const readyForReviewBundle = {
             ]
           }
         ],
-        _transforms: {
-          matching: {
-            name: {
-              given: [['SFN', 'SFN']],
-              family: [['KTM', 'KTM']]
-            }
-          },
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.292Z'
-          }
-        },
         meta: {
           lastUpdated: '2023-11-30T12:36:27.292+00:00',
           versionId: '4104a428-d7fd-4b71-aa36-ce165fe9a80b'
         },
-        _request: {
-          method: 'POST'
-        },
-        id: 'cf60f3c7-9ab9-491e-83cd-b6aadc772aa4'
+        id: 'cf60f3c7-9ab9-491e-83cd-b6aadc772aa4' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/4d67992c-ab35-4e26-a8b9-9447540cca00',
+        '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/4d67992c-ab35-4e26-a8b9-9447540cca00' as URLReference,
       resource: {
         resourceType: 'Task',
         extension: [
@@ -493,7 +458,7 @@ export const readyForReviewBundle = {
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'BQSQASX'
+            value: 'BQSQASX' as TrackingID
           }
         ],
         lastModified: '2023-11-30T12:36:27.043Z',
@@ -520,20 +485,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-30T12:36:27.277+00:00',
           versionId: '4d67992c-ab35-4e26-a8b9-9447540cca00'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-30T12:36:27.277Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'f00e742a-0900-488b-b7c1-9625d7b7e456'
+        id: 'f00e742a-0900-488b-b7c1-9625d7b7e456' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1/_history/4b7aa336-8922-45e3-b1d4-45e25e3d5a6a',
+        '/fhir/Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1/_history/4b7aa336-8922-45e3-b1d4-45e25e3d5a6a' as URLReference,
       resource: {
         resourceType: 'Practitioner',
         identifier: [],
@@ -558,20 +515,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:39.305+00:00',
           versionId: '4b7aa336-8922-45e3-b1d4-45e25e3d5a6a'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:39.305Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: '4651d1cc-6072-4e34-bf20-b583f421a9f1'
+        id: '4651d1cc-6072-4e34-bf20-b583f421a9f1' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/0f7684aa-8c65-4901-8318-bf1e22c247cb/_history/2a913694-3217-4981-9689-a9d4e020a2d5',
+        '/fhir/Location/0f7684aa-8c65-4901-8318-bf1e22c247cb/_history/2a913694-3217-4981-9689-a9d4e020a2d5' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -613,20 +562,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:38.392+00:00',
           versionId: '2a913694-3217-4981-9689-a9d4e020a2d5'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:38.392Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: '0f7684aa-8c65-4901-8318-bf1e22c247cb'
+        id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/ce73938d-a188-4a78-9d19-35dfd4ca6957/_history/f3012375-dbd1-4615-a1ef-e9982fa9a2ba',
+        '/fhir/Location/ce73938d-a188-4a78-9d19-35dfd4ca6957/_history/f3012375-dbd1-4615-a1ef-e9982fa9a2ba' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -662,20 +603,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:38.868+00:00',
           versionId: 'f3012375-dbd1-4615-a1ef-e9982fa9a2ba'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:38.868Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957'
+        id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/95c12c54-4060-4acc-ae47-94b1639e2c3f',
+        '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/95c12c54-4060-4acc-ae47-94b1639e2c3f' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -711,20 +644,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:38.742+00:00',
           versionId: '95c12c54-4060-4acc-ae47-94b1639e2c3f'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:38.742Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: '146251e9-df90-4068-82b0-27d8f979e8e2'
+        id: '146251e9-df90-4068-82b0-27d8f979e8e2' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/PractitionerRole/f845d4fa-71fe-4d99-9f92-e5ed60838d1d/_history/566659dc-347a-4c6a-8516-606db3a95ffe',
+        '/fhir/PractitionerRole/f845d4fa-71fe-4d99-9f92-e5ed60838d1d/_history/566659dc-347a-4c6a-8516-606db3a95ffe' as URLReference,
       resource: {
         resourceType: 'PractitionerRole',
         practitioner: {
@@ -763,20 +688,12 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:40.052+00:00',
           versionId: '566659dc-347a-4c6a-8516-606db3a95ffe'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:40.052Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'f845d4fa-71fe-4d99-9f92-e5ed60838d1d'
+        id: 'f845d4fa-71fe-4d99-9f92-e5ed60838d1d' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/ed6195ff-0f83-4852-832e-dc9db07151ff/_history/6f8d39b4-0e82-461d-8c95-c470b34027e2',
+        '/fhir/Location/ed6195ff-0f83-4852-832e-dc9db07151ff/_history/6f8d39b4-0e82-461d-8c95-c470b34027e2' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -818,15 +735,7 @@ export const readyForReviewBundle = {
           lastUpdated: '2023-11-29T07:02:38.369+00:00',
           versionId: '6f8d39b4-0e82-461d-8c95-c470b34027e2'
         },
-        _transforms: {
-          meta: {
-            lastUpdated: '2023-11-29T07:02:38.369Z'
-          }
-        },
-        _request: {
-          method: 'POST'
-        },
-        id: 'ed6195ff-0f83-4852-832e-dc9db07151ff'
+        id: 'ed6195ff-0f83-4852-832e-dc9db07151ff' as UUID
       }
     }
   ]
