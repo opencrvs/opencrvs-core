@@ -35,7 +35,7 @@ import {
   SavedBundle
 } from '.'
 import { UUID } from '..'
-import { RegistrationStatus } from 'src/record'
+import { RegistrationStatus } from '../record'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>

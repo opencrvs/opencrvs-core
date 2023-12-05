@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { createServer } from '@workflow/server'
-import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
@@ -22,7 +21,7 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 
-describe('Update record endpoint', () => {
+describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {
@@ -34,7 +33,7 @@ describe('Update record endpoint', () => {
     await server.stop()
   })
 
-  it('returns OK for a correctly authenticated updating a birth declaration', async () => {
+  it('returns OK for a correctly authenticated validating a birth declaration', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
       readFileSync('./test/cert.key'),
@@ -54,7 +53,6 @@ describe('Update record endpoint', () => {
         }
       )
     )
-
     // Mock response from hearth
     mswServer.use(
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
@@ -64,12 +62,7 @@ describe('Update record endpoint', () => {
 
     const response = await server.server.inject({
       method: 'POST',
-      url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/update',
-      payload: {
-        id: '7c3af302-08c9-41af-8701-92de9a71a3e4',
-        event: 'BIRTH',
-        details: updateBirthRegistrationPayload
-      },
+      url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/validate',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -81,6 +74,6 @@ describe('Update record endpoint', () => {
     const businessStatus = getStatusFromTask(task)
 
     expect(response.statusCode).toBe(200)
-    expect(businessStatus).toBe('DECLARATION_UPDATED')
+    expect(businessStatus).toBe('VALIDATED')
   })
 })

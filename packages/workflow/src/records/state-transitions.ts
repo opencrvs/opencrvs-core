@@ -213,9 +213,7 @@ export async function toUpdated(
 
   const newEntries = [
     ...record.entry.map((entry) => {
-      const { fullUrl, ...restOfResources } = entry
-
-      if (restOfResources.resource.id !== previousTask.id) {
+      if (entry.resource.id !== previousTask.id) {
         return entry
       }
       return {

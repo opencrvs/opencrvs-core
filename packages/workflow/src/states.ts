@@ -46,11 +46,7 @@ export type ActionIdentifiers = {
  */
 
 export type StateTree =
-  | Transition<
-      InProgressRecord | ReadyForReviewRecord,
-      Validate,
-      ValidatedRecord
-    >
+  | Transition<ReadyForReviewRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
   // Corrections
