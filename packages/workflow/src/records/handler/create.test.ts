@@ -14,7 +14,7 @@ import { readFileSync } from 'fs'
 import {
   createBirthRegistrationPayload,
   READY_FOR_REVIEW_RECORD
-} from '@test/mocks/createBirthRecordBundle'
+} from '@test/mocks/createBirthRecord'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
