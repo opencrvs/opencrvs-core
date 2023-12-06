@@ -25,7 +25,7 @@ import {
   Task,
   TrackingID,
   URLReference
-} from 'src/types'
+} from '../types'
 
 export const MARRIAGE_BUNDLE: Saved<
   Bundle<

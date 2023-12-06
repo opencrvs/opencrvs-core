@@ -26,7 +26,7 @@ import {
   Task,
   TrackingID,
   URLReference
-} from 'src/types'
+} from '../types'
 
 export const DEATH_BUNDLE: SavedBundle<
   Saved<
