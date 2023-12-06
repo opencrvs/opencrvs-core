@@ -18,7 +18,6 @@ import {
 } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
-import { logger } from '@workflow/logger'
 import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 
@@ -29,43 +28,38 @@ export const registerRoute = [
     allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
     action: 'WAITING_VALIDATION',
     handler: async (request, record) => {
+      const token = getToken(request)
+
+      const practitioner = await getLoggedInPractitionerResource(token)
+      const recordInWaitingValidationState =
+        await toWaitingForExternalValidationState(record, practitioner)
+
+      await sendBundleToHearth(recordInWaitingValidationState)
+      await indexBundle(recordInWaitingValidationState, token)
+
       try {
-        const token = getToken(request)
-
-        const practitioner = await getLoggedInPractitionerResource(token)
-        const recordInWaitingValidationState =
-          await toWaitingForExternalValidationState(record, practitioner)
-
-        await sendBundleToHearth(recordInWaitingValidationState)
-        await indexBundle(recordInWaitingValidationState, token)
-
-        try {
-          await invokeRegistrationValidation(
-            recordInWaitingValidationState,
-            request.headers,
-            getToken(request)
-          )
-        } catch (error) {
-          const statusReason: fhir3.CodeableConcept = {
-            text: REG_NUMBER_GENERATION_FAILED
-          }
-          const recordInRejectedState = await toRejected(
-            record,
-            practitioner,
-            statusReason
-          )
-
-          await sendBundleToHearth(recordInRejectedState)
-          await indexBundle(recordInRejectedState, token)
-
-          return recordInRejectedState
-        }
-
-        return recordInWaitingValidationState
+        await invokeRegistrationValidation(
+          recordInWaitingValidationState,
+          request.headers,
+          getToken(request)
+        )
       } catch (error) {
-        logger.error(`Workflow/markAsRegisteredHandler: error: ${error}`)
-        throw new Error(error)
+        const statusReason: fhir3.CodeableConcept = {
+          text: REG_NUMBER_GENERATION_FAILED
+        }
+        const recordInRejectedState = await toRejected(
+          record,
+          practitioner,
+          statusReason
+        )
+
+        await sendBundleToHearth(recordInRejectedState)
+        await indexBundle(recordInRejectedState, token)
+
+        return recordInRejectedState
       }
+
+      return recordInWaitingValidationState
     }
   })
 ]
