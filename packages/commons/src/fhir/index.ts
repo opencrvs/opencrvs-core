@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ValidRecord } from '../record'
+import { RegistrationStatus, ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
@@ -152,6 +152,15 @@ export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
   type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
   extension?: Array<
     KnownExtensionType['http://opencrvs.org/specs/extension/part-of']
+  >
+}
+
+export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
+  coding: Array<
+    Omit<fhir3.Coding, 'code' | 'system'> & {
+      system: 'http://opencrvs.org/specs/reg-status'
+      code: RegistrationStatus
+    }
   >
 }
 
@@ -313,7 +322,9 @@ export function findResourceFromBundleById<T extends Resource = Resource>(
   }
 }
 
-export function isSaved(resource: Resource): resource is Saved<Resource> {
+export function isSaved<T extends Resource>(
+  resource: T
+): resource is T & Saved<T> {
   return resource.id !== undefined
 }
 

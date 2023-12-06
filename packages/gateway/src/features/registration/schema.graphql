@@ -383,6 +383,7 @@ input RegistrationInput {
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
+  changedValues: [CorrectionValueInput!]
 }
 
 type Registration { # -> Task

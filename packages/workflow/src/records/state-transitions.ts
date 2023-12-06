@@ -25,7 +25,10 @@ import {
   Task,
   sortTasksDescending,
   RecordWithPreviousTask,
+  ValidatedRecord,
   Attachment,
+  InProgressRecord,
+  ReadyForReviewRecord,
   Encounter,
   SavedBundleEntry
 } from '@opencrvs/commons/types'
@@ -34,21 +37,23 @@ import {
   setupLastRegUser
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-
 import {
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput,
-  MakeCorrectionRequestInput
-} from './correction-request'
+  MakeCorrectionRequestInput,
+  ChangedValuesInput
+} from '@workflow/records/correction-request'
 import {
   createCorrectedTask,
   createCorrectionEncounter,
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createUpdatedTask,
+  createValidateTask,
   getTaskHistory
-} from './fhir'
+} from '@workflow/records/fhir'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -182,6 +187,78 @@ export async function toCorrectionApproved(
     },
     'REGISTERED'
   ) as any as RecordWithPreviousTask<RegisteredRecord>
+}
+
+export async function toUpdated(
+  record: InProgressRecord | ReadyForReviewRecord,
+  practitioner: Practitioner,
+  updatedDetails: ChangedValuesInput
+): Promise<InProgressRecord | ReadyForReviewRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+
+  const updatedTask = createUpdatedTask(
+    previousTask,
+    updatedDetails,
+    practitioner
+  )
+  const updatedTaskWithPractitionerExtensions = setupLastRegUser(
+    updatedTask,
+    practitioner
+  )
+
+  const updatedTaskWithLocationExtensions = await setupLastRegLocation(
+    updatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const newEntries = [
+    ...record.entry.map((entry) => {
+      if (entry.resource.id !== previousTask.id) {
+        return entry
+      }
+      return {
+        ...entry,
+        resource: updatedTaskWithLocationExtensions
+      }
+    })
+  ]
+
+  const updatedRecord = {
+    ...record,
+    entry: newEntries
+  }
+  return updatedRecord
+}
+
+export async function toValidated(
+  record: InProgressRecord | ReadyForReviewRecord,
+  practitioner: Practitioner
+): Promise<ValidatedRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const validatedTask = createValidateTask(previousTask, practitioner)
+
+  const validatedTaskWithPractitionerExtensions = setupLastRegUser(
+    validatedTask,
+    practitioner
+  )
+
+  const validatedTaskWithLocationExtensions = await setupLastRegLocation(
+    validatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter(
+          (entry) => entry.resource.id !== previousTask.id
+        ),
+        { resource: validatedTaskWithLocationExtensions }
+      ]
+    },
+    'VALIDATED'
+  )
 }
 
 export async function toCorrectionRequested(

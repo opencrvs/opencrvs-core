@@ -63,7 +63,11 @@ import {
   removeDuplicatesFromComposition,
   setCertificateCollector,
   uploadBase64AttachmentsToDocumentsStore
-} from './utils'
+} from '@gateway/features/registration/utils'
+import {
+  updateRegistration,
+  validateRegistration
+} from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { createRegistration } from '@gateway/workflow'
 
@@ -437,7 +441,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
+      return await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -832,22 +836,20 @@ async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details?:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskEntry = await getTaskEntry(id, authHeader)
-
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskEntry
-    }
-  } else {
-    doc = await registrationToFHIR(event, details, authHeader)
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
   }
 
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  await validateRegistration(id, authHeader)
+  return id
 }
 
 async function markEventAsRegistered(

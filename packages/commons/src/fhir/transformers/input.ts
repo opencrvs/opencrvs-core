@@ -177,7 +177,7 @@ export interface AddressInput {
   from?: DateString
   to?: DateString
 }
-interface Registration {
+export interface Registration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
@@ -202,6 +202,7 @@ interface Registration {
   certificates?: Array<Certificate | null>
   location?: Location
   correction?: Correction
+  changedValues?: Array<CorrectionValue>
 }
 interface Certificate {
   collector?: RelatedPerson

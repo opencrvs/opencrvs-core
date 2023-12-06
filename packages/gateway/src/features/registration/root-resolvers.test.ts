@@ -992,7 +992,7 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderValidate }
       )
 
-      expect(result).toBeUndefined()
+      expect(result).toBe('cd168e0b-0817-4880-a67f-35de777460a5')
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
@@ -1120,44 +1120,11 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderValidate }
       )
 
-      expect(result).toBeUndefined()
+      expect(result).toBe('cd168e0b-0817-4880-a67f-35de777460a5')
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
-    })
-
-    it('throws error if no task entry found by given id', async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
-          meta: {
-            lastUpdated: '2018-12-13T04:02:42.003+00:00'
-          },
-          type: 'searchset',
-          total: 0,
-          link: [
-            {
-              relation: 'self',
-              url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
-            }
-          ],
-          entry: []
-        })
-      )
-      expect(
-        resolvers.Mutation!.markBirthAsValidated(
-          {},
-          { id: compositionID },
-          { headers: authHeaderValidate }
-        )
-      ).rejects.toThrowError('Task does not exist')
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
@@ -1355,7 +1322,7 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderValidate }
       )
 
-      expect(result).toBeUndefined()
+      expect(result).toBe('cd168e0b-0817-4880-a67f-35de777460a5')
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
@@ -1475,44 +1442,11 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderValidate }
       )
 
-      expect(result).toBeUndefined()
+      expect(result).toBe('cd168e0b-0817-4880-a67f-35de777460a5')
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
-    })
-
-    it('throws error if no task entry found by given id', async () => {
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
-          meta: {
-            lastUpdated: '2018-12-13T04:02:42.003+00:00'
-          },
-          type: 'searchset',
-          total: 0,
-          link: [
-            {
-              relation: 'self',
-              url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
-            }
-          ],
-          entry: []
-        })
-      )
-      return expect(
-        resolvers.Mutation!.markDeathAsValidated(
-          {},
-          { id: compositionID },
-          { headers: authHeaderValidate }
-        )
-      ).rejects.toThrowError('Task does not exist')
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {

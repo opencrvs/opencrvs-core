@@ -13,14 +13,18 @@ import {
   CertifiedRecord,
   CorrectionRequestedRecord,
   RegisteredRecord,
+  ValidatedRecord,
   Nominal,
   StateIdenfitiers,
-  IssuedRecord
+  IssuedRecord,
+  InProgressRecord,
+  ReadyForReviewRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
 export type Certify = Nominal<{}, 'Certify'>
 export type Validate = Nominal<{}, 'Validate'>
+export type Update = Nominal<{}, 'Update'>
 export type Issue = Nominal<{}, 'Issue'>
 export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
@@ -34,15 +38,15 @@ export type ActionIdentifiers = {
   REJECT_CORRECTION: RejectCorrection
   CERTIFY: Certify
   VALIDATION: Validate
+  DECLARATION_UPDATED: Update
 }
-
-export type Action = RequestCorrection | Certify | Validate
 
 /*
  * Amend this state tree to allow more state transitions
  */
 
 export type StateTree =
+  | Transition<ReadyForReviewRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
   // Corrections
@@ -57,6 +61,12 @@ export type StateTree =
       CorrectionRequestedRecord,
       RejectCorrection,
       RegisteredRecord | CertifiedRecord | IssuedRecord
+    >
+  // Update declaration
+  | Transition<
+      InProgressRecord | ReadyForReviewRecord,
+      Update,
+      InProgressRecord | ReadyForReviewRecord
     >
 
 /*

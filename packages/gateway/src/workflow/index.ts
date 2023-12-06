@@ -19,6 +19,7 @@ import {
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
+import { hasScope } from '@gateway/features/user/utils/index'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -105,7 +106,7 @@ export function rejectRegistrationCorrection(
   )
 }
 
-export function createRegistration(
+export async function createRegistration(
   record:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput
@@ -113,5 +114,42 @@ export function createRegistration(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  return createRequest('POST', '/create-record', authHeader, { record, event })
+  const res = await createRequest<{
+    compositionId: string
+    trackingId: string
+    isPotentiallyDuplicate: boolean
+  }>('POST', '/create-record', authHeader, { record, event })
+
+  if (hasScope(authHeader, 'validate') && !res.isPotentiallyDuplicate) {
+    createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
+  }
+
+  return res
+}
+
+export async function updateRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  event: EVENT_TYPE
+) {
+  return await createRequest<void>(
+    'POST',
+    `/records/${id}/update`,
+    authHeader,
+    {
+      details,
+      event
+    }
+  )
+}
+
+export async function validateRegistration(
+  id: string,
+  authHeader: IAuthHeader
+) {
+  return await createRequest('POST', `/records/${id}/validate`, authHeader)
 }

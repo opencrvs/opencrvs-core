@@ -18,7 +18,7 @@ import {
   Saved,
   Task,
   findExtension,
-  TaskStatus
+  RegistrationStatus
 } from '@opencrvs/commons/types'
 import {
   APPLICATION_CONFIG_URL,
@@ -434,7 +434,7 @@ export function setupRegistrationType(
 export async function setupRegistrationWorkflow(
   taskResource: Task,
   tokenpayload: ITokenPayload,
-  defaultStatus?: TaskStatus
+  defaultStatus?: RegistrationStatus
 ): Promise<Task> {
   const regStatusCodeString = defaultStatus
     ? defaultStatus
@@ -464,10 +464,10 @@ export async function setupRegistrationWorkflow(
   return taskResource
 }
 
-export async function setupLastRegLocation(
-  taskResource: Task,
+export async function setupLastRegLocation<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Promise<Task> {
+): Promise<T> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
@@ -548,10 +548,10 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   })
 }
 
-export function setupLastRegUser(
-  taskResource: Task,
+export function setupLastRegUser<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Task {
+): T {
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -608,10 +608,7 @@ export async function checkForDuplicateStatusUpdate(taskResource: Task) {
   const existingRegStatusCode = await fetchExistingRegStatusCode(
     taskResource.id
   )
-  if (
-    existingRegStatusCode &&
-    existingRegStatusCode.code === regStatusCode.code
-  ) {
+  if (existingRegStatusCode?.code === regStatusCode.code) {
     logger.error(`Declaration is already in ${regStatusCode} state`)
     throw new Error(`Declaration is already in ${regStatusCode} state`)
   }

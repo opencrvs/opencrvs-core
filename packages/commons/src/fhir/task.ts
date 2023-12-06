@@ -35,6 +35,7 @@ import {
   SavedBundle
 } from '.'
 import { UUID } from '..'
+import { RegistrationStatus } from '../record'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -285,7 +286,7 @@ export function getActionFromTask(task: Task) {
  */
 export function updateFHIRTaskBundle(
   taskEntry: BundleEntry<Task>,
-  status: TaskStatus,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -372,7 +373,7 @@ export function taskBundleWithExtension(
  */
 function updateTaskTemplate(
   task: Task,
-  status: TaskStatus,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
