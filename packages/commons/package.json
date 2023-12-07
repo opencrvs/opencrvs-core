@@ -7,7 +7,9 @@
   "exports": {
     ".": "./build/dist/index.js",
     "./monitoring": "./build/dist/monitoring.js",
-    "./types": "./build/dist/types.js"
+    "./types": "./build/dist/types.js",
+    "./authentication": "./build/dist/authentication.js",
+    "./http": "./build/dist/http.js"
   },
   "scripts": {
     "start": "yarn build:watch",
@@ -21,7 +23,6 @@
   },
   "private": true,
   "dependencies": {
-    "@hapi/hapi": "^20.0.1",
     "@types/fhir": "^0.0.37",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
@@ -38,14 +39,14 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "jest-fetch-mock": "^2.1.2",
-    "ts-jest": "^26.4.4",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^4.0.0",
-    "@typescript-eslint/parser": "^4.5.0"
+    "jest-fetch-mock": "^2.1.2",
+    "ts-jest": "^26.4.4"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

@@ -17,6 +17,7 @@ import {
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
+import { Scope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -73,7 +74,7 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   }
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: string) {
+export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -81,7 +82,7 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: string[]) {
+export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }

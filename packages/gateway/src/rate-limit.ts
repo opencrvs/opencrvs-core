@@ -12,10 +12,11 @@ import * as client from '@gateway/utils/redis'
 import { ApolloError } from 'apollo-server-hapi'
 import { GraphQLResolveInfo } from 'graphql'
 import { Context } from '@gateway/graphql/context'
-import { getUserId } from '@gateway/features/user/utils/index'
-import { ENABLE_RATE_LIMIT } from './constants'
+import { getUserId, hasScope } from '@gateway/features/user/utils'
+import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
+import { userScopes } from '@opencrvs/commons/authentication'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -41,7 +42,7 @@ const withRateLimit = <A extends any[], R>(
   { key, requestsPerMinute }: RouteOptions,
   fn: (...args: A) => R
 ) => {
-  if (!ENABLE_RATE_LIMIT) {
+  if (DISABLE_RATE_LIMIT) {
     return fn
   }
 
@@ -87,6 +88,15 @@ export const rateLimitedRoute =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
+    if (
+      hasScope(
+        { Authorization: args[0].headers.authorization },
+        userScopes.bypassRateLimit
+      )
+    ) {
+      return fn(...args)
+    }
+
     if (pathForKey) pathOptionsForKey = [pathForKey]
 
     const route = args[1].request.path
@@ -115,6 +125,10 @@ export const rateLimitedResolver =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
+    if (hasScope(args[2].headers, userScopes.bypassRateLimit)) {
+      return fn(...args)
+    }
+
     const route = args[3].fieldName // e.g. "getUser"
     const userId = getUserId(args[2].headers)
 
