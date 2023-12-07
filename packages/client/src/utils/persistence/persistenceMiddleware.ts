@@ -24,10 +24,9 @@ import {
   NATL_ADMIN_ROLES
 } from '@client/utils/constants'
 import { client } from '@client/utils/apolloClient'
-import { READY } from '@client/offline/actions'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { QueryOptions } from '@apollo/client'
+import { QueryOptions } from '@apollo/client/core'
 
 const isUserOfNationalScope = (userDetails: UserDetails) =>
   [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
@@ -107,21 +106,6 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
         )
         for (const query of queriesToPrefetch) {
           client.query(query)
-        }
-      }
-    } else if (action.type === READY) {
-      const { locations } = getState().offline.offlineData
-      const userDetails = getState().profile.userDetails
-      if (!isFieldAgent(userDetails!)) {
-        const stateIds = Object.values(locations!)
-          .filter((location) => location.partOf === 'Location/0')
-          .map((location) => location.id)
-
-        for (const stateId of stateIds) {
-          const queriesToPrefetch = getQueriesToPrefetch(stateId, false)
-          for (const query of queriesToPrefetch) {
-            client.query(query)
-          }
         }
       }
     }
