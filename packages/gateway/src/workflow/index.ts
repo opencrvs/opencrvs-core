@@ -14,6 +14,7 @@ import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
+  GQLCertificateInput,
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
@@ -152,4 +153,21 @@ export async function validateRegistration(
   authHeader: IAuthHeader
 ) {
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
+}
+
+export function certifyRegistration(
+  recordId: string,
+  certificate: GQLCertificateInput,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest(
+    'POST',
+    `/records/${recordId}/certify-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }

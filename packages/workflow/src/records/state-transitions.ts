@@ -30,8 +30,17 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   Encounter,
-  SavedBundleEntry
+  SavedBundleEntry,
+  SavedTask,
+  Bundle,
+  CompositionSection,
+  DocumentReference,
+  getComposition,
+  Composition,
+  EVENT_TYPE,
+  RelatedPerson
 } from '@opencrvs/commons/types'
+import { getUUID } from '@opencrvs/commons'
 import {
   setupLastRegLocation,
   setupLastRegUser
@@ -54,6 +63,7 @@ import {
   createValidateTask,
   getTaskHistory
 } from '@workflow/records/fhir'
+import { CertificateInput } from './validations/certify'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -411,6 +421,153 @@ export async function toCorrectionRejected(
   ) as any as RecordWithPreviousTask<
     RegisteredRecord | CertifiedRecord | IssuedRecord
   >
+}
+
+async function createCertifiedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+): Promise<SavedTask> {
+  const certifiedTask: SavedTask = {
+    ...previousTask,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      )
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'CERTIFIED'
+        }
+      ]
+    }
+  }
+  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
+    certifiedTask,
+    practitioner
+  )
+
+  return await setupLastRegLocation(
+    certifiedTaskWithPractitionerExtensions,
+    practitioner
+  )
+}
+
+export async function toCertified(
+  record: RegisteredRecord,
+  practitioner: Practitioner,
+  eventType: EVENT_TYPE,
+  certificateDetails: Omit<CertificateInput, 'data'> & { dataUrl: string }
+): Promise<Bundle<Composition | Task | DocumentReference | RelatedPerson>> {
+  const previousTask = getTaskFromSavedBundle(record)
+
+  const certifiedTask = await createCertifiedTask(previousTask, practitioner)
+
+  const temporaryDocumentReferenceId = getUUID()
+  const temporaryRelatedPersonId = getUUID()
+
+  const relatedPersonEntry: BundleEntry<RelatedPerson> = {
+    fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+    resource: {
+      resourceType: 'RelatedPerson',
+      relationship: {
+        coding: [
+          {
+            system:
+              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            code: certificateDetails.collector.relationship
+          }
+        ]
+      }
+    }
+  }
+
+  const certificateSection: CompositionSection = {
+    // TODO: Add stricter type for title
+    title: 'Certificates',
+    code: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'certificates'
+        }
+      ],
+      text: 'Certificates'
+    },
+    entry: [
+      {
+        reference: `urn:uuid:${temporaryDocumentReferenceId}`
+      }
+    ]
+  }
+
+  const documentReferenceEntry: BundleEntry<DocumentReference> = {
+    fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
+    resource: {
+      resourceType: 'DocumentReference',
+      masterIdentifier: {
+        system: 'urn:ietf:rfc:3986',
+        value: temporaryDocumentReferenceId
+      },
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/collector',
+          valueReference: {
+            reference: `urn:uuid:${temporaryRelatedPersonId}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+          valueBoolean: certificateDetails.hasShowedVerifiedDocument
+        }
+      ],
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/certificate-type',
+            code: eventType
+          }
+        ]
+      },
+      content: [
+        {
+          attachment: {
+            contentType: 'application/pdf',
+            data: certificateDetails.dataUrl
+          }
+        }
+      ],
+      status: 'current'
+    }
+  }
+
+  const previousComposition = getComposition(record)
+
+  const compositionWithCertificateSection: Composition = {
+    ...previousComposition,
+    section: [
+      ...previousComposition.section.filter(
+        ({ title }) => title !== 'Certificates'
+      ),
+      certificateSection
+    ]
+  }
+  return {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [
+      { resource: compositionWithCertificateSection },
+      { resource: certifiedTask },
+      documentReferenceEntry,
+      relatedPersonEntry
+    ]
+  }
 }
 
 function extensionsWithoutAssignment(extensions: Extension[]) {

@@ -69,7 +69,7 @@ import {
   validateRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
-import { createRegistration } from '@gateway/workflow'
+import { certifyRegistration, createRegistration } from '@gateway/workflow'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -672,10 +672,18 @@ export const resolvers: GQLResolver = {
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      const certificateDetails = details.registration?.certificates?.[0]
+      if (!certificateDetails) {
+        return Promise.reject(new Error('Certificate details required'))
+      }
+      return certifyRegistration(
+        id,
+        certificateDetails,
+        EVENT_TYPE.BIRTH,
+        authHeader
+      )
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
