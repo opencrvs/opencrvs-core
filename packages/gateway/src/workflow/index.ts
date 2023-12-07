@@ -153,3 +153,9 @@ export async function validateRegistration(
 ) {
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
 }
+
+export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
+  return await createRequest<void>('POST', '/download-record', authHeader, {
+    id
+  })
+}
