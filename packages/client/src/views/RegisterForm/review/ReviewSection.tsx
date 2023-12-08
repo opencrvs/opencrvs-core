@@ -1752,7 +1752,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const getSignature = (eventType: Event) => {
       if ([Event.Birth, Event.Death].includes(eventType)) {
-        if (!offlineCountryConfiguration.config.FEATURES.INFORMANT_SIGNATURE) {
+        if (!window.config.FEATURES.INFORMANT_SIGNATURE) {
           return <></>
         }
         const informantsSignatureInputPros = generateSignatureProps(
