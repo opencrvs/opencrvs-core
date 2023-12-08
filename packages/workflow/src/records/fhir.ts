@@ -545,6 +545,20 @@ export async function sendBundleToHearth(
   return res.json()
 }
 
+function findSavedReference(
+  temporaryReference: URNReference,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): URLReference | null {
+  const indexInResponseBundle = resourceBundle.entry.findIndex(
+    (entry) => entry.fullUrl === temporaryReference
+  )
+  if (indexInResponseBundle === -1) {
+    return null
+  }
+  return responseBundle.entry[indexInResponseBundle].response.location
+}
+
 function toSavedComposition(
   composition: Composition,
   id: UUID,
@@ -563,10 +577,12 @@ function toSavedComposition(
             reference: sectionEntry.reference
           }
         }
-        const indexInResponseBundle = resourceBundle.entry.findIndex(
-          (entry) => entry.fullUrl === sectionEntry.reference
+        const savedReference = findSavedReference(
+          sectionEntry.reference,
+          resourceBundle,
+          responseBundle
         )
-        if (indexInResponseBundle === -1) {
+        if (!savedReference) {
           throw internal(
             `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
               responseBundle
@@ -575,14 +591,19 @@ function toSavedComposition(
         }
         return {
           ...sectionEntry,
-          reference:
-            responseBundle.entry[indexInResponseBundle].response.location
+          reference: savedReference
         }
       })
     }))
   }
 }
 
+/*
+ * Only the references in Composition->section->entry->reference
+ * are being resolved, the others e.g.
+ * DocumentReference->extension->valueReference->reference
+ * need to be added if needed
+ */
 export function toSavedBundle<T extends Resource>(
   resourceBundle: Bundle<T>,
   responseBundle: TransactionResponse
