@@ -58,6 +58,13 @@ const config = {
       DELAYED: 0
     }
   },
+  FEATURES: {
+    DEATH_REGISTRATION: true,
+    MARRIAGE_REGISTRATION: true,
+    EXTERNAL_VALIDATION_WORKQUEUE: false,
+    INFORMANT_SIGNATURE: true,
+    PRINT_DECLARATION: true
+  },
   LANGUAGES: 'en,bn,fr',
   AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
