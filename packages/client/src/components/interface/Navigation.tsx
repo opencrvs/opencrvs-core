@@ -553,7 +553,7 @@ const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {window.config.FEATURES?.EXTERNAL_VALIDATION_WORKQUEUE && (
+                {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
                     icon={() => <DeclarationIconSmall color={'teal'} />}
                     id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
