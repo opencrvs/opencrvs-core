@@ -671,7 +671,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
       const certificateDetails = details.registration?.certificates?.[0]
