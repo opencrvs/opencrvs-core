@@ -8,19 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  Bundle,
-  CertifiedRecord,
-  changeState,
-  Composition,
-  isComposition,
-  isURLReference,
-  Resource,
-  SavedBundle,
-  SavedComposition,
-  urlReferenceToUUID,
-  ValidRecord
-} from '@opencrvs/commons/types'
+import { CertifiedRecord, changeState } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
@@ -29,100 +17,11 @@ import { requestSchema } from '@workflow/records/validations/certify'
 import { toCertified } from '@workflow/records/state-transitions'
 import { uploadBase64ToMinio } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
-import { sendBundleToHearth } from '@workflow/records/fhir'
-import { UUID } from '@opencrvs/commons'
-import { internal } from '@hapi/boom'
-
-function toSavedComposition(
-  composition: Composition,
-  id: UUID,
-  record: Bundle,
-  bundleResponse: Awaited<ReturnType<typeof sendBundleToHearth>>
-): SavedComposition {
-  return {
-    ...composition,
-    id,
-    section: composition.section.map((section) => ({
-      ...section,
-      entry: section.entry.map((sectionEntry) => {
-        if (isURLReference(sectionEntry.reference)) {
-          return {
-            ...sectionEntry,
-            reference: sectionEntry.reference
-          }
-        }
-        const indexInResponseBundle = record.entry.findIndex(
-          (entry) => entry.fullUrl === sectionEntry.reference
-        )
-        if (indexInResponseBundle === -1) {
-          throw internal(
-            `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
-              bundleResponse
-            )}"`
-          )
-        }
-        return {
-          ...sectionEntry,
-          reference:
-            bundleResponse.entry[indexInResponseBundle].response.location
-        }
-      })
-    }))
-  }
-}
-
-function mergeIdsFromResponse<T extends Resource>(
-  record: Bundle<T>,
-  bundleResponse: Awaited<ReturnType<typeof sendBundleToHearth>>
-): SavedBundle<T> {
-  return {
-    ...record,
-    entry: record.entry.map((entry, index) => {
-      if (isComposition(entry.resource)) {
-        return {
-          fullUrl: bundleResponse.entry[index].response.location,
-          resource: toSavedComposition(
-            entry.resource,
-            urlReferenceToUUID(bundleResponse.entry[index].response.location),
-            record,
-            bundleResponse
-          )
-        }
-      }
-      return {
-        ...entry,
-        fullUrl: bundleResponse.entry[index].response.location,
-        resource: {
-          ...entry.resource,
-          id: urlReferenceToUUID(bundleResponse.entry[index].response.location)
-        }
-      }
-    })
-  } as SavedBundle<T>
-}
-
-function mergeBundles(
-  record: ValidRecord,
-  changedBundle: SavedBundle
-): SavedBundle {
-  const existingResourceIds = record.entry.map(({ resource }) => resource.id)
-  const newEntries = changedBundle.entry.filter(
-    ({ resource }) => !existingResourceIds.includes(resource.id)
-  )
-  return {
-    ...record,
-    entry: [
-      ...record.entry.map((previousEntry) => ({
-        ...previousEntry,
-        resource:
-          changedBundle.entry.find(
-            (newEntry) => newEntry.resource.id === previousEntry.resource.id
-          )?.resource ?? previousEntry.resource
-      })),
-      ...newEntries
-    ]
-  }
-}
+import {
+  mergeBundles,
+  sendBundleToHearth,
+  toSavedBundle
+} from '@workflow/records/fhir'
 
 export const certifyRoute = createRoute({
   method: 'POST',
@@ -136,19 +35,22 @@ export const certifyRoute = createRoute({
       event
     } = validateRequest(requestSchema, request.payload)
     const dataUrl = await uploadBase64ToMinio(data, getAuthHeader(request))
-    const changedResources = await toCertified(
+
+    const unsavedChangedResources = await toCertified(
       record,
       await getLoggedInPractitionerResource(token),
       event,
       { ...certificateDetailsWithoutData, dataUrl }
     )
-    const response = await sendBundleToHearth(changedResources)
-    const changedResourcesBundle = mergeIdsFromResponse(
-      changedResources,
-      response
+
+    const responseBundle = await sendBundleToHearth(unsavedChangedResources)
+    const changedResources = toSavedBundle(
+      unsavedChangedResources,
+      responseBundle
     )
+
     const certifiedRecord = changeState(
-      mergeBundles(record, changedResourcesBundle),
+      mergeBundles(record, changedResources),
       'CERTIFIED'
     )
     return certifiedRecord

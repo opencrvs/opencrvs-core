@@ -18,7 +18,7 @@ import {
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
-import { ResponseBundleEntry } from '@workflow/records/fhir'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -61,7 +61,7 @@ describe('Create record endpoint', () => {
     // only the composition location is used in the handler
     mswServer.use(
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        const responseBundle: ResponseBundleEntry = {
+        const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
           entry: [

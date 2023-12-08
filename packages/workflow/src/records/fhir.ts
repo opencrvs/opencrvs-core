@@ -18,11 +18,19 @@ import {
   Task,
   URNReference,
   URLReference,
-  SavedTask
+  SavedTask,
+  Composition,
+  SavedComposition,
+  isURLReference,
+  isComposition,
+  SavedBundle,
+  Resource,
+  urlReferenceToUUID,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -30,6 +38,7 @@ import {
   CorrectionRequestPaymentInput,
   ChangedValuesInput
 } from '@workflow/records/correction-request'
+import { internal } from '@hapi/boom'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -506,7 +515,7 @@ export function createCorrectionRequestTask(
   }
 }
 
-export type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
+export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
   entry: Array<
     Omit<fhir3.BundleEntry, 'response'> & {
       response: Omit<fhir3.BundleEntryResponse, 'location'> & {
@@ -518,7 +527,7 @@ export type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
 
 export async function sendBundleToHearth(
   payload: Bundle
-): Promise<ResponseBundleEntry> {
+): Promise<TransactionResponse> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -534,6 +543,97 @@ export async function sendBundleToHearth(
   }
 
   return res.json()
+}
+
+function toSavedComposition(
+  composition: Composition,
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedComposition {
+  return {
+    ...composition,
+    id,
+    section: composition.section.map((section) => ({
+      ...section,
+      entry: section.entry.map((sectionEntry) => {
+        if (isURLReference(sectionEntry.reference)) {
+          return {
+            ...sectionEntry,
+            reference: sectionEntry.reference
+          }
+        }
+        const indexInResponseBundle = resourceBundle.entry.findIndex(
+          (entry) => entry.fullUrl === sectionEntry.reference
+        )
+        if (indexInResponseBundle === -1) {
+          throw internal(
+            `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
+              responseBundle
+            )}"`
+          )
+        }
+        return {
+          ...sectionEntry,
+          reference:
+            responseBundle.entry[indexInResponseBundle].response.location
+        }
+      })
+    }))
+  }
+}
+
+export function toSavedBundle<T extends Resource>(
+  resourceBundle: Bundle<T>,
+  responseBundle: TransactionResponse
+): SavedBundle<T> {
+  return {
+    ...resourceBundle,
+    entry: resourceBundle.entry.map((entry, index) => {
+      if (isComposition(entry.resource)) {
+        return {
+          fullUrl: responseBundle.entry[index].response.location,
+          resource: toSavedComposition(
+            entry.resource,
+            urlReferenceToUUID(responseBundle.entry[index].response.location),
+            resourceBundle,
+            responseBundle
+          )
+        }
+      }
+      return {
+        ...entry,
+        fullUrl: responseBundle.entry[index].response.location,
+        resource: {
+          ...entry.resource,
+          id: urlReferenceToUUID(responseBundle.entry[index].response.location)
+        }
+      }
+    })
+  } as SavedBundle<T>
+}
+
+export function mergeBundles(
+  record: ValidRecord,
+  newOrUpdatedResourcesBundle: SavedBundle
+): SavedBundle {
+  const existingResourceIds = record.entry.map(({ resource }) => resource.id)
+  const newEntries = newOrUpdatedResourcesBundle.entry.filter(
+    ({ resource }) => !existingResourceIds.includes(resource.id)
+  )
+  return {
+    ...record,
+    entry: [
+      ...record.entry.map((previousEntry) => ({
+        ...previousEntry,
+        resource:
+          newOrUpdatedResourcesBundle.entry.find(
+            (newEntry) => newEntry.resource.id === previousEntry.resource.id
+          )?.resource ?? previousEntry.resource
+      })),
+      ...newEntries
+    ]
+  }
 }
 
 export async function findTaskFromIdentifier(
