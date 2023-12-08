@@ -55,7 +55,7 @@ interface IMatchParams {
 
 interface IStateProps {
   registerForm: IForm
-  declaration: IPrintableDeclaration
+  declaration?: IPrintableDeclaration
   offlineCountryConfiguration: IOfflineData
 }
 interface IDispatchProps {
@@ -75,13 +75,18 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps
 class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const isIssueUrl = window.location.href.includes('issue')
-    const event = this.props.declaration.event
-    const eventDate = getEventDate(this.props.declaration.data, event)
-    const registeredDate = getRegisteredDate(this.props.declaration.data)
+
+    if (!this.props.declaration) {
+      return
+    }
+
+    const event = this.props.declaration?.event
+    const eventDate = getEventDate(this.props.declaration?.data, event)
+    const registeredDate = getRegisteredDate(this.props.declaration?.data)
     const { offlineCountryConfiguration } = this.props
 
     const declaration = { ...this.props.declaration }
-    if (declaration.data.registration.certificates.length) {
+    if (declaration?.data?.registration.certificates.length) {
       declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
         hasShowedVerifiedDocument
     }
@@ -125,11 +130,23 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, declaration, registerForm } = this.props
-    const info = declaration.data[collector]
+
+    if (!declaration)
+      return {
+        iD: '',
+        iDType: '',
+        firstNames: '',
+        familyName: '',
+        birthDate: '',
+        nationality: '',
+        age: ''
+      }
+
+    const info = declaration?.data[collector]
 
     const eventRegistrationInput = draftToGqlTransformer(
       registerForm,
-      declaration.data
+      declaration.data!
     )
 
     const informantType =
@@ -253,15 +270,21 @@ const mapStateToProps = (
     (draft) => draft.id === registrationId
   ) as IPrintableDeclaration
 
-  let registerForm
-
-  if (declaration) {
-    registerForm = getEventRegisterForm(state, declaration.event)
-  } else {
-    registerForm = {
-      sections: []
+  /**
+   * ISSUE : The user clicks on the Back button after unasigning the declaration (in the case of printing)
+   * SOLUTION : This condition enables the redirection to be activated when the declaration is not present in the State.
+   */
+  if (!declaration) {
+    return {
+      registerForm: {
+        sections: []
+      },
+      declaration: undefined,
+      offlineCountryConfiguration: getOfflineData(state)
     }
   }
+
+  const registerForm = getEventRegisterForm(state, declaration.event)
 
   return {
     registerForm,

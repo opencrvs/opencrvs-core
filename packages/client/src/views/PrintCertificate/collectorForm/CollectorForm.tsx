@@ -24,7 +24,6 @@ import {
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  CertificateSection,
   IForm,
   IFormField,
   IFormSection,
@@ -338,12 +337,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const { showError, showModalForNoSignedAffidavit } = this.state
 
-    let nextSectionGroup: { sectionId: string; groupId: string } | null = null
-
-    if (declaration) {
-      nextSectionGroup = getNextSectionIds(formSection, formGroup, declaration)
-    }
-
     const declarationToBeCertified = declaration
     if (!declarationToBeCertified) {
       return (
@@ -365,6 +358,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         />
       )
     }
+
+    const nextSectionGroup = getNextSectionIds(
+      formSection,
+      formGroup,
+      declaration
+    )
+
     return (
       <>
         <ActionPageLight
