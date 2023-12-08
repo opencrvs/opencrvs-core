@@ -466,15 +466,17 @@ function FormAppBar({
                         <Icon name="DownloadSimple" />
                         {intl.formatMessage(buttonMessages.saveExitButton)}
                       </Button>
-                      <Button
-                        id="print-btn"
-                        type="secondary"
-                        size="small"
-                        onClick={() => printDeclarationMethod(declaration.id)}
-                      >
-                        <Icon name="Printer" />
-                        {intl.formatMessage(buttonMessages.printDeclaration)}
-                      </Button>
+                      {window.config.FEATURES.PRINT_DECLARATION && (
+                        <Button
+                          id="print-btn"
+                          type="secondary"
+                          size="small"
+                          onClick={() => printDeclarationMethod(declaration.id)}
+                        >
+                          <Icon name="Printer" />
+                          {intl.formatMessage(buttonMessages.printDeclaration)}
+                        </Button>
+                      )}
                     </>
                   )}
                 <Button
@@ -547,17 +549,18 @@ function FormAppBar({
                     {intl.formatMessage(buttonMessages.saveExitButton)}
                   </Button>
                 )}
-                {section.viewType === 'preview' && (
-                  <Button
-                    id="print-btn"
-                    type="secondary"
-                    size="small"
-                    onClick={() => printDeclarationMethod(declaration.id)}
-                  >
-                    <Icon name="Printer" />
-                    {intl.formatMessage(buttonMessages.printDeclaration)}
-                  </Button>
-                )}
+                {section.viewType === 'preview' &&
+                  window.config.FEATURES.PRINT_DECLARATION && (
+                    <Button
+                      id="print-btn"
+                      type="secondary"
+                      size="small"
+                      onClick={() => printDeclarationMethod(declaration.id)}
+                    >
+                      <Icon name="Printer" />
+                      {intl.formatMessage(buttonMessages.printDeclaration)}
+                    </Button>
+                  )}
                 <Button type="secondary" size="small" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
