@@ -252,7 +252,16 @@ const mapStateToProps = (
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
   ) as IPrintableDeclaration
-  const registerForm = getEventRegisterForm(state, declaration.event)
+
+  let registerForm
+
+  if (declaration) {
+    registerForm = getEventRegisterForm(state, declaration.event)
+  } else {
+    registerForm = {
+      sections: []
+    }
+  }
 
   return {
     registerForm,
