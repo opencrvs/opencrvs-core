@@ -49,8 +49,13 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
-    DEATH_REGISTRATION: boolean
-    MARRIAGE_REGISTRATION: boolean
+    FEATURES: {
+      DEATH_REGISTRATION: boolean
+      MARRIAGE_REGISTRATION: boolean
+      INFORMANT_SIGNATURE: boolean
+      EXTERNAL_VALIDATION_WORKQUEUE: boolean
+      PRINT_DECLARATION: boolean
+    }
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
@@ -60,7 +65,6 @@ interface Window {
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
@@ -68,7 +72,6 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     DATE_OF_BIRTH_UNKNOWN: boolean
-    INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
