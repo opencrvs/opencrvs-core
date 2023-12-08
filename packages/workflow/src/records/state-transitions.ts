@@ -489,7 +489,6 @@ export async function toCertified(
   }
 
   const certificateSection: CompositionSection = {
-    // TODO: Add stricter type for title
     title: 'Certificates',
     code: {
       coding: [
