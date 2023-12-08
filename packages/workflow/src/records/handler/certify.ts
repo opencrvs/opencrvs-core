@@ -14,6 +14,7 @@ import {
   changeState,
   Composition,
   isComposition,
+  isURLReference,
   Resource,
   SavedBundle,
   SavedComposition,
@@ -30,6 +31,7 @@ import { uploadBase64ToMinio } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { UUID } from '@opencrvs/commons'
+import { internal } from '@hapi/boom'
 
 function toSavedComposition(
   composition: Composition,
@@ -39,19 +41,33 @@ function toSavedComposition(
 ): SavedComposition {
   return {
     ...composition,
+    id,
     section: composition.section.map((section) => ({
       ...section,
-      entry: section.entry.map((sectionEntry) => ({
-        ...sectionEntry,
-        reference:
-          bundleResponse.entry[
-            record.entry.findIndex(
-              (entry) => entry.fullUrl === sectionEntry.reference
-            )
-          ].response.location
-      }))
-    })),
-    id
+      entry: section.entry.map((sectionEntry) => {
+        if (isURLReference(sectionEntry.reference)) {
+          return {
+            ...sectionEntry,
+            reference: sectionEntry.reference
+          }
+        }
+        const indexInResponseBundle = record.entry.findIndex(
+          (entry) => entry.fullUrl === sectionEntry.reference
+        )
+        if (indexInResponseBundle === -1) {
+          throw internal(
+            `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
+              bundleResponse
+            )}"`
+          )
+        }
+        return {
+          ...sectionEntry,
+          reference:
+            bundleResponse.entry[indexInResponseBundle].response.location
+        }
+      })
+    }))
   }
 }
 
