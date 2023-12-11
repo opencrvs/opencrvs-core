@@ -52,6 +52,7 @@ export async function downloadRecordHandler(
 
   const token = getToken(request)
   const record = await getRecordById(
+    // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
     token,
     [
@@ -80,6 +81,7 @@ export async function downloadRecordHandler(
   )
 
   const downloadedRecord = await toDownloaded(
+    token,
     record,
     isSystem(request),
     practitioner,

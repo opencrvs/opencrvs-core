@@ -31,7 +31,9 @@ import {
   ReadyForReviewRecord,
   Encounter,
   SavedBundleEntry,
-  ValidRecord
+  ValidRecord,
+  Bundle,
+  SavedTask
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -57,6 +59,7 @@ import {
   getTaskHistory,
   sendBundleToHearth
 } from '@workflow/records/fhir'
+import { indexBundleForAssignment } from './search'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -234,6 +237,7 @@ export async function toUpdated(
 }
 
 export async function toDownloaded(
+  token: string,
   record: ValidRecord,
   isSystem: boolean,
   practitioner: Practitioner,
@@ -258,13 +262,19 @@ export async function toDownloaded(
     ]
   }
 
-  await sendBundleToHearth({
+  const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: downloadRecord.entry.filter(
-      ({ resource }) => resource.resourceType === 'Task'
-    )
-  })
+    entry: [{ resource: downloadedTask }]
+  }
+
+  // Here the sent bundle is saved with task only
+  await sendBundleToHearth(downloadedRecordWithTaskOnly)
+  await indexBundleForAssignment(
+    downloadedRecordWithTaskOnly,
+    token,
+    '/events/assigned'
+  )
 
   return downloadRecord
 }

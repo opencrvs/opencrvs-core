@@ -305,13 +305,13 @@ export function createCorrectedTask(
 }
 
 export async function createDownloadTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   practitioner: Practitioner,
   isSystem: boolean,
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
-): Promise<Task> {
+): Promise<SavedTask> {
   const identifiers = previousTask.identifier.filter(
     ({ system }) =>
       // Clear old system identifier task if it happens that the last task was made
@@ -331,7 +331,7 @@ export async function createDownloadTask(
     })
   }
 
-  const downloadedTask: Task = {
+  const downloadedTask: SavedTask = {
     resourceType: 'Task',
     status: 'accepted',
     intent: 'proposal',
