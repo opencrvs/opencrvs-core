@@ -59,3 +59,7 @@ export function hasValidateScope(request: Hapi.Request): boolean {
 export function hasDeclareScope(request: Hapi.Request): boolean {
   return hasScope(request.headers.authorization, USER_SCOPE.DECLARE)
 }
+
+export function isSystem(request: Hapi.Request): boolean {
+  return hasScope(request.headers.authorization, USER_SCOPE.RECORD_SEARCH)
+}

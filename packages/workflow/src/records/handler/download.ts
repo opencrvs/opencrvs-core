@@ -12,13 +12,32 @@
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  hasScope,
+  inScope,
+  TaskStatus,
   ValidRecord
 } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getRecordById } from '../index'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken, isSystem } from '@workflow/utils/authUtils'
+import { IAuthHeader } from '@workflow/../../commons/build/dist/http'
+import { toDownloaded } from '../state-transitions'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+
+function getDownloadedOrAssignedExtension(
+  authHeader: IAuthHeader,
+  status: TaskStatus
+) {
+  if (
+    inScope(authHeader, ['declare', 'recordsearch']) ||
+    (hasScope(authHeader, 'validate') && status === 'VALIDATED')
+  ) {
+    return `http://opencrvs.org/specs/extension/regDownloaded` as const
+  }
+  return `http://opencrvs.org/specs/extension/regAssigned` as const
+}
 
 export async function downloadRecordHandler(
   request: Hapi.Request,
@@ -32,15 +51,19 @@ export async function downloadRecordHandler(
   )
 
   const token = getToken(request)
-  const record = await getRecordById(payload.id, token, [
-    'CERTIFIED',
-    'VALIDATED',
-    'IN_PROGRESS',
-    'READY_FOR_REVIEW',
-    'REGISTERED',
-    'ISSUED',
-    'CORRECTION_REQUESTED'
-  ])
+  const record = await getRecordById(
+    `${payload.id}?includeHistoryResources`,
+    token,
+    [
+      'CERTIFIED',
+      'VALIDATED',
+      'IN_PROGRESS',
+      'READY_FOR_REVIEW',
+      'REGISTERED',
+      'ISSUED',
+      'CORRECTION_REQUESTED'
+    ]
+  )
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
@@ -49,5 +72,19 @@ export async function downloadRecordHandler(
     throw new Error("Task didn't have any status. This should never happen")
   }
 
-  return record as ValidRecord
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  const extensionUrl = getDownloadedOrAssignedExtension(
+    request.headers.authHeader,
+    businessStatus
+  )
+
+  const downloadedRecord = await toDownloaded(
+    record,
+    isSystem(request),
+    practitioner,
+    extensionUrl
+  )
+
+  return downloadedRecord as ValidRecord
 }

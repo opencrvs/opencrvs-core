@@ -30,7 +30,8 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   Encounter,
-  SavedBundleEntry
+  SavedBundleEntry,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -50,9 +51,11 @@ import {
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createDownloadTask,
   createUpdatedTask,
   createValidateTask,
-  getTaskHistory
+  getTaskHistory,
+  sendBundleToHearth
 } from '@workflow/records/fhir'
 
 export async function toCorrected(
@@ -228,6 +231,42 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toDownloaded(
+  record: ValidRecord,
+  isSystem: boolean,
+  practitioner: Practitioner,
+  extensionUrl:
+    | 'http://opencrvs.org/specs/extension/regDownloaded'
+    | 'http://opencrvs.org/specs/extension/regAssigned'
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+
+  const downloadedTask = await createDownloadTask(
+    previousTask,
+    practitioner,
+    isSystem,
+    extensionUrl
+  )
+
+  const downloadRecord = {
+    ...record,
+    entry: [
+      ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
+      { resource: downloadedTask }
+    ]
+  }
+
+  await sendBundleToHearth({
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: downloadRecord.entry.filter(
+      ({ resource }) => resource.resourceType === 'Task'
+    )
+  })
+
+  return downloadRecord
 }
 
 export async function toValidated(

@@ -30,6 +30,10 @@ import {
   CorrectionRequestPaymentInput,
   ChangedValuesInput
 } from '@workflow/records/correction-request'
+import {
+  setupLastRegLocation,
+  setupLastRegUser
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -298,6 +302,77 @@ export function createCorrectedTask(
       ]
     }
   }
+}
+
+export async function createDownloadTask(
+  previousTask: Task,
+  practitioner: Practitioner,
+  isSystem: boolean,
+  extensionUrl:
+    | 'http://opencrvs.org/specs/extension/regDownloaded'
+    | 'http://opencrvs.org/specs/extension/regAssigned'
+): Promise<Task> {
+  const identifiers = previousTask.identifier.filter(
+    ({ system }) =>
+      // Clear old system identifier task if it happens that the last task was made
+      // by an intergration but this one is by a real user
+      system !== 'http://opencrvs.org/specs/id/system_identifier'
+  )
+
+  if (isSystem) {
+    identifiers.push({
+      system: 'http://opencrvs.org/specs/id/system_identifier',
+      value: JSON.stringify({
+        name: practitioner.name,
+        //@ts-ignore
+        username: practitioner.username,
+        type: 'HEALTH'
+      })
+    })
+  }
+
+  const downloadedTask: Task = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      { url: extensionUrl }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  if (!isSystem) {
+    const downloadedTaskWithPractitioner = setupLastRegUser(
+      downloadedTask,
+      practitioner
+    )
+    const downloadedTaskWithLocation = await setupLastRegLocation(
+      downloadedTaskWithPractitioner,
+      practitioner
+    )
+    return downloadedTaskWithLocation
+  }
+
+  return downloadedTask
 }
 
 export function createValidateTask(
