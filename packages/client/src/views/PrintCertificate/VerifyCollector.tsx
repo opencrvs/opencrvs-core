@@ -76,16 +76,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const isIssueUrl = window.location.href.includes('issue')
 
-    if (!this.props.declaration) {
-      return
-    }
-
-    const event = this.props.declaration?.event
-    const eventDate = getEventDate(this.props.declaration?.data, event)
-    const registeredDate = getRegisteredDate(this.props.declaration?.data)
+    const event = this.props.declaration!.event
+    const eventDate = getEventDate(this.props.declaration!.data, event)
+    const registeredDate = getRegisteredDate(this.props.declaration!.data)
     const { offlineCountryConfiguration } = this.props
 
-    const declaration = { ...this.props.declaration }
+    const declaration = { ...this.props.declaration! }
     if (declaration?.data?.registration.certificates.length) {
       declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
         hasShowedVerifiedDocument
@@ -131,29 +127,18 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, declaration, registerForm } = this.props
 
-    if (!declaration)
-      return {
-        iD: '',
-        iDType: '',
-        firstNames: '',
-        familyName: '',
-        birthDate: '',
-        nationality: '',
-        age: ''
-      }
-
-    const info = declaration?.data[collector]
+    const info = declaration!.data[collector]
 
     const eventRegistrationInput = draftToGqlTransformer(
       registerForm,
-      declaration.data!
+      declaration!.data
     )
 
     const informantType =
       eventRegistrationInput.registration.informantType.toLowerCase()
 
     const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
-      declaration.event
+      declaration!.event
     ][collector] as IVerifyIDCertificateCollectorField
 
     const iD =
