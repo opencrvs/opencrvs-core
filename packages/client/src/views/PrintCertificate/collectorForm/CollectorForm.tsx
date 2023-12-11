@@ -19,8 +19,7 @@ import {
   storeDeclaration,
   writeDeclaration,
   IPrintableDeclaration,
-  ICertificate,
-  IDeclaration
+  ICertificate
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -82,16 +81,22 @@ const ErrorWrapper = styled.div`
   margin-bottom: 16px;
 `
 
-interface IBaseProps {
+type PropsWhenDeclarationIsFound = {
   registerForm: IForm
   event: Event
   pageRoute: string
   declarationId: string
-  declaration: IPrintableDeclaration | undefined
+  declaration: IPrintableDeclaration
   formSection: IFormSection
   formGroup: IFormSectionGroup
   offlineCountryConfiguration: IOfflineData
-  theme: ITheme
+}
+type PropsWhenDeclarationIsNotFound = {
+  declaration: undefined
+}
+
+interface IBaseProps {
+  theme?: ITheme
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   storeDeclaration: typeof storeDeclaration
@@ -103,7 +108,9 @@ interface IBaseProps {
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
-type IProps = IBaseProps & IntlShapeProps
+type IProps =
+  | (IBaseProps & PropsWhenDeclarationIsFound & IntlShapeProps)
+  | (IBaseProps & PropsWhenDeclarationIsNotFound & IntlShapeProps)
 
 function getNextSectionIds(
   formSection: IFormSection,
@@ -297,12 +304,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     declaration: IPrintableDeclaration,
     event: Event
   ) => {
+    const { offlineCountryConfiguration } = this
+      .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
         event,
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
-        this.props.offlineCountryConfiguration
+        offlineCountryConfiguration
       )
     ) {
       this.props.goToReviewCertificate(declarationId, event)
@@ -324,23 +333,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   render() {
-    const {
-      intl,
-      event,
-      declarationId,
-      declaration,
-      formSection,
-      formGroup,
-      goBack
-    } = this.props
-
     const { showError, showModalForNoSignedAffidavit } = this.state
+    const props = this.props
+    const { declaration } = props
 
-    const nextSectionGroup = getNextSectionIds(
-      formSection,
-      formGroup,
-      declaration
-    )
     const declarationToBeCertified = declaration
     if (!declarationToBeCertified) {
       return (
@@ -352,6 +348,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         />
       )
     }
+
+    const { intl, event, declarationId, formSection, formGroup, goBack } = props
+
+    const nextSectionGroup = getNextSectionIds(
+      formSection,
+      formGroup,
+      declaration
+    )
     return (
       <>
         <ActionPageLight
@@ -460,7 +464,7 @@ const mapStateToProps = (
     eventType: string
     groupId: string
   }>
-) => {
+): PropsWhenDeclarationIsFound | PropsWhenDeclarationIsNotFound => {
   const { registrationId, eventType, groupId } = props.match.params
   const event = getEvent(eventType)
 
@@ -468,12 +472,14 @@ const mapStateToProps = (
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
 
+  if (!declaration) {
+    return { declaration: undefined }
+  }
+
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(
-    declaration as IDeclaration
-  )
+  const certFormSection = getCertificateCollectorFormSection(declaration)
 
   const isAllowPrintInAdvance =
     event === Event.Birth
@@ -531,7 +537,7 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(mapStateToProps, {
+export const CollectorForm = connect<any, any, any, any>(mapStateToProps, {
   goBack,
   goToHomeTab,
   storeDeclaration,
@@ -541,4 +547,4 @@ export const CollectorForm = connect(mapStateToProps, {
   goToVerifyCollector,
   goToReviewCertificate,
   goToPrintCertificatePayment
-})(injectIntl(withTheme(CollectorFormComponent)))
+})(injectIntl<'intl', IProps>(withTheme(CollectorFormComponent)))
