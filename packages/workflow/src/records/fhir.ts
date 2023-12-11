@@ -542,7 +542,18 @@ export async function sendBundleToHearth(
     )
   }
 
-  return res.json()
+  const responseBundle: TransactionResponse = await res.json()
+
+  const ok = responseBundle.entry.every((e) =>
+    e.response.status.startsWith('2')
+  )
+  if (!ok) {
+    throw new Error(
+      'Hearth was unable to create/update all the entires in the bundle'
+    )
+  }
+
+  return responseBundle
 }
 
 function findSavedReference(

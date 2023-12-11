@@ -171,12 +171,6 @@ export default async function createRecordHandler(
     })
 
     const responseBundle = await sendBundleToHearth(inputBundle)
-    const ok = responseBundle.entry.every((e) => e.response.status === '201')
-    if (!ok) {
-      throw new Error(
-        'Hearth was unable to create all the entires in the bundle'
-      )
-    }
     const compositionLocation = responseBundle.entry
       .map((e) => e.response.location)
       .find((l) => l.includes('Composition'))
