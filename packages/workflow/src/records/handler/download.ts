@@ -20,10 +20,10 @@ import {
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
-import { getRecordById } from '../index'
+import { getRecordById } from '@workflow/records/index'
 import { getToken, isSystem } from '@workflow/utils/authUtils'
-import { IAuthHeader } from '@workflow/../../commons/build/dist/http'
-import { toDownloaded } from '../state-transitions'
+import { IAuthHeader } from '@opencrvs/commons'
+import { toDownloaded } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 function getDownloadedOrAssignedExtension(

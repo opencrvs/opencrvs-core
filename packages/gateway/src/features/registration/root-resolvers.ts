@@ -161,20 +161,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
-          id,
-          user,
-          office,
-          context.headers
-        )
+        context.record = await fetchRegistration(id, context.headers)
         return context.record
       } else {
         return await Promise.reject(
@@ -192,20 +179,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
-          id,
-          user,
-          office,
-          context.headers
-        )
+        context.record = await fetchRegistration(id, context.headers)
         return context.record
       } else {
         return await Promise.reject(
