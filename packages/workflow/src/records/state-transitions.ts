@@ -270,7 +270,7 @@ export async function toDownloaded(
 
   // Here the sent bundle is saved with task only
   await sendBundleToHearth(downloadedRecordWithTaskOnly)
-  await indexBundleForAssignment(
+  indexBundleForAssignment(
     downloadedRecordWithTaskOnly,
     token,
     '/events/assigned'

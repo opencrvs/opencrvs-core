@@ -48,7 +48,7 @@ export async function indexBundleForAssignment(
 
   if (!res.ok) {
     throw new Error(
-      `Indexing a bundle to search service failed with [${
+      `Indexing a bundle to search service for assignment failed with [${
         res.status
       }] body: ${await res.text()}`
     )
