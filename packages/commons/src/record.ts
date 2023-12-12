@@ -32,46 +32,13 @@ import {
   SavedBundle,
   TrackingID
 } from './fhir'
-import { IAuthHeader } from './http'
 import { NestedNominal, Nominal } from './nominal'
-import * as decode from 'jwt-decode'
 
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH',
   MARRIAGE = 'MARRIAGE'
 }
-
-export interface ITokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: string[]
-}
-
-type UserScope =
-  | 'demo'
-  | 'declare'
-  | 'register'
-  | 'certify'
-  | 'performance'
-  | 'sysadmin'
-  | 'validate'
-  | 'natlsysadmin'
-  | 'bypassratelimit'
-  | 'teams'
-  | 'config'
-
-type SystemScope =
-  | 'declare'
-  | 'recordsearch'
-  | 'notification-api'
-  | 'validator-api'
-  | 'age-verification-api'
-  | 'webhook'
-  | 'nationalId'
-
-export type Scope = UserScope | SystemScope
 
 export function getEventLabelFromBundle(bundle: Bundle) {
   const composition = getComposition(bundle)
@@ -238,29 +205,4 @@ export function replaceFromBundle(
       return shouldUpdate ? { ...entry, resource: newResource } : entry
     })
   }
-}
-
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
-  if (!authHeader || !authHeader.Authorization) {
-    return false
-  }
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
-}
-
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
-  const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
-  return !!matchedScope
-}
-
-export const getTokenPayload = (token: string): ITokenPayload => {
-  let decoded: ITokenPayload
-  try {
-    decoded = decode(token)
-  } catch (err) {
-    throw new Error(
-      `getTokenPayload: Error occurred during token decode : ${err}`
-    )
-  }
-  return decoded
 }

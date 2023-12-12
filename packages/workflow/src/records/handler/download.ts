@@ -12,8 +12,6 @@
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
-  hasScope,
-  inScope,
   TaskStatus,
   ValidRecord
 } from '@opencrvs/commons/types'
@@ -25,6 +23,7 @@ import { getToken, isSystem } from '@workflow/utils/authUtils'
 import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { hasScope, inScope } from '@opencrvs/commons/authentication'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
