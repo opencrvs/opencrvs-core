@@ -65,7 +65,7 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
@@ -81,6 +81,7 @@ import { Query as QueryType, User } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { HOME } from '@client/navigation/routes'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -816,6 +817,15 @@ function UserListComponent(props: IProps) {
       deliveryMethod
     ]
   )
+
+  if (
+    !locationId ||
+    (userDetails &&
+      !NATL_ADMIN_ROLES.includes(userDetails.systemRole) &&
+      !SYS_ADMIN_ROLES.includes(userDetails.systemRole))
+  ) {
+    return <Redirect to={HOME} />
+  }
 
   return (
     <SysAdminContentWrapper
