@@ -389,7 +389,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ] as IColumn[]
     return keys.filter((item) => {
       return !(
-        !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+        !window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
         item.key === 'timeLoggedWaitingValidation'
       )
     })
