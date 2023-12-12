@@ -1836,7 +1836,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
         title: 'Marriage Declaration',
         section: [
           {
-            title: 'Groom details',
+            title: "Groom's details",
             code: {
               coding: [
                 {
@@ -1844,7 +1844,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'groom-details'
                 }
               ],
-              text: 'Groom details'
+              text: "Groom's details"
             },
             entry: [
               {
@@ -1854,7 +1854,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
             ]
           },
           {
-            title: 'Bride details',
+            title: "Bride's details",
             code: {
               coding: [
                 {
@@ -1862,7 +1862,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'bride-details'
                 }
               ],
-              text: 'Bride details'
+              text: "Bride's details"
             },
             entry: [
               {
