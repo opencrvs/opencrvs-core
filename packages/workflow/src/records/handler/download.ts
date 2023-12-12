@@ -24,6 +24,8 @@ import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { hasScope, inScope } from '@opencrvs/commons/authentication'
+import { sendBundleToHearth } from '../fhir'
+import { indexBundleForAssignment } from '../search'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -79,12 +81,19 @@ export async function downloadRecordHandler(
     businessStatus
   )
 
-  const downloadedRecord = await toDownloaded(
-    token,
+  const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
     record,
     isSystem(request),
     practitioner,
     extensionUrl
+  )
+
+  // Here the sent bundle is saved with task only
+  await sendBundleToHearth(downloadedRecordWithTaskOnly)
+  indexBundleForAssignment(
+    downloadedRecordWithTaskOnly,
+    token,
+    '/events/assigned'
   )
 
   return downloadedRecord as ValidRecord

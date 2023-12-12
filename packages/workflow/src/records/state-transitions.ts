@@ -56,10 +56,8 @@ import {
   createDownloadTask,
   createUpdatedTask,
   createValidateTask,
-  getTaskHistory,
-  sendBundleToHearth
+  getTaskHistory
 } from '@workflow/records/fhir'
-import { indexBundleForAssignment } from './search'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -237,7 +235,6 @@ export async function toUpdated(
 }
 
 export async function toDownloaded(
-  token: string,
   record: ValidRecord,
   isSystem: boolean,
   practitioner: Practitioner,
@@ -254,7 +251,7 @@ export async function toDownloaded(
     extensionUrl
   )
 
-  const downloadRecord = {
+  const downloadedRecord = {
     ...record,
     entry: [
       ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
@@ -268,15 +265,7 @@ export async function toDownloaded(
     entry: [{ resource: downloadedTask }]
   }
 
-  // Here the sent bundle is saved with task only
-  await sendBundleToHearth(downloadedRecordWithTaskOnly)
-  indexBundleForAssignment(
-    downloadedRecordWithTaskOnly,
-    token,
-    '/events/assigned'
-  )
-
-  return downloadRecord
+  return { downloadedRecord, downloadedRecordWithTaskOnly }
 }
 
 export async function toValidated(
