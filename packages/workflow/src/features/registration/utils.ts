@@ -454,7 +454,7 @@ export function hasCertificateDataInDocRef(fhirBundle: Bundle) {
   return fhirBundle.entry?.some((item) => {
     if (
       item.fullUrl === docRefId &&
-      (item.resource as DocumentReference)?.content
+      (item.resource as DocumentReference)?.content?.length > 0
     ) {
       return true
     }
