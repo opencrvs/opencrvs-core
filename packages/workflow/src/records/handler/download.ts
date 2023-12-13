@@ -19,13 +19,18 @@ import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getRecordById } from '@workflow/records/index'
-import { getToken, isSystem } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/authUtils'
 import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { hasScope, inScope } from '@opencrvs/commons/authentication'
-import { sendBundleToHearth } from '../fhir'
-import { indexBundleForAssignment } from '../search'
+import { getSystem, getUser } from '@workflow/features/user/utils'
+import {
+  getTokenPayload,
+  hasScope,
+  inScope
+} from '@opencrvs/commons/authentication'
+import { sendBundleToHearth } from '@workflow/records/fhir'
+import { indexBundleForAssignment } from '@workflow/records/search'
+import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -52,6 +57,7 @@ export async function downloadRecordHandler(
   )
 
   const token = getToken(request)
+  const tokenPayload = getTokenPayload(token)
   const record = await getRecordById(
     // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
@@ -74,17 +80,27 @@ export async function downloadRecordHandler(
     throw new Error("Task didn't have any status. This should never happen")
   }
 
-  const practitioner = await getLoggedInPractitionerResource(token)
+  const isRecordSearch = hasScope(
+    { Authorization: `Bearer ${token}` },
+    'recordsearch'
+  )
+
+  const user: IUserModelData | ISystemModelData = !isRecordSearch
+    ? await getUser(tokenPayload.sub, {
+        Authorization: `Bearer ${token}`
+      })
+    : await getSystem(tokenPayload.sub, {
+        Authorization: `Bearer ${token}`
+      })
 
   const extensionUrl = getDownloadedOrAssignedExtension(
-    request.headers.authHeader,
+    { Authorization: `Bearer ${token}` },
     businessStatus
   )
 
   const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
     record,
-    isSystem(request),
-    practitioner,
+    user,
     extensionUrl
   )
 

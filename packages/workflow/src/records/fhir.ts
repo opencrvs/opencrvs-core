@@ -18,11 +18,13 @@ import {
   Task,
   URNReference,
   URLReference,
-  SavedTask
+  SavedTask,
+  resourceIdentifierToUUID,
+  Location
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -30,10 +32,8 @@ import {
   CorrectionRequestPaymentInput,
   ChangedValuesInput
 } from '@workflow/records/correction-request'
-import {
-  setupLastRegLocation,
-  setupLastRegUser
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { isSystem, ISystemModelData, IUserModelData } from './user'
+import { getPractitionerOffice } from '@workflow/features/user/utils'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -306,12 +306,12 @@ export function createCorrectedTask(
 
 export async function createDownloadTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
-  isSystem: boolean,
+  user: IUserModelData | ISystemModelData,
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
 ): Promise<SavedTask> {
+  const office = (await getPractitionerOffice(user.practitionerId)) as Location
   const identifiers = previousTask.identifier.filter(
     ({ system }) =>
       // Clear old system identifier task if it happens that the last task was made
@@ -319,17 +319,41 @@ export async function createDownloadTask(
       system !== 'http://opencrvs.org/specs/id/system_identifier'
   )
 
-  if (isSystem) {
+  if (isSystem(user)) {
     identifiers.push({
       system: 'http://opencrvs.org/specs/id/system_identifier',
       value: JSON.stringify({
-        name: practitioner.name,
-        //@ts-ignore
-        username: practitioner.username,
-        type: 'HEALTH'
+        name: user.name,
+        username: user.username,
+        type: user.type
       })
     })
   }
+
+  const extensions: Extension[] = isSystem(user)
+    ? []
+    : [
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastUser',
+          valueReference: {
+            reference: `Practitioner/${user.practitionerId as UUID}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastLocation',
+          valueReference: {
+            reference: `Location/${resourceIdentifierToUUID(
+              office!.partOf!.reference
+            )}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastOffice',
+          valueReference: {
+            reference: `Location/${user.primaryOfficeId}`
+          }
+        }
+      ]
 
   const downloadedTask: SavedTask = {
     resourceType: 'Task',
@@ -339,9 +363,9 @@ export async function createDownloadTask(
     focus: previousTask.focus,
     id: previousTask.id,
     requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
+      agent: { reference: `Practitioner/${user.practitionerId}` }
     },
-    identifier: previousTask.identifier,
+    identifier: identifiers,
     extension: [
       ...previousTask.extension.filter((extension) =>
         [
@@ -350,7 +374,8 @@ export async function createDownloadTask(
           'http://opencrvs.org/specs/extension/contact-person-email'
         ].includes(extension.url)
       ),
-      { url: extensionUrl }
+      { url: extensionUrl },
+      ...extensions
     ],
     lastModified: new Date().toISOString(),
     businessStatus: previousTask.businessStatus,
@@ -358,18 +383,6 @@ export async function createDownloadTask(
       ...previousTask.meta,
       lastUpdated: new Date().toISOString()
     }
-  }
-
-  if (!isSystem) {
-    const downloadedTaskWithPractitioner = setupLastRegUser(
-      downloadedTask,
-      practitioner
-    )
-    const downloadedTaskWithLocation = await setupLastRegLocation(
-      downloadedTaskWithPractitioner,
-      practitioner
-    )
-    return downloadedTaskWithLocation
   }
 
   return downloadedTask
