@@ -26,7 +26,6 @@ import {
   Task,
   TaskActionExtension,
   TaskHistory,
-  TaskStatus,
   addExtensionsToTask,
   buildFHIRBundle,
   clearActionExtension,
@@ -1006,87 +1005,4 @@ export function insertActionToBundle(
     ...record,
     entry: updatedEntries
   } as Saved<Bundle>
-}
-
-function getDownloadedOrAssignedExtension(
-  authHeader: IAuthHeader,
-  status: TaskStatus
-): Action[number] {
-  if (
-    inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === 'VALIDATED')
-  ) {
-    return `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-  }
-  return `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-}
-
-export async function markRecordAsDownloadedBySystem(
-  id: string,
-  system: ISystemModelData,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromSavedBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, system)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
-}
-export async function markRecordAsDownloadedOrAssigned(
-  id: string,
-  user: IUserModelData,
-  office: Saved<Location>,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromSavedBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, user, office)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
 }
