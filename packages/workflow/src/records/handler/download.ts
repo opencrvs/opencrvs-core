@@ -31,6 +31,7 @@ import {
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleForAssignment } from '@workflow/records/search'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
+import { logger } from '@workflow/logger'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -104,13 +105,25 @@ export async function downloadRecordHandler(
     extensionUrl
   )
 
-  // Here the sent bundle is saved with task only
-  await sendBundleToHearth(downloadedRecordWithTaskOnly)
-  indexBundleForAssignment(
-    downloadedRecordWithTaskOnly,
-    token,
-    '/events/assigned'
-  )
+  /*
+   * Storing the details of the downloaded record in the database(s) is slow.
+   * So we return the requested record to the requesting users optimistically immediately.
+   * The time difference is 50ms when not waiting and 1000ms when waiting.
+   */
+  process.nextTick(async () => {
+    try {
+      // Here the sent bundle is saved with task only
+      await sendBundleToHearth(downloadedRecordWithTaskOnly)
+
+      await indexBundleForAssignment(
+        downloadedRecordWithTaskOnly,
+        token,
+        '/events/assigned'
+      )
+    } catch (error) {
+      logger.error(error)
+    }
+  })
 
   return downloadedRecord as ValidRecord
 }
