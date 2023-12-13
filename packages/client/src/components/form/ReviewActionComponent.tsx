@@ -104,9 +104,12 @@ enum ACTION {
   DECLARATION_TO_BE_REGISTERED = 'DECLARATION_TO_BE_REGISTERED'
 }
 
-const ACTION_TO_CONTENT_MAP_SKELETON: (deliveryMethod: string) => {
+const ACTION_TO_CONTENT_MAP_SKELETON: (
+  deliveryMethod: string,
+  hasErrorsOnFields: boolean
+) => {
   [key: string]: any
-} = (deliveryMethod) => ({
+} = (deliveryMethod, hasErrorsOnFields) => ({
   [String(ACTION.DECLARATION_TO_BE_DECLARED)]: {
     draftStatus: {
       true: {
@@ -119,7 +122,8 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (deliveryMethod: string) => {
             description: {
               message: messages.reviewActionDescriptionComplete,
               payload: {
-                deliveryMethod
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
               }
             },
             modal: {
@@ -139,7 +143,13 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (deliveryMethod: string) => {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: !hasErrorsOnFields
+                ? messages.reviewActionDescriptionIncomplete
+                : messages.reviewActionDescriptionForErrors,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -312,7 +322,8 @@ class ReviewActionComponent extends React.Component<
       hasErrorsOnFields
     } = this.props
     const ACTION_TO_CONTENT_MAP = ACTION_TO_CONTENT_MAP_SKELETON(
-      window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+      window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD,
+      !!hasErrorsOnFields
     )
 
     const background = !completeDeclaration

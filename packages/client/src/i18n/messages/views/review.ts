@@ -191,10 +191,17 @@ const messagesToDefine = {
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'Please ensure all fields are either empty or have a valid value in them.',
+      'The informant will receive an {deliveryMethod} with a tracking ID that they can use to provide the additional mandatory information required for registration.',
     description:
       'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'
+  },
+  reviewActionDescriptionForErrors: {
+    defaultMessage:
+      'Please ensure all fields are either empty or have a valid value in them.',
+    description:
+      'Description for review action component when declaration has errors on fields',
+    id: 'review.actions.description.hasError'
   },
   reviewActionTitle: {
     defaultMessage:
