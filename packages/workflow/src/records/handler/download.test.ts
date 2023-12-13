@@ -19,7 +19,7 @@ import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForDownloadExtenstion(task: Task) {
   return task.extension.find(
-    (e) => e.url === 'http://opencrvs.org/specs/extension/regAssigned'
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regDownloaded'
   )
 }
 
@@ -81,6 +81,12 @@ describe('download record endpoint', () => {
       }
     })
 
+    // The download process schedules the callback of hearth and search
+    // for later, before that the server is stopped and when two callbacks
+    // are later brought in for execution, the mock handlers are not found
+    // as they were already removed
+    // wait two http requests(search and hearth) to finish
+    await new Promise((resolve) => setImmediate(resolve))
     const isDownloaded = checkForDownloadExtenstion(
       getTaskFromSavedBundle(JSON.parse(res.payload))
     )
