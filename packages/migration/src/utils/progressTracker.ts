@@ -8,13 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const certificateBaseTemplate = {
-  definition: {
-    pageMargins: [0, 0, 0, 0] as [number, number, number, number],
-    defaultStyle: {
-      font: 'notosans'
-    },
-    content: []
-  },
-  fonts: {}
+
+export function reportProgress(message: string, step: number, total: number) {
+  // log every 0.1% progress
+  const logEvery = Math.max(10, Math.round(total / 1000))
+  if (step % logEvery === 0 || step === total) {
+    console.log(`${message}: ${((100 * step) / total).toFixed(2)}%`)
+  }
 }

@@ -196,6 +196,7 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadCertificateConfiguration: () => Promise.resolve({}),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),
