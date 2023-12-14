@@ -18,7 +18,6 @@ import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
