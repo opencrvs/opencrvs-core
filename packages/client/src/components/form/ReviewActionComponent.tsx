@@ -25,6 +25,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   draftDeclaration?: boolean
   completeDeclaration: boolean
+  hasErrorsOnFields?: boolean
   totalFileSizeExceeded: boolean
   declarationToBeValidated?: boolean
   declarationToBeRegistered?: boolean
@@ -103,7 +104,12 @@ enum ACTION {
   DECLARATION_TO_BE_REGISTERED = 'DECLARATION_TO_BE_REGISTERED'
 }
 
-const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
+const ACTION_TO_CONTENT_MAP_SKELETON: (
+  deliveryMethod: string,
+  hasErrorsOnFields: boolean
+) => {
+  [key: string]: any
+} = (deliveryMethod, hasErrorsOnFields) => ({
   [String(ACTION.DECLARATION_TO_BE_DECLARED)]: {
     draftStatus: {
       true: {
@@ -137,7 +143,9 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete,
+              message: !hasErrorsOnFields
+                ? messages.reviewActionDescriptionIncomplete
+                : messages.reviewActionDescriptionForErrors,
               payload: {
                 deliveryMethod:
                   window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
@@ -283,7 +291,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
       }
     }
   }
-}
+})
 
 interface IReviewActionState {
   showSubmitModal: boolean
@@ -310,8 +318,13 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl
+      intl,
+      hasErrorsOnFields
     } = this.props
+    const ACTION_TO_CONTENT_MAP = ACTION_TO_CONTENT_MAP_SKELETON(
+      window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD,
+      !!hasErrorsOnFields
+    )
 
     const background = !completeDeclaration
       ? 'error'
@@ -377,7 +390,7 @@ class ReviewActionComponent extends React.Component<
                 size="large"
                 id="submit_form"
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded}
+                disabled={hasErrorsOnFields || totalFileSizeExceeded}
               >
                 <Upload />
                 {intl.formatMessage(
