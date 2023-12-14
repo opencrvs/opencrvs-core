@@ -78,7 +78,6 @@
     "lint-staged": "^7.1.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
-    "logrocket": "^0.6.19",
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
