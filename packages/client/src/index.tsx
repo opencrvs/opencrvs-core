@@ -53,31 +53,6 @@ if (
       dsn: window.config.SENTRY
     })
   }
-
-  // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET, {
-      release: import.meta.env.VITE_APP_VERSION
-    })
-  }
-
-  // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
-    Sentry.configureScope((scope) => {
-      scope.addEventProcessor(async (event) => {
-        if (!event.extra) {
-          event.extra = {}
-        }
-        const sessionUrl = await new Promise((resolve) => {
-          LogRocket.getSessionURL((url) => {
-            resolve(url)
-          })
-        })
-        event.extra.sessionURL = sessionUrl
-        return event
-      })
-    })
-  }
 }
 
 function userReconnectedToast() {

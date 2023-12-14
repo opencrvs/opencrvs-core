@@ -69,7 +69,6 @@ interface Window {
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
-    LOGROCKET: string
     SENTRY: string
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
