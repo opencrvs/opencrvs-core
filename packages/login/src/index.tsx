@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
+
 import { App } from '@login/App'
 import { storage } from '@login/storage'
 import { createStore } from './store'
