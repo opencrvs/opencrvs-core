@@ -473,7 +473,6 @@ export const mockOfflineData = {
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
-    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     DATE_OF_BIRTH_UNKNOWN: true,
     INFORMANT_SIGNATURE: false,
     INFORMANT_SIGNATURE_REQUIRED: false,
