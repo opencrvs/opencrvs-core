@@ -253,10 +253,6 @@ export async function markEventAsRegisteredCallbackHandler(
       registrationNumber,
       childIdentifiers
     )
-
-    if (!registeredBundle) {
-      throw new Error('Could not create registered bundle!')
-    }
     await sendBundleToHearth(registeredBundle)
     await indexBundle(registeredBundle, getToken(request))
 

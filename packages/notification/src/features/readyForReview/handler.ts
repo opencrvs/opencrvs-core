@@ -14,7 +14,7 @@ import { messageKeys } from '@notification/i18n/messages'
 import {
   getContactEmail,
   getContactPhoneNo,
-  getDeclarationName,
+  getPersonName,
   getInformantName,
   getOfficeName,
   getRegistrationLocation
@@ -41,7 +41,7 @@ export async function birthReadyForReviewNotification(
       trackingId: getTrackingId(readyForReviewRecord),
       crvsOffice: getOfficeName(readyForReviewRecord),
       registrationLocation: getRegistrationLocation(readyForReviewRecord),
-      name: getDeclarationName(readyForReviewRecord, 'child-details'),
+      name: getPersonName(readyForReviewRecord, 'child-details'),
       informantName: getInformantName(readyForReviewRecord)
     }
   )
@@ -68,7 +68,7 @@ export async function deathReadyForReviewNotification(
       trackingId: getTrackingId(readyForReviewRecord),
       crvsOffice: getOfficeName(readyForReviewRecord),
       registrationLocation: getRegistrationLocation(readyForReviewRecord),
-      name: getDeclarationName(readyForReviewRecord, 'deceased-details'),
+      name: getPersonName(readyForReviewRecord, 'deceased-details'),
       informantName: getInformantName(readyForReviewRecord)
     }
   )

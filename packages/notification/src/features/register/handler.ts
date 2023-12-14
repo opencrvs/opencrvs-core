@@ -11,16 +11,19 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import { messageKeys } from '@notification/i18n/messages'
-import { getTrackingId, RegisteredRecord } from '@opencrvs/commons/types'
+import {
+  getRegistrationNumber,
+  getTrackingId,
+  RegisteredRecord
+} from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import {
   getContactEmail,
   getContactPhoneNo,
-  getDeclarationName,
+  getPersonName,
   getInformantName,
   getOfficeName,
-  getRegistrationLocation,
-  getRegistrationNumber
+  getRegistrationLocation
 } from '@notification/features/utils'
 
 export async function birthRegisterNotification(
@@ -43,7 +46,7 @@ export async function birthRegisterNotification(
       trackingId: getTrackingId(registeredRecord),
       crvsOffice: getOfficeName(registeredRecord),
       registrationLocation: getRegistrationLocation(registeredRecord),
-      name: getDeclarationName(registeredRecord, 'child-details'),
+      name: getPersonName(registeredRecord, 'child-details'),
       informantName: getInformantName(registeredRecord),
       registrationNumber: getRegistrationNumber(registeredRecord)
     }
@@ -71,7 +74,7 @@ export async function deathRegisterNotification(
       trackingId: getTrackingId(registeredRecord),
       crvsOffice: getOfficeName(registeredRecord),
       registrationLocation: getRegistrationLocation(registeredRecord),
-      name: getDeclarationName(registeredRecord, 'deceased-details'),
+      name: getPersonName(registeredRecord, 'deceased-details'),
       informantName: getInformantName(registeredRecord),
       registrationNumber: getRegistrationNumber(registeredRecord)
     }

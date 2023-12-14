@@ -223,3 +223,13 @@ export function replaceFromBundle(
     })
   }
 }
+
+export function getRegistrationNumber(record: RegisteredRecord): string {
+  const taskEntryResource = getTaskFromSavedBundle(record)
+  const identiferWithRn = taskEntryResource.identifier.find((obj) =>
+    obj.system.endsWith('registration-number')
+  )
+  if (!identiferWithRn)
+    throw new Error('Could not find registration number in bundle')
+  return identiferWithRn.value
+}

@@ -11,6 +11,7 @@
 
 import { getDefaultLanguage } from '@notification/i18n/utils'
 import {
+  CompositionSectionCode,
   findCompositionSection,
   findExtension,
   getComposition,
@@ -96,22 +97,25 @@ export function getInformantName(
   return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
 }
 
-export function getDeclarationName(
+export function getPersonName(
   record: ReadyForReviewRecord | RegisteredRecord,
-  compositionCode: 'deceased-details' | 'child-details'
+  compositionCode: Extract<
+    CompositionSectionCode,
+    'deceased-details' | 'child-details'
+  >
 ) {
   const composition = getComposition(record)
-  const deceasedSection = findCompositionSection(compositionCode, composition)
-  if (!deceasedSection) {
-    error(record, 'deceased section not found')
+  const patientSection = findCompositionSection(compositionCode, composition)
+  if (!patientSection) {
+    error(record, `patient section not found for ${compositionCode}`)
   }
-  const deceased = getResourceFromBundleById<Patient>(
+  const person = getResourceFromBundleById<Patient>(
     record,
-    urlReferenceToUUID(deceasedSection.entry[0].reference)
+    urlReferenceToUUID(patientSection.entry[0].reference)
   )
-  const name = deceased.name.find(({ use }) => use === 'en')
+  const name = person.name.find(({ use }) => use === 'en')
   if (!name) {
-    error(record, 'name not found in deceased patient resource')
+    error(record, `name not found in patient resource for ${compositionCode}`)
   }
   return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
 }
@@ -137,14 +141,4 @@ export function getRegistrationLocation(
       ? location.name
       : location.alias?.[0] ?? location.name) ?? ''
   )
-}
-
-export function getRegistrationNumber(record: RegisteredRecord): string {
-  const taskEntryResource = getTaskFromSavedBundle(record)
-  const identiferWithRn = taskEntryResource.identifier.find((obj) =>
-    obj.system.endsWith('registration-number')
-  )
-  if (!identiferWithRn)
-    throw new Error('Could not find registration number in bundle')
-  return identiferWithRn.value
 }
