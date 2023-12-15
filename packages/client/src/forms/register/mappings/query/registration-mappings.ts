@@ -181,7 +181,7 @@ export const userTransformer =
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
-        office: history.office,
+        office: history.office?.id,
         date: history.date,
         ...locationHierarchy,
         signature: getUserSignature(history),
