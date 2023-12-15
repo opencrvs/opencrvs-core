@@ -174,10 +174,14 @@ export function executeHandlebarsTemplate(
   Handlebars.registerHelper(
     'location',
     function (this: any, locationId: string, key: keyof ILocation) {
-      const locations = getOfflineData(state).locations
-      return locations[locationId]
-        ? locations[locationId][key]
-        : `Missing location for id: ${locationId}`
+      const offlineData = getOfflineData(state)
+
+      const location =
+        offlineData.locations[locationId] ??
+        offlineData.facilities[locationId] ??
+        offlineData.offices[locationId]
+
+      return location[key] ?? `Missing location for id: ${locationId}`
     }
   )
 
