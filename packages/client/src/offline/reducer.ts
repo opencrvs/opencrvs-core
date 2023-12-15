@@ -26,7 +26,9 @@ import {
   ILocationDataResponse,
   ICertificateTemplateData,
   referenceApi,
-  CertificateConfiguration
+  CertificateConfiguration,
+  IFacilitiesDataResponse,
+  IOfficesDataResponse
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -70,6 +72,29 @@ export interface ILocation {
   partOf: string
 }
 
+type JurisdictionType =
+  | 'STATE'
+  | 'DISTRICT'
+  | 'LOCATION_LEVEL_3'
+  | 'LOCATION_LEVEL_4'
+  | 'LOCATION_LEVEL_5'
+
+export interface AdminStructure extends ILocation {
+  type: LocationType.ADMIN_STRUCTURE
+  jurisdictionType: JurisdictionType
+  physicalType: 'Jurisdiction'
+}
+
+export interface Facility extends ILocation {
+  type: LocationType.HEALTH_FACILITY
+  physicalType: 'Building'
+}
+
+export interface CRVSOffice extends ILocation {
+  type: LocationType.CRVS_OFFICE
+  physicalType: 'Building'
+}
+
 export interface IOfflineData {
   locations: ILocationDataResponse
   forms: {
@@ -78,8 +103,8 @@ export interface IOfflineData {
     death: ISerializedForm
     marriage: ISerializedForm
   }
-  facilities: ILocationDataResponse
-  offices: ILocationDataResponse
+  facilities: IFacilitiesDataResponse
+  offices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate

@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  AdminStructure,
   CertificatePayload,
+  CRVSOffice,
+  Facility,
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
@@ -52,7 +55,7 @@ type ContentFailedAction = {
 export const LOCATIONS_LOADED = 'OFFLINE/LOCATIONS_LOADED'
 type LocationsLoadedAction = {
   type: typeof LOCATIONS_LOADED
-  payload: { [key: string]: ILocation }
+  payload: { [key: string]: AdminStructure }
 }
 
 export const LOCATIONS_FAILED = 'OFFLINE/LOCATIONS_FAILED'
@@ -76,7 +79,7 @@ export type FormsFailedAction = {
 export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
 type FacilitiesLoadedAction = {
   type: typeof FACILITIES_LOADED
-  payload: { [key: string]: ILocation }
+  payload: { [key: string]: Facility | CRVSOffice }
 }
 
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'

@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
+import {
+  ILocation,
+  LocationType,
+  IOfflineData,
+  Facility,
+  CRVSOffice
+} from '@client/offline/reducer'
 import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
@@ -27,6 +33,22 @@ export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   return alpha2
 }
 
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: LocationType.HEALTH_FACILITY,
+  match?: {
+    locationLevel: keyof ILocation // ex: 'partOf' or 'id'
+    locationId?: string
+  }
+): { [key: string]: Facility }
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: LocationType.CRVS_OFFICE,
+  match?: {
+    locationLevel: keyof ILocation // ex: 'partOf' or 'id'
+    locationId?: string
+  }
+): { [key: string]: CRVSOffice }
 export function filterLocations(
   locations: { [key: string]: ILocation },
   allowedType: LocationType,
