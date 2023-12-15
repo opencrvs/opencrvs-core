@@ -31,7 +31,10 @@ import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
-import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
+import {
+  countryAlpha3toAlpha2,
+  getLocationHierarchy
+} from '@client/utils/locationUtils'
 
 /** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
@@ -168,16 +171,11 @@ export const userTransformer =
           !action && regStatus && statuses.includes(regStatus)
       )
 
-    if (history) {
-      const district = history.location?.id
-        ? offlineData?.locations?.[history.location.id]
-        : null
-      const state = district
-        ? offlineData?.locations?.[district.partOf.split('/')[1]]
-        : null
-      const province = state
-        ? offlineData?.locations?.[state.partOf.split('/')[1]]
-        : null
+    if (history && history.location && offlineData) {
+      const locationHierarchy = getLocationHierarchy(
+        history.location.id,
+        offlineData.locations
+      )
       transformedData[targetSectionId || sectionId][
         targetFieldName || 'registrar'
       ] = {
@@ -185,9 +183,7 @@ export const userTransformer =
         role: getUserRole(history),
         office: history.office,
         date: history.date,
-        district,
-        state,
-        province,
+        ...locationHierarchy,
         signature: getUserSignature(history),
         comments: history.comments?.[0]?.comment
       } as IFormSectionData
