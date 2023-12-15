@@ -176,6 +176,10 @@ export function executeHandlebarsTemplate(
     function (this: any, locationId: string, key: keyof ILocation) {
       const offlineData = getOfflineData(state)
 
+      if (!['name', 'alias'].includes(key)) {
+        return `Unknown property ${key}`
+      }
+
       const location =
         offlineData.locations[locationId] ??
         offlineData.facilities[locationId] ??
