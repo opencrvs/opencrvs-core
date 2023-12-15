@@ -38,24 +38,16 @@ import {
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
 import format from '@client/utils/date-formatting'
-import {
-  IOfflineData,
-  OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY,
-  LocationType
-} from '@client/offline/reducer'
+import { IOfflineData, OFFLINE_FACILITIES_KEY } from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/utils/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption, getFieldOptions } from '@client/forms/utils'
 import {
   countryAlpha3toAlpha2,
+  getLocationHierarchy,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-
-interface IName {
-  [key: string]: any
-}
 
 type QueryData = BirthRegistration | DeathRegistration | MarriageRegistration
 
@@ -813,20 +805,6 @@ export const dateFormatTransformer =
     }
   }
 
-const isLocationFacilityOrCRVSOffice = (
-  type: string
-): type is Exclude<
-  LocationType,
-  LocationType.HEALTH_FACILITY | LocationType.CRVS_OFFICE
-> => {
-  return Boolean(
-    type &&
-      [LocationType.HEALTH_FACILITY, LocationType.CRVS_OFFICE].includes(
-        type as LocationType
-      )
-  )
-}
-
 enum FHIRPropLocationLevel {
   city,
   district,
@@ -841,19 +819,13 @@ const setAddressPropFromFHIRProp = (
   fhirProp: keyof typeof FHIRPropLocationLevel,
   sectionId: string,
   fieldName: string,
-  offlineData?: IOfflineData
+  _offlineData?: IOfflineData
 ) => {
   const value =
     fhirProp === 'country'
       ? (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
           ?.label.defaultMessage as string) || ''
-      : offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-          addressFromQuery[
-            fhirProp as keyof typeof FHIRPropLocationLevel
-          ] as string
-        ]?.name ||
-        addressFromQuery[fhirProp as keyof typeof FHIRPropLocationLevel] ||
-        ''
+      : addressFromQuery[fhirProp] || ''
   if (fhirProp === 'country') {
     transformedData[sectionId][fieldName] = value
   } else if (
@@ -911,33 +883,26 @@ export const addressLineTemplateTransformer =
     addressCase: AddressCases,
     lineNumber: number,
     transformedFieldName: string,
-    location: '' | FHIRAddressLineLocationLevel
+    _location: '' | FHIRAddressLineLocationLevel
   ) =>
   (
     transformedData: IFormData,
     queryData: QueryData,
     sectionId: SectionId,
-    field: IFormField,
+    _field: IFormField,
     _?: IFormField,
-    offlineData?: IOfflineData
+    _offlineData?: IOfflineData
   ) => {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
     const address = queryData[sectionId]?.address
-    const addressFromQuery: Address = (address || []).find(
+    const addressFromQuery: Address | undefined = (address || []).find(
       (addr: { type: AddressCases }) => addr.type === addressCase
     )
-    if (addressFromQuery && addressFromQuery.line) {
-      if (location in FHIRAddressLineLocationLevel) {
-        transformedData[sectionId][transformedFieldName] =
-          offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-            addressFromQuery.line[lineNumber] as string
-          ]?.name || ''
-      } else {
-        transformedData[sectionId][transformedFieldName] =
-          addressFromQuery.line[lineNumber] || ''
-      }
+    if (addressFromQuery?.line) {
+      transformedData[sectionId][transformedFieldName] =
+        addressFromQuery.line[lineNumber] || ''
     }
   }
 
@@ -951,7 +916,7 @@ export const eventLocationAddressLineTemplateTransformer =
     transformedData: IFormData,
     queryData: QueryData,
     sectionId: SectionId,
-    field: IFormField,
+    _field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
   ) => {
@@ -966,19 +931,27 @@ export const eventLocationAddressLineTemplateTransformer =
         queryData.eventLocation?.type &&
         queryData.eventLocation?.type === 'HEALTH_FACILITY'
       ) {
-        // Requires health facility address lines to be saved in seeded data
-        // Currently not a requirement
+        if (!offlineData || !location) {
+          return
+        }
+        const facility =
+          offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
+
+        if (!facility) {
+          return
+        }
+        const locationHierarchy = getLocationHierarchy(
+          facility.partOf.split('/').at(1)!,
+          offlineData.locations
+        )
+        const value = locationHierarchy[location]
+        if (value) {
+          transformedData[sectionId][transformedFieldName] = value
+        }
         return
       }
-      if (location in FHIRAddressLineLocationLevel) {
-        transformedData[sectionId][transformedFieldName] =
-          offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-            addressFromQuery.line[lineNumber] as string
-          ]?.name || ''
-      } else {
-        transformedData[sectionId][transformedFieldName] =
-          addressFromQuery.line[lineNumber] || ''
-      }
+      transformedData[sectionId][transformedFieldName] =
+        addressFromQuery.line[lineNumber] || ''
     }
   }
 
@@ -1015,19 +988,20 @@ export const eventLocationAddressFHIRPropertyTemplateTransformer =
       if (!offlineData) {
         return
       }
-      const selectedLocation =
+      const facility =
         offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
 
-      if (selectedLocation) {
-        const locationNameMap = getLocationNameMapOfFacility(
-          selectedLocation,
-          offlineData.locations,
-          true
-        )
-        transformedData[sectionId][field.name] = get(
-          locationNameMap,
-          fhirProp
-        ) as string
+      if (!facility) {
+        return
+      }
+      const locationHierarchy = getLocationHierarchy(
+        facility.partOf.split('/').at(1)!,
+        offlineData.locations
+      )
+      const value =
+        locationHierarchy[fhirProp as keyof typeof locationHierarchy]
+      if (value) {
+        transformedData[sectionId][field.name] = value
       }
     } else if (
       queryData.eventLocation?.type &&
