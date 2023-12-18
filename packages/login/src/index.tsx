@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
+
 import { App } from '@login/App'
 import { storage } from '@login/storage'
 import { createStore } from './store'
@@ -37,29 +37,6 @@ if (
       dsn: window.config.SENTRY,
       integrations: [new BrowserTracing()],
       tracesSampleRate: 1.0
-    })
-  }
-
-  // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET)
-  }
-
-  // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
-    Sentry.configureScope((scope) => {
-      scope.addEventProcessor(async (event) => {
-        if (!event.extra) {
-          event.extra = {}
-        }
-        const sessionUrl = await new Promise((resolve) => {
-          LogRocket.getSessionURL((url) => {
-            resolve(url)
-          })
-        })
-        event.extra.sessionURL = sessionUrl
-        return event
-      })
     })
   }
 }

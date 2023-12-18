@@ -15,7 +15,8 @@ import {
   GQLCountryLogoInput,
   GQLLoginBackgroundInput,
   GQLResolver,
-  GQLMarriageInput
+  GQLMarriageInput,
+  GQLFeaturesInput
 } from '@gateway/graphql/schema'
 import fetch from '@gateway/fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
@@ -47,13 +48,11 @@ export const resolvers: GQLResolver = {
         MARRIAGE: applicationConfig.MARRIAGE as GQLMarriageInput,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
-        EXTERNAL_VALIDATION_WORKQUEUE:
-          applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
+        FEATURES: applicationConfig.FEATURES as GQLFeaturesInput,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         DATE_OF_BIRTH_UNKNOWN:
           applicationConfig.DATE_OF_BIRTH_UNKNOWN as boolean,
-        INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean,
         INFORMANT_SIGNATURE_REQUIRED:
           applicationConfig.INFORMANT_SIGNATURE_REQUIRED as boolean,
         LOGIN_BACKGROUND:
