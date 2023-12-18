@@ -714,12 +714,10 @@ export interface GQLApplicationConfiguration {
   CURRENCY?: GQLCurrency
   DEATH?: GQLDeath
   MARRIAGE?: GQLMarriage
-  MARRIAGE_REGISTRATION?: boolean
+  FEATURES?: GQLFeatures
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
@@ -734,11 +732,10 @@ export interface GQLApplicationConfigurationInput {
   CURRENCY?: GQLCurrencyInput
   DEATH?: GQLDeathInput
   MARRIAGE?: GQLMarriageInput
+  FEATURES?: GQLFeaturesInput
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
@@ -1356,6 +1353,14 @@ export interface GQLMarriage {
   PRINT_IN_ADVANCE?: boolean
 }
 
+export interface GQLFeatures {
+  DEATH_REGISTRATION?: boolean
+  MARRIAGE_REGISTRATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  INFORMANT_SIGNATURE?: boolean
+  PRINT_DECLARATION?: boolean
+}
+
 export interface GQLLoginBackground {
   backgroundColor?: string
   backgroundImage?: string
@@ -1389,6 +1394,14 @@ export interface GQLMarriageInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLMarriageFeeInput
   PRINT_IN_ADVANCE?: boolean
+}
+
+export interface GQLFeaturesInput {
+  DEATH_REGISTRATION?: boolean
+  MARRIAGE_REGISTRATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  INFORMANT_SIGNATURE?: boolean
+  PRINT_DECLARATION?: boolean
 }
 
 export interface GQLLoginBackgroundInput {
@@ -2009,6 +2022,7 @@ export interface GQLResolver {
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
   Marriage?: GQLMarriageTypeResolver
+  Features?: GQLFeaturesTypeResolver
   LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -6227,12 +6241,10 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
   MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
-  MARRIAGE_REGISTRATION?: ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<TParent>
+  FEATURES?: ApplicationConfigurationToFEATURESResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
-  EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
-  INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
   USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
@@ -6312,7 +6324,7 @@ export interface ApplicationConfigurationToMARRIAGEResolver<
   ): TResult
 }
 
-export interface ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<
+export interface ApplicationConfigurationToFEATURESResolver<
   TParent = any,
   TResult = any
 > {
@@ -6325,18 +6337,6 @@ export interface ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<
 }
 
 export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
   TParent = any,
   TResult = any
 > {
@@ -6361,18 +6361,6 @@ export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
   TParent = any,
   TResult = any
 > {
@@ -9131,6 +9119,74 @@ export interface MarriageToFEEResolver<TParent = any, TResult = any> {
 }
 
 export interface MarriageToPRINT_IN_ADVANCEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLFeaturesTypeResolver<TParent = any> {
+  DEATH_REGISTRATION?: FeaturesToDEATH_REGISTRATIONResolver<TParent>
+  MARRIAGE_REGISTRATION?: FeaturesToMARRIAGE_REGISTRATIONResolver<TParent>
+  EXTERNAL_VALIDATION_WORKQUEUE?: FeaturesToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
+  INFORMANT_SIGNATURE?: FeaturesToINFORMANT_SIGNATUREResolver<TParent>
+  PRINT_DECLARATION?: FeaturesToPRINT_DECLARATIONResolver<TParent>
+}
+
+export interface FeaturesToDEATH_REGISTRATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FeaturesToMARRIAGE_REGISTRATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FeaturesToEXTERNAL_VALIDATION_WORKQUEUEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FeaturesToINFORMANT_SIGNATUREResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FeaturesToPRINT_DECLARATIONResolver<
   TParent = any,
   TResult = any
 > {

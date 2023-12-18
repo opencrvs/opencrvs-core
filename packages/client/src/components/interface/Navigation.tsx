@@ -391,7 +391,7 @@ const NavigationView = (props: IFullProps) => {
       ? 0
       : filteredData.approvalTab?.totalItems || 0,
     externalValidation:
-      window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
+      window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
@@ -553,7 +553,7 @@ const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+                {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
                     icon={() => <DeclarationIconSmall color={'teal'} />}
                     id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
