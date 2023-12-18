@@ -16,7 +16,11 @@ import {
 } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import {
+  AdminStructure,
+  ILocation,
+  IOfflineData
+} from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -180,12 +184,16 @@ export function executeHandlebarsTemplate(
         return `Unknown property ${key}`
       }
 
-      const location =
+      const location: AdminStructure | undefined =
         offlineData.locations[locationId] ??
         offlineData.facilities[locationId] ??
         offlineData.offices[locationId]
 
-      return location[key] ?? `Missing location for id: ${locationId}`
+      const fallback = import.meta.env.DEV
+        ? `Missing location for id: ${locationId}`
+        : locationId
+
+      return location?.[key] ?? fallback
     }
   )
 
