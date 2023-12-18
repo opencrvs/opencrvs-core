@@ -65,6 +65,7 @@ import {
 } from '@gateway/features/registration/utils'
 import {
   fetchRegistration,
+  unassignRegistration,
   updateRegistration,
   validateRegistration
 } from '@gateway/workflow/index'
@@ -727,15 +728,16 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
-      })
+      // const taskEntry = await getTaskEntry(id, authHeader)
+      // const taskBundle = taskBundleWithExtension(taskEntry, {
+      //   url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
+      // })
 
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      // await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const taskId = await unassignRegistration(id, authHeader)
 
       // return the taskId
-      return taskEntry.resource.id
+      return taskId
     },
     async markEventAsDuplicate(
       _,

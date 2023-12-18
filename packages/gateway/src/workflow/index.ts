@@ -154,6 +154,18 @@ export async function validateRegistration(
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
 }
 
+export async function unassignRegistration(
+  id: string,
+  authHeader: IAuthHeader
+) {
+  return await createRequest<Promise<string>>(
+    'POST',
+    '/unassign-record',
+    authHeader,
+    { id }
+  )
+}
+
 export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
   return await createRequest<SavedBundle<Resource>>(
     'POST',
