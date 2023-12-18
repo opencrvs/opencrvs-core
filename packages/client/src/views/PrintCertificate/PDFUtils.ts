@@ -177,8 +177,12 @@ export function executeHandlebarsTemplate(
 
   Handlebars.registerHelper(
     'location',
-    function (this: any, locationId: string, key: keyof ILocation) {
+    function (this: any, locationId: string | undefined, key: keyof ILocation) {
       const offlineData = getOfflineData(state)
+
+      if (!locationId) {
+        return ''
+      }
 
       if (!['name', 'alias'].includes(key)) {
         return `Unknown property ${key}`
