@@ -1,10 +1,9 @@
 ---
-name: "\U0001F680 Feature"
+name: 'Feature'
 about: Used to suggest something that you wish OpenCRVS could do
 title: ''
-labels: "☕️ Discussion"
+labels: 'Feature'
 assignees: ''
-
 ---
 
 ## 🚀 Feature
