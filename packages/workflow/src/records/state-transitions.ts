@@ -71,6 +71,7 @@ import {
   createDownloadTask,
   createRegisterTask,
   createRejectTask,
+  createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
   createWaitingForValidationTask,
@@ -545,6 +546,39 @@ export async function toCorrectionRequested(
     },
     'CORRECTION_REQUESTED'
   )
+}
+
+export async function toUnassigned(
+  record: ValidRecord,
+  practitioner: Practitioner
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+  const unassignedTask = createUnassignedTask(previousTask, practitioner)
+  // const unassignedRecord = {
+  //   ...record,
+  //   entry: [
+  //     ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
+  //     { resource: unassignedTask }
+  //   ]
+  // }
+
+  const unassignedTaskWithPractitionerExtensions = setupLastRegUser(
+    unassignedTask,
+    practitioner
+  )
+
+  const unassignedTaskWithLocationExtensions = await setupLastRegLocation(
+    unassignedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const unassignedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: unassignedTaskWithLocationExtensions }]
+  }
+
+  return { unassignedTask, unassignedRecordWithTaskOnly }
 }
 
 export async function toCorrectionRejected(
