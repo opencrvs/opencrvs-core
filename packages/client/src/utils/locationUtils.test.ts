@@ -121,7 +121,7 @@ describe('locationUtil tests', () => {
       const locations = mockOfflineData.locations
       const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
 
-      expect(getJurisidictionType(locations, locationId)).toEqual('DIVISION')
+      expect(getJurisidictionType(locations, locationId)).toEqual('STATE')
     })
   })
 

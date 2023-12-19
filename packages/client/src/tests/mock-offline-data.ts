@@ -128,7 +128,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -139,7 +139,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -150,7 +150,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -161,7 +161,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -172,7 +172,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -183,7 +183,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -194,7 +194,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -205,7 +205,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -367,7 +367,7 @@ export const mockOfflineData = {
       alias: 'বানিয়াজান',
       id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
       status: 'active',
-      jurisdictionType: 'UNION',
+      jurisdictionType: 'LOCATION_LEVEL_3',
       name: 'Baniajan',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
@@ -378,7 +378,7 @@ export const mockOfflineData = {
       alias: 'দুওজ',
       id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
       status: 'active',
-      jurisdictionType: 'UNION',
+      jurisdictionType: 'LOCATION_LEVEL_3',
       name: 'Duaz',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
