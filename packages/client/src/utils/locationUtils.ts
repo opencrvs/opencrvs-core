@@ -37,20 +37,28 @@ export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  allowedType: LocationType.HEALTH_FACILITY,
+  allowedType: 'HEALTH_FACILITY',
   match?: {
-    locationLevel: keyof ILocation // ex: 'partOf' or 'id'
+    locationLevel: keyof ILocation
     locationId?: string
   }
 ): { [key: string]: Facility }
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  allowedType: LocationType.CRVS_OFFICE,
+  allowedType: 'CRVS_OFFICE',
   match?: {
-    locationLevel: keyof ILocation // ex: 'partOf' or 'id'
+    locationLevel: keyof ILocation
     locationId?: string
   }
 ): { [key: string]: CRVSOffice }
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: 'ADMIN_STRUCTURE',
+  match?: {
+    locationLevel: keyof ILocation
+    locationId?: string
+  }
+): { [key: string]: AdminStructure }
 export function filterLocations(
   locations: { [key: string]: ILocation },
   allowedType: LocationType,

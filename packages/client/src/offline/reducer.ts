@@ -54,12 +54,12 @@ import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export enum LocationType {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  CRVS_OFFICE = 'CRVS_OFFICE',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
-  PRIVATE_HOME = 'PRIVATE_HOME'
-}
+export type LocationType =
+  | 'HEALTH_FACILITY'
+  | 'CRVS_OFFICE'
+  | 'ADMIN_STRUCTURE'
+  | 'PRIVATE_HOME'
+
 export interface ILocation {
   id: string
   name: string
@@ -80,18 +80,18 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: LocationType.ADMIN_STRUCTURE
+  type: 'ADMIN_STRUCTURE'
   jurisdictionType: JurisdictionType
   physicalType: 'Jurisdiction'
 }
 
 export interface Facility extends ILocation {
-  type: LocationType.HEALTH_FACILITY
+  type: 'HEALTH_FACILITY'
   physicalType: 'Building'
 }
 
 export interface CRVSOffice extends ILocation {
-  type: LocationType.CRVS_OFFICE
+  type: 'CRVS_OFFICE'
   physicalType: 'Building'
 }
 
@@ -696,14 +696,11 @@ function reducer(
      */
 
     case actions.FACILITIES_LOADED: {
-      const facilities = filterLocations(
-        action.payload,
-        LocationType.HEALTH_FACILITY
-      )
+      const facilities = filterLocations(action.payload, 'HEALTH_FACILITY')
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE
+        'CRVS_OFFICE'
         /*
 
         // This is used to filter office locations available offline

@@ -11,7 +11,11 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
-import { ILocation } from '@client/offline/reducer'
+import type {
+  Facility,
+  CRVSOffice,
+  AdminStructure
+} from '@client/offline/reducer'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -497,10 +501,11 @@ export const mockOfflineData = {
   systems
 }
 
-export const mockOfflineLocationsWithHierarchy: Record<
-  string,
-  Record<string, ILocation>
-> = {
+export const mockOfflineLocationsWithHierarchy: {
+  facilities: Record<string, Facility>
+  offices: Record<string, CRVSOffice>
+  locations: Record<string, AdminStructure>
+} = {
   facilities: {
     '5c6abc88-26b8-4834-a1a6-2992807e3a72': {
       id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
