@@ -728,16 +728,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      // const taskEntry = await getTaskEntry(id, authHeader)
-      // const taskBundle = taskBundleWithExtension(taskEntry, {
-      //   url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
-      // })
-
-      // await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
-      const taskId = await unassignRegistration(id, authHeader)
+      const task = await unassignRegistration(id, authHeader)
 
       // return the taskId
-      return taskId
+      return task.id
     },
     async markEventAsDuplicate(
       _,

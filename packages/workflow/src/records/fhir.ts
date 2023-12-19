@@ -507,7 +507,13 @@ export function createUnassignedTask(
     },
     identifier: previousTask.identifier,
     extension: [
-      ...previousTask.extension,
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
       { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
     ],
     lastModified: new Date().toISOString(),
