@@ -388,6 +388,12 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.LocalRegistrar,
+                                                SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalSystemAdmin,
+                                                SystemRoleType.PerformanceManagement
+                                              ]}
                                               path={routes.TEAM_USER_LIST}
                                               component={UserList}
                                             />

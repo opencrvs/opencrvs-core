@@ -818,12 +818,7 @@ function UserListComponent(props: IProps) {
     ]
   )
 
-  if (
-    !locationId ||
-    (userDetails &&
-      !NATL_ADMIN_ROLES.includes(userDetails.systemRole) &&
-      !SYS_ADMIN_ROLES.includes(userDetails.systemRole))
-  ) {
+  if (!locationId) {
     return <Redirect to={HOME} />
   }
 
