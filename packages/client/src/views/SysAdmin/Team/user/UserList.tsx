@@ -818,6 +818,10 @@ function UserListComponent(props: IProps) {
     ]
   )
 
+  /**
+   * Because the locationId is a search parameter,
+   * it can happen that it gets removed as part of the login redirect mechanism causing the user to land on /team/users without a search parameter
+   */
   if (!locationId) {
     return <Redirect to={HOME} />
   }
