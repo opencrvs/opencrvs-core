@@ -46,8 +46,7 @@ const server = setupServer(
             fileName: 'dummy-file-name',
             file: 'dummy-logo'
           },
-          SENTRY: '',
-          LOGROCKET: ''
+          SENTRY: ''
         }
       })
     )
