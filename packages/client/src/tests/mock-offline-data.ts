@@ -111,7 +111,7 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     }
-  },
+  } satisfies Record<string, Facility>,
   offices: {
     '0d8474da-0361-4d32-979e-af91f012340a': {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
@@ -123,7 +123,7 @@ export const mockOfflineData = {
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
-  },
+  } satisfies Record<string, CRVSOffice>,
   locations: {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
@@ -411,7 +411,7 @@ export const mockOfflineData = {
       statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     }
-  },
+  } satisfies Record<string, AdminStructure>,
   languages: JSON.parse(
     readFileSync(join(__dirname, './languages.json')).toString()
   ).data,
