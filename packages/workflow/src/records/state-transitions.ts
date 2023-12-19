@@ -554,13 +554,6 @@ export async function toUnassigned(
 ) {
   const previousTask = getTaskFromSavedBundle(record)
   const unassignedTask = createUnassignedTask(previousTask, practitioner)
-  // const unassignedRecord = {
-  //   ...record,
-  //   entry: [
-  //     ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
-  //     { resource: unassignedTask }
-  //   ]
-  // }
 
   const unassignedTaskWithPractitionerExtensions = setupLastRegUser(
     unassignedTask,
@@ -578,7 +571,7 @@ export async function toUnassigned(
     entry: [{ resource: unassignedTaskWithLocationExtensions }]
   }
 
-  return { unassignedTask, unassignedRecordWithTaskOnly }
+  return unassignedRecordWithTaskOnly
 }
 
 export async function toCorrectionRejected(

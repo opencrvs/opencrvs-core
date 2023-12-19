@@ -155,19 +155,18 @@ export async function validateRegistration(
   id: string,
   authHeader: IAuthHeader
 ) {
-  return await createRequest('POST', `/records/${id}/validate`, authHeader)
+  return await createRequest<Promise<void>>(
+    'POST',
+    `/records/${id}/validate`,
+    authHeader
+  )
 }
 
 export async function unassignRegistration(
   id: string,
   authHeader: IAuthHeader
 ) {
-  return await createRequest<Promise<string>>(
-    'POST',
-    '/unassign-record',
-    authHeader,
-    { id }
-  )
+  return await createRequest('POST', '/unassign-record', authHeader, { id })
 }
 
 export async function fetchRegistration(id: string, authHeader: IAuthHeader) {

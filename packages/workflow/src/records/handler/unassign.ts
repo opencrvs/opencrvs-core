@@ -34,8 +34,6 @@ export async function unassignRecordHandler(
   )
 
   const token = getToken(request)
-  const practitioner = await getLoggedInPractitionerResource(token)
-
   const record = await getRecordById(
     // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
@@ -50,7 +48,6 @@ export async function unassignRecordHandler(
       'CORRECTION_REQUESTED'
     ]
   )
-  // console.log('record', JSON.stringify(record, null, ' '))
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
@@ -59,14 +56,9 @@ export async function unassignRecordHandler(
     throw new Error("Task didn't have any status. This should never happen")
   }
 
-  const { unassignedRecordWithTaskOnly, unassignedTask } = await toUnassigned(
+  const unassignedRecordWithTaskOnly = await toUnassigned(
     record,
-    practitioner
-  )
-
-  console.log(
-    'unassignedRecordWithTaskOnly',
-    JSON.stringify(unassignedRecordWithTaskOnly, null, ' ')
+    await getLoggedInPractitionerResource(token)
   )
 
   await sendBundleToHearth(unassignedRecordWithTaskOnly)
@@ -76,5 +68,5 @@ export async function unassignRecordHandler(
     '/events/unassigned'
   )
 
-  return unassignedTask.id
+  return { id: unassignedRecordWithTaskOnly.id, unassignedRecordWithTaskOnly }
 }
