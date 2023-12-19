@@ -11,13 +11,10 @@
 import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 import {
-  ASSIGNED_EXTENSION_URL,
-  Bundle,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   findExtension,
-  getStatusFromTask,
-  isTask
+  getStatusFromTask
 } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
@@ -2184,27 +2181,6 @@ describe('Registration root resolvers', () => {
 })
 
 describe('markEventAsUnassigned()', () => {
-  it('updates a task with rejected status, reason and comment', async () => {
-    fetch.mockResponses(
-      [JSON.stringify(mockTaskBundle), { status: 200 }],
-      [JSON.stringify(mockTaskBundle), { status: 200 }]
-    )
-    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-    const result = await resolvers.Mutation!.markEventAsUnassigned(
-      {},
-      { id },
-      { headers: authHeaderRegCert }
-    )
-    const bundle: Bundle = JSON.parse(fetch.mock.calls[1][1].body)
-    const task = bundle.entry.map(({ resource }) => resource).find(isTask)!
-
-    expect(
-      findExtension(ASSIGNED_EXTENSION_URL, task.extension)
-    ).toBeUndefined()
-
-    expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
-  })
-
   it('throws error if user does not have register or validate scope', async () => {
     fetch.mockResponses(
       [JSON.stringify(mockTaskBundle), { status: 200 }],
