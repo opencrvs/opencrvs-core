@@ -90,6 +90,7 @@ export type CorrectionRequestedRecord = Nominal<
 export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type ArchivedRecord = Nominal<SavedBundle, 'Archived'>
 
 export type ValidRecord =
   | InProgressRecord
@@ -99,6 +100,7 @@ export type ValidRecord =
   | CorrectionRequestedRecord
   | CertifiedRecord
   | IssuedRecord
+  | ArchivedRecord
 
 export type RegistrationStatus =
   | 'ARCHIVED'
@@ -121,6 +123,7 @@ export type StateIdenfitiers = {
   CORRECTION_REQUESTED: CorrectionRequestedRecord
   CERTIFIED: CertifiedRecord
   ISSUED: IssuedRecord
+  ARCHIVED: ArchivedRecord
 }
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(

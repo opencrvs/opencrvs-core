@@ -30,7 +30,8 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   Encounter,
-  SavedBundleEntry
+  SavedBundleEntry,
+  ArchivedRecord
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -45,6 +46,7 @@ import {
   ChangedValuesInput
 } from '@workflow/records/correction-request'
 import {
+  createArchiveTask,
   createCorrectedTask,
   createCorrectionEncounter,
   createCorrectionPaymentResources,
@@ -228,6 +230,44 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toArchived(
+  record: RegisteredRecord | ReadyForReviewRecord,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): Promise<ArchivedRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const archivedTask = createArchiveTask(
+    previousTask,
+    practitioner,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  const archivedTaskWithPractitionerExtensions = setupLastRegUser(
+    archivedTask,
+    practitioner
+  )
+
+  const archivedTaskWithLocationExtensions = await setupLastRegLocation(
+    archivedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  return changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter((e) => e.resource.id !== archivedTask.id),
+        { resource: archivedTaskWithLocationExtensions }
+      ]
+    },
+    'ARCHIVED'
+  )
 }
 
 export async function toValidated(

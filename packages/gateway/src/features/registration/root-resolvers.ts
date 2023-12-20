@@ -65,6 +65,7 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
+  archiveRegistration,
   updateRegistration,
   validateRegistration
 } from '@gateway/workflow/index'
@@ -624,15 +625,13 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.ARCHIVED,
+      const taskEntry = await archiveRegistration(
+        id,
+        authHeader,
         reason,
         comment,
         duplicateTrackingId
       )
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },

@@ -1,0 +1,50 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import * as z from 'zod'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { createRoute } from '@workflow/states'
+import { getToken } from '@workflow/utils/authUtils'
+import { validateRequest } from '@workflow/utils/index'
+import { toArchived } from '@workflow/records/state-transitions'
+import { sendBundleToHearth } from '@workflow/records/fhir'
+import { indexBundle } from '@workflow/records/search'
+
+const requestSchema = z.object({
+  reason: z.string().optional(),
+  comment: z.string().optional(),
+  duplicateTrackingId: z.string().optional()
+})
+
+export const archiveRoute = createRoute({
+  action: 'ARCHIVE',
+  allowedStartStates: ['REGISTERED', 'READY_FOR_REVIEW'],
+  method: 'POST',
+  path: '/records/{recordId}/archive',
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(requestSchema, request.payload)
+
+    const { reason, comment, duplicateTrackingId } = payload
+
+    const recordInArchivedState = await toArchived(
+      record,
+      await getLoggedInPractitionerResource(token),
+      reason,
+      comment,
+      duplicateTrackingId
+    )
+
+    await sendBundleToHearth(recordInArchivedState)
+    await indexBundle(recordInArchivedState, token)
+
+    return recordInArchivedState
+  }
+})

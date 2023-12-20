@@ -18,7 +18,8 @@ import {
   StateIdenfitiers,
   IssuedRecord,
   InProgressRecord,
-  ReadyForReviewRecord
+  ReadyForReviewRecord,
+  ArchivedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -30,6 +31,7 @@ export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
 export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
+export type Archive = Nominal<{}, 'Archive'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -39,6 +41,7 @@ export type ActionIdentifiers = {
   CERTIFY: Certify
   VALIDATION: Validate
   DECLARATION_UPDATED: Update
+  ARCHIVE: Archive
 }
 
 /*
@@ -68,6 +71,8 @@ export type StateTree =
       Update,
       InProgressRecord | ReadyForReviewRecord
     >
+  // Archive declaration
+  | Transition<RegisteredRecord | ReadyForReviewRecord, Archive, ArchivedRecord>
 
 /*
  * Internals
