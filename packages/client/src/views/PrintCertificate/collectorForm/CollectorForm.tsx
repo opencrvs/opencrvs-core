@@ -537,7 +537,7 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect<any, any, any, any>(mapStateToProps, {
+export const CollectorForm = connect(mapStateToProps, {
   goBack,
   goToHomeTab,
   storeDeclaration,
