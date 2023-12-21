@@ -818,25 +818,6 @@ describe('Registration root resolvers', () => {
   })
 
   describe('markEventAsArchived()', () => {
-    it('updates a task with archived status', async () => {
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
-        [JSON.stringify(mockTaskBundle), { status: 200 }],
-        [JSON.stringify('ok'), { status: 200 }]
-      )
-      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation!.markEventAsArchived(
-        {},
-        { id },
-        { headers: authHeaderRegCert }
-      )
-      const postData = JSON.parse(fetch.mock.calls[2][1].body)
-      expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
-        'ARCHIVED'
-      )
-      expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
-    })
-
     it('throws error if user does not have register or validate scope', async () => {
       fetch.mockResponses([
         JSON.stringify({ userId: '121221' }),

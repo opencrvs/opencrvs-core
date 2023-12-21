@@ -124,7 +124,7 @@ jest.mock('@gateway/workflow/index', () => {
   const originalModule = jest.requireActual('@gateway/workflow/index')
   return {
     ...originalModule,
-    fetchRegistration: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
+    fetchRegistrationForAssignment: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
   }
 })
 
