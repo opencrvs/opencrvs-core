@@ -33,8 +33,7 @@ import {
   SavedBundleEntry,
   ValidRecord,
   Bundle,
-  SavedTask,
-  ArchivedRecord
+  SavedTask
 } from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
@@ -275,7 +274,7 @@ export async function toArchived(
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
-): Promise<ArchivedRecord> {
+) {
   const previousTask = getTaskFromSavedBundle(record)
   const archivedTask = createArchiveTask(
     previousTask,
@@ -295,7 +294,13 @@ export async function toArchived(
     practitioner
   )
 
-  return changeState(
+  const archivedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: archivedTaskWithLocationExtensions }]
+  }
+
+  const archivedRecord = changeState(
     {
       ...record,
       entry: [
@@ -305,6 +310,8 @@ export async function toArchived(
     },
     'ARCHIVED'
   )
+
+  return { archivedRecord, archivedRecordWithTaskOnly }
 }
 
 export async function toValidated(

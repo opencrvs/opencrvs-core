@@ -9,42 +9,52 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod'
+import * as Hapi from '@hapi/hapi'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { indexBundle } from '@workflow/records/search'
+import { indexBundle, indexBundleForAssignment } from '@workflow/records/search'
+import { getRecordById } from '@workflow/records/index'
 
 const requestSchema = z.object({
+  id: z.string(),
   reason: z.string().optional(),
   comment: z.string().optional(),
   duplicateTrackingId: z.string().optional()
 })
 
-export const archiveRoute = createRoute({
-  action: 'ARCHIVE',
-  allowedStartStates: ['REGISTERED', 'READY_FOR_REVIEW'],
-  method: 'POST',
-  path: '/records/{recordId}/archive',
-  handler: async (request, record) => {
-    const token = getToken(request)
-    const payload = validateRequest(requestSchema, request.payload)
+export async function archiveRecordHandler(
+  request: Hapi.Request,
+  _: Hapi.ResponseToolkit
+) {
+  const token = getToken(request)
+  const payload = validateRequest(requestSchema, request.payload)
+  const record = await getRecordById(
+    // Task history is fetched rather than the task only
+    `${payload.id}?includeHistoryResources`,
+    token,
+    ['READY_FOR_REVIEW', 'REGISTERED']
+  )
 
-    const { reason, comment, duplicateTrackingId } = payload
+  const { reason, comment, duplicateTrackingId } = payload
 
-    const recordInArchivedState = await toArchived(
-      record,
-      await getLoggedInPractitionerResource(token),
-      reason,
-      comment,
-      duplicateTrackingId
-    )
+  const { archivedRecord, archivedRecordWithTaskOnly } = await toArchived(
+    record,
+    await getLoggedInPractitionerResource(token),
+    reason,
+    comment,
+    duplicateTrackingId
+  )
 
-    await sendBundleToHearth(recordInArchivedState)
-    await indexBundle(recordInArchivedState, token)
+  await sendBundleToHearth(archivedRecordWithTaskOnly)
+  await indexBundle(archivedRecord, token)
+  await indexBundleForAssignment(
+    archivedRecordWithTaskOnly,
+    token,
+    '/events/unassigned'
+  )
 
-    return recordInArchivedState
-  }
-})
+  return archivedRecord
+}

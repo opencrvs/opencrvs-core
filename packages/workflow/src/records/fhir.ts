@@ -465,7 +465,7 @@ export function createArchiveTask(
     extension,
     // Reason example - "duplicate"
     reason: { text: reason ?? '' },
-    // Status reason is comments added in the UI
+    // Status reason is comments which is added in the UI
     statusReason: { text: comment ?? '' },
     lastModified: new Date().toISOString(),
     businessStatus: {
@@ -475,6 +475,10 @@ export function createArchiveTask(
           code: 'ARCHIVED'
         }
       ]
+    },
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
     }
   }
 }

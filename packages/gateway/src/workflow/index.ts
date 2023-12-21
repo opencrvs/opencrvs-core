@@ -180,7 +180,8 @@ export async function archiveRegistration(
 ) {
   const res = await createRequest<{
     record: ArchivedRecord
-  }>('POST', `/records/${id}/archive`, authHeader, {
+  }>('POST', `/archive-record`, authHeader, {
+    id,
     reason,
     comment,
     duplicateTrackingId
