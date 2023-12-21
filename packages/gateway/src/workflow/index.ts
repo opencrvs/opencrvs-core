@@ -159,7 +159,10 @@ export async function validateRegistration(
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
 }
 
-export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
+export async function fetchRegistrationForAssignment(
+  id: string,
+  authHeader: IAuthHeader
+) {
   return await createRequest<SavedBundle<Resource>>(
     'POST',
     '/download-record',

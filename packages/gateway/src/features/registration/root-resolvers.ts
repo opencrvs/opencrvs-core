@@ -64,10 +64,10 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
-  fetchRegistration,
   archiveRegistration,
   updateRegistration,
-  validateRegistration
+  validateRegistration,
+  fetchRegistrationForAssignment
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { createRegistration } from '@gateway/workflow'
@@ -147,7 +147,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForAssignment(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
@@ -161,7 +164,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForAssignment(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
@@ -179,7 +185,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForAssignment(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
