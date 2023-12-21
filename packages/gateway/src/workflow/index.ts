@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
-import { ArchivedRecord, EVENT_TYPE } from '@opencrvs/commons/types'
+import {
+  ArchivedRecord,
+  EVENT_TYPE,
+  SavedBundle,
+  Resource
+} from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
@@ -152,6 +157,15 @@ export async function validateRegistration(
   authHeader: IAuthHeader
 ) {
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
+}
+
+export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
+  return await createRequest<SavedBundle<Resource>>(
+    'POST',
+    '/download-record',
+    authHeader,
+    { id }
+  )
 }
 
 export async function archiveRegistration(

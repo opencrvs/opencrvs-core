@@ -10,6 +10,7 @@
  */
 import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
+import { hasScope } from '@opencrvs/commons/authentication'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',
@@ -47,25 +48,14 @@ export const getToken = (request: Hapi.Request): string => {
   }
 }
 
-export const hasScope = (request: Hapi.Request, scope: string): boolean => {
-  if (
-    !request.auth ||
-    !request.auth.credentials ||
-    !request.auth.credentials.scope
-  ) {
-    return false
-  }
-  return request.auth.credentials.scope.includes(scope)
-}
-
 export function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.REGISTER)
+  return hasScope(request.headers.authorization, USER_SCOPE.REGISTER)
 }
 
 export function hasValidateScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.VALIDATE)
+  return hasScope(request.headers.authorization, USER_SCOPE.VALIDATE)
 }
 
 export function hasDeclareScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.DECLARE)
+  return hasScope(request.headers.authorization, USER_SCOPE.DECLARE)
 }
