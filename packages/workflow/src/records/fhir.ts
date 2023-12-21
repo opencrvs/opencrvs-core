@@ -18,11 +18,13 @@ import {
   Task,
   URNReference,
   URLReference,
-  SavedTask
+  SavedTask,
+  resourceIdentifierToUUID,
+  Location
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -30,6 +32,8 @@ import {
   CorrectionRequestPaymentInput,
   ChangedValuesInput
 } from '@workflow/records/correction-request'
+import { isSystem, ISystemModelData, IUserModelData } from './user'
+import { getPractitionerOffice } from '@workflow/features/user/utils'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -298,6 +302,90 @@ export function createCorrectedTask(
       ]
     }
   }
+}
+
+export async function createDownloadTask(
+  previousTask: SavedTask,
+  user: IUserModelData | ISystemModelData,
+  extensionUrl:
+    | 'http://opencrvs.org/specs/extension/regDownloaded'
+    | 'http://opencrvs.org/specs/extension/regAssigned'
+): Promise<SavedTask> {
+  const office = (await getPractitionerOffice(user.practitionerId)) as Location
+  const identifiers = previousTask.identifier.filter(
+    ({ system }) =>
+      // Clear old system identifier task if it happens that the last task was made
+      // by an intergration but this one is by a real user
+      system !== 'http://opencrvs.org/specs/id/system_identifier'
+  )
+
+  if (isSystem(user)) {
+    identifiers.push({
+      system: 'http://opencrvs.org/specs/id/system_identifier',
+      value: JSON.stringify({
+        name: user.name,
+        username: user.username,
+        type: user.type
+      })
+    })
+  }
+
+  const extensions: Extension[] = isSystem(user)
+    ? []
+    : [
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastUser',
+          valueReference: {
+            reference: `Practitioner/${user.practitionerId as UUID}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastLocation',
+          valueReference: {
+            reference: `Location/${resourceIdentifierToUUID(
+              office!.partOf!.reference
+            )}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastOffice',
+          valueReference: {
+            reference: `Location/${user.primaryOfficeId}`
+          }
+        }
+      ]
+
+  const downloadedTask: SavedTask = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${user.practitionerId}` }
+    },
+    identifier: identifiers,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      { url: extensionUrl },
+      ...extensions
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  return downloadedTask
 }
 
 export function createValidateTask(
