@@ -178,18 +178,19 @@ export async function archiveRegistration(
   comment?: string,
   duplicateTrackingId?: string
 ) {
-  const res = await createRequest<{
-    record: ArchivedRecord
-  }>('POST', `/archive-record`, authHeader, {
-    id,
-    reason,
-    comment,
-    duplicateTrackingId
-  })
+  const res: ArchivedRecord = await createRequest(
+    'POST',
+    `/archive-record`,
+    authHeader,
+    {
+      id,
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
 
-  const taskEntry = res.record.entry.find(
-    (e) => e.resource.resourceType === 'Task'
-  )!
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
 }

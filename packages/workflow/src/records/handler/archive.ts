@@ -15,7 +15,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { indexBundle, indexBundleForAssignment } from '@workflow/records/search'
+import { indexBundle } from '@workflow/records/search'
 import { getRecordById } from '@workflow/records/index'
 
 const requestSchema = z.object({
@@ -50,11 +50,6 @@ export async function archiveRecordHandler(
 
   await sendBundleToHearth(archivedRecordWithTaskOnly)
   await indexBundle(archivedRecord, token)
-  await indexBundleForAssignment(
-    archivedRecordWithTaskOnly,
-    token,
-    '/events/unassigned'
-  )
 
   return archivedRecord
 }
