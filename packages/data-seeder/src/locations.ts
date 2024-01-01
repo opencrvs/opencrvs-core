@@ -18,6 +18,14 @@ import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { inspect } from 'util'
 
+const jurisdictionLevels = [
+  'STATE',
+  'DISTRICT',
+  'LOCATION_LEVEL_3',
+  'LOCATION_LEVEL_4',
+  'LOCATION_LEVEL_5'
+] as const
+
 const LocationSchema = z.array(
   z.object({
     id: z.string(),
@@ -25,15 +33,7 @@ const LocationSchema = z.array(
     alias: z.string().optional(),
     partOf: z.string(),
     locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
-    jurisdictionType: z
-      .enum([
-        'STATE',
-        'DISTRICT',
-        'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_4',
-        'LOCATION_LEVEL_5'
-      ])
-      .optional(),
+    jurisdictionType: z.enum(jurisdictionLevels).optional(),
     statistics: z
       .array(
         z.object({
@@ -227,31 +227,48 @@ export async function seedLocations(token: string) {
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_HOST}/location?`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
+  const locationSegments: TypeOf<typeof LocationSchema>[] = []
+  jurisdictionLevels.forEach((jurisictionType) => {
+    const jurisictionTypeLocations = locations.filter(
+      (location) =>
+        location.jurisdictionType === jurisictionType &&
+        location.locationType === 'ADMIN_STRUCTURE'
     )
-  })
-  if (!res.ok) {
-    raise(await res.json())
-  }
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
-  response.entry?.forEach((res, index) => {
-    if (res.response?.status !== '201') {
-      console.log(
-        `Failed to create location resource for: "${locations[index].name}"`
-      )
+    if (jurisictionTypeLocations.length) {
+      locationSegments.push(jurisictionTypeLocations)
     }
   })
+  // offices, health faclities
+  locationSegments.push(
+    locations.filter((location) => location.locationType !== 'ADMIN_STRUCTURE')
+  )
+  for (const segment of locationSegments) {
+    const res = await fetch(`${GATEWAY_HOST}/location?`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/fhir+json'
+      },
+      body: JSON.stringify(
+        segment
+          // statisticalID & code are legacy properties
+          .map(({ id, locationType, ...loc }) => ({
+            statisticalID: id,
+            code: locationType,
+            ...loc
+          }))
+      )
+    })
+    if (!res.ok) {
+      raise(await res.json())
+    }
+    const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
+    response.entry?.forEach((res, index) => {
+      if (res.response?.status !== '201') {
+        console.log(
+          `Failed to create location resource for: "${segment[index].name}"`
+        )
+      }
+    })
+  }
 }
