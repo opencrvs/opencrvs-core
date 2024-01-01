@@ -41,6 +41,8 @@ import {
   ValidRecord,
   Bundle,
   SavedTask,
+  ArchivedRecord,
+  RegistrationStatus,
   WaitingForValidationRecord,
   EVENT_TYPE,
   getComposition,
@@ -80,6 +82,7 @@ import {
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
+  createReinstateTask,
   createUpdatedTask,
   createValidateTask,
   createWaitingForValidationTask,
@@ -510,6 +513,35 @@ export async function toArchived(
   )
 
   return { archivedRecord, archivedRecordWithTaskOnly }
+}
+
+export async function toReinstated(
+  record: ArchivedRecord,
+  practitioner: Practitioner,
+  prevRegStatus: RegistrationStatus
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+  const reinstatedTask = createReinstateTask(
+    previousTask,
+    prevRegStatus,
+    practitioner
+  )
+
+  const reinstatedRecordWithTaskOnly = {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.id !== reinstatedTask.id),
+      {
+        resource: reinstatedTask,
+        fullUrl: record.entry.find((e) => e.resource.resourceType === 'Task')!
+          .fullUrl
+      }
+    ]
+  }
+  return {
+    reinstatedRecordWithTaskOnly,
+    taskId: previousTask.id
+  }
 }
 
 export async function toValidated(

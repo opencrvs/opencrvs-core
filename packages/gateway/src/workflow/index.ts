@@ -16,7 +16,8 @@ import {
   Resource,
   Bundle,
   SavedTask,
-  CertifiedRecord
+  CertifiedRecord,
+  RegistrationStatus
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -244,4 +245,17 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function reinstateRegistration(
+  id: string,
+  authHeader: IAuthHeader
+): Promise<{ taskId: string; prevRegStatus: RegistrationStatus }> {
+  const res = await createRequest('POST', '/reinstate-record', authHeader, {
+    id
+  })
+
+  const { taskId, prevRegStatus } = res
+
+  return { taskId, prevRegStatus }
 }
