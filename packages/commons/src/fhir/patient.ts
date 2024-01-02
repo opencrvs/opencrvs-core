@@ -16,9 +16,17 @@ export function isPatient<T extends Resource>(
   return resource.resourceType === 'Patient'
 }
 
-export type PatientIdentifier = fhir3.Identifier & {
+export type PatientIdentifier = Omit<fhir3.Identifier, 'type'> & {
   otherType?: string
   fieldsModifiedByIdentity?: string[]
+  type: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code' | 'system'> & {
+        system: 'http://opencrvs.org/specs/identifier-type'
+        code: string
+      }
+    >
+  }
 }
 
 export type Patient = WithStrictExtensions<

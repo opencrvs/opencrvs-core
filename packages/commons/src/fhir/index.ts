@@ -185,7 +185,9 @@ export type DocumentReference = WithStrictExtensions<
   docStatus?: 'validated' | 'approved' | 'deleted'
 }
 
-export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
+export type RelatedPerson = WithStrictExtensions<
+  Omit<fhir3.RelatedPerson, 'patient'>
+> & {
   patient?: {
     reference: URNReference | URLReference | ResourceIdentifier
   }

@@ -2699,12 +2699,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   contentType: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 contentType: fieldValue
               }
@@ -2728,12 +2731,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   data: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 data: fieldValue
               }

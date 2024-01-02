@@ -38,9 +38,11 @@ import {
   getComposition,
   Composition,
   EVENT_TYPE,
-  RelatedPerson
+  RelatedPerson,
+  Patient,
+  findCompositionSection
 } from '@opencrvs/commons/types'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   setupLastRegLocation,
   setupLastRegUser
@@ -64,6 +66,8 @@ import {
   getTaskHistory
 } from '@workflow/records/fhir'
 import { CertificateInput } from './validations/certify'
+import { z } from 'zod'
+import { badRequest } from '@hapi/boom'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -459,12 +463,147 @@ async function createCertifiedTask(
   )
 }
 
+const knownRelationships = z.enum([
+  'MOTHER',
+  'FATHER',
+  'INFORMANT',
+  'BRIDE',
+  'GROOM'
+])
+
+const relationshipToSectionCode = (
+  relationship: z.TypeOf<typeof knownRelationships>
+): `${Lowercase<typeof relationship>}-details` =>
+  `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
+
+function getRelatedPersonEntries(
+  collectorDetails: CertificateInput['collector'],
+  temporaryRelatedPersonId: UUID,
+  record: RegisteredRecord
+): BundleEntry<RelatedPerson | Patient>[] {
+  if ('otherRelationship' in collectorDetails) {
+    const temporaryPatientId = getUUID()
+    return [
+      {
+        fullUrl: `urn:uuid:${temporaryPatientId}`,
+        resource: {
+          resourceType: 'Patient',
+          name: collectorDetails.name.map(
+            ({ use, firstNames, familyName }) => ({
+              use,
+              given: firstNames.split(' '),
+              family: [familyName]
+            })
+          ),
+          identifier: collectorDetails.identifier.map(({ id, type }) => ({
+            id,
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/identifier-type',
+                  code: type
+                }
+              ]
+            }
+          }))
+        }
+      },
+      {
+        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+        resource: {
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: collectorDetails.relationship
+              }
+            ],
+            text: collectorDetails.otherRelationship
+          },
+          ...(collectorDetails.affidavit?.[0] && {
+            extension: [
+              {
+                url: `http://opencrvs.org/specs/extension/relatedperson-affidavittype`,
+                valueAttachment: {
+                  ...collectorDetails.affidavit[0]
+                }
+              }
+            ]
+          }),
+          patient: {
+            reference: `urn:uuid:${temporaryPatientId}`
+          }
+        }
+      }
+    ]
+  }
+
+  const parseResult = knownRelationships.safeParse(
+    collectorDetails.relationship
+  )
+
+  if (parseResult.success) {
+    const knownRelationship = parseResult.data
+    const section = findCompositionSection(
+      relationshipToSectionCode(knownRelationship),
+      getComposition(record)
+    )
+
+    if (!section) {
+      throw badRequest(`Patient resource for ${knownRelationship} not found`)
+    }
+
+    return [
+      {
+        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+        resource: {
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: collectorDetails.relationship
+              }
+            ]
+          },
+          patient: {
+            reference: section.entry[0].reference
+          }
+        }
+      }
+    ]
+  }
+
+  return [
+    {
+      fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: collectorDetails.relationship
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+
 export async function toCertified(
   record: RegisteredRecord,
   practitioner: Practitioner,
   eventType: EVENT_TYPE,
   certificateDetails: Omit<CertificateInput, 'data'> & { dataUrl: string }
-): Promise<Bundle<Composition | Task | DocumentReference | RelatedPerson>> {
+): Promise<
+  Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
+> {
   const previousTask = getTaskFromSavedBundle(record)
 
   const certifiedTask = await createCertifiedTask(previousTask, practitioner)
@@ -472,21 +611,11 @@ export async function toCertified(
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
 
-  const relatedPersonEntry: BundleEntry<RelatedPerson> = {
-    fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
-    resource: {
-      resourceType: 'RelatedPerson',
-      relationship: {
-        coding: [
-          {
-            system:
-              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-            code: certificateDetails.collector.relationship
-          }
-        ]
-      }
-    }
-  }
+  const relatedPersonEntries = getRelatedPersonEntries(
+    certificateDetails.collector,
+    temporaryRelatedPersonId,
+    record
+  )
 
   const certificateSection: CompositionSection = {
     title: 'Certificates',
@@ -563,8 +692,8 @@ export async function toCertified(
     entry: [
       { resource: compositionWithCertificateSection },
       { resource: certifiedTask },
-      documentReferenceEntry,
-      relatedPersonEntry
+      ...relatedPersonEntries,
+      documentReferenceEntry
     ]
   }
 }
