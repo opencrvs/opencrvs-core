@@ -33,8 +33,7 @@ import {
   isEncounter,
   isRelatedPerson,
   Encounter,
-  RelatedPerson,
-  RegistrationStatus
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -635,44 +634,6 @@ export function createArchiveTask(
     meta: {
       ...previousTask.meta,
       lastUpdated: new Date().toISOString()
-    }
-  }
-}
-
-export function createReinstateTask(
-  previousTask: SavedTask,
-  prevRegStatus: RegistrationStatus,
-  practitioner: Practitioner
-): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
-        ].includes(extension.url)
-      ),
-      { url: `http://opencrvs.org/specs/extension/regReinstated` }
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: prevRegStatus
-        }
-      ]
     }
   }
 }

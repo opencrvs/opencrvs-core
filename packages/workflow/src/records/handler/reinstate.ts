@@ -14,10 +14,10 @@ import * as z from 'zod'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { getRecordById } from '@workflow/records/index'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toReinstated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
+import { SavedBundleEntry, Task } from '@opencrvs/commons/types'
 
 export async function reinstateRecordHandler(
   request: Hapi.Request,
@@ -34,10 +34,13 @@ export async function reinstateRecordHandler(
 
   const taskHistoryEntries = record.entry.filter(
     (e) => e.resource.resourceType === 'TaskHistory'
-  )
+  ) as SavedBundleEntry<Task>[]
+
+  if (taskHistoryEntries.length <= 0) {
+    return await Promise.reject(new Error('Task history is empty'))
+  }
 
   const prevBusinessStatuses = taskHistoryEntries.map(
-    //@ts-ignore
     (e) => e.resource.businessStatus.coding[0].code
   )
 
@@ -53,7 +56,6 @@ export async function reinstateRecordHandler(
 
   const { reinstatedRecordWithTaskOnly, taskId } = await toReinstated(
     record,
-    await getLoggedInPractitionerResource(token),
     prevRegStatus
   )
 

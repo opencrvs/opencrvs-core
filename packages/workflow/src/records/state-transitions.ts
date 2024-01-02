@@ -82,7 +82,6 @@ import {
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
-  createReinstateTask,
   createUpdatedTask,
   createValidateTask,
   createWaitingForValidationTask,
@@ -517,20 +516,31 @@ export async function toArchived(
 
 export async function toReinstated(
   record: ArchivedRecord,
-  practitioner: Practitioner,
   prevRegStatus: RegistrationStatus
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const reinstatedTask = createReinstateTask(
-    previousTask,
-    prevRegStatus,
-    practitioner
-  )
+  const reinstatedTask: SavedTask = {
+    ...previousTask,
+    extension: [
+      ...(previousTask.extension || []),
+      {
+        url: 'http://opencrvs.org/specs/extension/regReinstated'
+      }
+    ],
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: prevRegStatus
+        }
+      ]
+    }
+  }
 
-  const reinstatedRecordWithTaskOnly = {
-    ...record,
+  const reinstatedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
     entry: [
-      ...record.entry.filter((e) => e.resource.id !== reinstatedTask.id),
       {
         resource: reinstatedTask,
         fullUrl: record.entry.find((e) => e.resource.resourceType === 'Task')!
