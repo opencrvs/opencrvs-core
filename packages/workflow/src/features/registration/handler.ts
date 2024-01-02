@@ -333,7 +333,12 @@ export async function markEventAsRegisteredCallbackHandler(
         if (!previousIdentifier) {
           patients[0].identifier!.push({
             type: {
-              coding: [{ code: childIdentifier.type }]
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/identifier-type',
+                  code: childIdentifier.type
+                }
+              ]
             },
             value: childIdentifier.value
           })
