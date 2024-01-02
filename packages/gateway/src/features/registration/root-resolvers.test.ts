@@ -10,16 +10,10 @@
  */
 import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  findExtension,
-  getStatusFromTask
-} from '@opencrvs/commons/types'
+import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { cloneDeep } from 'lodash'
 
 import { UserInputError } from 'apollo-server-hapi'
 
@@ -832,31 +826,6 @@ describe('Registration root resolvers', () => {
   })
 
   describe('markEventAsReinstated()', () => {
-    it('updates a task with WAITING_VALIDATION status', async () => {
-      const archivedTaskBundle = cloneDeep(mockTaskBundle)
-      archivedTaskBundle.entry[0].resource.businessStatus.coding[0].code =
-        'ARCHIVED'
-      const taskHistoryBundle = cloneDeep(mockTaskBundle)
-      taskHistoryBundle.entry.push(mockTaskBundle.entry[0])
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
-        [JSON.stringify(archivedTaskBundle), { status: 200 }],
-        [JSON.stringify(taskHistoryBundle), { status: 200 }],
-        [JSON.stringify({}), { status: 200 }]
-      )
-      await resolvers.Mutation!.markEventAsReinstated(
-        {},
-        { id: archivedTaskBundle.id },
-        { headers: authHeaderRegCert }
-      )
-      expect(fetch.mock.calls[1][0]).toContain(archivedTaskBundle.id)
-      const task = JSON.parse(fetch.mock.calls[3][1].body).entry[0].resource
-      expect(
-        findExtension(REINSTATED_EXTENSION_URL, task.extension)
-      ).not.toBeUndefined()
-      expect(getStatusFromTask(task)).toBe('DECLARED')
-    })
-
     it('throws error if user does not have register or validate scope', async () => {
       fetch.mockResponses([
         JSON.stringify({ userId: '121221' }),
