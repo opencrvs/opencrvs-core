@@ -7162,9 +7162,9 @@
     joi "^17.3.0"
 
 "@types/hapi__inert@^5.2.3":
-  version "5.2.8"
-  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.8.tgz#bb8f10a600967bb4b123ce522de5ee86699bbd25"
-  integrity sha512-gGr9TssoWngxSVBMFJa0jtJwWhHzJMspAru45Mc6VNf7A7qh1bSYqXEgRqCHkei2OyRFzN0H5PnSKaMEGV9Qwg==
+  version "5.2.10"
+  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.10.tgz#776865cd184cf9579f0dced159788c69a44d6fa7"
+  integrity sha512-egynajL8fKZvUn1GlUnxd/TjYNKb+a/o6ZFvCJsWyLtC+nU98j6Fa20cAD53UbO4Hx5a3JsDsDTW/NwYN205mQ==
   dependencies:
     "@hapi/hapi" "^21.1.0"
     joi "^17.7.0"
