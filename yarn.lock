@@ -7184,11 +7184,12 @@
     "@types/node" "*"
 
 "@types/hapi__vision@^5.5.3":
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/@types/hapi__vision/-/hapi__vision-5.5.5.tgz#98ab8cd4d4cc2015f83e3ac21ea08185776b448c"
-  integrity sha512-gl85F/eHz9LdDZREuhlPaDl0X4rjAV3lEydCGJMBchhHU+RqqXLNJ/IMgYADrOh6jri3KfMpVlkrYVqhUbzvRw==
+  version "5.5.7"
+  resolved "https://registry.yarnpkg.com/@types/hapi__vision/-/hapi__vision-5.5.7.tgz#ed4b452b460ecc08a2ba5b28094c674ab63c9bf5"
+  integrity sha512-+w9nMJXICXTUS/cP10hURywUCAnt70I/+d27etVg4EuGXqWv3UTtC9VM67BMAtcuGUVWZCaKCX+D4eYig7I2+Q==
   dependencies:
     "@hapi/hapi" "^21.1.0"
+    "@types/node" "*"
     handlebars "^4.1"
     joi "^17.7.0"
 
