@@ -7250,24 +7250,24 @@
     pretty-format "^26.0.0"
 
 "@types/js-yaml@^3.12.1":
-  version "3.12.9"
-  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.9.tgz#b7a2bcc679a54c4240bd2909f58ce3396967e3f7"
-  integrity sha512-s5v3+2RB96nd7AOZXLScwHDRClor83+0E5q+5fzq0fTFXw8spF3QWHAUmHwItmmlr7XnDjpM0FkAgNKHzDTXtg==
+  version "3.12.10"
+  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.10.tgz#4d80d0c7dfc570eb4f0be280cb2d67789f977ba5"
+  integrity sha512-/Mtaq/wf+HxXpvhzFYzrzCqNRcA958sW++7JOFC8nPrZcvfi/TrzOaaGbvt27ltJB2NQbHVAg5a1wUCsyMH7NA==
 
 "@types/js-yaml@^4.0.0":
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.8.tgz#7574e422d70d4a1b41f517d1d9abc61be2299a97"
-  integrity sha512-m6jnPk1VhlYRiLFm3f8X9Uep761f+CK8mHyS65LutH2OhmBF0BeMEjHgg05usH8PLZMWWc/BUR9RPmkvpWnyRA==
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.9.tgz#cd82382c4f902fed9691a2ed79ec68c5898af4c2"
+  integrity sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==
 
 "@types/json-schema@*", "@types/json-schema@^7.0.6", "@types/json-schema@^7.0.7":
-  version "7.0.14"
-  resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.14.tgz#74a97a5573980802f32c8e47b663530ab3b6b7d1"
-  integrity sha512-U3PUjAudAdJBeC2pgN8uTIKgxrb4nlDF3SF0++EldXQvQBGkpFZMSnwQiIoDU77tv45VgNkl/L4ouD+rEomujw==
+  version "7.0.15"
+  resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
+  integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
 "@types/json-stable-stringify@^1.0.32":
-  version "1.0.35"
-  resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.35.tgz#9cea8628b50a093ae00a7e73de49676f2f9ade27"
-  integrity sha512-zlCWqsRBI0+ANN7dzGeDFJ4CHaVFTLqBNRS11GjR2mHCW6XxNtnMxhQzBKMzfsnjI8oI+kWq2vBwinyQpZVSsg==
+  version "1.0.36"
+  resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.36.tgz#fe6c6001a69ff8160a772da08779448a333c7ddd"
+  integrity sha512-b7bq23s4fgBB76n34m2b3RBf6M369B0Z9uRR8aHTMd8kZISRkmDEpPD8hhpYvDFzr3bJCPES96cm3Q6qRNDbQw==
 
 "@types/json2csv@^4.4.0":
   version "4.5.1"
