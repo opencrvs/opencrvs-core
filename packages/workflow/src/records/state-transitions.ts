@@ -63,12 +63,13 @@ import { IEventRegistrationCallbackPayload } from '@workflow/features/registrati
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
+  CertifyInput,
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput,
   MakeCorrectionRequestInput,
   ChangedValuesInput
-} from '@workflow/records/correction-request'
+} from './validations'
 import {
   createArchiveTask,
   createCorrectedTask,
@@ -85,7 +86,6 @@ import {
   createWaitingForValidationTask,
   getTaskHistory
 } from '@workflow/records/fhir'
-import { CertificateInput } from './validations/certify'
 import { z } from 'zod'
 import { badRequest } from '@hapi/boom'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
@@ -771,9 +771,9 @@ const relationshipToSectionCode = (
   `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
 
 function getRelatedPersonEntries(
-  collectorDetails: CertificateInput['collector'],
+  collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
-  record: RegisteredRecord
+  record: RegisteredRecord | CertifiedRecord
 ): BundleEntry<RelatedPerson | Patient>[] {
   if ('otherRelationship' in collectorDetails) {
     const temporaryPatientId = getUUID()
@@ -894,7 +894,7 @@ export async function toCertified(
   record: RegisteredRecord,
   practitioner: Practitioner,
   eventType: EVENT_TYPE,
-  certificateDetails: CertificateInput
+  certificateDetails: CertifyInput
 ): Promise<
   Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
 > {

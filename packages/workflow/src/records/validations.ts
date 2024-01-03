@@ -8,7 +8,63 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EVENT_TYPE } from '@opencrvs/commons/types'
 import { z } from 'zod'
+
+export const CertifyRequestSchema = z.object({
+  event: z.custom<EVENT_TYPE>(),
+  certificate: z.object({
+    hasShowedVerifiedDocument: z.boolean(),
+    data: z.string(),
+    collector: z
+      .object({
+        relationship: z.string(),
+        otherRelationship: z.string(),
+        name: z.array(
+          z.object({
+            use: z.string(),
+            firstNames: z.string(),
+            familyName: z.string()
+          })
+        ),
+        affidavit: z
+          .array(
+            z.object({
+              contentType: z.string(),
+              data: z.string()
+            })
+          )
+          .optional(),
+        identifier: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string()
+          })
+        )
+      })
+      .or(
+        z.object({
+          relationship: z.string()
+        })
+      )
+  })
+})
+
+const PaymentSchema = z.object({
+  type: z.enum(['MANUAL']),
+  total: z.number(),
+  amount: z.number(),
+  outcome: z.enum(['COMPLETED', 'ERROR', 'PARTIAL']),
+  date: z.string().datetime(),
+  attachmentData: z.string().optional()
+})
+
+export const IssueRequestSchema = z.object({
+  event: z.custom<EVENT_TYPE>(),
+  certificate: CertifyRequestSchema.shape.certificate
+    .omit({ data: true })
+    .and(z.object({ payment: PaymentSchema }))
+})
 
 export const ChangedValuesInput = z.array(
   z.object({
@@ -18,13 +74,6 @@ export const ChangedValuesInput = z.array(
     newValue: z.union([z.string(), z.number(), z.boolean()])
   })
 )
-export const CorrectionRequestPaymentInput = z.object({
-  type: z.string(),
-  amount: z.number(),
-  outcome: z.string(),
-  date: z.string().datetime(),
-  attachmentData: z.string().optional()
-})
 export const CorrectionRequestInput = z.object({
   requester: z.string(),
   requesterOther: z.string().optional(),
@@ -38,7 +87,7 @@ export const CorrectionRequestInput = z.object({
       })
     )
     .default([]),
-  payment: CorrectionRequestPaymentInput.optional(),
+  payment: PaymentSchema.optional(),
   location: z.object({
     _fhirID: z.string()
   }),
@@ -74,11 +123,12 @@ export const CorrectionRejectionInput = z.object({
 
 export type ChangedValuesInput = z.infer<typeof ChangedValuesInput>
 export type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
-export type CorrectionRequestPaymentInput = z.infer<
-  typeof CorrectionRequestPaymentInput
->
+export type PaymentInput = z.infer<typeof PaymentSchema>
 export type CorrectionRejectionInput = z.infer<typeof CorrectionRejectionInput>
 export type ApproveRequestInput = z.infer<typeof ApproveRequestInput>
 export type MakeCorrectionRequestInput = z.infer<
   typeof MakeCorrectionRequestInput
 >
+
+export type CertifyInput = z.TypeOf<typeof CertifyRequestSchema>['certificate']
+export type IssueInput = z.TypeOf<typeof IssueRequestSchema>['certificate']

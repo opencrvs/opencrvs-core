@@ -13,7 +13,7 @@ import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { requestSchema } from '@workflow/records/validations/certify'
+import { CertifyRequestSchema } from '@workflow/records/validations'
 import { toCertified } from '@workflow/records/state-transitions'
 import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
@@ -33,7 +33,7 @@ export const certifyRoute = createRoute({
   handler: async (request, record): Promise<CertifiedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
-      validateRequest(requestSchema, request.payload)
+      validateRequest(CertifyRequestSchema, request.payload)
 
     const certificateDetails =
       await uploadCertificateAttachmentsToDocumentsStore(

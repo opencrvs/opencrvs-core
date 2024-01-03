@@ -42,9 +42,9 @@ import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/cons
 import {
   ApproveRequestInput,
   CorrectionRequestInput,
-  CorrectionRequestPaymentInput,
+  PaymentInput,
   ChangedValuesInput
-} from '@workflow/records/correction-request'
+} from '@workflow/records/validations'
 import { isSystem, ISystemModelData, IUserModelData } from './user'
 import { getPractitionerOffice } from '@workflow/features/user/utils'
 
@@ -104,16 +104,16 @@ export function createCorrectionProofOfLegalCorrectionDocument(
 }
 
 export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput
+  paymentDetails: PaymentInput
 ): [BundleEntry<PaymentReconciliation>]
 
 export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput,
+  paymentDetails: PaymentInput,
   attachmentURL?: string
 ): [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]
 
 export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput,
+  paymentDetails: PaymentInput,
   attachmentURL?: string
 ):
   | [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]

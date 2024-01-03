@@ -24,7 +24,7 @@ import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUpdated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
-import { ChangedValuesInput } from '@workflow/records/correction-request'
+import { ChangedValuesInput } from '@workflow/records/validations'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 
