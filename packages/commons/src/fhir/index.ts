@@ -123,8 +123,11 @@ export type BundleEntry<T extends Resource = Resource> = Omit<
   fullUrl?: URNReference | URLReference
 }
 
-export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
-  fullUrl: string
+export type BundleEntryWithFullUrl<T extends Resource = Resource> = Omit<
+  BundleEntry<T>,
+  'fullUrl'
+> & {
+  fullUrl: URNReference | URLReference
 }
 
 /*
