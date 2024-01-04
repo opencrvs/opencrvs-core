@@ -9,7 +9,8 @@
     "./monitoring": "./build/dist/monitoring.js",
     "./types": "./build/dist/types.js",
     "./authentication": "./build/dist/authentication.js",
-    "./http": "./build/dist/http.js"
+    "./http": "./build/dist/http.js",
+    "./fixtures": "./build/dist/fixtures.js"
   },
   "scripts": {
     "start": "yarn build:watch",

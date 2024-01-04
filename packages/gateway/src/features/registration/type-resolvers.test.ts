@@ -24,7 +24,7 @@ import {
   BIRTH_BUNDLE,
   DEATH_BUNDLE,
   MARRIAGE_BUNDLE
-} from '@opencrvs/commons/types'
+} from '@opencrvs/commons/fixtures'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
