@@ -18,18 +18,22 @@ import {
   StateIdenfitiers,
   IssuedRecord,
   InProgressRecord,
-  ReadyForReviewRecord
+  ReadyForReviewRecord,
+  WaitingForValidationRecord,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
 export type Certify = Nominal<{}, 'Certify'>
 export type Validate = Nominal<{}, 'Validate'>
 export type Update = Nominal<{}, 'Update'>
+export type Register = Nominal<{}, 'Register'>
 export type Issue = Nominal<{}, 'Issue'>
 export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
 export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
+export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -39,6 +43,8 @@ export type ActionIdentifiers = {
   CERTIFY: Certify
   VALIDATION: Validate
   DECLARATION_UPDATED: Update
+  REGISTERED: Register
+  WAITING_VALIDATION: WaitForExternalValidation
 }
 
 /*
@@ -67,6 +73,18 @@ export type StateTree =
       InProgressRecord | ReadyForReviewRecord,
       Update,
       InProgressRecord | ReadyForReviewRecord
+    >
+  // Register declaration
+  | Transition<
+      ReadyForReviewRecord | ValidatedRecord,
+      Register,
+      RegisteredRecord
+    >
+  // Waiting for validation declaration
+  | Transition<
+      ReadyForReviewRecord | ValidatedRecord,
+      WaitForExternalValidation,
+      WaitingForValidationRecord | RejectedRecord
     >
 
 /*

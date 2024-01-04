@@ -65,6 +65,7 @@ import {
 } from '@gateway/features/registration/utils'
 import {
   fetchRegistration,
+  registerDeclaration,
   updateRegistration,
   validateRegistration
 } from '@gateway/workflow/index'
@@ -822,13 +823,15 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
+  }
 
-  // return the full composition
-  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
-
-  return composition
+  await registerDeclaration(id, authHeader, event)
+  return id
 }
 
 async function markEventAsCertified(

@@ -34,17 +34,19 @@ import { createServer } from '@workflow/server'
 import {
   compositionMock,
   deathCompositionMock,
-  deathTaskMock,
   districtMock,
+  districtMockOfState,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
   hearthResponseMock,
-  informantSMSNotificationMock,
   mockFormDraft,
   motherMock,
   officeMock,
-  patientMock,
+  officeMockOfDistrict,
+  practitionerRoleMock,
+  registrarMock,
   relatedPersonMock,
+  stateMock,
   taskResourceMock,
   testFhirBundle,
   testFhirBundleWithIds,
@@ -55,11 +57,11 @@ import {
   unionMock,
   upazilaMock,
   userMock,
-  userResponseMock,
-  wrapInBundle
+  userResponseMock
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
+import { BIRTH_BUNDLE, DEATH_BUNDLE } from '@opencrvs/commons/fixtures'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -965,8 +967,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        error: "Couldn't generate registration number"
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -977,21 +978,26 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(taskResourceMock), { status: 200 }],
-      [compositionMock, { status: 200 }],
+      [JSON.stringify(BIRTH_BUNDLE), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [registrarMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [JSON.stringify({}), { status: 200 }],
-      [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }],
-      [JSON.stringify(informantSMSNotificationMock), { status: 200 }]
+      [JSON.stringify({}), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        registrationNumber: '12345678',
+        compositionId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -1002,22 +1008,27 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with death registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(JSON.parse(deathTaskMock)), { status: 200 }],
-      [deathCompositionMock, { status: 200 }],
+      [JSON.stringify(DEATH_BUNDLE), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [registrarMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [JSON.stringify([]), { status: 200 }],
-      [JSON.stringify([]), { status: 200 }],
-      [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }],
-      [motherMock, { status: 200 }]
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({}), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        registrationNumber: '12345678',
+        compositionId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -1505,7 +1516,7 @@ describe('Register handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/fhir',
+      url: '/records/111/register',
       payload: testFhirBundleWithIds,
       headers: {
         Authorization: `Bearer ${token}`
