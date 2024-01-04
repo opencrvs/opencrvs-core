@@ -99,11 +99,12 @@ export function getInformantName(
 
 export function getPersonName(
   record: ReadyForReviewRecord | RegisteredRecord,
-  compositionCode: Extract<
+  personType: 'deceased' | 'child'
+) {
+  const compositionCode: Extract<
     CompositionSectionCode,
     'deceased-details' | 'child-details'
-  >
-) {
+  > = `${personType}-details`
   const composition = getComposition(record)
   const patientSection = findCompositionSection(compositionCode, composition)
   if (!patientSection) {

@@ -41,7 +41,7 @@ export async function birthReadyForReviewNotification(
       trackingId: getTrackingId(readyForReviewRecord),
       crvsOffice: getOfficeName(readyForReviewRecord),
       registrationLocation: getRegistrationLocation(readyForReviewRecord),
-      name: getPersonName(readyForReviewRecord, 'child-details'),
+      name: getPersonName(readyForReviewRecord, 'child'),
       informantName: getInformantName(readyForReviewRecord)
     }
   )
@@ -68,7 +68,7 @@ export async function deathReadyForReviewNotification(
       trackingId: getTrackingId(readyForReviewRecord),
       crvsOffice: getOfficeName(readyForReviewRecord),
       registrationLocation: getRegistrationLocation(readyForReviewRecord),
-      name: getPersonName(readyForReviewRecord, 'deceased-details'),
+      name: getPersonName(readyForReviewRecord, 'deceased'),
       informantName: getInformantName(readyForReviewRecord)
     }
   )
