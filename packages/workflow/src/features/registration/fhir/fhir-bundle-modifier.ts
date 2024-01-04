@@ -134,9 +134,8 @@ export async function markBundleAsValidated<T extends Bundle>(
 
 export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
-  headers: Record<string, string>,
-  token: string
-): Promise<{ bundle: Bundle }> {
+  headers: Record<string, string>
+): Promise<Bundle> {
   const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
     method: 'POST',
     body: JSON.stringify(bundle),
@@ -149,7 +148,7 @@ export async function invokeRegistrationValidation(
     const errorData = await res.json()
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
-  return { bundle }
+  return bundle
 }
 
 export async function markBundleAsWaitingValidation<T extends Bundle>(

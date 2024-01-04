@@ -40,8 +40,7 @@ export const registerRoute = [
       try {
         await invokeRegistrationValidation(
           recordInWaitingValidationState,
-          request.headers,
-          getToken(request)
+          request.headers
         )
       } catch (error) {
         const statusReason: fhir3.CodeableConcept = {
