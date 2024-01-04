@@ -504,6 +504,7 @@ export const BIRTH_BUNDLE: SavedBundle<
             type: {
               coding: [
                 {
+                  system: 'http://opencrvs.org/specs/identifier-type',
                   code: 'BIRTH_CONFIGURABLE_IDENTIFIER_1'
                 }
               ]
@@ -514,6 +515,7 @@ export const BIRTH_BUNDLE: SavedBundle<
             type: {
               coding: [
                 {
+                  system: 'http://opencrvs.org/specs/identifier-type',
                   code: 'BIRTH_CONFIGURABLE_IDENTIFIER_2'
                 }
               ]
@@ -524,6 +526,7 @@ export const BIRTH_BUNDLE: SavedBundle<
             type: {
               coding: [
                 {
+                  system: 'http://opencrvs.org/specs/identifier-type',
                   code: 'BIRTH_CONFIGURABLE_IDENTIFIER_3'
                 }
               ]
