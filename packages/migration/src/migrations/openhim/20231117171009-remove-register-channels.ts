@@ -28,46 +28,25 @@ const birthRegistrationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...routeTemplate,
       name: 'Metrics -> Birth Registration',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...routeTemplate,
       name: 'Search -> Birth Registration',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...routeTemplate,
       name: 'Webhooks -> Birth Registration',
-      secured: false,
       host: 'webhooks',
       port: 2525,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Birth Registration',
@@ -78,32 +57,18 @@ const deathRegistrationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...routeTemplate,
       name: 'Search -> Death Registration',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...routeTemplate,
       name: 'Metrics -> Death Registration',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Death Registration',
