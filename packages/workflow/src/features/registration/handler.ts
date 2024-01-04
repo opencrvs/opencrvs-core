@@ -29,8 +29,7 @@ import {
 import {
   sendEventNotification,
   isEventNonNotifiable,
-  getEventType,
-  isEventNotification
+  getEventType
 } from '@workflow/features/registration/utils'
 import { taskHasInput } from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
@@ -244,7 +243,6 @@ export async function markEventAsRegisteredCallbackHandler(
     )
 
     const event = getEventType(savedRecord)
-    const eventNotification = isEventNotification(savedRecord)
 
     const registeredBundle = await toRegistered(
       request,
@@ -260,7 +258,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // don't forward hospital notifications
     if (
       event !== EVENT_TYPE.MARRIAGE &&
-      !eventNotification &&
       (await isNotificationEnabled('register', event, token))
     ) {
       await sendNotification('register', registeredBundle, token)
