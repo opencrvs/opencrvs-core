@@ -13,6 +13,8 @@ import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import { certifyRoute } from '@workflow/records/handler/certify'
 import createRecordHandler from '@workflow/records/handler/create'
+import { downloadRecordHandler } from '@workflow/records/handler/download'
+import { registerRoute } from '@workflow/records/handler/register'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 
@@ -75,8 +77,18 @@ export const getRoutes = () => {
         description: 'Create record endpoint'
       }
     },
+    {
+      method: 'POST',
+      path: '/download-record',
+      handler: downloadRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
+      }
+    },
     ...validateRoute,
     ...updateRoute,
+    ...registerRoute,
     certifyRoute
   ]
 

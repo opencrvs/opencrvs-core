@@ -8,18 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-interface Window {
-  config: {
-    AUTH_API_URL: string
-    CONFIG_API_URL: string
-    COUNTRY_CONFIG_URL: string
-    COUNTRY: string
-    LANGUAGES: string
-    AVAILABLE_LANGUAGES_SELECT: string
-    USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    CLIENT_APP_URL: string
-    PHONE_NUMBER_PATTERN: RegExp
-    SENTRY: string
-  }
-}
+
+export * from './fixtures/birth-bundle'
+export * from './fixtures/death-bundle'
+export * from './fixtures/marriage-bundle'

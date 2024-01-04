@@ -134,7 +134,11 @@ export default async function createRecordHandler(
         isPotentiallyDuplicate: false
       }
     }
-
+    const isPotentiallyDuplicate = await hasDuplicates(
+      recordDetails,
+      { Authorization: token },
+      event
+    )
     const inputBundle = buildFHIRBundle(recordDetails, event)
     const practitioner = await getLoggedInPractitionerResource(token)
     const trackingId = generateTrackingIdForEvents(event)
@@ -215,11 +219,7 @@ export default async function createRecordHandler(
     return {
       compositionId,
       trackingId,
-      isPotentiallyDuplicate: await hasDuplicates(
-        recordDetails,
-        { Authorization: token },
-        event
-      )
+      isPotentiallyDuplicate
     }
   } catch (error) {
     logger.error(`Workflow/createRecordHandler: error: ${error}`)
