@@ -138,7 +138,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       options: {
         tags: ['api'],
         description:
-          'Sends a notification to country-config for birth ready for review declaration',
+          'Sends a notification to country-config for death ready for review declaration',
         validate: recordValidation
       }
     },
@@ -160,7 +160,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       options: {
         tags: ['api'],
         description:
-          'Sends a notification to country config for birth register declaration',
+          'Sends a notification to country config for death register declaration',
         validate: recordValidation
       }
     },

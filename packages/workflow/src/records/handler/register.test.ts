@@ -1,5 +1,3 @@
-import { createServer } from '@workflow/server'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +8,7 @@ import { createServer } from '@workflow/server'
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
@@ -20,7 +19,7 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
-import { READY_FOR_REVIEW_RECORD } from '@workflow/../test/mocks/createBirthRecord'
+import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
 
 describe('Register record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -34,7 +33,7 @@ describe('Register record endpoint', () => {
     await server.stop()
   })
 
-  it('returns OK for a correctly authenticated rejecting a birth declaration', async () => {
+  it('returns OK for a correctly authenticated user rejecting a birth declaration', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
       readFileSync('./test/cert.key'),
@@ -62,7 +61,7 @@ describe('Register record endpoint', () => {
       })
     )
 
-    // Mock response from hearth
+    // Mock response from country-config
     mswServer.use(
       rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
         return res(ctx.json({}))
@@ -91,7 +90,7 @@ describe('Register record endpoint', () => {
     expect(businessStatus).toBe('REJECTED')
   })
 
-  it('returns OK for a correctly authenticated registering a birth declaration', async () => {
+  it('returns OK for a correctly authenticated user registering a birth declaration', async () => {
     const token = jwt.sign(
       { scope: ['register'] },
       readFileSync('./test/cert.key'),
