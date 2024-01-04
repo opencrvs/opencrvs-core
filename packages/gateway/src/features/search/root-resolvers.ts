@@ -19,7 +19,7 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
+import { fetchRegistration } from '@gateway/workflow/index'
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -120,7 +120,7 @@ export const resolvers: GQLResolver = {
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedBySystem(hit._id, system, authHeader)
+          await fetchRegistration(hit._id, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {

@@ -26,7 +26,6 @@ import {
   Task,
   TaskActionExtension,
   TaskHistory,
-  TaskStatus,
   addExtensionsToTask,
   buildFHIRBundle,
   clearActionExtension,
@@ -65,6 +64,7 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
+  fetchRegistration,
   registerDeclaration,
   updateRegistration,
   validateRegistration
@@ -147,20 +147,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
-          id,
-          user,
-          office,
-          context.headers
-        )
+        context.record = await fetchRegistration(id, context.headers)
         return context.record
       } else {
         return await Promise.reject(
@@ -174,20 +161,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
-          id,
-          user,
-          office,
-          context.headers
-        )
+        context.record = await fetchRegistration(id, context.headers)
         return context.record
       } else {
         return await Promise.reject(
@@ -205,20 +179,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
-          id,
-          user,
-          office,
-          context.headers
-        )
+        context.record = await fetchRegistration(id, context.headers)
         return context.record
       } else {
         return await Promise.reject(
@@ -1047,87 +1008,4 @@ export function insertActionToBundle(
     ...record,
     entry: updatedEntries
   } as Saved<Bundle>
-}
-
-function getDownloadedOrAssignedExtension(
-  authHeader: IAuthHeader,
-  status: TaskStatus
-): Action[number] {
-  if (
-    inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === 'VALIDATED')
-  ) {
-    return `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-  }
-  return `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-}
-
-export async function markRecordAsDownloadedBySystem(
-  id: string,
-  system: ISystemModelData,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromSavedBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, system)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
-}
-export async function markRecordAsDownloadedOrAssigned(
-  id: string,
-  user: IUserModelData,
-  office: Saved<Location>,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromSavedBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, user, office)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
 }

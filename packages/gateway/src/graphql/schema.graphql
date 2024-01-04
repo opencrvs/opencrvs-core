@@ -856,12 +856,10 @@ type ApplicationConfiguration {
   CURRENCY: Currency
   DEATH: Death
   MARRIAGE: Marriage
-  MARRIAGE_REGISTRATION: Boolean
+  FEATURES: Features
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
@@ -876,11 +874,10 @@ input ApplicationConfigurationInput {
   CURRENCY: CurrencyInput
   DEATH: DeathInput
   MARRIAGE: MarriageInput
+  FEATURES: FeaturesInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
@@ -1474,6 +1471,14 @@ type Marriage {
   PRINT_IN_ADVANCE: Boolean
 }
 
+type Features {
+  DEATH_REGISTRATION: Boolean
+  MARRIAGE_REGISTRATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  INFORMANT_SIGNATURE: Boolean
+  PRINT_DECLARATION: Boolean
+}
+
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1507,6 +1512,14 @@ input MarriageInput {
   REGISTRATION_TARGET: Int
   FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
+}
+
+input FeaturesInput {
+  DEATH_REGISTRATION: Boolean
+  MARRIAGE_REGISTRATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  INFORMANT_SIGNATURE: Boolean
+  PRINT_DECLARATION: Boolean
 }
 
 input LoginBackgroundInput {

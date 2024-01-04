@@ -13,10 +13,8 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 // eslint-disable-next-line import/no-relative-parent-imports
 import {
-  BIRTH_BUNDLE,
   Bundle,
   Composition,
-  DEATH_BUNDLE,
   Encounter,
   Location,
   Observation,
@@ -63,6 +61,7 @@ import {
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
+import { BIRTH_BUNDLE, DEATH_BUNDLE } from '@opencrvs/commons/fixtures'
 const fetch = fetchAny as any
 
 const mockInput = [

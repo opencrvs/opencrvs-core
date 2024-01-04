@@ -12,6 +12,7 @@ import { routes as correctionRoutes } from '@workflow/features/correction/routes
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import createRecordHandler from '@workflow/records/handler/create'
+import { downloadRecordHandler } from '@workflow/records/handler/download'
 import { registerRoute } from '@workflow/records/handler/register'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
@@ -70,6 +71,15 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/create-record',
       handler: createRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/download-record',
+      handler: downloadRecordHandler,
       config: {
         tags: ['api'],
         description: 'Create record endpoint'

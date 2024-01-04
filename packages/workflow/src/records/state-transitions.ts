@@ -32,6 +32,9 @@ import {
   ReadyForReviewRecord,
   Encounter,
   SavedBundleEntry,
+  ValidRecord,
+  Bundle,
+  SavedTask,
   WaitingForValidationRecord,
   EVENT_TYPE,
   getComposition,
@@ -65,6 +68,7 @@ import {
   createCorrectionPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createDownloadTask,
   createRegisterTask,
   createRejectTask,
   createUpdatedTask,
@@ -72,6 +76,7 @@ import {
   createWaitingForValidationTask,
   getTaskHistory
 } from '@workflow/records/fhir'
+import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -246,6 +251,38 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toDownloaded(
+  record: ValidRecord,
+  user: IUserModelData | ISystemModelData,
+  extensionUrl:
+    | 'http://opencrvs.org/specs/extension/regDownloaded'
+    | 'http://opencrvs.org/specs/extension/regAssigned'
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+
+  const downloadedTask = await createDownloadTask(
+    previousTask,
+    user,
+    extensionUrl
+  )
+
+  const downloadedRecord = {
+    ...record,
+    entry: [
+      ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
+      { resource: downloadedTask }
+    ]
+  }
+
+  const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: downloadedTask }]
+  }
+
+  return { downloadedRecord, downloadedRecordWithTaskOnly }
 }
 
 export async function toRejected(

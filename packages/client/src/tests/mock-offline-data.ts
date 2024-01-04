@@ -446,13 +446,18 @@ export const mockOfflineData = {
       },
       PRINT_IN_ADVANCE: true
     },
-    MARRIAGE_REGISTRATION: true,
+    FEATURES: {
+      DEATH_REGISTRATION: true,
+      MARRIAGE_REGISTRATION: true,
+      EXTERNAL_VALIDATION_WORKQUEUE: true,
+      INFORMANT_SIGNATURE: false,
+      PRINT_DECLARATION: true
+    },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
     FIELD_AGENT_AUDIT_LOCATIONS:
       'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
     DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION',
-    EXTERNAL_VALIDATION_WORKQUEUE: true,
     _id: '61a8c105c04ac94fe46ceb27',
     COUNTRY: 'BGD',
     COUNTRY_LOGO: {
@@ -473,9 +478,7 @@ export const mockOfflineData = {
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
-    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     DATE_OF_BIRTH_UNKNOWN: true,
-    INFORMANT_SIGNATURE: false,
     INFORMANT_SIGNATURE_REQUIRED: false,
     USER_NOTIFICATION_DELIVERY_METHOD: 'email',
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',

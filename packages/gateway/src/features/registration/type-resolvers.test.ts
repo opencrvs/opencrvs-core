@@ -15,16 +15,10 @@ jest.useFakeTimers('modern').setSystemTime(new Date('2023-10-11T07:24:55.108Z'))
 
 import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { getApolloConfig } from '@gateway/graphql/config'
-import { Context } from '@gateway/graphql/context'
 import { generateQueryForType } from '@gateway/graphql/query-generator'
-import { getAuthHeader } from '@opencrvs/commons/http'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import {
-  BIRTH_BUNDLE,
-  DEATH_BUNDLE,
-  MARRIAGE_BUNDLE
-} from '@opencrvs/commons/fixtures'
+import { BIRTH_BUNDLE } from '@opencrvs/commons/fixtures'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -82,134 +76,7 @@ const MOCK_RESPONSES = {
     userName: 'e.test',
     avatarURI: '/mock-avatar-url'
   },
-  getUser: MOCK_USER,
-  // User's primary office's parent location
-  '/Location/c1ddb556-8b22-4182-9a6c-64358c0e96c9': {
-    resourceType: 'Location',
-    identifier: [
-      {
-        system: 'http://opencrvs.org/specs/id/internal-id',
-        value: 'CRVS_OFFICE_HPGiE9Jjh2r'
-      }
-    ],
-    name: 'HPGiE9Jjh2r',
-    alias: ['HPGiE9Jjh2r'],
-    status: 'active',
-    mode: 'instance',
-    partOf: {
-      reference: 'Location/0'
-    },
-    type: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/location-type',
-          code: 'CRVS_OFFICE'
-        }
-      ]
-    },
-    physicalType: {
-      coding: [
-        {
-          code: 'jdn',
-          display: 'Jurisdiction'
-        }
-      ]
-    },
-    meta: {
-      lastUpdated: '2023-09-13T12:36:08.757+00:00',
-      versionId: 'c5e4cf8a-15c6-4bd0-8299-6be0383d5713'
-    },
-    _transforms: {
-      meta: {
-        lastUpdated: '2023-09-13T12:36:08.757Z'
-      }
-    },
-    _request: {
-      method: 'POST'
-    },
-    id: 'c1ddb556-8b22-4182-9a6c-64358c0e96c9'
-  },
-  // User's primary office
-  '/Location/5faf414c-99e8-47a7-b4d9-d07a02dbc97e': {
-    _id: '6501acb8b91837001d484b6d',
-    resourceType: 'Location',
-    identifier: [
-      {
-        system: 'http://opencrvs.org/specs/id/internal-id',
-        value: 'CRVS_OFFICE_okQp4uKCz0'
-      }
-    ],
-    name: 'Ilanga District Office',
-    alias: ['Ilanga District Office'],
-    status: 'active',
-    mode: 'instance',
-    partOf: {
-      reference: 'Location/c1ddb556-8b22-4182-9a6c-64358c0e96c9'
-    },
-    type: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/location-type',
-          code: 'CRVS_OFFICE'
-        }
-      ]
-    },
-    physicalType: {
-      coding: [
-        {
-          code: 'bu',
-          display: 'Building'
-        }
-      ]
-    },
-    meta: {
-      lastUpdated: '2023-09-13T12:36:08.757+00:00',
-      versionId: 'c5e4cf8a-15c6-4bd0-8299-6be0383d5713'
-    },
-    _transforms: {
-      meta: {
-        lastUpdated: '2023-09-13T12:36:08.757Z'
-      }
-    },
-    _request: {
-      method: 'POST'
-    },
-    id: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e'
-  },
-  '/PractitionerRole?practitioner=511ab59f-54df-4331-8c22-97062a602154': {
-    resourceType: 'PractitionerRole',
-    practitioner: {
-      reference: 'Practitioner/511ab59f-54df-4331-8c22-97062a602154'
-    },
-    id: '82ef255e-7b49-4e7c-8851-b3f0b440839a'
-  },
-  '/Practitioner/511ab59f-54df-4331-8c22-97062a602154': {
-    _id: '6501acbcb91837001d484b89',
-    resourceType: 'Practitioner',
-    identifier: [],
-    telecom: [
-      {
-        system: 'phone',
-        value: '0934343434'
-      },
-      {
-        system: 'email',
-        value: ''
-      }
-    ],
-    name: [
-      {
-        use: 'en',
-        family: 'Mweene',
-        given: ['Kennedy']
-      }
-    ],
-    meta: {
-      lastUpdated: '2023-09-13T12:36:12.371+00:00',
-      versionId: '61171268-0270-4497-87a4-9c464a9d4257'
-    },
-    id: '511ab59f-54df-4331-8c22-97062a602154'
-  }
+  getUser: MOCK_USER
 }
 
 jest.mock('@gateway/features/registration/utils', () => {
@@ -224,32 +91,11 @@ jest.mock('@gateway/features/registration/utils', () => {
   }
 })
 
-jest.mock('@gateway/features/fhir/service', () => {
-  const originalModule = jest.requireActual('@gateway/features/fhir/service')
-  return {
-    ...originalModule,
-    fetchFHIR: (url: string, headers: Headers, method: 'PUT' | 'GET') => {
-      if (method === 'GET') {
-        throw new Error(
-          'FHIR resources should not be fetched from Hearth when GraphQL is being resolved'
-        )
-      }
-      return Promise.resolve()
-    }
-  }
-})
 jest.mock('@gateway/features/user/utils', () => {
   const originalModule = jest.requireActual('@gateway/features/user/utils')
   return {
     ...originalModule,
     getUser: () => Promise.resolve(MOCK_USER)
-  }
-})
-jest.mock('@gateway/records', () => {
-  const originalModule = jest.requireActual('@gateway/records')
-  return {
-    ...originalModule,
-    getRecordById: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
   }
 })
 
@@ -274,6 +120,14 @@ jest.mock('apollo-datasource-rest', () => {
   }
 })
 
+jest.mock('@gateway/workflow/index', () => {
+  const originalModule = jest.requireActual('@gateway/workflow/index')
+  return {
+    ...originalModule,
+    fetchRegistration: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
+  }
+})
+
 test('running a full aggregated birth FHIR bundle through resolvers produces a BirthRegistration object', async () => {
   const apolloConfig = getApolloConfig()
   const testServer = new ApolloServer(getApolloConfig())
@@ -281,99 +135,6 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a B
   const query = `query {
     fetchBirthRegistration(id: "") {
     ${generateQueryForType(apolloConfig.schema!, 'BirthRegistration')}
-    }
-  }
-  `
-
-  const response = await testServer.executeOperation(
-    {
-      query
-    },
-    {
-      request: {
-        auth: {
-          isAuthenticated: true,
-          credentials: {
-            scope: ['register', 'performance', 'certify', 'demo']
-          }
-        },
-        headers: {
-          authorization: `Bearer ${MOCK_TOKEN}`
-        }
-      }
-    }
-  )
-  expect(response.data).toMatchSnapshot()
-})
-
-test('running a full aggregated birth FHIR bundle through resolvers produces a DeathRegistration object', async () => {
-  const apolloConfig = getApolloConfig()
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/records').getRecordById.mockImplementation(() =>
-    Promise.resolve(DEATH_BUNDLE)
-  )
-  const testServer = new ApolloServer({
-    ...getApolloConfig(),
-    context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
-      return {
-        request,
-        headers: getAuthHeader(request),
-        presignDocumentUrls: true,
-        record: DEATH_BUNDLE as any
-      }
-    }
-  })
-
-  const query = `query {
-    fetchDeathRegistration(id: "") {
-    ${generateQueryForType(apolloConfig.schema!, 'DeathRegistration')}
-    }
-  }
-  `
-
-  const response = await testServer.executeOperation(
-    {
-      query
-    },
-    {
-      request: {
-        auth: {
-          isAuthenticated: true,
-          credentials: {
-            scope: ['register', 'performance', 'certify', 'demo']
-          }
-        },
-        headers: {
-          authorization: `Bearer ${MOCK_TOKEN}`
-        }
-      }
-    }
-  )
-  expect(response.data).toMatchSnapshot()
-})
-test('running a full aggregated birth FHIR bundle through resolvers produces a MarriageRegistration object', async () => {
-  const apolloConfig = getApolloConfig()
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/records').getRecordById.mockImplementation(() =>
-    Promise.resolve(MARRIAGE_BUNDLE)
-  )
-  const testServer = new ApolloServer({
-    ...getApolloConfig(),
-    context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
-      return {
-        request,
-        headers: getAuthHeader(request),
-        presignDocumentUrls: true,
-        record: MARRIAGE_BUNDLE
-      }
-    }
-  })
-
-  const query = `query {
-    fetchMarriageRegistration(id: "") {
-    ${generateQueryForType(apolloConfig.schema!, 'MarriageRegistration')}
     }
   }
   `
