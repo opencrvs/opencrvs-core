@@ -31,7 +31,9 @@ import {
   Location,
   urlReferenceToResourceIdentifier,
   isEncounter,
-  isRelatedPerson
+  isRelatedPerson,
+  Encounter,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -759,7 +761,7 @@ function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
                   : entry.reference
               }))
             }))
-          }
+          } satisfies Composition
         }
       }
       if (isEncounter(resource) && resource.location) {
@@ -778,7 +780,7 @@ function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
                   : location.location.reference
               }
             }))
-          }
+          } satisfies Encounter
         }
       }
 
@@ -793,7 +795,7 @@ function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
                 ? urlReferenceToResourceIdentifier(resource.patient.reference)
                 : resource.patient.reference
             }
-          }
+          } satisfies RelatedPerson
         }
       }
 
