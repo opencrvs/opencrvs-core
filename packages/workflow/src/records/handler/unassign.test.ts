@@ -14,7 +14,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
-import { assignedTask } from '@test/mocks/unassignedTask'
+import { bundleWithAssignedTask } from '@test/mocks/unassignedTask'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForUnassignExtenstion(task: Task) {
@@ -49,9 +49,9 @@ describe('unassign record endpoint', () => {
     // Fetches a record from search
     mswServer.use(
       rest.get(
-        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e?includeHistoryResources',
+        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(assignedTask))
+          return res(ctx.json(bundleWithAssignedTask))
         }
       )
     )
@@ -81,7 +81,7 @@ describe('unassign record endpoint', () => {
       }
     })
 
-    const { unassignedRecordWithTaskOnly } = JSON.parse(res.payload)
+    const unassignedRecordWithTaskOnly = JSON.parse(res.payload)
     const isUnassigned = checkForUnassignExtenstion(
       getTaskFromSavedBundle(unassignedRecordWithTaskOnly)
     )
