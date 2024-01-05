@@ -28,7 +28,10 @@ import {
   urlReferenceToUUID,
   ValidRecord,
   resourceIdentifierToUUID,
-  Location
+  Location,
+  urlReferenceToResourceIdentifier,
+  isEncounter,
+  isRelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -735,12 +738,76 @@ export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
   >
 }
 
+function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
+  return {
+    ...bundle,
+    entry: bundle.entry.map((entry) => {
+      const resource = entry.resource
+      if (isComposition(resource)) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            section: resource.section.map((section) => ({
+              ...section,
+              entry: section.entry.map((entry) => ({
+                ...entry,
+                reference: isURLReference(entry.reference)
+                  ? (urlReferenceToResourceIdentifier(
+                      entry.reference
+                    ) as URLReference)
+                  : entry.reference
+              }))
+            }))
+          }
+        }
+      }
+      if (isEncounter(resource) && resource.location) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            location: resource.location.map((location) => ({
+              ...location,
+              location: {
+                ...location.location,
+                reference: isURLReference(location.location.reference)
+                  ? urlReferenceToResourceIdentifier(
+                      location.location.reference
+                    )
+                  : location.location.reference
+              }
+            }))
+          }
+        }
+      }
+
+      if (isRelatedPerson(resource) && resource.patient) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            patient: {
+              ...resource.patient,
+              reference: isURLReference(resource.patient.reference)
+                ? urlReferenceToResourceIdentifier(resource.patient.reference)
+                : resource.patient.reference
+            }
+          }
+        }
+      }
+
+      return entry
+    })
+  }
+}
+
 export async function sendBundleToHearth(
-  payload: Bundle
+  bundle: Bundle
 ): Promise<TransactionResponse> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(unresolveReferenceFullUrls(bundle)),
     headers: {
       'Content-Type': 'application/fhir+json'
     }

@@ -56,6 +56,11 @@ export function urlReferenceToUUID(reference: URLReference) {
   return urlParts[urlParts.length - 3] as UUID
 }
 
+export function urlReferenceToResourceIdentifier(reference: URLReference) {
+  const urlParts = reference.split('/')
+  return urlParts.slice(2, 4).join('/') as ResourceIdentifier
+}
+
 export function resourceIdentifierToUUID(
   resourceIdentifier: ResourceIdentifier
 ) {
