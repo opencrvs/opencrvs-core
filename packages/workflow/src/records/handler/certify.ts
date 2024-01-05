@@ -22,6 +22,8 @@ import {
   sendBundleToHearth,
   toSavedBundle
 } from '@workflow/records/fhir'
+import { indexBundle } from '@workflow/records/search'
+import { auditEvent } from '@workflow/records/audit'
 
 export const certifyRoute = createRoute({
   method: 'POST',
@@ -56,6 +58,10 @@ export const certifyRoute = createRoute({
       mergeBundles(record, changedResources),
       'CERTIFIED'
     )
+
+    await indexBundle(certifiedRecord, token)
+    await auditEvent('mark-certified', certifiedRecord, token)
+
     return certifiedRecord
   }
 })
