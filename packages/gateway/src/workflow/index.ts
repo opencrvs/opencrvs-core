@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
-import { EVENT_TYPE, SavedBundle, Resource } from '@opencrvs/commons/types'
+import {
+  EVENT_TYPE,
+  SavedBundle,
+  Resource,
+  CertifiedRecord
+} from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
@@ -184,7 +189,7 @@ export function certifyRegistration(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  return createRequest(
+  return createRequest<CertifiedRecord>(
     'POST',
     `/records/${recordId}/certify-record`,
     authHeader,

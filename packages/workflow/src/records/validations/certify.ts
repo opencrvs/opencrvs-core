@@ -18,33 +18,33 @@ export const requestSchema = z.object({
     data: z.string(),
     collector: z
       .object({
-        relationship: z.string()
+        relationship: z.string(),
+        otherRelationship: z.string(),
+        name: z.array(
+          z.object({
+            use: z.string(),
+            firstNames: z.string(),
+            familyName: z.string()
+          })
+        ),
+        affidavit: z
+          .array(
+            z.object({
+              contentType: z.string(),
+              data: z.string()
+            })
+          )
+          .optional(),
+        identifier: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string()
+          })
+        )
       })
       .or(
         z.object({
-          relationship: z.string(),
-          otherRelationship: z.string(),
-          name: z.array(
-            z.object({
-              use: z.string(),
-              firstNames: z.string(),
-              familyName: z.string()
-            })
-          ),
-          affidavit: z
-            .array(
-              z.object({
-                contentType: z.string(),
-                data: z.string()
-              })
-            )
-            .optional(),
-          identifier: z.array(
-            z.object({
-              id: z.string(),
-              type: z.string()
-            })
-          )
+          relationship: z.string()
         })
       )
   })

@@ -35,7 +35,8 @@ import {
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  getComposition
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -60,7 +61,7 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   removeDuplicatesFromComposition,
-  setCertificateCollector,
+  setCollectorForPrintInAdvance,
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
@@ -636,16 +637,18 @@ export const resolvers: GQLResolver = {
       if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      await setCollectorForPrintInAdvance(details, authHeader)
       const certificateDetails = details.registration?.certificates?.[0]
       if (!certificateDetails) {
         return Promise.reject(new Error('Certificate details required'))
       }
-      return certifyRegistration(
+      const certifiedRecord = await certifyRegistration(
         id,
         certificateDetails,
         EVENT_TYPE.BIRTH,
         authHeader
       )
+      return getComposition(certifiedRecord).id
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -847,7 +850,7 @@ async function markEventAsCertified(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  await setCertificateCollector(details, authHeader)
+  await setCollectorForPrintInAdvance(details, authHeader)
   const doc = await registrationToFHIR(event, details, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
