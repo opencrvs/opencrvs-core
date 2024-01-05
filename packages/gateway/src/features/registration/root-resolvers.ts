@@ -637,18 +637,7 @@ export const resolvers: GQLResolver = {
       if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
-      await setCollectorForPrintInAdvance(details, authHeader)
-      const certificateDetails = details.registration?.certificates?.[0]
-      if (!certificateDetails) {
-        return Promise.reject(new Error('Certificate details required'))
-      }
-      const certifiedRecord = await certifyRegistration(
-        id,
-        certificateDetails,
-        EVENT_TYPE.BIRTH,
-        authHeader
-      )
-      return getComposition(certifiedRecord).id
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -658,13 +647,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -676,15 +662,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(
-          details,
-          authHeader,
-          EVENT_TYPE.MARRIAGE
-        )
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -846,16 +827,26 @@ async function markEventAsRegistered(
 }
 
 async function markEventAsCertified(
-  details: any,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
   await setCollectorForPrintInAdvance(details, authHeader)
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return composition-id
-  return getIDFromResponse(res)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const certifiedRecord = await certifyRegistration(
+    id,
+    certificateDetails,
+    event,
+    authHeader
+  )
+  return getComposition(certifiedRecord).id
 }
 
 async function markEventAsIssued(

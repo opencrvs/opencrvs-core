@@ -34,13 +34,16 @@ export const certifyRoute = createRoute({
       certificate: { data, ...certificateDetailsWithoutData },
       event
     } = validateRequest(requestSchema, request.payload)
-    const dataUrl = await uploadBase64ToMinio(data, getAuthHeader(request))
+    const certificateUrl = await uploadBase64ToMinio(
+      data,
+      getAuthHeader(request)
+    )
 
     const unsavedChangedResources = await toCertified(
       record,
       await getLoggedInPractitionerResource(token),
       event,
-      { ...certificateDetailsWithoutData, dataUrl }
+      { ...certificateDetailsWithoutData, certificateUrl }
     )
 
     const responseBundle = await sendBundleToHearth(unsavedChangedResources)
