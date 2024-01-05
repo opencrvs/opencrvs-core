@@ -177,65 +177,65 @@ export async function fetchLocationHandler(
   return response
 }
 
-// function createLocationSegments(locations: Location[]): Location[][] {
-//   const segments = []
-//   for (const jurisdictionType of Object.keys(JurisdictionType)) {
-//     const jurisdictionLocations = locations.filter(
-//       (loc) => loc.jurisdictionType === jurisdictionType
-//     )
-//     if (jurisdictionLocations.length) {
-//       segments.push(jurisdictionLocations)
-//     }
-//   }
-//   segments.push(locations.filter(loc=>loc.))
-// }
+function createLocationSegments(locations: Location[]): Location[][] {
+  const segments = []
+  for (const jurisdictionType of Object.keys(JurisdictionType)) {
+    const jurisdictionLocations = locations.filter(
+      (loc) => loc.jurisdictionType === jurisdictionType
+    )
+    if (jurisdictionLocations.length) {
+      segments.push(jurisdictionLocations)
+    }
+  }
+  const facilitiesOrOffices = locations.filter((loc) => !loc.jurisdictionType)
+  if (facilitiesOrOffices.length) {
+    segments.push(facilitiesOrOffices)
+  }
+  return segments
+}
+
 async function batchLocationsHandler(
   locations: Location[],
   h: Hapi.ResponseToolkit
 ) {
   let parentLocationsMap: Map<string, string> = new Map()
-  for (const jurisdictionType of Object.keys(JurisdictionType)) {
-    const jurisdictionLocations = locations.filter(
-      (loc) => loc.jurisdictionType === jurisdictionType
+  const locationSegments = createLocationSegments(locations)
+  for (const each of locationSegments) {
+    const locationsBundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: each
+        .map((location) => ({
+          ...location,
+          // partOf is either Location/{fhirID} of another location or 'Location/0'
+          partOf:
+            parentLocationsMap?.get(location.partOf.split('/')[1]) ??
+            location.partOf
+        }))
+        .map(
+          (location): BundleEntry<FhirLocation> => ({
+            fullUrl: `urn:uuid:${uuid()}` as URNReference,
+            resource: {
+              ...composeFhirLocation(location),
+              ...(location.statistics && {
+                extension: generateStatisticalExtensions(location.statistics)
+              })
+            }
+          })
+        )
+    }
+    const res = await fetchFromHearth(
+      '',
+      'POST',
+      JSON.stringify(locationsBundle)
     )
 
-    if (jurisdictionLocations.length) {
-      const locationsBundle = {
-        resourceType: 'Bundle',
-        type: 'document',
-        entry: jurisdictionLocations
-          .map((location) => ({
-            ...location,
-            // partOf is either Location/{statisticalID} of another location or 'Location/0'
-            partOf:
-              parentLocationsMap?.get(location.partOf.split('/')[1]) ??
-              location.partOf
-          }))
-          .map(
-            (location): BundleEntry<FhirLocation> => ({
-              fullUrl: `urn:uuid:${uuid()}` as URNReference,
-              resource: {
-                ...composeFhirLocation(location),
-                ...(location.statistics && {
-                  extension: generateStatisticalExtensions(location.statistics)
-                })
-              }
-            })
-          )
-      }
-      const res = await fetchFromHearth(
-        '',
-        'POST',
-        JSON.stringify(locationsBundle)
-      )
-
-      parentLocationsMap = new Map(
-        jurisdictionLocations.map((loc, i) => [
-          loc.statisticalID,
-          'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
-        ])
-      )
-    }
+    parentLocationsMap = new Map(
+      each.map((loc, i) => [
+        loc.statisticalID,
+        'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
+      ])
+    )
   }
   return h.response().code(201)
 }
