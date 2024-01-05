@@ -159,7 +159,7 @@ export async function validateRegistration(
   return await createRequest('POST', `/records/${id}/validate`, authHeader)
 }
 
-export async function fetchRegistrationForAssignment(
+export async function fetchRegistrationForDownloading(
   id: string,
   authHeader: IAuthHeader
 ) {

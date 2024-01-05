@@ -67,7 +67,7 @@ import {
   archiveRegistration,
   updateRegistration,
   validateRegistration,
-  fetchRegistrationForAssignment
+  fetchRegistrationForDownloading
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { createRegistration } from '@gateway/workflow'
@@ -147,7 +147,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForAssignment(
+        context.record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
@@ -164,7 +164,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForAssignment(
+        context.record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
@@ -185,7 +185,7 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForAssignment(
+        context.record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
