@@ -60,13 +60,6 @@ describe('archive record endpoint', () => {
       })
     )
 
-    // Sends bundle to unassign in elastic search
-    mswServer.use(
-      rest.post('http://localhost:9090/events/unassigned', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
-    )
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/archive-record',
