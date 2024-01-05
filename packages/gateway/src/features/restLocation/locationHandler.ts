@@ -189,15 +189,11 @@ export async function fetchLocationHandler(
 //   }
 //   segments.push(locations.filter(loc=>loc.))
 // }
-async function batchLocationsHandler(locations: Location[]) {
-  // const locationsMap = new Map(
-  //   locations.map((location) => [
-  //     location.statisticalID,
-  //     { ...location, uid: `urn:uuid:${uuid()}` as URNReference }
-  //   ])
-  // )
-  // @ts-ignore
-  let parentLocationsMap: Map<string, string>
+async function batchLocationsHandler(
+  locations: Location[],
+  h: Hapi.ResponseToolkit
+) {
+  let parentLocationsMap: Map<string, string> = new Map()
   for (const jurisdictionType of Object.keys(JurisdictionType)) {
     const jurisdictionLocations = locations.filter(
       (loc) => loc.jurisdictionType === jurisdictionType
@@ -236,12 +232,12 @@ async function batchLocationsHandler(locations: Location[]) {
       parentLocationsMap = new Map(
         jurisdictionLocations.map((loc, i) => [
           loc.statisticalID,
-          res[i]?.response?.location?.split('/')?.[3]
+          'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
         ])
       )
     }
   }
-  return true
+  return h.response().code(201)
 }
 
 export async function createLocationHandler(
@@ -249,7 +245,7 @@ export async function createLocationHandler(
   h: Hapi.ResponseToolkit
 ) {
   if (Array.isArray(request.payload)) {
-    return batchLocationsHandler(request.payload as Location[])
+    return batchLocationsHandler(request.payload as Location[], h)
   }
   const payload = request.payload as Location | Facility
   const newLocation: fhir.Location = composeFhirLocation(payload)
