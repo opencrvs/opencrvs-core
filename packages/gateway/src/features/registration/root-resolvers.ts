@@ -728,10 +728,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const task = await unassignRegistration(id, authHeader)
+      const task = (await unassignRegistration(id, authHeader)).entry[0]
 
       // return the taskId
-      return task.id
+      return task.resource.id
     },
     async markEventAsDuplicate(
       _,

@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
-import { EVENT_TYPE, SavedBundle, Resource } from '@opencrvs/commons/types'
+import {
+  EVENT_TYPE,
+  SavedBundle,
+  Resource,
+  Bundle,
+  SavedTask
+} from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
@@ -162,7 +168,12 @@ export async function unassignRegistration(
   id: string,
   authHeader: IAuthHeader
 ) {
-  return await createRequest('POST', '/unassign-record', authHeader, { id })
+  return await createRequest<Bundle<SavedTask>>(
+    'POST',
+    '/unassign-record',
+    authHeader,
+    { id }
+  )
 }
 
 export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
