@@ -10,10 +10,14 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { internal } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import {
+  postUserActionToMetrics,
+  verifyToken
+} from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
+import { pipe } from 'fp-ts/lib/function'
 
 interface IInvalidateTokenPayload {
   token: string
@@ -24,6 +28,11 @@ export default async function invalidateTokenHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IInvalidateTokenPayload
+  const decodedOrError = pipe(token, verifyToken)
+  if (decodedOrError._tag === 'Left') {
+    return badRequest("The token in payload couldn't be validated.")
+  }
+
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =

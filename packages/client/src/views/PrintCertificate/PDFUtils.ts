@@ -351,7 +351,7 @@ export function executeHandlebarsTemplate(
     'getLocalizedLocationName',
     function (office: ILocation) {
       if (intl.locale === getDefaultLanguage()) {
-        return office.name
+        return office?.name
       } else {
         return office.alias?.toString()
       }

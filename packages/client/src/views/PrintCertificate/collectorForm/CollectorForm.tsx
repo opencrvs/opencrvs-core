@@ -337,11 +337,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const { showError, showModalForNoSignedAffidavit } = this.state
 
-    const nextSectionGroup = getNextSectionIds(
-      formSection,
-      formGroup,
-      declaration
-    )
     const declarationToBeCertified = declaration
     if (!declarationToBeCertified) {
       return (
@@ -363,6 +358,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         />
       )
     }
+
+    const nextSectionGroup = getNextSectionIds(
+      formSection,
+      formGroup,
+      declaration
+    )
+
     return (
       <>
         <ActionPageLight
@@ -479,6 +481,10 @@ const mapStateToProps = (
   const declaration = state.declarationsState.declarations.find(
     (declaration) => declaration.id === registrationId
   ) as IPrintableDeclaration | undefined
+
+  if (!declaration) {
+    return {}
+  }
 
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id

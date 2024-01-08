@@ -47,8 +47,7 @@ import {
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
-// eslint-disable-next-line import/no-relative-parent-imports
-import { createServer } from '../../server'
+import { createServer } from '@workflow/server'
 const fetch = fetchAny as any
 
 const mockInput = [
