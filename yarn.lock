@@ -7137,17 +7137,18 @@
   resolved "https://registry.yarnpkg.com/@types/hapi__catbox/-/hapi__catbox-10.2.5.tgz#4eb5e2fbb966acd2a3c2e86f935b7de95aceb7dd"
   integrity sha512-vomIMP6dUDSbiasbPglH5LJvnnl8jFmRTjPgPl4l9Vi1L9fto3VXJQZtl8LzyIQUUoocyT5bmvWeYWsVgxAHQg==
 
-"@types/hapi__h2o2@8.3.3":
-  version "8.3.3"
-  resolved "https://registry.yarnpkg.com/@types/hapi__h2o2/-/hapi__h2o2-8.3.3.tgz#f6c5ac480a6fd421025f7d0f78dfa916703511b7"
-  integrity sha512-+qWZVFVGc5Y0wuNZvVe876VJjUBCJ8eQdXovg4Rg9laHpeERQejluI7aw31xXWfLojTuHz3ThZzC6Orqras05Q==
+"@types/hapi__h2o2@8.3.4":
+  version "8.3.4"
+  resolved "https://registry.yarnpkg.com/@types/hapi__h2o2/-/hapi__h2o2-8.3.4.tgz#e936885e935d0abddbbbbb3b057dbd24262a8a2d"
+  integrity sha512-yGMQ5C9NgV/e3KtSrQS8OLDaCoje6g+WTBgrNiBDbq0vBvuQTmfVOFhsUOfmcQARxSWsMUUTFmQI4t2km965QA==
   dependencies:
     "@hapi/boom" "^9.0.0"
+    "@hapi/hapi" "^21.1.0"
     "@hapi/wreck" "^17.0.0"
-    "@types/hapi__hapi" "*"
     "@types/node" "*"
+    joi "^17.7.0"
 
-"@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
+"@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
   version "20.0.13"
   resolved "https://registry.yarnpkg.com/@types/hapi__hapi/-/hapi__hapi-20.0.13.tgz#ea8ce83c192f6e8106f6e76e40f795e7e36d0615"
   integrity sha512-LP4IPfhIO5ZPVOrJo7H8c8Slc0WYTFAUNQX1U0LBPKyXioXhH5H2TawIgxKujIyOhbwoBbpvOsBf6o5+ToJIrQ==
