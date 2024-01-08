@@ -1738,7 +1738,14 @@ describe('populateCompositionWithID', () => {
             identifier: [
               {
                 value: '123456789',
-                type: { coding: [{ code: 'NATIONAL_ID' }] }
+                type: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/identifier-type',
+                      code: 'NATIONAL_ID'
+                    }
+                  ]
+                }
               }
             ],
             name: [{ use: 'en', family: ['Rahman'] }],

@@ -2538,6 +2538,8 @@ export const mockFormDraft = [
     __v: 0
   }
 ]
+type PatientIdentifier = NonNullable<Patient['identifier']>[number]
+
 const drnIdentifier = {
   type: {
     coding: [
@@ -2548,7 +2550,7 @@ const drnIdentifier = {
     ]
   },
   value: '2022DSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const nidIdentifier = {
   value: '654654666',
@@ -2560,7 +2562,7 @@ const nidIdentifier = {
       }
     ]
   }
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const brnIdentifier = {
   type: {
@@ -2572,7 +2574,7 @@ const brnIdentifier = {
     ]
   },
   value: '2022BSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const mosipPsutTokenIdentifier = {
   type: {
