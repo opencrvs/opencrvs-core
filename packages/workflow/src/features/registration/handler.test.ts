@@ -11,7 +11,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-// eslint-disable-next-line import/no-relative-parent-imports
 import { Bundle, Task } from '@opencrvs/commons/types'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import {
@@ -48,6 +47,7 @@ import {
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
+// eslint-disable-next-line import/no-relative-parent-imports
 import { createServer } from '../../server'
 const fetch = fetchAny as any
 
