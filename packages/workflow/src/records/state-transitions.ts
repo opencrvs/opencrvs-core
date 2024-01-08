@@ -820,9 +820,7 @@ export async function toCertified(
   record: RegisteredRecord,
   practitioner: Practitioner,
   eventType: EVENT_TYPE,
-  certificateDetails: Omit<CertificateInput, 'data'> & {
-    certificateUrl: string
-  }
+  certificateDetails: CertificateInput
 ): Promise<
   Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
 > {
@@ -889,7 +887,7 @@ export async function toCertified(
         {
           attachment: {
             contentType: 'application/pdf',
-            data: certificateDetails.certificateUrl
+            data: certificateDetails.data
           }
         }
       ],

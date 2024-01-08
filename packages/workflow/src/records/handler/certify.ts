@@ -15,7 +15,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { requestSchema } from '@workflow/records/validations/certify'
 import { toCertified } from '@workflow/records/state-transitions'
-import { uploadBase64ToMinio } from '@workflow/documents'
+import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import {
   mergeBundles,
@@ -32,20 +32,20 @@ export const certifyRoute = createRoute({
   action: 'CERTIFY',
   handler: async (request, record): Promise<CertifiedRecord> => {
     const token = getToken(request)
-    const {
-      certificate: { data, ...certificateDetailsWithoutData },
-      event
-    } = validateRequest(requestSchema, request.payload)
-    const certificateUrl = await uploadBase64ToMinio(
-      data,
-      getAuthHeader(request)
-    )
+    const { certificate: certificateDetailsWithRawAttachments, event } =
+      validateRequest(requestSchema, request.payload)
+
+    const certificateDetails =
+      await uploadCertificateAttachmentsToDocumentsStore(
+        certificateDetailsWithRawAttachments,
+        getAuthHeader(request)
+      )
 
     const unsavedChangedResources = await toCertified(
       record,
       await getLoggedInPractitionerResource(token),
       event,
-      { ...certificateDetailsWithoutData, certificateUrl }
+      certificateDetails
     )
 
     const responseBundle = await sendBundleToHearth(unsavedChangedResources)
