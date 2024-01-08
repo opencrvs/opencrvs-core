@@ -47,6 +47,8 @@ import {
   isNotificationEnabled,
   sendNotification
 } from '@workflow/records/notification'
+import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
+import { getAuthHeader } from '@opencrvs/commons/http'
 
 export const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -139,7 +141,16 @@ export default async function createRecordHandler(
       { Authorization: token },
       event
     )
-    const inputBundle = buildFHIRBundle(recordDetails, event)
+    const recordInputWithUploadedAttachments =
+      await uploadBase64AttachmentsToDocumentsStore(
+        recordDetails,
+        getAuthHeader(request)
+      )
+
+    const inputBundle = buildFHIRBundle(
+      recordInputWithUploadedAttachments,
+      event
+    )
     const practitioner = await getLoggedInPractitionerResource(token)
     const trackingId = generateTrackingIdForEvents(event)
     const composition = getComposition(inputBundle)
