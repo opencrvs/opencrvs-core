@@ -1609,15 +1609,12 @@ describe('Registration root resolvers', () => {
             resourceType: 'Bundle',
             entry: [
               {
-                response: { location: 'Task/12423/_history/1' }
+                resource: {
+                  id: 'df3fb104-4c2c-486f-97b3-edbeabcd4422',
+                  resourceType: 'Composition'
+                }
               }
             ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
           }),
           { status: 200 }
         ]
@@ -1630,32 +1627,11 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('1')
+      expect(result).toBe(id)
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
-    })
-
-    it("throws an error when the response isn't what we expect", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockUserDetails), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }]
-      )
-      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
-      fetch.mockResponse(
-        JSON.stringify({
-          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-        })
-      )
-      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      await expect(
-        resolvers.Mutation!.markBirthAsCertified(
-          {},
-          { id, details },
-          { headers: authHeaderRegCert }
-        )
-      ).rejects.toThrowError('FHIR did not send a valid response')
     })
 
     it("throws an error when the user doesn't have a certify scope", async () => {
@@ -1699,28 +1675,26 @@ describe('Registration root resolvers', () => {
             resourceType: 'Bundle',
             entry: [
               {
-                response: { location: 'Task/12423/_history/1' }
+                resource: {
+                  id: 'df3fb104-4c2c-486f-97b3-edbeabcd4422',
+                  resourceType: 'Composition'
+                }
               }
             ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
           }),
           { status: 200 }
         ]
       )
 
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const result = await resolvers.Mutation!.markDeathAsCertified(
         {},
-        { details },
+        { id, details },
         { headers: authHeaderRegCert }
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('1')
+      expect(result).toBe(id)
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
