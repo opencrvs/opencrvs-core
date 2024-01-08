@@ -868,16 +868,6 @@ type LocationStatisticsResponse {
   offices: Int!
 }
 
-type LocationWiseEstimationMetric {
-  total: Int!
-  withinTarget: Int!
-  within1Year: Int!
-  within5Years: Int!
-  estimated: Int!
-  locationId: String!
-  locationName: String!
-}
-
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
