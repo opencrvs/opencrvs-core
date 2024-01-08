@@ -56,13 +56,6 @@ describe('download record endpoint', () => {
       )
     )
 
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
-    )
-
     // Sends bundle to save in elastic search
     mswServer.use(
       rest.post('http://localhost:9090/events/assigned', (_, res, ctx) => {
@@ -85,7 +78,7 @@ describe('download record endpoint', () => {
     // for later, before that the server is stopped and when two callbacks
     // are later brought in for execution, the mock handlers are not found
     // as they were already removed
-    // wait two http requests(search and hearth) to finish
+    // wait for the two http requests(search and hearth) to finish
     await new Promise((resolve) => setImmediate(resolve))
     const isDownloaded = checkForDownloadExtenstion(
       getTaskFromSavedBundle(JSON.parse(res.payload))

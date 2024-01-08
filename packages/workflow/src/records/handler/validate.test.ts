@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -52,12 +51,6 @@ describe('Validate record endpoint', () => {
           return res(ctx.json(READY_FOR_REVIEW_RECORD))
         }
       )
-    )
-    // Mock response from hearth
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     const response = await server.server.inject({

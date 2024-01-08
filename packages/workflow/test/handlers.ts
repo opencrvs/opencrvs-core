@@ -13,6 +13,7 @@ import { practitioner } from './mocks/practitioner'
 import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -102,6 +103,14 @@ const duplicatesHandler = rest.post(
     throw new Error(`no mock set for ${event} duplicates`)
   }
 )
+const hearthHandler = rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+  const responseBundle: TransactionResponse = {
+    resourceType: 'Bundle',
+    type: 'batch-response',
+    entry: []
+  }
+  return res(ctx.json(responseBundle))
+})
 
 const handlers = [
   userHandler,
@@ -112,7 +121,8 @@ const handlers = [
   duplicatesHandler,
   indexBundleHandler,
   auditEventHandler,
-  sendNotificationHandler
+  sendNotificationHandler,
+  hearthHandler
 ]
 
 export default handlers

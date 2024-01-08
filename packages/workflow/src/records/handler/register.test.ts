@@ -54,13 +54,6 @@ describe('Register record endpoint', () => {
       )
     )
 
-    // Mock response from hearth
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
-    )
-
     // Mock response from country-config
     mswServer.use(
       rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
