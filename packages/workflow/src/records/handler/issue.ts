@@ -20,6 +20,10 @@ import {
   sendBundleToHearth,
   toSavedBundle
 } from '@workflow/records/fhir'
+import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
+import { getAuthHeader } from '@opencrvs/commons/http'
+import { indexBundle } from '@workflow/records/search'
+import { auditEvent } from '@workflow/records/audit'
 
 export const issueRoute = createRoute({
   method: 'POST',
@@ -28,16 +32,20 @@ export const issueRoute = createRoute({
   action: 'ISSUE',
   handler: async (request, record): Promise<IssuedRecord> => {
     const token = getToken(request)
-    const { certificate, event } = validateRequest(
-      IssueRequestSchema,
-      request.payload
-    )
+    const { certificate: certificateDetailsWithRawAttachments, event } =
+      validateRequest(IssueRequestSchema, request.payload)
+
+    const certificateDetails =
+      await uploadCertificateAttachmentsToDocumentsStore(
+        certificateDetailsWithRawAttachments,
+        getAuthHeader(request)
+      )
 
     const unsavedChangedResources = await toIssued(
       record,
       await getLoggedInPractitionerResource(token),
       event,
-      certificate
+      certificateDetails
     )
 
     const responseBundle = await sendBundleToHearth(unsavedChangedResources)
@@ -50,6 +58,10 @@ export const issueRoute = createRoute({
       mergeBundles(record, changedResources),
       'ISSUED'
     )
+
+    await indexBundle(issuedRecord, token)
+    await auditEvent('mark-issued', issuedRecord, token)
+
     return issuedRecord
   }
 })

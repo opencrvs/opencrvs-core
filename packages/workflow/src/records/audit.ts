@@ -17,6 +17,7 @@ type AuditAction =
   | 'in-progress-declaration'
   | 'new-declaration'
   | 'mark-certified'
+  | 'mark-issued'
 
 export async function auditEvent(
   action: AuditAction,
