@@ -10,7 +10,8 @@
  */
 import { createServer } from '@auth/server'
 import { get, setex } from '@auth/database'
-import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
+import { INVALID_TOKEN_NAMESPACE, JWT_ISSUER } from '@auth/constants'
+import { createToken } from '@auth/features/authenticate/service'
 
 describe('invalidate token handler', () => {
   let server: any
@@ -19,7 +20,7 @@ describe('invalidate token handler', () => {
     server = await createServer()
   })
 
-  it('add an invalid token to redis', async () => {
+  it('does not allow to invalidate an invalid token', async () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/invalidateToken',
@@ -28,20 +29,48 @@ describe('invalidate token handler', () => {
       }
     })
 
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('invalidates the fresh token', async () => {
+    const token = await createToken(
+      'auth',
+      ['service'],
+      ['opencrvs:auth-user'],
+      JWT_ISSUER,
+      true
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/invalidateToken',
+      payload: {
+        token
+      }
+    })
+
     expect(res.statusCode).toBe(200)
 
-    const val = await get(`${INVALID_TOKEN_NAMESPACE}:111`)
+    const val = await get(`${INVALID_TOKEN_NAMESPACE}:${token}`)
     expect(val).toBe('INVALID')
   })
 
   it('catches redis errors', async () => {
     ;(setex as jest.Mock).mockImplementationOnce(() => Promise.reject('boom'))
 
+    const token = await createToken(
+      'auth',
+      ['service'],
+      ['opencrvs:auth-user'],
+      JWT_ISSUER,
+      true
+    )
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/invalidateToken',
       payload: {
-        token: '111'
+        token
       }
     })
 
