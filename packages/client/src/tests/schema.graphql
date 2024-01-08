@@ -1,13 +1,12 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
-#
-# OpenCRVS is also distributed under the terms of the Civil Registration
-# & Healthcare Disclaimer located at http://opencrvs.org/license.
-#
-# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-# source: http://localhost:7070/graphql
-# timestamp: Fri Jun 07 2019 20:35:09 GMT+0100 (British Summer Time)
+"""
+Exposes a URL that specifies the behaviour of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
+  url: String!
+) on SCALAR
 
 type AdditionalIdWithCompositionId {
   compositionId: String!
@@ -32,10 +31,10 @@ type Address {
 }
 
 input AddressInput {
-  use: String
-  type: String
+  use: AddressUse
+  type: AddressType
   text: String
-  line: [String]
+  line: [String!]
   city: String
   district: String
   state: String
@@ -43,6 +42,21 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+}
+
+enum AddressType {
+  PRIMARY_ADDRESS
+  SECONDARY_ADDRESS
+  postal
+  physical
+  both
+}
+
+enum AddressUse {
+  home
+  work
+  temp
+  old
 }
 
 type AdvancedSeachParameters {
@@ -74,6 +88,7 @@ type AdvancedSeachParameters {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -132,6 +147,7 @@ input AdvancedSearchParametersInput {
   childDoBStart: String
   childDoBEnd: String
   childGender: String
+  childIdentifier: String
   deceasedFirstNames: String
   deceasedFamilyName: String
   deceasedGender: String
@@ -240,13 +256,20 @@ input AttachmentInput {
   contentType: String
   data: String
   uri: String
-  status: String
+  status: AttachmentStatus
   originalFileName: String
   systemFileName: String
   type: String
   description: String
   subject: String
   createdAt: Date
+}
+
+enum AttachmentStatus {
+  ENTERED_IN_ERROR
+  PRELIMINARY
+  FINAL
+  AMENDED
 }
 
 interface AuditLogItemBase {
@@ -278,6 +301,7 @@ type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
+  childIdentifier: String
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
@@ -335,7 +359,7 @@ type BirthRegistration implements EventRegistration {
 }
 
 input BirthRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -451,10 +475,30 @@ type ContactPoint {
   use: String
 }
 
+type MonthWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  month: Int!
+  year: Int!
+}
+
+type LocationWiseEstimationMetric {
+  total: Float!
+  withinTarget: Float!
+  within1Year: Float!
+  within5Years: Float!
+  estimated: Float!
+  locationId: String!
+  locationName: String!
+}
+
 input ContactPointInput {
-  system: String
+  system: TelecomSystem
   value: String
-  use: String
+  use: TelecomUse
 }
 
 input CorrectionInput {
@@ -499,16 +543,6 @@ input CorrectionValueInput {
 type CountryLogo {
   fileName: String
   file: String
-}
-
-type LocationWiseEstimationMetric {
-  total: Float!
-  withinTarget: Float!
-  within1Year: Float!
-  within5Years: Float!
-  estimated: Float!
-  locationId: String!
-  locationName: String!
 }
 
 input CountryLogoInput {
@@ -592,7 +626,7 @@ type DeathRegistration implements EventRegistration {
 }
 
 input DeathRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   deceased: PersonInput
   informant: RelatedPersonInput
@@ -729,6 +763,21 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+input FHIRIDMap {
+  composition: String
+  encounter: String
+  eventLocation: String
+  questionnaireResponse: String
+  observation: ObservationFHIRIDS
+}
+
+enum Gender {
+  male
+  female
+  other
+  unknown
 }
 
 type History {
@@ -934,7 +983,7 @@ type MarriageRegistration implements EventRegistration {
 }
 
 input MarriageRegistrationInput {
-  _fhirIDMap: Map
+  _fhirIDMap: FHIRIDMap
   registration: RegistrationInput
   informant: RelatedPersonInput
   bride: PersonInput
@@ -1122,6 +1171,23 @@ input NotificationInput {
   updatedAt: Date
 }
 
+input ObservationFHIRIDS {
+  maleDependentsOfDeceased: String
+  femaleDependentsOfDeceased: String
+  mannerOfDeath: String
+  deathDescription: String
+  causeOfDeathEstablished: String
+  causeOfDeathMethod: String
+  causeOfDeath: String
+  birthType: String
+  typeOfMarriage: String
+  weightAtBirth: String
+  attendantAtBirth: String
+  childrenBornAliveToMother: String
+  foetalDeathsToMother: String
+  lastPreviousLiveBirth: String
+}
+
 type OIDPUserAddress {
   formatted: String
   street_address: String
@@ -1231,7 +1297,7 @@ input PersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String
@@ -1493,9 +1559,7 @@ input RegistrationInput {
   witnessOneSignature: String
   witnessTwoSignature: String
   informantType: String
-  registrationOffice: String
   otherInformantType: String
-  contact: String
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflowInput]
@@ -1610,7 +1674,7 @@ input RelatedPersonInput {
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
-  gender: String
+  gender: Gender
   birthDate: String
   age: Float
   maritalStatus: String
@@ -1704,6 +1768,11 @@ input SMSNotificationInput {
   enabled: Boolean!
 }
 
+input SortBy {
+  column: String!
+  order: String!
+}
+
 enum Status {
   active
   deactivated
@@ -1792,6 +1861,24 @@ enum SystemType {
   WEBHOOK
 }
 
+enum TelecomSystem {
+  other
+  phone
+  fax
+  email
+  pager
+  url
+  sms
+}
+
+enum TelecomUse {
+  home
+  work
+  temp
+  old
+  mobile
+}
+
 type TotalMetricsByLocation {
   results: [EventMetricsByLocation!]!
   total: Int
@@ -1830,12 +1917,10 @@ type User {
   mobile: String
   systemRole: SystemRoleType!
   role: Role!
-  title: String!
   email: String
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  primaryFacilityId: String
   catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
@@ -1895,13 +1980,11 @@ input UserInput {
   status: Status
   systemRole: SystemRoleType!
   role: String
-  title: String!
   email: String
   primaryOffice: String
   catchmentArea: [String]
   device: String
   signature: SignatureInput
-  primaryFacilityId: String
 }
 
 type VerifyPasswordResult {
