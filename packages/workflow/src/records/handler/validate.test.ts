@@ -13,7 +13,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -48,7 +48,7 @@ describe('Validate record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
     )

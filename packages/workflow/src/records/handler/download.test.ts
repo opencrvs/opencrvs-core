@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForDownloadExtenstion(task: Task) {
@@ -51,7 +50,7 @@ describe('download record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
     )

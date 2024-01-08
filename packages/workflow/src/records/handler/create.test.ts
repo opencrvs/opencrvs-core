@@ -11,14 +11,12 @@
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import {
-  createBirthRegistrationPayload,
-  READY_FOR_REVIEW_RECORD
-} from '@test/mocks/createBirthRecord'
+import { createBirthRegistrationPayload } from '@test/mocks/createBirthRecord'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
 import { TransactionResponse } from '@workflow/records/fhir'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -82,7 +80,7 @@ describe('Create record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
     )
