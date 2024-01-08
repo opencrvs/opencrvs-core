@@ -86,7 +86,9 @@ import {
   createWaitingForValidationTask,
   getTaskHistory,
   createRelatedPersonEntries,
-  createDocumentReferenceEntryForCertificate
+  createDocumentReferenceEntryForCertificate,
+  createIssuedTask,
+  createCertifiedTask
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 
@@ -721,42 +723,6 @@ export async function toCorrectionRejected(
   >
 }
 
-async function createCertifiedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): Promise<SavedTask> {
-  const certifiedTask: SavedTask = {
-    ...previousTask,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
-        ].includes(extension.url)
-      )
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'CERTIFIED'
-        }
-      ]
-    }
-  }
-  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
-    certifiedTask,
-    practitioner
-  )
-
-  return await setupLastRegLocation(
-    certifiedTaskWithPractitionerExtensions,
-    practitioner
-  )
-}
-
 export async function toCertified(
   record: RegisteredRecord,
   practitioner: Practitioner,
@@ -767,7 +733,17 @@ export async function toCertified(
 > {
   const previousTask = getTaskFromSavedBundle(record)
 
-  const certifiedTask = await createCertifiedTask(previousTask, practitioner)
+  const certifiedTask = createCertifiedTask(previousTask, practitioner)
+
+  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
+    certifiedTask,
+    practitioner
+  )
+
+  const certifiedTaskWithLocationExtensions = await setupLastRegLocation(
+    certifiedTaskWithPractitionerExtensions,
+    practitioner
+  )
 
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
@@ -820,47 +796,11 @@ export async function toCertified(
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: certifiedTask },
+      { resource: certifiedTaskWithLocationExtensions },
       ...relatedPersonEntries,
       documentReferenceEntry
     ]
   }
-}
-
-async function createIssuedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): Promise<SavedTask> {
-  const certifiedTask: SavedTask = {
-    ...previousTask,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
-        ].includes(extension.url)
-      )
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'ISSUED'
-        }
-      ]
-    }
-  }
-  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
-    certifiedTask,
-    practitioner
-  )
-
-  return await setupLastRegLocation(
-    certifiedTaskWithPractitionerExtensions,
-    practitioner
-  )
 }
 
 export async function toIssued(
@@ -880,8 +820,17 @@ export async function toIssued(
 > {
   const previousTask = getTaskFromSavedBundle(record)
 
-  const issuedTask = await createIssuedTask(previousTask, practitioner)
+  const issuedTask = createIssuedTask(previousTask, practitioner)
 
+  const issuedTaskWithPractitionerExtensions = setupLastRegUser(
+    issuedTask,
+    practitioner
+  )
+
+  const issuedTaskWithLocationExtensions = await setupLastRegLocation(
+    issuedTaskWithPractitionerExtensions,
+    practitioner
+  )
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
 
@@ -936,7 +885,7 @@ export async function toIssued(
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: issuedTask },
+      { resource: issuedTaskWithLocationExtensions },
       ...relatedPersonEntries,
       paymentEntry,
       documentReferenceEntry
