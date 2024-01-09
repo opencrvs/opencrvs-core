@@ -243,6 +243,7 @@ export type KnownExtensionType = StringExtensionType & {
 }
 export type StringExtension = { url: string; valueString: string }
 export type Extension = KnownExtensionType[keyof KnownExtensionType]
+export type ExtensionUrls = Extract<Extension, { url: string }>['url']
 
 type NestedExtensionTypes = Extract<
   Extension,
