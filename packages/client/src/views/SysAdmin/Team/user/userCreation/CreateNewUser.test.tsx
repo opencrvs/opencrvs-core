@@ -236,7 +236,7 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
-      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+      store.dispatch(modifyUserFormData(mockCompleteFormData))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
