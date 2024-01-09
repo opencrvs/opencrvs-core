@@ -25,6 +25,8 @@ import { toUpdated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
 import { ChangedValuesInput } from '@workflow/records/correction-request'
+import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
+import { getAuthHeader } from '@opencrvs/commons/http'
 
 type BirthRegistration = Omit<GQLBirthRegistration, 'registration'> & {
   registration: Registration
@@ -57,7 +59,16 @@ export const updateRoute = [
       const { details, event } = payload
       const { registration, ...detailsWithoutReg } = details
       const { changedValues, ...restOfRegistration } = registration
+      const payloadRecordDetails = {
+        ...detailsWithoutReg,
+        registration: restOfRegistration
+      }
       const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
+      const recordInputWithUploadedAttachments =
+        await uploadBase64AttachmentsToDocumentsStore(
+          payloadRecordDetails,
+          getAuthHeader(request)
+        )
 
       const recordInUpdatedState = await toUpdated(
         record,
@@ -67,7 +78,7 @@ export const updateRoute = [
 
       const updatedBundle = updateFHIRBundle(
         recordInUpdatedState,
-        { ...detailsWithoutReg, registration: restOfRegistration },
+        recordInputWithUploadedAttachments,
         event
       )
 
