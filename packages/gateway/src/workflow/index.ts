@@ -26,7 +26,8 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLPaymentInput
 } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils/index'
 
@@ -244,4 +245,23 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export function issueRegistration(
+  recordId: string,
+  certificate: Omit<GQLCertificateInput, 'payments'> & {
+    payment: GQLPaymentInput
+  },
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<CertifiedRecord>(
+    'POST',
+    `/records/${recordId}/issue-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }

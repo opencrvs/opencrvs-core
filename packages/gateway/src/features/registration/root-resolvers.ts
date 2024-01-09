@@ -65,7 +65,12 @@ import {
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
+<<<<<<< HEAD
   archiveRegistration,
+=======
+  fetchRegistration,
+  issueRegistration,
+>>>>>>> 45d8bb03d... Call issue endpoint from birth root resolver
   registerDeclaration,
   unassignRegistration,
   updateRegistration,
@@ -644,11 +649,24 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      const certificateDetails = details.registration?.certificates?.[0]
+      if (!certificateDetails) {
+        return Promise.reject(new Error('Certificate details required'))
+      }
+      const { payments, ...withoutPayments } = certificateDetails
+      if (!payments?.[0]) {
+        return Promise.reject(new Error('Payment details required'))
+      }
+      const certifiedRecord = await issueRegistration(
+        id,
+        { ...withoutPayments, payment: payments[0] },
+        EVENT_TYPE.BIRTH,
+        authHeader
+      )
+      return getComposition(certifiedRecord).id
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'certify')) {
