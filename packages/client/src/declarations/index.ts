@@ -310,7 +310,7 @@ export type Payment = {
   total: number
   amount: number
   outcome: PaymentOutcomeType
-  date: number
+  date: string
 }
 
 interface IArchiveDeclarationAction {

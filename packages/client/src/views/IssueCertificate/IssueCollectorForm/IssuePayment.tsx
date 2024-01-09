@@ -10,27 +10,16 @@
  */
 
 import {
-  IDeclaration,
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import {
-  formatUrl,
-  goBack,
-  goToHomeTab,
-  goToReviewCertificate
-} from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  useIntl
-} from 'react-intl'
+import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
+import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Redirect, RouteComponentProps, useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
@@ -54,9 +43,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { connect, useDispatch, useSelector } from 'react-redux'
-import { Event } from '@client/utils/gateway'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { useDispatch, useSelector } from 'react-redux'
+import { Event, PaymentOutcomeType, PaymentType } from '@client/utils/gateway'
 import { Button } from '@client/../../components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
@@ -109,7 +97,7 @@ export const IssuePayment = () => {
       total: Number(paymentAmount),
       amount: Number(paymentAmount),
       outcome: 'COMPLETED' as const,
-      date: Date.now()
+      date: new Date().toISOString()
     }
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(declaration))

@@ -164,7 +164,7 @@ class ReviewCertificateActionComponent extends React.Component<
           total: 0,
           amount: 0,
           outcome: 'COMPLETED' as const,
-          date: Date.now()
+          date: new Date().toISOString()
         }
       } else {
         const paymentAmount = calculatePrice(
@@ -178,7 +178,7 @@ class ReviewCertificateActionComponent extends React.Component<
           total: Number(paymentAmount),
           amount: Number(paymentAmount),
           outcome: 'COMPLETED' as const,
-          date: Date.now()
+          date: new Date().toISOString()
         }
       }
     }
