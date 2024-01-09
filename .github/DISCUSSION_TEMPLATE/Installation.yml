@@ -21,14 +21,14 @@ body:
     id: core-version
     attributes:
       label: OpenCRVS Core version
-      description: e.g 1.3.2
+      description: e.g 1.3.3
     validations:
       required: true
   - type: input
     id: countryconfig-version
     attributes:
       label: OpenCRVS Countryconfig version
-      description: e.g 1.3.2
+      description: e.g 1.3.3
     validations:
       required: true
   - type: input
