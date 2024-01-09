@@ -89,6 +89,9 @@ const getNextMessages = (
   language: string,
   languages: ILanguageState
 ): IntlMessages => {
+  if (!languages[language]) {
+    return languages[getDefaultLanguage()].messages
+  }
   return languages[language].messages
 }
 
