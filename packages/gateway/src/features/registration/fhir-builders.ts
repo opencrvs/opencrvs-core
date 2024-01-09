@@ -104,6 +104,7 @@ import {
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
+import { subYears, format } from 'date-fns'
 
 export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
@@ -752,9 +753,14 @@ function createAgeOfIndividualInYearsBuilder(
     })
   }
 
+  const age = parseInt(fieldValue.toString(), 10)
+  if (resource.deceasedDateTime) {
+    const birthDate = subYears(new Date(resource.deceasedDateTime), age)
+    resource.birthDate = format(birthDate, 'yyyy-MM-dd')
+    return
+  }
   // for storing an assumed birthdate when exact DOB is not known
-  const birthYear =
-    new Date().getFullYear() - parseInt(fieldValue.toString(), 10)
+  const birthYear = new Date().getFullYear() - age
   const firstDayOfBirthYear = new Date(birthYear, 0, 1)
   resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
     firstDayOfBirthYear.getMonth() + 1
@@ -1909,6 +1915,24 @@ export const builders: IFieldBuilders = {
           DECEASED_TITLE,
           fhirBundle
         )
+        /*
+         * setting birthDate from both here
+         * & age builder as it depends on which
+         * one gets called second
+         */
+        const age = person.extension?.find(
+          ({ url }) =>
+            url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
+        )?.valueString
+
+        if (age) {
+          const birthDate = subYears(
+            new Date(fieldValue as string),
+            parseInt(age, 10)
+          )
+          person.birthDate = format(birthDate, 'yyyy-MM-dd')
+        }
         person.deceasedDateTime = fieldValue as string
       }
     },
