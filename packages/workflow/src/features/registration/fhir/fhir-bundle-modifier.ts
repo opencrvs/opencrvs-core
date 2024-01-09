@@ -162,14 +162,17 @@ export async function invokeRegistrationValidation(
   token: string
 ): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    const res = await fetch(`${COUNTRY_CONFIG_URL}event-registration`, {
-      method: 'POST',
-      body: JSON.stringify(bundle),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
+    const res = await fetch(
+      new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
+      {
+        method: 'POST',
+        body: JSON.stringify(bundle),
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        }
       }
-    })
+    )
     if (!res.ok) {
       const errorData = await res.json()
       throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
