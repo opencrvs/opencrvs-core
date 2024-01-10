@@ -146,6 +146,8 @@ export const requestParamsSchema = Joi.object({
   locationId: Joi.string().uuid()
 })
 
+const LOCATION_CHUNK_SIZE = 400
+
 export async function fetchLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -177,6 +179,14 @@ export async function fetchLocationHandler(
   return response
 }
 
+function createChunks<T>(array: T[], limit: number): T[][] {
+  const result = []
+  for (let i = 0; i < array.length; i += limit) {
+    result.push(array.slice(i, i + limit))
+  }
+  return result
+}
+
 function createLocationSegments(locations: Location[]): Location[][] {
   const segments = []
   for (const jurisdictionType of Object.keys(JurisdictionType)) {
@@ -184,22 +194,20 @@ function createLocationSegments(locations: Location[]): Location[][] {
       (loc) => loc.jurisdictionType === jurisdictionType
     )
     if (jurisdictionLocations.length) {
-      segments.push(jurisdictionLocations)
+      segments.push(...createChunks(jurisdictionLocations, LOCATION_CHUNK_SIZE))
     }
   }
   const facilitiesOrOffices = locations.filter((loc) => !loc.jurisdictionType)
   if (facilitiesOrOffices.length) {
-    segments.push(facilitiesOrOffices)
+    segments.push(...createChunks(facilitiesOrOffices, LOCATION_CHUNK_SIZE))
   }
   return segments
 }
 
-async function batchLocationsHandler(
-  locations: Location[],
-  h: Hapi.ResponseToolkit
-) {
-  let parentLocationsMap: Map<string, string> = new Map()
+async function batchLocationsHandler(locations: Location[]) {
+  let statisticalToFhirIDMapOfParentLocations: Map<string, string> = new Map()
   const locationSegments = createLocationSegments(locations)
+  let cumulativeResponse
   for (const each of locationSegments) {
     const locationsBundle = {
       resourceType: 'Bundle',
@@ -209,8 +217,9 @@ async function batchLocationsHandler(
           ...location,
           // partOf is either Location/{fhirID} of another location or 'Location/0'
           partOf:
-            parentLocationsMap?.get(location.partOf.split('/')[1]) ??
-            location.partOf
+            statisticalToFhirIDMapOfParentLocations?.get(
+              location.partOf.split('/')[1]
+            ) ?? location.partOf
         }))
         .map(
           (location): BundleEntry<FhirLocation> => ({
@@ -230,14 +239,19 @@ async function batchLocationsHandler(
       JSON.stringify(locationsBundle)
     )
 
-    parentLocationsMap = new Map(
+    statisticalToFhirIDMapOfParentLocations = new Map(
       each.map((loc, i) => [
         loc.statisticalID,
         'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
       ])
     )
+    if (!cumulativeResponse) {
+      cumulativeResponse = res
+    } else {
+      cumulativeResponse.entry = cumulativeResponse.entry.concat(res.entry)
+    }
   }
-  return h.response().code(201)
+  return cumulativeResponse
 }
 
 export async function createLocationHandler(
@@ -245,7 +259,7 @@ export async function createLocationHandler(
   h: Hapi.ResponseToolkit
 ) {
   if (Array.isArray(request.payload)) {
-    return batchLocationsHandler(request.payload as Location[], h)
+    return batchLocationsHandler(request.payload as Location[])
   }
   const payload = request.payload as Location | Facility
   const newLocation: fhir.Location = composeFhirLocation(payload)
