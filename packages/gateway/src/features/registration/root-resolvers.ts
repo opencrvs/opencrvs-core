@@ -417,27 +417,24 @@ export const resolvers: GQLResolver = {
       }
     },
     async fetchRecordDetailsForVerification(_, { id }, context) {
-      try {
-        const token = await getAnonymousToken()
-        context.headers.Authorization = `Bearer ${token}`
-        const authHeader = {
-          Authorization: context.headers.Authorization
-        }
-        context.record = await getRecordById(id, authHeader.Authorization)
+      const token = await getAnonymousToken()
+      context.headers.Authorization = `Bearer ${token}`
+      context.record = await getRecordById(id, context.headers.Authorization)
 
-        const taskEntry = getTaskEntryFromBundle(context.record)
+      const taskEntry = getTaskEntryFromBundle(context.record)
 
-        const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: 'http://opencrvs.org/specs/extension/regVerified',
-          valueString: context.headers['x-real-ip']!
-        })
-        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: 'http://opencrvs.org/specs/extension/regVerified',
+        valueString: context.headers['x-real-ip']!
+      })
+      await fetchFHIR(
+        '/Task',
+        context.headers,
+        'PUT',
+        JSON.stringify(taskBundle)
+      )
 
-        return context.record
-      } catch (e) {
-        await Promise.reject(new Error(e))
-        throw e
-      }
+      return context.record
     }
   },
 
