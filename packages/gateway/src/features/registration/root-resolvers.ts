@@ -66,6 +66,7 @@ import {
 import {
   fetchRegistration,
   registerDeclaration,
+  rejectDeclaration,
   updateRegistration,
   validateRegistration
 } from '@gateway/workflow/index'
@@ -559,15 +560,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.REJECTED,
-        reason,
-        comment
-      )
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const taskEntry = await rejectDeclaration(id, authHeader, reason, comment)
+      if (!taskEntry) {
+        return await Promise.reject(new Error('Task not found'))
+      }
 
       // return the taskId
       return taskEntry.resource.id
