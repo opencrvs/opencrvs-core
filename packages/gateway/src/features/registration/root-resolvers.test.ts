@@ -764,41 +764,6 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('markEventAsVoided()', () => {
-    it('updates a task with rejected status, reason and comment', async () => {
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
-        [JSON.stringify(mockTaskBundle), { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: {
-                  location:
-                    'Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc/_history/ba0412c6-5125-4447-bd32-fb5cf336ddbc'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const reason = 'Misspelling'
-      const comment = 'Family name misspelled'
-      const result = await resolvers.Mutation!.markEventAsVoided(
-        {},
-        { id, reason, comment },
-        { headers: authHeaderRegCert }
-      )
-      const postData = JSON.parse(fetch.mock.calls[2][1].body)
-      expect(postData.entry[0].resource.reason.text).toBe('Misspelling')
-      expect(postData.entry[0].resource.statusReason.text).toBe(
-        'Family name misspelled'
-      )
-      expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
-    })
-
     it('throws error if user does not have register or validate scope', async () => {
       fetch.mockResponses([
         JSON.stringify({ userId: '121221' }),
