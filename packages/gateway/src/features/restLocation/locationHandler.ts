@@ -238,12 +238,13 @@ async function batchLocationsHandler(locations: Location[]) {
       'POST',
       JSON.stringify(locationsBundle)
     )
-
     statisticalToFhirIDMapOfParentLocations = new Map(
-      each.map((loc, i) => [
-        loc.statisticalID,
-        'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
-      ])
+      Array.from(statisticalToFhirIDMapOfParentLocations.entries()).concat(
+        each.map((loc, i) => [
+          loc.statisticalID,
+          'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
+        ])
+      )
     )
     if (!cumulativeResponse) {
       cumulativeResponse = res
