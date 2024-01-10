@@ -66,11 +66,22 @@ describe('Reject record endpoint', () => {
       })
     )
 
+    // Mock response from metrics
+    mswServer.use(
+      rest.post(
+        'http://localhost:1050/events/birth/mark-voided',
+        (_, res, ctx) => {
+          return res(ctx.json({}))
+        }
+      )
+    )
+
     const response = await server.server.inject({
       method: 'POST',
       url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/reject',
       payload: {
-        comment: 'Not enough data'
+        comment: 'Not enough data',
+        reason: ''
       },
       headers: {
         Authorization: `Bearer ${token}`
