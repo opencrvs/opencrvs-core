@@ -16,7 +16,8 @@ import {
   Resource,
   Bundle,
   SavedTask,
-  CertifiedRecord
+  CertifiedRecord,
+  ReadyForReviewRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -232,6 +233,29 @@ export async function archiveRegistration(
   const res: ArchivedRecord = await createRequest(
     'POST',
     `/records/${id}/archive`,
+    authHeader,
+    {
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
+}
+
+export async function duplicateRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/duplicate-record`,
     authHeader,
     {
       id,

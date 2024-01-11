@@ -33,7 +33,8 @@ import {
   isEncounter,
   isRelatedPerson,
   Encounter,
-  RelatedPerson
+  RelatedPerson,
+  TaskStatus
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -583,15 +584,35 @@ export function createRegisterTask(
   }
 }
 
-export function createArchiveTask(
+export function updateBusinessStatusInTask(
   previousTask: SavedTask,
+  status: TaskStatus
+): SavedTask {
+  return {
+    ...previousTask,
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: status
+        }
+      ]
+    }
+  }
+}
+
+function updateTaskWithCommentAndReason(
+  task: SavedTask,
   practitioner: Practitioner,
+  urlExtension:
+    | 'http://opencrvs.org/specs/extension/duplicateTrackingId'
+    | 'http://opencrvs.org/specs/extension/markedAsDuplicate',
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
-): SavedTask {
+) {
   const extension: Extension[] = [
-    ...previousTask.extension.filter((extension) =>
+    ...task.extension.filter((extension) =>
       [
         'http://opencrvs.org/specs/extension/contact-person-phone-number',
         'http://opencrvs.org/specs/extension/informants-signature',
@@ -602,40 +623,62 @@ export function createArchiveTask(
 
   if (duplicateTrackingId)
     extension.push({
-      url: `http://opencrvs.org/specs/extension/duplicateTrackingId`,
+      url: urlExtension,
       valueString: duplicateTrackingId
     })
 
   return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
+    ...task,
     requester: {
       agent: { reference: `Practitioner/${practitioner.id}` }
     },
-    identifier: previousTask.identifier,
     extension,
     // Reason example - "duplicate"
     reason: { text: reason ?? '' },
     // Status reason is comments which is added in the UI
     statusReason: { text: comment ?? '' },
     lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'ARCHIVED'
-        }
-      ]
-    },
     meta: {
-      ...previousTask.meta,
+      ...task.meta,
       lastUpdated: new Date().toISOString()
     }
   }
+}
+
+export function createArchiveTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  const updatedTask = updateTaskWithCommentAndReason(
+    previousTask,
+    practitioner,
+    `http://opencrvs.org/specs/extension/duplicateTrackingId`,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  return updateBusinessStatusInTask(updatedTask, 'ARCHIVED')
+}
+
+export function createDuplicateTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  return updateTaskWithCommentAndReason(
+    previousTask,
+    practitioner,
+    `http://opencrvs.org/specs/extension/markedAsDuplicate`,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
 }
 
 export function createUpdatedTask(
