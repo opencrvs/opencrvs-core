@@ -1128,7 +1128,7 @@ export const testDeathCertPayload = {
             date: 1575127120540
           }
         ],
-        total: 25,
+        total: { value: 25 },
         outcome: { coding: [{ code: 'COMPLETED' }] }
       }
     },
