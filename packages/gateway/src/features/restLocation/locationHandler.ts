@@ -157,9 +157,9 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth<fhir3.Bundle>(`/Location/${locationId}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth<fhir3.Bundle>(`/Location${searchParam}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location${searchParam}`)
   }
 
   response.link = response.link?.map((link) => ({
@@ -222,7 +222,7 @@ async function batchLocationsHandler(locations: Location[]) {
             ) ?? location.partOf
         }))
         .map(
-          (location): fhir3.BundleEntry<fhir3.Location> => ({
+          (location): fhir.BundleEntry => ({
             fullUrl: `urn:uuid:${uuid()}`,
             resource: {
               ...composeFhirLocation(location),
@@ -263,7 +263,7 @@ export async function createLocationHandler(
     return batchLocationsHandler(request.payload as Location[])
   }
   const payload = request.payload as Location | Facility
-  const newLocation: fhir3.Location = composeFhirLocation(payload)
+  const newLocation: fhir.Location = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
   const locations = [
