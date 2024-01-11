@@ -336,6 +336,9 @@ export function createPaymentResources(
     resource: {
       resourceType: 'PaymentReconciliation',
       status: 'active',
+      total: {
+        value: paymentDetails.total
+      },
       detail: [
         {
           type: {
