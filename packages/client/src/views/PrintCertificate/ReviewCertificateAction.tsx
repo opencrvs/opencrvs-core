@@ -161,7 +161,6 @@ class ReviewCertificateActionComponent extends React.Component<
       ) {
         certificate.payments = {
           type: 'MANUAL' as const,
-          total: 0,
           amount: 0,
           outcome: 'COMPLETED' as const,
           date: new Date().toISOString()
@@ -175,7 +174,6 @@ class ReviewCertificateActionComponent extends React.Component<
         )
         certificate.payments = {
           type: 'MANUAL' as const,
-          total: Number(paymentAmount),
           amount: Number(paymentAmount),
           outcome: 'COMPLETED' as const,
           date: new Date().toISOString()

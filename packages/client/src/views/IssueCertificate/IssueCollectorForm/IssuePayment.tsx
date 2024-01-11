@@ -44,7 +44,7 @@ import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { useDispatch, useSelector } from 'react-redux'
-import { Event, PaymentOutcomeType, PaymentType } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import { Button } from '@client/../../components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
@@ -94,7 +94,6 @@ export const IssuePayment = () => {
     )
     certificate.payments = {
       type: 'MANUAL' as const,
-      total: Number(paymentAmount),
       amount: Number(paymentAmount),
       outcome: 'COMPLETED' as const,
       date: new Date().toISOString()

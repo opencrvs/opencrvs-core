@@ -52,7 +52,6 @@ export const CertifyRequestSchema = z.object({
 
 const PaymentSchema = z.object({
   type: z.enum(['MANUAL']),
-  total: z.number(),
   amount: z.number(),
   outcome: z.enum(['COMPLETED', 'ERROR', 'PARTIAL']),
   date: z.string().datetime(),

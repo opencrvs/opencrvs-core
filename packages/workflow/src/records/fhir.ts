@@ -337,7 +337,7 @@ export function createPaymentResources(
       resourceType: 'PaymentReconciliation',
       status: 'active',
       total: {
-        value: paymentDetails.total
+        value: paymentDetails.amount
       },
       detail: [
         {
