@@ -62,7 +62,19 @@ type RecordBase = Bundle
 export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
 
 export type WaitingForValidationRecord = Nominal<
-  RecordBase,
+  SavedBundle<
+    | Composition
+    | DocumentReference
+    | Encounter
+    | Patient
+    | RelatedPerson
+    | PaymentReconciliation
+    | Task
+    | Practitioner
+    | PractitionerRole
+    | Location
+    | Observation
+  >,
   'WaitingForValidation'
 >
 
@@ -90,6 +102,7 @@ export type CorrectionRequestedRecord = Nominal<
 export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type RejectedRecord = Nominal<SavedBundle, 'Rejected'>
 export type ArchivedRecord = Nominal<SavedBundle, 'Archived'>
 
 export type ValidRecord =
@@ -100,6 +113,8 @@ export type ValidRecord =
   | CorrectionRequestedRecord
   | CertifiedRecord
   | IssuedRecord
+  | RejectedRecord
+  | WaitingForValidationRecord
   | ArchivedRecord
 
 export type RegistrationStatus =
@@ -123,6 +138,8 @@ export type StateIdenfitiers = {
   CORRECTION_REQUESTED: CorrectionRequestedRecord
   CERTIFIED: CertifiedRecord
   ISSUED: IssuedRecord
+  WAITING_VALIDATION: WaitingForValidationRecord
+  REJECTED: RejectedRecord
   ARCHIVED: ArchivedRecord
 }
 
@@ -208,4 +225,14 @@ export function replaceFromBundle(
       return shouldUpdate ? { ...entry, resource: newResource } : entry
     })
   }
+}
+
+export function getRegistrationNumber(record: RegisteredRecord): string {
+  const taskEntryResource = getTaskFromSavedBundle(record)
+  const identiferWithRn = taskEntryResource.identifier.find((obj) =>
+    obj.system.endsWith('registration-number')
+  )
+  if (!identiferWithRn)
+    throw new Error('Could not find registration number in bundle')
+  return identiferWithRn.value
 }

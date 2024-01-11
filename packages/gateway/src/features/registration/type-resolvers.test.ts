@@ -18,7 +18,7 @@ import { getApolloConfig } from '@gateway/graphql/config'
 import { generateQueryForType } from '@gateway/graphql/query-generator'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { BIRTH_BUNDLE } from './fixtures/birth-bundle'
+import { BIRTH_BUNDLE } from '@opencrvs/commons/fixtures'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -124,7 +124,9 @@ jest.mock('@gateway/workflow/index', () => {
   const originalModule = jest.requireActual('@gateway/workflow/index')
   return {
     ...originalModule,
-    fetchRegistrationForAssignment: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
+    fetchRegistrationForDownloading: jest.fn(() =>
+      Promise.resolve(BIRTH_BUNDLE)
+    )
   }
 })
 

@@ -129,6 +129,10 @@ export async function createRegistration(
     createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
   }
 
+  if (hasScope(authHeader, 'register') && !res.isPotentiallyDuplicate) {
+    createRequest('POST', `/records/${res.compositionId}/register`, authHeader)
+  }
+
   return res
 }
 
@@ -169,6 +173,16 @@ export async function fetchRegistrationForDownloading(
     authHeader,
     { id }
   )
+}
+
+export async function registerDeclaration(
+  id: string,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  return await createRequest('POST', `/records/${id}/register`, authHeader, {
+    event
+  })
 }
 
 export async function archiveRegistration(

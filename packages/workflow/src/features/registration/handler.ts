@@ -8,74 +8,52 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
+import { HEARTH_URL } from '@workflow/constants'
 import {
   markBundleAsCertified,
   markBundleAsValidated,
-  markEventAsRegistered,
   modifyRegistrationBundle,
   setTrackingId,
   markBundleAsWaitingValidation,
-  updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  validateDeceasedDetails,
   makeTaskAnonymous,
   markBundleAsIssued
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  getEventInformantName,
-  getFromFhir,
-  getPhoneNo,
   getSharedContactMsisdn,
   postToHearth,
-  generateEmptyBundle,
   mergePatientIdentifier,
-  getSharedContactEmail,
-  getEmailAddress,
-  getInformantName,
-  getCRVSOfficeName,
-  getRegistrationLocation
+  getSharedContactEmail
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
-  sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  getEventType
 } from '@workflow/features/registration/utils'
-import {
-  taskHasInput,
-  getTaskEventType
-} from '@workflow/features/task/fhir/utils'
+import { taskHasInput } from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import {
-  INFORMANT_CODE,
-  getTaskResourceFromFhirBundle
-} from '@workflow/features/registration/fhir/fhir-template'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
+import { Bundle, BundleEntry, EVENT_TYPE, Saved } from '@opencrvs/commons/types'
+import { getRecordById } from '@workflow/records/index'
+import { toRegistered } from '@workflow/records/state-transitions'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { indexBundle } from '@workflow/records/search'
 import {
-  Events,
-  MARK_REG,
-  REG_NUMBER_SYSTEM,
-  SECTION_CODE
-} from '@workflow/features/events/utils'
-import {
-  Bundle,
-  BundleEntry,
-  Composition,
-  Patient,
-  RegistrationNumber,
-  Saved,
-  Task
-} from '@opencrvs/commons/types'
+  isNotificationEnabled,
+  sendNotification
+} from '@workflow/records/notification'
 
-interface IEventRegistrationCallbackPayload {
+export interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
+  compositionId: string
   childIdentifiers?: {
     type: string
     value: string
@@ -239,182 +217,59 @@ export async function createRegistrationHandler(
   }
 }
 
-export async function markEventAsValidatedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    let payload: Bundle
-
-    const taskResource = getTaskResourceFromFhirBundle(
-      request.payload as Bundle
-    )
-
-    // In case the record was updated then there will be input output in payload
-    if (taskHasInput(taskResource)) {
-      payload = await markBundleAsDeclarationUpdated(
-        request.payload as Bundle,
-        getToken(request)
-      )
-      await postToHearth(payload)
-      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
-      delete taskResource.input
-      delete taskResource.output
-    }
-
-    payload = await markBundleAsValidated(
-      request.payload as Bundle,
-      getToken(request)
-    )
-
-    return await postToHearth(payload)
-  } catch (error) {
-    logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
 export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { trackingId, registrationNumber, error, childIdentifiers } =
+  const token = getToken(request)
+  const { registrationNumber, error, childIdentifiers, compositionId } =
     request.payload as IEventRegistrationCallbackPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
   }
 
-  const taskBundle: Bundle = await getFromFhir(`/Task?identifier=${trackingId}`)
-  if (
-    !taskBundle ||
-    !taskBundle.entry ||
-    !taskBundle.entry[0] ||
-    !taskBundle.entry[0].resource
-  ) {
-    throw new Error(
-      `Task for tracking id ${trackingId} could not be found during markEventAsRegisteredCallbackHandler`
-    )
-  }
-
-  const task = taskBundle.entry[0].resource as Task
-  if (!task.focus || !task.focus.reference) {
-    throw new Error(`Task ${task.id} doesn't have a focus reference`)
-  }
-  const composition: Composition = await getFromFhir(`/${task.focus.reference}`)
-  const event = getTaskEventType(task) as EVENT_TYPE
-
   try {
-    await markEventAsRegistered(
-      task,
-      registrationNumber as RegistrationNumber,
-      event,
+    const savedRecord = await getRecordById(
+      compositionId,
+      request.headers.authorization,
+      ['WAITING_VALIDATION']
+    )
+    if (!savedRecord) {
+      throw new Error('Could not find record in elastic search!')
+    }
+    const practitioner = await getLoggedInPractitionerResource(
       getToken(request)
     )
 
-    /** pushing registrationNumber on related person's identifier
-     *  taking patients as an array because MARRIAGE Event has two types of patient
-     */
-    const patients: Patient[] = await updatePatientIdentifierWithRN(
-      composition,
-      SECTION_CODE[event],
-      REG_NUMBER_SYSTEM[event],
-      registrationNumber
+    const event = getEventType(savedRecord)
+
+    const registeredBundle = await toRegistered(
+      request,
+      savedRecord,
+      practitioner,
+      registrationNumber,
+      childIdentifiers
     )
+    await sendBundleToHearth(registeredBundle)
+    await indexBundle(registeredBundle, getToken(request))
 
-    if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
-      // For birth event patients[0] is child and it should
-      // already be initialized with the RN identifier
-      childIdentifiers.forEach((childIdentifier) => {
-        const previousIdentifier = patients[0].identifier!.find(
-          ({ type }) => type?.coding?.[0].code === childIdentifier.type
-        )
-        if (!previousIdentifier) {
-          patients[0].identifier!.push({
-            type: {
-              coding: [{ code: childIdentifier.type }]
-            },
-            value: childIdentifier.value
-          })
-        } else {
-          previousIdentifier.value = childIdentifier.value
-        }
-      })
+    // Notification not implemented for marriage yet
+    // don't forward hospital notifications
+    if (
+      event !== EVENT_TYPE.MARRIAGE &&
+      (await isNotificationEnabled('register', event, token))
+    ) {
+      await sendNotification('register', registeredBundle, token)
     }
 
-    if (event === EVENT_TYPE.DEATH) {
-      /** using first patient because for death event there is only one patient */
-      patients[0] = await validateDeceasedDetails(patients[0], {
-        Authorization: request.headers.authorization
-      })
-    }
-
-    //** Making sure db automicity */
-    const bundle = generateEmptyBundle()
-    bundle.entry?.push({ resource: task })
-    for (const patient of patients) {
-      bundle.entry?.push({ resource: patient })
-    }
-    await sendBundleToHearth(bundle)
-    //TODO: We have to configure sms and identify informant for marriage event
-    if (event !== EVENT_TYPE.MARRIAGE) {
-      const sms = getPhoneNo(task, event)
-      const email = getEmailAddress(task, event)
-      const informantName = await getInformantName(bundle, INFORMANT_CODE)
-      const name = await getEventInformantName(composition, event)
-      const crvsOffice = await getCRVSOfficeName(bundle)
-      const registrationLocation = await getRegistrationLocation(bundle)
-
-      /* sending notification to the contact */
-      if ((sms || email) && informantName) {
-        logger.info(
-          'markEventAsRegisteredCallbackHandler sending event notification'
-        )
-        sendRegisteredNotification(
-          { sms, email },
-          informantName,
-          name,
-          trackingId,
-          registrationNumber,
-          crvsOffice,
-          registrationLocation,
-          event,
-          {
-            Authorization: request.headers.authorization
-          }
-        )
-      } else {
-        logger.info(
-          'markEventAsRegisteredCallbackHandler could not send event notification'
-        )
-      }
-    }
-    // Most nations will desire the opportunity to pilot OpenCRVS alongised a legacy system, or an external data store / validation process
-    // In the absence of an external process, we must wait at least a second before we continue, because Elasticsearch must
-    // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
-    // If an external system is being used, then its processing time will mean a wait is not required.
-    if (!VALIDATING_EXTERNALLY) {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-    }
-    // Trigger an event for the registration
-    await triggerEvent(
-      MARK_REG[event],
-      {
-        resourceType: 'Bundle',
-        // Allow updating patients[0] as for example new-born child might get identifier updated
-        entry: [{ resource: task }, { resource: patients[0] }]
-      },
-      request.headers
-    )
+    return h.response(registeredBundle).code(200)
   } catch (error) {
     logger.error(
-      `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
+      `Workflow/markEventAsRegisteredCallbackHandler: error: ${error}`
     )
     throw new Error(error)
   }
-
-  return h.response().code(200)
 }
 
 export async function markEventAsWaitingValidationHandler(

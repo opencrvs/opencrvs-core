@@ -121,6 +121,10 @@ function isValidationAction(action: SubmissionAction) {
   return [SubmissionAction.APPROVE_DECLARATION].includes(action)
 }
 
+function isRegisterAction(action: SubmissionAction) {
+  return [SubmissionAction.REGISTER_DECLARATION].includes(action)
+}
+
 async function removeDuplicatesFromCompositionAndElastic(
   declaration: IDeclaration,
   submissionAction: SubmissionAction
@@ -170,7 +174,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const form = getRegisterForm(getState())[event]
     const offlineData = getOfflineData(getState())
-    let graphqlPayload = getGqlDetails(
+    const graphqlPayload = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
       getOfflineData(getState()),
@@ -185,7 +189,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       graphqlPayload.registration.correction.values = changedValues
     }
 
-    if (isValidationAction(submissionAction)) {
+    if (
+      isValidationAction(submissionAction) ||
+      isRegisterAction(submissionAction)
+    ) {
       const changedValues = getChangedValues(form, declaration, offlineData)
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.changedValues = changedValues
