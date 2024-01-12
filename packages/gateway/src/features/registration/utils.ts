@@ -10,7 +10,6 @@
  */
 
 import { IAuthHeader } from '@opencrvs/commons'
-import { Composition } from '@opencrvs/commons/types'
 import { fetchDocuments } from '@gateway/features/documents/service'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 import {
@@ -33,33 +32,7 @@ export async function getPresignedUrlFromUri(
   return response.presignedURL
 }
 
-export async function removeDuplicatesFromComposition(
-  composition: Composition,
-  compositionId: string,
-  duplicateId?: string
-) {
-  if (duplicateId) {
-    const removeAllDuplicates = compositionId === duplicateId
-    const updatedRelatesTo =
-      composition.relatesTo &&
-      composition.relatesTo.filter((relatesTo) => {
-        return (
-          relatesTo.code !== 'duplicate' ||
-          (!removeAllDuplicates &&
-            relatesTo.targetReference &&
-            relatesTo.targetReference.reference !==
-              `Composition/${duplicateId}`)
-        )
-      })
-    composition.relatesTo = updatedRelatesTo
-    return composition
-  } else {
-    composition.relatesTo = []
-    return composition
-  }
-}
-
-export async function setCollectorForPrintInAdvance(
+export async function setCertificateCollector(
   details:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput

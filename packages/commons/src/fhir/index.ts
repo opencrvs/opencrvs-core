@@ -404,3 +404,29 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
     : never
 }
 export { updateFHIRBundle, buildFHIRBundle } from './transformers'
+
+export function removeDuplicatesFromComposition(
+  composition: Composition,
+  compositionId: string,
+  duplicateId?: string
+) {
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
+}
