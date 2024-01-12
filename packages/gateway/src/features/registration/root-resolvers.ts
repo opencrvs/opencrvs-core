@@ -66,6 +66,7 @@ import {
 import {
   archiveRegistration,
   registerDeclaration,
+  unassignRegistration,
   updateRegistration,
   validateRegistration,
   fetchRegistrationForDownloading
@@ -521,12 +522,7 @@ export const resolvers: GQLResolver = {
         throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.DEATH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.DEATH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
@@ -736,15 +732,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
-      })
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const task = (await unassignRegistration(id, authHeader)).entry[0]
 
       // return the taskId
-      return taskEntry.resource.id
+      return task.resource.id
     },
     async markEventAsDuplicate(
       _,

@@ -51,6 +51,7 @@ export type Address = {
   from?: Maybe<Scalars['Date']>
   line?: Maybe<Array<Maybe<Scalars['String']>>>
   lineName?: Maybe<Array<Maybe<Scalars['String']>>>
+  partOf?: Maybe<Scalars['String']>
   postalCode?: Maybe<Scalars['String']>
   state?: Maybe<Scalars['String']>
   stateName?: Maybe<Scalars['String']>
@@ -231,14 +232,12 @@ export type ApplicationConfiguration = {
   CURRENCY?: Maybe<Currency>
   DATE_OF_BIRTH_UNKNOWN?: Maybe<Scalars['Boolean']>
   DEATH?: Maybe<Death>
-  EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
+  FEATURES?: Maybe<Features>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
-  INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
   MARRIAGE?: Maybe<Marriage>
-  MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
   USER_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
@@ -251,10 +250,9 @@ export type ApplicationConfigurationInput = {
   CURRENCY?: InputMaybe<CurrencyInput>
   DATE_OF_BIRTH_UNKNOWN?: InputMaybe<Scalars['Boolean']>
   DEATH?: InputMaybe<DeathInput>
-  EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
+  FEATURES?: InputMaybe<FeaturesInput>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: InputMaybe<Scalars['String']>
-  INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   MARRIAGE?: InputMaybe<MarriageInput>
@@ -566,7 +564,7 @@ export type CorrectionRejectionInput = {
 export type CorrectionValueInput = {
   fieldName: Scalars['String']
   newValue: Scalars['FieldValue']
-  oldValue: Scalars['FieldValue']
+  oldValue?: InputMaybe<Scalars['FieldValue']>
   section: Scalars['String']
 }
 
@@ -818,6 +816,23 @@ export type FhiridMap = {
   eventLocation?: InputMaybe<Scalars['String']>
   observation?: InputMaybe<ObservationFhirids>
   questionnaireResponse?: InputMaybe<Scalars['String']>
+}
+
+export type Features = {
+  __typename?: 'Features'
+  DEATH_REGISTRATION?: Maybe<Scalars['Boolean']>
+  EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
+  MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
+  PRINT_DECLARATION?: Maybe<Scalars['Boolean']>
+}
+
+export type FeaturesInput = {
+  DEATH_REGISTRATION?: InputMaybe<Scalars['Boolean']>
+  EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
+  MARRIAGE_REGISTRATION?: InputMaybe<Scalars['Boolean']>
+  PRINT_DECLARATION?: InputMaybe<Scalars['Boolean']>
 }
 
 export enum Gender {
@@ -1121,12 +1136,12 @@ export type Mutation = {
   deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
   markBirthAsIssued: Scalars['ID']
-  markBirthAsRegistered: BirthRegistration
+  markBirthAsRegistered: Scalars['ID']
   markBirthAsValidated?: Maybe<Scalars['ID']>
   markBirthAsVerified?: Maybe<BirthRegistration>
   markDeathAsCertified: Scalars['ID']
   markDeathAsIssued: Scalars['ID']
-  markDeathAsRegistered: DeathRegistration
+  markDeathAsRegistered: Scalars['ID']
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
@@ -1137,7 +1152,7 @@ export type Mutation = {
   markEventAsVoided: Scalars['ID']
   markMarriageAsCertified: Scalars['ID']
   markMarriageAsIssued: Scalars['ID']
-  markMarriageAsRegistered: MarriageRegistration
+  markMarriageAsRegistered: Scalars['ID']
   markMarriageAsValidated?: Maybe<Scalars['ID']>
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
@@ -2009,6 +2024,7 @@ export type RegistrationInput = {
   book?: InputMaybe<Scalars['String']>
   brideSignature?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
+  changedValues?: InputMaybe<Array<CorrectionValueInput>>
   contactEmail?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
@@ -3378,51 +3394,7 @@ export type MarkBirthAsRegisteredMutationVariables = Exact<{
 
 export type MarkBirthAsRegisteredMutation = {
   __typename?: 'Mutation'
-  markBirthAsRegistered: {
-    __typename?: 'BirthRegistration'
-    id: string
-    registration?: {
-      __typename?: 'Registration'
-      id?: string | null
-      status?: Array<{
-        __typename?: 'RegWorkflow'
-        id: string
-        type?: RegStatus | null
-        timestamp?: any | null
-        user?: {
-          __typename?: 'User'
-          id: string
-          systemRole: SystemRoleType
-          name: Array<{
-            __typename?: 'HumanName'
-            use?: string | null
-            firstNames?: string | null
-            familyName?: string | null
-          }>
-        } | null
-        location?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          alias?: Array<string> | null
-        } | null
-        office?: {
-          __typename?: 'Location'
-          name?: string | null
-          alias?: Array<string> | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-          } | null
-        } | null
-        comments?: Array<{
-          __typename?: 'Comment'
-          comment?: string | null
-        } | null> | null
-      } | null> | null
-    } | null
-  }
+  markBirthAsRegistered: string
 }
 
 export type MarkEventAsVoidedMutationVariables = Exact<{
@@ -4185,51 +4157,7 @@ export type MarkDeathAsRegisteredMutationVariables = Exact<{
 
 export type MarkDeathAsRegisteredMutation = {
   __typename?: 'Mutation'
-  markDeathAsRegistered: {
-    __typename?: 'DeathRegistration'
-    id: string
-    registration?: {
-      __typename?: 'Registration'
-      id?: string | null
-      status?: Array<{
-        __typename?: 'RegWorkflow'
-        id: string
-        type?: RegStatus | null
-        timestamp?: any | null
-        user?: {
-          __typename?: 'User'
-          id: string
-          systemRole: SystemRoleType
-          name: Array<{
-            __typename?: 'HumanName'
-            use?: string | null
-            firstNames?: string | null
-            familyName?: string | null
-          }>
-        } | null
-        location?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          alias?: Array<string> | null
-        } | null
-        office?: {
-          __typename?: 'Location'
-          name?: string | null
-          alias?: Array<string> | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-          } | null
-        } | null
-        comments?: Array<{
-          __typename?: 'Comment'
-          comment?: string | null
-        } | null> | null
-      } | null> | null
-    } | null
-  }
+  markDeathAsRegistered: string
 }
 
 export type MarkDeathAsCertifiedMutationVariables = Exact<{
@@ -5000,51 +4928,7 @@ export type MarkMarriageAsRegisteredMutationVariables = Exact<{
 
 export type MarkMarriageAsRegisteredMutation = {
   __typename?: 'Mutation'
-  markMarriageAsRegistered: {
-    __typename?: 'MarriageRegistration'
-    id: string
-    registration?: {
-      __typename?: 'Registration'
-      id?: string | null
-      status?: Array<{
-        __typename?: 'RegWorkflow'
-        id: string
-        type?: RegStatus | null
-        timestamp?: any | null
-        user?: {
-          __typename?: 'User'
-          id: string
-          systemRole: SystemRoleType
-          name: Array<{
-            __typename?: 'HumanName'
-            use?: string | null
-            firstNames?: string | null
-            familyName?: string | null
-          }>
-        } | null
-        location?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          alias?: Array<string> | null
-        } | null
-        office?: {
-          __typename?: 'Location'
-          name?: string | null
-          alias?: Array<string> | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-          } | null
-        } | null
-        comments?: Array<{
-          __typename?: 'Comment'
-          comment?: string | null
-        } | null> | null
-      } | null> | null
-    } | null
-  }
+  markMarriageAsRegistered: string
 }
 
 export type MarkMarriageAsCertifiedMutationVariables = Exact<{
@@ -7912,7 +7796,6 @@ export type UpdateApplicationConfigMutation = {
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
     DATE_OF_BIRTH_UNKNOWN?: boolean | null
-    INFORMANT_SIGNATURE?: boolean | null
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     USER_NOTIFICATION_DELIVERY_METHOD?: string | null
     INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string | null
