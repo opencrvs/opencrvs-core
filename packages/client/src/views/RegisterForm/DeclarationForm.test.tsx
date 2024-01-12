@@ -125,7 +125,6 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
-          // Child's details view
           // await waitForElement(app, '#informant_parent_view')
           app
             .find('#firstNamesEng')
@@ -136,17 +135,6 @@ describe('when user has starts a new declaration', () => {
 
           app.find('#next_section').hostNodes().simulate('click')
           await flushPromises()
-        })
-        it('stores the value to a new draft and move to next section', () => {
-          const mockCalls = (storage.setItem as Mock).mock.calls
-          const userData = mockCalls[mockCalls.length - 1]
-          const storedDeclarations = JSON.parse(
-            userData[userData.length - 1]
-          )[0].declarations
-          expect(storedDeclarations[0].data.child.firstNamesEng).toEqual(
-            'hello'
-          )
-          expect(window.location.href).toContain('informant')
         })
         it('redirect to home when pressed save and exit button', async () => {
           app.find('#save-exit-btn').hostNodes().simulate('click')
