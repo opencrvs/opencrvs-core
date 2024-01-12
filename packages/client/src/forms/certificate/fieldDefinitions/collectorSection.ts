@@ -1022,8 +1022,7 @@ const marriageIssueCollectorFormOptions = [
 ]
 
 function getCertCollectorGroupForEvent(
-  declaration: IDeclaration,
-  intl: IntlShape
+  declaration: IDeclaration
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1072,8 +1071,7 @@ function getCertCollectorGroupForEvent(
 }
 
 export function getCertificateCollectorFormSection(
-  declaration: IDeclaration,
-  intl: IntlShape
+  declaration: IDeclaration
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1081,7 +1079,7 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(declaration, intl),
+      getCertCollectorGroupForEvent(declaration),
       otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]
