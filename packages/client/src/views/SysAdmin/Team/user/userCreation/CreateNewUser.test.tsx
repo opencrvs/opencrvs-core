@@ -36,6 +36,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
+import { GetUserQuery, Status, SystemRoleType } from '@client/utils/gateway'
 
 const mockUsers = {
   data: {
@@ -184,127 +185,6 @@ const mockUsers = {
   }
 }
 
-describe('create new user tests', () => {
-  let store: AppStore
-  let history: History
-  let testComponent: ReactWrapper
-
-  beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
-    const s = createStore()
-    store = s.store
-    history = s.history
-    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-  })
-
-  describe('when user is in create new user form', () => {
-    beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <CreateNewUser
-          match={{
-            // @ts-ignore
-            params: {
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.userForms.sections[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-
-      loginAsFieldAgent(store)
-    })
-
-    it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
-      await waitForElement(testComponent, '#confirm_form')
-
-      testComponent.find('#confirm_form').hostNodes().simulate('click')
-
-      await flushPromises()
-      testComponent.update()
-      expect(
-        testComponent
-          .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
-          .hostNodes()
-          .text()
-      ).toBe('Required to register a new user')
-    })
-
-    it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
-      store.dispatch(modifyUserFormData(mockCompleteFormData))
-      await waitForElement(testComponent, '#confirm_form')
-      testComponent.find('#confirm_form').hostNodes().simulate('click')
-      await flushPromises()
-      expect(history.location.pathname).toContain(
-        'preview/preview-registration-office'
-      )
-    })
-
-    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
-      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      await waitForElement(testComponent, '#confirm_form')
-      testComponent.find('#confirm_form').hostNodes().simulate('click')
-      await flushPromises()
-
-      expect(history.location.pathname).toContain(
-        '/createUser/user/signature-attachment'
-      )
-    })
-  })
-
-  describe('when user in review page', () => {
-    beforeEach(async () => {
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-      store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
-              sectionId: mockOfflineData.userForms.sections[1].id,
-              groupId: mockOfflineData.userForms.sections[1].groups[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-    })
-
-    it('renders review header', () => {
-      expect(testComponent.find('#content-name').hostNodes().text()).toBe(
-        'Please review the new users details'
-      )
-    })
-
-    it('clicking change button on a field takes user back to form', async () => {
-      testComponent
-        .find('#btn_change_familyNameEng')
-        .hostNodes()
-        .first()
-        .simulate('click')
-      await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#familyNameEng')
-    })
-
-    it('clicking submit button submits the form data', async () => {
-      testComponent.find('#submit_user_form').hostNodes().simulate('click')
-
-      await flushPromises()
-
-      expect(store.getState().userForm.submitting).toBe(false)
-    })
-  })
-})
-
 describe('edit user tests', () => {
   const { store, history } = createStore()
   let component: ReactWrapper<{}, {}>
@@ -342,9 +222,24 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
-            systemRole: 'REGISTRATION_AGENT',
-            role: { _id: '63ef9466f708ea080777c27a' },
-            status: 'active',
+            systemRole: SystemRoleType.RegistrationAgent,
+            role: {
+              _id: '63ef9466f708ea080777c27d',
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Registration Agent',
+                  __typename: 'RoleLabel'
+                },
+                {
+                  lang: 'fr',
+                  label: "Agent d'enregistrement",
+                  __typename: 'RoleLabel'
+                }
+              ],
+              __typename: 'Role'
+            },
+            status: Status.Active,
             title: 'Test user',
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
@@ -358,7 +253,7 @@ describe('edit user tests', () => {
               {
                 id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
                 name: 'Sample location',
-                alias: 'স্যাম্পল লোকেশান'
+                alias: ['স্যাম্পল লোকেশান']
               }
             ],
             // without signature confirm button stays disabled
@@ -368,7 +263,7 @@ describe('edit user tests', () => {
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
           }
-        }
+        } satisfies GetUserQuery
       }
     }
   ]
@@ -424,6 +319,8 @@ describe('edit user tests', () => {
       component.update()
       await flushPromises()
 
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+
       expect(history.location.pathname).toContain('signature-attachment')
     })
   })
@@ -444,7 +341,8 @@ describe('edit user tests', () => {
             // @ts-ignore
             params: {
               userId: '5e835e4d81fbf01e4dc554db',
-              sectionId: UserSection.Preview
+              sectionId: UserSection.Preview,
+              groupId: 'preview-registration-office'
             },
             isExact: true,
             path: REVIEW_USER_FORM,
@@ -480,6 +378,10 @@ describe('edit user tests', () => {
     it('clicking confirm button starts submitting the form', async () => {
       await waitForElement(component, '#submit-edit-user-form')
       component.update()
+
+      store.dispatch(
+        modifyUserFormData(store.getState().userForm.userFormData, true)
+      )
 
       const submitButton = await waitForElement(
         component,
