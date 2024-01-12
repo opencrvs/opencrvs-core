@@ -512,12 +512,7 @@ export const resolvers: GQLResolver = {
         throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.DEATH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.DEATH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
