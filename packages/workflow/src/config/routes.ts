@@ -23,6 +23,7 @@ import { rejectRoute } from '@workflow/records/handler/reject'
 import { reinstateRoute } from '@workflow/records/handler/reinstate'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
+import { markAsNotDuplicateHandler } from '@workflow/records/handler/not-duplicate'
 
 export const getRoutes = () => {
   const routes = [
@@ -116,6 +117,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Unassign record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/not-duplicate/{id}/record',
+      handler: markAsNotDuplicateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Mark as not duplicate record endpoint'
       }
     }
   ]

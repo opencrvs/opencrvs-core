@@ -32,7 +32,7 @@ export async function getPresignedUrlFromUri(
   return response.presignedURL
 }
 
-export async function setCertificateCollector(
+export async function setCollectorForPrintInAdvance(
   details:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput

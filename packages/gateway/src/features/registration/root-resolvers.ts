@@ -19,7 +19,6 @@ import {
   EVENT_TYPE,
   Extension,
   Location,
-  OPENCRVS_SPECIFICATION_URL,
   Patient,
   Saved,
   SavedBundleEntry,
@@ -57,10 +56,7 @@ import {
   IUserModelData,
   isSystem
 } from '@gateway/features/user/type-resolvers'
-import {
-  removeDuplicatesFromComposition,
-  setCollectorForPrintInAdvance
-} from '@gateway/features/registration/utils'
+import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
   issueRegistration,
@@ -71,7 +67,8 @@ import {
   validateRegistration,
   fetchRegistrationForDownloading,
   reinstateRegistration,
-  duplicateRegistration
+  duplicateRegistration,
+  markNotAsDuplicate
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -661,32 +658,8 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition: Composition = await fetchFHIR(
-          `/Composition/${id}`,
-          authHeader,
-          'GET'
-        )
-        await removeDuplicatesFromComposition(composition, id)
-        const compositionEntry = {
-          resource: composition
-        }
+        const composition = await markNotAsDuplicate(id, authHeader)
 
-        const taskEntry = await getTaskEntry(id, authHeader)
-
-        const extension = {
-          url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
-        }
-        const taskBundle = taskBundleWithExtension(taskEntry, extension)
-        const payloadBundle: Bundle = {
-          ...taskBundle,
-          entry: [compositionEntry, ...taskBundle.entry]
-        }
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(payloadBundle)
-        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -820,44 +793,6 @@ async function markEventAsIssued(
     authHeader
   )
   return getComposition(issuedRecord).id
-}
-
-const ACTION_EXTENSIONS: Extension['url'][] = [
-  'http://opencrvs.org/specs/extension/regAssigned',
-  'http://opencrvs.org/specs/extension/regVerified',
-  'http://opencrvs.org/specs/extension/regUnassigned',
-  'http://opencrvs.org/specs/extension/regDownloaded',
-  'http://opencrvs.org/specs/extension/regReinstated',
-  'http://opencrvs.org/specs/extension/makeCorrection',
-  'http://opencrvs.org/specs/extension/regViewed',
-  'http://opencrvs.org/specs/extension/markedAsNotDuplicate',
-  'http://opencrvs.org/specs/extension/markedAsDuplicate',
-  'http://opencrvs.org/specs/extension/duplicateTrackingId',
-  'http://opencrvs.org/specs/extension/flaggedAsPotentialDuplicate'
-]
-
-type ACTION_EXTENSION_TYPE = typeof ACTION_EXTENSIONS
-
-async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
-  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
-  const taskBundle = await fetchFHIR<Saved<Bundle<Task>>>(
-    `/Task?focus=Composition/${compositionId}`,
-    authHeader
-  )
-  const taskEntry = taskBundle.entry[0]
-  if (!taskEntry) {
-    throw new Error('Task does not exist')
-  }
-  taskEntry.resource.extension = taskEntry.resource.extension?.filter(
-    ({ url }) =>
-      !ACTION_EXTENSIONS.includes(
-        url as unknown as ACTION_EXTENSION_TYPE[number]
-      )
-  )
-  taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
-    ({ system }) => system != systemIdentifierUrl
-  )
-  return taskEntry
 }
 
 type Action = typeof TaskActionExtension
