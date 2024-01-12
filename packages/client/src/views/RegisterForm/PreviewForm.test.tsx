@@ -75,7 +75,13 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       const data = deathReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.Death }
+      customDraft = {
+        id: uuid(),
+        data,
+        review: true,
+        event: Event.Death,
+        registrationStatus: 'VALIDATED'
+      }
       store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
