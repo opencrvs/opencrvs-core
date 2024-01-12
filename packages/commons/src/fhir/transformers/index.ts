@@ -99,8 +99,7 @@ import {
   WITNESS_TWO_CODE,
   findExtension,
   getComposition,
-  markSaved,
-  ExtensionUrls
+  markSaved
 } from '..'
 import { getUUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
@@ -821,7 +820,8 @@ function createOrUpdateSignatureExtension(
   if (!resource.extension) {
     resource.extension = []
   }
-  const signatureUrl: ExtensionUrls = `http://opencrvs.org/specs/extension/${extensionPostfix}`
+  const signatureUrl =
+    `http://opencrvs.org/specs/extension/${extensionPostfix}` as const
   resource.extension = resource.extension.filter(
     (ext) => ext.url !== signatureUrl
   )
