@@ -20,7 +20,8 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   WaitingForValidationRecord,
-  RejectedRecord
+  RejectedRecord,
+  ArchivedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -46,6 +47,7 @@ export type ActionIdentifiers = {
   DECLARATION_UPDATED: Update
   REGISTERED: Register
   WAITING_VALIDATION: WaitForExternalValidation
+  ARCHIVE: Archive
 }
 
 /*
@@ -86,6 +88,12 @@ export type StateTree =
       ReadyForReviewRecord | ValidatedRecord,
       WaitForExternalValidation,
       WaitingForValidationRecord | RejectedRecord
+    >
+  // Archive declaration
+  | Transition<
+      ReadyForReviewRecord | ValidatedRecord | RegisteredRecord,
+      Archive,
+      ArchivedRecord
     >
 
 /*

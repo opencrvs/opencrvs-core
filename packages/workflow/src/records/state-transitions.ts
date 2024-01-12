@@ -452,7 +452,7 @@ export async function toRegistered(
 }
 
 export async function toArchived(
-  record: RegisteredRecord | ReadyForReviewRecord,
+  record: RegisteredRecord | ReadyForReviewRecord | ValidatedRecord,
   practitioner: Practitioner,
   reason?: string,
   comment?: string,

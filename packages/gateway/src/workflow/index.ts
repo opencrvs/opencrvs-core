@@ -212,7 +212,7 @@ export async function archiveRegistration(
 ) {
   const res: ArchivedRecord = await createRequest(
     'POST',
-    `/archive-record`,
+    `/records/${id}/archive`,
     authHeader,
     {
       id,

@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod'
-import * as Hapi from '@hapi/hapi'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
-import { getRecordById } from '@workflow/records/index'
+import { createRoute } from '@workflow/states'
 
 const requestSchema = z.object({
   id: z.string(),
@@ -25,31 +24,30 @@ const requestSchema = z.object({
   duplicateTrackingId: z.string().optional()
 })
 
-export async function archiveRecordHandler(
-  request: Hapi.Request,
-  _: Hapi.ResponseToolkit
-) {
-  const token = getToken(request)
-  const payload = validateRequest(requestSchema, request.payload)
-  const record = await getRecordById(
-    // Task history is fetched rather than the task only
-    `${payload.id}?includeHistoryResources`,
-    token,
-    ['READY_FOR_REVIEW', 'REGISTERED']
-  )
+export const archiveRoute = [
+  createRoute({
+    method: 'POST',
+    path: '/records/{recordId}/archive',
+    allowedStartStates: ['REGISTERED', 'READY_FOR_REVIEW', 'VALIDATED'],
+    action: 'ARCHIVE',
+    handler: async (request, record) => {
+      const token = getToken(request)
+      const payload = validateRequest(requestSchema, request.payload)
 
-  const { reason, comment, duplicateTrackingId } = payload
+      const { reason, comment, duplicateTrackingId } = payload
 
-  const { archivedRecord, archivedRecordWithTaskOnly } = await toArchived(
-    record,
-    await getLoggedInPractitionerResource(token),
-    reason,
-    comment,
-    duplicateTrackingId
-  )
+      const { archivedRecord, archivedRecordWithTaskOnly } = await toArchived(
+        record,
+        await getLoggedInPractitionerResource(token),
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-  await sendBundleToHearth(archivedRecordWithTaskOnly)
-  await indexBundle(archivedRecord, token)
+      await sendBundleToHearth(archivedRecordWithTaskOnly)
+      await indexBundle(archivedRecord, token)
 
-  return archivedRecord
-}
+      return archivedRecord
+    }
+  })
+]
