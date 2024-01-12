@@ -12,6 +12,7 @@ import { routes as correctionRoutes } from '@workflow/features/correction/routes
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import createRecordHandler from '@workflow/records/handler/create'
+import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
 import { registerRoute } from '@workflow/records/handler/register'
 import { updateRoute } from '@workflow/records/handler/update'
@@ -83,6 +84,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/unassign-record',
+      handler: unassignRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Unassign record endpoint'
       }
     },
     ...validateRoute,

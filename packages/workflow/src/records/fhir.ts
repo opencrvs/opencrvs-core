@@ -613,6 +613,42 @@ export function createUpdatedTask(
   }
 }
 
+export function createUnassignedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+) {
+  const unassignedTask: SavedTask = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  return unassignedTask
+}
+
 export function createCorrectionRequestTask(
   previousTask: Task,
   correctionDetails: CorrectionRequestInput,
