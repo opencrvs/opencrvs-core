@@ -43,7 +43,7 @@ export type ActionIdentifiers = {
   REJECT_CORRECTION: RejectCorrection
   CERTIFY: Certify
   VALIDATE: Validate
-  DECLARATION_UPDATE: Update
+  UPDATE_DECLARATION: Update
   REGISTER: Register
   REJECT: Reject
   WAITING_VALIDATION: WaitForExternalValidation
