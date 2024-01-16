@@ -15,6 +15,7 @@ import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { SavedBundleEntry, Task } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
+import { auditEvent } from '@workflow/records/audit'
 
 export const reinstateRoute = createRoute({
   method: 'POST',
@@ -65,6 +66,7 @@ export const reinstateRoute = createRoute({
 
     await sendBundleToHearth(reinstatedRecordWithTaskOnly)
     await indexBundle(reinstatedRecordWithTaskOnly, token)
+    await auditEvent('mark-reinstated', reinstatedRecordWithTaskOnly, token)
 
     return reinstatedRecord
   }
