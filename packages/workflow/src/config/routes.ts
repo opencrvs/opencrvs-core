@@ -17,7 +17,7 @@ import createRecordHandler from '@workflow/records/handler/create'
 import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
 import { registerRoute } from '@workflow/records/handler/register'
-import { reinstateRecordHandler } from '@workflow/records/handler/reinstate'
+import { reinstateRoute } from '@workflow/records/handler/reinstate'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 
@@ -98,20 +98,12 @@ export const getRoutes = () => {
         description: 'Unassign record endpoint'
       }
     },
-    {
-      method: 'POST',
-      path: '/reinstate-record',
-      handler: reinstateRecordHandler,
-      config: {
-        tags: ['api'],
-        description: 'Reinstate record endpoint'
-      }
-    },
     ...validateRoute,
     ...updateRoute,
     ...registerRoute,
     certifyRoute,
-    ...archiveRoute
+    ...archiveRoute,
+    reinstateRoute
   ]
 
   return routes

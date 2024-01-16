@@ -17,7 +17,9 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
-  RegistrationStatus
+  ValidRecord,
+  getTaskFromSavedBundle,
+  getBusinessStatus
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -250,12 +252,17 @@ export async function archiveRegistration(
 export async function reinstateRegistration(
   id: string,
   authHeader: IAuthHeader
-): Promise<{ taskId: string; prevRegStatus: RegistrationStatus }> {
-  const res = await createRequest('POST', '/reinstate-record', authHeader, {
-    id
-  })
+) {
+  const reinstatedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/reinstate`,
+    authHeader,
+    {
+      id
+    }
+  )
 
-  const { taskId, prevRegStatus } = res
+  const task = getTaskFromSavedBundle(reinstatedRecord)
 
-  return { taskId, prevRegStatus }
+  return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
 }

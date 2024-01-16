@@ -517,7 +517,7 @@ export async function toArchived(
 export async function toReinstated(
   record: ArchivedRecord,
   prevRegStatus: RegistrationStatus
-) {
+): Promise<RegisteredRecord | ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const reinstatedTask: SavedTask = {
     ...previousTask,
@@ -537,21 +537,25 @@ export async function toReinstated(
     }
   }
 
-  const reinstatedRecordWithTaskOnly: Bundle<SavedTask> = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: [
-      {
-        resource: reinstatedTask,
-        fullUrl: record.entry.find((e) => e.resource.resourceType === 'Task')!
-          .fullUrl
+  const newEntries = [
+    ...record.entry.map((entry) => {
+      if (entry.resource.id !== previousTask.id) {
+        return entry
       }
-    ]
-  }
-  return {
-    reinstatedRecordWithTaskOnly,
-    taskId: previousTask.id
-  }
+      return {
+        ...entry,
+        resource: reinstatedTask
+      }
+    })
+  ]
+
+  return changeState(
+    {
+      ...record,
+      entry: newEntries
+    },
+    ['REGISTERED', 'READY_FOR_REVIEW']
+  )
 }
 
 export async function toValidated(

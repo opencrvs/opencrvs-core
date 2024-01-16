@@ -36,6 +36,7 @@ export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
 export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
 export type Archive = Nominal<{}, 'Archive'>
+export type Reinstate = Nominal<{}, 'Reinstate'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -48,6 +49,7 @@ export type ActionIdentifiers = {
   REGISTERED: Register
   WAITING_VALIDATION: WaitForExternalValidation
   ARCHIVE: Archive
+  REINSTATE: Reinstate
 }
 
 /*
@@ -95,6 +97,12 @@ export type StateTree =
       Archive,
       ArchivedRecord
     >
+  // Reinstate declaration
+  | Transition<
+      ArchivedRecord,
+      Reinstate,
+      ReadyForReviewRecord | RegisteredRecord
+    >
 
 /*
  * Internals
@@ -115,6 +123,7 @@ type RecordStateChangeRouteHandler<
   action: A
   method: string
   path: string
+  includeHistoryResources?: boolean
   handler: (
     request: Request,
     record: StateIdenfitiers[T[number]]
@@ -137,7 +146,8 @@ export function createRoute<
       const record = await getRecordById(
         request.params.recordId,
         request.headers.authorization,
-        params.allowedStartStates
+        params.allowedStartStates,
+        params.includeHistoryResources
       )
       return params.handler(request, record)
     }
