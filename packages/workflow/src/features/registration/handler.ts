@@ -102,7 +102,6 @@ function getSectionFromResponse(
   response: Bundle,
   reference: string
 ): BundleEntry[] {
-  console.log(response)
   return (response.entry &&
     response.entry.filter((o) => {
       const res = o.response as fhir3.BundleEntryResponse
@@ -243,7 +242,6 @@ export async function createRegistrationHandler(
     }
     return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
-    console.log(error)
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
     )
