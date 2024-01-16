@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: ${{fromJson(needs.setup.outputs.matrix)}}
+        node-version: [18.19.0]
 
     steps:
       - name: Checking out git repo
