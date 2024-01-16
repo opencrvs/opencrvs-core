@@ -183,7 +183,6 @@ export async function fhirWorkflowEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const event = detectEvent(request)
-
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary

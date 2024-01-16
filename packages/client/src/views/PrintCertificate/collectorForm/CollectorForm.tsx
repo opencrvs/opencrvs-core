@@ -491,7 +491,6 @@ const mapStateToProps = (
   const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-
   const certFormSection = getCertificateCollectorFormSection(declaration)
 
   const isAllowPrintInAdvance =

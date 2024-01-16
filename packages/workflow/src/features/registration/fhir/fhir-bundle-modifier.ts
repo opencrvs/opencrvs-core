@@ -43,10 +43,7 @@ import {
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import * as Hapi from '@hapi/hapi'
-import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   getToken,
   getTokenPayload,
@@ -81,7 +78,7 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = setTrackingId(fhirBundle)
+  fhirBundle = await setTrackingId(fhirBundle, token)
 
   const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
 
@@ -142,14 +139,17 @@ export async function invokeRegistrationValidation(
   token: string
 ): Promise<{ bundle: Bundle; regValidationError?: boolean }> {
   try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
-      method: 'POST',
-      body: JSON.stringify(bundle),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
+    const res = await fetch(
+      new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
+      {
+        method: 'POST',
+        body: JSON.stringify(bundle),
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        }
       }
-    })
+    )
     if (!res.ok) {
       const errorData = await res.json()
       throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
@@ -367,9 +367,16 @@ export async function touchBundle(
   return bundle
 }
 
-export function setTrackingId(fhirBundle: Bundle): Bundle {
+export async function setTrackingId(
+  fhirBundle: Bundle,
+  token: string
+): Promise<Bundle> {
   const eventType = getEventType(fhirBundle)
-  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingId = await generateTrackingIdForEvents(
+    eventType,
+    fhirBundle,
+    token
+  )
   const trackingIdFhirName = `${
     eventType.toLowerCase() as Lowercase<typeof eventType>
   }-tracking-id` as const

@@ -19,10 +19,12 @@ import {
 import {
   testFhirBundle,
   testMarriageFhirBundle,
-  officeMock
+  officeMock,
+  testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
+import { Bundle } from '@workflow/../../commons/build/dist/types'
 
 const fetch = fetchAny as any
 
@@ -83,8 +85,9 @@ describe('Verify getCRVSOfficeName', () => {
 })
 
 describe('Verify getTrackingId', () => {
-  it('Returned tracking id properly for birth', () => {
-    const trackingid = getTrackingId(setTrackingId(testFhirBundle))
+  it('Returned tracking id properly for birth', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(await setTrackingId(testFhirBundle, '123'))
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
       expect(trackingid.length).toBe(7)
@@ -93,8 +96,24 @@ describe('Verify getTrackingId', () => {
     }
   })
 
-  it('Returned tracking id properly for marriage', () => {
-    const trackingid = getTrackingId(setTrackingId(testMarriageFhirBundle))
+  it('Returned tracking id properly for death', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(
+      await setTrackingId(testDeathFhirTaskBundle as Bundle, '123')
+    )
+    if (trackingid) {
+      expect(trackingid).toMatch(/^D/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
+  })
+
+  it('Returned tracking id properly for marriage', async () => {
+    fetch.mockResponseOnce(null, { status: 404 })
+    const trackingid = getTrackingId(
+      await setTrackingId(testMarriageFhirBundle, '123')
+    )
     if (trackingid) {
       expect(trackingid).toMatch(/^M/)
       expect(trackingid.length).toBe(7)

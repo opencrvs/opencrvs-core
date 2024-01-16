@@ -589,7 +589,8 @@ const renderValue = (
 export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
-  draft: IDeclaration
+  draft: IDeclaration,
+  checkValidationErrorsOnly?: boolean
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
@@ -602,7 +603,9 @@ export const getErrorsOnFieldsBySection = (
       fields,
       draft.data[section.id] || {},
       offlineCountryConfig,
-      draft.data
+      draft.data,
+      undefined,
+      checkValidationErrorsOnly
     )
 
     return {
@@ -1680,6 +1683,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineCountryConfiguration,
       declaration
     )
+    const badInputErrors = getErrorsOnFieldsBySection(
+      formSections,
+      offlineCountryConfiguration,
+      declaration,
+      true
+    )
 
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
@@ -1705,6 +1714,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
       ).length === 0 && !isSignatureMissing()
+    const hasValidationErrors =
+      flatten(Object.values(badInputErrors).map(Object.values)).filter(
+        (errors) => errors.errors.length > 0
+      ).length > 0
 
     const textAreaProps = {
       id: 'additional_comments',
