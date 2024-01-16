@@ -371,7 +371,11 @@ export async function createDownloadTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       { url: extensionUrl },
@@ -411,7 +415,11 @@ export function createRejectTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
@@ -454,7 +462,11 @@ export function createValidateTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
@@ -494,7 +506,11 @@ export function createWaitingForValidationTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
@@ -534,7 +550,11 @@ export function createRegisterTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
@@ -575,7 +595,11 @@ export function createUpdatedTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       )
     ],
@@ -615,6 +639,42 @@ export function createUpdatedTask(
       ]
     }
   }
+}
+
+export function createUnassignedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+) {
+  const unassignedTask: SavedTask = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  return unassignedTask
 }
 
 export function createCorrectionRequestTask(
@@ -660,7 +720,11 @@ export function createCorrectionRequestTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
