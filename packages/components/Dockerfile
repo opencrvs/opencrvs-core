@@ -1,6 +1,6 @@
 # Step 1. Build the javascript bundle
 
-FROM node:gallium-alpine
+FROM node:hydrogen-alpine
 WORKDIR /app
 
 COPY . .

@@ -1,4 +1,4 @@
-FROM node:gallium-alpine
+FROM node:hydrogen-alpine
 WORKDIR /app
 
 ## Add the wait script to the image
