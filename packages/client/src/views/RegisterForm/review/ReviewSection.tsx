@@ -2068,6 +2068,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
+                          hasErrorsOnFields={hasValidationErrors}
                         />
                       </>
                     ) : (
