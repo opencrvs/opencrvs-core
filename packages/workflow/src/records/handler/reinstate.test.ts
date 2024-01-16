@@ -15,13 +15,21 @@ import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
+  ReadyForReviewRecord,
+  RegisteredRecord,
   Resource,
   SavedBundleEntry,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
-import { UUID } from '@workflow/../../commons/build/dist/uuid'
+import { UUID } from '@opencrvs/commons'
+
+function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
+  const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')
+  //@ts-ignore
+  return taskEntry?.resource.businessStatus.coding[0].code
+}
 
 const mockTaskHistoryEntries: SavedBundleEntry<Resource>[] = [
   {
@@ -361,14 +369,27 @@ describe('reinstate record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get('http://localhost:9090/records/123', (_, res, ctx) => {
-        return res(ctx.json(archivedBundleWithTaskHistory))
-      })
+      rest.get(
+        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+        (_, res, ctx) => {
+          return res(ctx.json(archivedBundleWithTaskHistory))
+        }
+      )
+    )
+
+    // Sends bundle to metrics
+    mswServer.use(
+      rest.post(
+        'http://localhost:1050/events/birth/mark-reinstated',
+        (_, res, ctx) => {
+          return res(ctx.json({}))
+        }
+      )
     )
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reinstate-record',
+      url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/reinstate',
       payload: {
         // payload composition id is not different from the actual
         // composition id because of there's a mock response
@@ -381,12 +402,10 @@ describe('reinstate record endpoint', () => {
       }
     })
 
-    const reinstatedEndpointResponse: {
-      taskId: string
-      prevRegStatus: string
-    } = JSON.parse(res.payload)
+    const reinstatedEndpointResponse: ReadyForReviewRecord | RegisteredRecord =
+      JSON.parse(res.payload)
 
     expect(res.statusCode).toBe(200)
-    expect(reinstatedEndpointResponse.prevRegStatus).toBe('DECLARED')
+    expect(getRegStatus(reinstatedEndpointResponse)).toBe('DECLARED')
   })
 })
