@@ -813,7 +813,7 @@ function createInformantRelationship(task: Task, fieldValue: string) {
   )
 }
 
-function createInformantsSignature(
+function createOrUpdateSignatureExtension(
   resource: Task,
   fieldValue: string,
   extensionPostfix: SignatureExtensionPostfix
@@ -821,8 +821,13 @@ function createInformantsSignature(
   if (!resource.extension) {
     resource.extension = []
   }
+  const signatureUrl =
+    `http://opencrvs.org/specs/extension/${extensionPostfix}` as const
+  resource.extension = resource.extension.filter(
+    (ext) => ext.url !== signatureUrl
+  )
   resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/${extensionPostfix}`,
+    url: signatureUrl,
     valueString: fieldValue
   })
 }
@@ -2297,7 +2302,7 @@ const builders: IFieldBuilders = {
     informantsSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.INFORMANT
@@ -2306,7 +2311,7 @@ const builders: IFieldBuilders = {
     groomSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.GROOM
@@ -2315,7 +2320,7 @@ const builders: IFieldBuilders = {
     brideSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.BRIDE
@@ -2324,7 +2329,7 @@ const builders: IFieldBuilders = {
     witnessOneSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_ONE
@@ -2333,7 +2338,7 @@ const builders: IFieldBuilders = {
     witnessTwoSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_TWO

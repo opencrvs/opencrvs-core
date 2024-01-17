@@ -33,42 +33,7 @@ const APPROVE_BIRTH_DECLARATION = gql`
 `
 const REGISTER_BIRTH_DECLARATION = gql`
   mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput!) {
-    markBirthAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markBirthAsRegistered(id: $id, details: $details)
   }
 `
 const REJECT_BIRTH_DECLARATION = gql`
