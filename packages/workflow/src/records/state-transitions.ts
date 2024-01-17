@@ -40,7 +40,10 @@ import {
   getComposition,
   OPENCRVS_SPECIFICATION_URL,
   RegistrationNumber,
-  RejectedRecord
+  RejectedRecord,
+  resourceToBundleEntry,
+  toHistoryResource,
+  TaskHistory
 } from '@opencrvs/commons/types'
 import {
   REG_NUMBER_SYSTEM,
@@ -269,12 +272,18 @@ export async function toDownloaded(
     extensionUrl
   )
 
+  // this is to show the latest action in history
+  // as all histories are read from task history
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
   const downloadedRecord = {
     ...record,
     entry: [
       ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
       { resource: downloadedTask }
-    ]
+    ].concat(taskHistoryEntry)
   }
 
   const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
