@@ -93,6 +93,23 @@ function getFHIRValueField(value: unknown) {
   throw new Error('Invalid value type')
 }
 
+export async function mergeChangedResourcesIntoRecord(
+  record: ValidRecord,
+  unsavedChangedResources: Bundle,
+  practitionerResourcesBundle: SavedBundle<SavedLocation | SavedPractitioner>
+) {
+  const responseBundle = await sendBundleToHearth(unsavedChangedResources)
+
+  const changedResources = await toSavedBundle(
+    unsavedChangedResources,
+    responseBundle
+  )
+
+  const recordWithChangedResources = mergeBundles(record, changedResources)
+
+  return mergeBundles(recordWithChangedResources, practitionerResourcesBundle)
+}
+
 export async function withPractitionerDetails<T extends Task>(
   task: T,
   token: string

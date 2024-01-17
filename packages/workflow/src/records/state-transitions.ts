@@ -49,7 +49,8 @@ import {
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
-  TaskHistory
+  TaskHistory,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -96,8 +97,7 @@ import {
   createCertifiedTask,
   withPractitionerDetails,
   sendBundleToHearth,
-  toSavedBundle,
-  mergeBundles
+  mergeChangedResourcesIntoRecord
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
@@ -313,81 +313,64 @@ export async function toDownloaded(
 
 export async function toRejected(
   record: ReadyForReviewRecord | ValidatedRecord | InProgressRecord,
-  practitioner: Practitioner,
+  token: string,
   comment: fhir3.CodeableConcept,
   reason?: string
-) {
+): Promise<RejectedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const rejectedTask = createRejectTask(
+  const taskWithoutPracitionerExtensions = createRejectTask(
     previousTask,
     practitioner,
     comment,
     reason
   )
 
-  const rejectedTaskWithPractitionerExtensions = setupLastRegUser(
-    rejectedTask,
-    practitioner
-  )
+  const [rejectedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPracitionerExtensions, token)
 
-  const rejectedTaskWithLocationExtensions = await setupLastRegLocation(
-    rejectedTaskWithPractitionerExtensions,
-    practitioner
-  )
-
-  const rejectedRecordWithTaskOnly: Bundle<SavedTask> = {
-    resourceType: 'Bundle',
+  const unsavedChangedResources: Bundle = {
     type: 'document',
-    entry: [{ resource: rejectedTaskWithLocationExtensions }]
+    resourceType: 'Bundle',
+    entry: [{ resource: rejectedTask }]
   }
 
-  const rejectedRecord = changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: rejectedTaskWithLocationExtensions }
-      ]
-    },
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'REJECTED'
   )
-
-  return { rejectedRecord, rejectedRecordWithTaskOnly }
 }
 
 export async function toWaitingForExternalValidationState(
   record: ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner
+  token: string
 ): Promise<WaitingForValidationRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const waitForValidationTask = createWaitingForValidationTask(
+  const taskWithoutPractitonerExtensions = createWaitingForValidationTask(
     previousTask,
     practitioner
   )
 
-  const waitForValidationTaskWithPractitionerExtensions = setupLastRegUser(
-    waitForValidationTask,
-    practitioner
-  )
+  const [waitingExternalValidationTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitonerExtensions, token)
 
-  const waitForValidationTaskWithLocationExtensions =
-    await setupLastRegLocation(
-      waitForValidationTaskWithPractitionerExtensions,
-      practitioner
-    )
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [{ resource: waitingExternalValidationTask }]
+  }
 
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: waitForValidationTaskWithLocationExtensions }
-      ]
-    },
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'WAITING_VALIDATION'
   )
 }
@@ -653,13 +636,13 @@ export async function toValidated(
 ): Promise<ValidatedRecord> {
   const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const validatedTaskWithoutPractitioner = createValidateTask(
+  const taskWithoutPractitionerExtensions = createValidateTask(
     previousTask,
     practitioner
   )
 
   const [validatedTask, practitionerResourcesBundle] =
-    await withPractitionerDetails(validatedTaskWithoutPractitioner, token)
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 
   const unsavedChangedResources: Bundle = {
     type: 'document',
@@ -667,17 +650,12 @@ export async function toValidated(
     entry: [{ resource: validatedTask }]
   }
 
-  const responseBundle = await sendBundleToHearth(unsavedChangedResources)
-
-  const changedResources = await toSavedBundle(
-    unsavedChangedResources,
-    responseBundle
-  )
-
-  const recordWithChangedResources = mergeBundles(record, changedResources)
-
   return changeState(
-    mergeBundles(recordWithChangedResources, practitionerResourcesBundle),
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'VALIDATED'
   )
 }
