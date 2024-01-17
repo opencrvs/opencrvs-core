@@ -883,29 +883,6 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   return taskEntry
 }
 
-// async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-//   const taskHistoryBundle: Bundle = await fetchFHIR(
-//     `/Task/${taskId}/_history`,
-//     authHeader
-//   )
-
-//   const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-//     return taskEntry.resource as Task
-//   })
-
-//   if (!taskHistory) {
-//     throw new Error('Task has no history')
-//   }
-
-//   const filteredTaskHistory = taskHistory.filter((task) => {
-//     return (
-//       task.businessStatus?.coding &&
-//       task.businessStatus?.coding[0].code !== 'ARCHIVED'
-//     )
-//   })
-//   return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
-// }
-
 type Action = typeof TaskActionExtension
 
 export function insertActionToBundle(
