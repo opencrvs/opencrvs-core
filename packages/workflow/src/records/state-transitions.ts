@@ -840,25 +840,20 @@ export async function toCorrectionRejected(
 
 export async function toCertified(
   record: RegisteredRecord,
-  practitioner: Practitioner,
+  token: string,
   eventType: EVENT_TYPE,
   certificateDetails: CertifyInput
-): Promise<
-  Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
-> {
+): Promise<CertifiedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const certifiedTask = createCertifiedTask(previousTask, practitioner)
-
-  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
-    certifiedTask,
+  const taskWithoutPractitionerExtensions = createCertifiedTask(
+    previousTask,
     practitioner
   )
 
-  const certifiedTaskWithLocationExtensions = await setupLastRegLocation(
-    certifiedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [certifiedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
@@ -906,16 +901,26 @@ export async function toCertified(
       certificateSection
     ]
   }
-  return {
+  const changedResources: Bundle<
+    Composition | Task | DocumentReference | RelatedPerson | Patient
+  > = {
     type: 'document',
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: certifiedTaskWithLocationExtensions },
+      { resource: certifiedTask },
       ...relatedPersonEntries,
       documentReferenceEntry
     ]
   }
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      changedResources,
+      practitionerResourcesBundle
+    ),
+    'CERTIFIED'
+  )
 }
 
 export async function toIssued(
