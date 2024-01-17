@@ -18,7 +18,6 @@ import { indexBundle } from '@workflow/records/search'
 import { createRoute } from '@workflow/states'
 
 const requestSchema = z.object({
-  id: z.string(),
   reason: z.string().optional(),
   comment: z.string().optional(),
   duplicateTrackingId: z.string().optional()

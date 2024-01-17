@@ -237,7 +237,6 @@ export async function archiveRegistration(
     `/records/${id}/archive`,
     authHeader,
     {
-      id,
       reason,
       comment,
       duplicateTrackingId

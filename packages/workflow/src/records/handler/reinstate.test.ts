@@ -22,8 +22,8 @@ import {
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
 import { UUID } from '@opencrvs/commons'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
   const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')
@@ -321,16 +321,9 @@ describe('reinstate record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
-    )
-
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     // Sends bundle to unassign in elastic search
@@ -342,10 +335,8 @@ describe('reinstate record endpoint', () => {
 
     const archiveEndpointResponse = await server.server.inject({
       method: 'POST',
-      url: '/archive-record',
-      payload: {
-        id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e'
-      },
+      url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/archive',
+      payload: {},
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -390,13 +381,7 @@ describe('reinstate record endpoint', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/reinstate',
-      payload: {
-        // payload composition id is not different from the actual
-        // composition id because of there's a mock response
-        // for the real composition id which returns a ready for review
-        // record, previous state of archived record
-        id: '123'
-      },
+      payload: {},
       headers: {
         Authorization: `Bearer ${token}`
       }
