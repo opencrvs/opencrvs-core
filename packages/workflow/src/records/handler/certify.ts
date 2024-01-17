@@ -49,7 +49,7 @@ export const certifyRoute = createRoute({
     )
 
     const responseBundle = await sendBundleToHearth(unsavedChangedResources)
-    const changedResources = toSavedBundle(
+    const changedResources = await toSavedBundle(
       unsavedChangedResources,
       responseBundle
     )

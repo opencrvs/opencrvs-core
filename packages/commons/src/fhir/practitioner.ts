@@ -8,7 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Bundle, Resource, Task, WithStrictExtensions, findExtension } from '.'
+import {
+  Bundle,
+  Resource,
+  Task,
+  WithStrictExtensions,
+  findExtension,
+  WithUUID
+} from '.'
 
 export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
   use: string
@@ -23,6 +30,8 @@ export type Practitioner = WithStrictExtensions<
     telecom: Array<fhir3.ContactPoint>
   }
 >
+
+export type SavedPractitioner = WithUUID<Practitioner>
 
 export function isPractitioner<T extends Resource>(
   resource: T
