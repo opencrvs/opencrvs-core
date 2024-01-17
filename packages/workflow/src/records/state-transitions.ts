@@ -93,9 +93,14 @@ import {
   createRelatedPersonEntries,
   createDocumentReferenceEntryForCertificate,
   createIssuedTask,
-  createCertifiedTask
+  createCertifiedTask,
+  withPractitionerDetails,
+  sendBundleToHearth,
+  toSavedBundle,
+  mergeBundles
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -648,31 +653,35 @@ export async function toDuplicated(
 
 export async function toValidated(
   record: InProgressRecord | ReadyForReviewRecord,
-  practitioner: Practitioner
+  token: string
 ): Promise<ValidatedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const validatedTask = createValidateTask(previousTask, practitioner)
-
-  const validatedTaskWithPractitionerExtensions = setupLastRegUser(
-    validatedTask,
+  const validatedTaskWithoutPractitioner = createValidateTask(
+    previousTask,
     practitioner
   )
 
-  const validatedTaskWithLocationExtensions = await setupLastRegLocation(
-    validatedTaskWithPractitionerExtensions,
-    practitioner
+  const [validatedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(validatedTaskWithoutPractitioner, token)
+
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [{ resource: validatedTask }]
+  }
+
+  const responseBundle = await sendBundleToHearth(unsavedChangedResources)
+
+  const changedResources = await toSavedBundle(
+    unsavedChangedResources,
+    responseBundle
   )
+
+  const recordWithChangedResources = mergeBundles(record, changedResources)
 
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: validatedTaskWithLocationExtensions }
-      ]
-    },
+    mergeBundles(recordWithChangedResources, practitionerResourcesBundle),
     'VALIDATED'
   )
 }
