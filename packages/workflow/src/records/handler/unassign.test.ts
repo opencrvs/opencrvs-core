@@ -56,13 +56,6 @@ describe('unassign record endpoint', () => {
       )
     )
 
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
-    )
-
     // Sends bundle to save in elastic search
     mswServer.use(
       rest.post('http://localhost:9090/events/unassigned', (_, res, ctx) => {
