@@ -96,7 +96,7 @@ function getFHIRValueField(value: unknown) {
 export async function withPractitionerDetails<T extends Task>(
   task: T,
   token: string
-): Promise<[T, ...(SavedLocation | SavedPractitioner)[]]> {
+): Promise<[T, SavedBundle<SavedLocation | SavedPractitioner>]> {
   const userOrSystem = await getUserOrSystem(token)
   const newTask: T = {
     ...task,
@@ -115,7 +115,14 @@ export async function withPractitionerDetails<T extends Task>(
         type
       })
     })
-    return [newTask]
+    return [
+      newTask,
+      {
+        type: 'document',
+        resourceType: 'Bundle',
+        entry: []
+      }
+    ]
   }
   const user = userOrSystem
   const practitioner = (await getLoggedInPractitionerResource(
@@ -163,7 +170,16 @@ export async function withPractitionerDetails<T extends Task>(
       }
     ] satisfies Task['extension'])
   )
-  return [newTask, practitioner, office, officeLocation]
+  return [
+    newTask,
+    {
+      type: 'document',
+      resourceType: 'Bundle',
+      entry: [practitioner, office, officeLocation].map((r) =>
+        resourceToSavedBundleEntry(r)
+      )
+    }
+  ]
 }
 
 export function createCorrectionProofOfLegalCorrectionDocument(

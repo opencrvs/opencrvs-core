@@ -21,8 +21,7 @@ import {
   isTask,
   changeState,
   InProgressRecord,
-  ReadyForReviewRecord,
-  resourceToSavedBundleEntry
+  ReadyForReviewRecord
 } from '@opencrvs/commons/types'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
@@ -143,7 +142,7 @@ async function createRecord(
     inProgress
   )
 
-  const [taskWithLocation, ...practitionerResources] =
+  const [taskWithLocation, practitionerResourcesBundle] =
     await withPractitionerDetails(task, token)
 
   inputBundle.entry = inputBundle.entry.map((e) => {
@@ -158,11 +157,6 @@ async function createRecord(
 
   const responseBundle = await sendBundleToHearth(inputBundle)
   const savedBundle = await toSavedBundle(inputBundle, responseBundle)
-  const practitionerResourcesBundle = {
-    type: 'document',
-    resourceType: 'Bundle',
-    entry: practitionerResources.map(resourceToSavedBundleEntry)
-  } satisfies Bundle
   const record = inProgress
     ? changeState(savedBundle, 'IN_PROGRESS')
     : changeState(savedBundle, 'READY_FOR_REVIEW')
