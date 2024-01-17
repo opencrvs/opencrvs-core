@@ -925,32 +925,21 @@ export async function toCertified(
 
 export async function toIssued(
   record: RegisteredRecord | CertifiedRecord,
-  practitioner: Practitioner,
+  token: string,
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
-): Promise<
-  Bundle<
-    | Composition
-    | Task
-    | DocumentReference
-    | RelatedPerson
-    | Patient
-    | PaymentReconciliation
-  >
-> {
+): Promise<IssuedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const issuedTask = createIssuedTask(previousTask, practitioner)
-
-  const issuedTaskWithPractitionerExtensions = setupLastRegUser(
-    issuedTask,
+  const taskWithoutPractitionerExtensions = createIssuedTask(
+    previousTask,
     practitioner
   )
 
-  const issuedTaskWithLocationExtensions = await setupLastRegLocation(
-    issuedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [issuedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
+
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
 
@@ -1007,17 +996,33 @@ export async function toIssued(
       certificateSection
     ]
   }
-  return {
+  const changedResources: Bundle<
+    | Composition
+    | Task
+    | DocumentReference
+    | RelatedPerson
+    | Patient
+    | PaymentReconciliation
+  > = {
     type: 'document',
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: issuedTaskWithLocationExtensions },
+      { resource: issuedTask },
       ...relatedPersonEntries,
       paymentEntry,
       documentReferenceEntry
     ]
   }
+
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      changedResources,
+      practitionerResourcesBundle
+    ),
+    'ISSUED'
+  )
 }
 
 function extensionsWithoutAssignment(extensions: Extension[]) {
