@@ -20,9 +20,7 @@ import {
 } from '@opencrvs/commons/types'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUpdated } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { validateRequest } from '@workflow/features/correction/routes'
 import { ChangedValuesInput } from '@workflow/records/validations'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
@@ -57,11 +55,14 @@ export const updateRoute = [
       const payload = validateRequest(requestSchema, request.payload)
 
       const { details, event } = payload
-      const { registration, ...detailsWithoutReg } = details
-      const { changedValues, ...restOfRegistration } = registration
+      const {
+        registration: registrationWithChangedValues,
+        ...detailsWithoutReg
+      } = details
+      const { changedValues, ...registration } = registrationWithChangedValues
       const payloadRecordDetails = {
         ...detailsWithoutReg,
-        registration: restOfRegistration
+        registration
       }
       const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
       const recordInputWithUploadedAttachments =
@@ -70,20 +71,18 @@ export const updateRoute = [
           getAuthHeader(request)
         )
 
-      const recordInUpdatedState = await toUpdated(
-        record,
-        await getLoggedInPractitionerResource(token),
-        updatedDetails
-      )
-
       const updatedBundle = updateFHIRBundle(
-        recordInUpdatedState,
+        record,
         recordInputWithUploadedAttachments,
         event
       )
+      const updatedRecord = await toUpdated(
+        updatedBundle,
+        token,
+        updatedDetails
+      )
 
-      await sendBundleToHearth(updatedBundle)
-      await indexBundle(updatedBundle, token)
+      await indexBundle(updatedRecord, token)
       return updatedBundle
     }
   })

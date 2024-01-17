@@ -238,43 +238,39 @@ export async function toCorrectionApproved(
 
 export async function toUpdated(
   record: InProgressRecord | ReadyForReviewRecord,
-  practitioner: Practitioner,
+  token: string,
   updatedDetails: ChangedValuesInput
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const updatedTask = createUpdatedTask(
+  const updatedTaskWithoutPractitionerExtensions = createUpdatedTask(
     previousTask,
     updatedDetails,
     practitioner
   )
-  const updatedTaskWithPractitionerExtensions = setupLastRegUser(
-    updatedTask,
-    practitioner
+
+  const [updatedTask] = await withPractitionerDetails(
+    updatedTaskWithoutPractitionerExtensions,
+    token
   )
 
-  const updatedTaskWithLocationExtensions = await setupLastRegLocation(
-    updatedTaskWithPractitionerExtensions,
-    practitioner
-  )
-
-  const newEntries = [
-    ...record.entry.map((entry) => {
-      if (entry.resource.id !== previousTask.id) {
-        return entry
-      }
-      return {
-        ...entry,
-        resource: updatedTaskWithLocationExtensions
-      }
-    })
-  ]
-
-  const updatedRecord = {
+  const recordWithUpdatedTask = {
     ...record,
-    entry: newEntries
+    entry: [
+      ...record.entry.map((entry) => {
+        if (entry.resource.id !== previousTask.id) {
+          return entry
+        }
+        return {
+          ...entry,
+          resource: updatedTask
+        }
+      })
+    ]
   }
-  return updatedRecord
+  await sendBundleToHearth(recordWithUpdatedTask)
+  return recordWithUpdatedTask
 }
 
 export async function toDownloaded(
