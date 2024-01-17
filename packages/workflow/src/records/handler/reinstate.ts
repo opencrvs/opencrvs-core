@@ -65,8 +65,8 @@ export const reinstateRoute = createRoute({
     }
 
     await sendBundleToHearth(reinstatedRecordWithTaskOnly)
-    await indexBundle(reinstatedRecordWithTaskOnly, token)
-    await auditEvent('mark-reinstated', reinstatedRecordWithTaskOnly, token)
+    await indexBundle(reinstatedRecord, token)
+    await auditEvent('mark-reinstated', reinstatedRecord, token)
 
     return reinstatedRecord
   }

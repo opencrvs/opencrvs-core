@@ -517,7 +517,7 @@ export async function toArchived(
 export async function toReinstated(
   record: ArchivedRecord,
   prevRegStatus: RegistrationStatus
-): Promise<RegisteredRecord | ReadyForReviewRecord> {
+): Promise<ValidatedRecord | ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const reinstatedTask: SavedTask = {
     ...previousTask,
@@ -554,7 +554,7 @@ export async function toReinstated(
       ...record,
       entry: newEntries
     },
-    ['REGISTERED', 'READY_FOR_REVIEW']
+    ['READY_FOR_REVIEW', 'VALIDATED']
   )
 }
 

@@ -92,16 +92,12 @@ export type StateTree =
       WaitingForValidationRecord | RejectedRecord
     >
   // Archive declaration
-  | Transition<
-      ReadyForReviewRecord | ValidatedRecord | RegisteredRecord,
-      Archive,
-      ArchivedRecord
-    >
+  | Transition<ReadyForReviewRecord | ValidatedRecord, Archive, ArchivedRecord>
   // Reinstate declaration
   | Transition<
       ArchivedRecord,
       Reinstate,
-      ReadyForReviewRecord | RegisteredRecord
+      ReadyForReviewRecord | ValidatedRecord
     >
 
 /*
