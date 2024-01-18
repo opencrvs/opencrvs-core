@@ -45,7 +45,7 @@ import {
   taskBundleWithExtension,
   toHistoryResource,
   updateFHIRTaskBundle,
-  getTaskEntryFromBundle
+  isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -421,7 +421,11 @@ export const resolvers: GQLResolver = {
       context.headers.Authorization = `Bearer ${token}`
       context.record = await getRecordById(id, context.headers.Authorization)
 
-      const taskEntry = getTaskEntryFromBundle(context.record)
+      const taskEntry = context.record.entry.find(isTaskBundleEntry)
+
+      if (!taskEntry) {
+        throw new Error('Task entry not found for verification')
+      }
 
       const taskBundle = taskBundleWithExtension(taskEntry, {
         url: 'http://opencrvs.org/specs/extension/regVerified',
