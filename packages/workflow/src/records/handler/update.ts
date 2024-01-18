@@ -83,7 +83,7 @@ export const updateRoute = [
       )
 
       await indexBundle(updatedRecord, token)
-      return updatedBundle
+      return updatedRecord
     }
   })
 ]
