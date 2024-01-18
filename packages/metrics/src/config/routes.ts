@@ -116,7 +116,7 @@ export const getRoutes = () => {
     // In progress declaration
     {
       method: 'POST',
-      path: '/events/{event}/in-progress-declaration',
+      path: '/events/{event}/new-incomplete',
       handler: analyticsDataRefreshingRoute(inProgressHandler),
       config: {
         tags: ['api'],
@@ -131,7 +131,7 @@ export const getRoutes = () => {
     // New declaration
     {
       method: 'POST',
-      path: '/events/{event}/new-declaration',
+      path: '/events/{event}/new-ready-for-review',
       handler: analyticsDataRefreshingRoute(newDeclarationHandler),
       config: {
         tags: ['api'],
@@ -146,7 +146,7 @@ export const getRoutes = () => {
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/{event}/request-for-registrar-validation',
+      path: '/events/{event}/new-validate',
       handler: analyticsDataRefreshingRoute(
         requestForRegistrarValidationHandler
       ),
@@ -179,7 +179,7 @@ export const getRoutes = () => {
     // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/{event}/waiting-external-resource-validation',
+      path: '/events/{event}/waiting-external-validation',
       handler: waitingExternalValidationHandler,
       config: {
         tags: ['api'],
@@ -192,7 +192,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/{event}/registrar-registration-waiting-external-resource-validation',
+      path: '/events/{event}/new-waiting-external-validation',
       handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
         tags: ['api'],
@@ -204,6 +204,7 @@ export const getRoutes = () => {
       }
     },
 
+    //@todo: remove this endpoint as it's not used anywhere
     {
       method: 'POST',
       path: '/events/{event}/new-registration',
@@ -221,7 +222,7 @@ export const getRoutes = () => {
     // Mark validated
     {
       method: 'POST',
-      path: '/events/{event}/mark-validated',
+      path: '/events/{event}/validate',
       handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
         tags: ['api'],
@@ -236,7 +237,7 @@ export const getRoutes = () => {
     // Mark registered
     {
       method: 'POST',
-      path: '/events/{event}/mark-registered',
+      path: '/events/{event}/register',
       handler: analyticsDataRefreshingRoute(markEventRegisteredHandler),
       config: {
         tags: ['api'],
@@ -250,7 +251,7 @@ export const getRoutes = () => {
     // Mark certified
     {
       method: 'POST',
-      path: '/events/{event}/mark-certified',
+      path: '/events/{event}/certify',
       handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
         tags: ['api'],
@@ -265,7 +266,7 @@ export const getRoutes = () => {
     // Mark issued
     {
       method: 'POST',
-      path: '/events/{event}/mark-issued',
+      path: '/events/{event}/issue',
       handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
         tags: ['api'],
@@ -280,7 +281,7 @@ export const getRoutes = () => {
     // Mark rejected
     {
       method: 'POST',
-      path: '/events/{event}/mark-voided',
+      path: '/events/{event}/reject',
       handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
         tags: ['api'],
@@ -368,7 +369,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/{event}/mark-archived',
+      path: '/events/{event}/archive',
       handler: analyticsDataRefreshingRoute(declarationArchivedHandler),
       config: {
         tags: ['api'],
@@ -381,7 +382,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/{event}/mark-reinstated',
+      path: '/events/{event}/reinstate',
       handler: analyticsDataRefreshingRoute(declarationReinstatedHandler),
       config: {
         tags: ['api'],
@@ -402,7 +403,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/declaration-updated',
+      path: '/events/update-declaration',
       handler: declarationUpdatedHandler,
       config: {
         tags: ['api']

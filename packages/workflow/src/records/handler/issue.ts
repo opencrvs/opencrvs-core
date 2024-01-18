@@ -43,7 +43,7 @@ export const issueRoute = createRoute({
     )
 
     await indexBundle(issuedRecord, token)
-    await auditEvent('mark-issued', issuedRecord, token)
+    await auditEvent('issue', issuedRecord, token)
 
     return issuedRecord
   }
