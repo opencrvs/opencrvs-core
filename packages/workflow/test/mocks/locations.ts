@@ -136,3 +136,41 @@ export const state: SavedLocation = {
   },
   id: 'ed6195ff-0f83-4852-832e-dc9db07151ff' as UUID
 }
+
+export const healthFacility: SavedLocation = {
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/internal-id',
+      value: 'HEALTH_FACILITY_di3U5u7F8Y3'
+    }
+  ],
+  name: 'Ibombo Rural Health Centre',
+  alias: ['Ibombo Rural Health Centre'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'HEALTH_FACILITY'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  meta: {
+    lastUpdated: '2023-09-19T12:20:24.395+00:00',
+    versionId: 'ddec9a40-d1a2-492a-9c4d-4abb7e24ab48'
+  },
+  id: '146251e9-df90-4068-82b0-27d8f979e8e2' as UUID
+}
