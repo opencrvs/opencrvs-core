@@ -166,7 +166,7 @@ const LinkButtonModified = styled(LinkButton)`
 `
 
 interface ISearchParams {
-  locationId: string
+  locationId?: string
 }
 
 type IOnlineStatusProps = {
