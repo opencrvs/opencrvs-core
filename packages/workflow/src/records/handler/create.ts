@@ -21,9 +21,18 @@ import {
   isTask,
   changeState,
   InProgressRecord,
-  ReadyForReviewRecord
+  ReadyForReviewRecord,
+  ValidRecord,
+  ValidatedRecord,
+  getStatusFromTask,
+  getTaskFromSavedBundle,
+  WaitingForValidationRecord
 } from '@opencrvs/commons/types'
-import { getToken } from '@workflow/utils/authUtils'
+import {
+  getToken,
+  hasRegisterScope,
+  hasValidateScope
+} from '@workflow/utils/authUtils'
 import {
   findTaskFromIdentifier,
   mergeBundles,
@@ -48,6 +57,10 @@ import {
 } from '@workflow/records/notification'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
+import {
+  toValidated,
+  toWaitingForExternalValidationState
+} from '@workflow/records/state-transitions'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -163,6 +176,51 @@ async function createRecord(
   return mergeBundles(record, practitionerResourcesBundle)
 }
 
+type CreatedRecord =
+  | InProgressRecord
+  | ReadyForReviewRecord
+  | ValidatedRecord
+  | WaitingForValidationRecord
+
+function isInProgress(record: ValidRecord): record is InProgressRecord {
+  return isInProgressDeclaration(record)
+}
+
+function isReadyForReview(record: ValidRecord): record is ReadyForReviewRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'DECLARED'
+}
+
+function isValidated(record: ValidRecord): record is ValidatedRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'VALIDATED'
+}
+
+function isWaitingExternalValidation(
+  record: ValidRecord
+): record is WaitingForValidationRecord {
+  return (
+    getStatusFromTask(getTaskFromSavedBundle(record)) === 'WAITING_VALIDATION'
+  )
+}
+
+function getEventAction(record: CreatedRecord) {
+  if (isInProgress(record)) {
+    return 'new-incomplete'
+  }
+  if (isReadyForReview(record)) {
+    return 'new-ready-for-review'
+  }
+  if (isValidated(record)) {
+    return 'new-validate'
+  }
+  if (isWaitingExternalValidation(record)) {
+    return 'new-waiting-external-validation'
+  }
+  // type assertion
+  record satisfies never
+  // this should never be reached
+  return 'new-incomplete'
+}
+
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
@@ -192,37 +250,33 @@ export default async function createRecordHandler(
       recordDetails,
       getAuthHeader(request)
     )
-  const record = await createRecord(
+  let record: CreatedRecord = await createRecord(
     recordInputWithUploadedAttachments,
     event,
     token
   )
-  const inProgress = isInProgressDeclaration(record)
-  const eventNotification = isEventNotification(record)
 
-  await indexBundle(record, token)
-  await auditEvent(
-    inProgress ? 'in-progress-declaration' : 'new-declaration',
-    record,
-    token
-  )
+  if (hasValidateScope(request)) {
+    record = await toValidated(record, token)
+  } else if (hasRegisterScope(request) && !isInProgress(record)) {
+    record = await toWaitingForExternalValidationState(record, token)
+  }
+  const eventAction = getEventAction(record)
 
   // Notification not implemented for marriage yet
   // don't forward hospital notifications
-  if (
-    event !== EVENT_TYPE.MARRIAGE &&
-    !eventNotification &&
-    (await isNotificationEnabled(
-      inProgress ? 'in-progress' : 'ready-for-review',
-      event,
-      token
-    ))
-  ) {
-    await sendNotification(
-      inProgress ? 'in-progress' : 'ready-for-review',
-      record,
-      token
-    )
+  const notificationDisabled =
+    isEventNotification(record) ||
+    event === EVENT_TYPE.MARRIAGE ||
+    eventAction === 'new-validate' ||
+    eventAction === 'new-waiting-external-validation' ||
+    !(await isNotificationEnabled(eventAction, event, token))
+
+  await indexBundle(record, token)
+  await auditEvent(eventAction, record, token)
+
+  if (!notificationDisabled) {
+    await sendNotification(eventAction, record, token)
   }
 
   return {

@@ -63,6 +63,8 @@ import {
 } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
+  certifyRegistration,
+  createRegistration,
   issueRegistration,
   registerDeclaration,
   unassignRegistration,
@@ -74,7 +76,6 @@ import {
   duplicateRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
-import { certifyRegistration, createRegistration } from '@gateway/workflow'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
