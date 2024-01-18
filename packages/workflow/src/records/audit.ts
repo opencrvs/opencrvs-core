@@ -25,18 +25,17 @@ export async function auditEvent(
   authToken: string
 ) {
   const eventType = getEventType(bundle).toLowerCase()
-  const url =
-    action !== 'marked-as-duplicate'
-      ? new URL(`/events/${eventType}/${action}`, METRICS_URL).href
-      : new URL(`/events/${action}`, METRICS_URL).href
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(bundle),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${authToken}`
+  const res = await fetch(
+    new URL(`/events/${eventType}/${action}`, METRICS_URL).href,
+    {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      }
     }
-  })
+  )
   if (!res.ok) {
     throw new Error(
       `Writing an audit event to metrics failed with [${
