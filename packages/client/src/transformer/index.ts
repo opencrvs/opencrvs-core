@@ -16,9 +16,7 @@ import {
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
-  IFormFieldValue,
   IFormSection,
-  IFormSectionData,
   TransformedData
 } from '@client/forms'
 import { sectionTransformer } from '@client/forms/register/mappings/query'
@@ -39,13 +37,6 @@ import {
 import { UserDetails } from '@client/utils/userUtils'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-
-interface ICorrection {
-  section: string
-  fieldName: string
-  oldValue: IFormFieldValue
-  newValue: IFormFieldValue
-}
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -186,6 +177,7 @@ export function getChangedValues(
           if (
             !conditionalActions.includes('hide') &&
             !conditionalActions.includes('disable') &&
+            !(section.id === 'documents') &&
             hasFieldChanged(
               fieldDef,
               draftData[section.id],
