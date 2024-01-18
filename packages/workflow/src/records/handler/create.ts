@@ -23,7 +23,6 @@ import {
   InProgressRecord,
   ReadyForReviewRecord
 } from '@opencrvs/commons/types'
-import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import {
   findTaskFromIdentifier,
@@ -168,72 +167,67 @@ export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
 ) {
-  try {
-    const token = getToken(request)
-    const { record: recordDetails, event } = validateRequest(
-      requestSchema,
-      request.payload
-    )
+  const token = getToken(request)
+  const { record: recordDetails, event } = validateRequest(
+    requestSchema,
+    request.payload
+  )
 
-    const existingDeclarationIds =
-      recordDetails.registration?.draftId &&
-      (await findExistingDeclarationIds(recordDetails.registration.draftId))
-    if (existingDeclarationIds) {
-      return {
-        ...existingDeclarationIds,
-        isPotentiallyDuplicate: false
-      }
+  const existingDeclarationIds =
+    recordDetails.registration?.draftId &&
+    (await findExistingDeclarationIds(recordDetails.registration.draftId))
+  if (existingDeclarationIds) {
+    return {
+      ...existingDeclarationIds,
+      isPotentiallyDuplicate: false
     }
-    const isPotentiallyDuplicate = await hasDuplicates(
+  }
+  const isPotentiallyDuplicate = await hasDuplicates(
+    recordDetails,
+    { Authorization: token },
+    event
+  )
+  const recordInputWithUploadedAttachments =
+    await uploadBase64AttachmentsToDocumentsStore(
       recordDetails,
-      { Authorization: token },
-      event
+      getAuthHeader(request)
     )
-    const recordInputWithUploadedAttachments =
-      await uploadBase64AttachmentsToDocumentsStore(
-        recordDetails,
-        getAuthHeader(request)
-      )
-    const record = await createRecord(
-      recordInputWithUploadedAttachments,
+  const record = await createRecord(
+    recordInputWithUploadedAttachments,
+    event,
+    token
+  )
+  const inProgress = isInProgressDeclaration(record)
+  const eventNotification = isEventNotification(record)
+
+  await indexBundle(record, token)
+  await auditEvent(
+    inProgress ? 'in-progress-declaration' : 'new-declaration',
+    record,
+    token
+  )
+
+  // Notification not implemented for marriage yet
+  // don't forward hospital notifications
+  if (
+    event !== EVENT_TYPE.MARRIAGE &&
+    !eventNotification &&
+    (await isNotificationEnabled(
+      inProgress ? 'in-progress' : 'ready-for-review',
       event,
       token
-    )
-    const inProgress = isInProgressDeclaration(record)
-    const eventNotification = isEventNotification(record)
-
-    await indexBundle(record, token)
-    await auditEvent(
-      inProgress ? 'in-progress-declaration' : 'new-declaration',
+    ))
+  ) {
+    await sendNotification(
+      inProgress ? 'in-progress' : 'ready-for-review',
       record,
       token
     )
+  }
 
-    // Notification not implemented for marriage yet
-    // don't forward hospital notifications
-    if (
-      event !== EVENT_TYPE.MARRIAGE &&
-      !eventNotification &&
-      (await isNotificationEnabled(
-        inProgress ? 'in-progress' : 'ready-for-review',
-        event,
-        token
-      ))
-    ) {
-      await sendNotification(
-        inProgress ? 'in-progress' : 'ready-for-review',
-        record,
-        token
-      )
-    }
-
-    return {
-      compositionId: getComposition(record).id,
-      trackingId: getTrackingIdFromRecord(record),
-      isPotentiallyDuplicate
-    }
-  } catch (error) {
-    logger.error(`Workflow/createRecordHandler: error: ${error}`)
-    throw new Error(error)
+  return {
+    compositionId: getComposition(record).id,
+    trackingId: getTrackingIdFromRecord(record),
+    isPotentiallyDuplicate
   }
 }
