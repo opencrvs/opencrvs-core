@@ -36,6 +36,7 @@ export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
 export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
 export type Archive = Nominal<{}, 'Archive'>
+export type Duplicate = Nominal<{}, 'Duplicate'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -48,6 +49,7 @@ export type ActionIdentifiers = {
   REGISTERED: Register
   WAITING_VALIDATION: WaitForExternalValidation
   ARCHIVE: Archive
+  DUPLICATE: Duplicate
 }
 
 /*
@@ -95,7 +97,12 @@ export type StateTree =
       Archive,
       ArchivedRecord
     >
-
+  // Duplicate declaration
+  | Transition<
+      ReadyForReviewRecord | ValidatedRecord,
+      Duplicate,
+      ReadyForReviewRecord | ValidatedRecord
+    >
 /*
  * Internals
  */
@@ -115,6 +122,7 @@ type RecordStateChangeRouteHandler<
   action: A
   method: string
   path: string
+  includeHistoryResources?: boolean
   handler: (
     request: Request,
     record: StateIdenfitiers[T[number]]
@@ -137,7 +145,8 @@ export function createRoute<
       const record = await getRecordById(
         request.params.recordId,
         request.headers.authorization,
-        params.allowedStartStates
+        params.allowedStartStates,
+        params.includeHistoryResources
       )
       return params.handler(request, record)
     }

@@ -10,47 +10,44 @@
  */
 
 import * as z from 'zod'
-import * as Hapi from '@hapi/hapi'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toDuplicated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { getRecordById } from '@workflow/records/index'
 import { auditEvent } from '@workflow/records/audit'
+import { createRoute } from '@workflow/states'
 
 const requestSchema = z.object({
-  id: z.string(),
   reason: z.string().optional(),
   comment: z.string().optional(),
   duplicateTrackingId: z.string().optional()
 })
 
-export async function duplicateRecordHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const token = getToken(request)
-  const payload = validateRequest(requestSchema, request.payload)
-  const record = await getRecordById(
-    // Task history is fetched rather than the task only
-    `${payload.id}?includeHistoryResources`,
-    token,
-    ['READY_FOR_REVIEW']
-  )
+export const duplicateRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/duplicate',
+  allowedStartStates: ['VALIDATED', 'READY_FOR_REVIEW'],
+  action: 'DUPLICATE',
+  includeHistoryResources: true,
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(requestSchema, request.payload)
 
-  const { reason, comment, duplicateTrackingId } = payload
+    const { reason, comment, duplicateTrackingId } = payload
 
-  const { duplicatedRecord, duplicatedRecordWithTaskOnly } = await toDuplicated(
-    record,
-    await getLoggedInPractitionerResource(token),
-    reason,
-    comment,
-    duplicateTrackingId
-  )
+    const { duplicatedRecord, duplicatedRecordWithTaskOnly } =
+      await toDuplicated(
+        record,
+        await getLoggedInPractitionerResource(token),
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-  await sendBundleToHearth(duplicatedRecordWithTaskOnly)
-  await auditEvent('marked-as-duplicate', duplicatedRecord, token)
+    await sendBundleToHearth(duplicatedRecordWithTaskOnly)
+    await auditEvent('marked-as-duplicate', duplicatedRecord, token)
 
-  return duplicatedRecord
-}
+    return duplicatedRecord
+  }
+})

@@ -15,9 +15,15 @@ import fetch from 'node-fetch'
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
   authorizationToken: string,
-  allowedStates: T
+  allowedStates: T,
+  includeHistoryResources = false
 ): Promise<StateIdenfitiers[T[number]]> {
-  const url = new URL(`/records/${recordId}`, SEARCH_URL)
+  const url = new URL(
+    `/records/${recordId}${
+      includeHistoryResources ? '?includeHistoryResources' : ''
+    }`,
+    SEARCH_URL
+  )
   url.searchParams.append('states', allowedStates.join(','))
 
   const res = await fetch(url.href, {

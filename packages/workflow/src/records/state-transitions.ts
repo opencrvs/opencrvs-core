@@ -514,13 +514,13 @@ export async function toArchived(
 }
 
 export async function toDuplicated(
-  record: ReadyForReviewRecord,
+  record: ReadyForReviewRecord | ValidatedRecord,
   practitioner: Practitioner,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
 ): Promise<{
-  duplicatedRecord: ReadyForReviewRecord
+  duplicatedRecord: ReadyForReviewRecord | ValidatedRecord
   duplicatedRecordWithTaskOnly: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
