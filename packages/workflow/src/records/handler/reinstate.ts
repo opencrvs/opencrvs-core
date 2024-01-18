@@ -16,6 +16,7 @@ import { indexBundle } from '@workflow/records/search'
 import { SavedBundleEntry, Task } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { auditEvent } from '@workflow/records/audit'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 export const reinstateRoute = createRoute({
   method: 'POST',
@@ -48,14 +49,18 @@ export const reinstateRoute = createRoute({
       return await Promise.reject(new Error('Task has no reg-status code'))
     }
 
-    const reinstatedRecord = await toReinstated(record, prevRegStatus)
+    const reinstatedRecord = await toReinstated(
+      record,
+      prevRegStatus,
+      await getLoggedInPractitionerResource(token)
+    )
 
     const reinstatedTask = reinstatedRecord.entry.find(
       (e) => e.resource.resourceType === 'Task'
     )
 
     if (!reinstatedTask) {
-      throw new Error('No task found after reinstate')
+      throw new Error('No task found after reinstating')
     }
 
     const reinstatedRecordWithTaskOnly = {

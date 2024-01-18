@@ -516,13 +516,24 @@ export async function toArchived(
 
 export async function toReinstated(
   record: ArchivedRecord,
-  prevRegStatus: RegistrationStatus
+  prevRegStatus: RegistrationStatus,
+  practitioner: Practitioner
 ): Promise<ValidatedRecord | ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const reinstatedTask: SavedTask = {
     ...previousTask,
     extension: [
-      ...(previousTask.extension || []),
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
       {
         url: 'http://opencrvs.org/specs/extension/regReinstated'
       }
@@ -537,6 +548,16 @@ export async function toReinstated(
     }
   }
 
+  const reinstatedTaskWithPractitionerExtensions = setupLastRegUser(
+    reinstatedTask,
+    practitioner
+  )
+
+  const reinstatedTaskWithLocationExtensions = await setupLastRegLocation(
+    reinstatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
   const newEntries = [
     ...record.entry.map((entry) => {
       if (entry.resource.id !== previousTask.id) {
@@ -544,7 +565,7 @@ export async function toReinstated(
       }
       return {
         ...entry,
-        resource: reinstatedTask
+        resource: reinstatedTaskWithLocationExtensions
       }
     })
   ]
