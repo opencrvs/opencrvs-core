@@ -313,7 +313,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.NEW_DEC
+      Events.NEW_READY_FOR_REVIEW
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -341,7 +341,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.REQUEST_FOR_REGISTRAR_VALIDATION
+      Events.NEW_VALIDATED
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -369,7 +369,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      Events.NEW_WAITING_EXTERNAL_VALIDATION
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -394,7 +394,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.IN_PROGRESS_DEC
+      Events.NEW_INCOMPLETE
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -426,7 +426,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(payload),
       AUTH_HEADER,
-      Events.IN_PROGRESS_DEC
+      Events.NEW_INCOMPLETE
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',

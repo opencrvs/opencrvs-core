@@ -105,7 +105,7 @@ export async function requestForRegistrarValidationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.REQUEST_FOR_REGISTRAR_VALIDATION
+        Events.NEW_VALIDATED
       )
     )
 
@@ -136,7 +136,7 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+        Events.NEW_WAITING_EXTERNAL_VALIDATION
       )
     )
     await writePoints(points)
@@ -169,7 +169,7 @@ export async function newDeclarationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_DEC
+        Events.NEW_READY_FOR_REVIEW
       )
     )
 
@@ -207,7 +207,7 @@ export async function inProgressHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.IN_PROGRESS_DEC
+        Events.NEW_INCOMPLETE
       )
     )
 
@@ -781,7 +781,7 @@ export async function newMarriageRegistrationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_DEC
+        Events.NEW_READY_FOR_REVIEW
       )
     )
 
