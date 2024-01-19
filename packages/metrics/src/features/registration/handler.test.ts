@@ -75,7 +75,7 @@ describe('When a new registration event is received', () => {
   it('returns ok for valid new birth declaration', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-declaration',
+      url: '/events/birth/new-ready-for-review',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -91,7 +91,7 @@ describe('When a new registration event is received', () => {
     payload.entry[0] = {}
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-declaration',
+      url: '/events/birth/new-ready-for-review',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1162,7 +1162,7 @@ describe('When an existing declaration is marked registered', () => {
     const payload = require('./test-data/mark-validated-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-validated',
+      url: '/events/birth/validated',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1181,7 +1181,7 @@ describe('When an existing declaration is marked registered', () => {
     const payload = require('./test-data/mark-registered-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-registered',
+      url: '/events/birth/registered',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1203,7 +1203,7 @@ describe('When an existing declaration is marked registered', () => {
     fetchTaskHistory.mockResolvedValue(taskHistory)
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/waiting-external-resource-validation',
+      url: '/events/birth/waiting-external-validation',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1226,7 +1226,7 @@ describe('When an existing declaration is marked registered', () => {
     fetchTaskHistory.mockResolvedValue(taskHistory)
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-registered',
+      url: '/events/birth/registered',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1247,7 +1247,7 @@ describe('When an existing declaration is marked registered', () => {
       const payload = require('./test-data/mark-death-registered-request.json')
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/death/mark-registered',
+        url: '/events/death/registered',
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -1276,7 +1276,7 @@ describe('When an existing declaration is marked certified', () => {
     const payload = require('./test-data/mark-certified-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-certified',
+      url: '/events/birth/certified',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1297,7 +1297,7 @@ describe('When an existing declaration is marked certified', () => {
       const payload = require('./test-data/mark-death-certified-request.json')
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/death/mark-certified',
+        url: '/events/death/certified',
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -1319,7 +1319,7 @@ describe('When an existing declaration is marked certified', () => {
       const payload = require('./test-data/mark-certified-request.json')
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/mark-certified',
+        url: '/events/birth/certified',
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -1350,7 +1350,7 @@ describe('When an in-progress declaration is received', () => {
     const payload = require('./test-data/new-in-progress-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/in-progress-declaration',
+      url: '/events/birth/new-incomplete',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1370,7 +1370,7 @@ describe('When an in-progress declaration is received', () => {
     payload.entry[1].resource.extension = []
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/in-progress-declaration',
+      url: '/events/birth/new-incomplete',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1384,7 +1384,7 @@ describe('When an in-progress declaration is received', () => {
     const payload = require('./test-data/rejected.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-voided',
+      url: '/events/birth/requires-updates',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1403,7 +1403,7 @@ describe('When an in-progress declaration is received', () => {
     payload.entry = []
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/mark-voided',
+      url: '/events/birth/requires-updates',
       headers: {
         Authorization: `Bearer ${token}`
       },
