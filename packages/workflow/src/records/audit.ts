@@ -13,7 +13,11 @@ import { getEventType } from '@workflow/features/registration/utils'
 import { ValidRecord } from '@opencrvs/commons/types'
 import { METRICS_URL } from '@workflow/constants'
 
-type AuditAction = 'in-progress-declaration' | 'new-declaration' | 'mark-voided'
+type AuditAction =
+  | 'in-progress-declaration'
+  | 'new-declaration'
+  | 'mark-voided'
+  | 'mark-certified'
 
 export async function auditEvent(
   action: AuditAction,

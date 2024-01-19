@@ -10,17 +10,20 @@
  */
 import { IAuthHeader } from '@opencrvs/commons'
 import {
+  ArchivedRecord,
   EVENT_TYPE,
   SavedBundle,
   Resource,
   Bundle,
   SavedTask,
+  CertifiedRecord,
   RejectedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
+  GQLCertificateInput,
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
@@ -181,7 +184,10 @@ export async function unassignRegistration(
   )
 }
 
-export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
+export async function fetchRegistrationForDownloading(
+  id: string,
+  authHeader: IAuthHeader
+) {
   return await createRequest<SavedBundle<Resource>>(
     'POST',
     '/download-record',
@@ -198,6 +204,47 @@ export async function registerDeclaration(
   return await createRequest('POST', `/records/${id}/register`, authHeader, {
     event
   })
+}
+
+export function certifyRegistration(
+  recordId: string,
+  certificate: GQLCertificateInput,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<CertifiedRecord>(
+    'POST',
+    `/records/${recordId}/certify-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
+}
+
+export async function archiveRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ArchivedRecord = await createRequest(
+    'POST',
+    `/records/${id}/archive`,
+    authHeader,
+    {
+      id,
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
 }
 
 export async function rejectDeclaration(

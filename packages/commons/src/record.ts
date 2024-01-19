@@ -103,6 +103,7 @@ export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
 export type RejectedRecord = Nominal<SavedBundle, 'Rejected'>
+export type ArchivedRecord = Nominal<SavedBundle, 'Archived'>
 
 export type ValidRecord =
   | InProgressRecord
@@ -114,6 +115,7 @@ export type ValidRecord =
   | IssuedRecord
   | RejectedRecord
   | WaitingForValidationRecord
+  | ArchivedRecord
 
 export type RegistrationStatus =
   | 'ARCHIVED'
@@ -138,6 +140,7 @@ export type StateIdenfitiers = {
   ISSUED: IssuedRecord
   WAITING_VALIDATION: WaitingForValidationRecord
   REJECTED: RejectedRecord
+  ARCHIVED: ArchivedRecord
 }
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(

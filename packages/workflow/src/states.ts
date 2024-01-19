@@ -20,7 +20,8 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   WaitingForValidationRecord,
-  RejectedRecord
+  RejectedRecord,
+  ArchivedRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -34,6 +35,7 @@ export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
 export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
 export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
+export type Archive = Nominal<{}, 'Archive'>
 export type Reject = Nominal<{}, 'Reject'>
 
 export type ActionIdentifiers = {
@@ -47,6 +49,7 @@ export type ActionIdentifiers = {
   REGISTER: Register
   REJECT: Reject
   WAITING_VALIDATION: WaitForExternalValidation
+  ARCHIVE: Archive
 }
 
 /*
@@ -87,6 +90,12 @@ export type StateTree =
       ReadyForReviewRecord | ValidatedRecord,
       WaitForExternalValidation,
       WaitingForValidationRecord | RejectedRecord
+    >
+  // Archive declaration
+  | Transition<
+      ReadyForReviewRecord | ValidatedRecord | RegisteredRecord,
+      Archive,
+      ArchivedRecord
     >
   // Reject declaration
   | Transition<

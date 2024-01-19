@@ -35,13 +35,13 @@ import {
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  getComposition
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput,
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -60,19 +60,20 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   removeDuplicatesFromComposition,
-  setCertificateCollector,
+  setCollectorForPrintInAdvance,
   uploadBase64AttachmentsToDocumentsStore
 } from '@gateway/features/registration/utils'
 import {
-  fetchRegistration,
+  archiveRegistration,
   registerDeclaration,
   unassignRegistration,
   rejectDeclaration,
   updateRegistration,
-  validateRegistration
+  validateRegistration,
+  fetchRegistrationForDownloading
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
-import { createRegistration } from '@gateway/workflow'
+import { certifyRegistration, createRegistration } from '@gateway/workflow'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -149,7 +150,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForDownloading(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
@@ -163,7 +167,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForDownloading(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
@@ -181,7 +188,10 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistration(id, context.headers)
+        context.record = await fetchRegistrationForDownloading(
+          id,
+          context.headers
+        )
         return context.record
       } else {
         return await Promise.reject(
@@ -578,15 +588,13 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.ARCHIVED,
+      const taskEntry = await archiveRegistration(
+        id,
+        authHeader,
         reason,
         comment,
         duplicateTrackingId
       )
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },
@@ -625,11 +633,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -639,13 +646,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -657,15 +661,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(
-          details,
-          authHeader,
-          EVENT_TYPE.MARRIAGE
-        )
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -822,16 +821,26 @@ async function markEventAsRegistered(
 }
 
 async function markEventAsCertified(
-  details: any,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  await setCertificateCollector(details, authHeader)
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return composition-id
-  return getIDFromResponse(res)
+  await setCollectorForPrintInAdvance(details, authHeader)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const certifiedRecord = await certifyRegistration(
+    id,
+    certificateDetails,
+    event,
+    authHeader
+  )
+  return getComposition(certifiedRecord).id
 }
 
 async function markEventAsIssued(

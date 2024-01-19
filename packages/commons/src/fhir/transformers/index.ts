@@ -11,38 +11,27 @@
 import { HAS_SHOWED_VERIFIED_DOCUMENT } from './constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
-  ATTACHMENT_DOCS_TITLE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
-  BRIDE_TITLE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  CHILD_TITLE,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
-  DECEASED_TITLE,
-  FATHER_TITLE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  GROOM_TITLE,
-  INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
-  MOTHER_TITLE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
   OBSERVATION_CATEGORY_VSIGN_DESC,
-  SPOUSE_TITLE,
-  WITNESS_ONE_TITLE,
-  WITNESS_TWO_TITLE,
   createCompositionTemplate
 } from './templates'
 import transformObj, { Context, IFieldBuilders } from './transformer'
@@ -73,33 +62,45 @@ import {
 
 import {
   ATTACHMENT_DOCS_CODE,
+  ATTACHMENT_DOCS_TITLE,
   BRIDE_CODE,
+  BRIDE_TITLE,
   Bundle,
   CHILD_CODE,
+  CHILD_TITLE,
   CompositionSectionCode,
   DECEASED_CODE,
+  DECEASED_TITLE,
   EncounterParticipant,
   Extension,
   FATHER_CODE,
+  FATHER_TITLE,
   FHIR_SPECIFICATION_URL,
   GROOM_CODE,
+  GROOM_TITLE,
   INFORMANT_CODE,
+  INFORMANT_TITLE,
   KnownExtensionType,
   MOTHER_CODE,
+  MOTHER_TITLE,
   Money,
   OPENCRVS_SPECIFICATION_URL,
   Patient,
   ResourceIdentifier,
   SPOUSE_CODE,
+  SPOUSE_TITLE,
   StringExtensionType,
   Task,
   TaskIdentifier,
   TaskIdentifierSystemType,
   WITNESS_ONE_CODE,
+  WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
+  WITNESS_TWO_TITLE,
   findExtension,
   getComposition,
-  markSaved
+  markSaved,
+  CompositionSectionTitleByCode
 } from '..'
 import { getUUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
@@ -132,9 +133,9 @@ enum SignatureExtensionPostfix {
   WITNESS_TWO = 'witness-two-signature'
 }
 
-function createNameBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createNameBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'name', HumanName> {
   return {
     use: (fhirBundle, fieldValue, context) => {
@@ -190,9 +191,9 @@ function createNameBuilder(
   }
 }
 
-function createIDBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createIDBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'identifier', IdentityType> {
   return {
     id: (fhirBundle, fieldValue, context) => {
@@ -254,9 +255,9 @@ function createIDBuilder(
   }
 }
 
-function createTelecomBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createTelecomBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'telecom', ContactPoint> {
   return {
     system: (fhirBundle, fieldValue, context) => {
@@ -304,9 +305,9 @@ function createTelecomBuilder(
   }
 }
 
-function createPhotoBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createPhotoBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'photo', Attachment> {
   return {
     contentType: (fhirBundle, fieldValue, context) => {
@@ -334,9 +335,9 @@ function createPhotoBuilder(
   }
 }
 
-function createAddressBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createAddressBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
@@ -2703,12 +2704,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   contentType: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 contentType: fieldValue
               }
@@ -2732,12 +2736,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   data: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 data: fieldValue
               }
