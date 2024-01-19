@@ -156,6 +156,7 @@ describe('Verify handler', () => {
   describe('createRegistrationHandler', () => {
     beforeEach(() => {
       fetch.mockResponses(
+        [null, { status: 404 }],
         [userMock, { status: 200 }],
         [fieldAgentPractitionerMock, { status: 200 }],
         [fieldAgentPractitionerRoleMock, { status: 200 }],
