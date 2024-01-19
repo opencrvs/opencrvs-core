@@ -69,9 +69,9 @@ const auditEventHandler = rest.post(
     const { action } = req.params
     const knownActions = [
       'new-ready-for-review',
-      'certify',
-      'issue',
-      'reject'
+      'certified',
+      'issued',
+      'requires-updates'
     ] satisfies RecordEvent[]
     if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)

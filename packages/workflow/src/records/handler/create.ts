@@ -210,7 +210,7 @@ function getEventAction(record: CreatedRecord) {
     return 'new-ready-for-review'
   }
   if (isValidated(record)) {
-    return 'new-validate'
+    return 'new-validated'
   }
   if (isWaitingExternalValidation(record)) {
     return 'new-waiting-external-validation'
@@ -268,7 +268,7 @@ export default async function createRecordHandler(
   const notificationDisabled =
     isEventNotification(record) ||
     event === EVENT_TYPE.MARRIAGE ||
-    eventAction === 'new-validate' ||
+    eventAction === 'new-validated' ||
     eventAction === 'new-waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 

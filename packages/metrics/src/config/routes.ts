@@ -146,7 +146,7 @@ export const getRoutes = () => {
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/{event}/new-validate',
+      path: '/events/{event}/new-validated',
       handler: analyticsDataRefreshingRoute(
         requestForRegistrarValidationHandler
       ),
@@ -222,7 +222,7 @@ export const getRoutes = () => {
     // Mark validated
     {
       method: 'POST',
-      path: '/events/{event}/validate',
+      path: '/events/{event}/validated',
       handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
         tags: ['api'],
@@ -237,7 +237,7 @@ export const getRoutes = () => {
     // Mark registered
     {
       method: 'POST',
-      path: '/events/{event}/register',
+      path: '/events/{event}/registered',
       handler: analyticsDataRefreshingRoute(markEventRegisteredHandler),
       config: {
         tags: ['api'],
@@ -251,7 +251,7 @@ export const getRoutes = () => {
     // Mark certified
     {
       method: 'POST',
-      path: '/events/{event}/certify',
+      path: '/events/{event}/certified',
       handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
         tags: ['api'],
@@ -266,7 +266,7 @@ export const getRoutes = () => {
     // Mark issued
     {
       method: 'POST',
-      path: '/events/{event}/issue',
+      path: '/events/{event}/issued',
       handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
         tags: ['api'],
@@ -281,7 +281,7 @@ export const getRoutes = () => {
     // Mark rejected
     {
       method: 'POST',
-      path: '/events/{event}/reject',
+      path: '/events/{event}/requires-updates',
       handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
         tags: ['api'],
@@ -369,7 +369,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/{event}/archive',
+      path: '/events/{event}/archived',
       handler: analyticsDataRefreshingRoute(declarationArchivedHandler),
       config: {
         tags: ['api'],
@@ -382,7 +382,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/{event}/reinstate',
+      path: '/events/{event}/reinstated',
       handler: analyticsDataRefreshingRoute(declarationReinstatedHandler),
       config: {
         tags: ['api'],
@@ -403,7 +403,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/update-declaration',
+      path: '/events/updated',
       handler: declarationUpdatedHandler,
       config: {
         tags: ['api']
