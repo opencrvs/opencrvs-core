@@ -678,7 +678,8 @@ export function createDuplicateTask(
   const newExtensions: Extension[] = []
   if (duplicateTrackingId) {
     newExtensions.push({
-      url: 'http://opencrvs.org/specs/extension/markedAsDuplicate'
+      url: 'http://opencrvs.org/specs/extension/markedAsDuplicate',
+      valueString: duplicateTrackingId
     })
   }
 
