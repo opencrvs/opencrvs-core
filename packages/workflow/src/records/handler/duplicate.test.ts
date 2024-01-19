@@ -14,17 +14,38 @@ import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
 import {
+  Extension,
   getTaskFromSavedBundle,
   SavedTask,
   ValidRecord
 } from '@opencrvs/commons/types'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 function hasDuplicateExtension(task: SavedTask) {
   return task.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/markedAsDuplicate'
   )
+}
+
+function findReasonForDuplicate(task: SavedTask) {
+  return task.reason?.text
+}
+
+function findCommentForDuplicate(task: SavedTask) {
+  return task.statusReason?.text
+}
+
+function findDuplicateTrackingId(task: SavedTask) {
+  type DuplicateExtenstion = Extract<
+    Extension,
+    { url: 'http://opencrvs.org/specs/extension/markedAsDuplicate' }
+  >
+
+  return task.extension.find(
+    (e): e is DuplicateExtenstion =>
+      e.url === 'http://opencrvs.org/specs/extension/markedAsDuplicate'
+  )!.valueString
 }
 
 describe('duplicate record endpoint', () => {
@@ -53,24 +74,17 @@ describe('duplicate record endpoint', () => {
     // Fetches a record from search
     mswServer.use(
       rest.get(
-        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+        'http://localhost:9090/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
-    )
-
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     // Sends bundle to metrics and gets a response
     mswServer.use(
       rest.post(
-        'http://localhost:1050/events/marked-as-duplicate',
+        'http://localhost:1050/events/birth/marked-as-duplicate',
         (_, res, ctx) => {
           return res(ctx.json({}))
         }
@@ -79,9 +93,8 @@ describe('duplicate record endpoint', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/duplicate-record',
+      url: '/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454/duplicate',
       payload: {
-        id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         reason: 'duplicate',
         comment: 'invalid data',
         duplicateTrackingId: 'B4678E2'
@@ -94,6 +107,9 @@ describe('duplicate record endpoint', () => {
     const task = getTaskFromSavedBundle(JSON.parse(res.payload) as ValidRecord)
     const isDuplicateRecord = hasDuplicateExtension(task)
 
+    expect(findDuplicateTrackingId(task)).toBe('B4678E2')
+    expect(findReasonForDuplicate(task)).toBe('duplicate')
+    expect(findCommentForDuplicate(task)).toBe('invalid data')
     expect(!!isDuplicateRecord).toBe(true)
     expect(res.statusCode).toBe(200)
   })
