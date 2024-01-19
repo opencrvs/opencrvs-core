@@ -2114,7 +2114,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
         title: 'Marriage Declaration',
         section: [
           {
-            title: 'Groom details',
+            title: "Groom's details",
             code: {
               coding: [
                 {
@@ -2122,7 +2122,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'groom-details'
                 }
               ],
-              text: 'Groom details'
+              text: "Groom's details"
             },
             entry: [
               {
@@ -2132,7 +2132,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
             ]
           },
           {
-            title: 'Bride details',
+            title: "Bride's details",
             code: {
               coding: [
                 {
@@ -2140,7 +2140,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'bride-details'
                 }
               ],
-              text: 'Bride details'
+              text: "Bride's details"
             },
             entry: [
               {
@@ -2538,6 +2538,8 @@ export const mockFormDraft = [
     __v: 0
   }
 ]
+type PatientIdentifier = NonNullable<Patient['identifier']>[number]
+
 const drnIdentifier = {
   type: {
     coding: [
@@ -2548,7 +2550,7 @@ const drnIdentifier = {
     ]
   },
   value: '2022DSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const nidIdentifier = {
   value: '654654666',
@@ -2560,7 +2562,7 @@ const nidIdentifier = {
       }
     ]
   }
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const brnIdentifier = {
   type: {
@@ -2572,7 +2574,7 @@ const brnIdentifier = {
     ]
   },
   value: '2022BSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const mosipPsutTokenIdentifier = {
   type: {

@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -49,15 +48,9 @@ describe('Validate record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
-    )
-    // Mock response from hearth
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     const response = await server.server.inject({

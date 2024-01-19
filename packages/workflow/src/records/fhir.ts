@@ -19,8 +19,21 @@ import {
   URNReference,
   URLReference,
   SavedTask,
+  Composition,
+  SavedComposition,
+  isURLReference,
+  isComposition,
+  SavedBundle,
+  Resource,
+  urlReferenceToUUID,
+  ValidRecord,
   resourceIdentifierToUUID,
-  Location
+  Location,
+  urlReferenceToResourceIdentifier,
+  isEncounter,
+  isRelatedPerson,
+  Encounter,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -835,7 +848,7 @@ export function createCorrectionRequestTask(
   }
 }
 
-export type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
+export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
   entry: Array<
     Omit<fhir3.BundleEntry, 'response'> & {
       response: Omit<fhir3.BundleEntryResponse, 'location'> & {
@@ -845,12 +858,76 @@ export type ResponseBundleEntry = Omit<fhir3.Bundle, 'entry'> & {
   >
 }
 
+function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
+  return {
+    ...bundle,
+    entry: bundle.entry.map((entry) => {
+      const resource = entry.resource
+      if (isComposition(resource)) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            section: resource.section.map((section) => ({
+              ...section,
+              entry: section.entry.map((entry) => ({
+                ...entry,
+                reference: isURLReference(entry.reference)
+                  ? (urlReferenceToResourceIdentifier(
+                      entry.reference
+                    ) as URLReference)
+                  : entry.reference
+              }))
+            }))
+          } satisfies Composition
+        }
+      }
+      if (isEncounter(resource) && resource.location) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            location: resource.location.map((location) => ({
+              ...location,
+              location: {
+                ...location.location,
+                reference: isURLReference(location.location.reference)
+                  ? urlReferenceToResourceIdentifier(
+                      location.location.reference
+                    )
+                  : location.location.reference
+              }
+            }))
+          } satisfies Encounter
+        }
+      }
+
+      if (isRelatedPerson(resource) && resource.patient) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            patient: {
+              ...resource.patient,
+              reference: isURLReference(resource.patient.reference)
+                ? urlReferenceToResourceIdentifier(resource.patient.reference)
+                : resource.patient.reference
+            }
+          } satisfies RelatedPerson
+        }
+      }
+
+      return entry
+    })
+  }
+}
+
 export async function sendBundleToHearth(
-  payload: Bundle
-): Promise<ResponseBundleEntry> {
+  bundle: Bundle
+): Promise<TransactionResponse> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(unresolveReferenceFullUrls(bundle)),
     headers: {
       'Content-Type': 'application/fhir+json'
     }
@@ -862,7 +939,130 @@ export async function sendBundleToHearth(
     )
   }
 
-  return res.json()
+  const responseBundle: TransactionResponse = await res.json()
+
+  const ok = responseBundle.entry.every((e) =>
+    e.response.status.startsWith('2')
+  )
+  if (!ok) {
+    throw new Error(
+      'Hearth was unable to create/update all the entires in the bundle'
+    )
+  }
+
+  return responseBundle
+}
+
+function findSavedReference(
+  temporaryReference: URNReference,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): URLReference | null {
+  const indexInResponseBundle = resourceBundle.entry.findIndex(
+    (entry) => entry.fullUrl === temporaryReference
+  )
+  if (indexInResponseBundle === -1) {
+    return null
+  }
+  return responseBundle.entry[indexInResponseBundle].response.location
+}
+
+function toSavedComposition(
+  composition: Composition,
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedComposition {
+  return {
+    ...composition,
+    id,
+    section: composition.section.map((section) => ({
+      ...section,
+      entry: section.entry.map((sectionEntry) => {
+        if (isURLReference(sectionEntry.reference)) {
+          return {
+            ...sectionEntry,
+            reference: sectionEntry.reference
+          }
+        }
+        const savedReference = findSavedReference(
+          sectionEntry.reference,
+          resourceBundle,
+          responseBundle
+        )
+        if (!savedReference) {
+          throw Error(
+            `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
+              responseBundle
+            )}"`
+          )
+        }
+        return {
+          ...sectionEntry,
+          reference: savedReference
+        }
+      })
+    }))
+  }
+}
+
+/*
+ * Only the references in Composition->section->entry->reference
+ * are being resolved, the others e.g.
+ * DocumentReference->extension->valueReference->reference
+ * need to be added if needed
+ */
+export function toSavedBundle<T extends Resource>(
+  resourceBundle: Bundle<T>,
+  responseBundle: TransactionResponse
+): SavedBundle<T> {
+  return {
+    ...resourceBundle,
+    entry: resourceBundle.entry.map((entry, index) => {
+      if (isComposition(entry.resource)) {
+        return {
+          fullUrl: responseBundle.entry[index].response.location,
+          resource: toSavedComposition(
+            entry.resource,
+            urlReferenceToUUID(responseBundle.entry[index].response.location),
+            resourceBundle,
+            responseBundle
+          )
+        }
+      }
+      return {
+        ...entry,
+        fullUrl: responseBundle.entry[index].response.location,
+        resource: {
+          ...entry.resource,
+          id: urlReferenceToUUID(responseBundle.entry[index].response.location)
+        }
+      }
+    })
+  } as SavedBundle<T>
+}
+
+export function mergeBundles(
+  record: ValidRecord,
+  newOrUpdatedResourcesBundle: SavedBundle
+): SavedBundle {
+  const existingResourceIds = record.entry.map(({ resource }) => resource.id)
+  const newEntries = newOrUpdatedResourcesBundle.entry.filter(
+    ({ resource }) => !existingResourceIds.includes(resource.id)
+  )
+  return {
+    ...record,
+    entry: [
+      ...record.entry.map((previousEntry) => ({
+        ...previousEntry,
+        resource:
+          newOrUpdatedResourcesBundle.entry.find(
+            (newEntry) => newEntry.resource.id === previousEntry.resource.id
+          )?.resource ?? previousEntry.resource
+      })),
+      ...newEntries
+    ]
+  }
 }
 
 export async function findTaskFromIdentifier(

@@ -15,12 +15,14 @@ import {
   SavedBundle,
   Resource,
   Bundle,
-  SavedTask
+  SavedTask,
+  CertifiedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
+  GQLCertificateInput,
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
@@ -201,6 +203,23 @@ export async function registerDeclaration(
   return await createRequest('POST', `/records/${id}/register`, authHeader, {
     event
   })
+}
+
+export function certifyRegistration(
+  recordId: string,
+  certificate: GQLCertificateInput,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<CertifiedRecord>(
+    'POST',
+    `/records/${recordId}/certify-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }
 
 export async function archiveRegistration(

@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForDownloadExtenstion(task: Task) {
@@ -51,16 +50,9 @@ describe('download record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
-    )
-
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     // Sends bundle to save in elastic search
@@ -85,7 +77,7 @@ describe('download record endpoint', () => {
     // for later, before that the server is stopped and when two callbacks
     // are later brought in for execution, the mock handlers are not found
     // as they were already removed
-    // wait two http requests(search and hearth) to finish
+    // wait for the two http requests(search and hearth) to finish
     await new Promise((resolve) => setImmediate(resolve))
     const isDownloaded = checkForDownloadExtenstion(
       getTaskFromSavedBundle(JSON.parse(res.payload))
