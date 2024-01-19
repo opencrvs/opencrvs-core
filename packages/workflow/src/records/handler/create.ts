@@ -171,7 +171,7 @@ async function createRecord(
   })
 
   const responseBundle = await sendBundleToHearth(inputBundle)
-  const savedBundle = await toSavedBundle(inputBundle, responseBundle)
+  const savedBundle = toSavedBundle(inputBundle, responseBundle)
   const record = inProgress
     ? changeState(savedBundle, 'IN_PROGRESS')
     : changeState(savedBundle, 'READY_FOR_REVIEW')

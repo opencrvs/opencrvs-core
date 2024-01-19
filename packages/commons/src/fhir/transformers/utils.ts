@@ -52,7 +52,6 @@ import {
   Reference,
   RelatedPerson,
   Resource,
-  Saved,
   Task,
   URNReference,
   WITNESS_ONE_CODE,
@@ -60,7 +59,10 @@ import {
   findCompositionSection,
   findExtension,
   getComposition,
-  isObservation
+  isObservation,
+  isURLReference,
+  urlReferenceToResourceIdentifier,
+  BundleEntryWithFullUrl
 } from '..'
 
 import { CompositionSectionTitleByCode, PartialBy } from '../../types'
@@ -797,14 +799,16 @@ export function setInformantReference<T extends CompositionSectionCode>(
   }
   const personSectionEntry = section.entry[0]
   const personEntry = fhirBundle.entry.find(
-    (entry): entry is Saved<BundleEntry<Patient>> =>
+    (entry): entry is BundleEntryWithFullUrl<Patient> =>
       entry.fullUrl === personSectionEntry.reference
   )
   if (!personEntry) {
     return
   }
   relatedPerson.patient = {
-    reference: personEntry.fullUrl
+    reference: isURLReference(personEntry.fullUrl)
+      ? urlReferenceToResourceIdentifier(personEntry.fullUrl)
+      : personEntry.fullUrl
   }
 }
 

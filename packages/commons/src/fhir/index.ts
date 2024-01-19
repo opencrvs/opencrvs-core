@@ -48,6 +48,14 @@ export type ResourceIdentifier<
 // /fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
 
+export type Reference = Omit<fhir3.Reference, 'reference'> & {
+  reference: URNReference | ResourceIdentifier
+}
+
+export type SavedReference = Omit<Reference, 'reference'> & {
+  reference: ResourceIdentifier
+}
+
 export function isURLReference(id: string): id is URLReference {
   return id.startsWith('/fhir')
 }
@@ -203,15 +211,11 @@ export type DocumentReference = WithStrictExtensions<
 export type RelatedPerson = WithStrictExtensions<
   Omit<fhir3.RelatedPerson, 'patient'>
 > & {
-  patient?: {
-    reference: URNReference | URLReference
-  }
+  patient?: Reference
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient: {
-    reference: URLReference
-  }
+  patient: SavedReference
 }
 
 export type Location = WithStrictExtensions<
@@ -291,12 +295,6 @@ export type FhirResourceType =
 
 export type Identifier = fhir3.Identifier
 
-export type Reference = Omit<fhir3.Reference, 'reference'> & {
-  reference: URNReference | ResourceIdentifier | URLReference
-}
-export type SavedReference = Omit<Reference, 'reference'> & {
-  reference: URLReference
-}
 export type Coding = fhir3.Coding
 export type QuestionnaireResponse = fhir3.QuestionnaireResponse
 export type CompositionRelatesTo = fhir3.CompositionRelatesTo
