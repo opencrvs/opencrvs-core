@@ -45,7 +45,6 @@ import {
   CorrectionRequestPaymentInput,
   ChangedValuesInput
 } from '@workflow/records/correction-request'
-import { internal } from '@hapi/boom'
 import { isSystem, ISystemModelData, IUserModelData } from './user'
 import { getPractitionerOffice } from '@workflow/features/user/utils'
 
@@ -937,7 +936,7 @@ function toSavedComposition(
           responseBundle
         )
         if (!savedReference) {
-          throw internal(
+          throw Error(
             `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
               responseBundle
             )}"`
