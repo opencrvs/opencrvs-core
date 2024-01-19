@@ -8,7 +8,7 @@
     "linux"
   ],
   "engines": {
-    "node": "18.19.0"
+    "node": "18.19.x"
   },
   "workspaces": [
     "packages/*"
