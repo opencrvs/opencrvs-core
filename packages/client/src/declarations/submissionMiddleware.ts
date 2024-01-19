@@ -174,7 +174,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const form = getRegisterForm(getState())[event]
     const offlineData = getOfflineData(getState())
-    let graphqlPayload = getGqlDetails(
+    const graphqlPayload = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
       getOfflineData(getState()),

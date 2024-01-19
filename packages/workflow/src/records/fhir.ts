@@ -570,6 +570,61 @@ export function createRegisterTask(
   }
 }
 
+export function createArchiveTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  const extension: Extension[] = [
+    ...previousTask.extension.filter((extension) =>
+      [
+        'http://opencrvs.org/specs/extension/contact-person-phone-number',
+        'http://opencrvs.org/specs/extension/informants-signature',
+        'http://opencrvs.org/specs/extension/contact-person-email'
+      ].includes(extension.url)
+    )
+  ]
+
+  if (duplicateTrackingId)
+    extension.push({
+      url: `http://opencrvs.org/specs/extension/duplicateTrackingId`,
+      valueString: duplicateTrackingId
+    })
+
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension,
+    // Reason example - "duplicate"
+    reason: { text: reason ?? '' },
+    // Status reason is comments which is added in the UI
+    statusReason: { text: comment ?? '' },
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'ARCHIVED'
+        }
+      ]
+    },
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+}
+
 export function createUpdatedTask(
   previousTask: SavedTask,
   updatedDetails: ChangedValuesInput,
