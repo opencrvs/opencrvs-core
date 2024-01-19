@@ -13,12 +13,12 @@ import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
-import { READY_FOR_REVIEW_RECORD } from '@test/mocks/createBirthRecord'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
   ValidRecord
 } from '@opencrvs/commons/types'
+import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 describe('archive record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -48,16 +48,9 @@ describe('archive record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_RECORD))
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
-    )
-
-    // Sends bundle to hearth and gets a response
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
     )
 
     const res = await server.server.inject({
