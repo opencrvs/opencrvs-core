@@ -980,6 +980,13 @@ export async function toCertified(
 
   const previousComposition = getComposition(record)
 
+  /*
+   * In order to maintain backwards compatibility
+   * we can't reuse the certificate section. Instead
+   * each time "certify" event is fired, a new composition
+   * section will be created with the new certificate. The older
+   * certificates can be accessed from composition_history
+   */
   const compositionWithCertificateSection: Composition = {
     ...previousComposition,
     section: [
