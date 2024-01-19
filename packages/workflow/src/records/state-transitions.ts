@@ -46,7 +46,6 @@ import {
   getComposition,
   OPENCRVS_SPECIFICATION_URL,
   RegistrationNumber,
-  RejectedRecord,
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory
@@ -307,15 +306,17 @@ export async function toDownloaded(
 }
 
 export async function toRejected(
-  record: ReadyForReviewRecord | ValidatedRecord,
+  record: ReadyForReviewRecord | ValidatedRecord | InProgressRecord,
   practitioner: Practitioner,
-  statusReason: fhir3.CodeableConcept
-): Promise<RejectedRecord> {
+  comment: fhir3.CodeableConcept,
+  reason?: string
+) {
   const previousTask = getTaskFromSavedBundle(record)
   const rejectedTask = createRejectTask(
     previousTask,
     practitioner,
-    statusReason
+    comment,
+    reason
   )
 
   const rejectedTaskWithPractitionerExtensions = setupLastRegUser(
@@ -328,7 +329,13 @@ export async function toRejected(
     practitioner
   )
 
-  return changeState(
+  const rejectedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: rejectedTaskWithLocationExtensions }]
+  }
+
+  const rejectedRecord = changeState(
     {
       ...record,
       entry: [
@@ -340,6 +347,8 @@ export async function toRejected(
     },
     'REJECTED'
   )
+
+  return { rejectedRecord, rejectedRecordWithTaskOnly }
 }
 
 export async function toWaitingForExternalValidationState(

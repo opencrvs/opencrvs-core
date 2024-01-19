@@ -16,7 +16,8 @@ import {
   Resource,
   Bundle,
   SavedTask,
-  CertifiedRecord
+  CertifiedRecord,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -244,4 +245,23 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function rejectDeclaration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason: string,
+  comment: string
+) {
+  const rejectedRecord: RejectedRecord = await createRequest(
+    'POST',
+    `/records/${id}/reject`,
+    authHeader,
+    {
+      reason,
+      comment
+    }
+  )
+
+  return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
 }
