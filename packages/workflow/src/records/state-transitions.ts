@@ -70,6 +70,7 @@ import {
   ChangedValuesInput
 } from '@workflow/records/correction-request'
 import {
+  createArchiveTask,
   createCorrectedTask,
   createCorrectionEncounter,
   createCorrectionPaymentResources,
@@ -463,6 +464,52 @@ export async function toRegistered(
     },
     'REGISTERED'
   )
+}
+
+export async function toArchived(
+  record: RegisteredRecord | ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+  const archivedTask = createArchiveTask(
+    previousTask,
+    practitioner,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  const archivedTaskWithPractitionerExtensions = setupLastRegUser(
+    archivedTask,
+    practitioner
+  )
+
+  const archivedTaskWithLocationExtensions = await setupLastRegLocation(
+    archivedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const archivedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: archivedTaskWithLocationExtensions }]
+  }
+
+  const archivedRecord = changeState(
+    {
+      ...record,
+      entry: [
+        ...record.entry.filter((e) => e.resource.id !== archivedTask.id),
+        { resource: archivedTaskWithLocationExtensions }
+      ]
+    },
+    'ARCHIVED'
+  )
+
+  return { archivedRecord, archivedRecordWithTaskOnly }
 }
 
 export async function toValidated(

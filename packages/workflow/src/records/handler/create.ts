@@ -50,7 +50,7 @@ import {
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 
-export const requestSchema = z.object({
+const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   record: z.custom<
     BirthRegistration | DeathRegistration | MarriageRegistration

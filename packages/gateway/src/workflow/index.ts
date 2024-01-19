@@ -10,6 +10,7 @@
  */
 import { IAuthHeader } from '@opencrvs/commons'
 import {
+  ArchivedRecord,
   EVENT_TYPE,
   SavedBundle,
   Resource,
@@ -182,7 +183,10 @@ export async function unassignRegistration(
   )
 }
 
-export async function fetchRegistration(id: string, authHeader: IAuthHeader) {
+export async function fetchRegistrationForDownloading(
+  id: string,
+  authHeader: IAuthHeader
+) {
   return await createRequest<SavedBundle<Resource>>(
     'POST',
     '/download-record',
@@ -216,4 +220,28 @@ export function certifyRegistration(
       event
     }
   )
+}
+
+export async function archiveRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ArchivedRecord = await createRequest(
+    'POST',
+    `/records/${id}/archive`,
+    authHeader,
+    {
+      id,
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
 }
