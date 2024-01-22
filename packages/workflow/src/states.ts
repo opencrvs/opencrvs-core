@@ -36,7 +36,6 @@ export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
 export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
 export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
 export type Archive = Nominal<{}, 'Archive'>
-export type Duplicate = Nominal<{}, 'Duplicate'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -49,7 +48,6 @@ export type ActionIdentifiers = {
   REGISTERED: Register
   WAITING_VALIDATION: WaitForExternalValidation
   ARCHIVE: Archive
-  DUPLICATE: Duplicate
 }
 
 /*
@@ -96,12 +94,6 @@ export type StateTree =
       ReadyForReviewRecord | ValidatedRecord | RegisteredRecord,
       Archive,
       ArchivedRecord
-    >
-  // Duplicate declaration
-  | Transition<
-      ReadyForReviewRecord | ValidatedRecord,
-      Duplicate,
-      ReadyForReviewRecord | ValidatedRecord
     >
 /*
  * Internals

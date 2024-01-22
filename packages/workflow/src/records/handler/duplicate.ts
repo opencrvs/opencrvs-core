@@ -10,13 +10,14 @@
  */
 
 import * as z from 'zod'
+import * as Hapi from '@hapi/hapi'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toDuplicated } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
-import { createRoute } from '@workflow/states'
+import { getRecordById } from '@workflow/records/index'
 
 const requestSchema = z.object({
   reason: z.string().optional(),
@@ -24,30 +25,28 @@ const requestSchema = z.object({
   duplicateTrackingId: z.string().optional()
 })
 
-export const duplicateRoute = createRoute({
-  method: 'POST',
-  path: '/records/{recordId}/duplicate',
-  allowedStartStates: ['VALIDATED', 'READY_FOR_REVIEW'],
-  action: 'DUPLICATE',
-  includeHistoryResources: true,
-  handler: async (request, record) => {
-    const token = getToken(request)
-    const payload = validateRequest(requestSchema, request.payload)
+export async function duplicateRecordHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const recordId = request.params.id
 
-    const { reason, comment, duplicateTrackingId } = payload
+  const token = getToken(request)
+  const payload = validateRequest(requestSchema, request.payload)
 
-    const { duplicatedRecord, duplicatedRecordWithTaskOnly } =
-      await toDuplicated(
-        record,
-        await getLoggedInPractitionerResource(token),
-        reason,
-        comment,
-        duplicateTrackingId
-      )
+  const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
+  const { reason, comment, duplicateTrackingId } = payload
 
-    await sendBundleToHearth(duplicatedRecordWithTaskOnly)
-    await auditEvent('marked-as-duplicate', duplicatedRecord, token)
+  const { duplicatedRecord, duplicatedRecordWithTaskOnly } = await toDuplicated(
+    record,
+    await getLoggedInPractitionerResource(token),
+    reason,
+    comment,
+    duplicateTrackingId
+  )
 
-    return duplicatedRecord
-  }
-})
+  await sendBundleToHearth(duplicatedRecordWithTaskOnly)
+  await auditEvent('marked-as-duplicate', duplicatedRecord, token)
+
+  return duplicatedRecord
+}
