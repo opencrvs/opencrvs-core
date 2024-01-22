@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.19.0]
+        package: ${{fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - name: Checking out git repo
@@ -67,11 +67,11 @@ jobs:
             fi
           fi
 
-      - name: Use Node.js 16.20
+      - name: Use Node.js 18.19
         if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v2
         with:
-          node-version: '16.20'
+          node-version: '18.19'
           cache: 'npm'
 
       - name: Remove other package directories
