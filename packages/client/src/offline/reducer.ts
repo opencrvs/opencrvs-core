@@ -26,7 +26,9 @@ import {
   ILocationDataResponse,
   ICertificateTemplateData,
   referenceApi,
-  CertificateConfiguration
+  CertificateConfiguration,
+  IFacilitiesDataResponse,
+  IOfficesDataResponse
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -52,12 +54,12 @@ import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export enum LocationType {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  CRVS_OFFICE = 'CRVS_OFFICE',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
-  PRIVATE_HOME = 'PRIVATE_HOME'
-}
+export type LocationType =
+  | 'HEALTH_FACILITY'
+  | 'CRVS_OFFICE'
+  | 'ADMIN_STRUCTURE'
+  | 'PRIVATE_HOME'
+
 export interface ILocation {
   id: string
   name: string
@@ -70,6 +72,29 @@ export interface ILocation {
   partOf: string
 }
 
+type JurisdictionType =
+  | 'STATE'
+  | 'DISTRICT'
+  | 'LOCATION_LEVEL_3'
+  | 'LOCATION_LEVEL_4'
+  | 'LOCATION_LEVEL_5'
+
+export interface AdminStructure extends ILocation {
+  type: 'ADMIN_STRUCTURE'
+  jurisdictionType: JurisdictionType
+  physicalType: 'Jurisdiction'
+}
+
+export interface Facility extends ILocation {
+  type: 'HEALTH_FACILITY'
+  physicalType: 'Building'
+}
+
+export interface CRVSOffice extends ILocation {
+  type: 'CRVS_OFFICE'
+  physicalType: 'Building'
+}
+
 export interface IOfflineData {
   locations: ILocationDataResponse
   forms: {
@@ -78,8 +103,8 @@ export interface IOfflineData {
     death: ISerializedForm
     marriage: ISerializedForm
   }
-  facilities: ILocationDataResponse
-  offices: ILocationDataResponse
+  facilities: IFacilitiesDataResponse
+  offices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
@@ -671,14 +696,11 @@ function reducer(
      */
 
     case actions.FACILITIES_LOADED: {
-      const facilities = filterLocations(
-        action.payload,
-        LocationType.HEALTH_FACILITY
-      )
+      const facilities = filterLocations(action.payload, 'HEALTH_FACILITY')
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE
+        'CRVS_OFFICE'
         /*
 
         // This is used to filter office locations available offline
