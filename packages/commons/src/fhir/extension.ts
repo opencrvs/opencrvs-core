@@ -161,7 +161,7 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/payment': {
     url: 'http://opencrvs.org/specs/extension/payment'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier | URNReference /* Unsaved */
     }
   }
   'http://opencrvs.org/specs/extension/date-of-marriage': {

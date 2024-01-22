@@ -32,7 +32,7 @@ import {
   isRelatedPerson,
   Encounter,
   RelatedPerson,
-  BundleEntryWithFullUrl,
+  BundleEntryWithFullUrl as MaybeSavedBundleEntryWithFullUrl,
   RegisteredRecord,
   CertifiedRecord,
   Patient,
@@ -243,7 +243,7 @@ export function createDocumentReferenceEntryForCertificate(
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
   attachmentUrl?: string,
-  paymentUrl?: URNReference | URLReference
+  paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
   return {
     fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
@@ -434,6 +434,13 @@ export function createRelatedPersonEntries(
       }
     }
   ]
+}
+
+type BundleEntryWithFullUrl<T extends Resource = Resource> = Omit<
+  MaybeSavedBundleEntryWithFullUrl<T>,
+  'fullUrl'
+> & {
+  fullUrl: URNReference
 }
 
 export function createPaymentResources(

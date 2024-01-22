@@ -364,6 +364,22 @@ export function getFromBundleById<T extends Resource = Resource>(
   return resource as SavedBundleEntry<T>
 }
 
+export function findEntryFromBundle<T extends Resource = Resource>(
+  bundle: Bundle,
+  reference: Reference['reference']
+): BundleEntryWithFullUrl<T> | SavedBundleEntry<T> | undefined {
+  return isURNReference(reference)
+    ? bundle.entry.find(
+        (entry): entry is BundleEntryWithFullUrl<T> =>
+          entry.fullUrl === reference
+      )
+    : bundle.entry.find(
+        (entry): entry is SavedBundleEntry<T> =>
+          isSaved(entry.resource) &&
+          entry.resource.id === resourceIdentifierToUUID(reference)
+      )
+}
+
 export function findCompositionSection<T extends SavedComposition>(
   code: CompositionSectionCode,
   composition: T
