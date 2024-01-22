@@ -93,7 +93,7 @@ describe('duplicate record endpoint', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454/duplicate',
+      url: '/record/c8b8e843-c5e0-49b5-96d9-a702ddb46454/duplicate',
       payload: {
         reason: 'duplicate',
         comment: 'invalid data',
