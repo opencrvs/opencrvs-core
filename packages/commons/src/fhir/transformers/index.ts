@@ -1805,17 +1805,13 @@ const builders: IFieldBuilders = {
          * & age builder as it depends on which
          * one gets called second
          */
-        const age = person.extension?.find(
-          ({ url }) =>
-            url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
-        )?.valueString
+        const age = findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+          person.extension || []
+        )?.valueInteger
 
         if (age) {
-          const birthDate = subYears(
-            new Date(fieldValue as string),
-            parseInt(age, 10)
-          )
+          const birthDate = subYears(new Date(fieldValue as string), age)
           person.birthDate = format(birthDate, 'yyyy-MM-dd')
         }
         person.deceasedDateTime = fieldValue as string
