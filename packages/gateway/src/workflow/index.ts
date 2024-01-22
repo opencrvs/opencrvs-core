@@ -233,7 +233,7 @@ export function certifyRegistration(
 export async function markNotAsDuplicate(id: string, authHeader: IAuthHeader) {
   const response = await createRequest<Bundle<Resource>>(
     'POST',
-    `/not-duplicate/${id}/record`,
+    `/record/${id}/not-duplicate`,
     authHeader
   )
 

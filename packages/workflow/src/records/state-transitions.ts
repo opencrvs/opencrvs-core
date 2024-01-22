@@ -49,7 +49,8 @@ import {
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
-  TaskHistory
+  TaskHistory,
+  removeDuplicatesFromComposition
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -83,6 +84,7 @@ import {
   createCorrectionRequestTask,
   createDownloadTask,
   createDuplicateTask,
+  createNotDuplicateTask,
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
@@ -644,6 +646,38 @@ export async function toDuplicated(
   } as ReadyForReviewRecord
 
   return { duplicatedRecord, duplicatedRecordWithTaskOnly }
+}
+
+export async function toNotDuplicated(
+  record: ReadyForReviewRecord,
+  practitioner: Practitioner
+): Promise<Bundle> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const notDuplicateTask = createNotDuplicateTask(previousTask)
+
+  const notDuplicateTaskWithPractitionerExtensions = setupLastRegUser(
+    notDuplicateTask,
+    practitioner
+  )
+
+  const notDuplicateTaskWithLocationExtensions = await setupLastRegLocation(
+    notDuplicateTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const updatedComposition = removeDuplicatesFromComposition(
+    getComposition(record)
+  )
+  const updatedBundle: Bundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [
+      { resource: updatedComposition },
+      { resource: notDuplicateTaskWithLocationExtensions }
+    ]
+  }
+
+  return updatedBundle
 }
 
 export async function toValidated(

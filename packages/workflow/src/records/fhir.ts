@@ -881,6 +881,27 @@ export function createArchiveTask(
   return updatedArchivedTask
 }
 
+export function createNotDuplicateTask(previousTask: SavedTask): SavedTask {
+  return {
+    ...previousTask,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+    ].concat({
+      url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate'
+    })
+  }
+}
+
 export function createDuplicateTask(
   previousTask: SavedTask,
   practitioner: Practitioner,

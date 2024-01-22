@@ -407,9 +407,9 @@ export { updateFHIRBundle, buildFHIRBundle } from './transformers'
 
 export function removeDuplicatesFromComposition(
   composition: Composition,
-  compositionId: string,
   duplicateId?: string
 ) {
+  const compositionId = composition.id
   if (duplicateId) {
     const removeAllDuplicates = compositionId === duplicateId
     const updatedRelatesTo =

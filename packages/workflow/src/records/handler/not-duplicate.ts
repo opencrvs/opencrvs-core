@@ -12,16 +12,11 @@
 import * as Hapi from '@hapi/hapi'
 import { getToken } from '@workflow/utils/authUtils'
 import { getRecordById } from '@workflow/records/index'
-import {
-  addExtensionsToTask,
-  Bundle,
-  getComposition,
-  getTaskFromSavedBundle,
-  removeDuplicatesFromComposition
-} from '@opencrvs/commons/types'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { toNotDuplicated } from '@workflow/records/state-transitions'
 
 export async function markAsNotDuplicateHandler(
   request: Hapi.Request,
@@ -31,30 +26,14 @@ export async function markAsNotDuplicateHandler(
   const token = getToken(request)
   const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
 
-  const composition = getComposition(record)
-
-  const task = getTaskFromSavedBundle(record)
-
-  const updatedTask = addExtensionsToTask(task, [
-    {
-      url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate'
-    }
-  ])
-
-  const updatedComposition = removeDuplicatesFromComposition(
-    composition,
-    recordId
+  const notDuplicateBundle = await toNotDuplicated(
+    record,
+    await getLoggedInPractitionerResource(token)
   )
 
-  const updatedBundle: Bundle = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: [{ resource: updatedComposition }, { resource: updatedTask }]
-  }
+  await sendBundleToHearth(notDuplicateBundle)
+  await indexBundle(notDuplicateBundle, token)
+  await auditEvent('not-duplicate', notDuplicateBundle, token)
 
-  await sendBundleToHearth(updatedBundle)
-  await indexBundle(updatedBundle, token)
-  await auditEvent('not-duplicate', updatedBundle, token)
-
-  return updatedBundle
+  return notDuplicateBundle
 }
