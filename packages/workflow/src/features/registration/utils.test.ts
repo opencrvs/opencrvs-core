@@ -20,7 +20,7 @@ import {
   testFhirBundle,
   officeMock,
   taskResourceMock,
-  deathTaskMock,
+  deathTaskMockJSON,
   mosipDeceasedPatientMock,
   testFhirBundleWithIdsForDeath,
   mosipSuccessMock
@@ -28,6 +28,7 @@ import {
 import { Events } from '@workflow/features/events/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import { Bundle } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 
@@ -40,7 +41,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.BIRTH,
-      {} as fhir.Bundle,
+      {} as Bundle,
       '123'
     )
     expect(trackingId).toBeDefined()
@@ -52,7 +53,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.DEATH,
-      {} as fhir.Bundle,
+      {} as Bundle,
       '123'
     )
 
@@ -65,7 +66,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.MARRIAGE,
-      {} as fhir.Bundle,
+      {} as Bundle,
       '123'
     )
 
@@ -256,8 +257,8 @@ describe('Verify utility functions', () => {
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockResponses([officeMock, { status: 200 }])
-    fetch.mockResponses([deathTaskMock, { status: 200 }])
-    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMockJSON, { status: 200 }])
+    fetch.mockResponses([deathTaskMockJSON, { status: 200 }])
     fetch.mockRejectedValueOnce(new Error('Mock Error'))
     await sendEventNotification(
       testFhirBundleWithIdsForDeath,
@@ -275,7 +276,7 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponses([officeMock, { status: 200 }])
-    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMockJSON, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,
@@ -291,8 +292,8 @@ describe('Verify utility functions', () => {
     fetch.mockResponseOnce(null, { status: 404 })
     const fhirBundle = await setTrackingId(testFhirBundleWithIdsForDeath, '123')
     fetch.mockResponses([officeMock, { status: 200 }])
-    fetch.mockResponses([deathTaskMock, { status: 200 }])
-    fetch.mockResponses([deathTaskMock, { status: 200 }])
+    fetch.mockResponses([deathTaskMockJSON, { status: 200 }])
+    fetch.mockResponses([deathTaskMockJSON, { status: 200 }])
     expect(
       sendEventNotification(
         fhirBundle,

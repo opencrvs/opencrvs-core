@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { UUID } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -19,11 +20,7 @@ import {
   Task,
   findExtension
 } from '@opencrvs/commons/types'
-import {
-  APPLICATION_CONFIG_URL,
-  COUNTRY_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   BIRTH_REG_NUMBER_GENERATION_FAILED,
@@ -81,11 +78,11 @@ export async function modifyRegistrationBundle<T extends Bundle>(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = await setTrackingId(fhirBundle, token)
+  const bundleWithTrackingId = await setTrackingId(fhirBundle, token)
 
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundleWithTrackingId)
 
-  const eventType = getEventType(fhirBundle)
+  const eventType = getEventType(bundleWithTrackingId)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
 
@@ -93,7 +90,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressDeclaration(fhirBundle)
+    isInProgressDeclaration(bundleWithTrackingId)
       ? RegStatus.IN_PROGRESS
       : RegStatus.DECLARED
   )
@@ -102,7 +99,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  if (!isEventNotification(fhirBundle)) {
+  if (!isEventNotification(bundleWithTrackingId)) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
@@ -110,7 +107,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
-  return fhirBundle
+  return bundleWithTrackingId as T
 }
 
 export async function markBundleAsValidated<T extends Bundle>(
@@ -378,7 +375,9 @@ export async function setTrackingId(
     fhirBundle,
     token
   )
-  const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
+  const trackingIdFhirName = `${
+    eventType.toLowerCase() as Lowercase<typeof eventType>
+  }-tracking-id` as const
 
   if (
     !fhirBundle ||
@@ -409,11 +408,13 @@ export async function setTrackingId(
       `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
   )
 
+  const systemIdentifierUrl =
+    `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}` as const
   if (existingTrackingId) {
     existingTrackingId.value = trackingId
   } else {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`,
+      system: systemIdentifierUrl,
       value: trackingId
     })
   }
@@ -492,11 +493,13 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+    regUserLastLocationExtension.valueReference.reference = `Location/${
+      location.id as UUID
+    }` as const
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: { reference: `Location/${location.id}` }
+      valueReference: { reference: `Location/${location.id as UUID}` }
     })
   }
 

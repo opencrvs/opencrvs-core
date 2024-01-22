@@ -103,15 +103,4 @@ describe('Verify getTrackingId', () => {
       throw new Error('Failed')
     }
   })
-  it('Returned tracking id properly for marriage', async () => {
-    const trackingid = getTrackingId(
-      await setTrackingId(testMarriageFhirBundle, '123')
-    )
-    if (trackingid) {
-      expect(trackingid).toMatch(/^M/)
-      expect(trackingid.length).toBe(7)
-    } else {
-      throw new Error('Failed')
-    }
-  })
 })

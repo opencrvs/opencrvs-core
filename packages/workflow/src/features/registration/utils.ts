@@ -8,38 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as ShortUIDGen from 'short-uid'
 import {
-  NOTIFICATION_SERVICE_URL,
-  MOSIP_TOKEN_SEEDER_URL,
+  COUNTRY_CONFIG_URL,
   HEARTH_URL,
-  COUNTRY_CONFIG_URL
+  MOSIP_TOKEN_SEEDER_URL,
+  NOTIFICATION_SERVICE_URL
 } from '@workflow/constants'
-import fetch from 'node-fetch'
-import { logger } from '@workflow/logger'
+import { Events } from '@workflow/features/events/utils'
 import {
-  getSubjectName,
-  getTrackingId,
-  getCRVSOfficeName,
-  getRegistrationNumber,
-  concatenateName,
-  getInformantName,
-  getRegistrationLocation
-} from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  EVENT_TYPE,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
+  EVENT_TYPE,
   INFORMANT_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { Events } from '@workflow/features/events/utils'
-
-import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
-  getInformantSMSNotification,
-  InformantNotificationName,
-  isInformantSMSNotificationEnabled
-} from './smsNotificationUtils'
+  concatenateName,
+  getCRVSOfficeName,
+  getInformantName,
+  getRegistrationLocation,
+  getRegistrationNumber,
+  getSubjectName,
+  getTrackingId
+} from '@workflow/features/registration/fhir/fhir-utils'
+import { logger } from '@workflow/logger'
+import fetch from 'node-fetch'
+import * as ShortUIDGen from 'short-uid'
+
 import {
   Bundle,
   BundleEntry,
@@ -52,7 +46,13 @@ import {
   TrackingID
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { getTaskResourceFromFhirBundle } from './fhir/fhir-template'
+import {
+  getInformantSMSNotification,
+  InformantNotificationName,
+  isInformantSMSNotificationEnabled
+} from './smsNotificationUtils'
 
 interface INotificationPayload {
   recipient: {
@@ -78,17 +78,17 @@ export async function generateTrackingIdForEvents(
   eventType: EVENT_TYPE,
   bundle: Bundle,
   token: string
-): Promise<string> {
+) {
   const trackingIdFromCountryConfig = await getTrackingIdFromCountryConfig(
     bundle,
     token
   )
   if (trackingIdFromCountryConfig) {
-    return trackingIdFromCountryConfig
+    return trackingIdFromCountryConfig as TrackingID
   } else {
     // using first letter of eventType for prefix
     // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
-    return generateTrackingId(eventType.charAt(0))
+    return generateTrackingId(eventType.charAt(0)) as TrackingID
   }
 }
 

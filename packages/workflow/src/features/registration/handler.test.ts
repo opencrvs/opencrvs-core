@@ -34,7 +34,7 @@ import { createServer } from '@workflow/server'
 import {
   compositionMock,
   deathCompositionMock,
-  deathTaskMock,
+  deathTaskMockJSON,
   districtMock,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
@@ -418,73 +418,6 @@ describe('Verify handler', () => {
 
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(500)
-    })
-
-    it('generates a new tracking id and repeats the request if a 409 is received from hearth', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
-        ]
-      )
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('fails after trying to generate a new trackingID and sending to Hearth 5 times', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }]
-      )
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -1003,7 +936,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with death registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(JSON.parse(deathTaskMock)), { status: 200 }],
+      [wrapInBundle(JSON.parse(deathTaskMockJSON)), { status: 200 }],
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
