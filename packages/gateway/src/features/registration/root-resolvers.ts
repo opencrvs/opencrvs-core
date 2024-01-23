@@ -839,13 +839,13 @@ async function markEventAsIssued(
   if (!payments?.[0]) {
     return Promise.reject(new Error('Payment details required'))
   }
-  const certifiedRecord = await issueRegistration(
+  const issuedRecord = await issueRegistration(
     id,
     { ...withoutPayments, payment: payments[0] },
     event,
     authHeader
   )
-  return getComposition(certifiedRecord).id
+  return getComposition(issuedRecord).id
 }
 
 const ACTION_EXTENSIONS: Extension['url'][] = [
