@@ -255,7 +255,7 @@ export async function duplicateRegistration(
 ) {
   const res: ReadyForReviewRecord = await createRequest(
     'POST',
-    `/record/${id}/duplicate`,
+    `/records/${id}/duplicate`,
     authHeader,
     {
       reason,

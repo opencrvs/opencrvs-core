@@ -105,7 +105,7 @@ export const getRoutes = () => {
     ...archiveRoute,
     {
       method: 'POST',
-      path: '/record/{id}/duplicate',
+      path: '/records/{id}/duplicate',
       handler: duplicateRecordHandler,
       config: {
         tags: ['api'],
