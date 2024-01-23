@@ -100,7 +100,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/birth/new-incomplete',
+      path: '/birth/sent-notification',
       handler: birthInProgressNotification,
       options: {
         tags: ['api'],
@@ -111,7 +111,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/death/new-incomplete',
+      path: '/death/sent-notification',
       handler: deathInProgressNotification,
       options: {
         tags: ['api'],
@@ -122,7 +122,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/birth/new-ready-for-review',
+      path: '/birth/sent-notification-for-review',
       handler: birthReadyForReviewNotification,
       options: {
         tags: ['api'],
@@ -133,7 +133,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/death/new-ready-for-review',
+      path: '/death/sent-notification-for-review',
       handler: deathReadyForReviewNotification,
       options: {
         tags: ['api'],
@@ -144,7 +144,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/birth/register',
+      path: '/birth/registered',
       handler: birthRegisterNotification,
       options: {
         tags: ['api'],
@@ -155,7 +155,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
-      path: '/death/register',
+      path: '/death/registered',
       handler: deathRegisterNotification,
       options: {
         tags: ['api'],
