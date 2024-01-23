@@ -18,6 +18,7 @@ import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
 import { issueRoute } from '@workflow/records/handler/issue'
 import { registerRoute } from '@workflow/records/handler/register'
+import { rejectRoute } from '@workflow/records/handler/reject'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 
@@ -103,7 +104,8 @@ export const getRoutes = () => {
     ...registerRoute,
     certifyRoute,
     issueRoute,
-    ...archiveRoute
+    ...archiveRoute,
+    rejectRoute
   ]
 
   return routes

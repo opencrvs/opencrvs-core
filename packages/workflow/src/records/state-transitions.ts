@@ -45,7 +45,9 @@ import {
   getComposition,
   OPENCRVS_SPECIFICATION_URL,
   RegistrationNumber,
-  RejectedRecord
+  resourceToBundleEntry,
+  toHistoryResource,
+  TaskHistory
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -282,12 +284,18 @@ export async function toDownloaded(
     extensionUrl
   )
 
+  // this is to show the latest action in history
+  // as all histories are read from task history
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
   const downloadedRecord = {
     ...record,
     entry: [
       ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
       { resource: downloadedTask }
-    ]
+    ].concat(taskHistoryEntry)
   }
 
   const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
@@ -300,15 +308,17 @@ export async function toDownloaded(
 }
 
 export async function toRejected(
-  record: ReadyForReviewRecord | ValidatedRecord,
+  record: ReadyForReviewRecord | ValidatedRecord | InProgressRecord,
   practitioner: Practitioner,
-  statusReason: fhir3.CodeableConcept
-): Promise<RejectedRecord> {
+  comment: fhir3.CodeableConcept,
+  reason?: string
+) {
   const previousTask = getTaskFromSavedBundle(record)
   const rejectedTask = createRejectTask(
     previousTask,
     practitioner,
-    statusReason
+    comment,
+    reason
   )
 
   const rejectedTaskWithPractitionerExtensions = setupLastRegUser(
@@ -321,7 +331,13 @@ export async function toRejected(
     practitioner
   )
 
-  return changeState(
+  const rejectedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: rejectedTaskWithLocationExtensions }]
+  }
+
+  const rejectedRecord = changeState(
     {
       ...record,
       entry: [
@@ -333,6 +349,8 @@ export async function toRejected(
     },
     'REJECTED'
   )
+
+  return { rejectedRecord, rejectedRecordWithTaskOnly }
 }
 
 export async function toWaitingForExternalValidationState(
@@ -871,6 +889,13 @@ export async function toIssued(
 
   const previousComposition = getComposition(record)
 
+  /*
+   * In order to maintain backwards compatibility
+   * we can't reuse the certificate section. Instead
+   * each time "certify" event is fired, a new composition
+   * section will be created with the new certificate. The older
+   * certificates can be accessed from composition_history
+   */
   const compositionWithCertificateSection: Composition = {
     ...previousComposition,
     section: [

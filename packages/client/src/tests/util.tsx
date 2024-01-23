@@ -816,7 +816,7 @@ export const mockDeathDeclarationData = {
     registrationEmail: 'sesrthsthsr@sdfsgt.com',
     informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    informantID: '1230000000000',
+    informantID: '123456789',
     informantFirstNames: '',
     informantFamilyName: 'ইসলাম',
     informantFirstNamesEng: 'Islam',

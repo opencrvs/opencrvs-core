@@ -12,7 +12,10 @@ import { Bundle, SavedTask, ValidRecord } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
-export async function indexBundle(bundle: ValidRecord, authToken: string) {
+export async function indexBundle(
+  bundle: ValidRecord | Bundle<SavedTask>,
+  authToken: string
+) {
   const res = await fetch(new URL('/record', SEARCH_URL).href, {
     method: 'POST',
     body: JSON.stringify(bundle),

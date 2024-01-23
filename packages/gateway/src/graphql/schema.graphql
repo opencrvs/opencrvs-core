@@ -200,7 +200,7 @@ type Mutation {
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsVoided(id: String!, reason: String!, comment: String!): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
