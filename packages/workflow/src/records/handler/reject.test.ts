@@ -8,20 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
+import { rest } from 'msw'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  SavedTask,
   ValidRecord
 } from '@opencrvs/commons/types'
-import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
-describe('Register record endpoint', () => {
+function getReasonFromTask(task: SavedTask) {
+  return task.statusReason?.text
+}
+
+describe('Reject record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {
@@ -54,69 +59,22 @@ describe('Register record endpoint', () => {
       )
     )
 
-    // Mock response from country-config
+    // Mock response from metrics
     mswServer.use(
-      rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
-        return res(ctx.status(400))
-      })
-    )
-
-    const response = await server.server.inject({
-      method: 'POST',
-      url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/register',
-      payload: {
-        id: '7c3af302-08c9-41af-8701-92de9a71a3e4',
-        event: 'BIRTH',
-        details: updateBirthRegistrationPayload
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    const task = getTaskFromSavedBundle(
-      JSON.parse(response.payload) as ValidRecord
-    )
-    const businessStatus = getStatusFromTask(task)
-
-    expect(response.statusCode).toBe(200)
-    expect(businessStatus).toBe('REJECTED')
-  })
-
-  it('returns OK for a correctly authenticated user registering a birth declaration', async () => {
-    const token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('./test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    // Gets record by id via getRecordById endpoint
-    mswServer.use(
-      rest.get(
-        'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
+      rest.post(
+        'http://localhost:1050/events/birth/mark-voided',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+          return res(ctx.json({}))
         }
       )
     )
 
-    // Mock response from hearth
-    mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
-      })
-    )
-
     const response = await server.server.inject({
       method: 'POST',
-      url: '/confirm/registration',
+      url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/reject',
       payload: {
-        registrationNumber: '1234',
-        compositionId: '7c3af302-08c9-41af-8701-92de9a71a3e4'
+        comment: 'Not enough data',
+        reason: ''
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -127,8 +85,10 @@ describe('Register record endpoint', () => {
       JSON.parse(response.payload) as ValidRecord
     )
     const businessStatus = getStatusFromTask(task)
+    const comment = getReasonFromTask(task)
 
     expect(response.statusCode).toBe(200)
-    expect(businessStatus).toBe('REGISTERED')
+    expect(comment).toBe('Not enough data')
+    expect(businessStatus).toBe('REJECTED')
   })
 })

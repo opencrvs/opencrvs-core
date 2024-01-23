@@ -3116,7 +3116,7 @@ export interface MutationToMarkBirthAsIssuedResolver<
 export interface MutationToMarkEventAsVoidedArgs {
   id: string
   reason: string
-  comment?: string
+  comment: string
 }
 export interface MutationToMarkEventAsVoidedResolver<
   TParent = any,
