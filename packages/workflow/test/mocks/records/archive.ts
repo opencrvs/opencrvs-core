@@ -19,29 +19,13 @@ import {
   PractitionerRole,
   RelatedPerson,
   SavedBundle,
-  SavedBundleEntry,
   Task,
-  TaskHistory,
+  TrackingID,
   URLReference
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import { cloneDeep } from 'lodash'
-
-const clonedBirthRecord: SavedBundleEntry<
-  | Composition
-  | Encounter
-  | Patient
-  | RelatedPerson
-  | Task
-  | Practitioner
-  | PractitionerRole
-  | Location
-  | Observation
-  | TaskHistory
->[] = cloneDeep(READY_FOR_REVIEW_BIRTH_RECORD.entry).filter(
-  (e) => e.resource.resourceType !== 'Task'
-)
 
 export const ARCHIVED_BIRTH_RECORD: SavedBundle<
   | Composition
@@ -53,19 +37,18 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
   | PractitionerRole
   | Location
   | Observation
-  | TaskHistory
 > = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
-    //@ts-ignore
-    ...clonedBirthRecord,
+    ...cloneDeep(READY_FOR_REVIEW_BIRTH_RECORD.entry).filter(
+      (e) => e.resource.resourceType !== 'Task'
+    ),
     {
       fullUrl:
         '/fhir/TaskHistory/8effdbd7-417b-4b6f-a78e-05a5a11d4d87/_history/8effdbd7-417b-4b6f-a78e-05a5a11d4d87' as URLReference,
       resource: {
-        //@ts-ignore
-        resourceType: 'TaskHistory',
+        resourceType: 'TaskHistory' as 'Task', // TaskHistory doesn't work with BundleEntry
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
@@ -107,7 +90,7 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B48K21W'
+            value: 'B48K21W' as TrackingID
           }
         ],
         lastModified: '2023-12-21T13:03:48.641Z',
@@ -139,87 +122,9 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
     },
     {
       fullUrl:
-        '/fhir/TaskHistory/3af91322-60d5-4738-bd6a-505c13cc632e/_history/3af91322-60d5-4738-bd6a-505c13cc632e' as URLReference,
+        '/fhir/Task/529a2252-597f-4651-9c53-fb0b68403247/_history/529a2252-597f-4651-9c53-fb0b68403247' as URLReference,
       resource: {
-        //@ts-ignore
         resourceType: 'Task',
-        status: 'accepted',
-        intent: 'proposal',
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: 'BIRTH'
-            }
-          ]
-        },
-        focus: {
-          reference: 'Composition/ef1bd844-a72b-42c3-b12b-13cb2a7c157c'
-        },
-        id: '3af91322-60d5-4738-bd6a-505c13cc632e' as UUID,
-        requester: {
-          agent: {
-            reference: 'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100'
-          }
-        },
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/draft-id',
-            value: '5a8b49c6-f61d-4891-a237-ffcd0ef4f08e'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B48K21W'
-          }
-        ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person-email',
-            valueString: 'nileeeem36@gmail.com'
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regAssigned'
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: {
-              reference: 'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/4bf67dc1-8412-4276-bbd0-05409e9bba1e'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: {
-              reference: 'Location/7d9f973f-f606-42f8-a92e-58953f0576ba'
-            }
-          }
-        ],
-        lastModified: '2024-01-01T08:05:20.523Z',
-        businessStatus: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/reg-status',
-              code: 'ARCHIVED'
-            }
-          ]
-        },
-        meta: {
-          lastUpdated: '2024-01-01T08:05:20.526+00:00',
-          versionId: '3af91322-60d5-4738-bd6a-505c13cc632e'
-        }
-      }
-    },
-    {
-      fullUrl:
-        '/fhir/TaskHistory/529a2252-597f-4651-9c53-fb0b68403247/_history/529a2252-597f-4651-9c53-fb0b68403247' as URLReference,
-      resource: {
-        //@ts-ignore
-        resourceType: 'TaskHistory',
         status: 'accepted',
         intent: 'proposal',
         code: {
@@ -246,7 +151,7 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B48K21W'
+            value: 'B48K21W' as TrackingID
           }
         ],
         extension: [
