@@ -132,11 +132,12 @@ const toCorrectionValue = (
         draftData[section.id][fieldDef.name],
         draftData[section.id]
       ),
-      oldValue: serializeFieldValue(
-        fieldDef,
-        originalDraftData[section.id][fieldDef.name],
-        originalDraftData[section.id]
-      )
+      oldValue:
+        serializeFieldValue(
+          fieldDef,
+          originalDraftData[section.id][fieldDef.name],
+          originalDraftData[section.id]
+        ) ?? ''
     })
   }
   return changedValues
@@ -173,26 +174,26 @@ export function getChangedValues(
           draftData
         )
 
-        if (Object.keys(originalDraftData).length) {
-          if (
-            !conditionalActions.includes('hide') &&
-            !conditionalActions.includes('disable') &&
-            !(section.id === 'documents') &&
-            hasFieldChanged(
+        originalDraftData[section.id] ??= {}
+
+        if (
+          !conditionalActions.includes('hide') &&
+          !conditionalActions.includes('disable') &&
+          !(section.id === 'documents') &&
+          hasFieldChanged(
+            fieldDef,
+            draftData[section.id],
+            originalDraftData[section.id]
+          )
+        ) {
+          changedValues.push(
+            ...toCorrectionValue(
+              section,
               fieldDef,
-              draftData[section.id],
-              originalDraftData[section.id]
+              draftData,
+              originalDraftData
             )
-          ) {
-            changedValues.push(
-              ...toCorrectionValue(
-                section,
-                fieldDef,
-                draftData,
-                originalDraftData
-              )
-            )
-          }
+          )
         }
       })
     })
