@@ -83,7 +83,7 @@ async function findExistingDeclarationIds(draftId: string) {
 function createInProgressOrReadyForReviewTask(
   previousTask: ReturnType<typeof findTask>,
   event: EVENT_TYPE,
-  trackingId: ReturnType<typeof generateTrackingIdForEvents>,
+  trackingId: Awaited<ReturnType<typeof generateTrackingIdForEvents>>,
   inProgress: boolean
 ): ReturnType<typeof findTask> {
   return {
@@ -152,7 +152,11 @@ export default async function createRecordHandler(
       event
     )
     const practitioner = await getLoggedInPractitionerResource(token)
-    const trackingId = generateTrackingIdForEvents(event)
+    const trackingId = await generateTrackingIdForEvents(
+      event,
+      inputBundle,
+      token
+    )
     const composition = getComposition(inputBundle)
     const inProgress = isInProgressDeclaration(inputBundle)
     const eventNotification = isEventNotification(inputBundle)
