@@ -89,6 +89,9 @@ const getNextMessages = (
   language: string,
   languages: ILanguageState
 ): IntlMessages => {
+  if (!languages[language]) {
+    return languages[getDefaultLanguage()].messages
+  }
   return languages[language].messages
 }
 
@@ -121,14 +124,19 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       }
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)
+      let language = action.payload.language
+
+      if (!state.languages[language]) {
+        language = getDefaultLanguage()
+      }
 
       return loop(
         {
           ...state,
-          language: action.payload.language,
+          language,
           messages
         },
-        Cmd.run(() => storeLanguage(action.payload.language))
+        Cmd.run(() => storeLanguage(language))
       )
     default:
       return state

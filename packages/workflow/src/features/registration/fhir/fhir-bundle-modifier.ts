@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { UUID } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -24,10 +25,7 @@ import {
   URLReference,
   getResourceFromBundleById
 } from '@opencrvs/commons/types'
-import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
@@ -79,11 +77,11 @@ export async function modifyRegistrationBundle<T extends Bundle>(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = setTrackingId(fhirBundle)
+  const bundleWithTrackingId = await setTrackingId(fhirBundle, token)
 
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundleWithTrackingId)
 
-  const eventType = getEventType(fhirBundle)
+  const eventType = getEventType(bundleWithTrackingId)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
 
@@ -91,7 +89,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressDeclaration(fhirBundle)
+    isInProgressDeclaration(bundleWithTrackingId)
       ? RegStatus.IN_PROGRESS
       : RegStatus.DECLARED
   )
@@ -100,7 +98,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  if (!isEventNotification(fhirBundle)) {
+  if (!isEventNotification(bundleWithTrackingId)) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
@@ -108,7 +106,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
-  return fhirBundle
+  return bundleWithTrackingId as T
 }
 
 export async function markBundleAsValidated<T extends Bundle>(
@@ -136,14 +134,17 @@ export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
   headers: Record<string, string>
 ): Promise<Bundle> {
-  const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
-    method: 'POST',
-    body: JSON.stringify(bundle),
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
+  const res = await fetch(
+    new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
+    {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      }
     }
-  })
+  )
   if (!res.ok) {
     const errorData = await res.json()
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
@@ -310,9 +311,16 @@ export async function touchBundle(
   return bundle
 }
 
-export function setTrackingId<T extends Bundle>(fhirBundle: T): T {
+export async function setTrackingId(
+  fhirBundle: Bundle,
+  token: string
+): Promise<Bundle> {
   const eventType = getEventType(fhirBundle)
-  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingId = await generateTrackingIdForEvents(
+    eventType,
+    fhirBundle,
+    token
+  )
   const trackingIdFhirName = `${
     eventType.toLowerCase() as Lowercase<typeof eventType>
   }-tracking-id` as const
@@ -346,11 +354,13 @@ export function setTrackingId<T extends Bundle>(fhirBundle: T): T {
       `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
   )
 
+  const systemIdentifierUrl =
+    `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}` as const
   if (existingTrackingId) {
     existingTrackingId.value = trackingId
   } else {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`,
+      system: systemIdentifierUrl,
       value: trackingId
     })
   }
@@ -429,11 +439,13 @@ export async function setupLastRegLocation<T extends Task>(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+    regUserLastLocationExtension.valueReference.reference = `Location/${
+      location.id as UUID
+    }` as const
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: { reference: `Location/${location.id}` }
+      valueReference: { reference: `Location/${location.id as UUID}` }
     })
   }
 

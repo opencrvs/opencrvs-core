@@ -158,6 +158,7 @@ describe('Verify handler', () => {
   describe('createRegistrationHandler', () => {
     beforeEach(() => {
       fetch.mockResponses(
+        [null, { status: 404 }],
         [userMock, { status: 200 }],
         [fieldAgentPractitionerMock, { status: 200 }],
         [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -419,73 +420,6 @@ describe('Verify handler', () => {
 
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(500)
-    })
-
-    it('generates a new tracking id and repeats the request if a 409 is received from hearth', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
-        ]
-      )
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('fails after trying to generate a new trackingID and sending to Hearth 5 times', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }]
-      )
 
       const token = jwt.sign(
         { scope: ['declare'] },
