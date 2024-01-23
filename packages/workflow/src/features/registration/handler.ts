@@ -249,9 +249,9 @@ export async function markEventAsRegisteredCallbackHandler(
     // don't forward hospital notifications
     if (
       event !== EVENT_TYPE.MARRIAGE &&
-      (await isNotificationEnabled('register', event, token))
+      (await isNotificationEnabled('registered', event, token))
     ) {
-      await sendNotification('register', registeredBundle, token)
+      await sendNotification('registered', registeredBundle, token)
     }
 
     return h.response(registeredBundle).code(200)

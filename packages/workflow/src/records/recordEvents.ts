@@ -9,16 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export type RecordEvent =
-  | 'new-incomplete'
-  | 'new-ready-for-review'
-  | 'new-validated'
-  | 'validated'
+  | 'sent-notification'
+  | 'sent-notification-for-review'
+  | 'sent-for-approval'
   | 'waiting-external-validation'
-  | 'new-waiting-external-validation'
   | 'registered'
   | 'certified'
   | 'issued'
-  | 'requires-updates'
+  | 'sent-for-updates'
   | 'archived'
   | 'reinstated'
   | 'updated'

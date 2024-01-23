@@ -17,8 +17,12 @@ import {
   InformantNotificationName
 } from '@workflow/features/registration/smsNotificationUtils'
 import { internal } from '@hapi/boom'
+import { RecordEvent } from './recordEvents'
 
-type NotificationEvent = 'new-incomplete' | 'new-ready-for-review' | 'register'
+type NotificationEvent = Extract<
+  RecordEvent,
+  'sent-notification' | 'sent-notification-for-review' | 'registered'
+>
 
 export async function sendNotification(
   action: NotificationEvent,
@@ -63,14 +67,16 @@ const MAPPING: Record<
   Record<NotificationEvent, InformantNotificationName>
 > = {
   [EVENT_TYPE.BIRTH]: {
-    'new-incomplete': InformantNotificationName.birthInProgressSMS,
-    'new-ready-for-review': InformantNotificationName.birthDeclarationSMS,
-    register: InformantNotificationName.birthRegistrationSMS
+    'sent-notification': InformantNotificationName.birthInProgressSMS,
+    'sent-notification-for-review':
+      InformantNotificationName.birthDeclarationSMS,
+    registered: InformantNotificationName.birthRegistrationSMS
   },
   [EVENT_TYPE.DEATH]: {
-    'new-incomplete': InformantNotificationName.deathInProgressSMS,
-    'new-ready-for-review': InformantNotificationName.deathDeclarationSMS,
-    register: InformantNotificationName.deathRegistrationSMS
+    'sent-notification': InformantNotificationName.deathInProgressSMS,
+    'sent-notification-for-review':
+      InformantNotificationName.deathDeclarationSMS,
+    registered: InformantNotificationName.deathRegistrationSMS
   }
 }
 

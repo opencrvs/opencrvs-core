@@ -204,21 +204,21 @@ function isWaitingExternalValidation(
 
 function getEventAction(record: CreatedRecord) {
   if (isInProgress(record)) {
-    return 'new-incomplete'
+    return 'sent-notification'
   }
   if (isReadyForReview(record)) {
-    return 'new-ready-for-review'
+    return 'sent-notification-for-review'
   }
   if (isValidated(record)) {
-    return 'new-validated'
+    return 'sent-for-approval'
   }
   if (isWaitingExternalValidation(record)) {
-    return 'new-waiting-external-validation'
+    return 'waiting-external-validation'
   }
   // type assertion
   record satisfies never
   // this should never be reached
-  return 'new-incomplete'
+  return 'sent-notification'
 }
 
 export default async function createRecordHandler(
@@ -268,8 +268,8 @@ export default async function createRecordHandler(
   const notificationDisabled =
     isEventNotification(record) ||
     event === EVENT_TYPE.MARRIAGE ||
-    eventAction === 'new-validated' ||
-    eventAction === 'new-waiting-external-validation' ||
+    eventAction === 'sent-for-approval' ||
+    eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 
   await indexBundle(record, token)
