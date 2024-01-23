@@ -72,7 +72,7 @@ import {
   findCompositionSection,
   findObservationByCode,
   getComposition,
-  getEncounterFromRecord,
+  findEncounterFromRecord,
   getEventLabelFromBundle,
   getResourceFromBundleById,
   getTaskFromSavedBundle,
@@ -1642,7 +1642,13 @@ export const typeResolvers: GQLResolver = {
     },
     async _fhirIDMap(record: Saved<Bundle>) {
       const composition = getComposition(record)
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
       const recordResources = record.entry.map((x) => x.resource)
@@ -1709,7 +1715,11 @@ export const typeResolvers: GQLResolver = {
       return getTaskFromSavedBundle(record)
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,
@@ -1747,7 +1757,11 @@ export const typeResolvers: GQLResolver = {
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -1778,10 +1792,9 @@ export const typeResolvers: GQLResolver = {
       }
     },
     async medicalPractitioner(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      const encounterParticipant =
-        encounter && encounter.participant && encounter.participant[0]
+      const encounterParticipant = encounter?.participant?.[0]
       if (!encounterParticipant) {
         return null
       }
@@ -1804,7 +1817,13 @@ export const typeResolvers: GQLResolver = {
 
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
 
@@ -1890,7 +1909,11 @@ export const typeResolvers: GQLResolver = {
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -1921,7 +1944,11 @@ export const typeResolvers: GQLResolver = {
       }
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,
@@ -1942,7 +1969,13 @@ export const typeResolvers: GQLResolver = {
     },
     async _fhirIDMap(record: Saved<Bundle>) {
       const composition = getComposition(record)
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
       const recordResources = record.entry.map((x) => x.resource)
@@ -2005,7 +2038,11 @@ export const typeResolvers: GQLResolver = {
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -2040,7 +2077,11 @@ export const typeResolvers: GQLResolver = {
         ?.value
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,

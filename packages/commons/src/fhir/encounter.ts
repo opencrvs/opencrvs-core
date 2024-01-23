@@ -39,7 +39,7 @@ export type SavedEncounter = Omit<Encounter, 'location'> & {
   }>
 }
 
-export function getEncounterFromRecord(
+export function findEncounterFromRecord(
   record: Saved<Bundle>,
   code?:
     | typeof DEATH_ENCOUNTER_CODE
@@ -47,7 +47,6 @@ export function getEncounterFromRecord(
     | typeof MARRIAGE_ENCOUNTER_CODE
 ) {
   const composition = getComposition(record)
-
   if (!code) {
     const foundCode = (
       [
@@ -58,28 +57,24 @@ export function getEncounterFromRecord(
     ).find((code) => findCompositionSection(code, composition))
 
     if (!foundCode) {
-      throw new Error('No encounter code found in composition')
+      return null
     }
     code = foundCode
   }
   const encounterSection = findCompositionSection(code, composition)
 
-  const encounterReference =
-    encounterSection &&
-    encounterSection.entry &&
-    encounterSection.entry[0].reference
-
-  if (!encounterReference) {
-    throw new Error('No encounter reference found in composition')
+  if (!encounterSection) {
+    return null
   }
 
+  const encounterReference = encounterSection.entry[0].reference
   const encounter = getResourceFromBundleById<Encounter>(
     record,
     urlReferenceToUUID(encounterReference)
   )
 
   if (!encounter) {
-    throw new Error('No encounter found in bundle')
+    return null
   }
   return encounter
 }
