@@ -17,6 +17,7 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
+  RejectedRecord,
   ValidRecord,
   getTaskFromSavedBundle,
   getBusinessStatus
@@ -246,6 +247,25 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function rejectDeclaration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason: string,
+  comment: string
+) {
+  const rejectedRecord: RejectedRecord = await createRequest(
+    'POST',
+    `/records/${id}/reject`,
+    authHeader,
+    {
+      reason,
+      comment
+    }
+  )
+
+  return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
 }
 
 export async function reinstateRegistration(

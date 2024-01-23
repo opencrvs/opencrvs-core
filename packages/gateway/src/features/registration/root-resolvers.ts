@@ -34,14 +34,12 @@ import {
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle,
   getComposition
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput,
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -67,6 +65,7 @@ import {
   archiveRegistration,
   registerDeclaration,
   unassignRegistration,
+  rejectDeclaration,
   updateRegistration,
   validateRegistration,
   fetchRegistrationForDownloading,
@@ -566,15 +565,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.REJECTED,
-        reason,
-        comment
-      )
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const taskEntry = await rejectDeclaration(id, authHeader, reason, comment)
+      if (!taskEntry) {
+        return await Promise.reject(new Error('Task not found'))
+      }
 
       // return the taskId
       return taskEntry.resource.id

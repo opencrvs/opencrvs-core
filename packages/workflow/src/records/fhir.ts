@@ -406,16 +406,17 @@ export async function createDownloadTask(
 }
 
 export function createRejectTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   practitioner: Practitioner,
-  statusReason: fhir3.CodeableConcept
-): Task {
+  comment: fhir3.CodeableConcept,
+  reason?: string
+): SavedTask {
   return {
     resourceType: 'Task',
     status: 'accepted',
     intent: 'proposal',
     code: previousTask.code,
-    statusReason,
+    statusReason: comment,
     focus: previousTask.focus,
     id: previousTask.id,
     requester: {
@@ -439,6 +440,9 @@ export function createRejectTask(
         valueInteger: 0
       }
     ],
+    reason: {
+      text: reason ?? ''
+    },
     lastModified: new Date().toISOString(),
     businessStatus: {
       coding: [
