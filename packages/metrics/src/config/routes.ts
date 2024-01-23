@@ -360,7 +360,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/viewed',
+      path: '/events/{event}/viewed',
       handler: declarationViewedHandler,
       config: {
         tags: ['api']
