@@ -62,16 +62,7 @@ export async function downloadRecordHandler(
   const record = await getRecordById(
     // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
-    token,
-    [
-      'CERTIFIED',
-      'VALIDATED',
-      'IN_PROGRESS',
-      'READY_FOR_REVIEW',
-      'REGISTERED',
-      'ISSUED',
-      'CORRECTION_REQUESTED'
-    ]
+    token
   )
 
   const task = getTaskFromSavedBundle(record)
