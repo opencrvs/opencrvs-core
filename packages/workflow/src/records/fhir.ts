@@ -34,7 +34,8 @@ import {
   isRelatedPerson,
   Encounter,
   RelatedPerson,
-  TaskStatus
+  TaskStatus,
+  getStatusFromTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -594,45 +595,39 @@ function createTask(
   practitioner: Practitioner,
   status?: TaskStatus
 ): SavedTask {
-  let updatedTaskWithBusinessStatus = previousTask
-
-  if (status) {
-    updatedTaskWithBusinessStatus = {
-      ...previousTask,
-      businessStatus: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/reg-status' as const,
-            code: status
-          }
-        ]
-      }
-    }
-  }
-
-  const prevExtensions: Extension[] = [
-    ...updatedTaskWithBusinessStatus.extension.filter((extension) =>
-      [
-        'http://opencrvs.org/specs/extension/contact-person-phone-number',
-        'http://opencrvs.org/specs/extension/informants-signature',
-        'http://opencrvs.org/specs/extension/contact-person-email',
-        'http://opencrvs.org/specs/extension/bride-signature',
-        'http://opencrvs.org/specs/extension/groom-signature',
-        'http://opencrvs.org/specs/extension/witness-one-signature',
-        'http://opencrvs.org/specs/extension/witness-two-signature'
-      ].includes(extension.url)
-    )
-  ]
-
-  const updatedExtension = prevExtensions.concat(newExtensions)
-
   return {
-    ...updatedTaskWithBusinessStatus,
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
     requester: {
       agent: { reference: `Practitioner/${practitioner.id}` }
     },
-    extension: updatedExtension,
+    identifier: previousTask.identifier,
+    extension: previousTask.extension
+      .filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+      .concat(newExtensions),
     lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: status ?? getStatusFromTask(previousTask)
+        }
+      ]
+    },
     meta: {
       ...previousTask.meta,
       lastUpdated: new Date().toISOString()

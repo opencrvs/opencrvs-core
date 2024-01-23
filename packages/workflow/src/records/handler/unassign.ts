@@ -9,10 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  getStatusFromTask,
-  getTaskFromSavedBundle
-} from '@opencrvs/commons/types'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
@@ -48,13 +44,6 @@ export async function unassignRecordHandler(
       'CORRECTION_REQUESTED'
     ]
   )
-
-  const task = getTaskFromSavedBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
 
   const unassignedRecordWithTaskOnly = await toUnassigned(
     record,

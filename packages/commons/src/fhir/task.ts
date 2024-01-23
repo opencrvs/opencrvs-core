@@ -232,11 +232,16 @@ export type TaskStatus =
   | 'ISSUED'
 
 export function getStatusFromTask(task: Task) {
-  const statusType = task.businessStatus?.coding?.find(
+  const statusType = task.businessStatus.coding.find(
     (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return statusType?.code
+  if (!statusType) {
+    throw new Error(
+      "Task didn't have any business status. This should never happen"
+    )
+  }
+  return statusType.code
 }
 
 export function getActionFromTask(task: Task) {
