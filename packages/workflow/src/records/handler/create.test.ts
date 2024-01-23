@@ -85,6 +85,13 @@ describe('Create record endpoint', () => {
       )
     )
 
+    // mock tracking-id generation from country confgi
+    mswServer.use(
+      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) => {
+        return res(ctx.text('BYW6MFW'))
+      })
+    )
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/create-record',
@@ -97,8 +104,8 @@ describe('Create record endpoint', () => {
       }
     })
     expect(res.statusCode).toBe(200)
-    // trackingId is randomly generated each time
     expect(JSON.parse(res.payload)).toMatchObject({
+      trackingId: 'BYW6MFW',
       compositionId: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
       isPotentiallyDuplicate: false
     })

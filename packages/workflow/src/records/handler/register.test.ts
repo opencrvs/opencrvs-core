@@ -57,7 +57,7 @@ describe('Register record endpoint', () => {
     // Mock response from country-config
     mswServer.use(
       rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
-        return res(ctx.json({}))
+        return res(ctx.status(400))
       })
     )
 
