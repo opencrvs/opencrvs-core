@@ -17,7 +17,8 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
-  RejectedRecord
+  RejectedRecord,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -264,4 +265,14 @@ export async function rejectDeclaration(
   )
 
   return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
+}
+
+export async function viewDeclaration(id: string, authHeader: IAuthHeader) {
+  const viewedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/view`,
+    authHeader
+  )
+
+  return viewedRecord
 }

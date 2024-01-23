@@ -48,7 +48,8 @@ import {
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
-  TaskHistory
+  TaskHistory,
+  Location
 } from '@opencrvs/commons/types'
 import { getUUID, UUID } from '@opencrvs/commons'
 import {
@@ -84,6 +85,7 @@ import {
   createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
+  createViewTask,
   createWaitingForValidationTask,
   getTaskHistory
 } from '@workflow/records/fhir'
@@ -265,6 +267,46 @@ export async function toUpdated(
     entry: newEntries
   }
   return updatedRecord
+}
+
+export async function toViewed(
+  record: ValidRecord,
+  user: IUserModelData,
+  office: Location
+) {
+  const previousTask: SavedTask = getTaskFromSavedBundle(record)
+  const viewedTask = await createViewTask(previousTask, user, office)
+
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
+  const filteredEntries = record.entry.filter(
+    (e) => e.resource.resourceType !== 'Task'
+  )
+
+  const viewedRecord: Bundle = {
+    resourceType: 'Bundle' as const,
+    type: 'document' as const,
+    entry: [
+      ...filteredEntries,
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      },
+      taskHistoryEntry
+    ]
+  }
+
+  const viewedRecordWithTaskOnly: Bundle = {
+    resourceType: 'Bundle' as const,
+    type: 'document' as const,
+    entry: [{ resource: viewedTask }]
+  }
+
+  return { viewedRecord, viewedRecordWithTaskOnly }
 }
 
 export async function toDownloaded(

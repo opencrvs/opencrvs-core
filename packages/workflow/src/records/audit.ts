@@ -10,7 +10,7 @@
  */
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
-import { ValidRecord } from '@opencrvs/commons/types'
+import { Bundle, ValidRecord } from '@opencrvs/commons/types'
 import { METRICS_URL } from '@workflow/constants'
 
 type AuditAction =
@@ -22,7 +22,7 @@ type AuditAction =
 
 export async function auditEvent(
   action: AuditAction,
-  bundle: ValidRecord,
+  bundle: ValidRecord | Bundle,
   authToken: string
 ) {
   const eventType = getEventType(bundle).toLowerCase()

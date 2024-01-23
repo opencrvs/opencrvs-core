@@ -20,6 +20,7 @@ import { registerRoute } from '@workflow/records/handler/register'
 import { rejectRoute } from '@workflow/records/handler/reject'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
+import { viewRecordHandler } from '@workflow/records/handler/view'
 
 export const getRoutes = () => {
   const routes = [
@@ -96,6 +97,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Unassign record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/view',
+      handler: viewRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'View record endpoint'
       }
     },
     ...validateRoute,

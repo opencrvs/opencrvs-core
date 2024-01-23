@@ -317,6 +317,65 @@ export function createCorrectedTask(
   }
 }
 
+export async function createViewTask(
+  previousTask: SavedTask,
+  user: IUserModelData,
+  office: Location
+): Promise<SavedTask> {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${user.practitionerId}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastUser',
+        valueReference: {
+          reference: `Practitioner/${user.practitionerId as UUID}`
+        }
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueReference: {
+          reference: `Location/${resourceIdentifierToUUID(
+            office!.partOf!.reference
+          )}`
+        }
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastOffice',
+        valueReference: {
+          reference: `Location/${user.primaryOfficeId}`
+        }
+      },
+      { url: 'http://opencrvs.org/specs/extension/regViewed' }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+}
+
 export async function createDownloadTask(
   previousTask: SavedTask,
   user: IUserModelData | ISystemModelData,

@@ -10,7 +10,7 @@
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
-import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
 import {
@@ -70,7 +70,8 @@ import {
   rejectDeclaration,
   updateRegistration,
   validateRegistration,
-  fetchRegistrationForDownloading
+  fetchRegistrationForDownloading,
+  viewDeclaration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -238,36 +239,7 @@ export const resolvers: GQLResolver = {
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      const user = await context.dataSources.usersAPI.getUserById(
-        getUserId(context.headers)
-      )
-
-      context.record = await getRecordById(id, context.headers.Authorization)
-
-      const office = await context.dataSources.locationsAPI.getLocation(
-        user.primaryOfficeId
-      )
-      context.record = insertActionToBundle(
-        context.record,
-        'http://opencrvs.org/specs/extension/regViewed',
-        user,
-        office
-      )
-
-      fetchFHIR(
-        '/Task',
-        context.headers,
-        'PUT',
-        JSON.stringify({
-          resourceType: 'Bundle',
-          type: 'document',
-          entry: [
-            context.record.entry.find(
-              ({ resource }) => resource.resourceType === 'Task'
-            )
-          ]
-        })
-      )
+      context.record = await viewDeclaration(id, context.headers)
 
       return context.record
     },
