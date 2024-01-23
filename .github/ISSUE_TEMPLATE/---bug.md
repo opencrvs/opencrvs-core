@@ -1,8 +1,8 @@
 ---
-name: "\U0001F479 Bug"
+name: 'Bug'
 about: Used to submit bugs and things that appear broken.
 title: ''
-labels: "\U0001F479Bug"
+labels: 'Bug'
 assignees: ''
 ---
 
