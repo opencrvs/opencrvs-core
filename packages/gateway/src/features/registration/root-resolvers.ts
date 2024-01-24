@@ -70,7 +70,8 @@ import {
   updateRegistration,
   validateRegistration,
   fetchRegistrationForDownloading,
-  reinstateRegistration
+  reinstateRegistration,
+  duplicateRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -726,28 +727,14 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const extension = {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
-        valueString: duplicateTrackingId
-      }
+      const taskEntry = await duplicateRegistration(
+        id,
+        authHeader,
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-      if (comment || reason) {
-        if (!taskEntry.resource.reason) {
-          taskEntry.resource.reason = {
-            text: ''
-          }
-        }
-
-        taskEntry.resource.reason.text = reason || ''
-        const statusReason = {
-          text: comment
-        }
-        taskEntry.resource.statusReason = statusReason
-      }
-
-      const taskBundle = taskBundleWithExtension(taskEntry, extension)
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return taskEntry.resource.id
     }
   }

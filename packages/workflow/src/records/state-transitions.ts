@@ -81,6 +81,7 @@ import {
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
   createDownloadTask,
+  createDuplicateTask,
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
@@ -595,6 +596,52 @@ export async function toReinstated(
     },
     ['READY_FOR_REVIEW', 'VALIDATED']
   )
+}
+
+export async function toDuplicated(
+  record: ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): Promise<{
+  duplicatedRecord: ReadyForReviewRecord | ValidatedRecord
+  duplicatedRecordWithTaskOnly: Bundle<SavedTask>
+}> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const duplicatedTask = createDuplicateTask(
+    previousTask,
+    practitioner,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  const duplicatedTaskWithPractitionerExtensions = setupLastRegUser(
+    duplicatedTask,
+    practitioner
+  )
+
+  const duplicatedTaskWithLocationExtensions = await setupLastRegLocation(
+    duplicatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const duplicatedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: duplicatedTaskWithLocationExtensions }]
+  }
+
+  const duplicatedRecord = {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.id !== duplicatedTask.id),
+      { resource: duplicatedTaskWithLocationExtensions }
+    ]
+  } as ReadyForReviewRecord
+
+  return { duplicatedRecord, duplicatedRecordWithTaskOnly }
 }
 
 export async function toValidated(

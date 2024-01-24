@@ -33,7 +33,9 @@ import {
   isEncounter,
   isRelatedPerson,
   Encounter,
-  RelatedPerson
+  RelatedPerson,
+  TaskStatus,
+  getStatusFromTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -587,29 +589,12 @@ export function createRegisterTask(
   }
 }
 
-export function createArchiveTask(
+function createTask(
   previousTask: SavedTask,
+  newExtensions: Extension[],
   practitioner: Practitioner,
-  reason?: string,
-  comment?: string,
-  duplicateTrackingId?: string
+  status?: TaskStatus
 ): SavedTask {
-  const extension: Extension[] = [
-    ...previousTask.extension.filter((extension) =>
-      [
-        'http://opencrvs.org/specs/extension/contact-person-phone-number',
-        'http://opencrvs.org/specs/extension/informants-signature',
-        'http://opencrvs.org/specs/extension/contact-person-email'
-      ].includes(extension.url)
-    )
-  ]
-
-  if (duplicateTrackingId)
-    extension.push({
-      url: `http://opencrvs.org/specs/extension/duplicateTrackingId`,
-      valueString: duplicateTrackingId
-    })
-
   return {
     resourceType: 'Task',
     status: 'accepted',
@@ -621,17 +606,25 @@ export function createArchiveTask(
       agent: { reference: `Practitioner/${practitioner.id}` }
     },
     identifier: previousTask.identifier,
-    extension,
-    // Reason example - "duplicate"
-    reason: { text: reason ?? '' },
-    // Status reason is comments which is added in the UI
-    statusReason: { text: comment ?? '' },
+    extension: previousTask.extension
+      .filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+      .concat(newExtensions),
     lastModified: new Date().toISOString(),
     businessStatus: {
       coding: [
         {
           system: 'http://opencrvs.org/specs/reg-status',
-          code: 'ARCHIVED'
+          code: status ?? getStatusFromTask(previousTask)
         }
       ]
     },
@@ -639,6 +632,62 @@ export function createArchiveTask(
       ...previousTask.meta,
       lastUpdated: new Date().toISOString()
     }
+  }
+}
+
+export function createArchiveTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  const newExtensions: Extension[] = []
+  if (duplicateTrackingId) {
+    newExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/duplicateTrackingId',
+      valueString: duplicateTrackingId
+    })
+  }
+  const archivedTask = createTask(
+    previousTask,
+    newExtensions,
+    practitioner,
+    'ARCHIVED'
+  )
+
+  const updatedArchivedTask = {
+    ...archivedTask,
+    // Reason example - "duplicate"
+    reason: { text: reason ?? '' },
+    // Status reason is comments which is added in the UI
+    statusReason: { text: comment ?? '' }
+  }
+
+  return updatedArchivedTask
+}
+
+export function createDuplicateTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  const newExtensions: Extension[] = []
+  if (duplicateTrackingId) {
+    newExtensions.push({
+      url: 'http://opencrvs.org/specs/extension/markedAsDuplicate',
+      valueString: duplicateTrackingId
+    })
+  }
+
+  const duplicateTask = createTask(previousTask, newExtensions, practitioner)
+
+  return {
+    ...duplicateTask,
+    reason: { text: reason ?? '' },
+    statusReason: { text: comment ?? '' }
   }
 }
 

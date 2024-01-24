@@ -8,19 +8,47 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { server as mswServer } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
-  getStatusFromTask,
+  Extension,
   getTaskFromSavedBundle,
+  SavedTask,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
-describe('archive record endpoint', () => {
+function hasDuplicateExtension(task: SavedTask) {
+  return task.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/markedAsDuplicate'
+  )
+}
+
+function findReasonForDuplicate(task: SavedTask) {
+  return task.reason?.text
+}
+
+function findCommentForDuplicate(task: SavedTask) {
+  return task.statusReason?.text
+}
+
+function findDuplicateTrackingId(task: SavedTask) {
+  type DuplicateExtenstion = Extract<
+    Extension,
+    { url: 'http://opencrvs.org/specs/extension/markedAsDuplicate' }
+  >
+
+  return task.extension.find(
+    (e): e is DuplicateExtenstion =>
+      e.url === 'http://opencrvs.org/specs/extension/markedAsDuplicate'
+  )!.valueString
+}
+
+describe('duplicate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {
@@ -32,7 +60,7 @@ describe('archive record endpoint', () => {
     await server.stop()
   })
 
-  it('returns OK after archiving a birth declaration', async () => {
+  it('returns OK after duplicating a birth declaration', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
       readFileSync('./test/cert.key'),
@@ -46,26 +74,43 @@ describe('archive record endpoint', () => {
     // Fetches a record from search
     mswServer.use(
       rest.get(
-        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+        'http://localhost:9090/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454',
         (_, res, ctx) => {
           return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
     )
 
+    // Sends bundle to metrics and gets a response
+    mswServer.use(
+      rest.post(
+        'http://localhost:1050/events/birth/marked-as-duplicate',
+        (_, res, ctx) => {
+          return res(ctx.json({}))
+        }
+      )
+    )
+
     const res = await server.server.inject({
       method: 'POST',
-      url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/archive',
-      payload: {},
+      url: '/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454/duplicate',
+      payload: {
+        reason: 'duplicate',
+        comment: 'invalid data',
+        duplicateTrackingId: 'B4678E2'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
     const task = getTaskFromSavedBundle(JSON.parse(res.payload) as ValidRecord)
-    const businessStatus = getStatusFromTask(task)
+    const isDuplicateRecord = hasDuplicateExtension(task)
 
+    expect(findDuplicateTrackingId(task)).toBe('B4678E2')
+    expect(findReasonForDuplicate(task)).toBe('duplicate')
+    expect(findCommentForDuplicate(task)).toBe('invalid data')
+    expect(!!isDuplicateRecord).toBe(true)
     expect(res.statusCode).toBe(200)
-    expect(businessStatus).toBe('ARCHIVED')
   })
 })
