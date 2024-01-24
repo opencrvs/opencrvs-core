@@ -49,7 +49,8 @@ import {
   isURNReference,
   SavedEncounter,
   resourceToSavedBundleEntry,
-  ResourceIdentifier
+  ResourceIdentifier,
+  isTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1482,6 +1483,33 @@ function toSavedComposition(
   }
 }
 
+function toSavedTask(
+  task: Task & { focus: { reference: URNReference } },
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedTask {
+  const savedReference = findSavedReference(
+    task.focus.reference,
+    resourceBundle,
+    responseBundle
+  )
+  if (!savedReference) {
+    throw internal(
+      `No response found for "task.focus.reference->${
+        task.focus.reference
+      }" in the following transaction: ${JSON.stringify(responseBundle)}`
+    )
+  }
+  return {
+    ...task,
+    id,
+    focus: {
+      reference: urlReferenceToResourceIdentifier(savedReference)
+    }
+  }
+}
+
 function toSavedRelatedPerson(
   relatedPersion: RelatedPerson & {
     patient: { reference: `urn:uuid:${string}` }
@@ -1639,6 +1667,26 @@ export async function toSavedBundle<T extends Resource>(
             fullUrl: responseBundle.entry[index].response.location,
             resource: toSavedEncounter(
               resource,
+              urlReferenceToUUID(responseBundle.entry[index].response.location),
+              resourceBundle,
+              responseBundle
+            )
+          }
+        }
+
+        if (
+          isTask(entry.resource) &&
+          entry.resource.focus?.reference &&
+          isURNReference(entry.resource.focus.reference)
+        ) {
+          return {
+            ...entry,
+            fullUrl: responseBundle.entry[index].response.location,
+            resource: toSavedTask(
+              {
+                ...entry.resource,
+                focus: { reference: entry.resource.focus.reference }
+              },
               urlReferenceToUUID(responseBundle.entry[index].response.location),
               resourceBundle,
               responseBundle
