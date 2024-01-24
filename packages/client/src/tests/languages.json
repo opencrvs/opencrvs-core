@@ -844,7 +844,7 @@
         "misc.notif.processingText": "{num} declaration processing...",
         "misc.notif.sorryError": "Sorry! Something went wrong",
         "misc.notif.userFormSuccess": "New user created",
-        "password.cases": "Contain upper and lower cases",
+        "password.cases": "At least one upper and lower case character",
         "password.label.current": "Current password",
         "password.label.confirm": "Confirm password",
         "password.label.new": "New password",

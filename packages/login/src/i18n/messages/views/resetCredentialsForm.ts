@@ -94,7 +94,7 @@ const messagesToDefine = {
   },
   passwordCaseCharacteristicsForPasswordUpdateForm: {
     id: 'password.cases',
-    defaultMessage: 'Contain upper and lower cases',
+    defaultMessage: 'At least one upper and lower case character',
     description: 'Password validation'
   },
   passwordNumberCharacteristicsForPasswordUpdateForm: {

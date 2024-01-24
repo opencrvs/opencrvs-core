@@ -90,7 +90,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'password.label.confirm'
   },
   hasCases: {
-    defaultMessage: 'Contain upper and lower cases',
+    defaultMessage: 'At least one upper and lower case character',
     description: 'Password validation',
     id: 'password.cases'
   },
