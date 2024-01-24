@@ -309,3 +309,9 @@ export async function reinstateRegistration(
 
   return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
 }
+
+export async function verifyRegistration(id: string, authHeader: IAuthHeader) {
+  return await createRequest('POST', `/records/${id}/verify`, authHeader, {
+    authHeader
+  })
+}

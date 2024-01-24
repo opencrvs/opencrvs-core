@@ -52,7 +52,7 @@ import {
   toHistoryResource,
   TaskHistory
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, IAuthHeader, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -87,6 +87,7 @@ import {
   createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
+  createVerifyRecordTask,
   createWaitingForValidationTask,
   getTaskHistory
 } from '@workflow/records/fhir'
@@ -766,6 +767,26 @@ export async function toUnassigned(
   }
 
   return unassignedRecordWithTaskOnly
+}
+
+export async function toVerified(
+  record: RegisteredRecord | IssuedRecord,
+  headers: IAuthHeader
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+  const verifyRecordTask = createVerifyRecordTask(previousTask, headers)
+
+  return {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.resourceType !== 'Task'),
+      {
+        fullUrl: record.entry.find((e) => e.resource.resourceType === 'Task')!
+          .fullUrl,
+        resource: verifyRecordTask
+      }
+    ]
+  }
 }
 
 export async function toCorrectionRejected(
