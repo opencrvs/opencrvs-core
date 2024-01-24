@@ -109,7 +109,13 @@ export const internationaliseListFieldObject = (
   intl: IntlShape,
   options: MessageDescriptor[]
 ) => {
-  return options.map((opt) => intl.formatMessage(opt))
+  return options.map((opt) =>
+    intl.formatMessage(
+      opt,
+      // @ts-ignore
+      opt.values
+    )
+  )
 }
 
 export const internationaliseFieldObject = (
