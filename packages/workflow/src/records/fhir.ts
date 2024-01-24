@@ -50,7 +50,8 @@ import {
   SavedEncounter,
   resourceToSavedBundleEntry,
   ResourceIdentifier,
-  isTask
+  isTask,
+  toHistoryResource
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1706,6 +1707,25 @@ export async function toSavedBundle<T extends Resource>(
       })
     )
   } as SavedBundle<T>
+}
+
+/*
+ * This is used to add the previous Task
+ * as TaskHistory to the record which
+ * is a differentiator between an entirely
+ * new record and a previous record changing
+ * state
+ */
+export function withTaskHistory<R extends ValidRecord>(
+  record: R,
+  previousTask: SavedTask
+): R {
+  return {
+    ...record,
+    entry: record.entry.concat(
+      resourceToSavedBundleEntry<Task>(toHistoryResource(previousTask))
+    )
+  }
 }
 
 export function mergeBundles<R extends ValidRecord>(

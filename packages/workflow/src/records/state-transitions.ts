@@ -97,7 +97,8 @@ import {
   createCertifiedTask,
   withPractitionerDetails,
   sendBundleToHearth,
-  mergeChangedResourcesIntoRecord
+  mergeChangedResourcesIntoRecord,
+  withTaskHistory
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
@@ -365,13 +366,16 @@ export async function toWaitingForExternalValidationState(
     entry: [{ resource: waitingExternalValidationTask }]
   }
 
-  return changeState(
-    await mergeChangedResourcesIntoRecord(
-      record,
-      unsavedChangedResources,
-      practitionerResourcesBundle
+  return withTaskHistory(
+    changeState(
+      await mergeChangedResourcesIntoRecord(
+        record,
+        unsavedChangedResources,
+        practitionerResourcesBundle
+      ),
+      'WAITING_VALIDATION'
     ),
-    'WAITING_VALIDATION'
+    previousTask
   )
 }
 
@@ -650,13 +654,16 @@ export async function toValidated(
     entry: [{ resource: validatedTask }]
   }
 
-  return changeState(
-    await mergeChangedResourcesIntoRecord(
-      record,
-      unsavedChangedResources,
-      practitionerResourcesBundle
+  return withTaskHistory(
+    changeState(
+      await mergeChangedResourcesIntoRecord(
+        record,
+        unsavedChangedResources,
+        practitionerResourcesBundle
+      ),
+      'VALIDATED'
     ),
-    'VALIDATED'
+    previousTask
   )
 }
 
