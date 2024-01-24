@@ -18,7 +18,10 @@ import {
   SavedTask,
   CertifiedRecord,
   ReadyForReviewRecord,
-  RejectedRecord
+  RejectedRecord,
+  ValidRecord,
+  getTaskFromSavedBundle,
+  getBusinessStatus
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -287,4 +290,22 @@ export async function rejectDeclaration(
   )
 
   return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
+}
+
+export async function reinstateRegistration(
+  id: string,
+  authHeader: IAuthHeader
+) {
+  const reinstatedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/reinstate`,
+    authHeader,
+    {
+      id
+    }
+  )
+
+  const task = getTaskFromSavedBundle(reinstatedRecord)
+
+  return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
 }

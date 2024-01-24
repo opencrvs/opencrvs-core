@@ -19,6 +19,7 @@ import { downloadRecordHandler } from '@workflow/records/handler/download'
 import { duplicateRecordHandler } from '@workflow/records/handler/duplicate'
 import { registerRoute } from '@workflow/records/handler/register'
 import { rejectRoute } from '@workflow/records/handler/reject'
+import { reinstateRoute } from '@workflow/records/handler/reinstate'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 
@@ -105,6 +106,7 @@ export const getRoutes = () => {
     certifyRoute,
     ...archiveRoute,
     rejectRoute,
+    reinstateRoute,
     {
       method: 'POST',
       path: '/records/{id}/duplicate',

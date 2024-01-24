@@ -27,7 +27,7 @@ export const archiveRoute = [
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/archive',
-    allowedStartStates: ['REGISTERED', 'READY_FOR_REVIEW', 'VALIDATED'],
+    allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
     action: 'ARCHIVE',
     handler: async (request, record) => {
       const token = getToken(request)
