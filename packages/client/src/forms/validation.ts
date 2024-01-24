@@ -40,7 +40,8 @@ const getValidationErrors = {
     values: IFormSectionData,
     offlineCountryConfig?: IOfflineData,
     drafts?: IFormData,
-    requiredErrorMessage?: MessageDescriptor
+    requiredErrorMessage?: MessageDescriptor,
+    checkValidationErrorsOnly?: boolean
   ) {
     const value =
       field.nestedFields && values[field.name]
@@ -66,7 +67,7 @@ const getValidationErrors = {
 
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
-    if (field.required) {
+    if (field.required && !checkValidationErrorsOnly) {
       validators.push(required(requiredErrorMessage))
     } else if (field.validateEmpty) {
     } else if (!value && value !== 0) {
@@ -127,7 +128,8 @@ export function getValidationErrorsForForm(
   values: IFormSectionData,
   resource?: IOfflineData,
   drafts?: IFormData,
-  requiredErrorMessage?: MessageDescriptor
+  requiredErrorMessage?: MessageDescriptor,
+  checkValidationErrorsOnly?: boolean
 ) {
   return fields.reduce(
     (errorsForAllFields: Errors, field) =>
@@ -141,7 +143,8 @@ export function getValidationErrorsForForm(
               values,
               resource,
               drafts,
-              requiredErrorMessage
+              requiredErrorMessage,
+              checkValidationErrorsOnly
             )
           },
     {}

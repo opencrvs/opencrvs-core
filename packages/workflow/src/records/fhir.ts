@@ -16,18 +16,37 @@ import {
   PaymentReconciliation,
   Practitioner,
   Task,
-  URNReference
+  URNReference,
+  URLReference,
+  SavedTask,
+  Composition,
+  SavedComposition,
+  isURLReference,
+  isComposition,
+  SavedBundle,
+  Resource,
+  urlReferenceToUUID,
+  ValidRecord,
+  resourceIdentifierToUUID,
+  Location,
+  urlReferenceToResourceIdentifier,
+  isEncounter,
+  isRelatedPerson,
+  Encounter,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
   CorrectionRequestInput,
-  CorrectionRequestPaymentInput
-} from './correction-request'
+  CorrectionRequestPaymentInput,
+  ChangedValuesInput
+} from '@workflow/records/correction-request'
+import { isSystem, ISystemModelData, IUserModelData } from './user'
+import { getPractitionerOffice } from '@workflow/features/user/utils'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -297,6 +316,439 @@ export function createCorrectedTask(
     }
   }
 }
+
+export async function createDownloadTask(
+  previousTask: SavedTask,
+  user: IUserModelData | ISystemModelData,
+  extensionUrl:
+    | 'http://opencrvs.org/specs/extension/regDownloaded'
+    | 'http://opencrvs.org/specs/extension/regAssigned'
+): Promise<SavedTask> {
+  const office = (await getPractitionerOffice(user.practitionerId)) as Location
+  const identifiers = previousTask.identifier.filter(
+    ({ system }) =>
+      // Clear old system identifier task if it happens that the last task was made
+      // by an intergration but this one is by a real user
+      system !== 'http://opencrvs.org/specs/id/system_identifier'
+  )
+
+  if (isSystem(user)) {
+    identifiers.push({
+      system: 'http://opencrvs.org/specs/id/system_identifier',
+      value: JSON.stringify({
+        name: user.name,
+        username: user.username,
+        type: user.type
+      })
+    })
+  }
+
+  const extensions: Extension[] = isSystem(user)
+    ? []
+    : [
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastUser',
+          valueReference: {
+            reference: `Practitioner/${user.practitionerId as UUID}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastLocation',
+          valueReference: {
+            reference: `Location/${resourceIdentifierToUUID(
+              office!.partOf!.reference
+            )}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastOffice',
+          valueReference: {
+            reference: `Location/${user.primaryOfficeId}`
+          }
+        }
+      ]
+
+  const downloadedTask: SavedTask = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${user.practitionerId}` }
+    },
+    identifier: identifiers,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      { url: extensionUrl },
+      ...extensions
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  return downloadedTask
+}
+
+export function createRejectTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  comment: fhir3.CodeableConcept,
+  reason?: string
+): SavedTask {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    statusReason: comment,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      }
+    ],
+    reason: {
+      text: reason ?? ''
+    },
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'REJECTED'
+        }
+      ]
+    }
+  }
+}
+
+export function createValidateTask(
+  previousTask: Task,
+  practitioner: Practitioner
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'VALIDATED'
+        }
+      ]
+    }
+  }
+}
+
+export function createWaitingForValidationTask(
+  previousTask: Task,
+  practitioner: Practitioner
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'WAITING_VALIDATION'
+        }
+      ]
+    }
+  }
+}
+
+export function createRegisterTask(
+  previousTask: Task,
+  practitioner: Practitioner
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'REGISTERED'
+        }
+      ]
+    }
+  }
+}
+
+export function createArchiveTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): SavedTask {
+  const extension: Extension[] = [
+    ...previousTask.extension.filter((extension) =>
+      [
+        'http://opencrvs.org/specs/extension/contact-person-phone-number',
+        'http://opencrvs.org/specs/extension/informants-signature',
+        'http://opencrvs.org/specs/extension/contact-person-email'
+      ].includes(extension.url)
+    )
+  ]
+
+  if (duplicateTrackingId)
+    extension.push({
+      url: `http://opencrvs.org/specs/extension/duplicateTrackingId`,
+      valueString: duplicateTrackingId
+    })
+
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension,
+    // Reason example - "duplicate"
+    reason: { text: reason ?? '' },
+    // Status reason is comments which is added in the UI
+    statusReason: { text: comment ?? '' },
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'ARCHIVED'
+        }
+      ]
+    },
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+}
+
+export function createUpdatedTask(
+  previousTask: SavedTask,
+  updatedDetails: ChangedValuesInput,
+  practitioner: Practitioner
+): SavedTask {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+    ],
+    input: updatedDetails.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      ...getFHIRValueField(update.oldValue)
+    })),
+    output: updatedDetails.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      ...getFHIRValueField(update.newValue)
+    })),
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'DECLARATION_UPDATED'
+        }
+      ]
+    }
+  }
+}
+
+export function createUnassignedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+) {
+  const unassignedTask: SavedTask = {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: previousTask.businessStatus,
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
+    }
+  }
+
+  return unassignedTask
+}
+
 export function createCorrectionRequestTask(
   previousTask: Task,
   correctionDetails: CorrectionRequestInput,
@@ -340,7 +792,11 @@ export function createCorrectionRequestTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       ),
       {
@@ -400,10 +856,86 @@ export function createCorrectionRequestTask(
   }
 }
 
-export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
+export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
+  entry: Array<
+    Omit<fhir3.BundleEntry, 'response'> & {
+      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
+        location: URLReference
+      }
+    }
+  >
+}
+
+function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
+  return {
+    ...bundle,
+    entry: bundle.entry.map((entry) => {
+      const resource = entry.resource
+      if (isComposition(resource)) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            section: resource.section.map((section) => ({
+              ...section,
+              entry: section.entry.map((entry) => ({
+                ...entry,
+                reference: isURLReference(entry.reference)
+                  ? (urlReferenceToResourceIdentifier(
+                      entry.reference
+                    ) as URLReference)
+                  : entry.reference
+              }))
+            }))
+          } satisfies Composition
+        }
+      }
+      if (isEncounter(resource) && resource.location) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            location: resource.location.map((location) => ({
+              ...location,
+              location: {
+                ...location.location,
+                reference: isURLReference(location.location.reference)
+                  ? urlReferenceToResourceIdentifier(
+                      location.location.reference
+                    )
+                  : location.location.reference
+              }
+            }))
+          } satisfies Encounter
+        }
+      }
+
+      if (isRelatedPerson(resource) && resource.patient) {
+        return {
+          ...entry,
+          resource: {
+            ...resource,
+            patient: {
+              ...resource.patient,
+              reference: isURLReference(resource.patient.reference)
+                ? urlReferenceToResourceIdentifier(resource.patient.reference)
+                : resource.patient.reference
+            }
+          } satisfies RelatedPerson
+        }
+      }
+
+      return entry
+    })
+  }
+}
+
+export async function sendBundleToHearth(
+  bundle: Bundle
+): Promise<TransactionResponse> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(unresolveReferenceFullUrls(bundle)),
     headers: {
       'Content-Type': 'application/fhir+json'
     }
@@ -412,6 +944,150 @@ export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
   if (!res.ok) {
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+
+  const responseBundle: TransactionResponse = await res.json()
+
+  const ok = responseBundle.entry.every((e) =>
+    e.response.status.startsWith('2')
+  )
+  if (!ok) {
+    throw new Error(
+      'Hearth was unable to create/update all the entires in the bundle'
+    )
+  }
+
+  return responseBundle
+}
+
+function findSavedReference(
+  temporaryReference: URNReference,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): URLReference | null {
+  const indexInResponseBundle = resourceBundle.entry.findIndex(
+    (entry) => entry.fullUrl === temporaryReference
+  )
+  if (indexInResponseBundle === -1) {
+    return null
+  }
+  return responseBundle.entry[indexInResponseBundle].response.location
+}
+
+function toSavedComposition(
+  composition: Composition,
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedComposition {
+  return {
+    ...composition,
+    id,
+    section: composition.section.map((section) => ({
+      ...section,
+      entry: section.entry.map((sectionEntry) => {
+        if (isURLReference(sectionEntry.reference)) {
+          return {
+            ...sectionEntry,
+            reference: sectionEntry.reference
+          }
+        }
+        const savedReference = findSavedReference(
+          sectionEntry.reference,
+          resourceBundle,
+          responseBundle
+        )
+        if (!savedReference) {
+          throw Error(
+            `No response found for "${`${section.title} -> ${sectionEntry.reference}`} in the following transaction: ${JSON.stringify(
+              responseBundle
+            )}"`
+          )
+        }
+        return {
+          ...sectionEntry,
+          reference: savedReference
+        }
+      })
+    }))
+  }
+}
+
+/*
+ * Only the references in Composition->section->entry->reference
+ * are being resolved, the others e.g.
+ * DocumentReference->extension->valueReference->reference
+ * need to be added if needed
+ */
+export function toSavedBundle<T extends Resource>(
+  resourceBundle: Bundle<T>,
+  responseBundle: TransactionResponse
+): SavedBundle<T> {
+  return {
+    ...resourceBundle,
+    entry: resourceBundle.entry.map((entry, index) => {
+      if (isComposition(entry.resource)) {
+        return {
+          fullUrl: responseBundle.entry[index].response.location,
+          resource: toSavedComposition(
+            entry.resource,
+            urlReferenceToUUID(responseBundle.entry[index].response.location),
+            resourceBundle,
+            responseBundle
+          )
+        }
+      }
+      return {
+        ...entry,
+        fullUrl: responseBundle.entry[index].response.location,
+        resource: {
+          ...entry.resource,
+          id: urlReferenceToUUID(responseBundle.entry[index].response.location)
+        }
+      }
+    })
+  } as SavedBundle<T>
+}
+
+export function mergeBundles(
+  record: ValidRecord,
+  newOrUpdatedResourcesBundle: SavedBundle
+): SavedBundle {
+  const existingResourceIds = record.entry.map(({ resource }) => resource.id)
+  const newEntries = newOrUpdatedResourcesBundle.entry.filter(
+    ({ resource }) => !existingResourceIds.includes(resource.id)
+  )
+  return {
+    ...record,
+    entry: [
+      ...record.entry.map((previousEntry) => ({
+        ...previousEntry,
+        resource:
+          newOrUpdatedResourcesBundle.entry.find(
+            (newEntry) => newEntry.resource.id === previousEntry.resource.id
+          )?.resource ?? previousEntry.resource
+      })),
+      ...newEntries
+    ]
+  }
+}
+
+export async function findTaskFromIdentifier(
+  identifier: string
+): Promise<Bundle<SavedTask>> {
+  const res = await fetch(
+    new URL(`/fhir/Task?identifier=${identifier}`, HEARTH_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching task history from Hearth failed with [${res.status}] body: ${res.statusText}`
     )
   }
 

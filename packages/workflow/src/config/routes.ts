@@ -11,6 +11,16 @@
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
+import { certifyRoute } from '@workflow/records/handler/certify'
+import { archiveRoute } from '@workflow/records/handler/archive'
+import createRecordHandler from '@workflow/records/handler/create'
+import { unassignRecordHandler } from '@workflow/records/handler/unassign'
+import { downloadRecordHandler } from '@workflow/records/handler/download'
+import { registerRoute } from '@workflow/records/handler/register'
+import { rejectRoute } from '@workflow/records/handler/reject'
+import { reinstateRoute } from '@workflow/records/handler/reinstate'
+import { updateRoute } from '@workflow/records/handler/update'
+import { validateRoute } from '@workflow/records/handler/validate'
 
 export const getRoutes = () => {
   const routes = [
@@ -61,7 +71,41 @@ export const getRoutes = () => {
         description:
           'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
       }
-    }
+    },
+    {
+      method: 'POST',
+      path: '/create-record',
+      handler: createRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/download-record',
+      handler: downloadRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/unassign-record',
+      handler: unassignRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Unassign record endpoint'
+      }
+    },
+    ...validateRoute,
+    ...updateRoute,
+    ...registerRoute,
+    certifyRoute,
+    ...archiveRoute,
+    rejectRoute,
+    reinstateRoute
   ]
 
   return routes

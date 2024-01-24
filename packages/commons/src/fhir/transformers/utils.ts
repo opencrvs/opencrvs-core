@@ -10,16 +10,10 @@
  */
 
 import {
-  BIRTH_CORRECTION_ENCOUNTER_CODE,
   BIRTH_ENCOUNTER_CODE,
   CERTIFICATE_CONTEXT_KEY,
-  CERTIFICATE_DOCS_TITLE,
   CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
-  CORRECTION_CERTIFICATE_DOCS_TITLE,
-  DEATH_CORRECTION_ENCOUNTER_CODE,
   DEATH_ENCOUNTER_CODE,
-  INFORMANT_TITLE,
-  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   createDocRefTemplate,
   createEncounter,
@@ -40,17 +34,23 @@ import { getUUID } from '../../uuid'
 import {
   Bundle,
   BundleEntry,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
   CERTIFICATE_DOCS_CODE,
+  CERTIFICATE_DOCS_TITLE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
+  CORRECTION_CERTIFICATE_DOCS_TITLE,
   CodeableConcept,
   CompositionSection,
   CompositionSectionCode,
   CompositionSectionEncounterReference,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
   DocumentReference,
   Encounter,
   EncounterParticipant,
   INFORMANT_CODE,
+  INFORMANT_TITLE,
   Location,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   OPENCRVS_SPECIFICATION_URL,
   Observation,
   Patient,
@@ -71,7 +71,7 @@ import {
   isObservation
 } from '..'
 
-import { PartialBy } from '../../types'
+import { CompositionSectionTitleByCode, PartialBy } from '../../types'
 import {
   DOWNLOADED_EXTENSION_URL,
   EVENT_TYPE,
@@ -80,20 +80,20 @@ import {
 } from './constants'
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ): CompositionSection | undefined
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ) {
   return findCompositionSection(code, getComposition(fhirBundle))
 }
 
-export function selectOrCreatePersonResource(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function selectOrCreatePersonResource<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   fhirBundle: Bundle
 ): Patient {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -181,7 +181,7 @@ export function selectOrCreateEncounterResource(
 }
 
 export function selectOrCreateObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   categoryCode: string,
   categoryDescription: string,
   observationCode: string,
@@ -302,7 +302,7 @@ export async function removeObservationResource(
 }
 
 export function createObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): Observation {
@@ -439,9 +439,9 @@ export function selectOrCreateEncounterLocationRef(
   return encounter.location[0].location
 }
 
-export function selectOrCreateDocRefResource(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function selectOrCreateDocRefResource<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   fhirBundle: Bundle,
   context: any,
   indexKey: string
@@ -531,12 +531,14 @@ export function selectOrCreateCertificateDocRefResource(
   return docRef
 }
 
+type InformantCode =
+  | typeof INFORMANT_CODE
+  | typeof WITNESS_ONE_CODE
+  | typeof WITNESS_TWO_CODE
+
 export function selectOrCreateInformantSection(
-  sectionCode:
-    | typeof INFORMANT_CODE
-    | typeof WITNESS_ONE_CODE
-    | typeof WITNESS_TWO_CODE,
-  sectionTitle: string,
+  sectionCode: InformantCode,
+  sectionTitle: CompositionSectionTitleByCode<InformantCode>,
   fhirBundle: Bundle
 ): RelatedPerson | PartialBy<RelatedPerson, 'patient'> {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -600,7 +602,9 @@ export function selectOrCreateInformantResource(fhirBundle: Bundle): Patient {
 export function selectOrCreateWitnessResource(
   fhirBundle: Bundle,
   code: typeof WITNESS_ONE_CODE | typeof WITNESS_TWO_CODE,
-  title: string
+  title: CompositionSectionTitleByCode<
+    typeof WITNESS_ONE_CODE | typeof WITNESS_TWO_CODE
+  >
 ): Patient {
   const relatedPersonResource = selectOrCreateInformantSection(
     code,
@@ -705,7 +709,7 @@ export function selectOrCreateCollectorPersonResource(
 }
 
 export async function setCertificateCollectorReference(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
   fhirBundle: Bundle,
   context: any
@@ -779,7 +783,7 @@ export function selectOrCreatePaymentReconciliationResource(
 }
 
 export function selectOrCreateQuestionnaireResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): QuestionnaireResponse {
@@ -974,9 +978,9 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function setInformantReference(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function setInformantReference<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
   fhirBundle: Bundle,
   context: any

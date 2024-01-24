@@ -46,8 +46,8 @@ const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
   describe('setTrackingId', () => {
-    it('Successfully modified the provided fhirBundle with birth trackingid', () => {
-      const fhirBundle = setTrackingId(testFhirBundle)
+    it('Successfully modified the provided fhirBundle with birth trackingid', async () => {
+      const fhirBundle = await setTrackingId(testFhirBundle, '')
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -75,8 +75,8 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     })
 
-    it('Successfully modified the provided fhirBundle with marriage trackingid', () => {
-      const fhirBundle = setTrackingId(testMarriageFhirBundle)
+    it('Successfully modified the provided fhirBundle with marriage trackingid', async () => {
+      const fhirBundle = await setTrackingId(testMarriageFhirBundle, '')
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -105,7 +105,7 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Throws error if invalid fhir bundle is provided', () => {
       const invalidData = { ...testFhirBundle, entry: [] }
-      expect(() => setTrackingId(invalidData)).toThrowError(
+      expect(() => setTrackingId(invalidData, '')).rejects.toThrowError(
         'Invalid FHIR bundle found'
       )
     })

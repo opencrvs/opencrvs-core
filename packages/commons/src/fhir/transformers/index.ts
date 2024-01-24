@@ -11,38 +11,27 @@
 import { HAS_SHOWED_VERIFIED_DOCUMENT } from './constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
-  ATTACHMENT_DOCS_TITLE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
-  BRIDE_TITLE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  CHILD_TITLE,
   DEATH_DESCRIPTION_CODE,
   DEATH_ENCOUNTER_CODE,
-  DECEASED_TITLE,
-  FATHER_TITLE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  GROOM_TITLE,
-  INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
-  MOTHER_TITLE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
   OBSERVATION_CATEGORY_VSIGN_DESC,
-  SPOUSE_TITLE,
-  WITNESS_ONE_TITLE,
-  WITNESS_TWO_TITLE,
   createCompositionTemplate
 } from './templates'
 import transformObj, { Context, IFieldBuilders } from './transformer'
@@ -73,33 +62,45 @@ import {
 
 import {
   ATTACHMENT_DOCS_CODE,
+  ATTACHMENT_DOCS_TITLE,
   BRIDE_CODE,
+  BRIDE_TITLE,
   Bundle,
   CHILD_CODE,
+  CHILD_TITLE,
   CompositionSectionCode,
   DECEASED_CODE,
+  DECEASED_TITLE,
   EncounterParticipant,
   Extension,
   FATHER_CODE,
+  FATHER_TITLE,
   FHIR_SPECIFICATION_URL,
   GROOM_CODE,
+  GROOM_TITLE,
   INFORMANT_CODE,
+  INFORMANT_TITLE,
   KnownExtensionType,
   MOTHER_CODE,
+  MOTHER_TITLE,
   Money,
   OPENCRVS_SPECIFICATION_URL,
   Patient,
   ResourceIdentifier,
   SPOUSE_CODE,
+  SPOUSE_TITLE,
   StringExtensionType,
   Task,
   TaskIdentifier,
   TaskIdentifierSystemType,
   WITNESS_ONE_CODE,
+  WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
+  WITNESS_TWO_TITLE,
   findExtension,
   getComposition,
-  markSaved
+  markSaved,
+  CompositionSectionTitleByCode
 } from '..'
 import { getUUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
@@ -115,6 +116,7 @@ import {
   QuestionnaireQuestion
 } from './input'
 
+import { subYears, format } from 'date-fns'
 type StringReplace<
   T extends string,
   S extends string,
@@ -124,7 +126,7 @@ type StringReplace<
   ? StringReplace<R, S, D, `${A}${L}${D}`>
   : `${A}${T}`
 
-enum SignatureExtensionPostfix {
+export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
   GROOM = 'groom-signature',
   BRIDE = 'bride-signature',
@@ -132,9 +134,9 @@ enum SignatureExtensionPostfix {
   WITNESS_TWO = 'witness-two-signature'
 }
 
-function createNameBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createNameBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'name', HumanName> {
   return {
     use: (fhirBundle, fieldValue, context) => {
@@ -190,9 +192,9 @@ function createNameBuilder(
   }
 }
 
-function createIDBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createIDBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'identifier', IdentityType> {
   return {
     id: (fhirBundle, fieldValue, context) => {
@@ -254,9 +256,9 @@ function createIDBuilder(
   }
 }
 
-function createTelecomBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createTelecomBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'telecom', ContactPoint> {
   return {
     system: (fhirBundle, fieldValue, context) => {
@@ -304,9 +306,9 @@ function createTelecomBuilder(
   }
 }
 
-function createPhotoBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createPhotoBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'photo', Attachment> {
   return {
     contentType: (fhirBundle, fieldValue, context) => {
@@ -334,9 +336,9 @@ function createPhotoBuilder(
   }
 }
 
-function createAddressBuilder(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string
+function createAddressBuilder<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): IFieldBuilders<'address', AddressInput> {
   return {
     use: (fhirBundle, fieldValue, context) => {
@@ -747,9 +749,14 @@ function createAgeOfIndividualInYearsBuilder(
     })
   }
 
+  const age = parseInt(fieldValue.toString(), 10)
+  if (resource.deceasedDateTime) {
+    const birthDate = subYears(new Date(resource.deceasedDateTime), age)
+    resource.birthDate = format(birthDate, 'yyyy-MM-dd')
+    return
+  }
   // for storing an assumed birthdate when exact DOB is not known
-  const birthYear =
-    new Date().getFullYear() - parseInt(fieldValue.toString(), 10)
+  const birthYear = new Date().getFullYear() - age
   const firstDayOfBirthYear = new Date(birthYear, 0, 1)
   resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
     firstDayOfBirthYear.getMonth() + 1
@@ -812,7 +819,7 @@ function createInformantRelationship(task: Task, fieldValue: string) {
   )
 }
 
-function createInformantsSignature(
+function createOrUpdateSignatureExtension(
   resource: Task,
   fieldValue: string,
   extensionPostfix: SignatureExtensionPostfix
@@ -820,8 +827,13 @@ function createInformantsSignature(
   if (!resource.extension) {
     resource.extension = []
   }
+  const signatureUrl =
+    `http://opencrvs.org/specs/extension/${extensionPostfix}` as const
+  resource.extension = resource.extension.filter(
+    (ext) => ext.url !== signatureUrl
+  )
   resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/${extensionPostfix}`,
+    url: signatureUrl,
     valueString: fieldValue
   })
 }
@@ -1794,6 +1806,20 @@ const builders: IFieldBuilders = {
           DECEASED_TITLE,
           fhirBundle
         )
+        /*
+         * setting birthDate from both here
+         * & age builder as it depends on which
+         * one gets called second
+         */
+        const age = findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+          person.extension || []
+        )?.valueInteger
+
+        if (age) {
+          const birthDate = subYears(new Date(fieldValue as string), age)
+          person.birthDate = format(birthDate, 'yyyy-MM-dd')
+        }
         person.deceasedDateTime = fieldValue as string
       }
     },
@@ -1964,129 +1990,7 @@ const builders: IFieldBuilders = {
       const person = selectOrCreateInformantResource(fhirBundle)
       person.multipleBirthInteger = fieldValue as number
     },
-    address: {
-      use: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'use',
-          context
-        )
-      },
-      type: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'type',
-          context
-        )
-      },
-      text: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'text',
-          context
-        )
-      },
-      line: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        if (!person.address) {
-          person.address = []
-        }
-        if (!person.address[context._index.address]) {
-          person.address[context._index.address] = {}
-        }
-        if (!person.address[context._index.address].line) {
-          person.address[context._index.address].line = []
-        }
-        if (
-          person.address[context._index.address].line![context._index.line] !==
-          undefined
-        ) {
-          person.address[context._index.address].line![context._index.line] =
-            fieldValue
-        } else {
-          ;(person.address[context._index.address].line as string[]).push(
-            fieldValue
-          )
-        }
-      },
-      city: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'city',
-          context
-        )
-      },
-      district: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'district',
-          context
-        )
-      },
-      state: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'state',
-          context
-        )
-      },
-      postalCode: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'postalCode',
-          context
-        )
-      },
-      partOf: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          [
-            {
-              url: 'http://opencrvs.org/specs/extension/part-of',
-              valueReference: {
-                reference: `Location/${fieldValue}`
-              }
-            }
-          ],
-          'extension',
-          context
-        )
-      },
-      country: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'address',
-          fieldValue,
-          'country',
-          context
-        )
-      }
-    },
+    address: createAddressBuilder(INFORMANT_CODE, INFORMANT_TITLE),
     photo: {
       contentType: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
@@ -2418,7 +2322,7 @@ const builders: IFieldBuilders = {
     informantsSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.INFORMANT
@@ -2427,7 +2331,7 @@ const builders: IFieldBuilders = {
     groomSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.GROOM
@@ -2436,7 +2340,7 @@ const builders: IFieldBuilders = {
     brideSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.BRIDE
@@ -2445,7 +2349,7 @@ const builders: IFieldBuilders = {
     witnessOneSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_ONE
@@ -2454,7 +2358,7 @@ const builders: IFieldBuilders = {
     witnessTwoSignature: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
 
-      return createInformantsSignature(
+      return createOrUpdateSignatureExtension(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_TWO
@@ -2820,12 +2724,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   contentType: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 contentType: fieldValue
               }
@@ -2849,12 +2756,15 @@ const builders: IFieldBuilders = {
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                //@ts-ignore
                 valueAttachment: {
                   data: fieldValue
                 }
               })
             } else {
+              //@ts-ignore
               hasAffidavit.valueAttachment = {
+                //@ts-ignore
                 ...hasAffidavit.valueAttachment,
                 data: fieldValue
               }
@@ -3388,6 +3298,22 @@ const builders: IFieldBuilders = {
           code: fieldValue
         }
       ]
+    }
+  },
+  duplicate: (fhirBundle, fieldValue, context) => {
+    const composition = getComposition(fhirBundle)
+    const duplicateExtensionURL = `${OPENCRVS_SPECIFICATION_URL}duplicate`
+    const duplicateExtension = composition.extension?.find(
+      (ext) => ext.url === duplicateExtensionURL
+    )
+    if (duplicateExtension) {
+      duplicateExtension.valueBoolean = fieldValue
+    } else {
+      if (!composition.extension) composition.extension = []
+      composition.extension.push({
+        url: duplicateExtensionURL,
+        valueBoolean: fieldValue
+      })
     }
   }
 }

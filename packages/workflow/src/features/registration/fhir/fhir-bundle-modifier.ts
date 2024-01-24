@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { UUID } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -17,15 +18,15 @@ import {
   RegistrationNumber,
   Saved,
   Task,
-  findExtension
+  findExtension,
+  RegistrationStatus,
+  WaitingForValidationRecord,
+  urlReferenceToUUID,
+  URLReference,
+  getResourceFromBundleById
 } from '@opencrvs/commons/types'
+import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
-import { triggerEvent } from '@workflow/features/events/handler'
-import {
-  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -41,12 +42,9 @@ import {
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  fetchTaskByCompositionIdFromHearth,
   generateTrackingIdForEvents,
-  getComposition,
   getEventType,
   getMosipUINToken,
-  getVoidEvent,
   isEventNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -76,15 +74,14 @@ export async function modifyRegistrationBundle<T extends Bundle>(
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
-    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = setTrackingId(fhirBundle)
+  const bundleWithTrackingId = await setTrackingId(fhirBundle, token)
 
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  const taskResource = getTaskResourceFromFhirBundle(bundleWithTrackingId)
 
-  const eventType = getEventType(fhirBundle)
+  const eventType = getEventType(bundleWithTrackingId)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
 
@@ -92,7 +89,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressDeclaration(fhirBundle)
+    isInProgressDeclaration(bundleWithTrackingId)
       ? RegStatus.IN_PROGRESS
       : RegStatus.DECLARED
   )
@@ -101,7 +98,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  if (!isEventNotification(fhirBundle)) {
+  if (!isEventNotification(bundleWithTrackingId)) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
@@ -109,7 +106,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
-  return fhirBundle
+  return bundleWithTrackingId as T
 }
 
 export async function markBundleAsValidated<T extends Bundle>(
@@ -135,74 +132,24 @@ export async function markBundleAsValidated<T extends Bundle>(
 
 export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
-  headers: Record<string, string>,
-  token: string
-): Promise<{ bundle: Bundle; regValidationError?: boolean }> {
-  try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
+  headers: Record<string, string>
+): Promise<Bundle> {
+  const res = await fetch(
+    new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
+    {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
         'Content-Type': 'application/json',
         ...headers
       }
-    })
-    if (!res.ok) {
-      const errorData = await res.json()
-      throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
     }
-    return { bundle }
-  } catch (err) {
-    const eventType = getEventType(bundle)
-    const composition = getComposition(bundle)
-    if (!composition) {
-      throw new Error('Cant get composition in bundle')
-    }
-    const taskResource = await fetchTaskByCompositionIdFromHearth(
-      composition.id
-    )
-    const practitioner = await getLoggedInPractitionerResource(token)
-
-    if (
-      !taskResource ||
-      !taskResource.businessStatus ||
-      !taskResource.businessStatus.coding ||
-      !taskResource.businessStatus.coding[0] ||
-      !taskResource.businessStatus.coding[0].code
-    ) {
-      throw new Error('taskResource has no businessStatus code')
-    }
-    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
-
-    const statusReason: fhir3.CodeableConcept = {
-      text: `${JSON.stringify(err)} - ${BIRTH_REG_NUMBER_GENERATION_FAILED}`
-    }
-    taskResource.statusReason = statusReason
-    taskResource.lastModified = new Date().toISOString()
-
-    /* setting registration workflow status here */
-    await setupRegistrationWorkflow(
-      taskResource,
-      getTokenPayload(token),
-      RegStatus.REJECTED
-    )
-
-    /* setting lastRegLocation here */
-    await setupLastRegLocation(taskResource, practitioner)
-
-    /* setting lastRegUser here */
-    setupLastRegUser(taskResource, practitioner)
-
-    await updateResourceInHearth(taskResource)
-
-    await triggerEvent(
-      getVoidEvent(eventType),
-      { resourceType: 'Bundle', entry: [{ resource: taskResource }] },
-      headers
-    )
-
-    return { bundle, regValidationError: true }
+  )
+  if (!res.ok) {
+    const errorData = await res.json()
+    throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
+  return bundle
 }
 
 export async function markBundleAsWaitingValidation<T extends Bundle>(
@@ -364,9 +311,16 @@ export async function touchBundle(
   return bundle
 }
 
-export function setTrackingId<T extends Bundle>(fhirBundle: T): T {
+export async function setTrackingId(
+  fhirBundle: Bundle,
+  token: string
+): Promise<Bundle> {
   const eventType = getEventType(fhirBundle)
-  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingId = await generateTrackingIdForEvents(
+    eventType,
+    fhirBundle,
+    token
+  )
   const trackingIdFhirName = `${
     eventType.toLowerCase() as Lowercase<typeof eventType>
   }-tracking-id` as const
@@ -400,11 +354,13 @@ export function setTrackingId<T extends Bundle>(fhirBundle: T): T {
       `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
   )
 
+  const systemIdentifierUrl =
+    `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}` as const
   if (existingTrackingId) {
     existingTrackingId.value = trackingId
   } else {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`,
+      system: systemIdentifierUrl,
       value: trackingId
     })
   }
@@ -434,7 +390,7 @@ export function setupRegistrationType(
 export async function setupRegistrationWorkflow(
   taskResource: Task,
   tokenpayload: ITokenPayload,
-  defaultStatus?: string
+  defaultStatus?: RegistrationStatus
 ): Promise<Task> {
   const regStatusCodeString = defaultStatus
     ? defaultStatus
@@ -464,10 +420,10 @@ export async function setupRegistrationWorkflow(
   return taskResource
 }
 
-export async function setupLastRegLocation(
-  taskResource: Task,
+export async function setupLastRegLocation<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Promise<Task> {
+): Promise<T> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
@@ -483,11 +439,13 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+    regUserLastLocationExtension.valueReference.reference = `Location/${
+      location.id as UUID
+    }` as const
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: { reference: `Location/${location.id}` }
+      valueReference: { reference: `Location/${location.id as UUID}` }
     })
   }
 
@@ -548,10 +506,10 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
   })
 }
 
-export function setupLastRegUser(
-  taskResource: Task,
+export function setupLastRegUser<T extends Task>(
+  taskResource: T,
   practitioner: Practitioner
-): Task {
+): T {
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -608,47 +566,48 @@ export async function checkForDuplicateStatusUpdate(taskResource: Task) {
   const existingRegStatusCode = await fetchExistingRegStatusCode(
     taskResource.id
   )
-  if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
+  if (existingRegStatusCode?.code === regStatusCode.code) {
     logger.error(`Declaration is already in ${regStatusCode} state`)
     throw new Error(`Declaration is already in ${regStatusCode} state`)
   }
 }
 
-export async function updatePatientIdentifierWithRN(
+export function updatePatientIdentifierWithRN(
+  record: WaitingForValidationRecord,
   composition: Composition,
   sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<Patient[]> {
-  return await Promise.all(
-    sectionCodes.map(async (sectionCode) => {
-      const section = getSectionEntryBySectionCode(composition, sectionCode)
-      const patient = await getFromFhir(`/${section.reference}`)
-      if (!patient.identifier) {
-        patient.identifier = []
-      }
-      const rnIdentifier = patient.identifier.find(
-        (identifier: fhir3.Identifier) =>
-          identifier.type?.coding?.[0].code === identifierType
-      )
-      if (rnIdentifier) {
-        rnIdentifier.value = registrationNumber
-      } else {
-        patient.identifier.push({
-          type: {
-            coding: [
-              {
-                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-                code: identifierType
-              }
-            ]
-          },
-          value: registrationNumber
-        })
-      }
-      return patient
-    })
-  )
+): Saved<Patient>[] {
+  return sectionCodes.map((sectionCode) => {
+    const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
+    const patientId = urlReferenceToUUID(sectionEntry.reference as URLReference)
+    const patient = getResourceFromBundleById<Patient>(record, patientId)
+
+    if (!patient.identifier) {
+      patient.identifier = []
+    }
+    const rnIdentifier = patient.identifier.find(
+      (identifier: fhir3.Identifier) =>
+        identifier.type?.coding?.[0].code === identifierType
+    )
+    if (rnIdentifier) {
+      rnIdentifier.value = registrationNumber
+    } else {
+      patient.identifier.push({
+        type: {
+          coding: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+              code: identifierType
+            }
+          ]
+        },
+        value: registrationNumber
+      })
+    }
+    return patient
+  })
 }
 
 interface Integration {
@@ -665,9 +624,9 @@ const statuses = {
 }
 
 export async function validateDeceasedDetails(
-  patient: Patient,
+  patient: Saved<Patient>,
   authHeader: { Authorization: string }
-): Promise<Patient> {
+): Promise<Saved<Patient>> {
   /*
     In OCRVS-1637 https://github.com/opencrvs/opencrvs-core/pull/964 we attempted to create a longitudinal
     record of life events by an attempt to use an existing person in gateway if an identifier is supplied that we already

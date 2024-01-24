@@ -34,17 +34,19 @@ import { createServer } from '@workflow/server'
 import {
   compositionMock,
   deathCompositionMock,
-  deathTaskMock,
   districtMock,
+  districtMockOfState,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
   hearthResponseMock,
-  informantSMSNotificationMock,
   mockFormDraft,
   motherMock,
   officeMock,
-  patientMock,
+  officeMockOfDistrict,
+  practitionerRoleMock,
+  registrarMock,
   relatedPersonMock,
+  stateMock,
   taskResourceMock,
   testFhirBundle,
   testFhirBundleWithIds,
@@ -55,11 +57,11 @@ import {
   unionMock,
   upazilaMock,
   userMock,
-  userResponseMock,
-  wrapInBundle
+  userResponseMock
 } from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
+import { BIRTH_BUNDLE, DEATH_BUNDLE } from '@opencrvs/commons/fixtures'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -156,6 +158,7 @@ describe('Verify handler', () => {
   describe('createRegistrationHandler', () => {
     beforeEach(() => {
       fetch.mockResponses(
+        [null, { status: 404 }],
         [userMock, { status: 200 }],
         [fieldAgentPractitionerMock, { status: 200 }],
         [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -417,73 +420,6 @@ describe('Verify handler', () => {
 
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementationOnce(() => new Error('boom'))
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(500)
-    })
-
-    it('generates a new tracking id and repeats the request if a 409 is received from hearth', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
-        ]
-      )
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/fhir',
-        payload: testFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('fails after trying to generate a new trackingID and sending to Hearth 5 times', async () => {
-      fetch.mockResponses(
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }],
-        ['', { status: 409 }]
-      )
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -965,8 +901,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        error: "Couldn't generate registration number"
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -977,21 +912,26 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(taskResourceMock), { status: 200 }],
-      [compositionMock, { status: 200 }],
+      [JSON.stringify(BIRTH_BUNDLE), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [registrarMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [JSON.stringify({}), { status: 200 }],
-      [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }],
-      [JSON.stringify(informantSMSNotificationMock), { status: 200 }]
+      [JSON.stringify({}), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        registrationNumber: '12345678',
+        compositionId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -1002,22 +942,27 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with death registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(JSON.parse(deathTaskMock)), { status: 200 }],
-      [deathCompositionMock, { status: 200 }],
+      [JSON.stringify(DEATH_BUNDLE), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [registrarMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [JSON.stringify([]), { status: 200 }],
-      [JSON.stringify([]), { status: 200 }],
-      [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }],
-      [motherMock, { status: 200 }]
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [practitionerRoleMock, { status: 200 }],
+      [officeMockOfDistrict, { status: 200 }],
+      [districtMockOfState, { status: 200 }],
+      [stateMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({}), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
       payload: {
-        trackingId: 'B1mW7jA',
-        registrationNumber: '12345678'
+        registrationNumber: '12345678',
+        compositionId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -1505,7 +1450,7 @@ describe('Register handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/fhir',
+      url: '/records/111/register',
       payload: testFhirBundleWithIds,
       headers: {
         Authorization: `Bearer ${token}`
@@ -1727,7 +1672,14 @@ describe('populateCompositionWithID', () => {
             identifier: [
               {
                 value: '123456789',
-                type: { coding: [{ code: 'NATIONAL_ID' }] }
+                type: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/identifier-type',
+                      code: 'NATIONAL_ID'
+                    }
+                  ]
+                }
               }
             ],
             name: [{ use: 'en', family: ['Rahman'] }],

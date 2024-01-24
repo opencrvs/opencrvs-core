@@ -169,7 +169,7 @@ export async function removeDuplicatesFromComposition(
   }
 }
 
-export async function setCertificateCollector(
+export async function setCollectorForPrintInAdvance(
   details:
     | GQLBirthRegistrationInput
     | GQLDeathRegistrationInput
@@ -192,7 +192,8 @@ export async function setCertificateCollector(
       certificate.collector = {
         name,
         relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: role
+        otherRelationship: role,
+        identifier: []
       }
     }
     return certificate

@@ -9,13 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-import {
-  fetchFHIR,
-  getCompositionIdFromResponse,
-  getDeclarationIds,
-  getDeclarationIdsFromResponse,
-  getIDFromResponse
-} from '@gateway/features/fhir/service'
+import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
 import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
@@ -32,26 +26,21 @@ import {
   Task,
   TaskActionExtension,
   TaskHistory,
-  TaskStatus,
   addExtensionsToTask,
   buildFHIRBundle,
   clearActionExtension,
-  getComposition,
-  getStatusFromTask,
-  getTaskFromBundle,
-  isComposition,
   resourceIdentifierToUUID,
+  getTaskFromSavedBundle,
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle,
+  getComposition,
   isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput,
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -61,13 +50,8 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
-import {
-  hasBirthDuplicates,
-  hasDeathDuplicates
-} from '@gateway/features/search/service'
 import {
   ISystemModelData,
   IUserModelData,
@@ -75,10 +59,21 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   removeDuplicatesFromComposition,
-  setCertificateCollector,
+  setCollectorForPrintInAdvance,
   uploadBase64AttachmentsToDocumentsStore
-} from './utils'
+} from '@gateway/features/registration/utils'
+import {
+  archiveRegistration,
+  registerDeclaration,
+  unassignRegistration,
+  rejectDeclaration,
+  updateRegistration,
+  validateRegistration,
+  fetchRegistrationForDownloading,
+  reinstateRegistration
+} from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
+import { certifyRegistration, createRegistration } from '@gateway/workflow'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -155,18 +150,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -182,18 +167,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -213,18 +188,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -450,7 +415,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
+      return await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -459,7 +424,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
+      return createRegistration(details, EVENT_TYPE.DEATH, authHeader)
     },
     async createMarriageRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -468,14 +433,14 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.MARRIAGE)
+      return createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
     },
     async updateBirthRegistration(_, { details }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
+        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -558,12 +523,7 @@ export const resolvers: GQLResolver = {
         throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.DEATH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.DEATH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
@@ -606,15 +566,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.REJECTED,
-        reason,
-        comment
-      )
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const taskEntry = await rejectDeclaration(id, authHeader, reason, comment)
+      if (!taskEntry) {
+        return await Promise.reject(new Error('Task not found'))
+      }
 
       // return the taskId
       return taskEntry.resource.id
@@ -633,15 +588,13 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.ARCHIVED,
+      const taskEntry = await archiveRegistration(
+        id,
+        authHeader,
         reason,
         comment,
         duplicateTrackingId
       )
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },
@@ -655,24 +608,11 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
 
-      const taskId = taskEntry.resource.id
-
-      const prevRegStatus =
-        taskId && (await getPreviousRegStatus(taskId, authHeader))
-      if (!prevRegStatus) {
-        return await Promise.reject(new Error('Task has no reg-status code'))
-      }
-
-      taskEntry.resource.extension = [
-        ...(taskEntry.resource.extension ?? []),
-        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
-      ]
-
-      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const { taskId, prevRegStatus } = await reinstateRegistration(
+        id,
+        authHeader
+      )
 
       return {
         taskEntryResourceID: taskId,
@@ -680,11 +620,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -694,13 +633,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -712,15 +648,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(
-          details,
-          authHeader,
-          EVENT_TYPE.MARRIAGE
-        )
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
@@ -775,15 +706,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
-      })
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const task = (await unassignRegistration(id, authHeader)).entry[0]
 
       // return the taskId
-      return taskEntry.resource.id
+      return task.resource.id
     },
     async markEventAsDuplicate(
       _,
@@ -841,129 +767,24 @@ async function registrationToFHIR(
   return buildFHIRBundle(recordWithAttachmentsUploaded, event)
 }
 
-async function createEventRegistration(
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader,
-  event: EVENT_TYPE
-) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  let isADuplicate = false
-  if (event === EVENT_TYPE.BIRTH) {
-    isADuplicate = await hasBirthDuplicates(
-      authHeader,
-      details as GQLBirthRegistrationInput
-    )
-  } else if (event === EVENT_TYPE.DEATH) {
-    isADuplicate = await hasDeathDuplicates(
-      authHeader,
-      details as GQLDeathRegistrationInput
-    )
-  }
-
-  const composition = getComposition(doc)
-  const hasBeenFlaggedAsDuplicate = composition.extension?.find(
-    (x) => x.url === `${OPENCRVS_SPECIFICATION_URL}duplicate`
-  )
-  if (isADuplicate && !hasBeenFlaggedAsDuplicate) {
-    composition.extension = composition.extension || []
-    composition.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
-      valueBoolean: true
-    })
-  }
-
-  const draftId =
-    details && details.registration && details.registration.draftId
-
-  const existingComposition =
-    draftId && (await lookForComposition(draftId, authHeader))
-
-  if (existingComposition) {
-    if (hasScope(authHeader, 'register')) {
-      return { compositionId: existingComposition }
-    } else {
-      // return tracking-id
-      return await getDeclarationIds(existingComposition, authHeader)
-    }
-  }
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-
-  /*
-   * Some custom logic added here. If you are a registar and
-   * we flagged the declaration as a duplicate, we push the declaration into
-   * "Ready for review" queue and not ready to print.
-   */
-  const hasDuplicates = Boolean(
-    doc.entry
-      .map((entry) => entry.resource)
-      .find(isComposition)
-      ?.extension?.find(
-        (ext) =>
-          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
-          ext.valueBoolean
-      )
-  )
-
-  if (hasScope(authHeader, 'register') && !hasDuplicates) {
-    // return the registrationNumber
-    return await getCompositionIdFromResponse(res, event, authHeader)
-  } else {
-    // return tracking-id and potential duplicates
-    const ids = await getDeclarationIdsFromResponse(res, authHeader)
-    return {
-      ...ids,
-      isPotentiallyDuplicate: hasDuplicates
-    }
-  }
-}
-
-export async function lookForComposition(
-  identifier: string,
-  authHeader: IAuthHeader
-) {
-  const taskBundle = await fetchFHIR<Bundle>(
-    `/Task?identifier=${identifier}`,
-    authHeader
-  )
-
-  const task =
-    taskBundle &&
-    taskBundle.entry &&
-    taskBundle.entry[0] &&
-    (taskBundle.entry[0].resource as Task)
-
-  return (
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-  )
-}
-
 async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details?:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskEntry = await getTaskEntry(id, authHeader)
-
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskEntry
-    }
-  } else {
-    doc = await registrationToFHIR(event, details, authHeader)
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
   }
 
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  await validateRegistration(id, authHeader)
+  return id
 }
 
 async function markEventAsRegistered(
@@ -975,26 +796,38 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
+  }
 
-  // return the full composition
-  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
-
-  return composition
+  await registerDeclaration(id, authHeader, event)
+  return id
 }
 
 async function markEventAsCertified(
-  details: any,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  await setCertificateCollector(details, authHeader)
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return composition-id
-  return getIDFromResponse(res)
+  await setCollectorForPrintInAdvance(details, authHeader)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const certifiedRecord = await certifyRegistration(
+    id,
+    certificateDetails,
+    event,
+    authHeader
+  )
+  return getComposition(certifiedRecord).id
 }
 
 async function markEventAsIssued(
@@ -1045,29 +878,6 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
   return taskEntry
 }
 
-async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-  const taskHistoryBundle: Bundle = await fetchFHIR(
-    `/Task/${taskId}/_history`,
-    authHeader
-  )
-
-  const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-    return taskEntry.resource as Task
-  })
-
-  if (!taskHistory) {
-    throw new Error('Task has no history')
-  }
-
-  const filteredTaskHistory = taskHistory.filter((task) => {
-    return (
-      task.businessStatus?.coding &&
-      task.businessStatus?.coding[0].code !== 'ARCHIVED'
-    )
-  })
-  return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
-}
-
 type Action = typeof TaskActionExtension
 
 export function insertActionToBundle(
@@ -1076,7 +886,7 @@ export function insertActionToBundle(
   user: IUserModelData | ISystemModelData,
   office?: Saved<Location>
 ) {
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
   const bundleEntry = record.entry.find(
     (entry) => entry.resource.id === task.id
   )!
@@ -1158,87 +968,4 @@ export function insertActionToBundle(
     ...record,
     entry: updatedEntries
   } as Saved<Bundle>
-}
-
-function getDownloadedOrAssignedExtension(
-  authHeader: IAuthHeader,
-  status: TaskStatus
-): Action[number] {
-  if (
-    inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === TaskStatus.VALIDATED)
-  ) {
-    return `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-  }
-  return `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-}
-
-export async function markRecordAsDownloadedBySystem(
-  id: string,
-  system: ISystemModelData,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, system)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
-}
-export async function markRecordAsDownloadedOrAssigned(
-  id: string,
-  user: IUserModelData,
-  office: Saved<Location>,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, user, office)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
 }
