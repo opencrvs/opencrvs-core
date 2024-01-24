@@ -34,7 +34,8 @@ import {
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  getComposition
+  getComposition,
+  isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -380,29 +381,29 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
-      try {
-        const token = await getAnonymousToken()
-        headers.Authorization = `Bearer ${token}`
-        const authHeader = {
-          Authorization: headers.Authorization
-        }
-        const taskEntry = await getTaskEntry(id, authHeader)
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      const token = await getAnonymousToken()
+      context.headers.Authorization = `Bearer ${token}`
+      context.record = await getRecordById(id, context.headers.Authorization)
 
-        const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: 'http://opencrvs.org/specs/extension/regVerified',
-          valueString: headers['x-real-ip']!
-        })
-        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const taskEntry = context.record.entry.find(isTaskBundleEntry)
 
-        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
-        if (!record) {
-          await Promise.reject(new Error('Invalid QrCode'))
-        }
-        return record
-      } catch (e) {
-        await Promise.reject(new Error(e))
+      if (!taskEntry) {
+        throw new Error('Task entry not found for verification')
       }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: 'http://opencrvs.org/specs/extension/regVerified',
+        valueString: context.headers['x-real-ip']!
+      })
+      await fetchFHIR(
+        '/Task',
+        context.headers,
+        'PUT',
+        JSON.stringify(taskBundle)
+      )
+
+      return context.record
     }
   },
 

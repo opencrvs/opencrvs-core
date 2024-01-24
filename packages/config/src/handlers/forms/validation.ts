@@ -420,7 +420,7 @@ const form = z.object({
     .refine(
       (sections) =>
         sections.filter(({ id }) =>
-          REQUIRED_SECTIONS.includes(id as (typeof REQUIRED_SECTIONS)[number])
+          REQUIRED_SECTIONS.includes(id as typeof REQUIRED_SECTIONS[number])
         ).length >= 2,
       {
         message: `${REQUIRED_SECTIONS.map((sec) => `"${sec}"`).join(
