@@ -30,12 +30,10 @@ import {
   buildFHIRBundle,
   clearActionExtension,
   resourceIdentifierToUUID,
-  getStatusFromTask,
   getTaskFromSavedBundle,
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle,
   getComposition
 } from '@opencrvs/commons/types'
 import {
@@ -70,7 +68,8 @@ import {
   rejectDeclaration,
   updateRegistration,
   validateRegistration,
-  fetchRegistrationForDownloading
+  fetchRegistrationForDownloading,
+  reinstateRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -608,24 +607,11 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
 
-      const taskId = taskEntry.resource.id
-
-      const prevRegStatus =
-        taskId && (await getPreviousRegStatus(taskId, authHeader))
-      if (!prevRegStatus) {
-        return await Promise.reject(new Error('Task has no reg-status code'))
-      }
-
-      taskEntry.resource.extension = [
-        ...(taskEntry.resource.extension ?? []),
-        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
-      ]
-
-      const newTaskBundle = updateFHIRTaskBundle(taskEntry, prevRegStatus)
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const { taskId, prevRegStatus } = await reinstateRegistration(
+        id,
+        authHeader
+      )
 
       return {
         taskEntryResourceID: taskId,
@@ -889,29 +875,6 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
     ({ system }) => system != systemIdentifierUrl
   )
   return taskEntry
-}
-
-async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-  const taskHistoryBundle: Bundle = await fetchFHIR(
-    `/Task/${taskId}/_history`,
-    authHeader
-  )
-
-  const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-    return taskEntry.resource as Task
-  })
-
-  if (!taskHistory) {
-    throw new Error('Task has no history')
-  }
-
-  const filteredTaskHistory = taskHistory.filter((task) => {
-    return (
-      task.businessStatus?.coding &&
-      task.businessStatus?.coding[0].code !== 'ARCHIVED'
-    )
-  })
-  return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
 }
 
 type Action = typeof TaskActionExtension

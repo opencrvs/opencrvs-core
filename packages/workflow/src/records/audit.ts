@@ -18,6 +18,7 @@ type AuditAction =
   | 'new-declaration'
   | 'mark-voided'
   | 'mark-certified'
+  | 'mark-reinstated'
 
 export async function auditEvent(
   action: AuditAction,
