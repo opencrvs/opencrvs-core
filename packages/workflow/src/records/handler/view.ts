@@ -10,7 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { getToken, getTokenPayload } from '@workflow/utils/authUtils'
-import { getRecordById } from '@workflow/records/index'
+import { getRecordsOfAllStatus } from '@workflow/records/index'
 import { getPractitionerOffice, getUser } from '@workflow/features/user/utils'
 import { Location } from '@opencrvs/commons/types'
 import { toViewed } from '@workflow/records/state-transitions'
@@ -23,7 +23,7 @@ export async function viewRecordHandler(
 ) {
   const token = getToken(request)
   const recordId = request.params.id
-  const record = await getRecordById(recordId, token)
+  const record = await getRecordsOfAllStatus(recordId, token)
 
   const tokenPayload = getTokenPayload(token)
   const user = await getUser(tokenPayload.sub, {

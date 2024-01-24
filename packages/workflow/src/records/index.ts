@@ -35,3 +35,27 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 
   return res.json()
 }
+
+export async function getRecordsOfAllStatus(
+  recordId: string,
+  token: string,
+  includeHistoryResources = false
+) {
+  return await getRecordById(
+    recordId,
+    token,
+    [
+      'ARCHIVED',
+      'CERTIFIED',
+      'CORRECTION_REQUESTED',
+      'IN_PROGRESS',
+      'ISSUED',
+      'READY_FOR_REVIEW',
+      'REGISTERED',
+      'REJECTED',
+      'VALIDATED',
+      'WAITING_VALIDATION'
+    ],
+    includeHistoryResources
+  )
+}
