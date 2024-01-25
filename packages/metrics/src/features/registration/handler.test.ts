@@ -75,7 +75,7 @@ describe('When a new registration event is received', () => {
   it('returns ok for valid new birth declaration', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-ready-for-review',
+      url: '/events/birth/sent-notification-for-review',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -91,7 +91,7 @@ describe('When a new registration event is received', () => {
     payload.entry[0] = {}
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-ready-for-review',
+      url: '/events/birth/sent-notification-for-review',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1350,7 +1350,7 @@ describe('When an in-progress declaration is received', () => {
     const payload = require('./test-data/new-in-progress-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-incomplete',
+      url: '/events/birth/sent-notification',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1370,7 +1370,7 @@ describe('When an in-progress declaration is received', () => {
     payload.entry[1].resource.extension = []
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/new-incomplete',
+      url: '/events/birth/sent-notification',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1384,7 +1384,7 @@ describe('When an in-progress declaration is received', () => {
     const payload = require('./test-data/rejected.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/requires-updates',
+      url: '/events/birth/sent-for-updates',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1403,7 +1403,7 @@ describe('When an in-progress declaration is received', () => {
     payload.entry = []
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/requires-updates',
+      url: '/events/birth/sent-for-updates',
       headers: {
         Authorization: `Bearer ${token}`
       },

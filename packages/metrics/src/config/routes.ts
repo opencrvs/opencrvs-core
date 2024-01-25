@@ -112,13 +112,13 @@ function analyticsDataRefreshingRoute<
 }
 
 export const getRoutes = () => {
-  const routes = [
+  const routes: Hapi.ServerRoute[] = [
     // In progress declaration
     {
       method: 'POST',
-      path: '/events/{event}/new-incomplete',
+      path: '/events/{event}/sent-notification',
       handler: analyticsDataRefreshingRoute(inProgressHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -131,9 +131,9 @@ export const getRoutes = () => {
     // New declaration
     {
       method: 'POST',
-      path: '/events/{event}/new-ready-for-review',
+      path: '/events/{event}/sent-notification-for-review',
       handler: analyticsDataRefreshingRoute(newDeclarationHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -146,11 +146,11 @@ export const getRoutes = () => {
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/{event}/new-validated',
+      path: '/events/{event}/sent-for-approval',
       handler: analyticsDataRefreshingRoute(
         requestForRegistrarValidationHandler
       ),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -159,11 +159,26 @@ export const getRoutes = () => {
         }
       }
     },
+    // todo: merge with sent-for-approval
+    {
+      method: 'POST',
+      path: '/events/{event}/validated',
+      handler: analyticsDataRefreshingRoute(markValidatedHandler),
+      options: {
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
+      }
+    },
+
     {
       method: 'POST',
       path: '/events/{event}/marked-as-duplicate',
       handler: markedAsDuplicate,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -171,7 +186,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/not-duplicate',
       handler: markedAsNotDuplicate,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -181,7 +196,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/waiting-external-validation',
       handler: waitingExternalValidationHandler,
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -190,11 +205,12 @@ export const getRoutes = () => {
         }
       }
     },
+    // todo: merge with waiting-external-validation
     {
       method: 'POST',
       path: '/events/{event}/new-waiting-external-validation',
       handler: registrarRegistrationWaitingExternalValidationHandler,
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -209,22 +225,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/new-registration',
       handler: analyticsDataRefreshingRoute(newEventRegistrationHandler),
-      config: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(EventType))
-          })
-        }
-      }
-    },
-
-    // Mark validated
-    {
-      method: 'POST',
-      path: '/events/{event}/validated',
-      handler: analyticsDataRefreshingRoute(markValidatedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -239,7 +240,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/registered',
       handler: analyticsDataRefreshingRoute(markEventRegisteredHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -253,7 +254,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/certified',
       handler: analyticsDataRefreshingRoute(markCertifiedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -268,7 +269,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/issued',
       handler: analyticsDataRefreshingRoute(markIssuedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -281,9 +282,9 @@ export const getRoutes = () => {
     // Mark rejected
     {
       method: 'POST',
-      path: '/events/{event}/requires-updates',
+      path: '/events/{event}/sent-for-updates',
       handler: analyticsDataRefreshingRoute(markRejectedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -298,7 +299,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/advancedSearch',
       handler: getAdvancedSearchByClient,
-      config: {
+      options: {
         tags: ['api'],
         response: {
           schema: responseSchema
@@ -309,7 +310,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/advancedSearch',
       handler: postAdvancedSearchByClient,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -319,7 +320,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/make-correction',
       handler: analyticsDataRefreshingRoute(correctionEventHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -332,7 +333,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/request-correction',
       handler: analyticsDataRefreshingRoute(correctionEventHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -347,7 +348,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/assigned',
       handler: declarationAssignedHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -355,7 +356,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/downloaded',
       handler: declarationDownloadedHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -363,7 +364,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/viewed',
       handler: declarationViewedHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -371,7 +372,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/archived',
       handler: analyticsDataRefreshingRoute(declarationArchivedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -384,7 +385,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/{event}/reinstated',
       handler: analyticsDataRefreshingRoute(declarationReinstatedHandler),
-      config: {
+      options: {
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -397,7 +398,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/unassigned',
       handler: declarationUnassignedHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -405,7 +406,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/updated',
       handler: declarationUpdatedHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -415,7 +416,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/metrics',
       handler: metricsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -433,7 +434,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/declarationsStarted',
       handler: declarationsStartedHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -449,7 +450,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalMetrics',
       handler: totalMetricsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -466,7 +467,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalMetricsByRegistrar',
       handler: totalMetricsByRegistrar,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -485,7 +486,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalMetricsByLocation',
       handler: totalMetricsByLocation,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -503,7 +504,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalMetricsByTime',
       handler: totalMetricsByTime,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -521,7 +522,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalPayments',
       handler: totalPaymentsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -537,7 +538,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalCertifications',
       handler: totalCertificationsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -552,7 +553,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/totalCorrections',
       handler: totalCorrectionsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -568,7 +569,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/locationStatistics',
       handler: locationStatisticsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             locationId: Joi.string(),
@@ -583,7 +584,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/monthWiseEventEstimations',
       handler: monthWiseEventEstimationsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -600,7 +601,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/locationWiseEventEstimations',
       handler: locationWiseEventEstimationsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -617,7 +618,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/eventDuration',
       handler: getEventDurationHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             compositionId: Joi.string().required()
@@ -631,7 +632,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/timeLogged',
       handler: getTimeLoggedHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             compositionId: Joi.string().required(),
@@ -647,7 +648,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/timeLoggedMetricsByPractitioner',
       handler: getTimeLoggedHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -665,7 +666,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/declarationStartedMetricsByPractitioners',
       handler: declarationStartedMetricsByPractitionersHandler,
-      config: {
+      options: {
         validate: {
           payload: Joi.object({
             timeStart: Joi.string().required(),
@@ -684,7 +685,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/export',
       handler: exportHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -693,7 +694,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/monthlyExport',
       handler: monthlyExportHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
@@ -709,7 +710,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/vsExport',
       handler: vsExportHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false
       }
@@ -718,7 +719,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/refreshPerformanceData',
       handler: performanceDataRefreshHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false
       }
@@ -727,7 +728,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/fetchVSExport',
       handler: getAllVSExport,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -738,7 +739,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         return 'success'
       },
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -753,7 +754,7 @@ export const getRoutes = () => {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -764,7 +765,7 @@ export const getRoutes = () => {
       method: 'DELETE',
       path: '/influxMeasurement',
       handler: metricsDeleteMeasurementHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
@@ -776,7 +777,7 @@ export const getRoutes = () => {
       method: 'DELETE',
       path: '/performance',
       handler: deletePerformanceHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
@@ -788,7 +789,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/audit/events',
       handler: newAuditHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: false
       }
@@ -798,7 +799,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/audit/events',
       handler: getUserAuditsHandler,
-      config: {
+      options: {
         validate: {
           query: Joi.object({
             practitionerId: Joi.string().required(),
