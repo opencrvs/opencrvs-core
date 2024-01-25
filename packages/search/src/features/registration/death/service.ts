@@ -29,6 +29,7 @@ import {
   NAME_EN,
   REGISTERED_STATUS,
   REJECTED_STATUS,
+  updateCompositionWithDuplicates,
   VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
@@ -46,7 +47,6 @@ import {
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
-import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
 
 const DECEASED_CODE = 'deceased-details'

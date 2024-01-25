@@ -29,18 +29,16 @@ import {
   CERTIFIED_STATUS,
   ARCHIVED_STATUS,
   DECLARED_STATUS,
-  IN_PROGRESS_STATUS
+  IN_PROGRESS_STATUS,
+  updateCompositionWithDuplicates
 } from '@search/elasticsearch/utils'
 import {
-  addDuplicatesToComposition,
   findEntry,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  getCompositionById,
-  updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
@@ -123,7 +121,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   ) {
     body.assignment = null
   }
-  await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body, client)
   await indexAndSearchComposition(
     compositionId,
@@ -408,33 +405,5 @@ async function detectAndUpdateBirthDuplicates(
   return await updateCompositionWithDuplicates(
     composition,
     duplicates.map((it) => it.id)
-  )
-}
-
-export async function updateCompositionWithDuplicates(
-  composition: fhir.Composition,
-  duplicates: string[]
-) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map((duplicate) => getCompositionById(duplicate))
-  )
-
-  const duplicateCompositionIds = duplicateCompositions.map(
-    (dupComposition) => dupComposition.id
-  )
-
-  if (composition && composition.id) {
-    const body: ICompositionBody = {}
-    body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body, client)
-  }
-  const compositionFromFhir = (await getCompositionById(
-    composition.id as string
-  )) as fhir.Composition
-  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
-
-  return updateInHearth(
-    `/Composition/${compositionFromFhir.id}`,
-    compositionFromFhir
   )
 }
