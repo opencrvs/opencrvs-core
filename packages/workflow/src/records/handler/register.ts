@@ -31,7 +31,11 @@ export const registerRoute = [
         await toWaitingForExternalValidationState(record, token)
 
       await indexBundle(recordInWaitingValidationState, token)
-      await auditEvent('waiting-external-validation', record, token)
+      await auditEvent(
+        'waiting-external-validation',
+        recordInWaitingValidationState,
+        token
+      )
 
       const rejectedOrWaitingValidationRecord = await initiateRegistration(
         recordInWaitingValidationState,

@@ -47,6 +47,7 @@ import {
   isNotificationEnabled,
   sendNotification
 } from '@workflow/records/notification'
+import { auditEvent } from '@workflow/records/audit'
 
 export interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -243,7 +244,8 @@ export async function markEventAsRegisteredCallbackHandler(
       childIdentifiers
     )
     await sendBundleToHearth(registeredBundle)
-    await indexBundle(registeredBundle, getToken(request))
+    await indexBundle(registeredBundle, token)
+    await auditEvent('registered', registeredBundle, token)
 
     // Notification not implemented for marriage yet
     // don't forward hospital notifications
