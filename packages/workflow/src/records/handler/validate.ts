@@ -12,6 +12,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { indexBundle } from '@workflow/records/search'
 import { toValidated } from '@workflow/records/state-transitions'
+import { auditEvent } from '@workflow/records/audit'
 
 export const validateRoute = [
   createRoute({
@@ -25,6 +26,7 @@ export const validateRoute = [
       const validatedRecord = await toValidated(record, token)
 
       await indexBundle(validatedRecord, token)
+      await auditEvent('sent-for-approval', validatedRecord, token)
 
       return validatedRecord
     }
