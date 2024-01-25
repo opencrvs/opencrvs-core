@@ -45,7 +45,7 @@ import {
   generateTrackingIdForEvents,
   getEventType,
   getMosipUINToken,
-  isEventNotification,
+  isHospitalNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
@@ -98,7 +98,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  if (!isEventNotification(bundleWithTrackingId)) {
+  if (!isHospitalNotification(bundleWithTrackingId)) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }

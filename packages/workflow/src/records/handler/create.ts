@@ -22,11 +22,13 @@ import {
   changeState,
   InProgressRecord,
   ReadyForReviewRecord,
-  ValidRecord,
   ValidatedRecord,
-  getStatusFromTask,
-  getTaskFromSavedBundle,
-  WaitingForValidationRecord
+  WaitingForValidationRecord,
+  isRejected,
+  isInProgress,
+  isReadyForReview,
+  isValidated,
+  isWaitingExternalValidation
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -46,7 +48,7 @@ import { validateRequest } from '@workflow/utils'
 import { hasDuplicates } from '@workflow/utils/duplicateChecker'
 import {
   generateTrackingIdForEvents,
-  isEventNotification,
+  isHospitalNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import { auditEvent } from '@workflow/records/audit'
@@ -58,6 +60,7 @@ import {
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import {
+  initiateRegistration,
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
@@ -182,26 +185,6 @@ type CreatedRecord =
   | ValidatedRecord
   | WaitingForValidationRecord
 
-function isInProgress(record: ValidRecord): record is InProgressRecord {
-  return isInProgressDeclaration(record)
-}
-
-function isReadyForReview(record: ValidRecord): record is ReadyForReviewRecord {
-  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'DECLARED'
-}
-
-function isValidated(record: ValidRecord): record is ValidatedRecord {
-  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'VALIDATED'
-}
-
-function isWaitingExternalValidation(
-  record: ValidRecord
-): record is WaitingForValidationRecord {
-  return (
-    getStatusFromTask(getTaskFromSavedBundle(record)) === 'WAITING_VALIDATION'
-  )
-}
-
 function getEventAction(record: CreatedRecord) {
   if (isInProgress(record)) {
     return 'sent-notification'
@@ -256,27 +239,51 @@ export default async function createRecordHandler(
     token
   )
 
+  await auditEvent(
+    isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
+    record,
+    token
+  )
+
   if (hasValidateScope(request)) {
     record = await toValidated(record, token)
+    await auditEvent('sent-for-approval', record, token)
   } else if (hasRegisterScope(request) && !isInProgress(record)) {
     record = await toWaitingForExternalValidationState(record, token)
+    await auditEvent('waiting-external-validation', record, token)
   }
   const eventAction = getEventAction(record)
 
   // Notification not implemented for marriage yet
   // don't forward hospital notifications
   const notificationDisabled =
-    isEventNotification(record) ||
+    isHospitalNotification(record) ||
     event === EVENT_TYPE.MARRIAGE ||
     eventAction === 'sent-for-approval' ||
     eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 
   await indexBundle(record, token)
-  await auditEvent(eventAction, record, token)
 
   if (!notificationDisabled) {
     await sendNotification(eventAction, record, token)
+  }
+
+  /*
+   * We need to initiate registration for a
+   * record in waiting validation state
+   */
+  if (isWaitingExternalValidation(record)) {
+    const rejectedOrWaitingValidationRecord = await initiateRegistration(
+      record,
+      request.headers,
+      token
+    )
+
+    if (isRejected(rejectedOrWaitingValidationRecord)) {
+      await indexBundle(rejectedOrWaitingValidationRecord, token)
+      await auditEvent('sent-for-updates', record, token)
+    }
   }
 
   return {
