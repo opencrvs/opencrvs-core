@@ -554,15 +554,15 @@ export async function generateDeclarationStartedPoint(
 
   let role = ''
 
-  if (status === Events.NEW_INCOMPLETE) {
+  if (status === Events.INCOMPLETE) {
     isNotification(composition)
       ? (role = 'NOTIFICATION_API_USER')
       : (role = 'FIELD_AGENT')
-  } else if (status === Events.NEW_VALIDATED) {
+  } else if (status === Events.VALIDATED) {
     role = 'REGISTRATION_AGENT'
-  } else if (status === Events.NEW_WAITING_EXTERNAL_VALIDATION) {
+  } else if (status === Events.WAITING_EXTERNAL_VALIDATION) {
     role = 'REGISTRAR'
-  } else if (status === Events.NEW_READY_FOR_REVIEW) {
+  } else if (status === Events.READY_FOR_REVIEW) {
     role = 'FIELD_AGENT'
   }
 

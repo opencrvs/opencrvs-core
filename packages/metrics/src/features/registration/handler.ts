@@ -37,6 +37,7 @@ import {
 } from '@metrics/features/registration/fhirUtils'
 import { EventType } from '@metrics/config/routes'
 import { fetchTaskHistory } from '@metrics/api'
+import { hasScope } from '@opencrvs/commons/authentication'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -120,6 +121,8 @@ export async function sentNotificationForReviewHandler(
 ) {
   const points = []
 
+  const authHeader = { Authorization: request.headers.authorization }
+
   await createUserAuditPointFromFHIR('DECLARED', request)
 
   try {
@@ -136,7 +139,11 @@ export async function sentNotificationForReviewHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_READY_FOR_REVIEW
+        hasScope(authHeader, 'validate')
+          ? Events.VALIDATED
+          : hasScope(authHeader, 'register')
+          ? Events.WAITING_EXTERNAL_VALIDATION
+          : Events.READY_FOR_REVIEW
       )
     )
 
@@ -174,7 +181,7 @@ export async function sentNotificationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_INCOMPLETE
+        Events.INCOMPLETE
       )
     )
 
@@ -719,7 +726,7 @@ export async function newMarriageRegistrationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_READY_FOR_REVIEW
+        Events.READY_FOR_REVIEW
       )
     )
 

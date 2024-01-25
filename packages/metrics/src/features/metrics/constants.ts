@@ -31,8 +31,8 @@ export const WITHIN_1_YEAR = 'DAYS_0_TO_365'
 export const EVENT = 'event'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export enum Events {
-  NEW_INCOMPLETE = 'in-progress-declaration', // Field agent or DHIS2 in progress
-  NEW_READY_FOR_REVIEW = 'new-declaration', // Field agent complete
-  NEW_WAITING_EXTERNAL_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
-  NEW_VALIDATED = 'request-for-registrar-validation' // Registration agent new event
+  INCOMPLETE = 'in-progress-declaration', // Field agent or DHIS2 in progress
+  READY_FOR_REVIEW = 'new-declaration', // Field agent complete
+  WAITING_EXTERNAL_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
+  VALIDATED = 'request-for-registrar-validation' // Registration agent new event
 }
