@@ -11,13 +11,12 @@
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import {
-  toRejected,
+  initiateRegistration,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
-import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { auditEvent } from '@workflow/records/audit'
+import { isRejected } from '@opencrvs/commons/types'
 
 export const registerRoute = [
   createRoute({
@@ -34,24 +33,18 @@ export const registerRoute = [
       await indexBundle(recordInWaitingValidationState, token)
       await auditEvent('waiting-external-validation', record, token)
 
-      try {
-        await invokeRegistrationValidation(
-          recordInWaitingValidationState,
-          request.headers
-        )
-      } catch (error) {
-        const statusReason: fhir3.CodeableConcept = {
-          text: REG_NUMBER_GENERATION_FAILED
-        }
-        const rejectedRecord = await toRejected(record, token, statusReason)
+      const rejectedOrWaitingValidationRecord = await initiateRegistration(
+        recordInWaitingValidationState,
+        request.headers,
+        token
+      )
 
-        await indexBundle(rejectedRecord, token)
+      if (isRejected(rejectedOrWaitingValidationRecord)) {
+        await indexBundle(rejectedOrWaitingValidationRecord, token)
         await auditEvent('sent-for-updates', record, token)
-
-        return rejectedRecord
       }
 
-      return recordInWaitingValidationState
+      return rejectedOrWaitingValidationRecord
     }
   })
 ]

@@ -58,6 +58,7 @@ import {
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
+  invokeRegistrationValidation,
   setupLastRegLocation,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
@@ -102,6 +103,7 @@ import {
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -313,7 +315,11 @@ export async function toDownloaded(
 }
 
 export async function toRejected(
-  record: ReadyForReviewRecord | ValidatedRecord | InProgressRecord,
+  record:
+    | ReadyForReviewRecord
+    | ValidatedRecord
+    | InProgressRecord
+    | WaitingForValidationRecord,
   token: string,
   comment: fhir3.CodeableConcept,
   reason?: string
@@ -377,6 +383,22 @@ export async function toWaitingForExternalValidationState(
     ),
     previousTask
   )
+}
+
+export async function initiateRegistration(
+  record: WaitingForValidationRecord,
+  headers: Record<string, string>,
+  token: string
+): Promise<WaitingForValidationRecord | RejectedRecord> {
+  try {
+    await invokeRegistrationValidation(record, headers)
+  } catch (error) {
+    const statusReason: fhir3.CodeableConcept = {
+      text: REG_NUMBER_GENERATION_FAILED
+    }
+    return toRejected(record, token, statusReason)
+  }
+  return record
 }
 
 export async function toRegistered(
