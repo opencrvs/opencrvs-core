@@ -17,6 +17,7 @@ import {
 import { indexBundle } from '@workflow/records/search'
 import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import { auditEvent } from '@workflow/records/audit'
 
 export const registerRoute = [
   createRoute({
@@ -31,6 +32,7 @@ export const registerRoute = [
         await toWaitingForExternalValidationState(record, token)
 
       await indexBundle(recordInWaitingValidationState, token)
+      await auditEvent('waiting-external-validation', record, token)
 
       try {
         await invokeRegistrationValidation(
@@ -44,6 +46,7 @@ export const registerRoute = [
         const rejectedRecord = await toRejected(record, token, statusReason)
 
         await indexBundle(rejectedRecord, token)
+        await auditEvent('sent-for-updates', record, token)
 
         return rejectedRecord
       }
