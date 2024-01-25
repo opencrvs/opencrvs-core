@@ -51,6 +51,7 @@ import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
+import { Bundle, getComposition } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -63,55 +64,18 @@ function getTypeFromTask(task: fhir.Task) {
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as fhir.Bundle
+  const bundle = requestBundle.payload as Bundle
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  const isCompositionInBundle = bundleEntries?.some(
-    ({ resource }) => resource?.resourceType === 'Composition'
-  )
+  const task = findTask(bundle.entry)
+  const patient = findPatient(bundle)
 
-  if (!isCompositionInBundle) {
-    await updateEvent(bundle, authHeader)
-    return
-  }
-
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  if (!composition) {
-    throw new Error('Composition not found')
-  }
-
+  const composition = getComposition(bundle)
   const compositionId = composition.id
 
   if (!compositionId) {
     throw new Error(`Composition ID not found`)
-  }
-
-  await indexAndSearchComposition(
-    compositionId,
-    composition,
-    authHeader,
-    bundleEntries
-  )
-}
-
-/**
- * Updates the search index with the latest information of the composition
- * Supports 1 task and 1 patient maximum
- */
-async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
-  const task = findTask(bundle.entry)
-  const patient = findPatient(bundle)
-
-  const compositionId =
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-
-  if (!compositionId) {
-    throw new Error('No Composition ID found')
   }
 
   const regLastUserIdentifier = findTaskExtension(
@@ -161,6 +125,12 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   }
   await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body, client)
+  await indexAndSearchComposition(
+    compositionId,
+    composition,
+    authHeader,
+    bundleEntries
+  )
 }
 
 async function indexAndSearchComposition(
