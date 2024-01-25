@@ -85,29 +85,26 @@ export async function markedAsNotDuplicate(
   return h.response().code(200)
 }
 
-export async function requestForRegistrarValidationHandler(
+export async function sentForApprovalHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const points = []
-  await createUserAuditPointFromFHIR('SENT_FOR_APPROVAL', request)
+  await createUserAuditPointFromFHIR('VALIDATED', request)
   try {
-    points.push(
-      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id']
-      })
-    )
-    points.push(
-      await generateDeclarationStartedPoint(
+    const points = await Promise.all([
+      generateEventDurationPoint(
         request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED'],
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
-        },
-        Events.NEW_VALIDATED
-      )
-    )
+        }
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    ])
 
     await writePoints(points)
   } catch (err) {
@@ -117,37 +114,7 @@ export async function requestForRegistrarValidationHandler(
   return h.response().code(200)
 }
 
-export async function registrarRegistrationWaitingExternalValidationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const points = []
-  try {
-    points.push(
-      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id']
-      })
-    )
-    points.push(
-      await generateDeclarationStartedPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        },
-        Events.NEW_WAITING_EXTERNAL_VALIDATION
-      )
-    )
-    await writePoints(points)
-  } catch (err) {
-    return internal(err)
-  }
-
-  return h.response().code(200)
-}
-
-export async function newDeclarationHandler(
+export async function sentNotificationForReviewHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -181,7 +148,7 @@ export async function newDeclarationHandler(
   return h.response().code(200)
 }
 
-export async function inProgressHandler(
+export async function sentNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -219,7 +186,7 @@ export async function inProgressHandler(
   return h.response().code(200)
 }
 
-export async function markRejectedHandler(
+export async function sentForUpdatesHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -481,35 +448,6 @@ export async function markIssuedHandler(
         }
       )
     ])
-    await writePoints(points)
-  } catch (err) {
-    return internal(err)
-  }
-
-  return h.response().code(200)
-}
-
-export async function markValidatedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  await createUserAuditPointFromFHIR('VALIDATED', request)
-  try {
-    const points = await Promise.all([
-      generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['IN_PROGRESS', 'DECLARED'],
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id']
-      })
-    ])
-
     await writePoints(points)
   } catch (err) {
     return internal(err)

@@ -28,13 +28,11 @@ import {
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 
 import {
-  inProgressHandler,
+  sentNotificationHandler,
   markCertifiedHandler,
-  markRejectedHandler,
-  markValidatedHandler,
-  newDeclarationHandler,
-  registrarRegistrationWaitingExternalValidationHandler,
-  requestForRegistrarValidationHandler,
+  sentForUpdatesHandler,
+  sentNotificationForReviewHandler,
+  sentForApprovalHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
   waitingExternalValidationHandler,
@@ -117,7 +115,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/sent-notification',
-      handler: analyticsDataRefreshingRoute(inProgressHandler),
+      handler: analyticsDataRefreshingRoute(sentNotificationHandler),
       options: {
         tags: ['api'],
         validate: {
@@ -132,7 +130,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/sent-notification-for-review',
-      handler: analyticsDataRefreshingRoute(newDeclarationHandler),
+      handler: analyticsDataRefreshingRoute(sentNotificationForReviewHandler),
       options: {
         tags: ['api'],
         validate: {
@@ -143,13 +141,10 @@ export const getRoutes = () => {
       }
     },
 
-    // Request for registrar validation
     {
       method: 'POST',
       path: '/events/{event}/sent-for-approval',
-      handler: analyticsDataRefreshingRoute(
-        requestForRegistrarValidationHandler
-      ),
+      handler: analyticsDataRefreshingRoute(sentForApprovalHandler),
       options: {
         tags: ['api'],
         validate: {
@@ -159,11 +154,11 @@ export const getRoutes = () => {
         }
       }
     },
-    // todo: merge with sent-for-approval
+    // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/{event}/validated',
-      handler: analyticsDataRefreshingRoute(markValidatedHandler),
+      path: '/events/{event}/waiting-external-validation',
+      handler: waitingExternalValidationHandler,
       options: {
         tags: ['api'],
         validate: {
@@ -188,35 +183,6 @@ export const getRoutes = () => {
       handler: markedAsNotDuplicate,
       options: {
         tags: ['api']
-      }
-    },
-
-    // Waiting external resource validation
-    {
-      method: 'POST',
-      path: '/events/{event}/waiting-external-validation',
-      handler: waitingExternalValidationHandler,
-      options: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(EventType))
-          })
-        }
-      }
-    },
-    // todo: merge with waiting-external-validation
-    {
-      method: 'POST',
-      path: '/events/{event}/new-waiting-external-validation',
-      handler: registrarRegistrationWaitingExternalValidationHandler,
-      options: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(EventType))
-          })
-        }
       }
     },
 
@@ -283,7 +249,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/sent-for-updates',
-      handler: analyticsDataRefreshingRoute(markRejectedHandler),
+      handler: analyticsDataRefreshingRoute(sentForUpdatesHandler),
       options: {
         tags: ['api'],
         validate: {
