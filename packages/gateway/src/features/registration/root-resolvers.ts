@@ -30,13 +30,12 @@ import {
   buildFHIRBundle,
   clearActionExtension,
   resourceIdentifierToUUID,
-  getStatusFromTask,
   getTaskFromSavedBundle,
   resourceToBundleEntry,
   taskBundleWithExtension,
   toHistoryResource,
-  updateFHIRTaskBundle,
-  getComposition
+  getComposition,
+  isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -70,7 +69,9 @@ import {
   rejectDeclaration,
   updateRegistration,
   validateRegistration,
-  fetchRegistrationForDownloading
+  fetchRegistrationForDownloading,
+  reinstateRegistration,
+  duplicateRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -381,29 +382,29 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
-      try {
-        const token = await getAnonymousToken()
-        headers.Authorization = `Bearer ${token}`
-        const authHeader = {
-          Authorization: headers.Authorization
-        }
-        const taskEntry = await getTaskEntry(id, authHeader)
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      const token = await getAnonymousToken()
+      context.headers.Authorization = `Bearer ${token}`
+      context.record = await getRecordById(id, context.headers.Authorization)
 
-        const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: 'http://opencrvs.org/specs/extension/regVerified',
-          valueString: headers['x-real-ip']!
-        })
-        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const taskEntry = context.record.entry.find(isTaskBundleEntry)
 
-        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
-        if (!record) {
-          await Promise.reject(new Error('Invalid QrCode'))
-        }
-        return record
-      } catch (e) {
-        await Promise.reject(new Error(e))
+      if (!taskEntry) {
+        throw new Error('Task entry not found for verification')
       }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: 'http://opencrvs.org/specs/extension/regVerified',
+        valueString: context.headers['x-real-ip']!
+      })
+      await fetchFHIR(
+        '/Task',
+        context.headers,
+        'PUT',
+        JSON.stringify(taskBundle)
+      )
+
+      return context.record
     }
   },
 
@@ -608,24 +609,11 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
 
-      const taskId = taskEntry.resource.id
-
-      const prevRegStatus =
-        taskId && (await getPreviousRegStatus(taskId, authHeader))
-      if (!prevRegStatus) {
-        return await Promise.reject(new Error('Task has no reg-status code'))
-      }
-
-      taskEntry.resource.extension = [
-        ...(taskEntry.resource.extension ?? []),
-        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
-      ]
-
-      const newTaskBundle = updateFHIRTaskBundle(taskEntry, prevRegStatus)
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const { taskId, prevRegStatus } = await reinstateRegistration(
+        id,
+        authHeader
+      )
 
       return {
         taskEntryResourceID: taskId,
@@ -732,28 +720,14 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const extension = {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
-        valueString: duplicateTrackingId
-      }
+      const taskEntry = await duplicateRegistration(
+        id,
+        authHeader,
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-      if (comment || reason) {
-        if (!taskEntry.resource.reason) {
-          taskEntry.resource.reason = {
-            text: ''
-          }
-        }
-
-        taskEntry.resource.reason.text = reason || ''
-        const statusReason = {
-          text: comment
-        }
-        taskEntry.resource.statusReason = statusReason
-      }
-
-      const taskBundle = taskBundleWithExtension(taskEntry, extension)
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return taskEntry.resource.id
     }
   }
@@ -884,29 +858,6 @@ async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
     ({ system }) => system != systemIdentifierUrl
   )
   return taskEntry
-}
-
-async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-  const taskHistoryBundle: Bundle = await fetchFHIR(
-    `/Task/${taskId}/_history`,
-    authHeader
-  )
-
-  const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-    return taskEntry.resource as Task
-  })
-
-  if (!taskHistory) {
-    throw new Error('Task has no history')
-  }
-
-  const filteredTaskHistory = taskHistory.filter((task) => {
-    return (
-      task.businessStatus?.coding &&
-      task.businessStatus?.coding[0].code !== 'ARCHIVED'
-    )
-  })
-  return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
 }
 
 type Action = typeof TaskActionExtension

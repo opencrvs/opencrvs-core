@@ -40,6 +40,8 @@ import {
   ValidRecord,
   Bundle,
   SavedTask,
+  ArchivedRecord,
+  RegistrationStatus,
   WaitingForValidationRecord,
   EVENT_TYPE,
   getComposition,
@@ -80,6 +82,7 @@ import {
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
   createDownloadTask,
+  createDuplicateTask,
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
@@ -530,6 +533,117 @@ export async function toArchived(
   )
 
   return { archivedRecord, archivedRecordWithTaskOnly }
+}
+
+export async function toReinstated(
+  record: ArchivedRecord,
+  prevRegStatus: RegistrationStatus,
+  practitioner: Practitioner
+): Promise<ValidatedRecord | ReadyForReviewRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const reinstatedTask: SavedTask = {
+    ...previousTask,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/regReinstated'
+      }
+    ],
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: prevRegStatus
+        }
+      ]
+    }
+  }
+
+  const reinstatedTaskWithPractitionerExtensions = setupLastRegUser(
+    reinstatedTask,
+    practitioner
+  )
+
+  const reinstatedTaskWithLocationExtensions = await setupLastRegLocation(
+    reinstatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const newEntries = [
+    ...record.entry.map((entry) => {
+      if (entry.resource.id !== previousTask.id) {
+        return entry
+      }
+      return {
+        ...entry,
+        resource: reinstatedTaskWithLocationExtensions
+      }
+    })
+  ]
+
+  return changeState(
+    {
+      ...record,
+      entry: newEntries
+    },
+    ['READY_FOR_REVIEW', 'VALIDATED']
+  )
+}
+
+export async function toDuplicated(
+  record: ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): Promise<{
+  duplicatedRecord: ReadyForReviewRecord | ValidatedRecord
+  duplicatedRecordWithTaskOnly: Bundle<SavedTask>
+}> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const duplicatedTask = createDuplicateTask(
+    previousTask,
+    practitioner,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  const duplicatedTaskWithPractitionerExtensions = setupLastRegUser(
+    duplicatedTask,
+    practitioner
+  )
+
+  const duplicatedTaskWithLocationExtensions = await setupLastRegLocation(
+    duplicatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const duplicatedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: duplicatedTaskWithLocationExtensions }]
+  }
+
+  const duplicatedRecord = {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.id !== duplicatedTask.id),
+      { resource: duplicatedTaskWithLocationExtensions }
+    ]
+  } as ReadyForReviewRecord
+
+  return { duplicatedRecord, duplicatedRecordWithTaskOnly }
 }
 
 export async function toValidated(

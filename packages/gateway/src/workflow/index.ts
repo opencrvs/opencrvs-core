@@ -17,7 +17,11 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
-  RejectedRecord
+  ReadyForReviewRecord,
+  RejectedRecord,
+  ValidRecord,
+  getTaskFromSavedBundle,
+  getBusinessStatus
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -236,7 +240,29 @@ export async function archiveRegistration(
     `/records/${id}/archive`,
     authHeader,
     {
-      id,
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
+}
+
+export async function duplicateRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/duplicate`,
+    authHeader,
+    {
       reason,
       comment,
       duplicateTrackingId
@@ -284,4 +310,22 @@ export async function rejectDeclaration(
   )
 
   return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
+}
+
+export async function reinstateRegistration(
+  id: string,
+  authHeader: IAuthHeader
+) {
+  const reinstatedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/reinstate`,
+    authHeader,
+    {
+      id
+    }
+  )
+
+  const task = getTaskFromSavedBundle(reinstatedRecord)
+
+  return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
 }

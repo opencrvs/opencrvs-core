@@ -19,6 +19,8 @@ type AuditAction =
   | 'mark-voided'
   | 'mark-certified'
   | 'mark-issued'
+  | 'mark-reinstated'
+  | 'marked-as-duplicate'
 
 export async function auditEvent(
   action: AuditAction,

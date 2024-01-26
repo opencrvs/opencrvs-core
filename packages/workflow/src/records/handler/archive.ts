@@ -18,7 +18,6 @@ import { indexBundle } from '@workflow/records/search'
 import { createRoute } from '@workflow/states'
 
 const requestSchema = z.object({
-  id: z.string(),
   reason: z.string().optional(),
   comment: z.string().optional(),
   duplicateTrackingId: z.string().optional()
@@ -28,7 +27,7 @@ export const archiveRoute = [
   createRoute({
     method: 'POST',
     path: '/records/{recordId}/archive',
-    allowedStartStates: ['REGISTERED', 'READY_FOR_REVIEW', 'VALIDATED'],
+    allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
     action: 'ARCHIVE',
     handler: async (request, record) => {
       const token = getToken(request)

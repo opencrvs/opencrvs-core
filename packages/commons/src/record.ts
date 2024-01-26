@@ -145,7 +145,7 @@ export type StateIdenfitiers = {
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
   record: R,
-  nextState: A
+  nextState: A | A[]
 ) {
   return record as any as StateIdenfitiers[A]
 }
