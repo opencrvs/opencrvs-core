@@ -11,8 +11,6 @@
 
 import {
   BIRTH_ENCOUNTER_CODE,
-  CERTIFICATE_CONTEXT_KEY,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
   DEATH_ENCOUNTER_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   createDocRefTemplate,
@@ -20,7 +18,6 @@ import {
   createEncounterSection,
   createLocationResource,
   createObservationEntryTemplate,
-  createPaymentReconciliationTemplate,
   createPersonEntryTemplate,
   createPersonSection,
   createPractitionerEntryTemplate,
@@ -35,10 +32,6 @@ import {
   Bundle,
   BundleEntry,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
-  CERTIFICATE_DOCS_CODE,
-  CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CODE,
-  CORRECTION_CERTIFICATE_DOCS_TITLE,
   CodeableConcept,
   CompositionSection,
   CompositionSectionCode,
@@ -54,7 +47,6 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Observation,
   Patient,
-  PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
   Reference,
@@ -493,44 +485,6 @@ export function selectOrCreateDocRefResource<T extends CompositionSectionCode>(
   return docRef.resource as DocumentReference
 }
 
-export function selectOrCreateCertificateDocRefResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string,
-  isCorrection?: boolean
-) {
-  const certificate = isCorrection
-    ? ({
-        code: CORRECTION_CERTIFICATE_DOCS_CODE,
-        title: CORRECTION_CERTIFICATE_DOCS_TITLE,
-        indexKey: CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
-      } as const)
-    : ({
-        code: CERTIFICATE_DOCS_CODE,
-        title: CERTIFICATE_DOCS_TITLE,
-        indexKey: CERTIFICATE_CONTEXT_KEY
-      } as const)
-
-  const docRef = selectOrCreateDocRefResource(
-    certificate.code,
-    certificate.title,
-    fhirBundle,
-    context,
-    certificate.indexKey
-  )
-  if (!docRef.type?.coding) {
-    docRef.type = {
-      coding: [
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}certificate-type`,
-          code: eventType
-        }
-      ]
-    }
-  }
-  return docRef
-}
-
 type InformantCode =
   | typeof INFORMANT_CODE
   | typeof WITNESS_ONE_CODE
@@ -630,155 +584,6 @@ export function selectOrCreateWitnessResource(
       )
     }
     return personEntry.resource as Patient
-  }
-}
-
-export function selectOrCreateRelatedPersonResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string
-): RelatedPerson | PartialBy<RelatedPerson, 'patient'> {
-  const docRef = selectOrCreateCertificateDocRefResource(
-    fhirBundle,
-    context,
-    eventType
-  )
-  if (!docRef.extension) {
-    docRef.extension = []
-  }
-  const relatedPersonExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-    docRef.extension
-  )
-  if (!relatedPersonExt) {
-    const relatedPersonEntry = createRelatedPersonTemplate(getUUID())
-    fhirBundle.entry.push(relatedPersonEntry)
-    docRef.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-      valueReference: {
-        reference: relatedPersonEntry.fullUrl
-      }
-    })
-    return relatedPersonEntry.resource
-  } else {
-    const relatedPersonEntry = fhirBundle.entry.find(
-      (entry): entry is BundleEntry<RelatedPerson> => {
-        if (!relatedPersonExt.valueReference) {
-          return false
-        }
-        return entry.fullUrl === relatedPersonExt.valueReference.reference
-      }
-    )
-    if (!relatedPersonEntry) {
-      throw new Error('No related person entry found on bundle')
-    }
-    return relatedPersonEntry.resource
-  }
-}
-
-export function selectOrCreateCollectorPersonResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string
-): Patient {
-  const relatedPersonResource = selectOrCreateRelatedPersonResource(
-    fhirBundle,
-    context,
-    eventType
-  )
-  const patientRef =
-    relatedPersonResource.patient && relatedPersonResource.patient.reference
-  if (!patientRef) {
-    const personEntry = createPersonEntryTemplate(getUUID())
-    fhirBundle.entry.push(personEntry)
-    relatedPersonResource.patient = {
-      reference: personEntry.fullUrl
-    }
-    return personEntry.resource as Patient
-  } else {
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === patientRef
-    )
-    if (!personEntry) {
-      throw new Error(
-        'No related collector person entry not found on fhir bundle'
-      )
-    }
-    return personEntry.resource as Patient
-  }
-}
-
-export async function setCertificateCollectorReference(
-  sectionCode: CompositionSectionCode,
-  relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
-  fhirBundle: Bundle,
-  context: any
-) {
-  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry): entry is Saved<BundleEntry<Patient>> =>
-        entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      throw new Error('Expected person entry not found on the bundle')
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = getComposition(fhirBundle)
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
-  }
-}
-
-export function selectOrCreatePaymentReconciliationResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string,
-  isCorrection?: boolean
-): PaymentReconciliation {
-  const docRef = selectOrCreateCertificateDocRefResource(
-    fhirBundle,
-    context,
-    eventType,
-    isCorrection
-  )
-  if (!docRef.extension) {
-    docRef.extension = []
-  }
-  const paymentExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
-    docRef.extension
-  )
-  if (!paymentExt) {
-    const paymentEntry = createPaymentReconciliationTemplate(getUUID())
-    fhirBundle.entry.push(paymentEntry)
-    docRef.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
-      valueReference: {
-        reference: paymentEntry.fullUrl
-      }
-    })
-    return paymentEntry.resource
-  } else {
-    const paymentEntry = fhirBundle.entry.find((entry) => {
-      if (!paymentExt.valueReference) {
-        return false
-      }
-      return entry.fullUrl === paymentExt.valueReference.reference
-    })
-    if (!paymentEntry) {
-      throw new Error('No related payment entry found on bundle')
-    }
-    return paymentEntry.resource as PaymentReconciliation
   }
 }
 
