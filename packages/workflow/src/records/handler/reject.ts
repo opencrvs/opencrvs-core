@@ -46,7 +46,7 @@ export const rejectRoute = createRoute({
     )
 
     await sendBundleToHearth(rejectedRecordWithTaskOnly)
-    await indexBundle(rejectedRecordWithTaskOnly, token)
+    await indexBundle(rejectedRecord, token)
     await auditEvent('mark-voided', rejectedRecord, token)
 
     return rejectedRecord

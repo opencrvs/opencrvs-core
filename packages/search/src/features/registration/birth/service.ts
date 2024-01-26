@@ -49,7 +49,7 @@ import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { Bundle, getComposition } from '@opencrvs/commons/types'
+import { getComposition, SavedBundle } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -62,7 +62,7 @@ function getTypeFromTask(task: fhir.Task) {
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as Bundle
+  const bundle = requestBundle.payload as SavedBundle
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
@@ -71,10 +71,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
 
   const composition = getComposition(bundle)
   const compositionId = composition.id
-
-  if (!compositionId) {
-    throw new Error(`Composition ID not found`)
-  }
 
   const regLastUserIdentifier = findTaskExtension(
     task,
@@ -90,6 +86,10 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
 
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
+    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
+  }
+
   if (body.type === REJECTED_STATUS) {
     const rejectAnnotation: fhir.Annotation = (task &&
       task.note &&
@@ -97,9 +97,11 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
       task.note.length > 0 &&
       task.note[task.note.length - 1]) || { text: '' }
     const nodeText = rejectAnnotation.text
-    body.rejectReason = (task && task.reason && task.reason.text) || ''
+    body.rejectReason =
+      (task && task.statusReason && task.statusReason.text) || ''
     body.rejectComment = nodeText
   }
+
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&
@@ -121,13 +123,14 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   ) {
     body.assignment = null
   }
-  await updateComposition(compositionId, body, client)
   await indexAndSearchComposition(
     compositionId,
     composition,
     authHeader,
     bundleEntries
   )
+  await createIndexBody(body, composition, authHeader, bundleEntries)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexAndSearchComposition(
