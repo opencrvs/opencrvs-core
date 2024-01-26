@@ -74,6 +74,7 @@ const auditEventHandler = rest.post(
       'waiting-external-validation',
       'registered',
       'certified',
+      'reinstated',
       'issued'
     ] satisfies RecordEvent[]
     if (!knownActions.includes(action as (typeof knownActions)[number])) {

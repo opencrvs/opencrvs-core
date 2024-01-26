@@ -50,7 +50,7 @@ export const rejectRoute = createRoute({
       },
       token
     )
-    await auditEvent('mark-voided', rejectedRecord, token)
+    await auditEvent('sent-for-updates', rejectedRecord, token)
 
     return rejectedRecord
   }
