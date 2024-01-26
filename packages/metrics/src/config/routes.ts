@@ -42,7 +42,6 @@ import {
   declarationReinstatedHandler,
   declarationUpdatedHandler,
   markEventRegisteredHandler,
-  newEventRegistrationHandler,
   markIssuedHandler,
   markedAsDuplicate,
   markedAsNotDuplicate,
@@ -183,21 +182,6 @@ export const getRoutes = () => {
       handler: markedAsNotDuplicate,
       options: {
         tags: ['api']
-      }
-    },
-
-    //@todo: remove this endpoint as it's not used anywhere
-    {
-      method: 'POST',
-      path: '/events/{event}/new-registration',
-      handler: analyticsDataRefreshingRoute(newEventRegistrationHandler),
-      options: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(EventType))
-          })
-        }
       }
     },
 
