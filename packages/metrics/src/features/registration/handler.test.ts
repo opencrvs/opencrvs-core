@@ -1162,7 +1162,7 @@ describe('When an existing declaration is marked registered', () => {
     const payload = require('./test-data/mark-validated-request.json')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/validated',
+      url: '/events/birth/sent-for-approval',
       headers: {
         Authorization: `Bearer ${token}`
       },
