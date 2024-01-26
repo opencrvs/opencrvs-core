@@ -172,7 +172,7 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1
+  const isDemoUser = scope.indexOf('demo') > -1 || QA_ENV
   logger.info(
     `isDemoUser,
       ${JSON.stringify({

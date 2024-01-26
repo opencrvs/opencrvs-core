@@ -14,7 +14,6 @@ import {
   markBundleAsValidated,
   markEventAsRegistered,
   modifyRegistrationBundle,
-  setTrackingId,
   markBundleAsWaitingValidation,
   updatePatientIdentifierWithRN,
   touchBundle,
@@ -82,10 +81,7 @@ interface IEventRegistrationCallbackPayload {
   }[]
 }
 
-async function sendBundleToHearth(
-  payload: Bundle,
-  count = 1
-): Promise<Saved<Bundle>> {
+async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -94,11 +90,6 @@ async function sendBundleToHearth(
     }
   })
   if (!res.ok) {
-    if (res.status === 409 && count < 5) {
-      setTrackingId(payload)
-      return await sendBundleToHearth(payload, count + 1)
-    }
-
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
