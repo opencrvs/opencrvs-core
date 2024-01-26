@@ -110,7 +110,7 @@ describe('When an existing declaration is marked registered', () => {
   })
   it('writes the delta between DECLARED and VALIDATED states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
-    const payload = require('./test-data/mark-validated-request.json')
+    const payload = require('./test-data/sent-for-approval-request.json')
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/sent-for-approval',
@@ -148,7 +148,7 @@ describe('When an existing declaration is marked registered', () => {
   })
   it('writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
-    const payload = require('./test-data/mark-waiting-validation-request.json')
+    const payload = require('./test-data/waiting-validation-request.json')
     const taskHistory = require('./test-data/task-history-validated-response.json')
     fetchTaskHistory.mockReset()
     fetchTaskHistory.mockResolvedValue(taskHistory)
@@ -298,7 +298,7 @@ describe('When an in-progress declaration is received', () => {
 
   it('writes the in complete field points to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
-    const payload = require('./test-data/new-in-progress-request.json')
+    const payload = require('./test-data/sent-notification-request.json')
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/sent-notification',
@@ -317,7 +317,7 @@ describe('When an in-progress declaration is received', () => {
     expect(inCompleteFieldPoints).toMatchSnapshot()
   })
   it('returns 500 for payload without expected extension on task resource', async () => {
-    const payload = require('./test-data/new-in-progress-request.json')
+    const payload = require('./test-data/sent-notification-request.json')
     payload.entry[1].resource.extension = []
     const res = await server.server.inject({
       method: 'POST',
@@ -332,7 +332,7 @@ describe('When an in-progress declaration is received', () => {
 
   it('writes the rejected points to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
-    const payload = require('./test-data/rejected.json')
+    const payload = require('./test-data/sent-for-updates-request.json')
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/sent-for-updates',
@@ -350,7 +350,7 @@ describe('When an in-progress declaration is received', () => {
     expect(rejectedPoints).toMatchSnapshot()
   })
   it('returns 500 for payload without task resource', async () => {
-    const payload = require('./test-data/rejected.json')
+    const payload = require('./test-data/sent-for-updates-request.json')
     payload.entry = []
     const res = await server.server.inject({
       method: 'POST',
