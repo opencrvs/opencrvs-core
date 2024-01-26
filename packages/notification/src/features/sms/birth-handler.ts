@@ -54,11 +54,7 @@ export async function sendBirthInProgressConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IInProgressPayload
-  logger.info(
-    `Notification service sendBirthInProgressConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info(`Notifying from sendBirthInProgressConfirmation`)
   const templateName = messageKeys.birthInProgressNotification
   await sendNotification(
     request,
@@ -86,11 +82,7 @@ export async function sendBirthDeclarationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
-  logger.info(
-    `Notification service sendBirthDeclarationConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info(`Notifying from sendBirthDeclarationConfirmation`)
   const templateName = messageKeys.birthDeclarationNotification
   await sendNotification(
     request,

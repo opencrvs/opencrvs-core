@@ -84,7 +84,11 @@ export async function birthRegisteredHandler(
             }
           }
           logger.info(
-            `DISPATCHING BIRTH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+            `Dispatching BIRTH_REGISTERED webhook: ${JSON.stringify({
+              timestamp: payload.timestamp,
+              id: payload.id,
+              event: { hub: { topic: payload.event.hub.topic } }
+            })}`
           )
           const hmac = createRequestSignature(
             'sha256',
@@ -175,7 +179,11 @@ export async function deathRegisteredHandler(
             }
           }
           logger.info(
-            `DISPATCHING DEATH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+            `Dispatching DEATH_REGISTERED webhook: ${JSON.stringify({
+              timestamp: payload.timestamp,
+              id: payload.id,
+              event: { hub: { topic: payload.event.hub.topic } }
+            })}`
           )
           const hmac = createRequestSignature(
             'sha256',
