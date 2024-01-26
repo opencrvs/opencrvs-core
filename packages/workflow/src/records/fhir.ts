@@ -290,6 +290,11 @@ export function createRelatedPersonEntries(
     ]
   }
 
+  /*
+   * For collector relations that we don't have any
+   * details e.g. "Legal Guardian"
+   */
+
   return [
     {
       fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
