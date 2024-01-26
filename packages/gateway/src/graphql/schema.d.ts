@@ -1911,7 +1911,6 @@ export interface GQLCommentInput {
 export interface GQLPaymentInput {
   paymentId?: string
   type?: GQLPaymentType
-  total?: number
   amount?: number
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate

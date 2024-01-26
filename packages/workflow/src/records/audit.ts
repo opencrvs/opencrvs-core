@@ -18,6 +18,7 @@ type AuditAction =
   | 'new-declaration'
   | 'mark-voided'
   | 'mark-certified'
+  | 'mark-issued'
   | 'mark-reinstated'
   | 'marked-as-duplicate'
 

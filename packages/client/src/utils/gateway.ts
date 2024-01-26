@@ -1550,7 +1550,6 @@ export type PaymentInput = {
   date?: InputMaybe<Scalars['Date']>
   outcome?: InputMaybe<PaymentOutcomeType>
   paymentId?: InputMaybe<Scalars['ID']>
-  total?: InputMaybe<Scalars['Float']>
   type?: InputMaybe<PaymentType>
 }
 

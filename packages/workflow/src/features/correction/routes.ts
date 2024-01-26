@@ -37,7 +37,7 @@ import {
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput
-} from '@workflow/records/correction-request'
+} from '@workflow/records/validations'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import {

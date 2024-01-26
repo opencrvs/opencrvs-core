@@ -76,7 +76,7 @@ describe('functions that take record from one state to another', () => {
           payment: {
             type: 'MANUAL',
             amount: 100,
-            outcome: 'SUCCESS',
+            outcome: 'COMPLETED',
             date: '2021-08-10T10:00:00.000Z'
           },
           location: {

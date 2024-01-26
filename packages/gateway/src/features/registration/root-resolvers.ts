@@ -59,11 +59,11 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   removeDuplicatesFromComposition,
-  setCollectorForPrintInAdvance,
-  uploadBase64AttachmentsToDocumentsStore
+  setCollectorForPrintInAdvance
 } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
+  issueRegistration,
   registerDeclaration,
   unassignRegistration,
   rejectDeclaration,
@@ -627,11 +627,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'certify')) {
@@ -640,13 +639,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'certify')) {
@@ -655,13 +651,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
       if (
@@ -740,20 +733,6 @@ export const resolvers: GQLResolver = {
   }
 }
 
-async function registrationToFHIR(
-  event: EVENT_TYPE,
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader
-) {
-  const recordWithAttachmentsUploaded =
-    await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
-
-  return buildFHIRBundle(recordWithAttachmentsUploaded, event)
-}
-
 async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,
@@ -818,13 +797,29 @@ async function markEventAsCertified(
 }
 
 async function markEventAsIssued(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  return getIDFromResponse(res)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const { payments, ...withoutPayments } = certificateDetails
+  if (!payments?.[0]) {
+    return Promise.reject(new Error('Payment details required'))
+  }
+  const issuedRecord = await issueRegistration(
+    id,
+    { ...withoutPayments, payment: payments[0] },
+    event,
+    authHeader
+  )
+  return getComposition(issuedRecord).id
 }
 
 const ACTION_EXTENSIONS: Extension['url'][] = [

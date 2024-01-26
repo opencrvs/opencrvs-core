@@ -399,7 +399,7 @@ export async function generatePaymentPoint(
     throw new Error('Payment reconciliation not found')
   }
 
-  const total = reconciliation.total as number
+  const total = reconciliation.total?.value ?? 0
 
   const fields: IPaymentFields = {
     total,

@@ -34,6 +34,13 @@ import {
   isRelatedPerson,
   Encounter,
   RelatedPerson,
+  BundleEntryWithFullUrl,
+  RegisteredRecord,
+  CertifiedRecord,
+  Patient,
+  findCompositionSection,
+  getComposition,
+  EVENT_TYPE,
   TaskStatus,
   getStatusFromTask
 } from '@opencrvs/commons/types'
@@ -44,11 +51,14 @@ import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/cons
 import {
   ApproveRequestInput,
   CorrectionRequestInput,
-  CorrectionRequestPaymentInput,
-  ChangedValuesInput
-} from '@workflow/records/correction-request'
+  PaymentInput,
+  ChangedValuesInput,
+  CertifyInput
+} from '@workflow/records/validations'
+import { badRequest } from '@hapi/boom'
 import { isSystem, ISystemModelData, IUserModelData } from './user'
 import { getPractitionerOffice } from '@workflow/features/user/utils'
+import { z } from 'zod'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -105,21 +115,226 @@ export function createCorrectionProofOfLegalCorrectionDocument(
   }
 }
 
-export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput
-): [BundleEntry<PaymentReconciliation>]
+export function createDocumentReferenceEntryForCertificate(
+  temporaryDocumentReferenceId: UUID,
+  temporaryRelatedPersonId: UUID,
+  eventType: EVENT_TYPE,
+  hasShowedVerifiedDocument: boolean,
+  attachmentUrl?: string,
+  paymentUrl?: URNReference | URLReference
+): BundleEntry<DocumentReference> {
+  return {
+    fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
+    resource: {
+      resourceType: 'DocumentReference',
+      masterIdentifier: {
+        system: 'urn:ietf:rfc:3986',
+        value: temporaryDocumentReferenceId
+      },
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/collector',
+          valueReference: {
+            reference: `urn:uuid:${temporaryRelatedPersonId}`
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+          valueBoolean: hasShowedVerifiedDocument
+        },
+        ...(paymentUrl
+          ? [
+              {
+                url: 'http://opencrvs.org/specs/extension/payment' as const,
+                valueReference: {
+                  reference: paymentUrl
+                }
+              }
+            ]
+          : [])
+      ],
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/certificate-type',
+            code: eventType
+          }
+        ]
+      },
+      content: attachmentUrl
+        ? [
+            {
+              attachment: {
+                contentType: 'application/pdf',
+                data: attachmentUrl
+              }
+            }
+          ]
+        : [],
+      status: 'current'
+    }
+  }
+}
 
-export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput,
+export function createRelatedPersonEntries(
+  collectorDetails: CertifyInput['collector'],
+  temporaryRelatedPersonId: UUID,
+  record: RegisteredRecord | CertifiedRecord
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+  const knownRelationships = z.enum([
+    'MOTHER',
+    'FATHER',
+    'INFORMANT',
+    'BRIDE',
+    'GROOM'
+  ])
+
+  const relationshipToSectionCode = (
+    relationship: z.TypeOf<typeof knownRelationships>
+  ): `${Lowercase<typeof relationship>}-details` =>
+    `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
+
+  if ('otherRelationship' in collectorDetails) {
+    const temporaryPatientId = getUUID()
+    return [
+      {
+        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+        resource: {
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: collectorDetails.relationship
+              }
+            ],
+            text: collectorDetails.otherRelationship
+          },
+          ...(collectorDetails.affidavit?.[0] && {
+            extension: [
+              {
+                url: `http://opencrvs.org/specs/extension/relatedperson-affidavittype`,
+                valueAttachment: {
+                  ...collectorDetails.affidavit[0]
+                }
+              }
+            ]
+          }),
+          patient: {
+            reference: `urn:uuid:${temporaryPatientId}`
+          }
+        }
+      },
+      {
+        fullUrl: `urn:uuid:${temporaryPatientId}`,
+        resource: {
+          resourceType: 'Patient',
+          name: collectorDetails.name.map(
+            ({ use, firstNames, familyName }) => ({
+              use,
+              given: firstNames.split(' '),
+              family: [familyName]
+            })
+          ),
+          identifier: collectorDetails.identifier.map(({ id, type }) => ({
+            id,
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/identifier-type',
+                  code: type
+                }
+              ]
+            }
+          }))
+        }
+      }
+    ]
+  }
+
+  const parseResult = knownRelationships.safeParse(
+    collectorDetails.relationship
+  )
+
+  if (parseResult.success) {
+    const knownRelationship = parseResult.data
+    const section = findCompositionSection(
+      relationshipToSectionCode(knownRelationship),
+      getComposition(record)
+    )
+
+    if (!section) {
+      throw badRequest(`Patient resource for ${knownRelationship} not found`)
+    }
+
+    return [
+      {
+        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+        resource: {
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: collectorDetails.relationship
+              }
+            ]
+          },
+          patient: {
+            reference: section.entry[0].reference
+          }
+        }
+      }
+    ]
+  }
+
+  /*
+   * For collector relations that we don't have any
+   * details e.g. "Legal Guardian"
+   */
+
+  return [
+    {
+      fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: collectorDetails.relationship
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+
+export function createPaymentResources(
+  paymentDetails: PaymentInput
+): [BundleEntryWithFullUrl<PaymentReconciliation>]
+
+export function createPaymentResources(
+  paymentDetails: PaymentInput,
   attachmentURL?: string
-): [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]
+): [
+  BundleEntryWithFullUrl<PaymentReconciliation>,
+  BundleEntryWithFullUrl<DocumentReference>
+]
 
-export function createCorrectionPaymentResources(
-  paymentDetails: CorrectionRequestPaymentInput,
+export function createPaymentResources(
+  paymentDetails: PaymentInput,
   attachmentURL?: string
 ):
-  | [BundleEntry<PaymentReconciliation>, BundleEntry<DocumentReference>]
-  | [BundleEntry<PaymentReconciliation>] {
+  | [
+      BundleEntryWithFullUrl<PaymentReconciliation>,
+      BundleEntryWithFullUrl<DocumentReference>
+    ]
+  | [BundleEntryWithFullUrl<PaymentReconciliation>] {
   const temporaryPaymentId = getUUID()
   const temporaryDocumentReferenceId = getUUID()
 
@@ -128,6 +343,9 @@ export function createCorrectionPaymentResources(
     resource: {
       resourceType: 'PaymentReconciliation',
       status: 'active',
+      total: {
+        value: paymentDetails.amount
+      },
       detail: [
         {
           type: {
@@ -216,12 +434,8 @@ export function createCorrectionEncounter() {
 export function createCorrectedTask(
   previousTask: Task, // @todo do not require previous task, pass values from outside
   correctionDetails: CorrectionRequestInput | ApproveRequestInput,
-  correctionEncounter:
-    | BundleEntry<fhir3.Encounter>
-    | BundleEntry<fhir3.Encounter>,
-  paymentReconciliation?:
-    | BundleEntry<PaymentReconciliation>
-    | BundleEntry<PaymentReconciliation>
+  correctionEncounter: BundleEntry<fhir3.Encounter>,
+  paymentReconciliation?: BundleEntry<PaymentReconciliation>
 ): Task {
   const conditionalExtensions: Extension[] = []
 
@@ -796,6 +1010,86 @@ export function createUnassignedTask(
   }
 
   return unassignedTask
+}
+
+export function createCertifiedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+): SavedTask {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'CERTIFIED'
+        }
+      ]
+    }
+  }
+}
+
+export function createIssuedTask(
+  previousTask: SavedTask,
+  practitioner: Practitioner
+): SavedTask {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitioner.id}` }
+    },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'ISSUED'
+        }
+      ]
+    }
+  }
 }
 
 export function createCorrectionRequestTask(

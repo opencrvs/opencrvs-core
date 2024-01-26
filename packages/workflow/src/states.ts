@@ -45,6 +45,7 @@ export type ActionIdentifiers = {
   MAKE_CORRECTION: MakeCorrection
   REJECT_CORRECTION: RejectCorrection
   CERTIFY: Certify
+  ISSUE: Issue
   VALIDATE: Validate
   UPDATE_DECLARATION: Update
   REGISTER: Register
