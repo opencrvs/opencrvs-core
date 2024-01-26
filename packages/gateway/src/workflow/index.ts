@@ -21,7 +21,8 @@ import {
   RejectedRecord,
   ValidRecord,
   getTaskFromSavedBundle,
-  getBusinessStatus
+  getBusinessStatus,
+  IssuedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -282,7 +283,7 @@ export function issueRegistration(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  return createRequest<CertifiedRecord>(
+  return createRequest<IssuedRecord>(
     'POST',
     `/records/${recordId}/issue-record`,
     authHeader,
