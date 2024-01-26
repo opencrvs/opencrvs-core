@@ -105,11 +105,7 @@ export async function sendBirthRegistrationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
-  logger.info(
-    `Notification service sendBirthRegistrationConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info(`Notifying from sendBirthRegistrationConfirmation`)
   const templateName = messageKeys.birthRegistrationNotification
   await sendNotification(
     request,
@@ -133,11 +129,7 @@ export async function sendBirthRejectionConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRejectionPayload
-  logger.info(
-    `Notification service sendBirthRejectionConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info(`Notifying from sendBirthRejectionConfirmation`)
 
   const templateName = messageKeys.birthRejectionNotification
   await sendNotification(

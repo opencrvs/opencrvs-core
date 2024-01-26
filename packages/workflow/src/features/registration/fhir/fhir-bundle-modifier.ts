@@ -733,9 +733,7 @@ export async function validateDeceasedDetails(
         new Error(`Config request failed: ${error.message}`)
       )
     })
-  logger.info(
-    `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
-  )
+  logger.info('validateDeceasedDetails response successful')
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
       return integration.integratingSystemType === 'MOSIP'
