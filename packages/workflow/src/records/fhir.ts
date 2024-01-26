@@ -1032,7 +1032,11 @@ export function createCertifiedTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       )
     ],
@@ -1068,7 +1072,11 @@ export function createIssuedTask(
         [
           'http://opencrvs.org/specs/extension/contact-person-phone-number',
           'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
         ].includes(extension.url)
       )
     ],
