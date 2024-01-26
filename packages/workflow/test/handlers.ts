@@ -66,7 +66,12 @@ const auditEventHandler = rest.post(
   'http://localhost:1050/events/birth/:action',
   (req, res, ctx) => {
     const { action } = req.params
-    const knownActions = ['new-declaration', 'mark-certified', 'mark-issued']
+    const knownActions = [
+      'new-declaration',
+      'mark-certified',
+      'mark-issued',
+      'mark-voided'
+    ]
     if (!knownActions.includes(action as string)) {
       throw new Error(`no mock set for "${action}" audit action`)
     }

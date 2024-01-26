@@ -41,15 +41,11 @@ export const registerRoute = [
         const statusReason: fhir3.CodeableConcept = {
           text: REG_NUMBER_GENERATION_FAILED
         }
-        const { rejectedRecord: recordInRejectedState } = await toRejected(
-          record,
-          token,
-          statusReason
-        )
+        const rejectedRecord = await toRejected(record, token, statusReason)
 
-        await indexBundle(recordInRejectedState, token)
+        await indexBundle(rejectedRecord, token)
 
-        return recordInRejectedState
+        return rejectedRecord
       }
 
       return recordInWaitingValidationState
