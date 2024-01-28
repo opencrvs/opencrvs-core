@@ -7748,24 +7748,24 @@
   integrity sha512-RbX9q0U00SLoV+l7loYX0Wrtv4QTClBC0QcdNts6x2b5G1HJN8NI9YlS1HNA6THrI9EH3OXSgya6eMQIlDjKFA==
 
 "@types/uuid@^3.4.3", "@types/uuid@^3.4.4":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.11.tgz#201bf1ca5756537886931aac6672c21c1a06f98a"
-  integrity sha512-CJNkbEu4IdVuBMRVaNC2GjASgJK7ziqDlVXWuJ1pvhOLADl7nzxhTKjHRdOmo2SuXuygcWBmzgYgn9foTX0UiA==
+  version "3.4.13"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.13.tgz#fe890e517fb840620be284ee213e81d702b1f76b"
+  integrity sha512-pAeZeUbLE4Z9Vi9wsWV2bYPTweEHeJJy0G4pEjOA/FSvy1Ad5U5Km8iDV6TKre1mjBiVNfAdVHKruP8bAh4Q5A==
 
 "@types/uuid@^9.0.3":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.5.tgz#25a71eb73eba95ac0e559ff3dd018fc08294acf6"
-  integrity sha512-xfHdwa1FMJ082prjSJpoEI57GZITiQz10r3vEJCHa2khEFQjKy91aWKz6+zybzssCvXUwE1LQWgWVwZ4nYUvHQ==
+  version "9.0.8"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.8.tgz#7545ba4fc3c003d6c756f651f3bf163d8f0f29ba"
+  integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
 
 "@types/webfontloader@^1.6.34":
-  version "1.6.35"
-  resolved "https://registry.yarnpkg.com/@types/webfontloader/-/webfontloader-1.6.35.tgz#c9cedff2995c61ee9b2064714e7f7d7763ac50bd"
-  integrity sha512-IJlrsiDWq6KghQ7tPlL5tcwSUyOxLDceT+AFUY7Ylj0Fcv3/h3QkANqQxZ0B5mEpEKxhTw76vDmvrruSMV9n9Q==
+  version "1.6.38"
+  resolved "https://registry.yarnpkg.com/@types/webfontloader/-/webfontloader-1.6.38.tgz#2cb965a7e7e4a83af6bac67688bc7d1c076107e8"
+  integrity sha512-kUaF72Fv202suFx6yBrwXqeVRMx7hGtJTesyESZgn9sEPCUeDXm2p0SiyS1MTqW74nQP4p7JyrOCwZ7pNFns4w==
 
 "@types/webidl-conversions@*":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@types/webidl-conversions/-/webidl-conversions-7.0.1.tgz#2b9a2062b39a7272343c185cdb884f2e52188f75"
-  integrity sha512-8hKOnOan+Uu+NgMaCouhg3cT9x5fFZ92Jwf+uDLXLu/MFRbXxlWwGeQY7KVHkeSft6RvY+tdxklUBuyY9eIEKg==
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@types/webidl-conversions/-/webidl-conversions-7.0.3.tgz#1306dbfa53768bcbcfc95a1c8cde367975581859"
+  integrity sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==
 
 "@types/whatwg-url@^8.2.1":
   version "8.2.2"
