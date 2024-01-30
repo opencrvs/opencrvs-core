@@ -53,6 +53,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfBirth
       childName {
         firstNames
+        middleName
         familyName
         use
       }
@@ -61,6 +62,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfDeath
       deceasedName {
         firstNames
+        middleName
         familyName
         use
       }
@@ -69,11 +71,13 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfMarriage
       brideName {
         firstNames
+        middleName
         familyName
         use
       }
       groomName {
         firstNames
+        middleName
         familyName
         use
       }
