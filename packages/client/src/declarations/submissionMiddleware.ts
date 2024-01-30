@@ -269,7 +269,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             }
           })
         }
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {
@@ -299,7 +302,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
         return
       } else {
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {
