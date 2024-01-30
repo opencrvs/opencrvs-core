@@ -17,14 +17,14 @@ import {
 import { createServer } from '@search/server'
 import {
   mockBirthFhirBundleWithoutCompositionId,
-  mockBirthRejectionTaskBundle,
   mockBirthRejectionTaskBundleWithoutCompositionReference,
   mockCompositionEntry,
   mockCompositionResponse,
   mockSearchResponse,
   mockEncounterResponse,
   mockUserModelResponse,
-  mockLocationResponse
+  // mockLocationResponse,
+  mockBirthFhirBundle
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -67,9 +67,37 @@ describe('Verify handlers', () => {
 
       fetch.mockResponses(
         [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }]
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
 
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
@@ -80,8 +108,8 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/mark-voided',
-        payload: mockBirthRejectionTaskBundle,
+        url: '/record',
+        payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
