@@ -227,12 +227,14 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
 
 const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   child: [
+    'middleNameEng',
     'attendantAtBirth',
     'birthType',
     'weightAtBirth',
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
   ],
   mother: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -246,6 +248,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -259,6 +262,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -268,6 +272,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   spouse: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -294,6 +299,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
   ],
   groom: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -303,6 +309,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -312,6 +319,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
+    'middleNameEng',
     'primaryAddress',
     'registrationPhone',
     'registrationEmail',
@@ -324,8 +332,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
-  witnessOne: [],
-  witnessTwo: []
+  witnessOne: ['middleNameEng'],
+  witnessTwo: ['middleNameEng']
 }
 
 const form = z.object({
