@@ -48,6 +48,7 @@ import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
+import { getComposition, SavedBundle } from '@opencrvs/commons/types'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -57,46 +58,14 @@ const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as fhir.Bundle
+  const bundle = requestBundle.payload as SavedBundle
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  const isCompositionInBundle = bundleEntries?.some(
-    ({ resource }) => resource?.resourceType === 'Composition'
-  )
-
-  if (!isCompositionInBundle) {
-    await updateEvent(bundle, authHeader)
-    return
-  }
-
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  if (!composition) {
-    throw new Error('Composition not found')
-  }
-
+  const composition = getComposition(bundle)
   const compositionId = composition.id
 
-  if (!compositionId) {
-    throw new Error(`Composition ID not found`)
-  }
-
-  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
-}
-
-/**
- * Updates the search index with the latest information of the composition
- * Supports 1 task and 1 patient maximum
- */
-async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   const task = findTask(bundle.entry)
-
-  const compositionId =
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
 
   if (!compositionId) {
     throw new Error('No Composition ID found')
@@ -124,7 +93,8 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   if (body.type === REJECTED_STATUS) {
     const nodeText =
       (task && task.note && task.note[0].text && task.note[0].text) || ''
-    body.rejectReason = (task && task.reason && task.reason.text) || ''
+    body.rejectReason =
+      (task && task.statusReason && task.statusReason.text) || ''
     body.rejectComment = nodeText
   }
   body.updatedBy =
@@ -145,7 +115,7 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   ) {
     body.assignment = null
   }
-  await createStatusHistory(body, task, authHeader)
+  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
   await updateComposition(compositionId, body, client)
 }
 
