@@ -13,4 +13,6 @@
 
 ## Bug fixes
 
+- Filter user information such as usernames and authentication codes from server logs
+
 See [Releases](https://github.com/opencrvs/opencrvs-core/releases) for release notes of older releases.

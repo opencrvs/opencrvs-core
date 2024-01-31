@@ -39,8 +39,7 @@ export async function sendUserCredentials(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ICredentialsPayload
-  logger.info(`Username: ${payload.username}`)
-  logger.info(`Password: ${payload.password}`)
+  logger.info('Notifying from sendUserCredentials')
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
@@ -68,7 +67,7 @@ export async function sendResetPasswordInvite(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IResetPasswordPayload
-  logger.info(`Password: ${payload.password}`)
+  logger.info('Notifying from sendResetPasswordInvite')
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
@@ -94,7 +93,7 @@ export async function retrieveUserName(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
-  logger.info(`Username: ${payload.username}`)
+  logger.info('Notifying from retrieveUserName')
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
@@ -121,7 +120,7 @@ export async function sendUserAuthenticationCode(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IUserAuthCodePayload
-  logger.info(`Authentication Code: ${payload.code}`)
+  logger.info('Notifying from sendUserAuthenticationCode')
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
 
@@ -148,7 +147,7 @@ export async function updateUserName(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
-  logger.info(`Username: ${payload.username}`)
+  logger.info(`Notifying from updateUserName`)
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
