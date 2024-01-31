@@ -584,39 +584,11 @@ export async function createDownloadTask(
         }
       ]
 
-  const downloadedTask: SavedTask = {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${user.practitionerId}` }
-    },
-    identifier: identifiers,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
-      { url: extensionUrl },
-      ...extensions
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: previousTask.businessStatus,
-    meta: {
-      ...previousTask.meta,
-      lastUpdated: new Date().toISOString()
-    }
-  }
+  const downloadedTask: SavedTask = createNewTaskResource(
+    previousTask,
+    [{ url: extensionUrl }, ...extensions],
+    user.practitionerId
+  )
 
   return downloadedTask
 }
@@ -627,226 +599,78 @@ export function createRejectTask(
   comment: fhir3.CodeableConcept,
   reason?: string
 ): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    statusReason: comment,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
+  const rejectedTask = createNewTaskResource(
+    previousTask,
+    [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       }
     ],
+    practitioner.id,
+    'REJECTED'
+  )
+
+  const updatedRejectedTask: SavedTask = {
+    ...rejectedTask,
+    statusReason: comment,
     reason: {
       text: reason ?? ''
-    },
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'REJECTED'
-        }
-      ]
     }
   }
+
+  return updatedRejectedTask
 }
 
 export function createValidateTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   practitioner: Practitioner
-): Task {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
+): SavedTask {
+  return createNewTaskResource(
+    previousTask,
+    [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       }
     ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'VALIDATED'
-        }
-      ]
-    }
-  }
+    practitioner.id,
+    'VALIDATED'
+  )
 }
 
 export function createWaitingForValidationTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   practitioner: Practitioner
 ): Task {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
+  return createNewTaskResource(
+    previousTask,
+    [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       }
     ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'WAITING_VALIDATION'
-        }
-      ]
-    }
-  }
+    practitioner.id,
+    'WAITING_VALIDATION'
+  )
 }
 
 export function createRegisterTask(
-  previousTask: Task,
+  previousTask: SavedTask,
   practitioner: Practitioner
 ): Task {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
+  return createNewTaskResource(
+    previousTask,
+    [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       }
     ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'REGISTERED'
-        }
-      ]
-    }
-  }
-}
-
-function createTask(
-  previousTask: SavedTask,
-  newExtensions: Extension[],
-  practitioner: Practitioner,
-  status?: TaskStatus
-): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: previousTask.extension
-      .filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      )
-      .concat(newExtensions),
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: status ?? getStatusFromTask(previousTask)
-        }
-      ]
-    },
-    meta: {
-      ...previousTask.meta,
-      lastUpdated: new Date().toISOString()
-    }
-  }
+    practitioner.id,
+    'REGISTERED'
+  )
 }
 
 export function createArchiveTask(
@@ -863,10 +687,10 @@ export function createArchiveTask(
       valueString: duplicateTrackingId
     })
   }
-  const archivedTask = createTask(
+  const archivedTask = createNewTaskResource(
     previousTask,
     newExtensions,
-    practitioner,
+    practitioner.id,
     'ARCHIVED'
   )
 
@@ -896,7 +720,11 @@ export function createDuplicateTask(
     })
   }
 
-  const duplicateTask = createTask(previousTask, newExtensions, practitioner)
+  const duplicateTask = createNewTaskResource(
+    previousTask,
+    newExtensions,
+    practitioner.id
+  )
 
   return {
     ...duplicateTask,
@@ -910,30 +738,14 @@ export function createUpdatedTask(
   updatedDetails: ChangedValuesInput,
   practitioner: Practitioner
 ): SavedTask {
+  const updatedTask = createNewTaskResource(
+    previousTask,
+    [],
+    practitioner.id,
+    'DECLARATION_UPDATED'
+  )
   return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      )
-    ],
+    ...updatedTask,
     input: updatedDetails.map((update) => ({
       valueCode: update.section,
       valueId: update.fieldName,
@@ -959,16 +771,7 @@ export function createUpdatedTask(
         ]
       },
       ...getFHIRValueField(update.newValue)
-    })),
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'DECLARATION_UPDATED'
-        }
-      ]
-    }
+    }))
   }
 }
 
@@ -976,38 +779,11 @@ export function createUnassignedTask(
   previousTask: SavedTask,
   practitioner: Practitioner
 ) {
-  const unassignedTask: SavedTask = {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
-      { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: previousTask.businessStatus,
-    meta: {
-      ...previousTask.meta,
-      lastUpdated: new Date().toISOString()
-    }
-  }
+  const unassignedTask: SavedTask = createNewTaskResource(
+    previousTask,
+    [{ url: 'http://opencrvs.org/specs/extension/regUnassigned' }],
+    practitioner.id
+  )
 
   return unassignedTask
 }
@@ -1016,80 +792,14 @@ export function createCertifiedTask(
   previousTask: SavedTask,
   practitioner: Practitioner
 ): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      )
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'CERTIFIED'
-        }
-      ]
-    }
-  }
+  return createNewTaskResource(previousTask, [], practitioner.id, 'CERTIFIED')
 }
 
 export function createIssuedTask(
   previousTask: SavedTask,
   practitioner: Practitioner
 ): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitioner.id}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      )
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'ISSUED'
-        }
-      ]
-    }
-  }
+  return createNewTaskResource(previousTask, [], practitioner.id, 'ISSUED')
 }
 
 export function createCorrectionRequestTask(
@@ -1195,6 +905,52 @@ export function createCorrectionRequestTask(
           code: 'CORRECTION_REQUESTED'
         }
       ]
+    }
+  }
+}
+
+function createNewTaskResource(
+  previousTask: SavedTask,
+  newExtensions: Extension[],
+  practitionerId: Practitioner['id'],
+  status?: TaskStatus
+): SavedTask {
+  return {
+    resourceType: 'Task',
+    status: 'accepted',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    requester: {
+      agent: { reference: `Practitioner/${practitionerId}` }
+    },
+    identifier: previousTask.identifier,
+    extension: previousTask.extension
+      .filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email',
+          'http://opencrvs.org/specs/extension/bride-signature',
+          'http://opencrvs.org/specs/extension/groom-signature',
+          'http://opencrvs.org/specs/extension/witness-one-signature',
+          'http://opencrvs.org/specs/extension/witness-two-signature'
+        ].includes(extension.url)
+      )
+      .concat(newExtensions),
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: status ?? getStatusFromTask(previousTask)
+        }
+      ]
+    },
+    meta: {
+      ...previousTask.meta,
+      lastUpdated: new Date().toISOString()
     }
   }
 }
