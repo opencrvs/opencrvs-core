@@ -624,9 +624,10 @@ export function createRejectTask(
 
 export function createValidateTask(
   previousTask: SavedTask,
-  practitioner: Practitioner
+  practitioner: Practitioner,
+  comments?: string
 ): SavedTask {
-  return createNewTaskResource(
+  const validatedTask = createNewTaskResource(
     previousTask,
     [
       {
@@ -637,13 +638,19 @@ export function createValidateTask(
     practitioner.id,
     'VALIDATED'
   )
+
+  return {
+    ...validatedTask,
+    ...(comments ? { note: [{ text: comments }] } : {})
+  }
 }
 
 export function createWaitingForValidationTask(
   previousTask: SavedTask,
-  practitioner: Practitioner
+  practitioner: Practitioner,
+  comments?: string
 ): Task {
-  return createNewTaskResource(
+  const waitingForValidationTask = createNewTaskResource(
     previousTask,
     [
       {
@@ -654,13 +661,18 @@ export function createWaitingForValidationTask(
     practitioner.id,
     'WAITING_VALIDATION'
   )
+
+  return {
+    ...waitingForValidationTask,
+    ...(comments ? { note: [{ text: comments }] } : {})
+  }
 }
 
 export function createRegisterTask(
   previousTask: SavedTask,
   practitioner: Practitioner
 ): Task {
-  return createNewTaskResource(
+  const registeredTask = createNewTaskResource(
     previousTask,
     [
       {
@@ -671,6 +683,13 @@ export function createRegisterTask(
     practitioner.id,
     'REGISTERED'
   )
+
+  const comments = previousTask?.note?.[0]?.text
+
+  return {
+    ...registeredTask,
+    ...(comments ? { note: [{ text: comments }] } : {})
+  }
 }
 
 export function createArchiveTask(
@@ -926,6 +945,7 @@ function createNewTaskResource(
       agent: { reference: `Practitioner/${practitionerId}` }
     },
     identifier: previousTask.identifier,
+    // note: previousTask.note,
     extension: previousTask.extension
       .filter((extension) =>
         [

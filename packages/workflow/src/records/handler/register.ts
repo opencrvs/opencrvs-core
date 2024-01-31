@@ -20,6 +20,8 @@ import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import { validateRequest } from '@workflow/utils/index'
+import * as z from 'zod'
 
 export const registerRoute = [
   createRoute({
@@ -30,9 +32,18 @@ export const registerRoute = [
     handler: async (request, record) => {
       const token = getToken(request)
 
+      const payload = validateRequest(
+        z.object({ comments: z.string().optional() }),
+        request.payload
+      )
+
       const practitioner = await getLoggedInPractitionerResource(token)
       const recordInWaitingValidationState =
-        await toWaitingForExternalValidationState(record, practitioner)
+        await toWaitingForExternalValidationState(
+          record,
+          practitioner,
+          payload.comments
+        )
 
       await sendBundleToHearth(recordInWaitingValidationState)
       await indexBundle(recordInWaitingValidationState, token)

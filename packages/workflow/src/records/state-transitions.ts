@@ -358,12 +358,14 @@ export async function toRejected(
 
 export async function toWaitingForExternalValidationState(
   record: ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner
+  practitioner: Practitioner,
+  comments?: string
 ): Promise<WaitingForValidationRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const waitForValidationTask = createWaitingForValidationTask(
     previousTask,
-    practitioner
+    practitioner,
+    comments
   )
 
   const waitForValidationTaskWithPractitionerExtensions = setupLastRegUser(
@@ -648,10 +650,11 @@ export async function toDuplicated(
 
 export async function toValidated(
   record: InProgressRecord | ReadyForReviewRecord,
-  practitioner: Practitioner
+  practitioner: Practitioner,
+  comments?: string
 ): Promise<ValidatedRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const validatedTask = createValidateTask(previousTask, practitioner)
+  const validatedTask = createValidateTask(previousTask, practitioner, comments)
 
   const validatedTaskWithPractitionerExtensions = setupLastRegUser(
     validatedTask,

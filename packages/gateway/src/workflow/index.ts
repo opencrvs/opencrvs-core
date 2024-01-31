@@ -169,12 +169,14 @@ export async function updateRegistration(
 
 export async function validateRegistration(
   id: string,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  comments?: string
 ) {
   return await createRequest<Promise<void>>(
     'POST',
     `/records/${id}/validate`,
-    authHeader
+    authHeader,
+    { comments }
   )
 }
 
@@ -205,10 +207,10 @@ export async function fetchRegistrationForDownloading(
 export async function registerDeclaration(
   id: string,
   authHeader: IAuthHeader,
-  event: EVENT_TYPE
+  comments?: string
 ) {
   return await createRequest('POST', `/records/${id}/register`, authHeader, {
-    event
+    comments
   })
 }
 

@@ -753,7 +753,10 @@ async function markEventAsValidated(
     await updateRegistration(id, authHeader, details, event)
   }
 
-  await validateRegistration(id, authHeader)
+  const comment =
+    details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+
+  await validateRegistration(id, authHeader, comment)
   return id
 }
 
@@ -773,7 +776,10 @@ async function markEventAsRegistered(
     await updateRegistration(id, authHeader, details, event)
   }
 
-  await registerDeclaration(id, authHeader, event)
+  const comments =
+    details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+
+  await registerDeclaration(id, authHeader, comments)
   return id
 }
 
