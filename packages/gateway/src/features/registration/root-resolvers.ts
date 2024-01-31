@@ -657,6 +657,10 @@ export const resolvers: GQLResolver = {
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
+      const isAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!isAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
