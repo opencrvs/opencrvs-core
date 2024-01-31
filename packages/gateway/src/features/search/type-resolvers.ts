@@ -68,7 +68,7 @@ const getChildName = (source: ISearchDataTemplate) => {
     {
       use: 'en',
       given:
-        (source.childFirstNames && [
+        ((source.childFirstNames || source.childMiddleName) && [
           source.childFirstNames,
           source.childMiddleName
         ]) ||
@@ -81,7 +81,7 @@ const getChildName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.childFirstNamesLocal && [
+        ((source.childFirstNamesLocal || source.childMiddleNameLocal) && [
           source.childFirstNamesLocal,
           source.childMiddleNameLocal
         ]) ||
@@ -103,7 +103,7 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
     {
       use: 'en',
       given:
-        (source.deceasedFirstNames && [
+        ((source.deceasedFirstNames || source.deceasedMiddleName) && [
           source.deceasedFirstNames,
           source.deceasedMiddleName
         ]) ||
@@ -116,7 +116,7 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.deceasedFirstNamesLocal && [
+        ((source.deceasedFirstNamesLocal || source.deceasedMiddleNameLocal) && [
           source.deceasedFirstNamesLocal,
           source.deceasedMiddleNameLocal
         ]) ||
@@ -138,7 +138,7 @@ const getBrideName = (source: ISearchDataTemplate) => {
     {
       use: 'en',
       given:
-        (source.brideFirstNames && [
+        ((source.brideFirstNames || source.brideMiddleName) && [
           source.brideFirstNames,
           source.brideMiddleName
         ]) ||
@@ -151,7 +151,7 @@ const getBrideName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.brideFirstNamesLocal && [
+        ((source.brideFirstNamesLocal || source.brideMiddleNameLocal) && [
           source.brideFirstNamesLocal,
           source.brideMiddleNameLocal
         ]) ||
@@ -172,7 +172,7 @@ const getGroomName = (source: ISearchDataTemplate) => {
     {
       use: 'en',
       given:
-        (source.groomFirstNames && [
+        ((source.groomFirstNames || source.groomMiddleName) && [
           source.groomFirstNames,
           source.groomMiddleName
         ]) ||
@@ -185,7 +185,7 @@ const getGroomName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.groomFirstNamesLocal && [
+        ((source.groomFirstNamesLocal || source.groomMiddleNameLocal) && [
           source.groomFirstNamesLocal,
           source.groomMiddleNameLocal
         ]) ||
