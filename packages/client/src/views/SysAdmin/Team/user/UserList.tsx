@@ -65,7 +65,7 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
@@ -81,6 +81,7 @@ import { Query as QueryType, User } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { HOME } from '@client/navigation/routes'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -165,7 +166,7 @@ const LinkButtonModified = styled(LinkButton)`
 `
 
 interface ISearchParams {
-  locationId: string
+  locationId?: string
 }
 
 type IOnlineStatusProps = {
@@ -816,6 +817,14 @@ function UserListComponent(props: IProps) {
       deliveryMethod
     ]
   )
+
+  /**
+   * Because the locationId is a search parameter,
+   * it can happen that it gets removed as part of the login redirect mechanism causing the user to land on /team/users without a search parameter
+   */
+  if (!locationId) {
+    return <Redirect to={HOME} />
+  }
 
   return (
     <SysAdminContentWrapper
