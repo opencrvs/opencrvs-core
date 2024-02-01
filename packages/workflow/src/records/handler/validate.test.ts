@@ -56,6 +56,7 @@ describe('Validate record endpoint', () => {
     const response = await server.server.inject({
       method: 'POST',
       url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/validate',
+      payload: {},
       headers: {
         Authorization: `Bearer ${token}`
       }
