@@ -116,12 +116,14 @@ describe('draftUtils tests', () => {
           childName: [
             {
               firstNames: 'Muhammad',
-              familyName: 'Ashraful',
+              middleName: 'Ashraful',
+              familyName: 'Alam',
               use: 'en'
             },
             {
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল',
+              middleName: 'আশরাফুল',
+              familyName: 'আলম',
               use: 'bn'
             }
           ]
@@ -141,9 +143,11 @@ describe('draftUtils tests', () => {
             },
             child: {
               firstNamesEng: 'Muhammad',
-              familyNameEng: 'Ashraful',
+              middleNameEng: 'Ashraful',
+              familyNameEng: 'Alam',
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল'
+              middleName: 'আশরাফুল',
+              familyName: 'আলম'
             }
           },
           event: 'birth',
@@ -165,12 +169,14 @@ describe('draftUtils tests', () => {
           deceasedName: [
             {
               firstNames: 'Muhammad',
-              familyName: 'Ashraful',
+              middleName: 'Ashraful',
+              familyName: 'Alam',
               use: 'en'
             },
             {
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল',
+              middleName: 'আশরাফুল',
+              familyName: 'আলম',
               use: 'bn'
             }
           ]
@@ -190,9 +196,11 @@ describe('draftUtils tests', () => {
             },
             deceased: {
               firstNamesEng: 'Muhammad',
-              familyNameEng: 'Ashraful',
+              middleNameEng: 'Ashraful',
+              familyNameEng: 'Alam',
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল'
+              middleName: 'আশরাফুল',
+              familyName: 'আলম'
             }
           },
           event: 'death',

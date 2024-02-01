@@ -137,7 +137,7 @@ const transformBirthSearchQueryDataToDraft = (
           .map((name) => name && name.firstNames)[0]) ||
       '',
     middleName:
-      data.childName?.find((name) => name?.use !== 'en')?.firstNames ?? '',
+      data.childName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     familyName:
       (data.childName &&
         data.childName
