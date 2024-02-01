@@ -1630,6 +1630,7 @@ describe('Registration root resolvers', () => {
   describe('markEventAsNotDuplicate()', () => {
     it('returns composition id after removing all duplicates from it', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
@@ -1681,10 +1682,10 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error from fhir', async () => {
-      fetch.mockResponses([
-        () => Promise.reject(new Error('Some error in fhir')),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [() => Promise.reject(new Error('Some error in fhir')), { status: 200 }]
+      )
 
       await expect(
         resolvers.Mutation!.markEventAsNotDuplicate(
@@ -1699,6 +1700,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error from search', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
@@ -1735,8 +1737,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR request failed: Some error from search')
     })
 
-    it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+    it('throws an error when the declaration is not assigned', async () => {
       await expect(
         resolvers.Mutation!.markEventAsNotDuplicate(
           {},
@@ -1745,7 +1746,7 @@ describe('Registration root resolvers', () => {
           },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User has been unassigned')
     })
   })
   describe('queryRegistrationByIdentifier()', () => {
