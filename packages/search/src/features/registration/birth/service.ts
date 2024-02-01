@@ -424,6 +424,7 @@ async function detectAndUpdateBirthDuplicates(
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
+  // done in workflow
   const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
@@ -431,10 +432,12 @@ async function detectAndUpdateBirthDuplicates(
   logger.info(
     `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
+  // done in workflow
   await addFlaggedAsPotentialDuplicate(
     duplicates.map((ite) => ite.trackingId).join(','),
     compositionId
   )
+  // done in workflow
   return await updateCompositionWithDuplicates(
     composition,
     duplicates.map((it) => it.id)

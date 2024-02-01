@@ -256,7 +256,7 @@ export async function detectBirthDuplicates(
   body: IBirthCompositionBody
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
-  const duplicates = findBirthDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -265,7 +265,7 @@ export async function detectDeathDuplicates(
   body: IDeathCompositionBody
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
-  const duplicates = findDeathDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -358,30 +358,13 @@ function isNotification(body: ICompositionBody): boolean {
   )
 }
 
-function findBirthDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
+export function findDuplicateIds(
+  results: ISearchResponse<
+    IBirthCompositionBody | IDeathCompositionBody
+  >['hits']['hits']
 ) {
   return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
-    .map((hit) => ({
-      id: hit._id,
-      trackingId: hit._source.trackingId
-    }))
-}
-
-function findDeathDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IDeathCompositionBody>['hits']['hits']
-) {
-  return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
+    .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
       id: hit._id,
       trackingId: hit._source.trackingId
