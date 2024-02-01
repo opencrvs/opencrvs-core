@@ -755,8 +755,10 @@ async function markEventAsValidated(
 
   const comment =
     details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+  const timeLoggedMS =
+    details?.registration?.status?.[0]?.timeLoggedMS ?? undefined
 
-  await validateRegistration(id, authHeader, comment)
+  await validateRegistration(id, authHeader, comment, timeLoggedMS)
   return id
 }
 
@@ -778,8 +780,10 @@ async function markEventAsRegistered(
 
   const comments =
     details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+  const timeLoggedMS =
+    details?.registration?.status?.[0]?.timeLoggedMS ?? undefined
 
-  await registerDeclaration(id, authHeader, comments)
+  await registerDeclaration(id, authHeader, comments, timeLoggedMS)
   return id
 }
 

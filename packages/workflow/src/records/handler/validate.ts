@@ -26,7 +26,10 @@ export const validateRoute = [
     handler: async (request, record) => {
       const token = getToken(request)
       const payload = validateRequest(
-        z.object({ comments: z.string().optional() }),
+        z.object({
+          comments: z.string().optional(),
+          timeLoggedMS: z.number().optional()
+        }),
         request.payload
       )
 
@@ -35,7 +38,8 @@ export const validateRoute = [
       const recordInValidatedRequestedState = await toValidated(
         record,
         practitioner,
-        payload.comments
+        payload.comments,
+        payload.timeLoggedMS
       )
 
       await sendBundleToHearth(recordInValidatedRequestedState)

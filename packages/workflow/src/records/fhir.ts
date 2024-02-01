@@ -625,14 +625,15 @@ export function createRejectTask(
 export function createValidateTask(
   previousTask: SavedTask,
   practitioner: Practitioner,
-  comments?: string
+  comments?: string,
+  timeLoggedMS?: number
 ): SavedTask {
   const validatedTask = createNewTaskResource(
     previousTask,
     [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
-        valueInteger: 0
+        valueInteger: timeLoggedMS ?? 0
       }
     ],
     practitioner.id,
@@ -648,14 +649,15 @@ export function createValidateTask(
 export function createWaitingForValidationTask(
   previousTask: SavedTask,
   practitioner: Practitioner,
-  comments?: string
+  comments?: string,
+  timeLoggedMS?: number
 ): Task {
   const waitingForValidationTask = createNewTaskResource(
     previousTask,
     [
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
-        valueInteger: 0
+        valueInteger: timeLoggedMS ?? 0
       }
     ],
     practitioner.id,
@@ -672,14 +674,13 @@ export function createRegisterTask(
   previousTask: SavedTask,
   practitioner: Practitioner
 ): Task {
+  const timeLoggedMSExtension = previousTask.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
+  )!
+
   const registeredTask = createNewTaskResource(
     previousTask,
-    [
-      {
-        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
-        valueInteger: 0
-      }
-    ],
+    [timeLoggedMSExtension],
     practitioner.id,
     'REGISTERED'
   )

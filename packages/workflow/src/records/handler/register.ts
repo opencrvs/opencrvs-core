@@ -33,7 +33,10 @@ export const registerRoute = [
       const token = getToken(request)
 
       const payload = validateRequest(
-        z.object({ comments: z.string().optional() }),
+        z.object({
+          comments: z.string().optional(),
+          timeLoggedMS: z.number().optional()
+        }),
         request.payload
       )
 
@@ -42,7 +45,8 @@ export const registerRoute = [
         await toWaitingForExternalValidationState(
           record,
           practitioner,
-          payload.comments
+          payload.comments,
+          payload.timeLoggedMS
         )
 
       await sendBundleToHearth(recordInWaitingValidationState)
