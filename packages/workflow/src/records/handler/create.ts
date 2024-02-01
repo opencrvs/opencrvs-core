@@ -45,7 +45,10 @@ import {
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
-import { hasDuplicates } from '@workflow/utils/duplicateChecker'
+import {
+  findDuplicateIds,
+  updateRecordWithDuplicateIds
+} from '@workflow/utils/duplicateChecker'
 import {
   generateTrackingIdForEvents,
   isHospitalNotification,
@@ -64,6 +67,7 @@ import {
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
+import { logger } from '@workflow/logger'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -223,7 +227,7 @@ export default async function createRecordHandler(
       isPotentiallyDuplicate: false
     }
   }
-  const isPotentiallyDuplicate = await hasDuplicates(
+  const duplicateIds = await findDuplicateIds(
     recordDetails,
     { Authorization: token },
     event
@@ -238,6 +242,12 @@ export default async function createRecordHandler(
     event,
     token
   )
+  if (duplicateIds.length) {
+    logger.info(
+      `Workflow/service:create-record: ${duplicateIds.length} duplicate composition(s) found`
+    )
+    record = updateRecordWithDuplicateIds(record, duplicateIds)
+  }
 
   await auditEvent(
     isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
@@ -289,6 +299,6 @@ export default async function createRecordHandler(
   return {
     compositionId: getComposition(record).id,
     trackingId: getTrackingIdFromRecord(record),
-    isPotentiallyDuplicate
+    isPotentiallyDuplicate: duplicateIds.length > 0
   }
 }
