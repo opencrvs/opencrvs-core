@@ -44,7 +44,7 @@ import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, SavedBundle } from '@opencrvs/commons/types'
+import { getComposition, ValidRecord } from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -53,7 +53,7 @@ const WITNESS_TWO_CODE = 'witness-two-details'
 const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as SavedBundle
+  const bundle = requestBundle.payload as ValidRecord
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 

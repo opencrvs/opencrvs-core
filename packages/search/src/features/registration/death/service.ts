@@ -48,7 +48,7 @@ import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, SavedBundle } from '@opencrvs/commons/types'
+import { getComposition, ValidRecord } from '@opencrvs/commons/types'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -58,7 +58,7 @@ const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as SavedBundle
+  const bundle = requestBundle.payload as ValidRecord
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 

@@ -52,8 +52,8 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   findCompositionSection,
   getComposition,
-  SavedBundle,
-  urlReferenceToUUID
+  urlReferenceToUUID,
+  ValidRecord
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -67,7 +67,7 @@ function getTypeFromTask(task: fhir.Task) {
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as SavedBundle
+  const bundle = requestBundle.payload as ValidRecord
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
   const task = findTask(bundle.entry)
@@ -139,7 +139,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     authHeader,
     bundleEntries
   )
-  await createIndexBody(body, composition, authHeader, bundleEntries)
   await updateComposition(compositionId, body, client)
 }
 
