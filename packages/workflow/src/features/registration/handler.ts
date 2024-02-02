@@ -227,7 +227,7 @@ export async function markEventAsRegisteredCallbackHandler(
       ['WAITING_VALIDATION']
     )
     if (!savedRecord) {
-      throw new Error('Could not find record in elastic search!')
+      throw new Error('No record found in waiting validation state')
     }
     const practitioner = await getLoggedInPractitionerResource(
       getToken(request)
