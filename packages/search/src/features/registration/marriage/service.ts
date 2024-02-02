@@ -80,6 +80,10 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
+  if (body.type === REGISTERED_STATUS) {
+    body.registrationNumber =
+      registrationNumberIdentifier && registrationNumberIdentifier.value
+  }
   if (body.type === REJECTED_STATUS) {
     const nodeText =
       (task && task.note && task.note[0].text && task.note[0].text) || ''
@@ -93,8 +97,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
   if (
     [
       REJECTED_STATUS,
@@ -329,10 +331,6 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/id/marriage-tracking-id'
   )
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/marriage-registration-number'
-  )
 
   const regLastUserIdentifier = findTaskExtension(
     task,
@@ -365,8 +363,6 @@ async function createDeclarationIndex(
     task.businessStatus.coding[0].code
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
   body.declarationLocationId =
     placeOfDeclarationExtension &&
     placeOfDeclarationExtension.valueReference &&

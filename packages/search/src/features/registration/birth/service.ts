@@ -43,13 +43,18 @@ import {
   addEventLocation,
   getdeclarationJurisdictionIds,
   addFlaggedAsPotentialDuplicate,
-  findPatient
+  findPatientEntryById
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, SavedBundle } from '@opencrvs/commons/types'
+import {
+  findCompositionSection,
+  getComposition,
+  SavedBundle,
+  urlReferenceToUUID
+} from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -65,9 +70,7 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as SavedBundle
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
-
   const task = findTask(bundle.entry)
-  const patient = findPatient(bundle)
 
   const composition = getComposition(bundle)
   const compositionId = composition.id
@@ -85,6 +88,17 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   }
   body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
+
+  if (body.type === REGISTERED_STATUS) {
+    const childSection = findCompositionSection('child-details', composition)
+    const patientId = urlReferenceToUUID(childSection.entry[0].reference)
+    const patient = findPatientEntryById(bundle, patientId)
+
+    body.childIdentifier =
+      patient.identifier && getSubmittedIdentifier(patient.identifier)
+    body.registrationNumber =
+      registrationNumberIdentifier && registrationNumberIdentifier.value
+  }
 
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateBirthDuplicates(compositionId, composition, body)
@@ -107,10 +121,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
-  body.childIdentifier =
-    patient?.identifier && getSubmittedIdentifier(patient.identifier)
 
   if (
     [
@@ -338,10 +348,6 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/id/birth-tracking-id'
   )
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/birth-registration-number'
-  )
 
   const regLastUserIdentifier = findTaskExtension(
     task,
@@ -370,8 +376,6 @@ async function createDeclarationIndex(
   body.type = task && getTypeFromTask(task)
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
   body.declarationLocationId =
     placeOfDeclarationExtension &&
     placeOfDeclarationExtension.valueReference &&
