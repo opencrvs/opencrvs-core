@@ -36,7 +36,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   return res.json()
 }
 
-export async function getRecordsOfAllStatus(
+export async function getValidRecordById(
   recordId: string,
   token: string,
   includeHistoryResources = false

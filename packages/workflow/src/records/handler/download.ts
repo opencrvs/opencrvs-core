@@ -17,7 +17,7 @@ import {
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
-import { getRecordsOfAllStatus } from '@workflow/records/index'
+import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/authUtils'
 import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
@@ -59,7 +59,7 @@ export async function downloadRecordHandler(
   const token = getToken(request)
   const tokenPayload = getTokenPayload(token)
   // Task history is fetched rather than the task only
-  const record = await getRecordsOfAllStatus(payload.id, token, true)
+  const record = await getValidRecordById(payload.id, token, true)
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
