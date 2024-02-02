@@ -28,7 +28,9 @@ import {
   isInProgress,
   isReadyForReview,
   isValidated,
-  isWaitingExternalValidation
+  isWaitingExternalValidation,
+  isComposition,
+  getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -40,6 +42,7 @@ import {
   mergeBundles,
   sendBundleToHearth,
   toSavedBundle,
+  updateInHearth,
   withPractitionerDetails
 } from '@workflow/records/fhir'
 import { z } from 'zod'
@@ -47,7 +50,8 @@ import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
 import {
   findDuplicateIds,
-  updateRecordWithDuplicateIds
+  updateCompositionWithDuplicateIds,
+  updateTaskWithDuplicateIds
 } from '@workflow/utils/duplicateChecker'
 import {
   generateTrackingIdForEvents,
@@ -138,7 +142,8 @@ function createInProgressOrReadyForReviewTask(
 async function createRecord(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
-  token: string
+  token: string,
+  duplicateIds: Array<{ id: string; trackingId: string }>
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
   const inputBundle = buildFHIRBundle(recordDetails, event)
   const trackingId = await generateTrackingIdForEvents(
@@ -164,7 +169,16 @@ async function createRecord(
   const [taskWithLocation, practitionerResourcesBundle] =
     await withPractitionerDetails(task, token)
 
+  logger.info(
+    `Workflow/service:createRecord: ${duplicateIds.length} duplicate composition(s) found`
+  )
   inputBundle.entry = inputBundle.entry.map((e) => {
+    if (isComposition(e.resource) && duplicateIds.length > 0) {
+      return {
+        ...e,
+        resource: updateCompositionWithDuplicateIds(e.resource, duplicateIds)
+      }
+    }
     if (e.resource.resourceType !== 'Task') {
       return e
     }
@@ -240,14 +254,9 @@ export default async function createRecordHandler(
   let record: CreatedRecord = await createRecord(
     recordInputWithUploadedAttachments,
     event,
-    token
+    token,
+    duplicateIds
   )
-  if (duplicateIds.length) {
-    logger.info(
-      `Workflow/service:create-record: ${duplicateIds.length} duplicate composition(s) found`
-    )
-    record = updateRecordWithDuplicateIds(record, duplicateIds)
-  }
 
   await auditEvent(
     isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
@@ -255,7 +264,20 @@ export default async function createRecordHandler(
     token
   )
 
-  if (hasValidateScope(request)) {
+  if (duplicateIds.length) {
+    // update task in hearth
+    let task = getTaskFromSavedBundle(record)
+    task = updateTaskWithDuplicateIds(task, duplicateIds)
+    task.lastModified = new Date().toISOString()
+    await updateInHearth(task)
+    // index
+    await indexBundle(record, token)
+    return {
+      compositionId: getComposition(record).id,
+      trackingId: getTrackingIdFromRecord(record),
+      isPotentiallyDuplicate: true
+    }
+  } else if (hasValidateScope(request)) {
     record = await toValidated(record, token)
     await auditEvent('sent-for-approval', record, token)
   } else if (hasRegisterScope(request) && !isInProgress(record)) {
@@ -299,6 +321,6 @@ export default async function createRecordHandler(
   return {
     compositionId: getComposition(record).id,
     trackingId: getTrackingIdFromRecord(record),
-    isPotentiallyDuplicate: duplicateIds.length > 0
+    isPotentiallyDuplicate: false
   }
 }

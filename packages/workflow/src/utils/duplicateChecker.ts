@@ -19,10 +19,6 @@ import {
   EVENT_TYPE,
   Extension,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
-  getCompositionFromSavedBundle,
-  getTaskFromSavedBundle,
-  InProgressRecord,
-  ReadyForReviewRecord,
   SavedComposition,
   SavedTask
 } from '@opencrvs/commons/types'
@@ -152,21 +148,7 @@ export async function findDuplicateIds(
   return []
 }
 
-export function updateRecordWithDuplicateIds(
-  record: InProgressRecord | ReadyForReviewRecord,
-  duplicateIds: { id: string; trackingId: string }[]
-) {
-  let task = getTaskFromSavedBundle(record)
-  let composition = getCompositionFromSavedBundle(record)
-  task = updateRecordTaskWithDuplicateIds(task, duplicateIds)
-  composition = updateRecordCompositionWithDuplicateIds(
-    composition,
-    duplicateIds
-  )
-  return record
-}
-
-function updateRecordTaskWithDuplicateIds(
+export function updateTaskWithDuplicateIds(
   task: SavedTask,
   duplicateIds: { id: string; trackingId: string }[]
 ) {
@@ -185,8 +167,8 @@ function updateRecordTaskWithDuplicateIds(
   ) as SavedTask
 }
 
-export function updateRecordCompositionWithDuplicateIds(
-  composition: SavedComposition,
+export function updateCompositionWithDuplicateIds(
+  composition: Composition,
   duplicateIds: { id: string; trackingId: string }[]
 ) {
   const relatesTo: NonNullable<Composition['relatesTo']> = duplicateIds.map(
