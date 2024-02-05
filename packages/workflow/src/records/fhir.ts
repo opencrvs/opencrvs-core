@@ -1687,22 +1687,3 @@ export function sortTasksDescending(tasks: Task[]) {
     )
   })
 }
-
-export async function updateInHearth(resource: Resource) {
-  const suffix = `/${resource.resourceType}/${resource.id}`
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
-    method: 'PUT',
-    body: JSON.stringify(resource),
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-  if (!res.ok) {
-    throw new Error(
-      `FHIR put to /fhir failed with [${res.status}] body: ${await res.text()}`
-    )
-  }
-
-  const text = await res.text()
-  return typeof text === 'string' ? text : JSON.parse(text)
-}

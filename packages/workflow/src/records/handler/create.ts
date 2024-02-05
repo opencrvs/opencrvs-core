@@ -30,8 +30,7 @@ import {
   isValidated,
   isWaitingExternalValidation,
   isComposition,
-  getTaskFromSavedBundle,
-  isTaskBundleEntry
+  getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -43,7 +42,6 @@ import {
   mergeBundles,
   sendBundleToHearth,
   toSavedBundle,
-  updateInHearth,
   withPractitionerDetails
 } from '@workflow/records/fhir'
 import { z } from 'zod'
@@ -266,21 +264,13 @@ export default async function createRecordHandler(
   )
 
   if (duplicateIds.length) {
-    // update task in hearth
+    await indexBundle(record, token)
     let task = getTaskFromSavedBundle(record)
     task = updateTaskWithDuplicateIds(task, duplicateIds)
-    task.lastModified = new Date().toISOString()
-    await updateInHearth(task)
-    // index
-    await indexBundle(
-      {
-        ...record,
-        entry: record.entry.map((e) =>
-          isTaskBundleEntry(e) ? { ...e, resource: task } : e
-        )
-      },
-      token
-    )
+    await sendBundleToHearth({
+      ...record,
+      entry: [{ resource: task }]
+    })
     return {
       compositionId: getComposition(record).id,
       trackingId: getTrackingIdFromRecord(record),
