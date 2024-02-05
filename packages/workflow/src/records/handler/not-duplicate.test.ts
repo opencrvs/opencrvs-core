@@ -69,10 +69,16 @@ describe('not-duplicate record endpoint', () => {
         }
       )
     )
+    // Sends bundle to deduplicate handler in search
+    mswServer.use(
+      rest.post('http://localhost:9090/events/not-duplicate', (_, res, ctx) => {
+        return res(ctx.json({}))
+      })
+    )
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/record/c8b8e843-c5e0-49b5-96d9-a702ddb46454/not-duplicate',
+      url: '/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454/not-duplicate',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
