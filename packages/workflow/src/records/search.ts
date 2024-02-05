@@ -8,17 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  Bundle,
-  Resource,
-  SavedTask,
-  ValidRecord
-} from '@opencrvs/commons/types'
+import { Bundle, SavedTask, ValidRecord } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 export async function indexBundle(
-  bundle: ValidRecord | Bundle<Resource>,
+  bundle: ValidRecord | Bundle<SavedTask>,
   authToken: string
 ) {
   const res = await fetch(new URL('/record', SEARCH_URL).href, {
@@ -41,9 +36,9 @@ export async function indexBundle(
 }
 
 export async function indexBundleForAssignment(
-  bundle: Bundle<SavedTask>,
+  bundle: Bundle<SavedTask> | Bundle,
   authToken: string,
-  path: string
+  path = '/record'
 ) {
   const res = await fetch(new URL(path, SEARCH_URL).href, {
     method: 'POST',

@@ -16,7 +16,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { indexBundle } from '@workflow/records/search'
+import { indexBundleForAssignment } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
 const requestSchema = z.object({
@@ -46,7 +46,7 @@ export const rejectRoute = createRoute({
     )
 
     await sendBundleToHearth(rejectedRecordWithTaskOnly)
-    await indexBundle(rejectedRecordWithTaskOnly, token)
+    await indexBundleForAssignment(rejectedRecordWithTaskOnly, token)
     await auditEvent('mark-voided', rejectedRecord, token)
 
     return rejectedRecord
