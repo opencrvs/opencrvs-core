@@ -30,7 +30,8 @@ import {
   isValidated,
   isWaitingExternalValidation,
   isComposition,
-  getTaskFromSavedBundle
+  getTaskFromSavedBundle,
+  isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -271,7 +272,15 @@ export default async function createRecordHandler(
     task.lastModified = new Date().toISOString()
     await updateInHearth(task)
     // index
-    await indexBundle(record, token)
+    await indexBundle(
+      {
+        ...record,
+        entry: record.entry.map((e) =>
+          isTaskBundleEntry(e) ? { ...e, resource: task } : e
+        )
+      },
+      token
+    )
     return {
       compositionId: getComposition(record).id,
       trackingId: getTrackingIdFromRecord(record),
