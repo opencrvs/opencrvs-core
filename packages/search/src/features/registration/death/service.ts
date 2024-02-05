@@ -18,7 +18,6 @@ import {
   CERTIFIED_STATUS,
   createStatusHistory,
   DECLARED_STATUS,
-  detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -33,7 +32,6 @@ import {
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
-  addFlaggedAsPotentialDuplicate,
   findEntry,
   findEntryResourceByUrl,
   findName,
@@ -45,9 +43,9 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
-import { logger } from '@search/logger'
-import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
+
 import { getSubmittedIdentifier } from '@search/features/search/utils'
+import { updateCompositionIfAnyDuplicates } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -170,30 +168,8 @@ async function indexDeclaration(
   await indexComposition(compositionId, body, client)
 
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    await detectAndUpdateDeathDuplicates(compositionId, composition, body)
+    updateCompositionIfAnyDuplicates(composition, body)
   }
-}
-
-async function detectAndUpdateDeathDuplicates(
-  compositionId: string,
-  composition: fhir.Composition,
-  body: IDeathCompositionBody
-) {
-  const duplicates = await detectDeathDuplicates(compositionId, body)
-  if (!duplicates.length) {
-    return
-  }
-  logger.info(
-    `Search/service:death: ${duplicates.length} duplicate composition(s) found`
-  )
-  await addFlaggedAsPotentialDuplicate(
-    duplicates.map((ite) => ite.trackingId).join(','),
-    compositionId
-  )
-  return await updateCompositionWithDuplicates(
-    composition,
-    duplicates.map((it) => it.id)
-  )
 }
 
 async function createIndexBody(

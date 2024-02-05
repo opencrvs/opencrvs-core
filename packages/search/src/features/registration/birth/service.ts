@@ -15,7 +15,6 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -29,22 +28,19 @@ import {
   CERTIFIED_STATUS,
   ARCHIVED_STATUS,
   DECLARED_STATUS,
-  IN_PROGRESS_STATUS
+  IN_PROGRESS_STATUS,
+  IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import {
-  addDuplicatesToComposition,
   findEntry,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  getCompositionById,
-  updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate,
   findPatient
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
@@ -185,7 +181,7 @@ async function indexAndSearchComposition(
   await indexComposition(compositionId, body, client)
 
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
+    updateCompositionIfAnyDuplicates(composition, body)
   }
 }
 
@@ -419,55 +415,19 @@ async function createDeclarationIndex(
   body.updatedBy = regLastUser
 }
 
-async function detectAndUpdateBirthDuplicates(
-  compositionId: string,
+export function updateCompositionIfAnyDuplicates(
   composition: fhir.Composition,
-  body: IBirthCompositionBody
+  body: IBirthCompositionBody | IDeathCompositionBody
 ) {
-  // done in workflow
-  const duplicates = await detectBirthDuplicates(compositionId, body)
+  const duplicates =
+    composition.relatesTo?.filter((rel) => rel.code === 'duplicate') || []
   if (!duplicates.length) {
     return
   }
   logger.info(
     `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-  // done in workflow
-  await addFlaggedAsPotentialDuplicate(
-    duplicates.map((ite) => ite.trackingId).join(','),
-    compositionId
-  )
-  // done in workflow
-  return await updateCompositionWithDuplicates(
-    composition,
-    duplicates.map((it) => it.id)
-  )
-}
-
-export async function updateCompositionWithDuplicates(
-  composition: fhir.Composition,
-  duplicates: string[]
-) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map((duplicate) => getCompositionById(duplicate))
-  )
-
-  const duplicateCompositionIds = duplicateCompositions.map(
-    (dupComposition) => dupComposition.id
-  )
-
-  if (composition && composition.id) {
-    const body: ICompositionBody = {}
-    body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body, client)
-  }
-  const compositionFromFhir = (await getCompositionById(
-    composition.id as string
-  )) as fhir.Composition
-  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
-
-  return updateInHearth(
-    `/Composition/${compositionFromFhir.id}`,
-    compositionFromFhir
+  body.relatesTo = duplicates.map(
+    (rel) => rel.targetReference!.reference!.split('/')[1]
   )
 }
