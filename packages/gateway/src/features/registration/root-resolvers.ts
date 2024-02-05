@@ -68,7 +68,7 @@ import {
   fetchRegistrationForDownloading,
   reinstateRegistration,
   duplicateRegistration,
-  markNotAsDuplicate
+  markNotADuplicate
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { certifyRegistration, createRegistration } from '@gateway/workflow'
@@ -658,7 +658,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition = await markNotAsDuplicate(id, authHeader)
+        const composition = await markNotADuplicate(id, authHeader)
 
         return composition.id
       } else {

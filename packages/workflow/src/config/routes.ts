@@ -121,7 +121,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/record/{id}/not-duplicate',
+      path: '/records/{id}/not-duplicate',
       handler: markAsNotDuplicateHandler,
       config: {
         tags: ['api'],

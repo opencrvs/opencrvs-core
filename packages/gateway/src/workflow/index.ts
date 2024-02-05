@@ -230,10 +230,10 @@ export function certifyRegistration(
   )
 }
 
-export async function markNotAsDuplicate(id: string, authHeader: IAuthHeader) {
+export async function markNotADuplicate(id: string, authHeader: IAuthHeader) {
   const response = await createRequest<Bundle<Resource>>(
     'POST',
-    `/record/${id}/not-duplicate`,
+    `/records/${id}/not-duplicate`,
     authHeader
   )
 
@@ -272,7 +272,7 @@ export async function duplicateRegistration(
 ) {
   const res: ReadyForReviewRecord = await createRequest(
     'POST',
-    `/record/${id}/duplicate`,
+    `/records/${id}/duplicate`,
     authHeader,
     {
       reason,
