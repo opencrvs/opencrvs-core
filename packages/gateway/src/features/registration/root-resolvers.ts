@@ -24,7 +24,8 @@ import {
   Task,
   buildFHIRBundle,
   taskBundleWithExtension,
-  getComposition
+  getComposition,
+  isTaskBundleEntry
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -43,11 +44,11 @@ import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
 import {
   removeDuplicatesFromComposition,
-  setCollectorForPrintInAdvance,
-  uploadBase64AttachmentsToDocumentsStore
+  setCollectorForPrintInAdvance
 } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
+  issueRegistration,
   registerDeclaration,
   unassignRegistration,
   rejectDeclaration,
@@ -55,6 +56,7 @@ import {
   validateRegistration,
   fetchRegistrationForDownloading,
   reinstateRegistration,
+  duplicateRegistration,
   viewDeclaration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
@@ -337,29 +339,29 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
-      try {
-        const token = await getAnonymousToken()
-        headers.Authorization = `Bearer ${token}`
-        const authHeader = {
-          Authorization: headers.Authorization
-        }
-        const taskEntry = await getTaskEntry(id, authHeader)
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      const token = await getAnonymousToken()
+      context.headers.Authorization = `Bearer ${token}`
+      context.record = await getRecordById(id, context.headers.Authorization)
 
-        const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: 'http://opencrvs.org/specs/extension/regVerified',
-          valueString: headers['x-real-ip']!
-        })
-        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const taskEntry = context.record.entry.find(isTaskBundleEntry)
 
-        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
-        if (!record) {
-          await Promise.reject(new Error('Invalid QrCode'))
-        }
-        return record
-      } catch (e) {
-        await Promise.reject(new Error(e))
+      if (!taskEntry) {
+        throw new Error('Task entry not found for verification')
       }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: 'http://opencrvs.org/specs/extension/regVerified',
+        valueString: context.headers['x-real-ip']!
+      })
+      await fetchFHIR(
+        '/Task',
+        context.headers,
+        'PUT',
+        JSON.stringify(taskBundle)
+      )
+
+      return context.record
     }
   },
 
@@ -582,11 +584,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'certify')) {
@@ -595,13 +596,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'certify')) {
@@ -610,13 +608,10 @@ export const resolvers: GQLResolver = {
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
       if (
@@ -682,45 +677,17 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const extension = {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
-        valueString: duplicateTrackingId
-      }
+      const taskEntry = await duplicateRegistration(
+        id,
+        authHeader,
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-      if (comment || reason) {
-        if (!taskEntry.resource.reason) {
-          taskEntry.resource.reason = {
-            text: ''
-          }
-        }
-
-        taskEntry.resource.reason.text = reason || ''
-        const statusReason = {
-          text: comment
-        }
-        taskEntry.resource.statusReason = statusReason
-      }
-
-      const taskBundle = taskBundleWithExtension(taskEntry, extension)
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return taskEntry.resource.id
     }
   }
-}
-
-async function registrationToFHIR(
-  event: EVENT_TYPE,
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader
-) {
-  const recordWithAttachmentsUploaded =
-    await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
-
-  return buildFHIRBundle(recordWithAttachmentsUploaded, event)
 }
 
 async function markEventAsValidated(
@@ -787,13 +754,29 @@ async function markEventAsCertified(
 }
 
 async function markEventAsIssued(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  return getIDFromResponse(res)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const { payments, ...withoutPayments } = certificateDetails
+  if (!payments?.[0]) {
+    return Promise.reject(new Error('Payment details required'))
+  }
+  const issuedRecord = await issueRegistration(
+    id,
+    { ...withoutPayments, payment: payments[0] },
+    event,
+    authHeader
+  )
+  return getComposition(issuedRecord).id
 }
 
 const ACTION_EXTENSIONS: Extension['url'][] = [

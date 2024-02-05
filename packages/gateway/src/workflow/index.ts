@@ -17,9 +17,11 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
+  ReadyForReviewRecord,
   RejectedRecord,
   getTaskFromSavedBundle,
   getBusinessStatus,
+  IssuedRecord,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
@@ -30,7 +32,8 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLPaymentInput
 } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils/index'
 
@@ -247,6 +250,48 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function duplicateRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/duplicate`,
+    authHeader,
+    {
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
+}
+
+export function issueRegistration(
+  recordId: string,
+  certificate: Omit<GQLCertificateInput, 'payments'> & {
+    payment: GQLPaymentInput
+  },
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<IssuedRecord>(
+    'POST',
+    `/records/${recordId}/issue-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }
 
 export async function rejectDeclaration(

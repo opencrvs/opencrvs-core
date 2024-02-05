@@ -8,32 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CertifiedRecord, changeState } from '@opencrvs/commons/types'
+import { changeState, IssuedRecord } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { CertifyRequestSchema } from '@workflow/records/validations'
-import { toCertified } from '@workflow/records/state-transitions'
-import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
-import { getAuthHeader } from '@opencrvs/commons/http'
+import { IssueRequestSchema } from '@workflow/records/validations'
+import { toIssued } from '@workflow/records/state-transitions'
 import {
   mergeBundles,
   sendBundleToHearth,
   toSavedBundle
 } from '@workflow/records/fhir'
+import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
+import { getAuthHeader } from '@opencrvs/commons/http'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
-export const certifyRoute = createRoute({
+export const issueRoute = createRoute({
   method: 'POST',
-  path: '/records/{recordId}/certify-record',
-  allowedStartStates: ['REGISTERED'],
-  action: 'CERTIFY',
-  handler: async (request, record): Promise<CertifiedRecord> => {
+  path: '/records/{recordId}/issue-record',
+  allowedStartStates: ['CERTIFIED'],
+  action: 'ISSUE',
+  handler: async (request, record): Promise<IssuedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
-      validateRequest(CertifyRequestSchema, request.payload)
+      validateRequest(IssueRequestSchema, request.payload)
 
     const certificateDetails =
       await uploadCertificateAttachmentsToDocumentsStore(
@@ -41,7 +41,7 @@ export const certifyRoute = createRoute({
         getAuthHeader(request)
       )
 
-    const unsavedChangedResources = await toCertified(
+    const unsavedChangedResources = await toIssued(
       record,
       await getLoggedInPractitionerResource(token),
       event,
@@ -54,14 +54,14 @@ export const certifyRoute = createRoute({
       responseBundle
     )
 
-    const certifiedRecord = changeState(
+    const issuedRecord = changeState(
       mergeBundles(record, changedResources),
-      'CERTIFIED'
+      'ISSUED'
     )
 
-    await indexBundle(certifiedRecord, token)
-    await auditEvent('mark-certified', certifiedRecord, token)
+    await indexBundle(issuedRecord, token)
+    await auditEvent('mark-issued', issuedRecord, token)
 
-    return certifiedRecord
+    return issuedRecord
   }
 })

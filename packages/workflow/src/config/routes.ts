@@ -16,6 +16,8 @@ import { archiveRoute } from '@workflow/records/handler/archive'
 import createRecordHandler from '@workflow/records/handler/create'
 import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
+import { issueRoute } from '@workflow/records/handler/issue'
+import { duplicateRecordHandler } from '@workflow/records/handler/duplicate'
 import { registerRoute } from '@workflow/records/handler/register'
 import { rejectRoute } from '@workflow/records/handler/reject'
 import { reinstateRoute } from '@workflow/records/handler/reinstate'
@@ -113,9 +115,19 @@ export const getRoutes = () => {
     ...updateRoute,
     ...registerRoute,
     certifyRoute,
+    issueRoute,
     ...archiveRoute,
     rejectRoute,
-    reinstateRoute
+    reinstateRoute,
+    {
+      method: 'POST',
+      path: '/records/{id}/duplicate',
+      handler: duplicateRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Unassign record endpoint'
+      }
+    }
   ]
 
   return routes

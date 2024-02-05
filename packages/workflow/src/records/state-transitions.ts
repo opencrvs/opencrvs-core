@@ -37,7 +37,6 @@ import {
   Composition,
   RelatedPerson,
   Patient,
-  findCompositionSection,
   ValidRecord,
   Bundle,
   SavedTask,
@@ -53,7 +52,7 @@ import {
   TaskHistory,
   Location
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -68,20 +67,23 @@ import { IEventRegistrationCallbackPayload } from '@workflow/features/registrati
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
+  CertifyInput,
+  IssueInput,
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput,
   MakeCorrectionRequestInput,
   ChangedValuesInput
-} from '@workflow/records/correction-request'
+} from './validations'
 import {
   createArchiveTask,
   createCorrectedTask,
   createCorrectionEncounter,
-  createCorrectionPaymentResources,
+  createPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
   createDownloadTask,
+  createDuplicateTask,
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
@@ -89,11 +91,12 @@ import {
   createValidateTask,
   createViewTask,
   createWaitingForValidationTask,
-  getTaskHistory
+  getTaskHistory,
+  createRelatedPersonEntries,
+  createDocumentReferenceEntryForCertificate,
+  createIssuedTask,
+  createCertifiedTask
 } from '@workflow/records/fhir'
-import { CertificateInput } from './validations/certify'
-import { z } from 'zod'
-import { badRequest } from '@hapi/boom'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 
 export async function toCorrected(
@@ -108,7 +111,7 @@ export async function toCorrected(
   let correctionPaymentBundleEntries: BundleEntry[] = []
 
   if (correctionDetails.payment) {
-    correctionPaymentBundleEntries = createCorrectionPaymentResources(
+    correctionPaymentBundleEntries = createPaymentResources(
       correctionDetails.payment,
       paymentAttachmentURL
     )
@@ -633,6 +636,52 @@ export async function toReinstated(
   )
 }
 
+export async function toDuplicated(
+  record: ReadyForReviewRecord | ValidatedRecord,
+  practitioner: Practitioner,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+): Promise<{
+  duplicatedRecord: ReadyForReviewRecord | ValidatedRecord
+  duplicatedRecordWithTaskOnly: Bundle<SavedTask>
+}> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const duplicatedTask = createDuplicateTask(
+    previousTask,
+    practitioner,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
+
+  const duplicatedTaskWithPractitionerExtensions = setupLastRegUser(
+    duplicatedTask,
+    practitioner
+  )
+
+  const duplicatedTaskWithLocationExtensions = await setupLastRegLocation(
+    duplicatedTaskWithPractitionerExtensions,
+    practitioner
+  )
+
+  const duplicatedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: duplicatedTaskWithLocationExtensions }]
+  }
+
+  const duplicatedRecord = {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.id !== duplicatedTask.id),
+      { resource: duplicatedTaskWithLocationExtensions }
+    ]
+  } as ReadyForReviewRecord
+
+  return { duplicatedRecord, duplicatedRecordWithTaskOnly }
+}
+
 export async function toValidated(
   record: InProgressRecord | ReadyForReviewRecord,
   practitioner: Practitioner
@@ -676,7 +725,7 @@ export async function toCorrectionRequested(
   let correctionPaymentBundleEntries: BundleEntry[] = []
 
   if (correctionDetails.payment) {
-    correctionPaymentBundleEntries = createCorrectionPaymentResources(
+    correctionPaymentBundleEntries = createPaymentResources(
       correctionDetails.payment,
       paymentAttachmentURL
     )
@@ -842,194 +891,43 @@ export async function toCorrectionRejected(
   >
 }
 
-async function createCertifiedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): Promise<SavedTask> {
-  const certifiedTask: SavedTask = {
-    ...previousTask,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
-        ].includes(extension.url)
-      )
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'CERTIFIED'
-        }
-      ]
-    }
-  }
-  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
-    certifiedTask,
-    practitioner
-  )
-
-  return await setupLastRegLocation(
-    certifiedTaskWithPractitionerExtensions,
-    practitioner
-  )
-}
-
-const knownRelationships = z.enum([
-  'MOTHER',
-  'FATHER',
-  'INFORMANT',
-  'BRIDE',
-  'GROOM'
-])
-
-const relationshipToSectionCode = (
-  relationship: z.TypeOf<typeof knownRelationships>
-): `${Lowercase<typeof relationship>}-details` =>
-  `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
-
-function getRelatedPersonEntries(
-  collectorDetails: CertificateInput['collector'],
-  temporaryRelatedPersonId: UUID,
-  record: RegisteredRecord
-): BundleEntry<RelatedPerson | Patient>[] {
-  if ('otherRelationship' in collectorDetails) {
-    const temporaryPatientId = getUUID()
-    return [
-      {
-        fullUrl: `urn:uuid:${temporaryPatientId}`,
-        resource: {
-          resourceType: 'Patient',
-          name: collectorDetails.name.map(
-            ({ use, firstNames, familyName }) => ({
-              use,
-              given: firstNames.split(' '),
-              family: [familyName]
-            })
-          ),
-          identifier: collectorDetails.identifier.map(({ id, type }) => ({
-            id,
-            type: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/identifier-type',
-                  code: type
-                }
-              ]
-            }
-          }))
-        }
-      },
-      {
-        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
-        resource: {
-          resourceType: 'RelatedPerson',
-          relationship: {
-            coding: [
-              {
-                system:
-                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                code: collectorDetails.relationship
-              }
-            ],
-            text: collectorDetails.otherRelationship
-          },
-          ...(collectorDetails.affidavit?.[0] && {
-            extension: [
-              {
-                url: `http://opencrvs.org/specs/extension/relatedperson-affidavittype`,
-                valueAttachment: {
-                  ...collectorDetails.affidavit[0]
-                }
-              }
-            ]
-          }),
-          patient: {
-            reference: `urn:uuid:${temporaryPatientId}`
-          }
-        }
-      }
-    ]
-  }
-
-  const parseResult = knownRelationships.safeParse(
-    collectorDetails.relationship
-  )
-
-  if (parseResult.success) {
-    const knownRelationship = parseResult.data
-    const section = findCompositionSection(
-      relationshipToSectionCode(knownRelationship),
-      getComposition(record)
-    )
-
-    if (!section) {
-      throw badRequest(`Patient resource for ${knownRelationship} not found`)
-    }
-
-    return [
-      {
-        fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
-        resource: {
-          resourceType: 'RelatedPerson',
-          relationship: {
-            coding: [
-              {
-                system:
-                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                code: collectorDetails.relationship
-              }
-            ]
-          },
-          patient: {
-            reference: section.entry[0].reference
-          }
-        }
-      }
-    ]
-  }
-
-  return [
-    {
-      fullUrl: `urn:uuid:${temporaryRelatedPersonId}`,
-      resource: {
-        resourceType: 'RelatedPerson',
-        relationship: {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: collectorDetails.relationship
-            }
-          ]
-        }
-      }
-    }
-  ]
-}
-
 export async function toCertified(
   record: RegisteredRecord,
   practitioner: Practitioner,
   eventType: EVENT_TYPE,
-  certificateDetails: CertificateInput
+  certificateDetails: CertifyInput
 ): Promise<
   Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
 > {
   const previousTask = getTaskFromSavedBundle(record)
 
-  const certifiedTask = await createCertifiedTask(previousTask, practitioner)
+  const certifiedTask = createCertifiedTask(previousTask, practitioner)
+
+  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
+    certifiedTask,
+    practitioner
+  )
+
+  const certifiedTaskWithLocationExtensions = await setupLastRegLocation(
+    certifiedTaskWithPractitionerExtensions,
+    practitioner
+  )
 
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
 
-  const relatedPersonEntries = getRelatedPersonEntries(
+  const relatedPersonEntries = createRelatedPersonEntries(
     certificateDetails.collector,
     temporaryRelatedPersonId,
     record
+  )
+
+  const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
+    temporaryDocumentReferenceId,
+    temporaryRelatedPersonId,
+    eventType,
+    certificateDetails.hasShowedVerifiedDocument,
+    certificateDetails.data
   )
 
   const certificateSection: CompositionSection = {
@@ -1050,44 +948,93 @@ export async function toCertified(
     ]
   }
 
-  const documentReferenceEntry: BundleEntry<DocumentReference> = {
-    fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
-    resource: {
-      resourceType: 'DocumentReference',
-      masterIdentifier: {
-        system: 'urn:ietf:rfc:3986',
-        value: temporaryDocumentReferenceId
-      },
-      extension: [
+  const previousComposition = getComposition(record)
+
+  const compositionWithCertificateSection: Composition = {
+    ...previousComposition,
+    section: [
+      ...previousComposition.section.filter(
+        ({ title }) => title !== 'Certificates'
+      ),
+      certificateSection
+    ]
+  }
+  return {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [
+      { resource: compositionWithCertificateSection },
+      { resource: certifiedTaskWithLocationExtensions },
+      ...relatedPersonEntries,
+      documentReferenceEntry
+    ]
+  }
+}
+
+export async function toIssued(
+  record: RegisteredRecord | CertifiedRecord,
+  practitioner: Practitioner,
+  eventType: EVENT_TYPE,
+  certificateDetails: IssueInput
+): Promise<
+  Bundle<
+    | Composition
+    | Task
+    | DocumentReference
+    | RelatedPerson
+    | Patient
+    | PaymentReconciliation
+  >
+> {
+  const previousTask = getTaskFromSavedBundle(record)
+
+  const issuedTask = createIssuedTask(previousTask, practitioner)
+
+  const issuedTaskWithPractitionerExtensions = setupLastRegUser(
+    issuedTask,
+    practitioner
+  )
+
+  const issuedTaskWithLocationExtensions = await setupLastRegLocation(
+    issuedTaskWithPractitionerExtensions,
+    practitioner
+  )
+  const temporaryDocumentReferenceId = getUUID()
+  const temporaryRelatedPersonId = getUUID()
+
+  const relatedPersonEntries = createRelatedPersonEntries(
+    certificateDetails.collector,
+    temporaryRelatedPersonId,
+    record
+  )
+
+  const [paymentEntry] = createPaymentResources(certificateDetails.payment)
+
+  const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
+    temporaryDocumentReferenceId,
+    temporaryRelatedPersonId,
+    eventType,
+    certificateDetails.hasShowedVerifiedDocument,
+    undefined,
+    paymentEntry.fullUrl
+  )
+
+  const certificateSection: CompositionSection = {
+    title: 'Certificates',
+    code: {
+      coding: [
         {
-          url: 'http://opencrvs.org/specs/extension/collector',
-          valueReference: {
-            reference: `urn:uuid:${temporaryRelatedPersonId}`
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
-          valueBoolean: certificateDetails.hasShowedVerifiedDocument
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'certificates'
         }
       ],
-      type: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/certificate-type',
-            code: eventType
-          }
-        ]
-      },
-      content: [
-        {
-          attachment: {
-            contentType: 'application/pdf',
-            data: certificateDetails.data
-          }
-        }
-      ],
-      status: 'current'
-    }
+      text: 'Certificates'
+    },
+    entry: [
+      {
+        reference: `urn:uuid:${temporaryDocumentReferenceId}`
+      }
+    ]
   }
 
   const previousComposition = getComposition(record)
@@ -1113,8 +1060,9 @@ export async function toCertified(
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: certifiedTask },
+      { resource: issuedTaskWithLocationExtensions },
       ...relatedPersonEntries,
+      paymentEntry,
       documentReferenceEntry
     ]
   }

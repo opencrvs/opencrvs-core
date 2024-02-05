@@ -17,7 +17,7 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/markedAsDuplicate': {
     url: 'http://opencrvs.org/specs/extension/markedAsDuplicate'
-    valueString?: string
+    valueString: string
   }
   'http://opencrvs.org/specs/extension/educational-attainment': {
     url: 'http://opencrvs.org/specs/extension/educational-attainment'
