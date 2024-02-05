@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import { getToken, getTokenPayload } from '@workflow/utils/authUtils'
 import { getValidRecordById } from '@workflow/records/index'
 import { getPractitionerOffice, getUser } from '@workflow/features/user/utils'
-import { Location } from '@opencrvs/commons/types'
+import { Bundle, Location } from '@opencrvs/commons/types'
 import { toViewed } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
@@ -31,11 +31,12 @@ export async function viewRecordHandler(
   })
   const office = (await getPractitionerOffice(user.practitionerId)) as Location
 
-  const { viewedRecord, viewedRecordWithTaskOnly } = await toViewed(
-    record,
-    user,
-    office
-  )
+  const viewedRecord = await toViewed(record, user, office)
+
+  const viewedRecordWithTaskOnly: Bundle = {
+    ...viewedRecord,
+    entry: [viewedRecord.entry.find((e) => e.resource.resourceType === 'Task')!]
+  }
 
   await sendBundleToHearth(viewedRecordWithTaskOnly)
   await auditEvent('viewed', viewedRecord, token)

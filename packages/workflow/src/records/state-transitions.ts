@@ -271,11 +271,11 @@ export async function toUpdated(
   return updatedRecord
 }
 
-export async function toViewed(
-  record: ValidRecord,
+export async function toViewed<T extends ValidRecord>(
+  record: T,
   user: IUserModelData,
   office: Location
-) {
+): Promise<T> {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
   const viewedTask = await createViewTask(previousTask, user, office)
 
@@ -287,7 +287,7 @@ export async function toViewed(
     (e) => e.resource.resourceType !== 'Task'
   )
 
-  const viewedRecord: Bundle = {
+  const viewedRecord = {
     resourceType: 'Bundle' as const,
     type: 'document' as const,
     entry: [
@@ -300,15 +300,9 @@ export async function toViewed(
       },
       taskHistoryEntry
     ]
-  }
+  } as T
 
-  const viewedRecordWithTaskOnly: Bundle = {
-    resourceType: 'Bundle' as const,
-    type: 'document' as const,
-    entry: [{ resource: viewedTask }]
-  }
-
-  return { viewedRecord, viewedRecordWithTaskOnly }
+  return viewedRecord
 }
 
 export async function toDownloaded(
