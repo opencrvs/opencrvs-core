@@ -49,8 +49,7 @@ import {
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
-  TaskHistory,
-  removeDuplicatesFromComposition
+  TaskHistory
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -65,7 +64,10 @@ import {
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { IEventRegistrationCallbackPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import {
+  getTaskEventType,
+  removeDuplicatesFromComposition
+} from '@workflow/features/task/fhir/utils'
 import {
   CertifyInput,
   IssueInput,
