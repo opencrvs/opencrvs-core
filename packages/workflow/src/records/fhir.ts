@@ -1539,7 +1539,7 @@ function toSavedRelatedPerson(
   }
 }
 
-type EncoutnerLocationResolved = {
+type EncounterLocationResolved = {
   location: {
     location: {
       reference: URLReference | URNReference
@@ -1548,7 +1548,7 @@ type EncoutnerLocationResolved = {
 }
 
 function toSavedEncounter(
-  encounter: Omit<Encounter, 'location'> & EncoutnerLocationResolved,
+  encounter: Omit<Encounter, 'location'> & EncounterLocationResolved,
   id: UUID,
   resourceBundle: Bundle,
   responseBundle: TransactionResponse
@@ -1658,7 +1658,7 @@ export async function toSavedBundle<T extends Resource>(
                         ? location.location.reference
                         : await resolveReference(location.location.reference)
                   }
-                } satisfies EncoutnerLocationResolved['location'][number]
+                } satisfies EncounterLocationResolved['location'][number]
               })
             )
           }

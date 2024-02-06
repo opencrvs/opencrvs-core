@@ -16,7 +16,7 @@ import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
-import { isTaskBundleEntry } from '@workflow/../../commons/build/dist/types'
+import { isTaskBundleEntry } from '@opencrvs/commons/types'
 
 const requestSchema = z.object({
   comment: z.custom<string>(),
