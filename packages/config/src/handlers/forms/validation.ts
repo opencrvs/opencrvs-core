@@ -268,6 +268,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'ageOfIndividualInYears',
     'deceasedID',
     'maritalStatus',
+    'occupation',
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
