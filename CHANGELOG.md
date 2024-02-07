@@ -14,5 +14,6 @@
 ## Bug fixes
 
 - Filter user information such as usernames and authentication codes from server logs
+- Core not recognizing "occupation" as an optional field for deceased
 
 See [Releases](https://github.com/opencrvs/opencrvs-core/releases) for release notes of older releases.
