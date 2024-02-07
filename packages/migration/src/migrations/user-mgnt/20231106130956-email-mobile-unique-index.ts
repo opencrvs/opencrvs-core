@@ -37,9 +37,8 @@ export const up = async (db: Db, client: MongoClient) => {
           .collection('users')
           .dropIndex({ emailForNotification: 1 } as any)
       }
-
-      // eslint-disable-next-line no-console
-      console.log('Updating indices for collection: users')
+      // Ensure that the "mobile" field in the "users" collection does not contain null or duplicate values
+      // Before making the field sparse, which allows it to have null values but ensures uniqueness
       const updateResult = await db.collection('users').updateMany(
         { mobile: { $in: [null, ''] } },
         {
@@ -50,6 +49,8 @@ export const up = async (db: Db, client: MongoClient) => {
       )
       console.log('Number of documents updated:', updateResult.modifiedCount)
 
+      // eslint-disable-next-line no-console
+      console.log('Updating indices for collection: users')
       await db
         .collection('users')
         .createIndex(
