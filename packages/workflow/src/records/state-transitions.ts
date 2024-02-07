@@ -52,7 +52,7 @@ import {
   toHistoryResource,
   TaskHistory
 } from '@opencrvs/commons/types'
-import { getUUID, IAuthHeader, UUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -771,10 +771,10 @@ export async function toUnassigned(
 
 export async function toVerified(
   record: RegisteredRecord | IssuedRecord,
-  headers: IAuthHeader
+  ipInfo: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const verifyRecordTask = createVerifyRecordTask(previousTask, headers)
+  const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
 
   return {
     ...record,

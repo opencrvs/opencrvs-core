@@ -39,7 +39,7 @@ import {
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID, IAuthHeader, UUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -800,7 +800,7 @@ export function createUnassignedTask(
 
 export function createVerifyRecordTask(
   previousTask: SavedTask,
-  headers: IAuthHeader
+  ipInfo: string
 ): SavedTask {
   return {
     resourceType: 'Task',
@@ -824,7 +824,7 @@ export function createVerifyRecordTask(
       ),
       {
         url: 'http://opencrvs.org/specs/extension/regVerified',
-        valueString: headers['x-real-ip']!
+        valueString: ipInfo
       }
     ],
     lastModified: new Date().toISOString(),

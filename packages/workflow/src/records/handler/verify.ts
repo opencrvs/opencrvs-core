@@ -15,7 +15,6 @@ import { getRecordById } from '@workflow/records/index'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { toVerified } from '@workflow/records/state-transitions'
 import { validateRequest } from '@workflow/features/correction/routes'
-import { IAuthHeader } from '@opencrvs/commons/http'
 
 export async function verifyRecordHandler(
   request: Hapi.Request,
@@ -26,11 +25,13 @@ export async function verifyRecordHandler(
   const record = await getRecordById(recordId, token, ['REGISTERED', 'ISSUED'])
 
   const payload = validateRequest(
-    z.object({ authHeader: z.custom<IAuthHeader>() }),
+    z.object({
+      'x-real-ip': z.string()
+    }),
     request.payload
   )
 
-  const verifiedRecord = await toVerified(record, payload.authHeader)
+  const verifiedRecord = await toVerified(record, payload['x-real-ip'])
 
   await sendBundleToHearth(verifiedRecord)
   return verifiedRecord
