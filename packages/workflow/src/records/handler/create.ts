@@ -168,11 +168,11 @@ async function createRecord(
   const [taskWithLocation, practitionerResourcesBundle] =
     await withPractitionerDetails(task, token)
 
-  logger.info(
-    `Workflow/service:createRecord: ${duplicateIds.length} duplicate composition(s) found`
-  )
   inputBundle.entry = inputBundle.entry.map((e) => {
     if (isComposition(e.resource) && duplicateIds.length > 0) {
+      logger.info(
+        `Workflow/service:createRecord: ${duplicateIds.length} duplicate composition(s) found`
+      )
       return {
         ...e,
         resource: updateCompositionWithDuplicateIds(e.resource, duplicateIds)

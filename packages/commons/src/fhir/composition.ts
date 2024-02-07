@@ -8,15 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  isComposition,
-  Reference,
-  SavedBundle,
-  SavedReference,
-  isSaved,
-  SavedComposition,
-  Composition
-} from '.'
+import { Reference, SavedReference, SavedComposition, Composition } from '.'
 
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
@@ -207,19 +199,6 @@ export type CompositionSection = Section<ReferenceType['code']>
 
 export type SavedCompositionSection = Omit<CompositionSection, 'entry'> & {
   entry: Array<SavedReference>
-}
-
-export function getCompositionFromSavedBundle<T extends SavedBundle>(
-  bundle: T
-) {
-  const composition = bundle.entry
-    .map(({ resource }) => resource)
-    .find(isComposition)
-
-  if (!composition || !isSaved(composition)) {
-    throw new Error('No task found in bundle')
-  }
-  return composition
 }
 
 export function addRelatesToToComposition(
