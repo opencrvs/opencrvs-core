@@ -13,8 +13,7 @@ import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
-  findTaskExtension,
-  getFromFhir
+  findTaskExtension
 } from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
@@ -23,6 +22,13 @@ import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import {
+  getFromBundleById,
+  OpenCRVSPatientName,
+  SavedBundle,
+  SavedLocation,
+  SavedTask
+} from '@opencrvs/commons/types'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -248,7 +254,7 @@ interface IUserRole {
 export interface IUserModelData {
   _id: string
   role: IUserRole
-  name: fhir.HumanName[]
+  name: OpenCRVSPatientName[]
 }
 
 export async function detectBirthDuplicates(
@@ -283,8 +289,9 @@ export const getStatus = async (compositionId: string) => {
 
 export const createStatusHistory = async (
   body: ICompositionBody,
-  task: fhir.Task | undefined,
-  authHeader: string
+  task: SavedTask | undefined,
+  authHeader: string,
+  bundle: SavedBundle
 ) => {
   if (!isValidOperationHistory(body)) {
     return
@@ -304,9 +311,13 @@ export const createStatusHistory = async (
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
-  const office: fhir.Location = await getFromFhir(
-    `/${regLasOfficeExtension?.valueReference?.reference}`
-  )
+  let office: SavedLocation | undefined
+  if (regLasOfficeExtension) {
+    office = getFromBundleById<SavedLocation>(
+      bundle,
+      regLasOfficeExtension.valueReference.reference.split('/')[1]
+    )?.resource
+  }
 
   const operationHistory = {
     operationType: body.type,
@@ -329,9 +340,10 @@ export const createStatusHistory = async (
     isNotification(body) &&
     body.eventLocationId
   ) {
-    const facility: fhir.Location = await getFromFhir(
-      `/Location/${body.eventLocationId}`
-    )
+    const facility = getFromBundleById<SavedLocation>(
+      bundle,
+      body.eventLocationId
+    ).resource
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
@@ -363,6 +375,10 @@ export function findDuplicateIds(
     IBirthCompositionBody | IDeathCompositionBody
   >['hits']['hits']
 ) {
+  console.log(
+    '----------------------SEARCH RESULTS----------------------------'
+  )
+  console.log(results)
   return results
     .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
@@ -411,7 +427,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
 function updateOperationHistoryWithCorrection(
   operationHistory: IOperationHistory,
-  task?: fhir.Task
+  task?: SavedTask
 ) {
   if (
     task?.input?.length &&

@@ -32,10 +32,8 @@ import {
   findEntry,
   findName,
   findNameLocale,
-  findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
   getdeclarationJurisdictionIds,
   addEventLocation,
   findExtension
@@ -44,6 +42,16 @@ import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
+import {
+  getComposition,
+  getFromBundleById,
+  getTaskFromSavedBundle,
+  Patient,
+  RelatedPerson,
+  SavedBundle,
+  SavedComposition,
+  SavedTask
+} from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -52,23 +60,14 @@ const WITNESS_TWO_CODE = 'witness-two-details'
 const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as fhir.Bundle
-  const bundleEntries = bundle.entry
+  const bundle = requestBundle.payload as SavedBundle
   const authHeader = requestBundle.headers.authorization
 
-  const isCompositionInBundle = bundleEntries?.some(
-    ({ resource }) => resource?.resourceType === 'Composition'
-  )
+  const composition = getComposition(bundle)
 
-  if (!isCompositionInBundle) {
+  if (!composition) {
     await updateEvent(bundle, authHeader)
     return
-  }
-
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  if (!composition) {
-    throw new Error('Composition not found')
   }
 
   const compositionId = composition.id
@@ -77,15 +76,15 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     throw new Error(`Composition ID not found`)
   }
 
-  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
+  await indexDeclaration(compositionId, composition, authHeader, bundle)
 }
 
 /**
  * Updates the search index with the latest information of the composition
  * Supports 1 task and 1 patient maximum
  */
-async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
-  const task = findTask(bundle.entry)
+async function updateEvent(bundle: SavedBundle, authHeader: string) {
+  const task: SavedTask | undefined = getTaskFromSavedBundle(bundle)
   const compositionId =
     task &&
     task.focus &&
@@ -140,15 +139,15 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   ) {
     body.assignment = null
   }
-  await createStatusHistory(body, task, authHeader)
+  await createStatusHistory(body, task, authHeader, bundle)
   await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
   compositionId: string,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
   const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
@@ -161,41 +160,37 @@ async function indexDeclaration(
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
-  await createIndexBody(body, composition, authHeader, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundle)
   await indexComposition(compositionId, body, client)
 }
 
 async function createIndexBody(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
-  await createBrideIndex(body, composition, bundleEntries)
-  await createGroomIndex(body, composition, bundleEntries)
-  createWitnessOneIndex(body, composition, bundleEntries)
-  createWitnessTwoIndex(body, composition, bundleEntries)
-  await createDeclarationIndex(body, composition, bundleEntries)
-  const task = findTask(bundleEntries)
-  await createStatusHistory(body, task, authHeader)
+  await createBrideIndex(body, composition, bundle)
+  await createGroomIndex(body, composition, bundle)
+  createWitnessOneIndex(body, composition, bundle)
+  createWitnessTwoIndex(body, composition, bundle)
+  await createDeclarationIndex(body, composition, bundle)
+  const task = getTaskFromSavedBundle(bundle)
+  await createStatusHistory(body, task, authHeader, bundle)
 }
 
 async function createBrideIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const bride = findEntry(
-    BRIDE_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
+  const bride = findEntry(BRIDE_CODE, composition, bundle) as unknown as Patient
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-    bride?.extension as fhir.Extension[]
+    bride.extension
   )
 
   const brideName = bride && findName(NAME_EN, bride.name)
@@ -219,20 +214,16 @@ async function createBrideIndex(
 
 async function createGroomIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const groom = findEntry(
-    GROOM_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
+  const groom = findEntry(GROOM_CODE, composition, bundle) as unknown as Patient
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-    groom?.extension as fhir.Extension[]
+    groom?.extension
   )
 
   const groomName = groom && findName(NAME_EN, groom.name)
@@ -257,23 +248,23 @@ async function createGroomIndex(
 
 function createWitnessOneIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
   const witnessRef = findEntry(
     WITNESS_ONE_CODE,
     composition,
-    bundleEntries
-  ) as fhir.RelatedPerson
+    bundle
+  ) as RelatedPerson
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = findEntryResourceByUrl(
-    witnessRef.patient.reference,
-    bundleEntries
-  ) as fhir.Patient
+  const witness = getFromBundleById(
+    bundle,
+    witnessRef.patient.reference.split('/')[1]
+  ) as unknown as Patient
 
   if (!witness) {
     return
@@ -296,23 +287,23 @@ function createWitnessOneIndex(
 
 function createWitnessTwoIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
   const witnessRef = findEntry(
     WITNESS_TWO_CODE,
     composition,
-    bundleEntries
-  ) as fhir.RelatedPerson
+    bundle
+  ) as unknown as RelatedPerson
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = findEntryResourceByUrl(
-    witnessRef.patient.reference,
-    bundleEntries
-  ) as fhir.Patient
+  const witness = getFromBundleById(
+    bundle,
+    witnessRef.patient.reference.split('/')[1]
+  ) as unknown as Patient
 
   if (!witness) {
     return
@@ -335,9 +326,9 @@ function createWitnessTwoIndex(
 async function createDeclarationIndex(
   body: IMarriageCompositionBody,
   composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  bundleEntries: SavedBundle
 ) {
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundleEntries)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'

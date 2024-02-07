@@ -33,10 +33,8 @@ import {
 import {
   addEventLocation,
   findEntry,
-  findEntryResourceByUrl,
   findName,
   findNameLocale,
-  findTask,
   findTaskExtension,
   findTaskIdentifier,
   getdeclarationJurisdictionIds
@@ -46,6 +44,16 @@ import { client } from '@search/elasticsearch/client'
 
 import { getSubmittedIdentifier } from '@search/features/search/utils'
 import { updateCompositionIfAnyDuplicates } from '@search/features/registration/birth/service'
+import {
+  getComposition,
+  getFromBundleById,
+  getTaskFromSavedBundle,
+  Patient,
+  RelatedPerson,
+  SavedBundle,
+  SavedComposition,
+  SavedTask
+} from '@opencrvs/commons/types'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -55,23 +63,14 @@ const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as fhir.Bundle
-  const bundleEntries = bundle.entry
+  const bundle = requestBundle.payload as SavedBundle
   const authHeader = requestBundle.headers.authorization
 
-  const isCompositionInBundle = bundleEntries?.some(
-    ({ resource }) => resource?.resourceType === 'Composition'
-  )
+  const composition = getComposition(bundle)
 
-  if (!isCompositionInBundle) {
+  if (!composition) {
     await updateEvent(bundle, authHeader)
     return
-  }
-
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  if (!composition) {
-    throw new Error('Composition not found')
   }
 
   const compositionId = composition.id
@@ -80,15 +79,15 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     throw new Error(`Composition ID not found`)
   }
 
-  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
+  await indexDeclaration(compositionId, composition, authHeader, bundle)
 }
 
 /**
  * Updates the search index with the latest information of the composition
  * Supports 1 task and 1 patient maximum
  */
-async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
-  const task = findTask(bundle.entry)
+async function updateEvent(bundle: SavedBundle, authHeader: string) {
+  const task: SavedTask | undefined = getTaskFromSavedBundle(bundle)
 
   const compositionId =
     task &&
@@ -143,15 +142,15 @@ async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
   ) {
     body.assignment = null
   }
-  await createStatusHistory(body, task, authHeader)
+  await createStatusHistory(body, task, authHeader, bundle)
   await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
   compositionId: string,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
   const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
@@ -164,7 +163,7 @@ async function indexDeclaration(
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
-  await createIndexBody(body, composition, authHeader, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundle)
   await indexComposition(compositionId, body, client)
 
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
@@ -174,30 +173,30 @@ async function indexDeclaration(
 
 async function createIndexBody(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
-  await createDeceasedIndex(body, composition, bundleEntries)
-  createFatherIndex(body, composition, bundleEntries)
-  createMotherIndex(body, composition, bundleEntries)
-  createSpouseIndex(body, composition, bundleEntries)
-  createInformantIndex(body, composition, bundleEntries)
-  await createDeclarationIndex(body, composition, bundleEntries)
-  const task = findTask(bundleEntries)
-  await createStatusHistory(body, task, authHeader)
+  await createDeceasedIndex(body, composition, bundle)
+  createFatherIndex(body, composition, bundle)
+  createMotherIndex(body, composition, bundle)
+  createSpouseIndex(body, composition, bundle)
+  createInformantIndex(body, composition, bundle)
+  await createDeclarationIndex(body, composition, bundle)
+  const task = getTaskFromSavedBundle(bundle)
+  await createStatusHistory(body, task, authHeader, bundle)
 }
 
 async function createDeceasedIndex(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const deceased = findEntry<fhir.Patient>(
+  const deceased = findEntry(
     DECEASED_CODE,
     composition,
-    bundleEntries
-  )
+    bundle
+  ) as unknown as Patient
 
   if (!deceased) {
     return
@@ -227,14 +226,14 @@ async function createDeceasedIndex(
 
 function createMotherIndex(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const mother = findEntry<fhir.Patient>(
+  const mother = findEntry(
     MOTHER_CODE,
     composition,
-    bundleEntries
-  )
+    bundle
+  ) as unknown as Patient
 
   if (!mother) {
     return
@@ -255,14 +254,14 @@ function createMotherIndex(
 
 function createFatherIndex(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const father = findEntry<fhir.Patient>(
+  const father = findEntry(
     FATHER_CODE,
     composition,
-    bundleEntries
-  )
+    bundle
+  ) as unknown as Patient
 
   if (!father) {
     return
@@ -283,14 +282,14 @@ function createFatherIndex(
 
 function createSpouseIndex(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const spouse = findEntry<fhir.Patient>(
+  const spouse = findEntry(
     SPOUSE_CODE,
     composition,
-    bundleEntries
-  )
+    bundle
+  ) as unknown as Patient
 
   if (!spouse) {
     return
@@ -311,23 +310,23 @@ function createSpouseIndex(
 
 function createInformantIndex(
   body: IDeathCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const informantRef = findEntry<fhir.RelatedPerson>(
+  const informantRef = findEntry(
     INFORMANT_CODE,
     composition,
-    bundleEntries
-  )
+    bundle
+  ) as unknown as RelatedPerson
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = findEntryResourceByUrl<fhir.Patient>(
-    informantRef.patient.reference,
-    bundleEntries
-  )
+  const informant = getFromBundleById(
+    bundle,
+    informantRef.patient.reference.split('/')[1]
+  )?.resource as unknown as Patient
 
   if (!informant) {
     return
@@ -356,9 +355,9 @@ function createInformantIndex(
 async function createDeclarationIndex(
   body: IDeathCompositionBody,
   composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundle)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'

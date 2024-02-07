@@ -8,6 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import {
+  CompositionSectionCode,
+  Extension,
+  findCompositionSection,
+  getFromBundleById,
+  KnownExtensionType,
+  OpenCRVSPatientName,
+  SavedBundle,
+  SavedComposition,
+  SavedTask
+} from '@opencrvs/commons/types'
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
@@ -18,21 +29,6 @@ import fetch from 'node-fetch'
 
 export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
-}
-
-export function findCompositionSection(
-  code: string,
-  composition: ITemplatedComposition
-) {
-  return (
-    composition.section &&
-    composition.section.find((section: fhir.CompositionSection) => {
-      if (!section.code || !section.code.coding || !section.code.coding.some) {
-        return false
-      }
-      return section.code.coding.some((coding) => coding.code === code)
-    })
-  )
 }
 
 export function findTask(bundleEntries?: fhir.BundleEntry[]) {
@@ -48,29 +44,28 @@ export function findPatient(bundle: fhir.Bundle) {
   )?.resource as fhir.Patient | undefined
 }
 
-export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
-  return (
-    task &&
-    task.extension &&
-    task.extension.find(
-      (extension) => extension && extension.url === extensionUrl
-    )
+export function findTaskExtension<T extends keyof KnownExtensionType>(
+  task: SavedTask | undefined,
+  extensionUrl: T
+) {
+  return task?.extension?.find(
+    (ext): ext is KnownExtensionType[T] => ext.url === extensionUrl
   )
 }
 
-export function findExtension(
-  url: string,
-  extensions: fhir.Extension[]
-): fhir.Extension | undefined {
+export function findExtension<T extends keyof KnownExtensionType>(
+  url: T,
+  extensions: Extension[] | undefined
+) {
   const extension =
     extensions &&
-    extensions.find((obj: fhir.Extension) => {
+    extensions.find((obj): obj is KnownExtensionType[T] => {
       return obj.url === url
     })
   return extension
 }
 
-export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
+export function findTaskIdentifier(task?: SavedTask, identiferSystem?: string) {
   return (
     task &&
     task.identifier &&
@@ -78,23 +73,23 @@ export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
   )
 }
 
-export function findEntry<T extends fhir.Resource = fhir.Resource>(
-  code: string,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
-): T | undefined {
+export function findEntry(
+  code: CompositionSectionCode,
+  composition: SavedComposition,
+  bundle: SavedBundle
+) {
   const patientSection = findCompositionSection(code, composition)
   if (!patientSection || !patientSection.entry) {
     return undefined
   }
   const reference = patientSection.entry[0].reference
-  return findEntryResourceByUrl(reference, bundleEntries) as T
+  return getFromBundleById(bundle, reference!.split('/')[1]).resource
 }
 
 export async function addEventLocation(
   body: IBirthCompositionBody | IDeathCompositionBody,
-  code: string,
-  composition: fhir.Composition
+  code: CompositionSectionCode,
+  composition: SavedComposition
 ) {
   let data
   let location: fhir.Location | undefined
@@ -157,12 +152,15 @@ export function findEntryResourceByUrl<T extends fhir.Resource = fhir.Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export function findName(code: string, names: fhir.HumanName[] | undefined) {
-  return names && names.find((name: fhir.HumanName) => name.use === code)
+export function findName(
+  code: string,
+  names: OpenCRVSPatientName[] | undefined
+) {
+  return names && names.find((name) => name.use === code)
 }
 
-export function findNameLocale(names: fhir.HumanName[] | undefined) {
-  return names && names.find((name: fhir.HumanName) => name.use !== 'en')
+export function findNameLocale(names: OpenCRVSPatientName[] | undefined) {
+  return names && names.find((name) => name.use !== 'en')
 }
 
 export async function getCompositionById(id: string) {
