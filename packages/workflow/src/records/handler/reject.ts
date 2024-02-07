@@ -20,8 +20,8 @@ import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
 const requestSchema = z.object({
-  comment: z.custom<string>(),
-  reason: z.custom<string>()
+  comment: z.string(),
+  reason: z.string()
 })
 
 export const rejectRoute = createRoute({
