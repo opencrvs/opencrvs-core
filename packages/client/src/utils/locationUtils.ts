@@ -8,7 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
+import {
+  ILocation,
+  LocationType,
+  IOfflineData,
+  Facility,
+  CRVSOffice,
+  AdminStructure
+} from '@client/offline/reducer'
 import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
@@ -17,6 +24,7 @@ import { countries } from '@client/utils/countries'
 import { UserDetails } from './userUtils'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { camelCase } from 'lodash'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -27,6 +35,30 @@ export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   return alpha2
 }
 
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: 'HEALTH_FACILITY',
+  match?: {
+    locationLevel: keyof ILocation
+    locationId?: string
+  }
+): { [key: string]: Facility }
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: 'CRVS_OFFICE',
+  match?: {
+    locationLevel: keyof ILocation
+    locationId?: string
+  }
+): { [key: string]: CRVSOffice }
+export function filterLocations(
+  locations: { [key: string]: ILocation },
+  allowedType: 'ADMIN_STRUCTURE',
+  match?: {
+    locationLevel: keyof ILocation
+    locationId?: string
+  }
+): { [key: string]: AdminStructure }
 export function filterLocations(
   locations: { [key: string]: ILocation },
   allowedType: LocationType,
@@ -209,4 +241,37 @@ export function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
   } else {
     return location.alias?.toString()
   }
+}
+
+type LocationHierarchy = {
+  state?: string
+  district?: string
+  locationLevel3?: string
+  locationLevel4?: string
+  locationLevel5?: string
+  country?: string
+}
+
+const camelCasedJurisdictionType = (
+  jurisdictionType: AdminStructure['jurisdictionType']
+) => camelCase(jurisdictionType) as keyof LocationHierarchy
+
+export function getLocationHierarchy(
+  locationId: string,
+  locations: Record<string, AdminStructure | undefined>,
+  hierarchy: LocationHierarchy = {
+    country: countries.find(({ value }) => value === window.config.COUNTRY)
+      ?.label.defaultMessage as string
+  }
+): LocationHierarchy {
+  const parentLocation = locations[locationId]
+  if (!parentLocation) {
+    return hierarchy
+  }
+  const { id, jurisdictionType, partOf } = parentLocation
+
+  return getLocationHierarchy(partOf.split('/').at(1)!, locations, {
+    ...hierarchy,
+    [camelCasedJurisdictionType(jurisdictionType)]: id
+  })
 }

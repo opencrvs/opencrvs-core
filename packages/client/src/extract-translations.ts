@@ -19,9 +19,6 @@ interface IReactIntlDescriptions {
   [key: string]: string
 }
 
-/** Keys used by unit tests that do not need to be content managed */
-const testKeys = ['form.field.label.UNION', 'form.field.label.DIVISION']
-
 const write = process.argv.includes('--write')
 const COUNTRY_CONFIG_PATH = process.argv[2]
 type LocalisationFile = {
@@ -93,8 +90,7 @@ async function extractMessages() {
       })
       const englishTranslations = translations.data.find(isEnglish)?.messages
       const missingKeys = Object.keys(reactIntlDescriptions).filter(
-        (key) =>
-          !englishTranslations?.hasOwnProperty(key) && !testKeys.includes(key)
+        (key) => !englishTranslations?.hasOwnProperty(key)
       )
 
       if (missingKeys.length > 0) {

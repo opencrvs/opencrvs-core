@@ -349,8 +349,7 @@ const messagesToDefine: IUserMessages = {
     id: 'settings.changePassword'
   },
   changePasswordMessage: {
-    defaultMessage:
-      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    defaultMessage: `Create a unique password - one that you don't use for other websites or applications. A secure and easy to remember passphrase could include three random words, while avoiding the use of personal info.`,
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
@@ -432,7 +431,7 @@ const messagesToDefine: IUserMessages = {
   },
   passwordCaseCharacteristicsForPasswordUpdateForm: {
     id: 'password.cases',
-    defaultMessage: 'Contain upper and lower cases',
+    defaultMessage: 'At least one upper and lower case character',
     description: 'Password validation'
   },
   passwordNumberCharacteristicsForPasswordUpdateForm: {
