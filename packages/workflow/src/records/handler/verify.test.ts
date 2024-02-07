@@ -19,7 +19,7 @@ import {
   Task
 } from '@opencrvs/commons/types'
 
-function checkForVerifiedExtenstion(task: Task) {
+function checkForVerifiedExtension(task: Task) {
   return task.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/regVerified'
   )
@@ -81,7 +81,7 @@ describe('verify record endpoint', () => {
 
     const verifiedRecord = JSON.parse(res.payload)
     const task = getTaskFromSavedBundle(verifiedRecord)
-    const isVerified = checkForVerifiedExtenstion(task)
+    const isVerified = checkForVerifiedExtension(task)
 
     expect(findVerificationIp(task)).toBe('127.0.0.1')
     expect(!!isVerified).toBe(true)
