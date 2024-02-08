@@ -375,10 +375,6 @@ export function findDuplicateIds(
     IBirthCompositionBody | IDeathCompositionBody
   >['hits']['hits']
 ) {
-  console.log(
-    '----------------------SEARCH RESULTS----------------------------'
-  )
-  console.log(results)
   return results
     .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
