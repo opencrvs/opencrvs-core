@@ -14,6 +14,7 @@ import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
 import { TransactionResponse } from '@workflow/records/fhir'
+import { AuditAction } from '@workflow/records/audit'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -71,8 +72,8 @@ const auditEventHandler = rest.post(
       'mark-certified',
       'mark-issued',
       'mark-voided'
-    ]
-    if (!knownActions.includes(action as string)) {
+    ] satisfies AuditAction[]
+    if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)
     }
     return res(ctx.status(200))
