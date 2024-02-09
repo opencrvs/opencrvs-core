@@ -10,8 +10,7 @@
  */
 import {
   indexComposition,
-  searchByCompositionId,
-  updateComposition
+  searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
   ARCHIVED_STATUS,
@@ -71,11 +70,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     throw new Error('No Composition ID found')
   }
 
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/death-registration-number'
-  )
-
   const body: ICompositionBody = {
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
@@ -86,11 +80,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
-
-  if (body.type === REGISTERED_STATUS) {
-    body.registrationNumber =
-      registrationNumberIdentifier && registrationNumberIdentifier.value
-  }
 
   if (body.type === REJECTED_STATUS) {
     const nodeText =
@@ -112,7 +101,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     body.assignment = null
   }
   await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
-  await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
@@ -375,6 +363,11 @@ async function createDeclarationIndex(
     'http://opencrvs.org/specs/id/death-tracking-id'
   )
 
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-registration-number'
+  )
+
   const regLastUserIdentifier = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
@@ -406,6 +399,8 @@ async function createDeclarationIndex(
     task.businessStatus.coding[0].code
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
   body.declarationLocationId =
     placeOfDeclarationExtension &&
     placeOfDeclarationExtension.valueReference &&

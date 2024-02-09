@@ -10,8 +10,7 @@
  */
 import {
   indexComposition,
-  searchByCompositionId,
-  updateComposition
+  searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
@@ -42,19 +41,13 @@ import {
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate,
-  findPatientEntryById
+  addFlaggedAsPotentialDuplicate
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import {
-  findCompositionSection,
-  getComposition,
-  urlReferenceToUUID,
-  ValidRecord
-} from '@opencrvs/commons/types'
+import { getComposition, ValidRecord } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -79,30 +72,12 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/birth-registration-number'
-  )
+
   const body: ICompositionBody = {
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
   body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
-
-  if (body.type === REGISTERED_STATUS) {
-    const childSection = findCompositionSection('child-details', composition)
-    const patientId = urlReferenceToUUID(childSection.entry[0].reference)
-    const patient = findPatientEntryById(bundle, patientId)
-
-    body.childIdentifier =
-      patient.identifier && getSubmittedIdentifier(patient.identifier)
-    body.registrationNumber =
-      registrationNumberIdentifier && registrationNumberIdentifier.value
-  }
-
-  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
-  }
 
   if (body.type === REJECTED_STATUS) {
     const rejectAnnotation: fhir.Annotation = (task &&
@@ -139,7 +114,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     authHeader,
     bundleEntries
   )
-  await updateComposition(compositionId, body, client)
 }
 
 async function indexAndSearchComposition(
@@ -199,6 +173,8 @@ async function createChildIndex(
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
+  body.childIdentifier =
+    child.identifier && getSubmittedIdentifier(child.identifier)
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
   body.childFamilyName = childName && childName.family && childName.family[0]
@@ -348,6 +324,11 @@ async function createDeclarationIndex(
     'http://opencrvs.org/specs/id/birth-tracking-id'
   )
 
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-registration-number'
+  )
+
   const regLastUserIdentifier = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
@@ -375,6 +356,8 @@ async function createDeclarationIndex(
   body.type = task && getTypeFromTask(task)
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
   body.declarationLocationId =
     placeOfDeclarationExtension &&
     placeOfDeclarationExtension.valueReference &&
