@@ -289,7 +289,7 @@ export const getStatus = async (compositionId: string) => {
 
 export const createStatusHistory = async (
   body: ICompositionBody,
-  task: SavedTask | undefined,
+  task: SavedTask,
   authHeader: string,
   bundle: SavedBundle
 ) => {

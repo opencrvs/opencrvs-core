@@ -45,10 +45,10 @@ export function findPatient(bundle: fhir.Bundle) {
 }
 
 export function findTaskExtension<T extends keyof KnownExtensionType>(
-  task: SavedTask | undefined,
+  task: SavedTask,
   extensionUrl: T
 ) {
-  return task?.extension?.find(
+  return task.extension.find(
     (ext): ext is KnownExtensionType[T] => ext.url === extensionUrl
   )
 }

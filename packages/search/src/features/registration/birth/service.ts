@@ -95,7 +95,7 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
  * Supports 1 task and 1 patient maximum
  */
 async function updateEvent(bundle: SavedBundle, authHeader: string) {
-  const task: SavedTask | undefined = getTaskFromSavedBundle(bundle)
+  const task = getTaskFromSavedBundle(bundle)
   const patient = findPatient(bundle)
 
   const compositionId =

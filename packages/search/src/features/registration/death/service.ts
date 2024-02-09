@@ -51,8 +51,7 @@ import {
   Patient,
   RelatedPerson,
   SavedBundle,
-  SavedComposition,
-  SavedTask
+  SavedComposition
 } from '@opencrvs/commons/types'
 
 const DECEASED_CODE = 'deceased-details'
@@ -87,7 +86,7 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
  * Supports 1 task and 1 patient maximum
  */
 async function updateEvent(bundle: SavedBundle, authHeader: string) {
-  const task: SavedTask | undefined = getTaskFromSavedBundle(bundle)
+  const task = getTaskFromSavedBundle(bundle)
 
   const compositionId =
     task &&
