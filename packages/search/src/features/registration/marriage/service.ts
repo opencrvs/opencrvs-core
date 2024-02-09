@@ -13,19 +13,17 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
-  ARCHIVED_STATUS,
-  CERTIFIED_STATUS,
   createStatusHistory,
   EVENT,
   getCreatedBy,
+  getPreviousStatusFromElasticResponse,
   getStatus,
+  hasStatusChanged,
   ICompositionBody,
   IMarriageCompositionBody,
   IOperationHistory,
   NAME_EN,
-  REGISTERED_STATUS,
-  REJECTED_STATUS,
-  VALIDATED_STATUS
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -43,7 +41,11 @@ import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, ValidRecord } from '@opencrvs/commons/types'
+import {
+  getComposition,
+  SavedComposition,
+  ValidRecord
+} from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -57,16 +59,31 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const authHeader = requestBundle.headers.authorization
 
   const composition = getComposition(bundle)
-  const task = findTask(bundle.entry)
+
+  await indexDeclaration(composition, authHeader, bundleEntries)
+}
+
+async function indexDeclaration(
+  composition: SavedComposition,
+  authHeader: string,
+  bundleEntries?: fhir.BundleEntry[]
+) {
   const compositionId = composition.id
-
-  const regLastUserIdentifier = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastUser'
-  )
-
+  const result = await searchByCompositionId(compositionId, client)
+  const previousStatus = getPreviousStatusFromElasticResponse(result)
+  const task = findTask(bundleEntries)
   const body: ICompositionBody = {
+    event: EVENT.MARRIAGE,
+    createdAt:
+      (result &&
+        result.body.hits.hits.length > 0 &&
+        result.body.hits.hits[0]._source.createdAt) ||
+      Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+  }
+
+  if (hasStatusChanged(task, previousStatus)) {
+    body.assignment = null
   }
 
   body.type =
@@ -83,42 +100,17 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
       (task && task.statusReason && task.statusReason.text) || ''
     body.rejectComment = nodeText
   }
+
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
-
-  if (
-    [
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      ARCHIVED_STATUS
-    ].includes(body.type ?? '')
-  ) {
-    body.assignment = null
-  }
-  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
-}
-
-async function indexDeclaration(
-  compositionId: string,
-  composition: fhir.Composition,
-  authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
-) {
-  const result = await searchByCompositionId(compositionId, client)
-  const body: ICompositionBody = {
-    event: EVENT.MARRIAGE,
-    createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
-      Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
@@ -322,7 +314,6 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/id/marriage-tracking-id'
   )
-
   const registrationNumberIdentifier = findTaskIdentifier(
     task,
     'http://opencrvs.org/specs/id/marriage-registration-number'

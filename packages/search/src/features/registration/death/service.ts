@@ -13,23 +13,21 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
-  ARCHIVED_STATUS,
-  CERTIFIED_STATUS,
   createStatusHistory,
   DECLARED_STATUS,
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
+  getPreviousStatusFromElasticResponse,
   getStatus,
+  hasStatusChanged,
   ICompositionBody,
   IDeathCompositionBody,
   IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
-  REGISTERED_STATUS,
   REJECTED_STATUS,
-  updateCompositionWithDuplicates,
-  VALIDATED_STATUS
+  updateCompositionWithDuplicates
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
@@ -47,7 +45,11 @@ import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, ValidRecord } from '@opencrvs/commons/types'
+import {
+  getComposition,
+  SavedComposition,
+  ValidRecord
+} from '@opencrvs/commons/types'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -62,16 +64,32 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const authHeader = requestBundle.headers.authorization
 
   const composition = getComposition(bundle)
+
+  await indexDeclaration(composition, authHeader, bundleEntries)
+}
+
+async function indexDeclaration(
+  composition: SavedComposition,
+  authHeader: string,
+  bundleEntries?: fhir.BundleEntry[]
+) {
   const compositionId = composition.id
-
-  const task = findTask(bundle.entry)
-
-  if (!compositionId) {
-    throw new Error('No Composition ID found')
-  }
+  const result = await searchByCompositionId(compositionId, client)
+  const previousStatus = getPreviousStatusFromElasticResponse(result)
+  const task = findTask(bundleEntries)
 
   const body: ICompositionBody = {
+    event: EVENT.DEATH,
+    createdAt:
+      (result &&
+        result.body.hits.hits.length > 0 &&
+        result.body.hits.hits[0]._source.createdAt) ||
+      Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+  }
+
+  if (hasStatusChanged(task, previousStatus)) {
+    body.assignment = null
   }
 
   body.type =
@@ -87,37 +105,6 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     body.rejectReason =
       (task && task.statusReason && task.statusReason.text) || ''
     body.rejectComment = nodeText
-  }
-
-  if (
-    [
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      ARCHIVED_STATUS
-    ].includes(body.type ?? '')
-  ) {
-    body.assignment = null
-  }
-  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
-}
-
-async function indexDeclaration(
-  compositionId: string,
-  composition: fhir.Composition,
-  authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
-) {
-  const result = await searchByCompositionId(compositionId, client)
-  const body: ICompositionBody = {
-    event: EVENT.DEATH,
-    createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
-      Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
@@ -362,7 +349,6 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/id/death-tracking-id'
   )
-
   const registrationNumberIdentifier = findTaskIdentifier(
     task,
     'http://opencrvs.org/specs/id/death-registration-number'

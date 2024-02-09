@@ -19,17 +19,14 @@ import {
   getCreatedBy,
   getStatus,
   IBirthCompositionBody,
-  ICompositionBody,
   NAME_EN,
   IOperationHistory,
   REJECTED_STATUS,
-  VALIDATED_STATUS,
-  REGISTERED_STATUS,
-  CERTIFIED_STATUS,
-  ARCHIVED_STATUS,
   DECLARED_STATUS,
   IN_PROGRESS_STATUS,
-  updateCompositionWithDuplicates
+  updateCompositionWithDuplicates,
+  hasStatusChanged,
+  getPreviousStatusFromElasticResponse
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -47,7 +44,11 @@ import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { getComposition, ValidRecord } from '@opencrvs/commons/types'
+import {
+  getComposition,
+  SavedComposition,
+  ValidRecord
+} from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -63,19 +64,39 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as ValidRecord
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
-  const task = findTask(bundle.entry)
 
-  const composition = getComposition(bundle)
-  const compositionId = composition.id
-
-  const regLastUserIdentifier = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastUser'
+  await indexAndSearchComposition(
+    getComposition(bundle),
+    authHeader,
+    bundleEntries
   )
+}
 
-  const body: ICompositionBody = {
+async function indexAndSearchComposition(
+  composition: SavedComposition,
+  authHeader: string,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const compositionId = composition.id
+  const result = await searchByCompositionId(compositionId, client)
+  const previousStatus = getPreviousStatusFromElasticResponse(result)
+  const task = findTask(bundleEntries)
+
+  const body: IBirthCompositionBody = {
+    event: EVENT.BIRTH,
+    createdAt:
+      (result &&
+        result.body.hits.hits.length > 0 &&
+        result.body.hits.hits[0]._source.createdAt) ||
+      Date.now().toString(),
+    modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
+
+  if (hasStatusChanged(task, previousStatus)) {
+    body.assignment = null
+  }
+
   body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
 
@@ -91,48 +112,16 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
     body.rejectComment = nodeText
   }
 
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
-
-  if (
-    [
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      ARCHIVED_STATUS
-    ].includes(body.type ?? '')
-  ) {
-    body.assignment = null
-  }
-  await indexAndSearchComposition(
-    compositionId,
-    composition,
-    authHeader,
-    bundleEntries
-  )
-}
-
-async function indexAndSearchComposition(
-  compositionId: string,
-  composition: fhir.Composition,
-  authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
-) {
-  const result = await searchByCompositionId(compositionId, client)
-  const body: IBirthCompositionBody = {
-    event: EVENT.BIRTH,
-    createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
-      Date.now().toString(),
-    modifiedAt: Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
