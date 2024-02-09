@@ -582,19 +582,19 @@ export function updatePatientIdentifierWithRN(
   return sectionCodes.map((sectionCode) => {
     const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
     const patientId = urlReferenceToUUID(sectionEntry.reference as URLReference)
-    const patientEntry = getResourceFromBundleById<Patient>(record, patientId)
+    const patient = getResourceFromBundleById<Patient>(record, patientId)
 
-    if (!patientEntry.identifier) {
-      patientEntry.identifier = []
+    if (!patient.identifier) {
+      patient.identifier = []
     }
-    const rnIdentifier = patientEntry.identifier.find(
+    const rnIdentifier = patient.identifier.find(
       (identifier: fhir3.Identifier) =>
         identifier.type?.coding?.[0].code === identifierType
     )
     if (rnIdentifier) {
       rnIdentifier.value = registrationNumber
     } else {
-      patientEntry.identifier.push({
+      patient.identifier.push({
         type: {
           coding: [
             {
@@ -606,7 +606,7 @@ export function updatePatientIdentifierWithRN(
         value: registrationNumber
       })
     }
-    return patientEntry
+    return patient
   })
 }
 
