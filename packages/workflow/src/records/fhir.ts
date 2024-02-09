@@ -1551,21 +1551,20 @@ export function toSavedBundle<T extends Resource>(
           )
         }
       }
+
       if (isEncounter(entry.resource) && entry.resource.location) {
         return {
           ...entry,
           fullUrl: responseBundle.entry[index].response.location,
           resource: toSavedEncounter(
-            {
-              ...entry.resource,
-              location: entry.resource.location
-            },
+            { ...entry.resource, location: entry.resource.location },
             urlReferenceToUUID(responseBundle.entry[index].response.location),
             resourceBundle,
             responseBundle
           )
         }
       }
+
       if (
         isRelatedPerson(entry.resource) &&
         entry.resource.patient &&
@@ -1606,18 +1605,6 @@ export function toSavedBundle<T extends Resource>(
         }
       }
 
-      if (isEncounter(entry.resource) && entry.resource.location) {
-        return {
-          ...entry,
-          fullUrl: responseBundle.entry[index].response.location,
-          resource: toSavedEncounter(
-            { ...entry.resource, location: entry.resource.location },
-            urlReferenceToUUID(responseBundle.entry[index].response.location),
-            resourceBundle,
-            responseBundle
-          )
-        }
-      }
       return {
         ...entry,
         fullUrl: responseBundle.entry[index].response.location,
