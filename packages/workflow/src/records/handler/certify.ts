@@ -43,7 +43,7 @@ export const certifyRoute = createRoute({
     )
 
     await indexBundle(certifiedRecord, token)
-    await auditEvent('mark-certified', certifiedRecord, token)
+    await auditEvent('certified', certifiedRecord, token)
 
     return certifiedRecord
   }

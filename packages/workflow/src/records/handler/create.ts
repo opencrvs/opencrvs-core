@@ -21,9 +21,20 @@ import {
   isTask,
   changeState,
   InProgressRecord,
-  ReadyForReviewRecord
+  ReadyForReviewRecord,
+  ValidatedRecord,
+  WaitingForValidationRecord,
+  isRejected,
+  isInProgress,
+  isReadyForReview,
+  isValidated,
+  isWaitingExternalValidation
 } from '@opencrvs/commons/types'
-import { getToken } from '@workflow/utils/authUtils'
+import {
+  getToken,
+  hasRegisterScope,
+  hasValidateScope
+} from '@workflow/utils/authUtils'
 import {
   findTaskFromIdentifier,
   mergeBundles,
@@ -37,7 +48,7 @@ import { validateRequest } from '@workflow/utils'
 import { hasDuplicates } from '@workflow/utils/duplicateChecker'
 import {
   generateTrackingIdForEvents,
-  isEventNotification,
+  isHospitalNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import { auditEvent } from '@workflow/records/audit'
@@ -48,6 +59,11 @@ import {
 } from '@workflow/records/notification'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
+import {
+  initiateRegistration,
+  toValidated,
+  toWaitingForExternalValidationState
+} from '@workflow/records/state-transitions'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -163,6 +179,31 @@ async function createRecord(
   return mergeBundles(record, practitionerResourcesBundle)
 }
 
+type CreatedRecord =
+  | InProgressRecord
+  | ReadyForReviewRecord
+  | ValidatedRecord
+  | WaitingForValidationRecord
+
+function getEventAction(record: CreatedRecord) {
+  if (isInProgress(record)) {
+    return 'sent-notification'
+  }
+  if (isReadyForReview(record)) {
+    return 'sent-notification-for-review'
+  }
+  if (isValidated(record)) {
+    return 'sent-for-approval'
+  }
+  if (isWaitingExternalValidation(record)) {
+    return 'waiting-external-validation'
+  }
+  // type assertion
+  record satisfies never
+  // this should never be reached
+  return 'sent-notification'
+}
+
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
@@ -192,37 +233,57 @@ export default async function createRecordHandler(
       recordDetails,
       getAuthHeader(request)
     )
-  const record = await createRecord(
+  let record: CreatedRecord = await createRecord(
     recordInputWithUploadedAttachments,
     event,
     token
   )
-  const inProgress = isInProgressDeclaration(record)
-  const eventNotification = isEventNotification(record)
 
-  await indexBundle(record, token)
   await auditEvent(
-    inProgress ? 'in-progress-declaration' : 'new-declaration',
+    isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
     record,
     token
   )
 
+  if (hasValidateScope(request)) {
+    record = await toValidated(record, token)
+    await auditEvent('sent-for-approval', record, token)
+  } else if (hasRegisterScope(request) && !isInProgress(record)) {
+    record = await toWaitingForExternalValidationState(record, token)
+    await auditEvent('waiting-external-validation', record, token)
+  }
+  const eventAction = getEventAction(record)
+
   // Notification not implemented for marriage yet
   // don't forward hospital notifications
-  if (
-    event !== EVENT_TYPE.MARRIAGE &&
-    !eventNotification &&
-    (await isNotificationEnabled(
-      inProgress ? 'in-progress' : 'ready-for-review',
-      event,
-      token
-    ))
-  ) {
-    await sendNotification(
-      inProgress ? 'in-progress' : 'ready-for-review',
+  const notificationDisabled =
+    isHospitalNotification(record) ||
+    event === EVENT_TYPE.MARRIAGE ||
+    eventAction === 'sent-for-approval' ||
+    eventAction === 'waiting-external-validation' ||
+    !(await isNotificationEnabled(eventAction, event, token))
+
+  await indexBundle(record, token)
+
+  if (!notificationDisabled) {
+    await sendNotification(eventAction, record, token)
+  }
+
+  /*
+   * We need to initiate registration for a
+   * record in waiting validation state
+   */
+  if (isWaitingExternalValidation(record)) {
+    const rejectedOrWaitingValidationRecord = await initiateRegistration(
       record,
+      request.headers,
       token
     )
+
+    if (isRejected(rejectedOrWaitingValidationRecord)) {
+      await indexBundle(rejectedOrWaitingValidationRecord, token)
+      await auditEvent('sent-for-updates', record, token)
+    }
   }
 
   return {
