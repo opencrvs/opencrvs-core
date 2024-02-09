@@ -191,11 +191,7 @@ async function createDeceasedIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const deceased = findEntry(
-    DECEASED_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const deceased = findEntry<Patient>(DECEASED_CODE, composition, bundle)
 
   if (!deceased) {
     return
@@ -228,11 +224,7 @@ function createMotherIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const mother = findEntry(
-    MOTHER_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const mother = findEntry<Patient>(MOTHER_CODE, composition, bundle)
 
   if (!mother) {
     return
@@ -256,11 +248,7 @@ function createFatherIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const father = findEntry(
-    FATHER_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const father = findEntry<Patient>(FATHER_CODE, composition, bundle)
 
   if (!father) {
     return
@@ -284,11 +272,7 @@ function createSpouseIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const spouse = findEntry(
-    SPOUSE_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const spouse = findEntry<Patient>(SPOUSE_CODE, composition, bundle)
 
   if (!spouse) {
     return
@@ -312,20 +296,20 @@ function createInformantIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const informantRef = findEntry(
+  const informantRef = findEntry<RelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundle
-  ) as unknown as RelatedPerson
+  )
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = getFromBundleById(
+  const informant = getFromBundleById<Patient>(
     bundle,
     informantRef.patient.reference.split('/')[1]
-  )?.resource as unknown as Patient
+  )?.resource
 
   if (!informant) {
     return

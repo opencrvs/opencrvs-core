@@ -183,13 +183,13 @@ async function createBrideIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const bride = findEntry(BRIDE_CODE, composition, bundle) as unknown as Patient
+  const bride = findEntry<Patient>(BRIDE_CODE, composition, bundle)
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-    bride.extension
+    bride?.extension
   )
 
   const brideName = bride && findName(NAME_EN, bride.name)
@@ -216,7 +216,7 @@ async function createGroomIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const groom = findEntry(GROOM_CODE, composition, bundle) as unknown as Patient
+  const groom = findEntry<Patient>(GROOM_CODE, composition, bundle)
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
@@ -250,20 +250,20 @@ function createWitnessOneIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const witnessRef = findEntry(
+  const witnessRef = findEntry<RelatedPerson>(
     WITNESS_ONE_CODE,
     composition,
     bundle
-  ) as RelatedPerson
+  )
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = getFromBundleById(
+  const witness = getFromBundleById<Patient>(
     bundle,
     witnessRef.patient.reference.split('/')[1]
-  ) as unknown as Patient
+  ).resource
 
   if (!witness) {
     return
@@ -289,20 +289,20 @@ function createWitnessTwoIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const witnessRef = findEntry(
+  const witnessRef = findEntry<RelatedPerson>(
     WITNESS_TWO_CODE,
     composition,
     bundle
-  ) as unknown as RelatedPerson
+  )
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = getFromBundleById(
+  const witness = getFromBundleById<Patient>(
     bundle,
     witnessRef.patient.reference.split('/')[1]
-  ) as unknown as Patient
+  ).resource
 
   if (!witness) {
     return

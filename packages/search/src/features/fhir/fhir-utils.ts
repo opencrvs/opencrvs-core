@@ -15,6 +15,7 @@ import {
   getFromBundleById,
   KnownExtensionType,
   OpenCRVSPatientName,
+  Resource,
   SavedBundle,
   SavedComposition,
   SavedTask
@@ -73,7 +74,7 @@ export function findTaskIdentifier(task?: SavedTask, identiferSystem?: string) {
   )
 }
 
-export function findEntry(
+export function findEntry<T extends Resource = Resource>(
   code: CompositionSectionCode,
   composition: SavedComposition,
   bundle: SavedBundle
@@ -83,7 +84,7 @@ export function findEntry(
     return undefined
   }
   const reference = patientSection.entry[0].reference
-  return getFromBundleById(bundle, reference!.split('/')[1]).resource
+  return getFromBundleById<T>(bundle, reference!.split('/')[1]).resource
 }
 
 export async function addEventLocation(

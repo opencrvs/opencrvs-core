@@ -50,10 +50,10 @@ import {
   getComposition,
   Patient,
   SavedComposition,
-  SavedRelatedPerson,
   getFromBundleById,
   getTaskFromSavedBundle,
-  SavedTask
+  SavedTask,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -202,7 +202,7 @@ async function createChildIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const child = findEntry(CHILD_CODE, composition, bundle) as unknown as Patient
+  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)
 
   if (!child) {
     return
@@ -229,11 +229,7 @@ function createMotherIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const mother = findEntry(
-    MOTHER_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const mother = findEntry<Patient>(MOTHER_CODE, composition, bundle)
 
   if (!mother) {
     return
@@ -260,11 +256,7 @@ function createFatherIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const father = findEntry(
-    FATHER_CODE,
-    composition,
-    bundle
-  ) as unknown as Patient
+  const father = findEntry<Patient>(FATHER_CODE, composition, bundle)
 
   if (!father) {
     return
@@ -291,11 +283,11 @@ function createInformantIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const informantRef = findEntry(
+  const informantRef = findEntry<RelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundle
-  ) as unknown as SavedRelatedPerson
+  )
 
   if (!informantRef || !informantRef.patient) {
     return
