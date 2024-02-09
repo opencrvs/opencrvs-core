@@ -423,7 +423,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
 function updateOperationHistoryWithCorrection(
   operationHistory: IOperationHistory,
-  task?: SavedTask
+  task: SavedTask
 ) {
   if (
     task?.input?.length &&
