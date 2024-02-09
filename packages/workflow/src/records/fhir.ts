@@ -42,7 +42,15 @@ import {
   getComposition,
   EVENT_TYPE,
   TaskStatus,
-  getStatusFromTask
+  getStatusFromTask,
+  SavedPractitioner,
+  SavedLocation,
+  SavedRelatedPerson,
+  isURNReference,
+  SavedEncounter,
+  resourceToSavedBundleEntry,
+  ResourceIdentifier,
+  isTask
 } from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -55,10 +63,20 @@ import {
   ChangedValuesInput,
   CertifyInput
 } from '@workflow/records/validations'
-import { badRequest } from '@hapi/boom'
-import { isSystem, ISystemModelData, IUserModelData } from './user'
-import { getPractitionerOffice } from '@workflow/features/user/utils'
+import { badRequest, internal } from '@hapi/boom'
+import {
+  getUserOrSystem,
+  isSystem,
+  ISystemModelData,
+  IUserModelData
+} from './user'
+import {
+  getPractitionerOffice,
+  getLoggedInPractitionerResource,
+  getPractitionerLocations
+} from '@workflow/features/user/utils'
 import { z } from 'zod'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -74,6 +92,112 @@ function getFHIRValueField(value: unknown) {
   }
 
   throw new Error('Invalid value type')
+}
+
+export async function mergeChangedResourcesIntoRecord(
+  record: ValidRecord,
+  unsavedChangedResources: Bundle,
+  practitionerResourcesBundle: SavedBundle<SavedLocation | SavedPractitioner>
+) {
+  const responseBundle = await sendBundleToHearth(unsavedChangedResources)
+
+  const changedResources = await toSavedBundle(
+    unsavedChangedResources,
+    responseBundle
+  )
+
+  const recordWithChangedResources = mergeBundles(record, changedResources)
+
+  return mergeBundles(recordWithChangedResources, practitionerResourcesBundle)
+}
+
+export async function withPractitionerDetails<T extends Task>(
+  task: T,
+  token: string
+): Promise<[T, SavedBundle<SavedLocation | SavedPractitioner>]> {
+  const userOrSystem = await getUserOrSystem(token)
+  const newTask: T = {
+    ...task,
+    identifier: task.identifier.filter(
+      ({ system }) =>
+        system !== 'http://opencrvs.org/specs/id/system_identifier'
+    )
+  }
+  if (isSystem(userOrSystem)) {
+    const { name, username, type } = userOrSystem
+    newTask.identifier.push({
+      system: 'http://opencrvs.org/specs/id/system_identifier',
+      value: JSON.stringify({
+        name,
+        username,
+        type
+      })
+    })
+    return [
+      newTask,
+      {
+        type: 'document',
+        resourceType: 'Bundle',
+        entry: []
+      }
+    ]
+  }
+  const user = userOrSystem
+  const practitioner = (await getLoggedInPractitionerResource(
+    token
+  )) as SavedPractitioner
+  const relatedLocations = (await getPractitionerLocations(
+    user.practitionerId
+  )) as [SavedLocation]
+  const office = relatedLocations.find((l) =>
+    l.type?.coding?.some(({ code }) => code === 'CRVS_OFFICE')
+  )
+  if (!office) {
+    throw internal('Office not found for the requesting user')
+  }
+  const officeLocationId = office.partOf?.reference.split('/').at(1)
+  const officeLocation = relatedLocations.find((l) => l.id === officeLocationId)
+  if (!officeLocation) {
+    throw internal(
+      'Parent location of office not found for the requesting user'
+    )
+  }
+  newTask.extension.push(
+    ...([
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastUser',
+        valueReference: {
+          reference: `Practitioner/${user.practitionerId as UUID}`
+        }
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueReference: {
+          reference: `Location/${resourceIdentifierToUUID(
+            office.partOf!.reference
+          )}`
+        }
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastOffice',
+        //@todo: make this field required
+        valueString: office.name,
+        valueReference: {
+          reference: `Location/${office.id}`
+        }
+      }
+    ] satisfies Task['extension'])
+  )
+  return [
+    newTask,
+    {
+      type: 'document',
+      resourceType: 'Bundle',
+      entry: [practitioner, office, officeLocation].map((r) =>
+        resourceToSavedBundleEntry(r)
+      )
+    }
+  ]
 }
 
 export function createCorrectionProofOfLegalCorrectionDocument(
@@ -1243,9 +1367,9 @@ function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
               location: {
                 ...location.location,
                 reference: isURLReference(location.location.reference)
-                  ? urlReferenceToResourceIdentifier(
+                  ? (urlReferenceToResourceIdentifier(
                       location.location.reference
-                    )
+                    ) as URLReference)
                   : location.location.reference
               }
             }))
@@ -1261,7 +1385,9 @@ function unresolveReferenceFullUrls(bundle: Bundle): Bundle {
             patient: {
               ...resource.patient,
               reference: isURLReference(resource.patient.reference)
-                ? urlReferenceToResourceIdentifier(resource.patient.reference)
+                ? (urlReferenceToResourceIdentifier(
+                    resource.patient.reference
+                  ) as URLReference)
                 : resource.patient.reference
             }
           } satisfies RelatedPerson
@@ -1357,46 +1483,235 @@ function toSavedComposition(
   }
 }
 
+function toSavedTask(
+  task: Task & { focus: { reference: URNReference } },
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedTask {
+  const savedReference = findSavedReference(
+    task.focus.reference,
+    resourceBundle,
+    responseBundle
+  )
+  if (!savedReference) {
+    throw internal(
+      `No response found for "task.focus.reference->${
+        task.focus.reference
+      }" in the following transaction: ${JSON.stringify(responseBundle)}`
+    )
+  }
+  return {
+    ...task,
+    id,
+    focus: {
+      reference: urlReferenceToResourceIdentifier(savedReference)
+    }
+  }
+}
+
+function toSavedRelatedPerson(
+  relatedPersion: RelatedPerson & {
+    patient: { reference: `urn:uuid:${string}` }
+  },
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedRelatedPerson {
+  const savedReference = findSavedReference(
+    relatedPersion.patient.reference,
+    resourceBundle,
+    responseBundle
+  )
+  if (!savedReference) {
+    throw internal(
+      `No response found for "relatedPersion.patient.reference->${
+        relatedPersion.patient.reference
+      }" in the following transaction: ${JSON.stringify(responseBundle)}`
+    )
+  }
+  return {
+    ...relatedPersion,
+    id,
+    patient: {
+      reference: savedReference
+    }
+  }
+}
+
+type EncounterLocationResolved = {
+  location: {
+    location: {
+      reference: URLReference | URNReference
+    }
+  }[]
+}
+
+function toSavedEncounter(
+  encounter: Omit<Encounter, 'location'> & EncounterLocationResolved,
+  id: UUID,
+  resourceBundle: Bundle,
+  responseBundle: TransactionResponse
+): SavedEncounter {
+  return {
+    ...encounter,
+    id,
+    location: encounter.location.map((location) => {
+      if (isURLReference(location.location.reference)) {
+        return {
+          ...location,
+          location: {
+            ...location.location,
+            reference: location.location.reference
+          }
+        }
+      }
+      const savedReference = findSavedReference(
+        location.location.reference,
+        resourceBundle,
+        responseBundle
+      )
+      if (!savedReference) {
+        throw internal(
+          `No response found for "encounter.location.location.reference->${
+            location.location.reference
+          }" in the following transaction: ${JSON.stringify(responseBundle)}`
+        )
+      }
+      return {
+        ...location,
+        location: {
+          ...location.location,
+          reference: savedReference
+        }
+      }
+    })
+  }
+}
+
+async function resolveReference(
+  reference: ResourceIdentifier
+): Promise<URLReference> {
+  const resource = await getFromFhir(`/${reference}`)
+  return resourceToSavedBundleEntry(resource).fullUrl
+}
+
 /*
- * Only the references in Composition->section->entry->reference
+ * Only the references in Composition->section->entry->reference,
+ * RelatedPerson->patient->reference,
+ * Encounter->location->location->reference
  * are being resolved, the others e.g.
  * DocumentReference->extension->valueReference->reference
  * need to be added if needed
  */
-export function toSavedBundle<T extends Resource>(
+export async function toSavedBundle<T extends Resource>(
   resourceBundle: Bundle<T>,
   responseBundle: TransactionResponse
-): SavedBundle<T> {
+): Promise<SavedBundle<T>> {
   return {
     ...resourceBundle,
-    entry: resourceBundle.entry.map((entry, index) => {
-      if (isComposition(entry.resource)) {
+    entry: await Promise.all(
+      resourceBundle.entry.map(async (entry, index) => {
+        if (isComposition(entry.resource)) {
+          return {
+            ...entry,
+            fullUrl: responseBundle.entry[index].response.location,
+            resource: toSavedComposition(
+              entry.resource,
+              urlReferenceToUUID(responseBundle.entry[index].response.location),
+              resourceBundle,
+              responseBundle
+            )
+          }
+        }
+        if (
+          isRelatedPerson(entry.resource) &&
+          entry.resource.patient &&
+          isURNReference(entry.resource.patient.reference)
+        ) {
+          return {
+            ...entry,
+            fullUrl: responseBundle.entry[index].response.location,
+            resource: toSavedRelatedPerson(
+              {
+                ...entry.resource,
+                patient: { reference: entry.resource.patient.reference }
+              },
+              urlReferenceToUUID(responseBundle.entry[index].response.location),
+              resourceBundle,
+              responseBundle
+            )
+          }
+        }
+        if (isEncounter(entry.resource) && entry.resource.location) {
+          const resource = {
+            ...entry.resource,
+            location: await Promise.all(
+              entry.resource.location.map(async (location) => {
+                return {
+                  ...location,
+                  location: {
+                    ...location.location,
+                    reference:
+                      isURLReference(location.location.reference) ||
+                      isURNReference(location.location.reference)
+                        ? location.location.reference
+                        : await resolveReference(location.location.reference)
+                  }
+                } satisfies EncounterLocationResolved['location'][number]
+              })
+            )
+          }
+          return {
+            ...entry,
+            fullUrl: responseBundle.entry[index].response.location,
+            resource: toSavedEncounter(
+              resource,
+              urlReferenceToUUID(responseBundle.entry[index].response.location),
+              resourceBundle,
+              responseBundle
+            )
+          }
+        }
+
+        if (
+          isTask(entry.resource) &&
+          entry.resource.focus?.reference &&
+          isURNReference(entry.resource.focus.reference)
+        ) {
+          return {
+            ...entry,
+            fullUrl: responseBundle.entry[index].response.location,
+            resource: toSavedTask(
+              {
+                ...entry.resource,
+                focus: { reference: entry.resource.focus.reference }
+              },
+              urlReferenceToUUID(responseBundle.entry[index].response.location),
+              resourceBundle,
+              responseBundle
+            )
+          }
+        }
         return {
+          ...entry,
           fullUrl: responseBundle.entry[index].response.location,
-          resource: toSavedComposition(
-            entry.resource,
-            urlReferenceToUUID(responseBundle.entry[index].response.location),
-            resourceBundle,
-            responseBundle
-          )
+          resource: {
+            ...entry.resource,
+            id: urlReferenceToUUID(
+              responseBundle.entry[index].response.location
+            )
+          }
         }
-      }
-      return {
-        ...entry,
-        fullUrl: responseBundle.entry[index].response.location,
-        resource: {
-          ...entry.resource,
-          id: urlReferenceToUUID(responseBundle.entry[index].response.location)
-        }
-      }
-    })
+      })
+    )
   } as SavedBundle<T>
 }
 
-export function mergeBundles(
-  record: ValidRecord,
+export function mergeBundles<R extends ValidRecord>(
+  record: R,
   newOrUpdatedResourcesBundle: SavedBundle
-): SavedBundle {
+): R {
   const existingResourceIds = record.entry.map(({ resource }) => resource.id)
   const newEntries = newOrUpdatedResourcesBundle.entry.filter(
     ({ resource }) => !existingResourceIds.includes(resource.id)

@@ -21,6 +21,7 @@ import {
   SavedCompositionSection
 } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
+import { Practitioner, SavedPractitioner } from './practitioner'
 
 export * from './practitioner'
 export * from './task'
@@ -49,6 +50,10 @@ export type URLReference = Nominal<string, 'URLReference'>
 
 export function isURLReference(id: string): id is URLReference {
   return id.startsWith('/fhir')
+}
+
+export function isURNReference(id: string): id is URNReference {
+  return id.startsWith('urn:uuid:')
 }
 
 export function urlReferenceToUUID(reference: URLReference) {
@@ -97,6 +102,8 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedLocation
   : T extends Task
   ? SavedTask
+  : T extends Practitioner
+  ? SavedPractitioner
   : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
@@ -197,7 +204,7 @@ export type RelatedPerson = WithStrictExtensions<
   Omit<fhir3.RelatedPerson, 'patient'>
 > & {
   patient?: {
-    reference: URNReference | URLReference | ResourceIdentifier
+    reference: URNReference | URLReference
   }
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
@@ -390,6 +397,16 @@ export function resourceToBundleEntry<T extends Resource>(
   return {
     resource,
     fullUrl: `urn:uuid:${resource.id as UUID}`
+  }
+}
+
+export function resourceToSavedBundleEntry<T extends Resource>(
+  resource: SavedResource<T>
+): SavedBundleEntry<T> {
+  return {
+    resource,
+    fullUrl:
+      `/fhir/${resource.resourceType}/${resource.id}/_history/${resource.meta?.versionId}` as URLReference
   }
 }
 

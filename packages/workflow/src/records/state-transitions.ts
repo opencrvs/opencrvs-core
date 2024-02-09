@@ -49,7 +49,8 @@ import {
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
-  TaskHistory
+  TaskHistory,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -93,9 +94,13 @@ import {
   createRelatedPersonEntries,
   createDocumentReferenceEntryForCertificate,
   createIssuedTask,
-  createCertifiedTask
+  createCertifiedTask,
+  withPractitionerDetails,
+  sendBundleToHearth,
+  mergeChangedResourcesIntoRecord
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -233,43 +238,39 @@ export async function toCorrectionApproved(
 
 export async function toUpdated(
   record: InProgressRecord | ReadyForReviewRecord,
-  practitioner: Practitioner,
+  token: string,
   updatedDetails: ChangedValuesInput
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const updatedTask = createUpdatedTask(
+  const updatedTaskWithoutPractitionerExtensions = createUpdatedTask(
     previousTask,
     updatedDetails,
     practitioner
   )
-  const updatedTaskWithPractitionerExtensions = setupLastRegUser(
-    updatedTask,
-    practitioner
+
+  const [updatedTask] = await withPractitionerDetails(
+    updatedTaskWithoutPractitionerExtensions,
+    token
   )
 
-  const updatedTaskWithLocationExtensions = await setupLastRegLocation(
-    updatedTaskWithPractitionerExtensions,
-    practitioner
-  )
-
-  const newEntries = [
-    ...record.entry.map((entry) => {
-      if (entry.resource.id !== previousTask.id) {
-        return entry
-      }
-      return {
-        ...entry,
-        resource: updatedTaskWithLocationExtensions
-      }
-    })
-  ]
-
-  const updatedRecord = {
+  const recordWithUpdatedTask = {
     ...record,
-    entry: newEntries
+    entry: [
+      ...record.entry.map((entry) => {
+        if (entry.resource.id !== previousTask.id) {
+          return entry
+        }
+        return {
+          ...entry,
+          resource: updatedTask
+        }
+      })
+    ]
   }
-  return updatedRecord
+  await sendBundleToHearth(recordWithUpdatedTask)
+  return recordWithUpdatedTask
 }
 
 export async function toDownloaded(
@@ -312,81 +313,64 @@ export async function toDownloaded(
 
 export async function toRejected(
   record: ReadyForReviewRecord | ValidatedRecord | InProgressRecord,
-  practitioner: Practitioner,
+  token: string,
   comment: fhir3.CodeableConcept,
   reason?: string
-) {
+): Promise<RejectedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const rejectedTask = createRejectTask(
+  const taskWithoutPracitionerExtensions = createRejectTask(
     previousTask,
     practitioner,
     comment,
     reason
   )
 
-  const rejectedTaskWithPractitionerExtensions = setupLastRegUser(
-    rejectedTask,
-    practitioner
-  )
+  const [rejectedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPracitionerExtensions, token)
 
-  const rejectedTaskWithLocationExtensions = await setupLastRegLocation(
-    rejectedTaskWithPractitionerExtensions,
-    practitioner
-  )
-
-  const rejectedRecordWithTaskOnly: Bundle<SavedTask> = {
-    resourceType: 'Bundle',
+  const unsavedChangedResources: Bundle = {
     type: 'document',
-    entry: [{ resource: rejectedTaskWithLocationExtensions }]
+    resourceType: 'Bundle',
+    entry: [{ resource: rejectedTask }]
   }
 
-  const rejectedRecord = changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: rejectedTaskWithLocationExtensions }
-      ]
-    },
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'REJECTED'
   )
-
-  return { rejectedRecord, rejectedRecordWithTaskOnly }
 }
 
 export async function toWaitingForExternalValidationState(
   record: ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner
+  token: string
 ): Promise<WaitingForValidationRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const waitForValidationTask = createWaitingForValidationTask(
+  const taskWithoutPractitonerExtensions = createWaitingForValidationTask(
     previousTask,
     practitioner
   )
 
-  const waitForValidationTaskWithPractitionerExtensions = setupLastRegUser(
-    waitForValidationTask,
-    practitioner
-  )
+  const [waitingExternalValidationTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitonerExtensions, token)
 
-  const waitForValidationTaskWithLocationExtensions =
-    await setupLastRegLocation(
-      waitForValidationTaskWithPractitionerExtensions,
-      practitioner
-    )
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [{ resource: waitingExternalValidationTask }]
+  }
 
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: waitForValidationTaskWithLocationExtensions }
-      ]
-    },
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'WAITING_VALIDATION'
   )
 }
@@ -648,31 +632,30 @@ export async function toDuplicated(
 
 export async function toValidated(
   record: InProgressRecord | ReadyForReviewRecord,
-  practitioner: Practitioner
+  token: string
 ): Promise<ValidatedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-  const validatedTask = createValidateTask(previousTask, practitioner)
-
-  const validatedTaskWithPractitionerExtensions = setupLastRegUser(
-    validatedTask,
+  const taskWithoutPractitionerExtensions = createValidateTask(
+    previousTask,
     practitioner
   )
 
-  const validatedTaskWithLocationExtensions = await setupLastRegLocation(
-    validatedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [validatedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
+
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [{ resource: validatedTask }]
+  }
 
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: validatedTaskWithLocationExtensions }
-      ]
-    },
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'VALIDATED'
   )
 }
@@ -857,25 +840,20 @@ export async function toCorrectionRejected(
 
 export async function toCertified(
   record: RegisteredRecord,
-  practitioner: Practitioner,
+  token: string,
   eventType: EVENT_TYPE,
   certificateDetails: CertifyInput
-): Promise<
-  Bundle<Composition | Task | DocumentReference | RelatedPerson | Patient>
-> {
+): Promise<CertifiedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const certifiedTask = createCertifiedTask(previousTask, practitioner)
-
-  const certifiedTaskWithPractitionerExtensions = setupLastRegUser(
-    certifiedTask,
+  const taskWithoutPractitionerExtensions = createCertifiedTask(
+    previousTask,
     practitioner
   )
 
-  const certifiedTaskWithLocationExtensions = await setupLastRegLocation(
-    certifiedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [certifiedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
@@ -923,46 +901,45 @@ export async function toCertified(
       certificateSection
     ]
   }
-  return {
+  const changedResources: Bundle<
+    Composition | Task | DocumentReference | RelatedPerson | Patient
+  > = {
     type: 'document',
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: certifiedTaskWithLocationExtensions },
+      { resource: certifiedTask },
       ...relatedPersonEntries,
       documentReferenceEntry
     ]
   }
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      changedResources,
+      practitionerResourcesBundle
+    ),
+    'CERTIFIED'
+  )
 }
 
 export async function toIssued(
   record: RegisteredRecord | CertifiedRecord,
-  practitioner: Practitioner,
+  token: string,
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
-): Promise<
-  Bundle<
-    | Composition
-    | Task
-    | DocumentReference
-    | RelatedPerson
-    | Patient
-    | PaymentReconciliation
-  >
-> {
+): Promise<IssuedRecord> {
+  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
-  const issuedTask = createIssuedTask(previousTask, practitioner)
-
-  const issuedTaskWithPractitionerExtensions = setupLastRegUser(
-    issuedTask,
+  const taskWithoutPractitionerExtensions = createIssuedTask(
+    previousTask,
     practitioner
   )
 
-  const issuedTaskWithLocationExtensions = await setupLastRegLocation(
-    issuedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [issuedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
+
   const temporaryDocumentReferenceId = getUUID()
   const temporaryRelatedPersonId = getUUID()
 
@@ -1019,17 +996,33 @@ export async function toIssued(
       certificateSection
     ]
   }
-  return {
+  const changedResources: Bundle<
+    | Composition
+    | Task
+    | DocumentReference
+    | RelatedPerson
+    | Patient
+    | PaymentReconciliation
+  > = {
     type: 'document',
     resourceType: 'Bundle',
     entry: [
       { resource: compositionWithCertificateSection },
-      { resource: issuedTaskWithLocationExtensions },
+      { resource: issuedTask },
       ...relatedPersonEntries,
       paymentEntry,
       documentReferenceEntry
     ]
   }
+
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      changedResources,
+      practitionerResourcesBundle
+    ),
+    'ISSUED'
+  )
 }
 
 function extensionsWithoutAssignment(extensions: Extension[]) {

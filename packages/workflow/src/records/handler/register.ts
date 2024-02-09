@@ -8,15 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import {
   toRejected,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
@@ -30,11 +27,9 @@ export const registerRoute = [
     handler: async (request, record) => {
       const token = getToken(request)
 
-      const practitioner = await getLoggedInPractitionerResource(token)
       const recordInWaitingValidationState =
-        await toWaitingForExternalValidationState(record, practitioner)
+        await toWaitingForExternalValidationState(record, token)
 
-      await sendBundleToHearth(recordInWaitingValidationState)
       await indexBundle(recordInWaitingValidationState, token)
 
       try {
@@ -46,16 +41,11 @@ export const registerRoute = [
         const statusReason: fhir3.CodeableConcept = {
           text: REG_NUMBER_GENERATION_FAILED
         }
-        const { rejectedRecord: recordInRejectedState } = await toRejected(
-          record,
-          practitioner,
-          statusReason
-        )
+        const rejectedRecord = await toRejected(record, token, statusReason)
 
-        await sendBundleToHearth(recordInRejectedState)
-        await indexBundle(recordInRejectedState, token)
+        await indexBundle(rejectedRecord, token)
 
-        return recordInRejectedState
+        return rejectedRecord
       }
 
       return recordInWaitingValidationState

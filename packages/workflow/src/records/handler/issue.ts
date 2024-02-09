@@ -8,18 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { changeState, IssuedRecord } from '@opencrvs/commons/types'
+import { IssuedRecord } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { IssueRequestSchema } from '@workflow/records/validations'
 import { toIssued } from '@workflow/records/state-transitions'
-import {
-  mergeBundles,
-  sendBundleToHearth,
-  toSavedBundle
-} from '@workflow/records/fhir'
 import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { indexBundle } from '@workflow/records/search'
@@ -41,22 +35,11 @@ export const issueRoute = createRoute({
         getAuthHeader(request)
       )
 
-    const unsavedChangedResources = await toIssued(
+    const issuedRecord = await toIssued(
       record,
-      await getLoggedInPractitionerResource(token),
+      token,
       event,
       certificateDetails
-    )
-
-    const responseBundle = await sendBundleToHearth(unsavedChangedResources)
-    const changedResources = toSavedBundle(
-      unsavedChangedResources,
-      responseBundle
-    )
-
-    const issuedRecord = changeState(
-      mergeBundles(record, changedResources),
-      'ISSUED'
     )
 
     await indexBundle(issuedRecord, token)

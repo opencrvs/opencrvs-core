@@ -17,30 +17,29 @@ import {
   buildFHIRBundle,
   Bundle,
   getComposition,
+  getTrackingId as getTrackingIdFromRecord,
   isTask,
-  urlReferenceToUUID
+  changeState,
+  InProgressRecord,
+  ReadyForReviewRecord
 } from '@opencrvs/commons/types'
-import {
-  setupLastRegUser,
-  setupLastRegLocation
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import {
   findTaskFromIdentifier,
-  sendBundleToHearth
+  mergeBundles,
+  sendBundleToHearth,
+  toSavedBundle,
+  withPractitionerDetails
 } from '@workflow/records/fhir'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
 import { hasDuplicates } from '@workflow/utils/duplicateChecker'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
   generateTrackingIdForEvents,
   isEventNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
-import { getRecordById } from '@workflow/records'
 import { auditEvent } from '@workflow/records/audit'
 import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -116,128 +115,119 @@ function createInProgressOrReadyForReviewTask(
   }
 }
 
+async function createRecord(
+  recordDetails: z.TypeOf<typeof requestSchema>['record'],
+  event: z.TypeOf<typeof requestSchema>['event'],
+  token: string
+): Promise<InProgressRecord | ReadyForReviewRecord> {
+  const inputBundle = buildFHIRBundle(recordDetails, event)
+  const trackingId = await generateTrackingIdForEvents(
+    event,
+    inputBundle,
+    token
+  )
+  const composition = getComposition(inputBundle)
+  const inProgress = isInProgressDeclaration(inputBundle)
+
+  composition.identifier = {
+    system: 'urn:ietf:rfc:3986',
+    value: trackingId
+  }
+
+  const task = createInProgressOrReadyForReviewTask(
+    findTask(inputBundle),
+    event,
+    trackingId,
+    inProgress
+  )
+
+  const [taskWithLocation, practitionerResourcesBundle] =
+    await withPractitionerDetails(task, token)
+
+  inputBundle.entry = inputBundle.entry.map((e) => {
+    if (e.resource.resourceType !== 'Task') {
+      return e
+    }
+    return {
+      ...e,
+      resource: taskWithLocation
+    }
+  })
+
+  const responseBundle = await sendBundleToHearth(inputBundle)
+  const savedBundle = await toSavedBundle(inputBundle, responseBundle)
+  const record = inProgress
+    ? changeState(savedBundle, 'IN_PROGRESS')
+    : changeState(savedBundle, 'READY_FOR_REVIEW')
+
+  return mergeBundles(record, practitionerResourcesBundle)
+}
+
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
 ) {
-  try {
-    const token = getToken(request)
-    const { record: recordDetails, event } = validateRequest(
-      requestSchema,
-      request.payload
-    )
+  const token = getToken(request)
+  const { record: recordDetails, event } = validateRequest(
+    requestSchema,
+    request.payload
+  )
 
-    const existingDeclarationIds =
-      recordDetails.registration?.draftId &&
-      (await findExistingDeclarationIds(recordDetails.registration.draftId))
-    if (existingDeclarationIds) {
-      return {
-        ...existingDeclarationIds,
-        isPotentiallyDuplicate: false
-      }
+  const existingDeclarationIds =
+    recordDetails.registration?.draftId &&
+    (await findExistingDeclarationIds(recordDetails.registration.draftId))
+  if (existingDeclarationIds) {
+    return {
+      ...existingDeclarationIds,
+      isPotentiallyDuplicate: false
     }
-    const isPotentiallyDuplicate = await hasDuplicates(
+  }
+  const isPotentiallyDuplicate = await hasDuplicates(
+    recordDetails,
+    { Authorization: token },
+    event
+  )
+  const recordInputWithUploadedAttachments =
+    await uploadBase64AttachmentsToDocumentsStore(
       recordDetails,
-      { Authorization: token },
-      event
+      getAuthHeader(request)
     )
-    const recordInputWithUploadedAttachments =
-      await uploadBase64AttachmentsToDocumentsStore(
-        recordDetails,
-        getAuthHeader(request)
-      )
+  const record = await createRecord(
+    recordInputWithUploadedAttachments,
+    event,
+    token
+  )
+  const inProgress = isInProgressDeclaration(record)
+  const eventNotification = isEventNotification(record)
 
-    const inputBundle = buildFHIRBundle(
-      recordInputWithUploadedAttachments,
-      event
-    )
-    const practitioner = await getLoggedInPractitionerResource(token)
-    const trackingId = await generateTrackingIdForEvents(
+  await indexBundle(record, token)
+  await auditEvent(
+    inProgress ? 'in-progress-declaration' : 'new-declaration',
+    record,
+    token
+  )
+
+  // Notification not implemented for marriage yet
+  // don't forward hospital notifications
+  if (
+    event !== EVENT_TYPE.MARRIAGE &&
+    !eventNotification &&
+    (await isNotificationEnabled(
+      inProgress ? 'in-progress' : 'ready-for-review',
       event,
-      inputBundle,
       token
-    )
-    const composition = getComposition(inputBundle)
-    const inProgress = isInProgressDeclaration(inputBundle)
-    const eventNotification = isEventNotification(inputBundle)
-
-    composition.identifier = {
-      system: 'urn:ietf:rfc:3986',
-      value: trackingId
-    }
-
-    const task = createInProgressOrReadyForReviewTask(
-      findTask(inputBundle),
-      event,
-      trackingId,
-      inProgress
-    )
-
-    const taskWithUser = setupLastRegUser(task, practitioner)
-
-    const taskWithLocation = eventNotification
-      ? taskWithUser
-      : await setupLastRegLocation(taskWithUser, practitioner)
-
-    inputBundle.entry = inputBundle.entry.map((e) => {
-      if (e.resource.resourceType !== 'Task') {
-        return e
-      }
-      return {
-        ...e,
-        resource: taskWithLocation
-      }
-    })
-
-    const responseBundle = await sendBundleToHearth(inputBundle)
-    const compositionLocation = responseBundle.entry
-      .map((e) => e.response.location)
-      .find((l) => l.includes('Composition'))
-
-    if (!compositionLocation) {
-      throw new Error('Unable to find Composition location in response bundle')
-    }
-
-    const compositionId = urlReferenceToUUID(compositionLocation)
-
-    // fetching the new record to send to search/metrics
-    const record = await getRecordById(compositionId, token, [
-      'IN_PROGRESS',
-      'READY_FOR_REVIEW'
-    ])
-
-    await indexBundle(record, token)
-    await auditEvent(
-      inProgress ? 'in-progress-declaration' : 'new-declaration',
+    ))
+  ) {
+    await sendNotification(
+      inProgress ? 'in-progress' : 'ready-for-review',
       record,
       token
     )
+  }
 
-    // Notification not implemented for marriage yet
-    // don't forward hospital notifications
-    if (
-      event !== EVENT_TYPE.MARRIAGE &&
-      !eventNotification &&
-      (await isNotificationEnabled(
-        inProgress ? 'in-progress' : 'ready-for-review',
-        event,
-        token
-      ))
-    ) {
-      await sendNotification(
-        inProgress ? 'in-progress' : 'ready-for-review',
-        record,
-        token
-      )
-    }
-
-    return {
-      compositionId,
-      trackingId,
-      isPotentiallyDuplicate
-    }
-  } catch (error) {
-    logger.error(`Workflow/createRecordHandler: error: ${error}`)
-    throw new Error(error)
+  return {
+    compositionId: getComposition(record).id,
+    trackingId: getTrackingIdFromRecord(record),
+    isPotentiallyDuplicate
   }
 }
