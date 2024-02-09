@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Patient, SavedBundle, SavedBundleEntry } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
@@ -49,15 +47,6 @@ export function findPatient(bundle: fhir.Bundle) {
   return bundle.entry?.find(
     (entry) => entry?.resource?.resourceType === 'Patient'
   )?.resource as fhir.Patient | undefined
-}
-
-export function findPatientEntryById(bundle: SavedBundle, patientId: UUID) {
-  const patient = bundle.entry.find(
-    (e): e is SavedBundleEntry<Patient> => e.resource.id === patientId
-  )?.resource
-  if (!patient)
-    throw new Error(`No patient found for this patient id ${patientId}`)
-  return patient
 }
 
 export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {

@@ -23,10 +23,8 @@ import {
   mockSearchResponse,
   mockEncounterResponse,
   mockUserModelResponse,
-  // mockLocationResponse,
   mockBirthFhirBundle
 } from '@search/test/utils'
-
 import * as fetchMock from 'jest-fetch-mock'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
