@@ -21,9 +21,9 @@ import {
   findExtension,
   RegistrationStatus,
   WaitingForValidationRecord,
-  urlReferenceToUUID,
-  URLReference,
-  getResourceFromBundleById
+  getResourceFromBundleById,
+  ResourceIdentifier,
+  resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -581,7 +581,9 @@ export function updatePatientIdentifierWithRN(
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
     const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
-    const patientId = urlReferenceToUUID(sectionEntry.reference as URLReference)
+    const patientId = resourceIdentifierToUUID(
+      sectionEntry.reference as ResourceIdentifier
+    )
     const patient = getResourceFromBundleById<Patient>(record, patientId)
 
     if (!patient.identifier) {

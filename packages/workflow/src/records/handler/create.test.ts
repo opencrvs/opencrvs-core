@@ -16,7 +16,6 @@ import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
 import { TransactionResponse } from '@workflow/records/fhir'
-import { healthFacility } from '@test/mocks/locations'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -115,16 +114,6 @@ describe('Create record endpoint', () => {
         }
         return res(ctx.json(responseBundle))
       })
-    )
-
-    // mock encounter location required for toSavedBundle
-    mswServer.use(
-      rest.get(
-        'http://localhost:3447/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2',
-        (_, res, ctx) => {
-          return res(ctx.json(healthFacility))
-        }
-      )
     )
 
     // mock tracking-id generation from country confgi
