@@ -2104,6 +2104,23 @@ export const builders: IFieldBuilders = {
           context
         )
       },
+      middleName: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
+          'given',
+          context
+        )
+      },
       familyName: (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
