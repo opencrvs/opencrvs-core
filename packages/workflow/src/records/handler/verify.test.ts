@@ -69,10 +69,7 @@ describe('verify record endpoint', () => {
       method: 'POST',
       url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/verify',
       payload: {
-        authHeader: {
-          Authorization: `Bearer ${token}`,
-          'x-real-ip': '127.0.0.1'
-        }
+        'x-real-ip': '119.148.49.98'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -83,7 +80,7 @@ describe('verify record endpoint', () => {
     const task = getTaskFromSavedBundle(verifiedRecord)
     const isVerified = checkForVerifiedExtension(task)
 
-    expect(findVerificationIp(task)).toBe('127.0.0.1')
+    expect(findVerificationIp(task)).toBe('119.148.49.98')
     expect(!!isVerified).toBe(true)
     expect(res.statusCode).toBe(200)
   })
