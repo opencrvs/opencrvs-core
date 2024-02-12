@@ -21,7 +21,7 @@
     }
   ],
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": true
   },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
