@@ -13,6 +13,8 @@
 
 ## Bug fixes
 
+- #### Fix location seeding scripts throwing error when there are too many source locations from the country config
+  Locations are now seeded in smaller segments instead of one big collection. The newer approach has improved performance to a significant extent and also clears the interruption caused for a large number of country config locations
 - Filter user information such as usernames and authentication codes from server logs
 - Core not recognizing "occupation" as an optional field for deceased
 
