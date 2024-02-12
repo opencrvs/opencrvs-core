@@ -10,8 +10,7 @@
  */
 import {
   indexComposition,
-  searchByCompositionId,
-  updateComposition
+  searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
@@ -20,37 +19,34 @@ import {
   getCreatedBy,
   getStatus,
   IBirthCompositionBody,
-  ICompositionBody,
   NAME_EN,
   IOperationHistory,
   REJECTED_STATUS,
-  VALIDATED_STATUS,
-  REGISTERED_STATUS,
-  CERTIFIED_STATUS,
-  ARCHIVED_STATUS,
   DECLARED_STATUS,
-  IN_PROGRESS_STATUS
+  IN_PROGRESS_STATUS,
+  updateCompositionWithDuplicates
 } from '@search/elasticsearch/utils'
 import {
-  addDuplicatesToComposition,
   findEntry,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  getCompositionById,
-  updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate,
-  findPatient
+  addFlaggedAsPotentialDuplicate
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
+import {
+  getComposition,
+  SavedComposition,
+  ValidRecord
+} from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -63,113 +59,26 @@ function getTypeFromTask(task: fhir.Task) {
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as fhir.Bundle
+  const bundle = requestBundle.payload as ValidRecord
   const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  const isCompositionInBundle = bundleEntries?.some(
-    ({ resource }) => resource?.resourceType === 'Composition'
-  )
-
-  if (!isCompositionInBundle) {
-    await updateEvent(bundle, authHeader)
-    return
-  }
-
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  if (!composition) {
-    throw new Error('Composition not found')
-  }
-
-  const compositionId = composition.id
-
-  if (!compositionId) {
-    throw new Error(`Composition ID not found`)
-  }
-
   await indexAndSearchComposition(
-    compositionId,
-    composition,
+    getComposition(bundle),
     authHeader,
     bundleEntries
   )
 }
 
-/**
- * Updates the search index with the latest information of the composition
- * Supports 1 task and 1 patient maximum
- */
-async function updateEvent(bundle: fhir.Bundle, authHeader: string) {
-  const task = findTask(bundle.entry)
-  const patient = findPatient(bundle)
-
-  const compositionId =
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-
-  if (!compositionId) {
-    throw new Error('No Composition ID found')
-  }
-
-  const regLastUserIdentifier = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastUser'
-  )
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/birth-registration-number'
-  )
-  const body: ICompositionBody = {
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
-  body.type = getTypeFromTask(task)
-  body.modifiedAt = Date.now().toString()
-
-  if (body.type === REJECTED_STATUS) {
-    const rejectAnnotation: fhir.Annotation = (task &&
-      task.note &&
-      Array.isArray(task.note) &&
-      task.note.length > 0 &&
-      task.note[task.note.length - 1]) || { text: '' }
-    const nodeText = rejectAnnotation.text
-    body.rejectReason = (task && task.reason && task.reason.text) || ''
-    body.rejectComment = nodeText
-  }
-  body.updatedBy =
-    regLastUserIdentifier &&
-    regLastUserIdentifier.valueReference &&
-    regLastUserIdentifier.valueReference.reference &&
-    regLastUserIdentifier.valueReference.reference.split('/')[1]
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
-  body.childIdentifier =
-    patient?.identifier && getSubmittedIdentifier(patient.identifier)
-
-  if (
-    [
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      ARCHIVED_STATUS
-    ].includes(body.type ?? '')
-  ) {
-    body.assignment = null
-  }
-  await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body, client)
-}
-
 async function indexAndSearchComposition(
-  compositionId: string,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
+  const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
+  const task = findTask(bundleEntries)
+
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
     createdAt:
@@ -180,6 +89,32 @@ async function indexAndSearchComposition(
     modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
+
+  body.type = getTypeFromTask(task)
+  body.modifiedAt = Date.now().toString()
+
+  if (body.type === REJECTED_STATUS) {
+    const rejectAnnotation: fhir.Annotation = (task &&
+      task.note &&
+      Array.isArray(task.note) &&
+      task.note.length > 0 &&
+      task.note[task.note.length - 1]) || { text: '' }
+    const nodeText = rejectAnnotation.text
+    body.rejectReason =
+      (task && task.statusReason && task.statusReason.text) || ''
+    body.rejectComment = nodeText
+  }
+
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
+  body.updatedBy =
+    regLastUserIdentifier &&
+    regLastUserIdentifier.valueReference &&
+    regLastUserIdentifier.valueReference.reference &&
+    regLastUserIdentifier.valueReference.reference.split('/')[1]
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
@@ -220,6 +155,8 @@ async function createChildIndex(
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
+  body.childIdentifier =
+    child.identifier && getSubmittedIdentifier(child.identifier)
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
   body.childFamilyName = childName && childName.family && childName.family[0]
@@ -368,6 +305,7 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/id/birth-tracking-id'
   )
+
   const registrationNumberIdentifier = findTaskIdentifier(
     task,
     'http://opencrvs.org/specs/id/birth-registration-number'
@@ -438,33 +376,5 @@ async function detectAndUpdateBirthDuplicates(
   return await updateCompositionWithDuplicates(
     composition,
     duplicates.map((it) => it.id)
-  )
-}
-
-export async function updateCompositionWithDuplicates(
-  composition: fhir.Composition,
-  duplicates: string[]
-) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map((duplicate) => getCompositionById(duplicate))
-  )
-
-  const duplicateCompositionIds = duplicateCompositions.map(
-    (dupComposition) => dupComposition.id
-  )
-
-  if (composition && composition.id) {
-    const body: ICompositionBody = {}
-    body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body, client)
-  }
-  const compositionFromFhir = (await getCompositionById(
-    composition.id as string
-  )) as fhir.Composition
-  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
-
-  return updateInHearth(
-    `/Composition/${compositionFromFhir.id}`,
-    compositionFromFhir
   )
 }

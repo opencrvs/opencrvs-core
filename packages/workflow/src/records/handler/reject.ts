@@ -16,7 +16,6 @@ import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
-import { isTaskBundleEntry } from '@opencrvs/commons/types'
 
 const requestSchema = z.object({
   comment: z.custom<string>(),
@@ -43,13 +42,7 @@ export const rejectRoute = createRoute({
       payload.reason
     )
 
-    await indexBundle(
-      {
-        ...rejectedRecord,
-        entry: rejectedRecord.entry.filter((e) => isTaskBundleEntry(e))
-      },
-      token
-    )
+    await indexBundle(rejectedRecord, token)
     await auditEvent('sent-for-updates', rejectedRecord, token)
 
     return rejectedRecord
