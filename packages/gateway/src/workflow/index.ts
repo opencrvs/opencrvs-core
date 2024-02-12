@@ -21,7 +21,8 @@ import {
   RejectedRecord,
   ValidRecord,
   getTaskFromSavedBundle,
-  getBusinessStatus
+  getBusinessStatus,
+  IssuedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -31,9 +32,9 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLPaymentInput
 } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils/index'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -133,14 +134,6 @@ export async function createRegistration(
     trackingId: string
     isPotentiallyDuplicate: boolean
   }>('POST', '/create-record', authHeader, { record, event })
-
-  if (hasScope(authHeader, 'validate') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
-  }
-
-  if (hasScope(authHeader, 'register') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/register`, authHeader)
-  }
 
   return res
 }
@@ -271,6 +264,25 @@ export async function duplicateRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export function issueRegistration(
+  recordId: string,
+  certificate: Omit<GQLCertificateInput, 'payments'> & {
+    payment: GQLPaymentInput
+  },
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<IssuedRecord>(
+    'POST',
+    `/records/${recordId}/issue-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }
 
 export async function rejectDeclaration(

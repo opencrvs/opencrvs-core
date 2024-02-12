@@ -16,10 +16,12 @@ import { server as mswServer } from '@test/setupServer'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('Register record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -58,6 +60,26 @@ describe('Register record endpoint', () => {
     mswServer.use(
       rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
         return res(ctx.status(400))
+      })
+    )
+
+    // Mock response from hearth
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
       })
     )
 
@@ -107,7 +129,20 @@ describe('Register record endpoint', () => {
     // Mock response from hearth
     mswServer.use(
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
-        return res(ctx.json({}))
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
       })
     )
 

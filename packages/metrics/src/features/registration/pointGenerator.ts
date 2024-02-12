@@ -399,7 +399,7 @@ export async function generatePaymentPoint(
     throw new Error('Payment reconciliation not found')
   }
 
-  const total = reconciliation.total as number
+  const total = reconciliation.total?.value ?? 0
 
   const fields: IPaymentFields = {
     total,
@@ -554,18 +554,15 @@ export async function generateDeclarationStartedPoint(
 
   let role = ''
 
-  if (status === Events.IN_PROGRESS_DEC) {
+  if (status === Events.INCOMPLETE) {
     isNotification(composition)
       ? (role = 'NOTIFICATION_API_USER')
       : (role = 'FIELD_AGENT')
-  } else if (status === Events.REQUEST_FOR_REGISTRAR_VALIDATION) {
+  } else if (status === Events.VALIDATED) {
     role = 'REGISTRATION_AGENT'
-  } else if (
-    status ===
-    Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-  ) {
+  } else if (status === Events.WAITING_EXTERNAL_VALIDATION) {
     role = 'REGISTRAR'
-  } else if (status === Events.NEW_DEC) {
+  } else if (status === Events.READY_FOR_REVIEW) {
     role = 'FIELD_AGENT'
   }
 

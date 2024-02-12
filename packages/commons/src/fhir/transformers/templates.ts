@@ -19,7 +19,6 @@ import {
   Location,
   Observation,
   Patient,
-  PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
   RelatedPerson,
@@ -154,16 +153,6 @@ export function createRelatedPersonTemplate(refUuid: UUID) {
       resourceType: 'RelatedPerson' as const
     }
   } satisfies BundleEntry<PartialBy<RelatedPerson, 'patient'>>
-}
-
-export function createPaymentReconciliationTemplate(refUuid: UUID) {
-  return {
-    fullUrl: `urn:uuid:${refUuid}` as const,
-    resource: {
-      resourceType: 'PaymentReconciliation',
-      status: 'active'
-    }
-  } satisfies BundleEntry<PaymentReconciliation>
 }
 
 export function createCompositionTemplate(

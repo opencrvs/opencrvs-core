@@ -23,8 +23,7 @@ import {
   ReadyForReviewRecord,
   RegisteredRecord,
   RelatedPerson,
-  resourceIdentifierToUUID,
-  urlReferenceToUUID
+  resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { badRequest as boomBadRequest } from '@hapi/boom'
 
@@ -84,11 +83,11 @@ export function getInformantName(
   }
   const informantRelation = getResourceFromBundleById<RelatedPerson>(
     record,
-    urlReferenceToUUID(informantSection.entry[0].reference)
+    resourceIdentifierToUUID(informantSection.entry[0].reference)
   )
   const informant = getResourceFromBundleById<Patient>(
     record,
-    urlReferenceToUUID(informantRelation.patient.reference)
+    resourceIdentifierToUUID(informantRelation.patient.reference)
   )
   const name = informant.name.find(({ use }) => use === 'en')
   if (!name) {
@@ -112,7 +111,7 @@ export function getPersonName(
   }
   const person = getResourceFromBundleById<Patient>(
     record,
-    urlReferenceToUUID(patientSection.entry[0].reference)
+    resourceIdentifierToUUID(patientSection.entry[0].reference)
   )
   const name = person.name.find(({ use }) => use === 'en')
   if (!name) {

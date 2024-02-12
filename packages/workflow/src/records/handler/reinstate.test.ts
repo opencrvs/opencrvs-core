@@ -56,16 +56,6 @@ describe('reinstate record endpoint', () => {
       )
     )
 
-    // Sends bundle to metrics
-    mswServer.use(
-      rest.post(
-        'http://localhost:1050/events/birth/mark-reinstated',
-        (_, res, ctx) => {
-          return res(ctx.json({}))
-        }
-      )
-    )
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/reinstate',

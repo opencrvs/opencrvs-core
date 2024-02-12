@@ -307,10 +307,9 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 export type Payment = {
   paymentId?: string
   type: PaymentType
-  total: number
   amount: number
   outcome: PaymentOutcomeType
-  date: number
+  date: string
 }
 
 interface IArchiveDeclarationAction {

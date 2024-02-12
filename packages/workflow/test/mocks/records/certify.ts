@@ -10,6 +10,7 @@
  */
 import {
   Composition,
+  DocumentReference,
   Encounter,
   Location,
   Observation,
@@ -26,8 +27,9 @@ import {
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
-export const REGISTERED_BIRTH_RECORD: SavedBundle<
+export const CERTIFIED_BIRTH_RECORD: SavedBundle<
   | Composition
+  | DocumentReference
   | Encounter
   | Patient
   | RelatedPerson
@@ -42,11 +44,11 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
   entry: [
     {
       fullUrl:
-        '/fhir/Composition/7a790b68-9433-47b8-b595-66aae80d044a/_history/20fbf8e0-6d5a-4a7b-a812-0fe4f82016e5' as URLReference,
+        '/fhir/Composition/9d377df7-8e18-46ce-b7c2-99393ddf3410/_history/c8cf0a1e-bbf3-4abf-84f5-c36baa661794' as URLReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
-          value: 'B9EKE2K'
+          value: 'BOEMTJF'
         },
         resourceType: 'Composition',
         status: 'preliminary',
@@ -84,7 +86,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  'RelatedPerson/7a661dba-080b-4481-8e1d-ec46b33ed979' as ResourceIdentifier
+                  'RelatedPerson/c84ddc15-e78f-4bcf-8d4d-c60c0dae1655' as ResourceIdentifier
               }
             ]
           },
@@ -102,7 +104,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  'Patient/53f84c51-e087-4011-9d20-f308b0040696' as ResourceIdentifier
+                  'Patient/9ed2849b-7055-41c1-be7f-e6bef66da95b' as ResourceIdentifier
               }
             ]
           },
@@ -120,7 +122,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  'Patient/25821f78-fe9f-4e52-bba4-bd0809fe3698' as ResourceIdentifier
+                  'Patient/3e30e461-5a25-472b-8e1c-13fc4d288897' as ResourceIdentifier
               }
             ]
           },
@@ -138,7 +140,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  'Patient/7e1a2bb0-d738-4668-aacb-ecc72e5d4a58' as ResourceIdentifier
+                  'Patient/069d6056-982f-49f6-8630-9559ee097bf5' as ResourceIdentifier
               }
             ]
           },
@@ -156,24 +158,42 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  'Encounter/2add7704-6b78-4e10-91ca-21158d2ef6b0' as ResourceIdentifier
+                  'Encounter/11382465-b873-4813-9413-ea2ace64c41b' as ResourceIdentifier
+              }
+            ]
+          },
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference:
+                  'DocumentReference/c808142a-b484-46aa-a666-083ffd22c172' as ResourceIdentifier
               }
             ]
           }
         ],
         subject: {},
-        date: '2024-01-05T09:34:50.523Z',
+        date: '2024-01-11T07:49:23.095Z',
         author: [],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.667+00:00',
-          versionId: '20fbf8e0-6d5a-4a7b-a812-0fe4f82016e5'
+          lastUpdated: '2024-01-11T07:49:54.022+00:00',
+          versionId: 'c8cf0a1e-bbf3-4abf-84f5-c36baa661794'
         },
-        id: '7a790b68-9433-47b8-b595-66aae80d044a' as UUID
+        id: '9d377df7-8e18-46ce-b7c2-99393ddf3410' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Encounter/2add7704-6b78-4e10-91ca-21158d2ef6b0/_history/94601b86-03f2-4bc4-826e-1c715bd5bf5f' as URLReference,
+        '/fhir/Encounter/11382465-b873-4813-9413-ea2ace64c41b/_history/2ba032aa-101a-4807-bd65-bc140a163d5c' as URLReference,
       resource: {
         resourceType: 'Encounter',
         status: 'finished',
@@ -181,20 +201,20 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           {
             location: {
               reference:
-                'Location/0e088936-4a22-426e-9beb-4c30bc3a4b4c' as ResourceIdentifier
+                'Location/8ea98ec2-4698-4582-b0c7-8124d24964a4' as ResourceIdentifier
             }
           }
         ],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.669+00:00',
-          versionId: '94601b86-03f2-4bc4-826e-1c715bd5bf5f'
+          lastUpdated: '2024-01-11T07:49:25.665+00:00',
+          versionId: '2ba032aa-101a-4807-bd65-bc140a163d5c'
         },
-        id: '2add7704-6b78-4e10-91ca-21158d2ef6b0' as UUID
+        id: '11382465-b873-4813-9413-ea2ace64c41b' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/RelatedPerson/7a661dba-080b-4481-8e1d-ec46b33ed979/_history/14d11990-4c07-4d9f-8cae-25be3f31761c' as URLReference,
+        '/fhir/RelatedPerson/c84ddc15-e78f-4bcf-8d4d-c60c0dae1655/_history/396a5f89-b614-4c4e-9da8-4229ff9041d3' as URLReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -208,18 +228,38 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         },
         patient: {
           reference:
-            'Patient/53f84c51-e087-4011-9d20-f308b0040696' as ResourceIdentifier
+            'Patient/9ed2849b-7055-41c1-be7f-e6bef66da95b' as ResourceIdentifier
         },
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.671+00:00',
-          versionId: '14d11990-4c07-4d9f-8cae-25be3f31761c'
+          lastUpdated: '2024-01-11T07:49:25.667+00:00',
+          versionId: '396a5f89-b614-4c4e-9da8-4229ff9041d3'
         },
-        id: '7a661dba-080b-4481-8e1d-ec46b33ed979' as UUID
+        id: 'c84ddc15-e78f-4bcf-8d4d-c60c0dae1655' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Patient/25821f78-fe9f-4e52-bba4-bd0809fe3698/_history/7a5bc612-4482-445e-8606-9b457ae7a56b' as URLReference,
+        '/fhir/Patient/069d6056-982f-49f6-8630-9559ee097bf5/_history/fddf3682-b821-489b-bcfe-9df7cb740c88' as URLReference,
+      resource: {
+        resourceType: 'Patient',
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/reason-not-applying',
+            valueString: 'No idea'
+          }
+        ],
+        active: false,
+        name: [],
+        meta: {
+          lastUpdated: '2024-01-11T07:49:25.668+00:00',
+          versionId: 'fddf3682-b821-489b-bcfe-9df7cb740c88'
+        },
+        id: '069d6056-982f-49f6-8630-9559ee097bf5' as UUID
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/Patient/3e30e461-5a25-472b-8e1c-13fc4d288897/_history/b7b521f6-22d8-4477-aa67-4ab9fdf84621' as URLReference,
       resource: {
         resourceType: 'Patient',
         extension: [],
@@ -227,17 +267,17 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         name: [
           {
             use: 'en',
-            given: ['Jara'],
-            family: ['Akhtar']
+            given: ['Bashir'],
+            family: ['Khan']
           }
         ],
-        gender: 'female',
-        birthDate: '2023-11-11',
+        gender: 'male',
+        birthDate: '2023-12-12',
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.672+00:00',
-          versionId: '7a5bc612-4482-445e-8606-9b457ae7a56b'
+          lastUpdated: '2024-01-11T07:49:25.673+00:00',
+          versionId: 'b7b521f6-22d8-4477-aa67-4ab9fdf84621'
         },
-        id: '25821f78-fe9f-4e52-bba4-bd0809fe3698' as UUID,
+        id: '3e30e461-5a25-472b-8e1c-13fc4d288897' as UUID,
         identifier: [
           {
             type: {
@@ -248,7 +288,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
                 }
               ]
             },
-            value: '2024B9EKE2K'
+            value: '2024BOEMTJF'
           },
           {
             type: {
@@ -288,7 +328,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
     },
     {
       fullUrl:
-        '/fhir/Patient/53f84c51-e087-4011-9d20-f308b0040696/_history/68919fdd-0fb5-4e5e-9b8b-f27f37935511' as URLReference,
+        '/fhir/Patient/9ed2849b-7055-41c1-be7f-e6bef66da95b/_history/90c92eed-f5af-410a-a89d-d727e50c3916' as URLReference,
       resource: {
         resourceType: 'Patient',
         extension: [
@@ -320,8 +360,8 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         name: [
           {
             use: 'en',
-            given: ['Wonder'],
-            family: ['Woman']
+            given: ['Jane'],
+            family: ['Foster']
           }
         ],
         identifier: [
@@ -337,7 +377,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             }
           }
         ],
-        birthDate: '1993-11-11',
+        birthDate: '1992-12-12',
         address: [
           {
             type: 'PRIMARY_ADDRESS',
@@ -358,49 +398,74 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
               '',
               ''
             ],
-            district: 'c535b9a2-da47-41d0-b0ac-5891e31eeb9f',
-            state: '3fba5456-91e9-4a36-951d-d433173203e8',
+            district: 'fe107046-f90b-4c10-a165-827b0c5c8d79',
+            state: 'e452aebe-5ce1-43dd-b2cd-d5628ff2b706',
             country: 'FAR',
             extension: [
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
+                  reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
                 }
               }
             ]
           }
         ],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.674+00:00',
-          versionId: '68919fdd-0fb5-4e5e-9b8b-f27f37935511'
+          lastUpdated: '2024-01-11T07:49:25.675+00:00',
+          versionId: '90c92eed-f5af-410a-a89d-d727e50c3916'
         },
-        id: '53f84c51-e087-4011-9d20-f308b0040696' as UUID
+        id: '9ed2849b-7055-41c1-be7f-e6bef66da95b' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Patient/7e1a2bb0-d738-4668-aacb-ecc72e5d4a58/_history/b201720b-f819-4714-aefe-6d58342e98d6' as URLReference,
+        '/fhir/DocumentReference/c808142a-b484-46aa-a666-083ffd22c172/_history/e63439e7-6f77-4a3c-bd04-d2defb9d7336' as URLReference,
       resource: {
-        resourceType: 'Patient',
+        resourceType: 'DocumentReference',
+        masterIdentifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '0a326397-2fdf-4bea-9bf2-3bf35846a1ad'
+        },
         extension: [
           {
-            url: 'http://opencrvs.org/specs/extension/reason-not-applying',
-            valueString: 'No idea'
+            url: 'http://opencrvs.org/specs/extension/collector',
+            valueReference: {
+              reference: 'RelatedPerson/219a94d9-92cf-4b7d-a082-368736c4eff5'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+            valueBoolean: true
           }
         ],
-        active: false,
-        name: [],
-        meta: {
-          lastUpdated: '2024-01-05T09:34:52.676+00:00',
-          versionId: 'b201720b-f819-4714-aefe-6d58342e98d6'
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/certificate-type',
+              code: 'BIRTH'
+            }
+          ]
         },
-        id: '7e1a2bb0-d738-4668-aacb-ecc72e5d4a58' as UUID
+        content: [
+          {
+            attachment: {
+              contentType: 'application/pdf',
+              data: '/ocrvs/7f089636-aa47-4b46-8971-4c952a3c47e2.pdf'
+            }
+          }
+        ],
+        status: 'current',
+        meta: {
+          lastUpdated: '2024-01-11T07:49:54.020+00:00',
+          versionId: 'e63439e7-6f77-4a3c-bd04-d2defb9d7336'
+        },
+        id: 'c808142a-b484-46aa-a666-083ffd22c172' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Task/df49e854-25b3-46b0-b6ea-e2f7f82ea297/_history/a08232a9-e3dc-43e8-8241-6df5d326b9f9' as URLReference,
+        '/fhir/Task/8c80cb66-6068-4ae8-97cb-bb65b75788b9/_history/14e5c6d9-570e-4c4f-aca2-fe84d82361f4' as URLReference,
       resource: {
         resourceType: 'Task',
         status: 'accepted',
@@ -414,26 +479,26 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           ]
         },
         focus: {
-          reference: 'Composition/7a790b68-9433-47b8-b595-66aae80d044a'
+          reference: 'Composition/9d377df7-8e18-46ce-b7c2-99393ddf3410'
         },
-        id: 'df49e854-25b3-46b0-b6ea-e2f7f82ea297' as UUID,
+        id: '8c80cb66-6068-4ae8-97cb-bb65b75788b9' as UUID,
         requester: {
           agent: {
-            reference: 'Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f'
+            reference: 'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7'
           }
         },
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/draft-id',
-            value: '019ca590-7c8f-4153-a8d3-0f0eec7a9a4b'
+            value: 'd44f6390-7fcb-4659-8baa-98ac99377585'
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B9EKE2K' as TrackingID
+            value: 'BOEMTJF' as TrackingID
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-registration-number',
-            value: '2024B9EKE2K' as RegistrationNumber
+            value: '2024BOEMTJF' as RegistrationNumber
           }
         ],
         extension: [
@@ -442,47 +507,43 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             valueString: 'abc@xyz.com'
           },
           {
-            url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
-            valueInteger: 0
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f'
+              reference: 'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
             valueReference: {
-              reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
+              reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueString: 'Ibombo District Office',
             valueReference: {
-              reference: 'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84'
+              reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
             }
           }
         ],
-        lastModified: '2024-01-05T09:34:52.632Z',
+        lastModified: '2024-01-11T07:49:53.988Z',
         businessStatus: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/reg-status',
-              code: 'REGISTERED'
+              code: 'CERTIFIED'
             }
           ]
         },
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.688+00:00',
-          versionId: 'a08232a9-e3dc-43e8-8241-6df5d326b9f9'
+          lastUpdated: '2024-01-11T07:49:54.026+00:00',
+          versionId: '14e5c6d9-570e-4c4f-aca2-fe84d82361f4'
         }
       }
     },
     {
       fullUrl:
-        '/fhir/Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f/_history/6bc85b24-3f70-459e-a21d-02a13e0b3265' as URLReference,
+        '/fhir/Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7/_history/aceb7848-c305-4fd3-8023-8e1327fa0bd4' as URLReference,
       resource: {
         resourceType: 'Practitioner',
         identifier: [],
@@ -504,15 +565,15 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           }
         ],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.678+00:00',
-          versionId: '6bc85b24-3f70-459e-a21d-02a13e0b3265'
+          lastUpdated: '2024-01-11T07:49:25.683+00:00',
+          versionId: 'aceb7848-c305-4fd3-8023-8e1327fa0bd4'
         },
-        id: '1a3cf855-1132-427f-b125-93c03d79b57f' as UUID
+        id: 'e46e1ed0-3869-48fe-8c7b-0859647649a7' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84/_history/e63bbba2-ae71-47a1-8b24-e62d1b121c00' as URLReference,
+        '/fhir/Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273/_history/b7144401-b1c5-4e1a-9caf-5af94cf457db' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -526,7 +587,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
+          reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
         },
         type: {
           coding: [
@@ -545,15 +606,15 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           ]
         },
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.679+00:00',
-          versionId: 'e63bbba2-ae71-47a1-8b24-e62d1b121c00'
+          lastUpdated: '2024-01-11T07:49:25.684+00:00',
+          versionId: 'b7144401-b1c5-4e1a-9caf-5af94cf457db'
         },
-        id: '0fad590a-41e4-4b82-a9ab-e8f32c2e7e84' as UUID
+        id: '4a9f7b1a-01b9-4ab5-977b-8942b2c20273' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f/_history/b38d0c37-c63c-4922-b901-aae6eecbae8c' as URLReference,
+        '/fhir/Location/fe107046-f90b-4c10-a165-827b0c5c8d79/_history/3a39313d-a4b3-4bbc-8649-051b6f325184' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -572,7 +633,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/3fba5456-91e9-4a36-951d-d433173203e8'
+          reference: 'Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706'
         },
         type: {
           coding: [
@@ -590,45 +651,17 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             }
           ]
         },
-        extension: [
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
-            valueAttachment: {
-              contentType: 'application/geo+json',
-              data: '<base64>'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/id/statistics-male-populations',
-            valueString:
-              '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
-          },
-          {
-            url: 'http://opencrvs.org/specs/id/statistics-female-populations',
-            valueString:
-              '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
-          },
-          {
-            url: 'http://opencrvs.org/specs/id/statistics-total-populations',
-            valueString:
-              '[{"2007":10000},{"2008":10000},{"2009":10000},{"2010":10000},{"2011":10000},{"2012":10000},{"2013":10000},{"2014":10000},{"2015":10000},{"2016":10000},{"2017":10000},{"2018":10000},{"2019":10000},{"2020":10000},{"2021":10000},{"2022":15000},{"2023":20000}]'
-          },
-          {
-            url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-            valueString:
-              '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
-          }
-        ],
+        extension: [],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.681+00:00',
-          versionId: 'b38d0c37-c63c-4922-b901-aae6eecbae8c'
+          lastUpdated: '2024-01-11T07:49:25.686+00:00',
+          versionId: '3a39313d-a4b3-4bbc-8649-051b6f325184'
         },
-        id: 'c535b9a2-da47-41d0-b0ac-5891e31eeb9f' as UUID
+        id: 'fe107046-f90b-4c10-a165-827b0c5c8d79' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/0e088936-4a22-426e-9beb-4c30bc3a4b4c/_history/ba48b3f8-1c94-4183-8831-035ce12e3981' as URLReference,
+        '/fhir/Location/8ea98ec2-4698-4582-b0c7-8124d24964a4/_history/6684da46-6ec6-41cb-ad7c-dc105f54f4e7' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -642,7 +675,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
+          reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
         },
         type: {
           coding: [
@@ -661,19 +694,44 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           ]
         },
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.683+00:00',
-          versionId: 'ba48b3f8-1c94-4183-8831-035ce12e3981'
+          lastUpdated: '2024-01-11T07:49:25.689+00:00',
+          versionId: '6684da46-6ec6-41cb-ad7c-dc105f54f4e7'
         },
-        id: '0e088936-4a22-426e-9beb-4c30bc3a4b4c' as UUID
+        id: '8ea98ec2-4698-4582-b0c7-8124d24964a4' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/PractitionerRole/ddc17e0c-9301-48a0-b4c4-a3d6b3fe8920/_history/b93f1843-064d-43c3-992d-94752bbf1ddc' as URLReference,
+        '/fhir/RelatedPerson/219a94d9-92cf-4b7d-a082-368736c4eff5/_history/d68594f8-c814-464f-806a-75a4df417375' as URLReference,
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'INFORMANT'
+            }
+          ]
+        },
+        patient: {
+          reference:
+            'RelatedPerson/c84ddc15-e78f-4bcf-8d4d-c60c0dae1655' as ResourceIdentifier
+        },
+        meta: {
+          lastUpdated: '2024-01-11T07:49:54.018+00:00',
+          versionId: 'd68594f8-c814-464f-806a-75a4df417375'
+        },
+        id: '219a94d9-92cf-4b7d-a082-368736c4eff5' as UUID
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/PractitionerRole/6cd6c596-2568-4541-bc3c-5464bd8d6b24/_history/1374b119-be0c-40e9-8616-bbe5b58b1363' as URLReference,
       resource: {
         resourceType: 'PractitionerRole',
         practitioner: {
-          reference: 'Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f'
+          reference: 'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7'
         },
         code: [
           {
@@ -695,25 +753,25 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         ],
         location: [
           {
-            reference: 'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84'
+            reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
           },
           {
-            reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
+            reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
           },
           {
-            reference: 'Location/3fba5456-91e9-4a36-951d-d433173203e8'
+            reference: 'Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706'
           }
         ],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.685+00:00',
-          versionId: 'b93f1843-064d-43c3-992d-94752bbf1ddc'
+          lastUpdated: '2024-01-11T07:49:25.691+00:00',
+          versionId: '1374b119-be0c-40e9-8616-bbe5b58b1363'
         },
-        id: 'ddc17e0c-9301-48a0-b4c4-a3d6b3fe8920' as UUID
+        id: '6cd6c596-2568-4541-bc3c-5464bd8d6b24' as UUID
       }
     },
     {
       fullUrl:
-        '/fhir/Location/3fba5456-91e9-4a36-951d-d433173203e8/_history/56621de2-a3f7-4177-96b2-86680a275b16' as URLReference,
+        '/fhir/Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706/_history/923a909f-2ca0-47a3-8b28-4a3f38eae21e' as URLReference,
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -752,10 +810,10 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         },
         extension: [],
         meta: {
-          lastUpdated: '2024-01-05T09:34:52.686+00:00',
-          versionId: '56621de2-a3f7-4177-96b2-86680a275b16'
+          lastUpdated: '2024-01-11T07:49:25.693+00:00',
+          versionId: '923a909f-2ca0-47a3-8b28-4a3f38eae21e'
         },
-        id: '3fba5456-91e9-4a36-951d-d433173203e8' as UUID
+        id: 'e452aebe-5ce1-43dd-b2cd-d5628ff2b706' as UUID
       }
     }
   ]
