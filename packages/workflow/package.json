@@ -38,7 +38,7 @@
     "zod": "^3.17.3"
   },
   "devDependencies": {
-    "@types/fhir": "0.0.37",
+    "@types/fhir": "0.0.41",
     "@types/hapi__boom": "^9.0.1",
     "@typescript-eslint/parser": "^4.5.0",
     "@types/hapi__hapi": "^20.0.0",
