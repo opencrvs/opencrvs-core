@@ -35,7 +35,6 @@ import {
   GQLMarriageRegistrationInput,
   GQLPaymentInput
 } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils/index'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -135,14 +134,6 @@ export async function createRegistration(
     trackingId: string
     isPotentiallyDuplicate: boolean
   }>('POST', '/create-record', authHeader, { record, event })
-
-  if (hasScope(authHeader, 'validate') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
-  }
-
-  if (hasScope(authHeader, 'register') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/register`, authHeader)
-  }
 
   return res
 }

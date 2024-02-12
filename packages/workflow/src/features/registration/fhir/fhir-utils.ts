@@ -282,6 +282,9 @@ export const getFromFhir = (suffix: string) => {
     }
   })
     .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to resolve "${suffix}" from hearth`)
+      }
       return response.json()
     })
     .catch((error) => {

@@ -510,7 +510,7 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
   )
 }
 
-export function isEventNotification(fhirBundle: Bundle) {
+export function isHospitalNotification(fhirBundle: Bundle) {
   const compositionEntry =
     fhirBundle &&
     fhirBundle.entry &&
