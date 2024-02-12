@@ -12,13 +12,13 @@ export default function performance() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <iframe
-            src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=2"
+            src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=2"
             width="100"
             height="100"
             style={{ border: '0px' }}
           />
           <iframe
-            src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=7"
+            src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=7"
             width="100"
             height="100"
             style={{ border: '0px' }}
@@ -26,32 +26,32 @@ export default function performance() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <iframe
-            src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=9"
+            src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=8"
             width="100"
             height="100"
             style={{ border: '0px' }}
           />
           <iframe
-            src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=8"
+            src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=9"
             width="100"
             height="100"
             style={{ border: '0px' }}
           />
         </div>
         <iframe
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=6"
+          src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=6"
           width="240"
           height="205"
           style={{ border: '0px' }}
         />
         <iframe
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&panelId=4"
+          src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=4"
           width="240"
           height="205"
           style={{ border: '0px' }}
         />
         <iframe
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&tab=transform&refresh=1s&panelId=5"
+          src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=5"
           width="240"
           height="205"
           style={{ border: '0px' }}
@@ -59,14 +59,14 @@ export default function performance() {
       </div>
       <div style={{ display: 'flex', marginLeft: '20px', marginTop: '10px' }}>
         <iframe
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&tab=transform&refresh=5s&panelId=1"
+          src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=1"
           width="480"
           height="350"
           style={{ border: '0px' }}
         />
         <iframe
           style={{ marginLeft: '10px', border: '0px' }}
-          src="http://localhost:3002/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&tab=transform&refresh=5s&panelId=3"
+          src="http://localhost:3003/d-solo/f662c48a-63b1-4093-af9b-e8677f77152e/host-resource-usage?orgId=1&refresh=5s&theme=light&panelId=3"
           width="480"
           height="350"
         />

@@ -1,0 +1,50 @@
+version: '3.3'
+
+services:
+  node-exporter:
+    container_name: node-exporter
+    ports:
+      - 9100:9100
+    image: prom/node-exporter:latest
+    networks:
+      - monitoring
+
+  prometheus:
+    container_name: prometheus
+    ports:
+      - 9092:9090
+    image: prom/prometheus:latest
+    volumes:
+      - $PWD/infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - $PWD/infrastructure/prometheus/first_rules.yml:/etc/prometheus/first_rules.yml
+    networks:
+      - monitoring
+
+  grafana:
+    container_name: 'grafana'
+    build: '$PWD/infrastructure/grafana'
+    ports:
+      - '3003:3000'
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+
+  alertmanager:
+    container_name: alertmanager
+    ports:
+      - 9093:9093
+    image: prom/alertmanager:latest
+    volumes:
+      - $PWD/infrastructure/alertmanager:/config
+      - alertmanager-data:/data
+    command: --config.file=/config/alertmanager.yml --log.level=debug
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+
+volumes:
+  alertmanager-data:

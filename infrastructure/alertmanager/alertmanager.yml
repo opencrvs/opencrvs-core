@@ -1,0 +1,24 @@
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  receiver: 'email-notifications'
+
+receivers:
+  - name: 'email-notifications'
+    email_configs:
+      - to: asaphirabaruta2@gmail.com
+        from: opencrvsservermonitoring@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: opencrvsservermonitoring@gmail.com
+        auth_identity: opencrvsservermonitoring@gmail.com
+        auth_password: nhxl lrbn mafk fucq
+        # send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

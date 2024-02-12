@@ -5,21 +5,21 @@ import {
   NavigationGroup,
   NavigationItem
 } from '@opencrvs/components/lib/SideNavigation'
-import styled from 'styled-components'
-import { SearchTool } from '@opencrvs/components/lib/SearchTool'
-import { Content } from '@opencrvs/components/lib/Content'
+// import styled from 'styled-components'
+// import { SearchTool } from '@opencrvs/components/lib/SearchTool'
+// import { Content } from '@opencrvs/components/lib/Content'
 import { useRouter } from 'next/router'
 
-const Search = styled(SearchTool)`
-  margin-right: 10px;
-  width: 250px;
-  border: 2px solid #93acd7;
-  background-color: white;
-`
-const ServiceContent = styled(Content)`
-  size: 'large';
-  width: 200%;
-`
+// const Search = styled(SearchTool)`
+//   margin-right: 10px;
+//   width: 250px;
+//   border: 2px solid #93acd7;
+//   background-color: white;
+// `
+// const ServiceContent = styled(Content)`
+//   size: 'large';
+//   width: 200%;
+// `
 
 export default function Sidebar() {
   const router = useRouter()
@@ -61,14 +61,14 @@ export default function Sidebar() {
         <NavigationItem
           // icon={function noRefCheck() {}}
           label="Country Config"
-          onClick={() => router.push('/country-config')}
+          onClick={() => router.push('/logs')}
         />
-        <NavigationItem
+        {/* <NavigationItem
           count={23}
           // icon={function noRefCheck() {}}
           label="Logs"
           onClick={() => router.push('/logs')}
-        />
+        /> */}
       </NavigationGroup>
       {/* <Span> */}
       <Text
@@ -76,7 +76,7 @@ export default function Sidebar() {
         element="span"
         style={{ display: 'flex', marginLeft: 25, marginTop: 20 }}
       >
-        Server Resources
+        OpenCRVS Server
       </Text>
       {/* </Span> */}
 
@@ -89,8 +89,8 @@ export default function Sidebar() {
         <NavigationItem
           // count={23}
           // icon={function noRefCheck() {}}
-          label="Report"
-          onClick={() => router.push('/report')}
+          label="Alerts"
+          onClick={() => router.push('/alerts')}
         />
       </NavigationGroup>
 
@@ -113,7 +113,7 @@ export default function Sidebar() {
           // count={23}
           // icon={function noRefCheck() {}}
           label="Backup Health"
-          onClick={() => router.push('/report')}
+          onClick={() => router.push('/performance')}
         />
       </NavigationGroup>
     </LeftNavigation>

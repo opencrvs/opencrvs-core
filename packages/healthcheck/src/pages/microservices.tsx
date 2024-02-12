@@ -12,10 +12,18 @@ import { Service, Status } from '@/lib/check-health'
 import { LoadingGrey, Spinner } from '@opencrvs/components'
 
 const Search = styled(SearchTool)`
+  position: relative;
   margin-right: 10px;
-  width: 70%;
+  width: 350px;
   border: 2px solid #93acd7;
-  background-color: white;
+  background: white;
+  &:focus-within {
+    outline: 2px solid #93acd7;
+    background: white;
+  }
+  &:hover {
+    background: white;
+  }
 `
 const ServiceContent = styled(Content)`
   size: 'large';
@@ -24,6 +32,11 @@ const ServiceContent = styled(Content)`
 
 export default function Microservices() {
   type ButtonType = 'primary' | 'secondary'
+  interface ButtonTypeState {
+    All: ButtonType
+    Running: ButtonType
+    Down: ButtonType
+  }
 
   const router = useRouter()
   const columns = [
@@ -155,7 +168,13 @@ export default function Microservices() {
   })
   const [modalState, setModalState] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [Running, setRunning] = useState<ButtonType>('secondary')
+  const [filter, setFilter] = useState('All')
+  const [searchString, setSearchString] = useState('')
+  const [buttonType, setButtonType] = useState<ButtonTypeState>({
+    All: 'secondary',
+    Running: 'secondary',
+    Down: 'secondary'
+  })
 
   const handleView = () => {
     setModalState(true)
@@ -163,6 +182,34 @@ export default function Microservices() {
   const handleClose = () => {
     setModalState(false)
   }
+
+  const handleClearText = (): void => {
+    setFilter('All')
+  }
+
+  const handleSearch = (searchValue: string): void => {
+    if (searchValue.trim() === '' || searchValue == undefined) {
+      setFilter('All')
+    } else {
+      setFilter(searchValue.toLowerCase())
+    }
+  }
+
+  useEffect(() => {
+    handleSearch(searchString)
+  }, [searchString])
+
+  const filteredServices = Object.values(services).filter((service) => {
+    if (filter === 'All') {
+      return true
+    } else if (filter === 'Running' && service.status === 'OK') {
+      return true
+    } else if (filter === 'Down' && service.status === 'FAIL') {
+      return true
+    }
+    const searchValue = filter.toLowerCase()
+    return service.name.toLowerCase().includes(searchValue)
+  })
 
   useEffect(() => {
     function setHealthy(service: Service) {
@@ -227,23 +274,50 @@ export default function Microservices() {
         >
           <h4>Filter: </h4>
           <Button
-            type="primary"
+            type={buttonType.All}
             size="small"
             style={{ marginRight: 5, marginLeft: 5 }}
+            onClick={() => {
+              setFilter('All')
+              setButtonType({
+                All: 'primary',
+                Running: 'secondary',
+                Down: 'secondary'
+              })
+            }}
           >
             {' '}
             All{' '}
           </Button>
           <Button
-            type={Running}
+            type={buttonType.Running}
             size="small"
             style={{ marginRight: 5 }}
-            onClick={() => setRunning('primary')}
+            onClick={() => {
+              setFilter('Running')
+              setButtonType({
+                All: 'secondary',
+                Running: 'primary',
+                Down: 'secondary'
+              })
+            }}
           >
             {' '}
             Running{' '}
           </Button>
-          <Button type="secondary" size="small" style={{ marginRight: 5 }}>
+          <Button
+            type={buttonType.Down}
+            size="small"
+            style={{ marginRight: 5 }}
+            onClick={() => {
+              setFilter('Down')
+              setButtonType({
+                All: 'secondary',
+                Running: 'secondary',
+                Down: 'primary'
+              })
+            }}
+          >
             {' '}
             Down{' '}
           </Button>
@@ -258,8 +332,11 @@ export default function Microservices() {
         >
           <Search
             language="english"
-            onClearText={() => {}}
-            searchHandler={function noRefCheck() {}}
+            onClearText={handleClearText}
+            searchHandler={(searchValue: string) => {
+              if (searchValue == '') setFilter('All')
+              else setSearchString(searchValue)
+            }}
             searchTypeList={[
               {
                 icon: <TrackingID />,
@@ -271,21 +348,21 @@ export default function Microservices() {
             ]}
           />
 
-          <Button type="primary" size="small" style={{ marginRight: 5 }}>
+          {/* <Button type="primary" size="small" style={{ marginRight: 5 }}>
             {' '}
             Search{' '}
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       <Table
-        totalItems={Object.keys(services).length}
+        totalItems={Object.keys(filteredServices).length}
         pageSize={5}
         columns={columns}
         currentPage={currentPage}
         isFullPage={true}
         onPageChange={(page) => setCurrentPage(page)}
-        content={Object.values(services)
+        content={Object.values(filteredServices)
           .filter((s) => s.type === 'service')
           .map((service) => ({
             service: service.label,

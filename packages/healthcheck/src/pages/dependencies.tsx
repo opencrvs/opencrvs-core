@@ -12,10 +12,18 @@ import { Service, Status } from '@/lib/check-health'
 import { LoadingGrey, Spinner } from '@opencrvs/components'
 
 const Search = styled(SearchTool)`
+  position: static;
   margin-right: 10px;
-  width: 70%;
+  width: 350px;
   border: 2px solid #93acd7;
-  background-color: white;
+  background: white;
+  &:focus-within {
+    outline: 2px solid #93acd7;
+    background: white;
+  }
+  &:hover {
+    background: white;
+  }
 `
 const ServiceContent = styled(Content)`
   size: 'large';
@@ -24,11 +32,16 @@ const ServiceContent = styled(Content)`
 
 export default function Dependencies() {
   type ButtonType = 'primary' | 'secondary'
+  interface ButtonTypeState {
+    All: ButtonType
+    Running: ButtonType
+    Down: ButtonType
+  }
 
   const router = useRouter()
   const pingUrl = 'http://localhost:7070/ping?'
   const columns = [
-    { label: 'Service', width: 25, key: 'service' },
+    { label: 'Dependency', width: 25, key: 'dependency' },
     { label: 'Port', width: 20, key: 'port' },
     { label: 'Status', width: 20, key: 'status' },
     { label: 'Timespan', width: 20, key: 'span' },
@@ -37,10 +50,18 @@ export default function Dependencies() {
   const [modalState, setModalState] = useState(false)
   const [Running, setRunning] = useState<ButtonType>('secondary')
   const [currentPage, setCurrentPage] = useState(1)
-  const [services, setServices] = useState({
+  const [filter, setFilter] = useState('All')
+  const [searchString, setSearchString] = useState('')
+  const [buttonType, setButtonType] = useState<ButtonTypeState>({
+    All: 'secondary',
+    Running: 'secondary',
+    Down: 'secondary'
+  })
+  const [dependencies, setDependencies] = useState({
     CountryConfig: {
       name: 'CountryConfig',
       url: `${pingUrl}service=countryconfig`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -48,6 +69,7 @@ export default function Dependencies() {
     Openhim: {
       name: 'Openhim',
       url: `${pingUrl}service=openhim`,
+      port: 4040,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -55,6 +77,7 @@ export default function Dependencies() {
     MongoDB: {
       name: 'MongoDB',
       url: `${pingUrl}dependency=mongodb`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -62,6 +85,7 @@ export default function Dependencies() {
     Influx: {
       name: 'Influx',
       url: `${pingUrl}dependency=influxdb`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -69,6 +93,7 @@ export default function Dependencies() {
     Minio: {
       name: 'Minio',
       url: `${pingUrl}dependency=minio`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -76,6 +101,7 @@ export default function Dependencies() {
     Kibana: {
       name: 'Kibana',
       url: `${pingUrl}dependency=kibana`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -83,6 +109,7 @@ export default function Dependencies() {
     Elasticsearch: {
       name: 'Elasticsearch',
       url: `${pingUrl}dependency=elasticsearch`,
+      port: 27017,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -92,14 +119,45 @@ export default function Dependencies() {
   const handleView = () => {
     setModalState(true)
   }
+
   const handleClose = () => {
     setModalState(false)
   }
 
+  const handleClearText = (): void => {
+    setFilter('All')
+  }
+
+  const handleSearch = (searchValue: string): void => {
+    if (searchValue.trim() === '' || searchValue == undefined) {
+      setFilter('All')
+    } else {
+      setFilter(searchValue.toLowerCase())
+    }
+  }
+
+  useEffect(() => {
+    handleSearch(searchString)
+  }, [searchString])
+
+  const filteredDependencies = Object.values(dependencies).filter(
+    (dependency) => {
+      if (filter === 'All') {
+        return true
+      } else if (filter === 'Running' && dependency.status === 'OK') {
+        return true
+      } else if (filter === 'Down' && dependency.status === 'FAIL') {
+        return true
+      }
+      const searchValue = filter.toLowerCase()
+      return dependency.name.toLowerCase().includes(searchValue)
+    }
+  )
+
   useEffect(() => {
     function setHealthy(service: Service) {
-      setServices((services) => ({
-        ...services,
+      setDependencies((dependencies) => ({
+        ...dependencies,
         [service.name]: {
           ...service,
           status: 'OK',
@@ -113,8 +171,8 @@ export default function Dependencies() {
       }))
     }
     function setFailing(service: Service) {
-      setServices((services) => ({
-        ...services,
+      setDependencies((dependencies) => ({
+        ...dependencies,
         [service.name]: {
           ...service,
           status: 'FAIL',
@@ -130,18 +188,18 @@ export default function Dependencies() {
       }))
     }
 
-    Object.values(services).forEach((service) => {
-      fetch(service.url)
+    Object.values(dependencies).forEach((dependency) => {
+      fetch(dependency.url)
         .then(async (res) => {
           const responseBody = await res.json()
           if (responseBody.status === 'ok') {
-            return setHealthy(service)
+            return setHealthy(dependency)
           }
 
-          setFailing(service)
+          setFailing(dependency)
         })
         .catch((err) => {
-          setFailing(service)
+          setFailing(dependency)
         })
     })
   }, [])
@@ -158,23 +216,50 @@ export default function Dependencies() {
         >
           <h4>Filter: </h4>
           <Button
-            type="primary"
+            type={buttonType.All}
             size="small"
             style={{ marginRight: 5, marginLeft: 5 }}
+            onClick={() => {
+              setFilter('All')
+              setButtonType({
+                All: 'primary',
+                Running: 'secondary',
+                Down: 'secondary'
+              })
+            }}
           >
             {' '}
             All{' '}
           </Button>
           <Button
-            type={Running}
+            type={buttonType.Running}
             size="small"
             style={{ marginRight: 5 }}
-            onClick={() => setRunning('primary')}
+            onClick={() => {
+              setFilter('Running')
+              setButtonType({
+                All: 'secondary',
+                Running: 'primary',
+                Down: 'secondary'
+              })
+            }}
           >
             {' '}
             Running{' '}
           </Button>
-          <Button type="secondary" size="small" style={{ marginRight: 5 }}>
+          <Button
+            type={buttonType.Down}
+            size="small"
+            style={{ marginRight: 5 }}
+            onClick={() => {
+              setFilter('Down')
+              setButtonType({
+                All: 'secondary',
+                Running: 'secondary',
+                Down: 'primary'
+              })
+            }}
+          >
             {' '}
             Down{' '}
           </Button>
@@ -189,41 +274,43 @@ export default function Dependencies() {
         >
           <Search
             language="english"
-            onClearText={() => {}}
-            searchHandler={function noRefCheck() {}}
-            // searchParam="String"
+            onClearText={handleClearText}
+            searchHandler={(searchValue: string) => {
+              if (searchValue == '') setFilter('All')
+              else setSearchString(searchValue)
+            }}
             searchTypeList={[
               {
                 icon: <TrackingID />,
                 invertIcon: <TrackingID />,
                 label: '',
-                placeHolderText: 'Search for a service',
-                value: 'Tracking ID'
+                placeHolderText: 'Search for a dependency',
+                value: ''
               }
             ]}
           />
 
-          <Button type="primary" size="small" style={{ marginRight: 5 }}>
+          {/* <Button type="primary" size="small" style={{ marginRight: 5 }}>
             {' '}
             Search{' '}
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       <Table
-        totalItems={Object.keys(services).length}
+        totalItems={Object.keys(filteredDependencies).length}
         pageSize={5}
         columns={columns}
         currentPage={currentPage}
         isFullPage={true}
         onPageChange={(page) => setCurrentPage(page)}
-        content={Object.values(services).map((service) => ({
-          service: service.name,
-          port: '3002',
-          status: service.icon,
-          span: '3 min',
+        content={Object.values(filteredDependencies).map((dependency) => ({
+          dependency: dependency.name,
+          port: dependency.port,
+          status: dependency.icon,
+          span: '0 min',
           action:
-            service.status === 'OK' ? (
+            dependency.status === 'OK' ? (
               <Button type="primary" size="small" onClick={handleView} disabled>
                 view
               </Button>
