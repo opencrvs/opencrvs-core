@@ -115,7 +115,7 @@ async function indexAndSearchComposition(
 
   await createIndexBody(body, composition, authHeader, bundle)
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    updateCompositionIfAnyDuplicates(composition, body)
+    updateIndexBodyWithDuplicateIds(composition, body)
   }
   await indexComposition(compositionId, body, client)
 }
@@ -345,7 +345,7 @@ async function createDeclarationIndex(
   body.updatedBy = regLastUser
 }
 
-export function updateCompositionIfAnyDuplicates(
+export function updateIndexBodyWithDuplicateIds(
   composition: SavedComposition,
   body: IBirthCompositionBody | IDeathCompositionBody
 ) {

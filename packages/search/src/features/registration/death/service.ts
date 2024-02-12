@@ -47,7 +47,7 @@ import {
   RelatedPerson,
   SavedBundle
 } from '@opencrvs/commons/types'
-import { updateCompositionIfAnyDuplicates } from '@search/features/registration/birth/service'
+import { updateIndexBodyWithDuplicateIds } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -101,7 +101,7 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundle)
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    updateCompositionIfAnyDuplicates(composition, body)
+    updateIndexBodyWithDuplicateIds(composition, body)
   }
   await indexComposition(compositionId, body, client)
 }
