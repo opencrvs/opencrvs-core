@@ -53,6 +53,10 @@ sleep_if_non_ci() {
   fi
 }
 
+disable_root_account() {
+  sudo passwd -l root
+}
+
 DOCKER_STARTED=0
 TMUX_STARTED=0
 
@@ -342,6 +346,7 @@ echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
 echo "wait-on tcp:3535" && wait-on -l tcp:3535
+disable_root_account
 
 
 set -- $(stty size) #$1=rows, $2=columns
