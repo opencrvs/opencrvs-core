@@ -49,7 +49,8 @@ import {
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord
+  RejectedRecord,
+  Location
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -89,6 +90,7 @@ import {
   createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
+  createViewTask,
   createWaitingForValidationTask,
   getTaskHistory,
   createRelatedPersonEntries,
@@ -272,6 +274,40 @@ export async function toUpdated(
   }
   await sendBundleToHearth(recordWithUpdatedTask)
   return recordWithUpdatedTask
+}
+
+export async function toViewed<T extends ValidRecord>(
+  record: T,
+  user: IUserModelData,
+  office: Location
+): Promise<T> {
+  const previousTask: SavedTask = getTaskFromSavedBundle(record)
+  const viewedTask = await createViewTask(previousTask, user, office)
+
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
+  const filteredEntries = record.entry.filter(
+    (e) => e.resource.resourceType !== 'Task'
+  )
+
+  const viewedRecord = {
+    resourceType: 'Bundle' as const,
+    type: 'document' as const,
+    entry: [
+      ...filteredEntries,
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      },
+      taskHistoryEntry
+    ]
+  } as T
+
+  return viewedRecord
 }
 
 export async function toDownloaded(

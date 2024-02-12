@@ -21,3 +21,4 @@ export type RecordEvent =
   | 'reinstated'
   | 'updated'
   | 'marked-as-duplicate'
+  | 'viewed'
