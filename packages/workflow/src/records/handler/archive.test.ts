@@ -56,9 +56,7 @@ describe('archive record endpoint', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/archive',
-      payload: {
-        id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e'
-      },
+      payload: {},
       headers: {
         Authorization: `Bearer ${token}`
       }

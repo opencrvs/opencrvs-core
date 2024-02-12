@@ -17,7 +17,7 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/markedAsDuplicate': {
     url: 'http://opencrvs.org/specs/extension/markedAsDuplicate'
-    valueString?: string
+    valueString: string
   }
   'http://opencrvs.org/specs/extension/educational-attainment': {
     url: 'http://opencrvs.org/specs/extension/educational-attainment'
@@ -161,7 +161,7 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/payment': {
     url: 'http://opencrvs.org/specs/extension/payment'
     valueReference: {
-      reference: string
+      reference: ResourceIdentifier | URNReference /* Unsaved */
     }
   }
   'http://opencrvs.org/specs/extension/date-of-marriage': {

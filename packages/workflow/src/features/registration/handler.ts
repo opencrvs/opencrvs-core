@@ -13,7 +13,6 @@ import {
   markBundleAsCertified,
   markBundleAsValidated,
   modifyRegistrationBundle,
-  setTrackingId,
   markBundleAsWaitingValidation,
   touchBundle,
   markBundleAsDeclarationUpdated,
@@ -48,6 +47,7 @@ import {
   isNotificationEnabled,
   sendNotification
 } from '@workflow/records/notification'
+import { auditEvent } from '@workflow/records/audit'
 
 export interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -60,10 +60,7 @@ export interface IEventRegistrationCallbackPayload {
   }[]
 }
 
-async function sendBundleToHearth(
-  payload: Bundle,
-  count = 1
-): Promise<Saved<Bundle>> {
+async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -72,11 +69,6 @@ async function sendBundleToHearth(
     }
   })
   if (!res.ok) {
-    if (res.status === 409 && count < 5) {
-      setTrackingId(payload)
-      return await sendBundleToHearth(payload, count + 1)
-    }
-
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
@@ -250,14 +242,14 @@ export async function markEventAsRegisteredCallbackHandler(
   )
   await sendBundleToHearth(registeredBundle)
   await indexBundle(registeredBundle, getToken(request))
+  await auditEvent('registered', registeredBundle, token)
 
   // Notification not implemented for marriage yet
-  // don't forward hospital notifications
   if (
     event !== EVENT_TYPE.MARRIAGE &&
-    (await isNotificationEnabled('register', event, token))
+    (await isNotificationEnabled('registered', event, token))
   ) {
-    await sendNotification('register', registeredBundle, token)
+    await sendNotification('registered', registeredBundle, token)
   }
 
   return h.response(registeredBundle).code(200)

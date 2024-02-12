@@ -17,7 +17,6 @@ import { createServer } from '@search/server'
 import {
   mockMarriageFhirBundle,
   mockMarriageFhirBundleWithoutCompositionId,
-  mockMarriageRejectionTaskBundle,
   mockLocationResponse,
   mockMinimalMarriageFhirBundle,
   mockSearchResponse,
@@ -233,10 +232,40 @@ describe('Verify handlers', () => {
         audience: 'opencrvs:search-user'
       })
 
+      fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
+      )
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/marriage/mark-voided',
-        payload: mockMarriageRejectionTaskBundle,
+        url: '/record',
+        payload: mockMarriageFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

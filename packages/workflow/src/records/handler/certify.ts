@@ -8,20 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CertifiedRecord, changeState } from '@opencrvs/commons/types'
+import { CertifiedRecord } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { requestSchema } from '@workflow/records/validations/certify'
+import { CertifyRequestSchema } from '@workflow/records/validations'
 import { toCertified } from '@workflow/records/state-transitions'
 import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
-import {
-  mergeBundles,
-  sendBundleToHearth,
-  toSavedBundle
-} from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
@@ -33,7 +27,7 @@ export const certifyRoute = createRoute({
   handler: async (request, record): Promise<CertifiedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
-      validateRequest(requestSchema, request.payload)
+      validateRequest(CertifyRequestSchema, request.payload)
 
     const certificateDetails =
       await uploadCertificateAttachmentsToDocumentsStore(
@@ -41,26 +35,15 @@ export const certifyRoute = createRoute({
         getAuthHeader(request)
       )
 
-    const unsavedChangedResources = await toCertified(
+    const certifiedRecord = await toCertified(
       record,
-      await getLoggedInPractitionerResource(token),
+      token,
       event,
       certificateDetails
     )
 
-    const responseBundle = await sendBundleToHearth(unsavedChangedResources)
-    const changedResources = toSavedBundle(
-      unsavedChangedResources,
-      responseBundle
-    )
-
-    const certifiedRecord = changeState(
-      mergeBundles(record, changedResources),
-      'CERTIFIED'
-    )
-
     await indexBundle(certifiedRecord, token)
-    await auditEvent('mark-certified', certifiedRecord, token)
+    await auditEvent('certified', certifiedRecord, token)
 
     return certifiedRecord
   }

@@ -94,7 +94,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@metrics/(.*)": "<rootDir>/src/$1"
+      "@metrics/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "coverageReporters": [
       "json",

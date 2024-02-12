@@ -30,7 +30,8 @@ import {
   isTask,
   sortTasksDescending,
   SavedBundle,
-  TrackingID
+  TrackingID,
+  getStatusFromTask
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -145,7 +146,7 @@ export type StateIdenfitiers = {
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
   record: R,
-  nextState: A
+  nextState: A | A[]
 ) {
   return record as any as StateIdenfitiers[A]
 }
@@ -156,6 +157,32 @@ export function getState(record: RecordBase) {
     throw new Error('No task found')
   }
   return getBusinessStatus(task) as keyof StateIdenfitiers
+}
+
+export function isInProgress(record: ValidRecord): record is InProgressRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'IN_PROGRESS'
+}
+
+export function isReadyForReview(
+  record: ValidRecord
+): record is ReadyForReviewRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'DECLARED'
+}
+
+export function isValidated(record: ValidRecord): record is ValidatedRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'VALIDATED'
+}
+
+export function isWaitingExternalValidation(
+  record: ValidRecord
+): record is WaitingForValidationRecord {
+  return (
+    getStatusFromTask(getTaskFromSavedBundle(record)) === 'WAITING_VALIDATION'
+  )
+}
+
+export function isRejected(record: ValidRecord): record is RejectedRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'REJECTED'
 }
 
 export function getCorrectionRequestedTask(

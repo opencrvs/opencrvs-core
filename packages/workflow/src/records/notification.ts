@@ -17,8 +17,12 @@ import {
   InformantNotificationName
 } from '@workflow/features/registration/smsNotificationUtils'
 import { internal } from '@hapi/boom'
+import { RecordEvent } from './recordEvents'
 
-type NotificationEvent = 'in-progress' | 'ready-for-review' | 'register'
+type NotificationEvent = Extract<
+  RecordEvent,
+  'sent-notification' | 'sent-notification-for-review' | 'registered'
+>
 
 export async function sendNotification(
   action: NotificationEvent,
@@ -56,27 +60,29 @@ async function getNotificationFlags(token: string) {
   }
 }
 
-type SupportedEvents = Exclude<EVENT_TYPE, 'MARRIAGE'>
+type SupportedVitalEvents = Exclude<EVENT_TYPE, 'MARRIAGE'>
 
 const MAPPING: Record<
-  SupportedEvents,
+  SupportedVitalEvents,
   Record<NotificationEvent, InformantNotificationName>
 > = {
   [EVENT_TYPE.BIRTH]: {
-    'in-progress': InformantNotificationName.birthInProgressSMS,
-    'ready-for-review': InformantNotificationName.birthDeclarationSMS,
-    register: InformantNotificationName.birthRegistrationSMS
+    'sent-notification': InformantNotificationName.birthInProgressSMS,
+    'sent-notification-for-review':
+      InformantNotificationName.birthDeclarationSMS,
+    registered: InformantNotificationName.birthRegistrationSMS
   },
   [EVENT_TYPE.DEATH]: {
-    'in-progress': InformantNotificationName.deathInProgressSMS,
-    'ready-for-review': InformantNotificationName.deathDeclarationSMS,
-    register: InformantNotificationName.deathRegistrationSMS
+    'sent-notification': InformantNotificationName.deathInProgressSMS,
+    'sent-notification-for-review':
+      InformantNotificationName.deathDeclarationSMS,
+    registered: InformantNotificationName.deathRegistrationSMS
   }
 }
 
 export async function isNotificationEnabled(
   action: NotificationEvent,
-  event: SupportedEvents,
+  event: SupportedVitalEvents,
   token: string
 ) {
   const notificationFlags = await getNotificationFlags(token)

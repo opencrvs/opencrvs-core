@@ -26,6 +26,58 @@ import {
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+export const deathTaskMock = {
+  resourceType: 'Task',
+  status: 'ready',
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'DEATH'
+      }
+    ]
+  },
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/paper-form-id',
+      value: '12345678'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+      value: 'B5WGYJE'
+    }
+  ],
+  focus: {
+    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+  },
+  lastModified: '2018-11-29T15:11:13.041+00:00',
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/status',
+        code: 'DECLARED'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: '123' }
+    }
+  ],
+  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+}
+export const deathTaskMockJSON = JSON.stringify(deathTaskMock)
+
 export const testFhirBundle: StrictBundle<
   [Composition, Task, Patient, Patient, Patient, RelatedPerson]
 > = {
@@ -191,7 +243,7 @@ export const testFhirBundle: StrictBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: { reference: 'Location/123' }
+            valueReference: { reference: 'Location/123' as `Location/${UUID}` }
           }
         ]
       }
@@ -1660,7 +1712,7 @@ export const motherMock = JSON.stringify({
 })
 
 export const testDeathFhirBundle: Bundle<
-  Composition | Patient | RelatedPerson | Encounter | Observation
+  Composition | Patient | RelatedPerson | Encounter | Observation | Task
 > = {
   resourceType: 'Bundle',
   type: 'document',
@@ -1750,6 +1802,10 @@ export const testDeathFhirBundle: Bundle<
         date: '2019-02-11',
         author: []
       }
+    },
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9' as URNReference,
+      resource: deathTaskMock as Task
     },
     {
       fullUrl: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' as URNReference,
@@ -2370,47 +2426,6 @@ export const testInProgressDeathFhirBundle = {
   ],
   meta: { lastUpdated: '2019-02-11' }
 }
-
-export const deathTaskMock = JSON.stringify({
-  resourceType: 'Task',
-  status: 'ready',
-  code: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/types',
-        code: 'DEATH'
-      }
-    ]
-  },
-  identifier: [
-    {
-      system: 'http://opencrvs.org/specs/id/paper-form-id',
-      value: '12345678'
-    },
-    {
-      system: 'http://opencrvs.org/specs/id/death-tracking-id',
-      value: 'B5WGYJE'
-    }
-  ],
-  focus: {
-    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-  },
-  extension: [
-    {
-      url: 'http://opencrvs.org/specs/extension/contact-person',
-      valueString: 'MOTHER'
-    },
-    {
-      url: 'http://opencrvs.org/specs/extension/regLastOffice',
-      valueReference: { reference: '123' }
-    },
-    {
-      url: 'http://opencrvs.org/specs/extension/regLastLocation',
-      valueReference: { reference: '123' }
-    }
-  ],
-  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-})
 
 export const hearthResponseMock = JSON.stringify({
   resourceType: 'Bundle',

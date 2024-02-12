@@ -10,12 +10,10 @@
  */
 
 import * as z from 'zod'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
@@ -32,22 +30,20 @@ export const rejectRoute = createRoute({
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)
-    const practitioner = await getLoggedInPractitionerResource(token)
 
     const commentCode: fhir3.CodeableConcept = {
       text: payload.comment
     }
 
-    const { rejectedRecord, rejectedRecordWithTaskOnly } = await toRejected(
+    const rejectedRecord = await toRejected(
       record,
-      practitioner,
+      token,
       commentCode,
       payload.reason
     )
 
-    await sendBundleToHearth(rejectedRecordWithTaskOnly)
-    await indexBundle(rejectedRecordWithTaskOnly, token)
-    await auditEvent('mark-voided', rejectedRecord, token)
+    await indexBundle(rejectedRecord, token)
+    await auditEvent('sent-for-updates', rejectedRecord, token)
 
     return rejectedRecord
   }

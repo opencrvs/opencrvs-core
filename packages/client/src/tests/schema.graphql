@@ -1246,7 +1246,6 @@ type Payment {
 input PaymentInput {
   paymentId: ID
   type: PaymentType
-  total: Float
   amount: Float
   outcome: PaymentOutcomeType
   date: Date

@@ -39,7 +39,8 @@ export function findTask(bundleEntries?: fhir.BundleEntry[]) {
   const taskEntry = bundleEntries?.find(
     (entry) => entry?.resource?.resourceType === 'Task'
   )
-  return taskEntry?.resource as fhir.Task | undefined
+  if (!taskEntry?.resource) throw new Error('No task resource found')
+  return taskEntry.resource as fhir.Task
 }
 
 export function findPatient(bundle: fhir.Bundle) {

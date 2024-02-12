@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { HAS_SHOWED_VERIFIED_DOCUMENT } from './constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
   BIRTH_ATTENDANT_CODE,
@@ -37,8 +36,6 @@ import {
 import transformObj, { Context, IFieldBuilders } from './transformer'
 import {
   getMaritalStatusCode,
-  selectOrCreateCertificateDocRefResource,
-  selectOrCreateCollectorPersonResource,
   selectOrCreateDocRefResource,
   selectOrCreateEncounterLocationRef,
   selectOrCreateEncounterParticipant,
@@ -48,13 +45,10 @@ import {
   selectOrCreateInformantSection,
   selectOrCreateLocationRefResource,
   selectOrCreateObservationResource,
-  selectOrCreatePaymentReconciliationResource,
   selectOrCreatePersonResource,
   selectOrCreateQuestionnaireResource,
-  selectOrCreateRelatedPersonResource,
   selectOrCreateTaskRefResource,
   selectOrCreateWitnessResource,
-  setCertificateCollectorReference,
   setInformantReference,
   setObjectPropInResourceArray,
   setQuestionnaireItem
@@ -83,7 +77,6 @@ import {
   KnownExtensionType,
   MOTHER_CODE,
   MOTHER_TITLE,
-  Money,
   OPENCRVS_SPECIFICATION_URL,
   Patient,
   ResourceIdentifier,
@@ -116,6 +109,7 @@ import {
   QuestionnaireQuestion
 } from './input'
 
+import { subYears, format } from 'date-fns'
 type StringReplace<
   T extends string,
   S extends string,
@@ -125,7 +119,7 @@ type StringReplace<
   ? StringReplace<R, S, D, `${A}${L}${D}`>
   : `${A}${T}`
 
-enum SignatureExtensionPostfix {
+export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
   GROOM = 'groom-signature',
   BRIDE = 'bride-signature',
@@ -748,9 +742,14 @@ function createAgeOfIndividualInYearsBuilder(
     })
   }
 
+  const age = parseInt(fieldValue.toString(), 10)
+  if (resource.deceasedDateTime) {
+    const birthDate = subYears(new Date(resource.deceasedDateTime), age)
+    resource.birthDate = format(birthDate, 'yyyy-MM-dd')
+    return
+  }
   // for storing an assumed birthdate when exact DOB is not known
-  const birthYear =
-    new Date().getFullYear() - parseInt(fieldValue.toString(), 10)
+  const birthYear = new Date().getFullYear() - age
   const firstDayOfBirthYear = new Date(birthYear, 0, 1)
   resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
     firstDayOfBirthYear.getMonth() + 1
@@ -1800,6 +1799,20 @@ const builders: IFieldBuilders = {
           DECEASED_TITLE,
           fhirBundle
         )
+        /*
+         * setting birthDate from both here
+         * & age builder as it depends on which
+         * one gets called second
+         */
+        const age = findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+          person.extension || []
+        )?.valueInteger
+
+        if (age) {
+          const birthDate = subYears(new Date(fieldValue as string), age)
+          person.birthDate = format(birthDate, 'yyyy-MM-dd')
+        }
         person.deceasedDateTime = fieldValue as string
       }
     },
@@ -2613,356 +2626,6 @@ const builders: IFieldBuilders = {
           ]
         }
         docRef.content[0].attachment.data = fieldValue
-      }
-    },
-    certificates: {
-      collector: {
-        relationship: (fhirBundle, fieldValue, context) => {
-          const relatedPersonResource = selectOrCreateRelatedPersonResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!relatedPersonResource.relationship) {
-            relatedPersonResource.relationship = {}
-          }
-          if (relatedPersonResource.relationship.coding?.[0]) {
-            relatedPersonResource.relationship.coding[0].code = fieldValue
-          } else {
-            relatedPersonResource.relationship.coding = [
-              {
-                system:
-                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                code: fieldValue
-              }
-            ]
-          }
-          /* if mother/father is collecting then we will just put the person ref here */
-          if (fieldValue === 'MOTHER') {
-            setCertificateCollectorReference(
-              MOTHER_CODE,
-              relatedPersonResource,
-              fhirBundle,
-              context
-            )
-          } else if (fieldValue === 'FATHER') {
-            setCertificateCollectorReference(
-              FATHER_CODE,
-              relatedPersonResource,
-              fhirBundle,
-              context
-            )
-          } else if (fieldValue === 'INFORMANT') {
-            setCertificateCollectorReference(
-              INFORMANT_CODE,
-              relatedPersonResource,
-              fhirBundle,
-              context
-            )
-          } else if (fieldValue === 'BRIDE') {
-            setCertificateCollectorReference(
-              BRIDE_CODE,
-              relatedPersonResource,
-              fhirBundle,
-              context
-            )
-          } else if (fieldValue === 'GROOM') {
-            setCertificateCollectorReference(
-              GROOM_CODE,
-              relatedPersonResource,
-              fhirBundle,
-              context
-            )
-          }
-        },
-        otherRelationship: (fhirBundle, fieldValue, context) => {
-          const relatedPersonResource = selectOrCreateRelatedPersonResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!relatedPersonResource.relationship) {
-            relatedPersonResource.relationship = {}
-          }
-          relatedPersonResource.relationship.text = fieldValue
-        },
-        affidavit: {
-          contentType: (fhirBundle, fieldValue, context) => {
-            const relatedPersonResource = selectOrCreateRelatedPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            if (!relatedPersonResource.extension) {
-              relatedPersonResource.extension = []
-            }
-            const hasAffidavit = relatedPersonResource.extension.find(
-              (extention) =>
-                extention.url ===
-                `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
-            )
-            if (!hasAffidavit) {
-              relatedPersonResource.extension.push({
-                url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
-                //@ts-ignore
-                valueAttachment: {
-                  contentType: fieldValue
-                }
-              })
-            } else {
-              //@ts-ignore
-              hasAffidavit.valueAttachment = {
-                //@ts-ignore
-                ...hasAffidavit.valueAttachment,
-                contentType: fieldValue
-              }
-            }
-          },
-          data: (fhirBundle, fieldValue, context) => {
-            const relatedPersonResource = selectOrCreateRelatedPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            if (!relatedPersonResource.extension) {
-              relatedPersonResource.extension = []
-            }
-            const hasAffidavit = relatedPersonResource.extension.find(
-              (extention) =>
-                extention.url ===
-                `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
-            )
-
-            if (!hasAffidavit) {
-              relatedPersonResource.extension.push({
-                url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
-                //@ts-ignore
-                valueAttachment: {
-                  data: fieldValue
-                }
-              })
-            } else {
-              //@ts-ignore
-              hasAffidavit.valueAttachment = {
-                //@ts-ignore
-                ...hasAffidavit.valueAttachment,
-                data: fieldValue
-              }
-            }
-          }
-        },
-        /* expecting value for this only when other is selected as relationship */
-        identifier: {
-          id: (fhirBundle, fieldValue, context) => {
-            const person = selectOrCreateCollectorPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            setObjectPropInResourceArray(
-              person,
-              'identifier',
-              fieldValue,
-              'id',
-              context
-            )
-          },
-          type: (fhirBundle, fieldValue, context) => {
-            const person = selectOrCreateCollectorPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            setObjectPropInResourceArray(
-              person,
-              'identifier',
-              fieldValue,
-              'type',
-              context
-            )
-          }
-        },
-        name: {
-          use: (fhirBundle, fieldValue, context) => {
-            const person = selectOrCreateCollectorPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            setObjectPropInResourceArray(
-              person,
-              'name',
-              fieldValue,
-              'use',
-              context
-            )
-          },
-          firstNames: (fhirBundle, fieldValue, context) => {
-            const person = selectOrCreateCollectorPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            setObjectPropInResourceArray(
-              person,
-              'name',
-              fieldValue.split(' '),
-              'given',
-              context
-            )
-          },
-          familyName: (fhirBundle, fieldValue, context) => {
-            const person = selectOrCreateCollectorPersonResource(
-              fhirBundle,
-              context,
-              context.event
-            )
-            setObjectPropInResourceArray(
-              person,
-              'name',
-              [fieldValue],
-              'family',
-              context
-            )
-          }
-        }
-      },
-      hasShowedVerifiedDocument: (fhirBundle, fieldValue, context) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          EVENT_TYPE.BIRTH
-        )
-        if (!certDocResource.extension) {
-          certDocResource.extension = []
-        }
-        const hasVerifiedExt = findExtension(
-          HAS_SHOWED_VERIFIED_DOCUMENT,
-          certDocResource.extension
-        )
-
-        if (!hasVerifiedExt) {
-          certDocResource.extension.push({
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
-            valueBoolean: fieldValue
-          })
-        } else {
-          hasVerifiedExt.valueBoolean = fieldValue
-        }
-      },
-      payments: {
-        paymentId: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!paymentResource.identifier) {
-            paymentResource.identifier = []
-          }
-          paymentResource.identifier.push({
-            system: `${OPENCRVS_SPECIFICATION_URL}id/payment-id`,
-            value: fieldValue
-          })
-        },
-        type: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                type: {
-                  coding: [{ code: fieldValue }]
-                }
-              }
-            ]
-          } else {
-            paymentResource.detail[0].type = {
-              coding: [{ code: fieldValue }]
-            }
-          }
-        },
-        total: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-
-          paymentResource.total = fieldValue as Money
-        },
-        amount: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                /* should be replaced when type value comes in */
-                type: {
-                  coding: [{ code: 'payment' }]
-                },
-                amount: fieldValue as Money
-              }
-            ]
-          } else {
-            paymentResource.detail[0].amount = fieldValue as Money
-          }
-        },
-        outcome: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          paymentResource.outcome = {
-            coding: [{ code: fieldValue }]
-          }
-        },
-        date: (fhirBundle, fieldValue, context) => {
-          const paymentResource = selectOrCreatePaymentReconciliationResource(
-            fhirBundle,
-            context,
-            context.event
-          )
-          if (!paymentResource.detail) {
-            paymentResource.detail = [
-              {
-                /* should be replaced when type value comes in */
-                type: {
-                  coding: [{ code: 'payment' }]
-                },
-                date: fieldValue
-              }
-            ]
-          } else {
-            paymentResource.detail[0].date = fieldValue
-          }
-        }
-      },
-      data: (fhirBundle, fieldValue, context) => {
-        const certDocResource = selectOrCreateCertificateDocRefResource(
-          fhirBundle,
-          context,
-          context.event
-        )
-
-        if (!certDocResource.content?.[0]) {
-          certDocResource.content = [
-            {
-              attachment: {
-                contentType: 'application/pdf',
-                data: fieldValue
-              }
-            }
-          ]
-        }
-        certDocResource.content[0].attachment.data = fieldValue
       }
     }
   },

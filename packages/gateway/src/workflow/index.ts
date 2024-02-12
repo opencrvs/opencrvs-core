@@ -17,7 +17,12 @@ import {
   Bundle,
   SavedTask,
   CertifiedRecord,
-  RejectedRecord
+  ReadyForReviewRecord,
+  RejectedRecord,
+  ValidRecord,
+  getTaskFromSavedBundle,
+  getBusinessStatus,
+  IssuedRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -27,9 +32,9 @@ import {
   GQLCorrectionInput,
   GQLCorrectionRejectionInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLPaymentInput
 } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils/index'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -130,14 +135,6 @@ export async function createRegistration(
     isPotentiallyDuplicate: boolean
   }>('POST', '/create-record', authHeader, { record, event })
 
-  if (hasScope(authHeader, 'validate') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
-  }
-
-  if (hasScope(authHeader, 'register') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/register`, authHeader)
-  }
-
   return res
 }
 
@@ -235,7 +232,6 @@ export async function archiveRegistration(
     `/records/${id}/archive`,
     authHeader,
     {
-      id,
       reason,
       comment,
       duplicateTrackingId
@@ -245,6 +241,48 @@ export async function archiveRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function duplicateRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/duplicate`,
+    authHeader,
+    {
+      reason,
+      comment,
+      duplicateTrackingId
+    }
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
+}
+
+export function issueRegistration(
+  recordId: string,
+  certificate: Omit<GQLCertificateInput, 'payments'> & {
+    payment: GQLPaymentInput
+  },
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  return createRequest<IssuedRecord>(
+    'POST',
+    `/records/${recordId}/issue-record`,
+    authHeader,
+    {
+      certificate,
+      event
+    }
+  )
 }
 
 export async function rejectDeclaration(
@@ -264,4 +302,22 @@ export async function rejectDeclaration(
   )
 
   return rejectedRecord.entry.find((e) => e.resource.resourceType === 'Task')
+}
+
+export async function reinstateRegistration(
+  id: string,
+  authHeader: IAuthHeader
+) {
+  const reinstatedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/reinstate`,
+    authHeader,
+    {
+      id
+    }
+  )
+
+  const task = getTaskFromSavedBundle(reinstatedRecord)
+
+  return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
 }
