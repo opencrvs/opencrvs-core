@@ -16,12 +16,14 @@ import { archiveRoute } from '@workflow/records/handler/archive'
 import createRecordHandler from '@workflow/records/handler/create'
 import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
+import { issueRoute } from '@workflow/records/handler/issue'
 import { duplicateRecordHandler } from '@workflow/records/handler/duplicate'
 import { registerRoute } from '@workflow/records/handler/register'
 import { rejectRoute } from '@workflow/records/handler/reject'
 import { reinstateRoute } from '@workflow/records/handler/reinstate'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
+import { viewRecordHandler } from '@workflow/records/handler/view'
 import { verifyRecordHandler } from '@workflow/records/handler/verify'
 
 export const getRoutes = () => {
@@ -101,10 +103,20 @@ export const getRoutes = () => {
         description: 'Unassign record endpoint'
       }
     },
+    {
+      method: 'POST',
+      path: '/records/{id}/view',
+      handler: viewRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'View record endpoint'
+      }
+    },
     ...validateRoute,
     ...updateRoute,
     ...registerRoute,
     certifyRoute,
+    issueRoute,
     ...archiveRoute,
     rejectRoute,
     reinstateRoute,

@@ -786,8 +786,7 @@ export const mockDeathComposition = {
       text: '',
       entry: [
         {
-          reference:
-            '/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' // reference to Encounter resource contained below
+          reference: 'Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e' // reference to Encounter resource contained below
         }
       ]
     },
@@ -830,7 +829,7 @@ export const mockDeathEncounter: BundleEntry<Encounter> = {
       {
         location: {
           reference:
-            '/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/_history/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference
+            'Location/11539b31-0123-4b3e-88a7-db5919b34bd4' as ResourceIdentifier
         }
       }
     ],

@@ -205,7 +205,7 @@ export const mockBirthFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/reg-status',
-              code: 'DECLARED'
+              code: 'VALIDATED'
             }
           ]
         }
@@ -2033,6 +2033,31 @@ export const mockComposition: fhir.Composition = {
   ]
 }
 
+export const mockOperationHistory = [
+  {
+    operatedOn: '2024-01-26T10:42:30.675Z',
+    operatorFirstNames: 'Kalusha',
+    operatorFamilyNameLocale: '',
+    operatorFamilyName: 'Bwalya',
+    operatorFirstNamesLocale: '',
+    operatorOfficeName: 'Ibombo District Office',
+    operatorOfficeAlias: ['Ibombo District Office'],
+    operationType: 'DECLARED',
+    operatorRole: 'Social Worker'
+  },
+  {
+    operatedOn: '2024-01-30T09:23:00.918Z',
+    operatorFirstNames: 'Kennedy',
+    operatorFamilyNameLocale: '',
+    operatorFamilyName: 'Mweene',
+    operatorFirstNamesLocale: '',
+    operatorOfficeName: 'Ibombo District Office',
+    operatorOfficeAlias: ['Ibombo District Office'],
+    operationType: 'WAITING_VALIDATION',
+    operatorRole: 'Local Registrar'
+  }
+]
+
 export const mockSearchResponse = {
   body: {
     hits: {
@@ -2057,7 +2082,8 @@ export const mockSearchResponse = {
             motherDoB: '1960-02-01',
             motherIdentifier: '22123123123123123',
             createdBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            updatedBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
+            updatedBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            operationHistories: mockOperationHistory
           }
         }
       ]
@@ -2834,7 +2860,7 @@ export const mockBirthFhirBundleWithoutParents = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/reg-status',
-              code: 'DECLARED'
+              code: 'VALIDATED'
             }
           ]
         }

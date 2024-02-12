@@ -8,26 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CertifiedRecord } from '@opencrvs/commons/types'
+import { IssuedRecord } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
 import { getToken } from '@workflow/utils/authUtils'
-import { CertifyRequestSchema } from '@workflow/records/validations'
-import { toCertified } from '@workflow/records/state-transitions'
+import { IssueRequestSchema } from '@workflow/records/validations'
+import { toIssued } from '@workflow/records/state-transitions'
 import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 
-export const certifyRoute = createRoute({
+export const issueRoute = createRoute({
   method: 'POST',
-  path: '/records/{recordId}/certify-record',
-  allowedStartStates: ['REGISTERED'],
-  action: 'CERTIFY',
-  handler: async (request, record): Promise<CertifiedRecord> => {
+  path: '/records/{recordId}/issue-record',
+  allowedStartStates: ['CERTIFIED'],
+  action: 'ISSUE',
+  handler: async (request, record): Promise<IssuedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
-      validateRequest(CertifyRequestSchema, request.payload)
+      validateRequest(IssueRequestSchema, request.payload)
 
     const certificateDetails =
       await uploadCertificateAttachmentsToDocumentsStore(
@@ -35,16 +35,16 @@ export const certifyRoute = createRoute({
         getAuthHeader(request)
       )
 
-    const certifiedRecord = await toCertified(
+    const issuedRecord = await toIssued(
       record,
       token,
       event,
       certificateDetails
     )
 
-    await indexBundle(certifiedRecord, token)
-    await auditEvent('certified', certifiedRecord, token)
+    await indexBundle(issuedRecord, token)
+    await auditEvent('issued', issuedRecord, token)
 
-    return certifiedRecord
+    return issuedRecord
   }
 })

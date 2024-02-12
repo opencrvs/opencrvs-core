@@ -17,7 +17,6 @@ import { createServer } from '@search/server'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
-  mockDeathRejectionTaskBundle,
   mockLocationResponse,
   mockMinimalDeathFhirBundle,
   mockSearchResponse,
@@ -209,6 +208,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the event data is updated with task', async () => {
+      fetch.resetMocks()
       ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
@@ -217,10 +217,25 @@ describe('Verify handlers', () => {
         audience: 'opencrvs:search-user'
       })
 
+      fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/death/mark-voided',
-        payload: mockDeathRejectionTaskBundle,
+        url: '/record',
+        payload: mockDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

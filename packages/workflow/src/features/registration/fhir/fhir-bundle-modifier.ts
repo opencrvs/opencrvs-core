@@ -21,9 +21,9 @@ import {
   findExtension,
   RegistrationStatus,
   WaitingForValidationRecord,
-  urlReferenceToUUID,
-  URLReference,
-  getResourceFromBundleById
+  getResourceFromBundleById,
+  ResourceIdentifier,
+  resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -45,7 +45,7 @@ import {
   generateTrackingIdForEvents,
   getEventType,
   getMosipUINToken,
-  isEventNotification,
+  isHospitalNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
@@ -98,7 +98,7 @@ export async function modifyRegistrationBundle<T extends Bundle>(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  if (!isEventNotification(bundleWithTrackingId)) {
+  if (!isHospitalNotification(bundleWithTrackingId)) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
@@ -581,7 +581,9 @@ export function updatePatientIdentifierWithRN(
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
     const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
-    const patientId = urlReferenceToUUID(sectionEntry.reference as URLReference)
+    const patientId = resourceIdentifierToUUID(
+      sectionEntry.reference as ResourceIdentifier
+    )
     const patient = getResourceFromBundleById<Patient>(record, patientId)
 
     if (!patient.identifier) {

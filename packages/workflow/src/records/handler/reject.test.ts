@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -18,9 +17,11 @@ import {
   getStatusFromTask,
   getTaskFromSavedBundle,
   SavedTask,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 function getReasonFromTask(task: SavedTask) {
   return task.statusReason?.text
@@ -59,14 +60,24 @@ describe('Reject record endpoint', () => {
       )
     )
 
-    // Mock response from metrics
+    // Mock response from hearth
     mswServer.use(
-      rest.post(
-        'http://localhost:1050/events/birth/mark-voided',
-        (_, res, ctx) => {
-          return res(ctx.json({}))
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
         }
-      )
+        return res(ctx.json(responseBundle))
+      })
     )
 
     const response = await server.server.inject({
