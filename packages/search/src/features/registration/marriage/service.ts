@@ -16,9 +16,7 @@ import {
   createStatusHistory,
   EVENT,
   getCreatedBy,
-  getPreviousStatusFromElasticResponse,
   getStatus,
-  hasStatusChanged,
   ICompositionBody,
   IMarriageCompositionBody,
   IOperationHistory,
@@ -70,7 +68,6 @@ async function indexDeclaration(
 ) {
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
-  const previousStatus = getPreviousStatusFromElasticResponse(result)
   const task = findTask(bundleEntries)
   const body: ICompositionBody = {
     event: EVENT.MARRIAGE,
@@ -80,10 +77,6 @@ async function indexDeclaration(
         result.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
-
-  if (hasStatusChanged(task, previousStatus)) {
-    body.assignment = null
   }
 
   body.type =

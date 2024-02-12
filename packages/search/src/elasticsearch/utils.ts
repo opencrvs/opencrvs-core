@@ -29,8 +29,6 @@ import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
-import { TaskStatus } from '@opencrvs/commons/types'
-import { ApiResponse } from '@elastic/elasticsearch'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -497,19 +495,4 @@ function updateOperationHistoryWithCorrection(
       operationHistory.correction?.push(payload)
     }
   }
-}
-
-export function getPreviousStatusFromElasticResponse(
-  searchResult: ApiResponse<ISearchResponse<any>, unknown> | null
-) {
-  return searchResult?.body.hits.hits[0]?._source?.type as
-    | TaskStatus
-    | undefined
-}
-
-export function hasStatusChanged(
-  task: fhir.Task,
-  previousStatus: TaskStatus | undefined = undefined
-) {
-  return task?.businessStatus?.coding?.[0].code !== previousStatus
 }

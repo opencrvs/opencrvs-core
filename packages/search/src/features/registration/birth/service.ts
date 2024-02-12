@@ -24,9 +24,7 @@ import {
   REJECTED_STATUS,
   DECLARED_STATUS,
   IN_PROGRESS_STATUS,
-  updateCompositionWithDuplicates,
-  hasStatusChanged,
-  getPreviousStatusFromElasticResponse
+  updateCompositionWithDuplicates
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -79,7 +77,6 @@ async function indexAndSearchComposition(
 ) {
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
-  const previousStatus = getPreviousStatusFromElasticResponse(result)
   const task = findTask(bundleEntries)
 
   const body: IBirthCompositionBody = {
@@ -91,10 +88,6 @@ async function indexAndSearchComposition(
       Date.now().toString(),
     modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
-
-  if (hasStatusChanged(task, previousStatus)) {
-    body.assignment = null
   }
 
   body.type = getTypeFromTask(task)

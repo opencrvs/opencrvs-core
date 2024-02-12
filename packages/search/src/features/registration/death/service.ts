@@ -18,9 +18,7 @@ import {
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
-  getPreviousStatusFromElasticResponse,
   getStatus,
-  hasStatusChanged,
   ICompositionBody,
   IDeathCompositionBody,
   IN_PROGRESS_STATUS,
@@ -75,7 +73,6 @@ async function indexDeclaration(
 ) {
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
-  const previousStatus = getPreviousStatusFromElasticResponse(result)
   const task = findTask(bundleEntries)
 
   const body: ICompositionBody = {
@@ -86,10 +83,6 @@ async function indexDeclaration(
         result.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
-
-  if (hasStatusChanged(task, previousStatus)) {
-    body.assignment = null
   }
 
   body.type =
