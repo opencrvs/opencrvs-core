@@ -10,12 +10,9 @@
  */
 import {
   indexComposition,
-  searchByCompositionId,
-  updateComposition
+  searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
-  ARCHIVED_STATUS,
-  CERTIFIED_STATUS,
   createStatusHistory,
   DECLARED_STATUS,
   EVENT,
@@ -26,9 +23,7 @@ import {
   IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
-  REGISTERED_STATUS,
-  REJECTED_STATUS,
-  VALIDATED_STATUS
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
@@ -41,18 +36,18 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
-
 import { getSubmittedIdentifier } from '@search/features/search/utils'
-import { updateCompositionIfAnyDuplicates } from '@search/features/registration/birth/service'
 import {
   getComposition,
+  SavedComposition,
+  ValidRecord,
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
   RelatedPerson,
-  SavedBundle,
-  SavedComposition
+  SavedBundle
 } from '@opencrvs/commons/types'
+import { updateCompositionIfAnyDuplicates } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -62,96 +57,23 @@ const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as SavedBundle
+  const bundle = requestBundle.payload as ValidRecord
   const authHeader = requestBundle.headers.authorization
 
   const composition = getComposition(bundle)
 
-  if (!composition) {
-    await updateEvent(bundle, authHeader)
-    return
-  }
-
-  const compositionId = composition.id
-
-  if (!compositionId) {
-    throw new Error(`Composition ID not found`)
-  }
-
-  await indexDeclaration(compositionId, composition, authHeader, bundle)
-}
-
-/**
- * Updates the search index with the latest information of the composition
- * Supports 1 task and 1 patient maximum
- */
-async function updateEvent(bundle: SavedBundle, authHeader: string) {
-  const task = getTaskFromSavedBundle(bundle)
-
-  const compositionId =
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-
-  if (!compositionId) {
-    throw new Error('No Composition ID found')
-  }
-
-  const regLastUserIdentifier = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastUser'
-  )
-  const registrationNumberIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/death-registration-number'
-  )
-
-  const body: ICompositionBody = {
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
-  }
-
-  body.type =
-    task &&
-    task.businessStatus &&
-    task.businessStatus.coding &&
-    task.businessStatus.coding[0].code
-  body.modifiedAt = Date.now().toString()
-  if (body.type === REJECTED_STATUS) {
-    const nodeText =
-      (task && task.note && task.note[0].text && task.note[0].text) || ''
-    body.rejectReason = (task && task.reason && task.reason.text) || ''
-    body.rejectComment = nodeText
-  }
-  body.updatedBy =
-    regLastUserIdentifier &&
-    regLastUserIdentifier.valueReference &&
-    regLastUserIdentifier.valueReference.reference &&
-    regLastUserIdentifier.valueReference.reference.split('/')[1]
-  body.registrationNumber =
-    registrationNumberIdentifier && registrationNumberIdentifier.value
-  if (
-    [
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      ARCHIVED_STATUS
-    ].includes(body.type ?? '')
-  ) {
-    body.assignment = null
-  }
-  await createStatusHistory(body, task, authHeader, bundle)
-  await updateComposition(compositionId, body, client)
+  await indexDeclaration(composition, authHeader, bundle)
 }
 
 async function indexDeclaration(
-  compositionId: string,
   composition: SavedComposition,
   authHeader: string,
   bundle: SavedBundle
 ) {
+  const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
+  const task = getTaskFromSavedBundle(bundle)
+
   const body: ICompositionBody = {
     event: EVENT.DEATH,
     createdAt:
@@ -162,12 +84,26 @@ async function indexDeclaration(
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
-  await createIndexBody(body, composition, authHeader, bundle)
-  await indexComposition(compositionId, body, client)
+  body.type =
+    task &&
+    task.businessStatus &&
+    task.businessStatus.coding &&
+    task.businessStatus.coding[0].code
+  body.modifiedAt = Date.now().toString()
 
+  if (body.type === REJECTED_STATUS) {
+    const nodeText =
+      (task && task.note && task.note[0].text && task.note[0].text) || ''
+    body.rejectReason =
+      (task && task.statusReason && task.statusReason.text) || ''
+    body.rejectComment = nodeText
+  }
+
+  await createIndexBody(body, composition, authHeader, bundle)
   if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     updateCompositionIfAnyDuplicates(composition, body)
   }
+  await indexComposition(compositionId, body, client)
 }
 
 async function createIndexBody(

@@ -45,12 +45,12 @@ import {
   WaitingForValidationRecord,
   EVENT_TYPE,
   getComposition,
-  OPENCRVS_SPECIFICATION_URL,
   RegistrationNumber,
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord
+  RejectedRecord,
+  Location
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -90,6 +90,7 @@ import {
   createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
+  createViewTask,
   createWaitingForValidationTask,
   getTaskHistory,
   createRelatedPersonEntries,
@@ -275,6 +276,40 @@ export async function toUpdated(
   return recordWithUpdatedTask
 }
 
+export async function toViewed<T extends ValidRecord>(
+  record: T,
+  user: IUserModelData,
+  office: Location
+): Promise<T> {
+  const previousTask: SavedTask = getTaskFromSavedBundle(record)
+  const viewedTask = await createViewTask(previousTask, user, office)
+
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
+  const filteredEntries = record.entry.filter(
+    (e) => e.resource.resourceType !== 'Task'
+  )
+
+  const viewedRecord = {
+    resourceType: 'Bundle' as const,
+    type: 'document' as const,
+    entry: [
+      ...filteredEntries,
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      },
+      taskHistoryEntry
+    ]
+  } as T
+
+  return viewedRecord
+}
+
 export async function toDownloaded(
   record: ValidRecord,
   user: IUserModelData | ISystemModelData,
@@ -401,7 +436,7 @@ export async function toRegistered(
   request: Hapi.Request,
   record: WaitingForValidationRecord,
   practitioner: Practitioner,
-  registrationNumber: IEventRegistrationCallbackPayload['compositionId'],
+  registrationNumber: IEventRegistrationCallbackPayload['registrationNumber'],
   childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
@@ -414,7 +449,8 @@ export async function toRegistered(
 
   const event = getTaskEventType(registeredTask) as EVENT_TYPE
   const composition = getComposition(record)
-  const patients = updatePatientIdentifierWithRN(
+  // for patient entries of child, deceased, bride, groom
+  const patientsWithRegNumber = updatePatientIdentifierWithRN(
     record,
     composition,
     SECTION_CODE[event],
@@ -423,7 +459,7 @@ export async function toRegistered(
   )
 
   /* Setting registration number here */
-  const system = `${OPENCRVS_SPECIFICATION_URL}id/${
+  const system = `http://opencrvs.org/specs/id/${
     event.toLowerCase() as Lowercase<typeof event>
   }-registration-number` as const
 
@@ -436,11 +472,11 @@ export async function toRegistered(
     // For birth event patients[0] is child and it should
     // already be initialized with the RN identifier
     childIdentifiers.forEach((childIdentifier) => {
-      const previousIdentifier = patients[0].identifier!.find(
+      const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
         ({ type }) => type?.coding?.[0].code === childIdentifier.type
       )
       if (!previousIdentifier) {
-        patients[0].identifier!.push({
+        patientsWithRegNumber[0].identifier!.push({
           type: {
             coding: [
               {
@@ -459,16 +495,19 @@ export async function toRegistered(
 
   if (event === EVENT_TYPE.DEATH) {
     /** using first patient because for death event there is only one patient */
-    patients[0] = await validateDeceasedDetails(patients[0], {
-      Authorization: request.headers.authorization
-    })
+    patientsWithRegNumber[0] = await validateDeceasedDetails(
+      patientsWithRegNumber[0],
+      {
+        Authorization: request.headers.authorization
+      }
+    )
   }
 
   const registeredTaskWithLocationExtensions = await setupLastRegLocation(
     registerTaskWithPractitionerExtensions,
     practitioner
   )
-  const patientIds = patients.map((p) => p.id)
+  const patientIds = patientsWithRegNumber.map((p) => p.id)
 
   const entriesWithUpdatedPatients = [
     ...record.entry.map((e) => {
@@ -477,7 +516,7 @@ export async function toRegistered(
       }
       return {
         ...e,
-        resource: patients.find(({ id }) => id === e.resource.id)!
+        resource: patientsWithRegNumber.find(({ id }) => id === e.resource.id)!
       }
     })
   ]

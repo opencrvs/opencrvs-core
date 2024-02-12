@@ -19,10 +19,10 @@ import {
   CertifiedRecord,
   ReadyForReviewRecord,
   RejectedRecord,
-  ValidRecord,
   getTaskFromSavedBundle,
   getBusinessStatus,
-  IssuedRecord
+  IssuedRecord,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -320,4 +320,14 @@ export async function reinstateRegistration(
   const task = getTaskFromSavedBundle(reinstatedRecord)
 
   return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
+}
+
+export async function viewDeclaration(id: string, authHeader: IAuthHeader) {
+  const viewedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/view`,
+    authHeader
+  )
+
+  return viewedRecord
 }
