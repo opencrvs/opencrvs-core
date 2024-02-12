@@ -24,11 +24,7 @@ export async function sendDeathInProgressConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IInProgressPayload
-  logger.info(
-    `Notification service sendDeathInProgressConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info('Notifying from sendDeathInProgressConfirmation')
   const templateName = messageKeys.deathInProgressNotification
   await sendNotification(
     request,
@@ -50,11 +46,7 @@ export async function sendDeathDeclarationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
-  logger.info(
-    `Notification service sendDeathDeclarationConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info('Notifying from sendDeathDeclarationConfirmation')
   const templateName = messageKeys.deathDeclarationNotification
   await sendNotification(
     request,
@@ -77,11 +69,7 @@ export async function sendDeathRegistrationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
-  logger.info(
-    `Notification service sendDeathRegistrationConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info('Notifying from sendDeathRegistrationConfirmation')
   const templateName = messageKeys.deathRegistrationNotification
   await sendNotification(
     request,
@@ -105,11 +93,7 @@ export async function sendDeathRejectionConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRejectionPayload
-  logger.info(
-    `Notification service sendDeathRejectionConfirmation calling sendSMS: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info('Notifying from sendDeathRejectionConfirmation')
   const templateName = messageKeys.deathRejectionNotification
   await sendNotification(
     request,

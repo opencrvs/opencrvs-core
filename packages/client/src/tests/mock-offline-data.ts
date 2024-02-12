@@ -11,7 +11,11 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
-import { ILocation } from '@client/offline/reducer'
+import type {
+  Facility,
+  CRVSOffice,
+  AdminStructure
+} from '@client/offline/reducer'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -107,7 +111,7 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     }
-  },
+  } satisfies Record<string, Facility>,
   offices: {
     '0d8474da-0361-4d32-979e-af91f012340a': {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
@@ -119,7 +123,7 @@ export const mockOfflineData = {
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
-  },
+  } satisfies Record<string, CRVSOffice>,
   locations: {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
@@ -128,7 +132,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -139,7 +143,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -150,7 +154,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -161,7 +165,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -172,7 +176,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -183,7 +187,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -194,7 +198,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -205,7 +209,7 @@ export const mockOfflineData = {
       physicalType: 'Jurisdiction',
       statisticalId: '123',
       status: 'active',
-      jurisdictionType: 'DIVISION',
+      jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -367,7 +371,7 @@ export const mockOfflineData = {
       alias: 'বানিয়াজান',
       id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
       status: 'active',
-      jurisdictionType: 'UNION',
+      jurisdictionType: 'LOCATION_LEVEL_3',
       name: 'Baniajan',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
@@ -378,7 +382,7 @@ export const mockOfflineData = {
       alias: 'দুওজ',
       id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
       status: 'active',
-      jurisdictionType: 'UNION',
+      jurisdictionType: 'LOCATION_LEVEL_3',
       name: 'Duaz',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
@@ -407,7 +411,7 @@ export const mockOfflineData = {
       statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     }
-  },
+  } satisfies Record<string, AdminStructure>,
   languages: JSON.parse(
     readFileSync(join(__dirname, './languages.json')).toString()
   ).data,
@@ -497,10 +501,11 @@ export const mockOfflineData = {
   systems
 }
 
-export const mockOfflineLocationsWithHierarchy: Record<
-  string,
-  Record<string, ILocation>
-> = {
+export const mockOfflineLocationsWithHierarchy: {
+  facilities: Record<string, Facility>
+  offices: Record<string, CRVSOffice>
+  locations: Record<string, AdminStructure>
+} = {
   facilities: {
     '5c6abc88-26b8-4834-a1a6-2992807e3a72': {
       id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
