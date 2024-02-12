@@ -1,0 +1,43 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+misconfigurations:
+  - id: AVD-DS-0002
+    statement: Non-root users in nginx and metabase images to be addressed in follow up PR
+    paths:
+      - 'packages/client/Dockerfile'
+      - 'packages/components/Dockerfile'
+      - 'packages/dashboards/Dockerfile'
+      - 'packages/login/Dockerfile'
+      - 'packages/scheduler/Dockerfile'
+      - '/usr/local/share/.cache'
+vulnerabilities:
+  - id: CVE-2023-46233
+    statement: only applies to SHA-1 usage - should still be patched though
+  - id: CVE-2023-52079
+    statement: msgpackr vulnerable to dos
+  - id: CVE-2024-23331
+    statement: Vites vuln only applicable to server.fs.deny
+  - id: CVE-2020-8231
+    statement: curl vuln scheduler - low prio
+  - id: CVE-2022-42003
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2022-42004
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2022-3509
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2022-3510
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2022-35010
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2023-24998
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2023-32697
+    statement: Dashboards vulns (java libs)
+  - id: CVE-2022-1471
+    statement: Dashboards vulns (java libs)

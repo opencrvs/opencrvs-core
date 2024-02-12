@@ -3,6 +3,8 @@
 FROM node:gallium-alpine
 WORKDIR /app
 
+RUN apk update && apk upgrade
+
 COPY . .
 
 # Remove packages we don't need to speed up yarn install
@@ -11,7 +13,7 @@ RUN rm -rf /app/packages/*
 # Copy packages
 COPY packages/components /app/packages/components
 
-RUN apk update && apk add make python3 g++
+RUN apk update && apk upgrade && apk add --no-cache make python3 g++
 RUN yarn install
 
 # Build components
@@ -22,6 +24,8 @@ RUN yarn build-storybook
 # Step 2. Build the actual image
 
 FROM nginx
+
+RUN apt-get update && apt-get upgrade -y
 
 ARG HOST
 ARG COUNTRY_CONFIG_URL
