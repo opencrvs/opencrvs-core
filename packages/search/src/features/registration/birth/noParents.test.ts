@@ -15,13 +15,14 @@ import {
   mockEncounterResponse,
   mockUserModelResponse,
   mockLocationResponse,
-  mockBirthFhirBundleWithoutParents
+  mockBirthFhirBundle
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
+import { isComposition } from '@search/../../commons/build/dist/types'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 jest.mock('@search/features/registration/deduplicate/service')
@@ -79,7 +80,25 @@ describe('Verify handlers', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/record',
-        payload: mockBirthFhirBundleWithoutParents,
+        payload: {
+          ...mockBirthFhirBundle,
+          entry: mockBirthFhirBundle.entry.map((e) => {
+            if (isComposition(e.resource)) {
+              return {
+                ...e,
+                resource: {
+                  ...e.resource,
+                  section: e.resource.section.filter(
+                    (s) =>
+                      s.code.coding[0].code !== 'mother-details' &&
+                      s.code.coding[0].code !== 'father-details'
+                  )
+                }
+              }
+            }
+            return e
+          })
+        },
         headers: {
           Authorization: `Bearer ${token}`
         }
