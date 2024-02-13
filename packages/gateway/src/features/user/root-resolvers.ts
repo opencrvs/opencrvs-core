@@ -6,15 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  isBase64FileString,
-  postMetrics,
-  uploadBase64ToMinio
-} from '@gateway/features/fhir/utils'
+
 import {
   IUserModelData,
   IUserPayload,
@@ -22,7 +17,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getFullName,
-  getUser,
   hasScope,
   inScope,
   isTokenOwner,
@@ -38,219 +32,236 @@ import {
 import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
-import fetch from 'node-fetch'
-import {
-  validateAttachments,
-  validateNotificationDeliveryMethod
-} from '@gateway/utils/validators'
+import fetch from '@gateway/fetch'
+import { validateAttachments } from '@gateway/utils/validators'
+import { postMetrics } from '@gateway/features/metrics/service'
+import { uploadBase64ToMinio } from '@gateway/features/documents/service'
+import { isBase64FileString } from '@opencrvs/commons'
+import { rateLimitedResolver } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }, { headers: authHeader }) {
-      return await getUser({ userId }, authHeader)
-    },
+    getUser: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      async (_, { userId }, { dataSources }) => {
+        const user = await dataSources.usersAPI.getUserById(userId!)
+        return user
+      }
+    ),
 
-    async getUserByMobile(_, { mobile }, { headers: authHeader }) {
-      const res = await getUser({ mobile }, authHeader)
-      if (!res._id) {
-        return null
+    getUserByMobile: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      async (_, { mobile }, { dataSources }) => {
+        return dataSources.usersAPI.getUserByMobile(mobile!)
       }
-      return res
-    },
+    ),
 
-    async getUserByEmail(_, { email }, { headers: authHeader }) {
-      const res = await getUser({ email }, authHeader)
-      if (!res._id) {
-        return null
+    getUserByEmail: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      (_, { email }, { dataSources }) => {
+        return dataSources.usersAPI.getUserByEmail(email!)
       }
-      return res
-    },
+    ),
 
-    async searchUsers(
-      _,
-      {
-        username = null,
-        mobile = null,
-        systemRole = null,
-        status = null,
-        primaryOfficeId = null,
-        locationId = null,
-        count = 10,
-        skip = 0,
-        sort = 'desc'
-      },
-      { headers: authHeader }
-    ) {
-      // Only sysadmin or registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'Search user is only allowed for sysadmin or registrar or registration agent'
-          )
-        )
-      }
-
-      let payload: IUserSearchPayload = {
-        count,
-        skip,
-        sortOrder: sort
-      }
-      if (username) {
-        payload = { ...payload, username }
-      }
-      if (mobile) {
-        payload = { ...payload, mobile }
-      }
-      if (systemRole) {
-        payload = { ...payload, systemRole }
-      }
-      if (locationId) {
-        payload = { ...payload, locationId }
-      }
-      if (primaryOfficeId) {
-        payload = { ...payload, primaryOfficeId }
-      }
-      if (status) {
-        payload = { ...payload, status }
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      return await res.json()
-    },
-
-    async searchFieldAgents(
-      _,
-      {
-        locationId,
-        primaryOfficeId,
-        language = 'en',
-        status = null,
-        timeStart,
-        timeEnd,
-        event,
-        count = 10,
-        skip = 0,
-        sort = 'desc'
-      },
-      { headers: authHeader }
-    ) {
-      // Only sysadmin or registrar or registration agent should be able to search field agents
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'Search field agents is only allowed for sysadmin or registrar or registration agent'
-          )
-        )
-      }
-
-      if (!locationId && !primaryOfficeId) {
-        logger.error('No location provided')
-        return {
-          totalItems: 0,
-          results: []
-        }
-      }
-
-      let payload: IUserSearchPayload = {
-        systemRole: 'FIELD_AGENT',
-        count,
-        skip,
-        sortOrder: sort
-      }
-      if (locationId) {
-        payload = { ...payload, locationId }
-      }
-      if (primaryOfficeId) {
-        payload = { ...payload, primaryOfficeId }
-      }
-      if (status) {
-        payload = { ...payload, status }
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      const userResponse = await res.json()
-      if (!userResponse || !userResponse.results || !userResponse.totalItems) {
-        logger.error('Invalid result found from search user endpoint')
-        return {
-          totalItems: 0,
-          results: []
-        }
-      }
-      // Loading metrics data by practitioner ids
-      const metricsForPractitioners = await postMetrics(
-        '/declarationStartedMetricsByPractitioners',
+    searchUsers: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      async (
+        _,
         {
+          username = null,
+          mobile = null,
+          systemRole = null,
+          status = null,
+          primaryOfficeId = null,
+          locationId = null,
+          count = 10,
+          skip = 0,
+          sort = 'desc'
+        },
+        { headers: authHeader }
+      ) => {
+        // Only sysadmin or registrar or registration agent should be able to search user
+        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+          return await Promise.reject(
+            new Error(
+              'Search user is only allowed for sysadmin or registrar or registration agent'
+            )
+          )
+        }
+
+        let payload: IUserSearchPayload = {
+          count,
+          skip,
+          sortOrder: sort
+        }
+        if (username) {
+          payload = { ...payload, username }
+        }
+        if (mobile) {
+          payload = { ...payload, mobile }
+        }
+        if (systemRole) {
+          payload = { ...payload, systemRole }
+        }
+        if (locationId) {
+          payload = { ...payload, locationId }
+        }
+        if (primaryOfficeId) {
+          payload = { ...payload, primaryOfficeId }
+        }
+        if (status) {
+          payload = { ...payload, status }
+        }
+        const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        })
+        return await res.json()
+      }
+    ),
+
+    searchFieldAgents: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      async (
+        _,
+        {
+          locationId,
+          primaryOfficeId,
+          language = 'en',
+          status = null,
           timeStart,
           timeEnd,
-          locationId: locationId ? locationId : (primaryOfficeId as string),
           event,
-          practitionerIds: userResponse.results.map(
-            (user: IUserModelData) => user.practitionerId
-          )
+          count = 10,
+          skip = 0,
+          sort = 'desc'
         },
-        authHeader
-      )
-
-      const fieldAgentList: GQLSearchFieldAgentResponse[] =
-        userResponse.results.map((user: IUserModelData) => {
-          const metricsData = metricsForPractitioners.find(
-            (metricsForPractitioner: { practitionerId: string }) =>
-              metricsForPractitioner.practitionerId === user.practitionerId
+        { headers: authHeader }
+      ) => {
+        // Only sysadmin or registrar or registration agent should be able to search field agents
+        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+          return await Promise.reject(
+            new Error(
+              'Search field agents is only allowed for sysadmin or registrar or registration agent'
+            )
           )
+        }
+
+        if (!locationId && !primaryOfficeId) {
+          logger.error('No location provided')
           return {
-            practitionerId: user.practitionerId,
-            fullName: getFullName(user, language),
-            role: user.role,
-            status: user.status,
-            avatar: user.avatar,
-            primaryOfficeId: user.primaryOfficeId,
-            creationDate: user?.creationDate,
-            totalNumberOfDeclarationStarted:
-              metricsData?.totalNumberOfDeclarationStarted ?? 0,
-            totalNumberOfInProgressAppStarted:
-              metricsData?.totalNumberOfInProgressAppStarted ?? 0,
-            totalNumberOfRejectedDeclarations:
-              metricsData?.totalNumberOfRejectedDeclarations ?? 0,
-            averageTimeForDeclaredDeclarations:
-              metricsData?.averageTimeForDeclaredDeclarations ?? 0
+            totalItems: 0,
+            results: []
+          }
+        }
+
+        let payload: IUserSearchPayload = {
+          systemRole: 'FIELD_AGENT',
+          count,
+          skip,
+          sortOrder: sort
+        }
+        if (locationId) {
+          payload = { ...payload, locationId }
+        }
+        if (primaryOfficeId) {
+          payload = { ...payload, primaryOfficeId }
+        }
+        if (status) {
+          payload = { ...payload, status }
+        }
+        const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        })
+        const userResponse = await res.json()
+        if (
+          !userResponse ||
+          !userResponse.results ||
+          !userResponse.totalItems
+        ) {
+          logger.error('Invalid result found from search user endpoint')
+          return {
+            totalItems: 0,
+            results: []
+          }
+        }
+        // Loading metrics data by practitioner ids
+        const metricsForPractitioners = await postMetrics(
+          '/declarationStartedMetricsByPractitioners',
+          {
+            timeStart,
+            timeEnd,
+            locationId: locationId ? locationId : (primaryOfficeId as string),
+            event,
+            practitionerIds: userResponse.results.map(
+              (user: IUserModelData) => user.practitionerId
+            )
+          },
+          authHeader
+        )
+
+        const fieldAgentList: GQLSearchFieldAgentResponse[] =
+          userResponse.results.map((user: IUserModelData) => {
+            const metricsData = metricsForPractitioners.find(
+              (metricsForPractitioner: { practitionerId: string }) =>
+                metricsForPractitioner.practitionerId === user.practitionerId
+            )
+            return {
+              practitionerId: user.practitionerId,
+              fullName: getFullName(user, language),
+              role: user.role,
+              status: user.status,
+              avatar: user.avatar,
+              primaryOfficeId: user.primaryOfficeId,
+              creationDate: user?.creationDate,
+              totalNumberOfDeclarationStarted:
+                metricsData?.totalNumberOfDeclarationStarted ?? 0,
+              totalNumberOfInProgressAppStarted:
+                metricsData?.totalNumberOfInProgressAppStarted ?? 0,
+              totalNumberOfRejectedDeclarations:
+                metricsData?.totalNumberOfRejectedDeclarations ?? 0,
+              averageTimeForDeclaredDeclarations:
+                metricsData?.averageTimeForDeclaredDeclarations ?? 0
+            }
+          })
+
+        return {
+          results: fieldAgentList,
+          totalItems: userResponse.totalItems
+        }
+      }
+    ),
+
+    verifyPasswordById: rateLimitedResolver(
+      { requestsPerMinute: 10 },
+      async (_, { id, password }, { headers: authHeader }) => {
+        const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
+          method: 'POST',
+          body: JSON.stringify({ id, password }),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
           }
         })
 
-      return {
-        results: fieldAgentList,
-        totalItems: userResponse.totalItems
-      }
-    },
-    async verifyPasswordById(_, { id, password }, { headers: authHeader }) {
-      const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
-        method: 'POST',
-        body: JSON.stringify({ id, password }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
+        if (res.status !== 200) {
+          return await Promise.reject(
+            new Error('Unauthorized to verify password')
+          )
         }
-      })
 
-      if (res.status !== 200) {
-        return await Promise.reject(
-          new Error('Unauthorized to verify password')
-        )
+        return await res.json()
       }
-
-      return await res.json()
-    }
+    )
   },
 
   Mutation: {
@@ -263,7 +274,6 @@ export const resolvers: GQLResolver = {
       }
 
       try {
-        await validateNotificationDeliveryMethod(user)
         if (user.signature) {
           await validateAttachments([user.signature])
         }
@@ -297,7 +307,11 @@ export const resolvers: GQLResolver = {
 
         throw new UserInputError(errorResponse.message, {
           duplicateNotificationMethodError:
-            duplicateDataErrorMap[errorResponse['errorThrowingProperty']]
+            duplicateDataErrorMap[
+              errorResponse[
+                'errorThrowingProperty'
+              ] as keyof typeof duplicateDataErrorMap
+            ]
         })
       } else if (res.status !== 201) {
         return await Promise.reject(
@@ -620,19 +634,21 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
-      family: name.familyName as string,
-      given: (name.firstNames || '').split(' ') as string[]
+      family: name.familyName?.trim() as string,
+      given: (name.firstNames || '')?.trim().split(' ') as string[]
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
     ...(user.password && { password: user.password }),
+    ...(user.status && { status: user.status }),
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
-    emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
-    mobile: user.mobile as string,
+    ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property
+    ...(user.mobile && { mobile: user.mobile as string }),
     device: user.device as string,
-    signature: user.signature
+    signature: user.signature,
+    ...(user.username && { username: user.username })
   }
   if (user.id) {
     userPayload.id = user.id

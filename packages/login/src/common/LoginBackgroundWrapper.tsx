@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled, { css, useTheme } from 'styled-components'
-
+import { storage } from '@login/storage'
 import {
   selectCountryBackground,
   selectCountryLogo
@@ -58,29 +57,36 @@ export interface IProps {
 
 export function usePersistentCountryBackground() {
   const theme = useTheme()
-  const countryBackground: NonNullable<
-    ReturnType<typeof selectCountryBackground>
-  > = JSON.parse(
-    localStorage.getItem('country-background') ??
-      `{"backgroundColor" : "${(theme as ITheme).colors.backgroundPrimary}"}`
-  )
+  const [countryBackground, setCountryBackground] = React.useState({
+    backgroundColor: `${(theme as ITheme).colors.backgroundPrimary}`,
+    backgroundImage: '',
+    imageFit: ''
+  })
   const [offlineBackground, setOfflineBackground] =
     React.useState(countryBackground)
+  React.useEffect(() => {
+    storage.getItem('country-background').then((res) => {
+      res ?? setCountryBackground(JSON.parse(res))
+    })
+  }, [])
 
   const background = useSelector(selectCountryBackground)
 
   if (background && !isEqual(background, offlineBackground)) {
     setOfflineBackground(background)
-    localStorage.setItem('country-background', JSON.stringify(background))
+    storage.setItem('country-background', JSON.stringify(background))
   }
 
   return offlineBackground
 }
 
 export function usePersistentCountryLogo() {
-  const [offlineLogo, setOfflineLogo] = React.useState(
-    localStorage.getItem('country-logo') ?? ''
-  )
+  const [offlineLogo, setOfflineLogo] = React.useState('')
+  React.useEffect(() => {
+    storage.getItem('country-logo').then((res) => {
+      res ?? setOfflineLogo(res)
+    })
+  }, [])
   const logo = useSelector(selectCountryLogo)
   if (logo && logo !== offlineLogo) {
     setOfflineLogo(logo)

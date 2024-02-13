@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
@@ -16,9 +15,10 @@ import {
   setupAuthorOnNotes,
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
+import { Bundle, Task } from '@opencrvs/commons/types'
 
-export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
+export async function modifyTaskBundle(fhirBundle: Bundle, token: string) {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -28,9 +28,9 @@ export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
     throw new Error('Invalid FHIR bundle found for task')
   }
   // Checking for duplicate status update
-  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as fhir.Task)
+  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as Task)
 
-  const taskResource = getTaskResource(fhirBundle)
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
@@ -36,6 +35,7 @@ type userCreateDuplicateEmailFailedToastState = {
 
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
+  configurationError: string | null
   configurationErrorVisible: boolean
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
@@ -56,6 +56,7 @@ export type NotificationState = {
 
 const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
+  configurationError: null,
   configurationErrorVisible: false,
   waitingSW: null,
   sessionExpired: false,
@@ -92,6 +93,11 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         sessionExpired: true
+      }
+    case actions.CONFIGURATION_ERROR:
+      return {
+        ...state,
+        configurationError: action.payload
       }
     case actions.SHOW_CONFIG_ERROR:
       return {

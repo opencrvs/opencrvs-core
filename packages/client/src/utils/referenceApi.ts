@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
@@ -16,12 +15,24 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
+import { IntlShape } from 'react-intl'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
+
+type FontFamilyTypes = {
+  normal: string
+  bold: string
+  italics: string
+  bolditalics: string
+}
+
+export type CertificateConfiguration = Partial<{
+  fonts: Record<string, FontFamilyTypes>
+}>
 export interface IContentResponse {
   languages: ILanguage[]
 }
@@ -106,6 +117,8 @@ export interface IApplicationConfig {
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
   LOGIN_BACKGROUND: ILoginBackground
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
@@ -121,6 +134,14 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+
+  if (res && res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
+
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
@@ -157,6 +178,12 @@ async function loadForms(): Promise<LoadFormsResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+  if (res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
 
   if (res && res.status !== 201) {
     throw Error(res.statusText)
@@ -186,6 +213,54 @@ export async function importConditionals(): Promise<LoadConditionalsResponse> {
     /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`
   )
   return conditionals
+}
+
+type InjectedUtilities = {
+  intl: IntlShape
+}
+
+export type LoadHandlebarHelpersResponse = Record<
+  string,
+  (injectedUtilities: InjectedUtilities) => Handlebars.HelperDelegate
+>
+
+async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
+  try {
+    // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+    const handlebars = await import(
+      /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+    )
+    return handlebars
+  } catch (error) {
+    return {}
+  }
+}
+async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  // for backward compatibility, if the endpoint is unimplemented
+  if (res.status === 404) {
+    return {
+      fonts: {
+        notosans: {
+          normal: 'NotoSans-Light.ttf',
+          bold: 'NotoSans-Regular.ttf',
+          italics: 'NotoSans-Light.ttf',
+          bolditalics: 'NotoSans-Regular.ttf'
+        }
+      }
+    }
+  }
+
+  if (!res.ok) {
+    throw Error(res.statusText)
+  }
+
+  return res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -325,10 +400,12 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
+  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,
   importValidators,
   importConditionals,
+  importHandlebarHelpers,
   loadConfigAnonymousUser
 }

@@ -6,11 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { roleTypeResolvers as typeResolvers } from '@gateway/features/role/type-resolvers'
+import { TestResolvers } from '@gateway/utils/testUtils'
+
+const roleTypeResolvers = typeResolvers as unknown as TestResolvers
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -75,7 +78,7 @@ describe('Role type resolvers', () => {
     creationDate: 1559054406433
   }
   it('return id type', () => {
-    const res = roleTypeResolvers.SystemRole.id(mockResponse)
+    const res = roleTypeResolvers.SystemRole!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
 })

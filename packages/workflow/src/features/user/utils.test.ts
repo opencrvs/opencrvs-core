@@ -6,14 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   getLoggedInPractitionerResource,
   getUser,
   getLoggedInPractitionerPrimaryLocation,
-  getPrimaryLocationFromLocationList,
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import {
@@ -29,6 +27,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 import * as fetchAny from 'jest-fetch-mock'
+import { Practitioner } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 
@@ -64,7 +63,7 @@ describe('Verify getLoggedInPractitionerResource', () => {
     )
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -101,7 +100,7 @@ describe('Verify getLoggedInPractitionerResource', () => {
     )
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -126,7 +125,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('returns the primary location', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -151,7 +150,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('throws errof if valid practioner is not found', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -195,7 +194,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
   it('throws errof if practioner does not have any valid role entry', async () => {
     const token = jwt.sign(
       { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
         algorithm: 'RS256',
@@ -278,142 +277,10 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
     )
   })
 })
-describe('Verify getPrimaryLocationFromLocationList', () => {
-  it('returns the primary location properly', () => {
-    const locations = [
-      JSON.parse(districtMock),
-      JSON.parse(upazilaMock),
-      JSON.parse(unionMock),
-      JSON.parse(officeMock)
-    ]
-    const primaryLocation = getPrimaryLocationFromLocationList(
-      locations as [fhir.Location]
-    )
-    expect(primaryLocation).toBeDefined()
-    expect(primaryLocation).toEqual(JSON.parse(unionMock))
-  })
-  it('throws error if no CRVS office is found', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UPAZILA'
-          }
-        ]
-      },
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ]
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
-    ).toThrowError('No CRVS office found')
-  })
-  it('throws error if no primary location for crvs office found', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ]
-      },
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'CRVS_OFFICE'
-          }
-        ],
-        type: {
-          coding: [{ code: 'CRVS_OFFICE' }]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'bu',
-              display: 'Building'
-            }
-          ]
-        }
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
-    ).toThrowError('No primary location found')
-  })
-  it('throws error if crvs office has a invalid location id', () => {
-    const locations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'CRVS_OFFICE'
-          }
-        ],
-        partOf: {
-          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
-        },
-        type: {
-          coding: [{ code: 'CRVS_OFFICE' }]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'bu',
-              display: 'Building'
-            }
-          ]
-        }
-      }
-    ]
-    expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
-    ).toThrowError(
-      'No primary location not found for office: d33e4cb2-670e-4564-a8ed-c72baacdy48y'
-    )
-  })
-})
+
 describe('Verify getPractitionerRef', () => {
   it('returns practinioner ref properly', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
@@ -440,7 +307,7 @@ describe('Verify getPractitionerRef', () => {
         lastUpdated: '2018-11-25T17:31:08.062+00:00',
         versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
       }
-    }
+    } as Practitioner
     expect(() => getPractitionerRef(practitioner)).toThrowError(
       'Invalid practitioner data found'
     )

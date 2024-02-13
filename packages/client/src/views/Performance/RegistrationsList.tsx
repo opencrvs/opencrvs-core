@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISearchLocation, Stack } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
@@ -50,7 +49,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLMixedTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'

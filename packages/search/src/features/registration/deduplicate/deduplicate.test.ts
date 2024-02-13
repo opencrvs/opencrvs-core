@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import {
@@ -20,6 +19,7 @@ import * as elasticsearch from '@elastic/elasticsearch'
 
 import { StartedElasticsearchContainer } from 'testcontainers'
 
+// Test timeout is increased due to the fact that testcontainers can take a while to pull Docker images
 jest.setTimeout(10 * 60 * 1000)
 
 let container: StartedElasticsearchContainer

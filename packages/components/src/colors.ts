@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import darken from 'polished/lib/color/darken'
@@ -51,7 +50,10 @@ const config = {
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
-  backgroundPrimary: '#36304E'
+  backgroundPrimary: '#36304E',
+  subheaderCopyBirth: '#007A5E',
+  subheaderCopyDeath: '#4B5EAA',
+  subheaderCopyMarriage: '#E4BC0C'
 }
 
 export const gradients = {

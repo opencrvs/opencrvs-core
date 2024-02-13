@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/notification/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -19,7 +18,7 @@ describe('Notification root resolvers', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
       // @ts-ignore
-      const compositions = await resolvers.Query.listNotifications(
+      const compositions = await resolvers.Query!.listNotifications(
         {},
         { status: 'preliminary' }
       )
@@ -32,7 +31,7 @@ describe('Notification root resolvers', () => {
   describe('createNotification', () => {
     it('posting the mutation', async () => {
       // @ts-ignore
-      const result = await resolvers.Mutation.createNotification(
+      const result = await resolvers.Mutation!.createNotification(
         {},
         { details: new Date() }
       )

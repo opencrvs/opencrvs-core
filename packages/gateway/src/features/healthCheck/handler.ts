@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -94,6 +93,16 @@ export async function checkServiceHealth(service: PingService) {
     logger.error(e)
     return { ...service, status: 'error' }
   }
+}
+
+const SERVICES = {
+  [Services.AUTH]: `${AUTH_URL}/ping`,
+  [Services.SEARCH]: `${SEARCH_URL}ping`,
+  [Services.USER_MGNT]: `${USER_MANAGEMENT_URL}ping`,
+  [Services.METRICS]: `${METRICS_URL}/ping`,
+  [Services.NOTIFICATION]: `${NOTIFICATION_URL}ping`,
+  [Services.COUNTRY_CONFIG]: `${COUNTRY_CONFIG_URL}/ping`,
+  [Services.WORKFLOW]: `${WORKFLOW_URL}ping`
 }
 
 export default async function healthCheckHandler(

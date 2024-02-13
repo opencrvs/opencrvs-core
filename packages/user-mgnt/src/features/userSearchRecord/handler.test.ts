@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
 import { logger } from '@user-mgnt/logger'
@@ -21,7 +20,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

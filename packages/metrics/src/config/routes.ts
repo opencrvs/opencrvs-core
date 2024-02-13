@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -35,7 +34,6 @@ import {
   markValidatedHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
-  requestCorrectionHandler,
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
@@ -49,7 +47,8 @@ import {
   newEventRegistrationHandler,
   markIssuedHandler,
   markedAsDuplicate,
-  markedAsNotDuplicate
+  markedAsNotDuplicate,
+  correctionEventHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -81,6 +80,7 @@ import {
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV, GIT_HASH } from '@metrics/constants'
 import fetch from 'node-fetch'
+import * as Hapi from '@hapi/hapi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -97,16 +97,18 @@ export enum EventType {
  * after a user action, you most likely need to add this wrapper to some
  * new endpoint handler here.
  */
-function analyticsDataRefreshingRoute<T extends Array<any>, U>(
-  handler: (...args: T) => U
-) {
+function analyticsDataRefreshingRoute<
+  Request extends Hapi.Request<Hapi.ReqRefDefaults>,
+  Response extends Hapi.ResponseToolkit,
+  U
+>(handler: (request: Request, response: Response) => U) {
   // Do not use await for the refresh operation. This operation can take minutes or more.
   // Consider triggering this a task that will be left to be run in the background.
-  return (...params: T) => {
+  return (request: Request, response: Response) => {
     if (!PRODUCTION || QA_ENV) {
-      refresh()
+      refresh(request.headers.authorization)
     }
-    return handler(...params)
+    return handler(request, response)
   }
 }
 
@@ -327,8 +329,21 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
+      path: '/events/{event}/make-correction',
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
+      config: {
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/{event}/request-correction',
-      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
       config: {
         tags: ['api'],
         validate: {

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { RadioButton } from './RadioButton'
@@ -67,6 +66,7 @@ interface IConditionals {
 export interface IRadioOption {
   label: string
   value: string | boolean
+  param?: Record<string, string>
   conditionals?: IConditionals[]
   disabled?: boolean
 }
@@ -114,7 +114,13 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     disabled={option.disabled}
                     label={option.label}
                     value={option.value}
-                    id={`${name}_${option.value}`}
+                    id={
+                      option.param
+                        ? `${name}_${option.value}_${Object.values(
+                            option.param
+                          ).toString()}`
+                        : `${name}_${option.value}`
+                    }
                     selected={value}
                     onChange={this.props.onChange}
                     hasFlexDirection={flexDirection ? true : false}
@@ -140,7 +146,13 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     disabled={option.disabled}
                     label={option.label}
                     value={option.value}
-                    id={`${name}_${option.value}`}
+                    id={
+                      option.param
+                        ? `${name}_${option.value}_${Object.values(
+                            option.param
+                          ).toString()}`
+                        : `${name}_${option.value}`
+                    }
                     selected={value}
                     onChange={this.props.onChange}
                     hasFlexDirection={flexDirection ? true : false}

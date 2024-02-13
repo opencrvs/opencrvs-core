@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloQueryResult } from '@apollo/client'
 import { ValidationInitializer } from '@client/utils/validate'
@@ -19,7 +18,7 @@ import {
   RadioSize
 } from '@opencrvs/components/lib/Radio'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use.d'
 import { MessageDescriptor } from 'react-intl'
 
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
@@ -27,21 +26,25 @@ import { IOfflineData } from '@client/offline/reducer'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import * as labels from './mappings/label'
-import * as mutations from './mappings/mutation'
-import * as graphQLQueries from './mappings/queries'
-import * as queries from './mappings/query'
-import * as responseTransformers from './mappings/response-transformers'
-import * as types from './mappings/type'
+import * as mutations from './register/mappings/mutation'
+import * as graphQLQueries from './register/legacy'
+import * as queries from './register/mappings/query'
+import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
-import { AnyFn } from './mappings/deserializer'
+import * as labels from '@client/forms/certificate/fieldDefinitions/label'
+import {
+  BIRTH_REGISTRATION_NUMBER,
+  DEATH_REGISTRATION_NUMBER,
+  NATIONAL_ID
+} from '@client/utils/constants'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
+export const HIDDEN = 'HIDDEN'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
@@ -82,9 +85,12 @@ export enum SubmissionAction {
   CERTIFY_DECLARATION = 'certify declaration',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction',
   ISSUE_DECLARATION = 'issue certificate',
-  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration',
+  MAKE_CORRECTION = 'make correction',
+  APPROVE_CORRECTION = 'approve correction',
+  REJECT_CORRECTION = 'reject correction',
+  REQUEST_CORRECTION = 'request correction'
 }
 
 export enum DownloadAction {
@@ -106,6 +112,7 @@ export interface ISelectOption {
 export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
+  param?: Record<string, string>
   conditionals?: RadioComponentOption['conditionals']
 }
 export interface ICheckboxOption {
@@ -157,6 +164,19 @@ export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
 
+export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+  switch (key) {
+    case NATIONAL_ID:
+      return BIG_NUMBER
+    case BIRTH_REGISTRATION_NUMBER:
+      return BIG_NUMBER
+    case DEATH_REGISTRATION_NUMBER:
+      return BIG_NUMBER
+    default:
+      return TEXT
+  }
+}
+
 export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
@@ -179,7 +199,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
     | {
         kind: 'dynamic'
         dependency: string
-        typeMapper: Operation<typeof types>
+        typeMapper: Operation<typeof identityTypeMapper>
       }
   validator?: Array<{
     dependencies: string[]
@@ -354,7 +374,7 @@ export type IFormFieldQueryMapDescriptor<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -492,7 +512,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
-  customQuesstionMappingId?: string
+  customQuestionMappingId?: string
   ignoreMediaQuery?: boolean
 }
 
@@ -549,6 +569,9 @@ export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
   maxLength?: number
   dependency?: string
+}
+export interface IHiddenFormField extends IFormFieldBase {
+  type: typeof HIDDEN
 }
 
 export interface ITelFormField extends IFormFieldBase {
@@ -695,6 +718,7 @@ export type IFormField =
   | ITelFormField
   | INumberFormField
   | IBigNumberFormField
+  | IHiddenFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IFormFieldWithDynamicDefinitions
@@ -762,7 +786,7 @@ export type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
-  parameters: Params<typeof validators[T]>
+  parameters: Params<(typeof validators)[T]>
 }
 
 type ValidationDefaultOperation<
@@ -792,7 +816,7 @@ export type QueryFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof queries[T]>,
+    Params<(typeof queries)[T]>,
     IQueryDescriptor
   >
 }
@@ -828,7 +852,7 @@ export type MutationFactoryOperation<
 > = {
   operation: T
   parameters: FunctionParamsToDescriptor<
-    Params<typeof mutations[T]>,
+    Params<(typeof mutations)[T]>,
     IMutationDescriptor
   >
 }
@@ -844,7 +868,7 @@ export type IMutationDescriptor =
   | MutationDefaultOperation
 
 export type X = FunctionParamsToDescriptor<
-  Params<typeof mutations['birthEventLocationMutationTransformer']>,
+  Params<(typeof mutations)['eventLocationMutationTransformer']>,
   IMutationDescriptor
 >
 
@@ -956,7 +980,6 @@ export interface IFormSectionGroup {
   conditionals?: Conditional[]
   error?: MessageDescriptor
   preventContinueIfError?: boolean
-  showExitButtonOnly?: boolean
 }
 
 export interface IForm {
@@ -1046,6 +1069,9 @@ export interface Ii18nInformativeRadioGroupFormField
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
   maxLength?: number
+}
+export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
+  type: typeof HIDDEN
 }
 export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL
@@ -1177,6 +1203,7 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
+  | Ii18nHiddenFormField
   | Ii18nNumberFormField
   | Ii18nBigNumberFormField
   | Ii18nSelectFormField

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -27,7 +26,7 @@ const taskBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -281,7 +280,7 @@ const mosipBundle = {
     {
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -458,7 +457,7 @@ describe('Webhook transformBirthBundle for national id integration', () => {
         [JSON.stringify(documentResource), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:webhooks-user'
@@ -497,7 +496,7 @@ describe('webhook transformBirthBundle for webhook permissions integrations ', (
       [JSON.stringify(documentResource), { status: 200 }]
     )
 
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:webhooks-user'

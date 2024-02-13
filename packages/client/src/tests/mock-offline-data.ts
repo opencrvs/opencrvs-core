@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import { join } from 'path'
@@ -477,7 +476,10 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     DATE_OF_BIRTH_UNKNOWN: true,
     INFORMANT_SIGNATURE: false,
-    INFORMANT_SIGNATURE_REQUIRED: false
+    INFORMANT_SIGNATURE_REQUIRED: false,
+    USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+    SIGNATURE_REQUIRED_FOR_ROLES: ['LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR']
   },
   anonymousConfig: {
     APPLICATION_NAME: 'Farajaland CRVS',

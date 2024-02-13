@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@search/server'
 import {
@@ -31,7 +30,7 @@ describe('assignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -50,7 +49,7 @@ describe('assignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -74,15 +73,11 @@ describe('assignEventHandler', () => {
       { status: 200 }
     ])
 
-    const token = jwt.sign(
-      { scope: [] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      }
-    )
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:search-user'
+    })
 
     const res = await server.server.inject({
       method: 'POST',
@@ -107,7 +102,7 @@ describe('unassignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -126,7 +121,7 @@ describe('unassignEventHandler', () => {
   })
 
   it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'
@@ -150,7 +145,7 @@ describe('unassignEventHandler', () => {
       { status: 200 }
     ])
 
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:search-user'

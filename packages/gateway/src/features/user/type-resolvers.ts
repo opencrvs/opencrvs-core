@@ -6,18 +6,28 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
+
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+
 import {
   GQLIdentifier,
   GQLResolver,
   GQLSignatureInput,
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
+import {
+  Bundle,
+  Extension,
+  OPENCRVS_SPECIFICATION_URL,
+  findExtension,
+  PractitionerRole,
+  ResourceIdentifier,
+  resourceIdentifierToUUID
+} from '@opencrvs/commons/types'
+
+import { fetchFHIR } from '@gateway/features/fhir/service'
 
 interface IAuditHistory {
   auditedBy: string
@@ -51,7 +61,7 @@ export interface IUserModelData {
   scope?: string[]
   email: string
   emailForNotification?: string
-  mobile: string
+  mobile?: string
   status: string
   systemRole: string
   role: IUserRole
@@ -73,10 +83,17 @@ export interface ISystemModelData {
   username: string
   status: string
   sha_secret: string
+  type: 'HEALTH'
   practitionerId: string
   settings: {
     dailyQuota: number
   }
+}
+
+export function isSystem(
+  systemOrUser: IUserModelData | ISystemModelData
+): systemOrUser is ISystemModelData {
+  return (systemOrUser as ISystemModelData).client_id !== undefined
 }
 
 export interface IUserPayload
@@ -93,6 +110,8 @@ export interface IUserPayload
   id?: string
   identifiers: GQLUserIdentifierInput[]
   systemRole: string
+  status?: string
+  username?: string
   password?: string
   role: string
   signature?: GQLSignatureInput
@@ -114,7 +133,7 @@ async function getPractitionerByOfficeId(
   primaryOfficeId: string,
   authHeader: IAuthHeader
 ) {
-  const roleBundle: fhir.Bundle = await fetchFHIR(
+  const roleBundle: Bundle = await fetchFHIR(
     `/PractitionerRole?location=${primaryOfficeId}&role=LOCAL_REGISTRAR`,
     authHeader
   )
@@ -124,7 +143,7 @@ async function getPractitionerByOfficeId(
     roleBundle.entry &&
     roleBundle.entry &&
     roleBundle.entry.length > 0 &&
-    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+    (roleBundle.entry[0].resource as PractitionerRole)
 
   const roleCode =
     practitionerRole &&
@@ -136,15 +155,13 @@ async function getPractitionerByOfficeId(
   return {
     practitionerId:
       practitionerRole && practitionerRole.practitioner
-        ? practitionerRole.practitioner.reference
+        ? (practitionerRole.practitioner.reference as ResourceIdentifier)
         : undefined,
     practitionerRole: roleCode || undefined
   }
 }
 
-export function getSignatureExtension(
-  extensions: fhir.Extension[] | undefined
-): fhir.Extension | undefined {
+export function getSignatureExtension(extensions: Extension[] | undefined) {
   return findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
     extensions || []
@@ -188,7 +205,7 @@ export const userTypeResolvers: GQLResolver = {
     async localRegistrar(
       userModel: IUserModelData,
       _,
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) {
       const scope = userModel.scope
 
@@ -199,7 +216,9 @@ export const userTypeResolvers: GQLResolver = {
       const { practitionerId, practitionerRole } = !scope.includes('register')
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
-            practitionerId: `Practitioner/${userModel.practitionerId}`,
+            practitionerId: `Practitioner/${
+              userModel.practitionerId as UUID
+            }` as const,
             practitionerRole: userModel.systemRole
           }
 
@@ -207,9 +226,8 @@ export const userTypeResolvers: GQLResolver = {
         return
       }
 
-      const practitioner: fhir.Practitioner = await fetchFHIR(
-        `/${practitionerId}`,
-        authHeader
+      const practitioner = await dataSources.fhirAPI.getPractitioner(
+        resourceIdentifierToUUID(practitionerId)
       )
 
       if (!practitioner) {
@@ -232,10 +250,9 @@ export const userTypeResolvers: GQLResolver = {
         }
       }
     },
-    async signature(userModel: IUserModelData, _, { headers: authHeader }) {
-      const practitioner: fhir.Practitioner = await fetchFHIR(
-        `/Practitioner/${userModel.practitionerId}`,
-        authHeader
+    async signature(userModel: IUserModelData, _, { dataSources }) {
+      const practitioner = await dataSources.fhirAPI.getPractitioner(
+        userModel.practitionerId
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -95,7 +94,7 @@ describe('Route authorization', () => {
   })
 
   it('accepts requests with a valid token', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -111,7 +110,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with a token with invalid signature', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert-invalid.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert-invalid.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -127,7 +126,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with expired token', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user',
@@ -149,7 +148,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong algorithm (RS384)', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS384',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -166,7 +165,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong audience', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:NOT_VALID'
@@ -183,7 +182,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong issuer', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:NOT_VALID',
       audience: 'opencrvs:gateway-user'
@@ -198,88 +197,21 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
-
-  // it('Tests the health check for all service', async () => {
-  //   fetch.mockResponses(
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ],
-  //     [
-  //       JSON.stringify({
-  //         status: 'ok'
-  //       }),
-  //       { status: 200 }
-  //     ]
-  //   )
-
-  //   const res = await server.app.inject({
-  //     method: 'GET',
-  //     url: '/ping'
-  //   })
-
-  //   expect(res.result).toMatchObject(mockPingResponse)
-  // })
-
-  it('Tests the health check for all service', async () => {
-    const server = await createServer()
+  /*it('Tests the health check for all the service', async () => {
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-    expect(res.statusCode).toBe(200)
-    expect(res.payload).toMatchSnapshot()
-  })
+    expect(res.result).toEqual({
+      auth: false,
+      search: false,
+      'user-mgnt': false,
+      metrics: false,
+      notification: false,
+      countryconfig: false,
+      workflow: false
+    })
+  })*/
   // TODO: after implementing the query parameter, this can be fixed to test the health check
   // it('Tests the health check with a valid parameter', async () => {
   //   fetch.mockResponse(

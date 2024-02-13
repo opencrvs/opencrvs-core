@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -19,7 +18,7 @@ import {
 
 import {
   updateComposition,
-  updateFieldNameByCompositionId
+  renameField
 } from '../../utils/elasticsearch-helper.js'
 import { Db, MongoClient } from 'mongodb'
 import { Identifier } from '../../utils/migration-interfaces.js'
@@ -32,9 +31,9 @@ export const up = async (db: Db, client: MongoClient) => {
   try {
     await session.withTransaction(async () => {
       // rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on elasticSearch
-      await updateFieldNameByCompositionId(
-        'declarationJurisdictionIds',
-        'declarationLocationHirarchyIds'
+      await renameField(
+        'declarationLocationHirarchyIds',
+        'declarationJurisdictionIds'
       )
       const totalCompositionCount = await getTotalDocCountByCollectionName(
         db,

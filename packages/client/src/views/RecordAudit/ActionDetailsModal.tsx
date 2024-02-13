@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -44,6 +43,8 @@ import { Table } from '@client/../../components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -137,13 +138,22 @@ function prepareComments(
   )
 }
 
-const requesterLabelMapper = (requester: string, intl: IntlShape) => {
+const requesterLabelMapper = (
+  requester: string,
+  intl: IntlShape,
+  declaration: IDeclaration
+) => {
   const requesterIndividual = CorrectorRelationLabelArray.find(
     (labelItem) => labelItem.value === requester
   )
+  const informant = (declaration.data.informant.otherInformantType ||
+    declaration.data.informant.informantType) as string
 
+  // informant info added for corrector being informant
   return requesterIndividual?.label
-    ? intl.formatMessage(requesterIndividual.label)
+    ? intl.formatMessage(requesterIndividual.label, {
+        informant: labelFormatterForInformant(informant)
+      })
     : ''
 }
 
@@ -292,9 +302,8 @@ const ActionDetailsModalListTable = ({
       ) as IFormSection
 
       if (section.id === 'documents') {
-        editedValue.valueString = intl.formatMessage(
-          dynamicConstantsMessages.updated
-        )
+        item.value = EMPTY_STRING
+        editedValue.value = intl.formatMessage(dynamicConstantsMessages.updated)
       }
 
       const indexes = item?.valueId?.split('.')
@@ -315,18 +324,8 @@ const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       } else {
         const [parentField] = indexes
@@ -339,18 +338,8 @@ const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       }
     })
@@ -421,7 +410,8 @@ const ActionDetailsModalListTable = ({
   const content = prepareComments(actionDetailsData, draft)
   const requesterLabel = requesterLabelMapper(
     actionDetailsData.requester as string,
-    intl
+    intl,
+    draft as IDeclaration
   )
   return (
     <>
@@ -449,6 +439,15 @@ const ActionDetailsModalListTable = ({
             noResultText=" "
             columns={requesterColumn}
             content={[{ requester: requesterLabel }]}
+          />
+        )}
+      {/* Correction rejected */}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RejectedCorrection && (
+          <Table
+            noResultText=" "
+            columns={reasonColumn}
+            content={[{ text: actionDetailsData.reason }]}
           />
         )}
 

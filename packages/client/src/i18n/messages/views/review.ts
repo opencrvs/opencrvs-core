@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages } from 'react-intl'
 
@@ -38,7 +37,7 @@ const messagesToDefine = {
   validateDeclarationActionModalDescription: {
     id: 'validate.declaration.action.modal.description',
     defaultMessage:
-      'This declaration will be sent to the registrar for them to register'
+      'This declaration will be sent for approval prior to registration.'
   },
   informantsSignature: {
     defaultMessage: 'Signature of informant',
@@ -158,7 +157,7 @@ const messagesToDefine = {
     id: 'review.actions.desc.regConfInComp'
   },
   registerActionTitle: {
-    defaultMessage: 'Ready to register?',
+    defaultMessage: 'Register event',
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
@@ -179,8 +178,7 @@ const messagesToDefine = {
     id: 'misc.description.inComplete'
   },
   approvalActionTitle: {
-    defaultMessage:
-      'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
+    defaultMessage: 'Send for approval?',
     description: 'Title for review action component',
     id: 'misc.title.declarationStatus'
   },
@@ -233,7 +231,7 @@ const messagesToDefine = {
   },
   validateConfirmationDesc: {
     defaultMessage:
-      'This declaration will be sent to the registrar for them to approve.',
+      'This declaration will be sent for approval prior to registration.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },
@@ -267,6 +265,11 @@ const messagesToDefine = {
     defaultMessage: 'Clear',
     description: 'Label for button that clear signature input',
     id: 'review.signature.clear'
+  },
+  documentViewerTitle: {
+    id: 'review.documentViewer.title',
+    defaultMessage: 'Supporting documents',
+    description: 'Label for Supporting documents section'
   }
 }
 

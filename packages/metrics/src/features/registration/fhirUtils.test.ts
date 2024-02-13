@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   getSectionBySectionCode,
@@ -85,7 +84,7 @@ describe('fhirUtils', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -823,7 +822,7 @@ describe('fhirUtils', () => {
   it('returns time taken to complete task', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -897,7 +896,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no extension', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -927,7 +926,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no time logged', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]

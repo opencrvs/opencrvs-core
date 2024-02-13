@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   FORGOTTEN_ITEMS,
@@ -204,6 +203,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
           <form id="password-update-form" onSubmit={this.whatNext}>
             <Content
               title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
+              showTitleOnMobile
               subtitle={intl.formatMessage(
                 messages.passwordUpdateFormBodySubheader
               )}

@@ -6,20 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as jwt from 'jsonwebtoken'
 import * as jose from 'jose'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import {
   OIDP_REST_URL,
   OIDP_CLIENT_PRIVATE_KEY,
   OIDP_JWT_AUD_CLAIM
 } from '@gateway/constants'
-import { fetchFromHearth } from '@gateway/features/fhir/utils'
+
 import { logger } from '@gateway/logger'
 import { OIDPUserInfo } from './oidp-types'
+import { Bundle, Location } from '@opencrvs/commons/types'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 
 const TOKEN_GRANT_TYPE = 'authorization_code'
 const CLIENT_ASSERTION_TYPE =
@@ -40,7 +41,7 @@ export type FetchTokenProps = {
 }
 
 const searchLocationFromHearth = (name: string) =>
-  fetchFromHearth<fhir.Bundle>(
+  fetchFromHearth<Bundle<Location>>(
     `/Location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
   )
 

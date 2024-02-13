@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IntlShape,
@@ -17,7 +16,7 @@ import {
 } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -29,6 +28,10 @@ import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import isValid from 'date-fns/isValid'
+import format from 'date-fns/format'
+import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -96,6 +99,20 @@ export function executeHandlebarsTemplate(
     cache
   )
 
+  const customHelpers = getHandlebarHelpers()
+
+  for (const helperName of Object.keys(customHelpers)) {
+    /*
+     * Note for anyone adding new context variables to handlebar helpers:
+     * Everything you expose to country config's here will become API surface area,
+     * This means that countries will become dependant on it and it will be hard to remove or rename later on.
+     * If you need to expose the full record, please consider only exposing the specific values you know are needed.
+     * Otherwise what happens is that we lose the ability to refactor and remove things later on.
+     */
+    const helper = customHelpers[helperName]({ intl })
+    Handlebars.registerHelper(helperName, helper)
+  }
+
   Handlebars.registerHelper(
     'intl',
     function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
@@ -145,6 +162,25 @@ export function executeHandlebarsTemplate(
       }
     }
   )
+
+  Handlebars.registerHelper(
+    'formatDate',
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'location',
+    function (this: any, locationId: string, key: keyof ILocation) {
+      const locations = getOfflineData(state).locations
+      return locations[locationId]
+        ? locations[locationId][key]
+        : `Missing location for id: ${locationId}`
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
@@ -232,7 +268,13 @@ async function getPDFTemplateWithSVG(
     state
   )
 
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
+  }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate

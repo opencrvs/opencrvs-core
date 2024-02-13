@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createFhirPractitioner,
@@ -24,12 +23,8 @@ import {
   generateSaltedHash,
   generateRandomPassword
 } from '@user-mgnt/utils/hash'
-import {
-  statuses,
-  roleScopeMapping,
-  hasDemoScope,
-  getUserId
-} from '@user-mgnt/utils/userUtils'
+import { statuses, hasDemoScope, getUserId } from '@user-mgnt/utils/userUtils'
+import { userRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -39,7 +34,7 @@ export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser & { password: string }
+  const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
 
   // construct Practitioner resource and save them
@@ -68,24 +63,15 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = roleScopeMapping[user.systemRole]
+    const userScopes: string[] = userRoleScopes[user.systemRole]
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
     ) {
       userScopes.push('demo')
     }
-    user.status = statuses.PENDING
+    user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
-
-    if (
-      user.systemRole === 'NOTIFICATION_API_USER' ||
-      user.systemRole === 'VALIDATOR_API_USER' ||
-      user.systemRole === 'AGE_VERIFICATION_API_USER'
-    ) {
-      // Immediately active API users
-      user.status = statuses.ACTIVE
-    }
 
     password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
@@ -94,8 +80,7 @@ export default async function createUser(
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
-
-    user.username = await generateUsername(user.name)
+    user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)

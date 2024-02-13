@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -35,6 +34,7 @@ interface ICorrectionMessages
   materialError: MessageDescriptor
   materialOmission: MessageDescriptor
   judicialOrder: MessageDescriptor
+  otherReason: MessageDescriptor
   reasonForChangeError: MessageDescriptor
   idCheckTitle: MessageDescriptor
   otherIdCheckTitle: MessageDescriptor
@@ -66,6 +66,10 @@ interface ICorrectionMessages
   correctionSummaryProofOfPayment: MessageDescriptor
   correctionSummaryTotalPaymentLabel: MessageDescriptor
   correctionRequiredLabel: MessageDescriptor
+  correctionForApprovalDialogTitle: MessageDescriptor
+  correctionSummarySubmitter: MessageDescriptor
+  correctionSummaryOffice: MessageDescriptor
+  correctionSummaryRequestedOn: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -148,7 +152,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   informant: {
     id: 'correction.corrector.informant',
-    defaultMessage: 'Informant',
+    defaultMessage: 'Informant ({informant})',
     description: 'Label for informant option in certificate correction form'
   },
   whatWasTheReasonForCorrection: {
@@ -187,6 +191,11 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'Requested to do so by the court (Judicial order)',
     description: 'Label for judicial order for correction reason form'
   },
+  otherReason: {
+    id: 'correction.reason.other',
+    defaultMessage: 'Other',
+    description: 'Label for other for correction reason form'
+  },
   reasonForChangeError: {
     id: 'correction.reason.error',
     defaultMessage: 'Please type the reason for change',
@@ -194,7 +203,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckTitle: {
     id: 'correction.certificate.corrector.idCheck',
-    defaultMessage: 'Check proof of ID',
+    defaultMessage: 'Verify their identity',
     description: 'The title for id check component'
   },
   otherIdCheckTitle: {
@@ -204,19 +213,19 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckVerify: {
     id: 'correction.certificate.corrector.idCheckVerify',
-    defaultMessage: 'ID verified',
+    defaultMessage: 'Verified',
     description: 'The label for id check component action when verify details'
   },
   idCheckWithoutVerify: {
     id: 'correction.certificate.corrector.idCheckWithoutVerify',
-    defaultMessage: 'No ID match',
+    defaultMessage: 'Identity does not match',
     description:
       'The label for id check component action when does not verify details'
   },
   birthCorrectionNote: {
     id: 'correction.corrector.birth.note',
     defaultMessage:
-      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
+      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to their birth record.',
     description: 'Birth correction note'
   },
   proofOfLegalDocuments: {
@@ -364,6 +373,46 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.required',
     defaultMessage: 'Required for correction',
     description: 'Payment and proof of payment input error'
+  },
+  correctionForApprovalDialogTitle: {
+    id: 'correction.correctionForApprovalDialog.title',
+    defaultMessage: 'Send record correction for approval ?',
+    description:
+      'The title for the dialog when record correction sent by registration agent for approval'
+  },
+  correctionForApprovalDialogCancel: {
+    defaultMessage: 'Cancel',
+    description:
+      'The cancel button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.cancel'
+  },
+  correctionForApprovalDialogConfirm: {
+    defaultMessage: 'Confirm',
+    description:
+      'The send button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.send'
+  },
+  correctionForApprovalDialogDescription: {
+    defaultMessage:
+      'The Registrar will be notified of this correction request and a record of this request will be recorded',
+    description:
+      'The description for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.description'
+  },
+  correctionSummarySubmitter: {
+    id: 'correction.summary.submitter',
+    defaultMessage: 'Submitter',
+    description: 'Submitter of certificate correction summary'
+  },
+  correctionSummaryOffice: {
+    id: 'correction.summary.office',
+    defaultMessage: 'Office',
+    description: 'Office where certificate correction summary was submitted'
+  },
+  correctionSummaryRequestedOn: {
+    id: 'correction.summary.requestedOn',
+    defaultMessage: 'Requested on',
+    description: 'Date when certificate correction summary was submitted'
   }
 }
 

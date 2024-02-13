@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -30,6 +29,8 @@ export interface IApplicationConfigPayload {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean

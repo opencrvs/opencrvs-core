@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -16,10 +15,10 @@ import {
   COLUMNS,
   SORT_ORDER
 } from '@opencrvs/components/lib/Workqueue'
-import {
+import type {
   GQLHumanName,
   GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   IDeclaration,
   DOWNLOAD_STATUS,
@@ -298,6 +297,7 @@ class InProgressComponent extends React.Component<
           <IconWithName
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         iconWithNameEvent: (
@@ -305,6 +305,7 @@ class InProgressComponent extends React.Component<
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
             name={NameComponent}
             event={event}
+            isDuplicate={(reg.registration?.duplicates?.length ?? 0) > 0}
           />
         ),
         dateOfEvent,

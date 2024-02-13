@@ -9,10 +9,23 @@ import { Event } from '@client/utils/gateway'
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 const verifyBirthCorrector: ICertificateCorrectorDefinition = {
+  informant: {
+    identifierTypeField: 'iDType',
+    identifierOtherTypeField: 'iDTypeOther',
+    identifierField: 'informantID',
+    nameFields: {
+      en: {
+        firstNamesField: 'firstNamesEng',
+        familyNameField: 'familyNameEng'
+      }
+    },
+    birthDateField: 'informantBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
+    nationalityField: 'nationality'
+  },
   mother: {
     identifierTypeField: 'iDType',
     identifierOtherTypeField: 'iDTypeOther',
@@ -24,6 +37,7 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'motherBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   },
   father: {
@@ -37,6 +51,7 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
       }
     },
     birthDateField: 'fatherBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   },
   child: {
@@ -49,7 +64,8 @@ const verifyBirthCorrector: ICertificateCorrectorDefinition = {
         familyNameField: 'familyNameEng'
       }
     },
-    birthDateField: 'childBirthDate'
+    birthDateField: 'childBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears'
   }
 }
 
@@ -64,6 +80,8 @@ const verifyDeathCorrector: ICertificateCorrectorDefinition = {
         familyNameField: 'familyNameEng'
       }
     },
+    birthDateField: 'informantBirthDate',
+    ageOfPerson: 'ageOfIndividualInYears',
     nationalityField: 'nationality'
   }
 }

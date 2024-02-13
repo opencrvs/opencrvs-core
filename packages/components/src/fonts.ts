@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const family = "'Noto Sans', sans-serif"
 
@@ -15,13 +14,13 @@ export const family = "'Noto Sans', sans-serif"
 const hero = `
   font-family: ${family};
   font-weight: 600;
-  font-size: 56px;
+  font-size: 48px;
   line-height: 120%;
 `
 const h1 = `
   font-family: ${family};
   font-weight: 600;
-  font-size: 36px;
+  font-size: 28px;
   line-height: 120%;
 `
 const h2 = `
@@ -33,7 +32,7 @@ const h2 = `
 const h3 = `
   font-family: ${family};
   font-weight: 600;
-  font-size: 21px;
+  font-size: 20px;
   line-height: 140%;
 `
 const h4 = `

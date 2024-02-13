@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { cloneDeep } from 'lodash'
@@ -48,9 +47,9 @@ describe('location utils function testing', () => {
           male_population: 1234,
           female_population: 4321,
           population: 5555,
-          crude_birth_rate: 2.0
+          crude_birth_rate: 2
         },
-        mockFhirLocation.extension
+        mockFhirLocation.extension as any
       )
       expect(extentions).toEqual([
         {
@@ -74,7 +73,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":1}]'
+          valueString: '[{"2020":13.675},{"2021":2}]'
         }
       ])
     })
@@ -87,7 +86,7 @@ describe('location utils function testing', () => {
           population: 3000,
           crude_birth_rate: 1.5
         },
-        mockFhirLocation.extension
+        mockFhirLocation.extension as any
       )
       expect(extentions).toEqual([
         {
@@ -111,7 +110,7 @@ describe('location utils function testing', () => {
         },
         {
           url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-          valueString: '[{"2020":6.8375},{"2021":6.9875},{"2022":0.75}]'
+          valueString: '[{"2020":13.675},{"2021":13.975},{"2022":1.5}]'
         }
       ])
     })

@@ -6,13 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 7070
 export const HOSTNAME = process.env.DOMAIN || '*'
+export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
+export const CLIENT_APP_URL =
+  process.env.CLIENT_APP_URL || 'http://localhost:3000/'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const CERT_PUBLIC_KEY_PATH =
@@ -24,7 +26,7 @@ export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:2525/'
+export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
 export const APPLICATION_CONFIG_URL =
   process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 export const NOTIFICATION_URL =
@@ -34,15 +36,13 @@ export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
+/** Disables the Redis-based rate limiting globally */
+export const DISABLE_RATE_LIMIT = Boolean(process.env.DISABLE_RATE_LIMIT)
+
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false
-
-export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
-
-export const USER_NOTIFICATION_DELIVERY_METHOD =
-  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
 
 export const AVATAR_API =
   'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
@@ -84,3 +84,4 @@ export const OIDP_CLIENT_PRIVATE_KEY =
   process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY
 /** Value for "aud" claim when getting access token for fetching Open ID provider user info */
 export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
+export const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:2525'

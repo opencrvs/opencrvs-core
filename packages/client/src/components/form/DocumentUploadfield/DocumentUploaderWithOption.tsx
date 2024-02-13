@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
@@ -58,6 +57,7 @@ export const ErrorMessage = styled.div`
 type IFullProps = {
   name: string
   label: string
+  placeholder?: string
   extraValue: IFormFieldValue
   options: ISelectOption[]
   splitView?: boolean
@@ -281,12 +281,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   renderDocumentUploaderWithDocumentTypeBlock = () => {
-    const { name, intl } = this.props
+    const { name, intl, placeholder } = this.props
     return this.props.splitView ? (
       this.state.dropDownOptions.map((opt, idx) => (
         <Flex splitView key={idx}>
           <Select
             id={`${name}${idx}`}
+            placeholder={placeholder}
             options={[opt]}
             value={opt.value}
             onChange={this.onChange}
@@ -308,6 +309,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       <Flex>
         <Select
           id={name}
+          placeholder={placeholder}
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}

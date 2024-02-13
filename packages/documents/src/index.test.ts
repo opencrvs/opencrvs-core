@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -48,7 +47,7 @@ describe('Route authorization', () => {
 
   it('accepts requests with a valid token', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:documents-user'
@@ -65,7 +64,7 @@ describe('Route authorization', () => {
 
   it('blocks requests with a token with invalid signature', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert-invalid.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert-invalid.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:documents-user'
@@ -82,7 +81,7 @@ describe('Route authorization', () => {
 
   it('blocks requests with expired token', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:documents-user',
@@ -105,7 +104,7 @@ describe('Route authorization', () => {
 
   it('blocks requests signed with wrong algorithm (RS384)', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS384',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:documents-user'
@@ -123,7 +122,7 @@ describe('Route authorization', () => {
 
   it('blocks requests signed with wrong audience', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:NOT_VALID'
@@ -141,7 +140,7 @@ describe('Route authorization', () => {
 
   it('blocks requests signed with wrong issuer', async () => {
     const server = await createServer()
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:NOT_VALID',
       audience: 'opencrvs:documents-user'

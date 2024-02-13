@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
+  DIVIDER,
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
@@ -50,8 +50,7 @@ import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT,
-  LinkButton
+  ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -73,6 +72,7 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Link } from '@opencrvs/components'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -108,6 +108,10 @@ const Container = styled.div`
   }
 `
 
+const SignatureImage = styled.img`
+  max-width: 70%;
+`
+
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;
@@ -129,7 +133,7 @@ class UserReviewFormComponent extends React.Component<
   transformSectionData = () => {
     const { intl, userFormSection } = this.props
     let nameJoined = false,
-      fieldValue = ''
+      fieldValue
     const sections: ISectionData[] = []
     getVisibleSectionGroupsBasedOnConditions(
       userFormSection,
@@ -138,36 +142,13 @@ class UserReviewFormComponent extends React.Component<
       group.fields.forEach((field: IFormField, idx) => {
         if (field.hideValueInPreview) {
           return
-        } else if (field.type === SUBSECTION_HEADER) {
+        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
           if (field.name === 'username' && !this.getValue(field)) return
-          let label =
-            field.type === SIMPLE_DOCUMENT_UPLOADER ? (
-              <DocumentUploaderContainer>
-                <SimpleDocumentUploader
-                  label={intl.formatMessage(field.label)}
-                  disableDeleteInPreview={true}
-                  name={field.name}
-                  onComplete={(file) => {
-                    this.props.modify({
-                      ...this.props.formData,
-                      [field.name]: file
-                    })
-                  }}
-                  allowedDocType={field.allowedDocType}
-                  files={
-                    this.props.formData[
-                      field.name
-                    ] as unknown as IAttachmentValue
-                  }
-                />
-              </DocumentUploaderContainer>
-            ) : (
-              intl.formatMessage(field.label)
-            )
+          let label = intl.formatMessage(field.label)
           if (
             !getConditionalActionsForField(field, this.props.formData).includes(
               'hide'
@@ -182,6 +163,20 @@ class UserReviewFormComponent extends React.Component<
               nameJoined = true
             }
 
+            if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+              fieldValue = (
+                <SignatureImage
+                  src={
+                    (
+                      this.props.formData[field.name] as
+                        | IAttachmentValue
+                        | undefined
+                    )?.data
+                  }
+                />
+              )
+            }
+
             sections[sections.length - 1].items.push({
               label: <Label>{label}</Label>,
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
@@ -190,7 +185,7 @@ class UserReviewFormComponent extends React.Component<
                   field.name === 'registrationOffice' &&
                   this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
-                  <LinkButton
+                  <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
                       this.props.userId
@@ -208,7 +203,7 @@ class UserReviewFormComponent extends React.Component<
                     }}
                   >
                     {intl.formatMessage(messages.change)}
-                  </LinkButton>
+                  </Link>
                 ) : (
                   <></>
                 )
@@ -331,12 +326,12 @@ class UserReviewFormComponent extends React.Component<
         }
         hideBackground={true}
       >
-        <Content title={intl.formatMessage(section.name)}>
+        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
           <Container>
             {this.transformSectionData().map((sec, index) => {
               return (
                 <React.Fragment key={index}>
-                  <ListViewSimplified>
+                  <ListViewSimplified bottomBorder>
                     {sec.items.map((item, index) => {
                       return (
                         <ListViewItemSimplified

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IFormField,
@@ -42,6 +41,9 @@ const AuditDescriptionMapping: {
   ASSIGNED: messages.assignedAuditAction,
   UNASSIGNED: messages.unAssignedAuditAction,
   CORRECTED: messages.correctedAuditAction,
+  REQUESTED_CORRECTION: messages.requestedCorrectionAuditAction,
+  APPROVED_CORRECTION: messages.approvedCorrectionAuditAction,
+  REJECTED_CORRECTION: messages.rejectedCorrectedAuditAction,
   ARCHIVED: messages.archivedAuditAction,
   LOGGED_IN: messages.loggedInAuditAction,
   LOGGED_OUT: messages.loggedOutAuditAction,

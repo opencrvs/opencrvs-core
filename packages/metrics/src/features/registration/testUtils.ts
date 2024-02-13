@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 export const testDeclaration = {
@@ -93,7 +92,7 @@ export const testDeclaration = {
       fullUrl: 'urn:uuid:5a53d591-5588-4bfc-a3e0-6efe94c2460f',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -338,7 +337,7 @@ export const testPayload = {
       fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -586,7 +585,7 @@ export const testDeathPayload = {
       fullUrl: 'urn:uuid:a37f7259-2272-4e1e-bdfd-616ec1224a6a',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
         },
@@ -989,7 +988,7 @@ export const testDeathCertPayload = {
       fullUrl: 'urn:uuid:0e4842d8-5e61-4fb5-af6b-ff3065adb8c5',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
         },

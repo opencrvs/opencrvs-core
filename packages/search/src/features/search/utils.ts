@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CERTIFIED_STATUS,
@@ -488,6 +487,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.childIdentifier) {
+    must.push({
+      match: {
+        childIdentifier: params.childIdentifier
+      }
+    })
+  }
+
   if (params.motherIdentifier) {
     must.push({
       match: {
@@ -620,6 +627,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.contactEmail) {
+    must.push({
+      terms: {
+        'contactEmail.keyword': [params.contactEmail]
+      }
+    })
+  }
+
   if (params.registrationNumber) {
     must.push({
       match: {
@@ -648,6 +663,11 @@ export function advancedQueryBuilder(
     must.push({
       bool: {
         should: [
+          {
+            match: {
+              childIdentifier: params.nationalId
+            }
+          },
           {
             match: {
               motherIdentifier: params.nationalId
@@ -711,4 +731,31 @@ export function advancedQueryBuilder(
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+export function getSubmittedIdentifier(identifiers: fhir.Identifier[]) {
+  const supportedIdentifiers = [
+    'PASSPORT',
+    'NATIONAL_ID',
+    'MOSIP_PSUT_TOKEN_ID',
+    'DECEASED_PATIENT_ENTRY',
+    'BIRTH_PATIENT_ENTRY',
+    'DRIVING_LICENSE',
+    'BIRTH_REGISTRATION_NUMBER',
+    'DEATH_REGISTRATION_NUMBER',
+    'REFUGEE_NUMBER',
+    'ALIEN_NUMBER',
+    'OTHER',
+    'SOCIAL_SECURITY_NO'
+  ]
+  let value = ''
+  identifiers.find((item) => {
+    const coding = item.type?.coding || []
+    coding.some((codeObj) => {
+      codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
+        ? (value = `${item.value}`)
+        : (value = '')
+    })
+  })
+  return value
 }

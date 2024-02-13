@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { generateUsername, sendCredentialsNotification } from './service'
 import User from '@user-mgnt/model/user'
@@ -22,15 +21,11 @@ const mockUser = {
   username: 'je.doe'
 }
 
-const token = jwt.sign(
-  { scope: ['system'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:user-mgnt-user'
-  }
-)
+const token = jwt.sign({ scope: ['system'] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:user-mgnt-user'
+})
 
 describe('Username generation', () => {
   it('generates valid username with given and family names', async () => {

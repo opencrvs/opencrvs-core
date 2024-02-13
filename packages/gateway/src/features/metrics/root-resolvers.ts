@@ -6,12 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { getMetrics } from '@gateway/features/fhir/utils'
+
 import { inScope } from '@gateway/features/user/utils'
+import { getMetrics } from './service'
 
 export interface IMetricsParam {
   timeStart?: string

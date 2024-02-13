@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -31,7 +30,7 @@ import {
   NUMBER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'

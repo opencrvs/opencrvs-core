@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages } from 'react-intl'
 
@@ -199,9 +198,14 @@ export const formMessageDescriptors = {
     id: 'form.field.label.firstName'
   },
   certifyRecordToMother: {
-    defaultMessage: 'Print and issue to informant (Mother)',
+    defaultMessage: 'Print and issue to mother',
     description: 'Label for mother select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.mother'
+  },
+  certifyRecordToInformant: {
+    defaultMessage: 'Print and issue to informant ({informant})',
+    description: 'Label for mother select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.informant'
   },
   someoneElseCollector: {
     defaultMessage: 'Print and issue to someone else',
@@ -214,7 +218,7 @@ export const formMessageDescriptors = {
     id: 'form.field.label.certificatePrintInAdvance'
   },
   certifyRecordToFather: {
-    defaultMessage: 'Print and issue to informant (Father)',
+    defaultMessage: 'Print and issue to father',
     description: 'Label for father select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.father'
   },
@@ -254,12 +258,12 @@ export const formMessageDescriptors = {
     id: 'form.field.label.informantsRelationWithDeceased'
   },
   brideName: {
-    defaultMessage: 'Bride',
+    defaultMessage: 'Print and issue to bride',
     description: 'Form section name for Bride',
     id: 'form.section.bride.name'
   },
   groomName: {
-    defaultMessage: 'Groom',
+    defaultMessage: 'Print and issue to groom',
     description: 'Form section name for Groom',
     id: 'form.section.groom.name'
   },

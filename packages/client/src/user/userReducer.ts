@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IForm,
@@ -17,7 +16,7 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
+import { AnyFn, deserializeForm } from '@client/forms/deserializer/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
@@ -35,11 +34,11 @@ import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
-import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { validators, Validator } from '@client/forms/validators'
@@ -61,13 +60,13 @@ export enum TOAST_MESSAGES {
 }
 
 const initialState: IUserFormState = {
-  userForm: null,
+  userForm: deserializeForm(getCreateUserForm(), validators),
   userFormData: {},
   userDetailsStored: false,
   submitting: false,
   loadingRoles: false,
   submissionError: false,
-  userAuditForm: null,
+  userAuditForm,
   systemRoleMap: {}
 }
 
@@ -176,19 +175,14 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
-    validators: Record<string, Validator>
   }
 }
 
-export function rolesLoaded(
-  systemRoles: SystemRole[],
-  validators: Record<string, Validator>
-): IRoleLoadedAction {
+export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
-      systemRoles,
-      validators
+      systemRoles
     }
   }
 }
@@ -255,13 +249,13 @@ export interface ISystemRolesMap {
   [key: string]: string
 }
 export interface IUserFormState {
-  userForm: IForm | null
+  userForm: IForm
   userFormData: IFormSectionData
   userDetailsStored: boolean
   submitting: boolean
   loadingRoles: boolean
   submissionError: boolean
-  userAuditForm: IUserAuditForm | null
+  userAuditForm: IUserAuditForm
   systemRoleMap: ISystemRolesMap
 }
 
@@ -328,7 +322,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
-          userAuditForm
+          userAuditForm,
+          loadingRoles: true
         },
         Cmd.run(fetchRoles, {
           successActionCreator: rolesLoaded
@@ -441,7 +436,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case ROLES_LOADED:
       const { systemRoles } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm, validators)
+      const form = deserializeForm(getCreateUserForm(), validators)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)

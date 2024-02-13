@@ -6,14 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { resolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 
 const fetch = fetchAny as any
 const informantSMSNotificationMock = [
@@ -33,7 +34,7 @@ const informantSMSNotificationMock = [
 
 const natlSYSAdminToken = jwt.sign(
   { scope: ['natlsysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: 'ba7022f0ff4822',
     algorithm: 'RS256',
@@ -46,7 +47,7 @@ const authHeaderNatlSYSAdmin = {
 }
 const regsiterToken = jwt.sign(
   { scope: ['register'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: 'ba7022f0ff4822',
     algorithm: 'RS256',
@@ -69,7 +70,7 @@ describe('InformantSMSNotifications root resolvers', () => {
         status: 200
       })
 
-      const res = await resolvers.Query.informantSMSNotifications(
+      const res = await resolvers.Query!.informantSMSNotifications(
         {},
         [
           {
@@ -90,7 +91,7 @@ describe('InformantSMSNotifications root resolvers', () => {
       })
 
       await expect(
-        resolvers.Query.informantSMSNotifications(
+        resolvers.Query!.informantSMSNotifications(
           {},
           [
             {
@@ -110,7 +111,7 @@ describe('InformantSMSNotifications root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
       await expect(
-        resolvers.Query.informantSMSNotifications(
+        resolvers.Query!.informantSMSNotifications(
           {},
           [
             {
@@ -138,7 +139,7 @@ describe('toggleInformantSMSNotification mutation', () => {
       status: 201
     })
 
-    const response = await resolvers.Mutation.toggleInformantSMSNotification(
+    const response = await resolvers.Mutation!.toggleInformantSMSNotification(
       {},
       [
         {
@@ -159,7 +160,7 @@ describe('toggleInformantSMSNotification mutation', () => {
     })
 
     return expect(
-      resolvers.Mutation.toggleInformantSMSNotification(
+      resolvers.Mutation!.toggleInformantSMSNotification(
         {},
         [
           {

@@ -6,10 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GIT_HASH } from '@workflow/constants'
+import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 
@@ -53,6 +53,7 @@ export const getRoutes = () => {
           'Register event based on tracking id and registration number.'
       }
     },
+    ...correctionRoutes,
     {
       method: '*',
       path: '/fhir/{path*}',
@@ -64,5 +65,6 @@ export const getRoutes = () => {
       }
     }
   ]
+
   return routes
 }

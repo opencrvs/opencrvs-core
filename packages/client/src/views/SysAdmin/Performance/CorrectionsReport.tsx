@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
@@ -19,7 +18,7 @@ import {
   ReportContainer,
   ListContainer
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLCorrectionMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'

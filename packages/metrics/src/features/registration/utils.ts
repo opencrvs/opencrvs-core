@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   getTask,
@@ -77,8 +76,10 @@ export async function populateBundleFromPayload(
   if (payload.resourceType === 'Bundle') {
     bundle = payload as fhir.Bundle
 
-    if (bundle.entry && bundle.entry.length > 1) {
-      // assume that if there are more than one entries then the bundle is already populated
+    const composition = getComposition(bundle)
+    const hasBundleBeenPopulated = composition !== undefined
+    if (hasBundleBeenPopulated) {
+      // Assume that if the bundle already has a fhir.Composition, it has already been populated
       return bundle
     }
   }

@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { FHIR_URL } from '../../constants'
+import { getResourceFromBundleById } from '@opencrvs/commons/types'
+import { FHIR_URL } from '@gateway/constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class PatientAPI extends RESTDataSource {
@@ -29,6 +29,12 @@ export default class PatientAPI extends RESTDataSource {
   }
 
   getPatient(id: string) {
+    const inBundle = getResourceFromBundleById(this.context.record, id)
+
+    if (inBundle) {
+      return { entry: [{ resource: inBundle }] }
+    }
+
     return this.get(`/${id}`)
   }
 }

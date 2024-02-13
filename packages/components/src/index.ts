@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './Accordion'
 export * from './ActionPageLight'
@@ -40,7 +39,7 @@ export * from './InputField'
 export * from './Legend'
 export * from './LineChart'
 export * from './Link'
-export * from './ListConfig'
+export * from './ListUser'
 export * from './ListTable'
 export * from './ListViewSimplified'
 export * from './Loader'

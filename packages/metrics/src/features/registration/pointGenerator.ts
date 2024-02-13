@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IBirthRegistrationFields,
@@ -34,7 +33,8 @@ import {
   IUserAuditTags,
   IUserAuditFields,
   IMarriageRegistrationFields,
-  IMarriageRegistrationTags
+  IMarriageRegistrationTags,
+  ICertifiedPoints
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -107,7 +107,7 @@ export const generateInCompleteFieldPoints = async (
   }
 
   const fields: IInProgressDeclarationFields = {
-    compositionId: composition.id
+    compositionId: composition.id!
   }
   const locationTags: ILocationTags = await generatePointLocations(
     payload,
@@ -145,7 +145,7 @@ export function toInfluxTimestamp(date?: Date | string) {
 export const generateCertificationPoint = async (
   payload: fhir.Bundle,
   authHeader: IAuthHeader
-): Promise<IPoints> => {
+): Promise<ICertifiedPoints> => {
   const composition = getComposition(payload)
 
   if (!composition) {
@@ -159,7 +159,7 @@ export const generateCertificationPoint = async (
   }
 
   const fields = {
-    compositionId: composition.id
+    compositionId: composition.id!
   }
 
   const tags = {
@@ -203,7 +203,7 @@ export const generateBirthRegPoint = async (
     undefined
 
   const fields: IBirthRegistrationFields = {
-    compositionId: composition.id,
+    compositionId: composition.id!,
     ageInDays
   }
   const compositionDate = new Date(composition.date)
@@ -275,7 +275,7 @@ export const generateDeathRegPoint = async (
       )) ||
     undefined
   const fields: IDeathRegistrationFields = {
-    compositionId: composition.id,
+    compositionId: composition.id!,
     ageInYears:
       (deceased.birthDate &&
         getAgeInYears(deceased.birthDate, new Date(composition.date))) ||
@@ -364,7 +364,7 @@ export async function generateCorrectionReasonPoint(
   const reason = task.reason.text
 
   const fields = {
-    compositionId: composition.id
+    compositionId: composition.id!
   }
 
   const tags = {
@@ -403,7 +403,7 @@ export async function generatePaymentPoint(
 
   const fields: IPaymentFields = {
     total,
-    compositionId: composition.id
+    compositionId: composition.id!
   }
 
   const tags = {
@@ -446,6 +446,7 @@ export async function generateEventDurationPoint(
   if (!currentTask || !currentTask.lastModified) {
     throw new Error('Current task not found')
   }
+
   const previousTask = await getPreviousTask(
     currentTask,
     allowedPreviousStates,
@@ -462,8 +463,8 @@ export async function generateEventDurationPoint(
       currentTask.lastModified
     ),
     compositionId: compositionId,
-    currentTaskId: currentTask.id,
-    previousTaskId: previousTask.id
+    currentTaskId: currentTask.id!,
+    previousTaskId: previousTask.id!
   }
 
   const tags: IDurationTags = {
@@ -575,7 +576,7 @@ export async function generateDeclarationStartedPoint(
   const fields: IDeclarationsStartedFields = {
     role,
     status: getDeclarationStatus(task),
-    compositionId: composition.id
+    compositionId: composition.id!
   }
 
   const tags = {
@@ -602,7 +603,7 @@ export async function generateRejectedPoints(
   if (!task) {
     throw new Error('Task not found')
   }
-  const taskHistory = await fetchTaskHistory(task.id, authHeader)
+  const taskHistory = await fetchTaskHistory(task.id!, authHeader)
   let compositionId
   if (task && task.focus && task.focus.reference) {
     compositionId = task.focus.reference.split('/')[1]
@@ -662,7 +663,7 @@ export async function generateMarriageRegPoint(
   const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const fields: IMarriageRegistrationFields = {
-    compositionId: composition.id,
+    compositionId: composition.id!,
     daysAfterEvent: marriageExtension.valueDateTime
       ? getdaysAfterEvent(
           marriageExtension.valueDateTime,

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -43,22 +42,22 @@ const messagesToDefine: IIssueMessages = {
     id: 'constants.collectorDetails'
   },
   issueToMother: {
-    defaultMessage: 'Issue to informant (Mother)',
+    defaultMessage: 'Issue to mother',
     description: 'Issuing to mother',
     id: 'constants.issueToMother'
   },
   issueToFather: {
-    defaultMessage: 'Issue to informant (Father)',
+    defaultMessage: 'Issue to father',
     description: 'Issuing to father',
     id: 'constants.issueToFather'
   },
   issueToGroom: {
-    defaultMessage: 'Issue to informant (Groom)',
+    defaultMessage: 'Issue to groom',
     description: 'Issuing to groom',
     id: 'constants.issueToGroom'
   },
   issueToBride: {
-    defaultMessage: 'Issue to informant (Bride)',
+    defaultMessage: 'Issue to bride',
     description: 'Issuing to bride',
     id: 'constants.issueToBride'
   },
@@ -68,7 +67,7 @@ const messagesToDefine: IIssueMessages = {
     id: 'constants.issueToSomeoneElse'
   },
   issueToInformant: {
-    defaultMessage: 'Issue to informant',
+    defaultMessage: 'Issue to informant ({informant})',
     description: 'Issuance of death to informant',
     id: 'constants.issueToInformant'
   },

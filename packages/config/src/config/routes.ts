@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createCertificateHandler,
@@ -33,6 +32,7 @@ import updateInformantSMSNotificationHandler, {
 } from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
+import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 
 import { GIT_HASH } from './constants'
 import fetch from 'node-fetch'
@@ -270,6 +270,15 @@ export default function getRoutes() {
         validate: {
           payload: updateInformantSMSNotificationReqSchema
         }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/dashboardQueries',
+      handler: getDashboardQueries,
+      config: {
+        tags: ['api'],
+        description: 'Fetch dashboard queries from country config'
       }
     }
   ]

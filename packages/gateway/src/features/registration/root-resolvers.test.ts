@@ -6,31 +6,34 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  resolvers,
+  resolvers as appResolvers,
   lookForComposition
 } from '@gateway/features/registration/root-resolvers'
+import { mockTaskBundle } from '@gateway/utils/testUtils'
 import {
+  ASSIGNED_EXTENSION_URL,
+  Bundle,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import * as jwt from 'jsonwebtoken'
+  findExtension,
+  getStatusFromTask,
+  isTask
+} from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
-import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 import { UserInputError } from 'apollo-server-hapi'
-const fetch = fetchAny as any
 
+const fetch = fetchAny as fetchAny.FetchMock
+const resolvers = appResolvers as any
 const registerCertifyToken = jwt.sign(
   { scope: ['register', 'certify'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -41,7 +44,7 @@ const registerCertifyToken = jwt.sign(
 
 const validateToken = jwt.sign(
   { scope: ['validate'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -52,7 +55,7 @@ const validateToken = jwt.sign(
 
 const declareToken = jwt.sign(
   { scope: ['declare'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     subject: '121221',
     algorithm: 'RS256',
@@ -63,7 +66,7 @@ const declareToken = jwt.sign(
 
 const certifyToken = jwt.sign(
   { scope: ['certify'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -73,7 +76,7 @@ const certifyToken = jwt.sign(
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -133,6 +136,60 @@ const mockUserDetails = {
   creationDate: 1559054406433
 }
 
+const mockLocation = {
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/internal-id',
+      value: 'HEALTH_FACILITY_di3U5u7F8Y3'
+    }
+  ],
+  name: 'Ibombo Rural Health Centre',
+  alias: ['Ibombo Rural Health Centre'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'HEALTH_FACILITY'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  meta: {
+    lastUpdated: '2023-09-13T12:36:07.539+00:00',
+    versionId: 'f55ebb42-d52c-4245-842b-b759cfb54143'
+  },
+  _transforms: {
+    meta: {
+      lastUpdated: '2023-09-13T12:36:07.539Z'
+    }
+  },
+  _request: {
+    method: 'POST'
+  },
+  id: '79776844-b606-40e9-8358-7d82147f702a'
+}
+
+const mockContext = {
+  headers: authHeaderRegCert,
+  dataSources: {
+    locationsAPI: { getLocation: () => mockLocation },
+    usersAPI: { getUserById: () => mockUserDetails }
+  }
+}
+
 beforeEach(() => {
   fetch.resetMocks()
 })
@@ -141,7 +198,7 @@ describe('Registration root resolvers', () => {
   describe('searchBirthRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
       return expect(
-        resolvers.Query.searchBirthRegistrations(
+        resolvers.Query!.searchBirthRegistrations(
           {},
           {
             fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -152,27 +209,49 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a sysadmin scope')
     })
 
-    it('returns an array of compositions', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          entry: [
-            {
-              resource: {
-                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                type: {
-                  coding: [
-                    {
-                      code: 'birth-declaration'
-                    }
-                  ]
+    it('returns an array of records', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            entry: [
+              {
+                resource: {
+                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                  type: {
+                    coding: [
+                      {
+                        code: 'birth-declaration'
+                      }
+                    ]
+                  }
                 }
               }
-            }
-          ]
-        })
+            ]
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            entry: [
+              {
+                resource: {
+                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                  type: {
+                    coding: [
+                      {
+                        code: 'birth-declaration'
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }),
+          { status: 200 }
+        ]
       )
 
-      const compositions = await resolvers.Query.searchBirthRegistrations(
+      const compositions = await resolvers.Query!.searchBirthRegistrations(
         {},
         {
           fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -181,14 +260,16 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+      expect(compositions[0].entry[0].resource.id).toBe(
+        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      )
     })
   })
 
   describe('searchDeathRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
       return expect(
-        resolvers.Query.searchDeathRegistrations(
+        resolvers.Query!.searchDeathRegistrations(
           {},
           {
             fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -199,27 +280,49 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a sysadmin scope')
     })
 
-    it('returns an array of compositions', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          entry: [
-            {
-              resource: {
-                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                type: {
-                  coding: [
-                    {
-                      code: 'death-declaration'
-                    }
-                  ]
+    it('returns an array of records', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            entry: [
+              {
+                resource: {
+                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                  type: {
+                    coding: [
+                      {
+                        code: 'death-declaration'
+                      }
+                    ]
+                  }
                 }
               }
-            }
-          ]
-        })
+            ]
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            entry: [
+              {
+                resource: {
+                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                  type: {
+                    coding: [
+                      {
+                        code: 'death-declaration'
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }),
+          { status: 200 }
+        ]
       )
 
-      const compositions = await resolvers.Query.searchDeathRegistrations(
+      const compositions = await resolvers.Query!.searchDeathRegistrations(
         {},
         {
           fromDate: new Date('05 October 2011 14:48 UTC'),
@@ -228,12 +331,14 @@ describe('Registration root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+      expect(compositions[0].entry[0].resource.id).toBe(
+        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      )
     })
   })
 
   describe('fetchBirthRegistration()', () => {
-    it('returns object of composition result', async () => {
+    it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
         entry: [
@@ -242,7 +347,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -318,19 +423,23 @@ describe('Registration root resolvers', () => {
       const mockPost = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
       })
-      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
-      const composition = await resolvers.Query.fetchBirthRegistration(
+      fetch.mockResponses(
+        [mockTaskOfComposition, { status: 200 }],
+        [mockPost, { status: 200 }],
+        [mockPost, { status: 200 }]
+      )
+      const record = await resolvers.Query.fetchBirthRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-        { headers: authHeaderRegCert }
+        mockContext
       )
-      expect(composition).toBeDefined()
-      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+      expect(record).toBeDefined()
+      expect(record.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchBirthRegistration(
+        resolvers.Query!.fetchBirthRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -339,7 +448,7 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('fetchDeathRegistration()', () => {
-    it('returns object of composition result', async () => {
+    it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
         entry: [
@@ -348,7 +457,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -424,12 +533,16 @@ describe('Registration root resolvers', () => {
       const mockPost = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
       })
-      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
-      // @ts-ignore
+      fetch.mockResponses(
+        [mockTaskOfComposition, { status: 200 }],
+        [mockPost, { status: 200 }],
+        [mockPost, { status: 200 }]
+      )
+
       const composition = await resolvers.Query.fetchDeathRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-        { headers: authHeaderRegCert }
+        mockContext
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
@@ -437,7 +550,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchDeathRegistration(
+        resolvers.Query!.fetchDeathRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -446,7 +559,7 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('fetchMarriageRegistration()', () => {
-    it('returns object of composition result', async () => {
+    it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
         entry: [
@@ -455,7 +568,7 @@ describe('Registration root resolvers', () => {
               'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
             resource: {
               resourceType: 'Task',
-              status: 'requested',
+              status: 'ready',
               code: {
                 coding: [
                   {
@@ -531,12 +644,16 @@ describe('Registration root resolvers', () => {
       const mockPost = JSON.stringify({
         id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
       })
-      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
-      // @ts-ignore
+      fetch.mockResponses(
+        [mockTaskOfComposition, { status: 200 }],
+        [mockPost, { status: 200 }],
+        [mockPost, { status: 200 }]
+      )
+
       const composition = await resolvers.Query.fetchMarriageRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-        { headers: authHeaderRegCert }
+        mockContext
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
@@ -544,7 +661,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if user does not have register or validate scope', async () => {
       await expect(
-        resolvers.Query.fetchMarriageRegistration(
+        resolvers.Query!.fetchMarriageRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
@@ -553,16 +670,16 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('fetchRegistration()', () => {
-    it('returns object of composition result', async () => {
+    it('returns the record in the OpenCRVS format', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
         })
       )
-      const composition = await resolvers.Query.fetchRegistration(
+      const composition = await resolvers.Query!.fetchRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-        { headers: undefined }
+        mockContext
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
@@ -587,7 +704,7 @@ describe('Registration root resolvers', () => {
     }
     it('checks duplicate draftId', async () => {
       fetch.mockResponses(
-        [JSON.stringify([])],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -604,7 +721,8 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -614,11 +732,12 @@ describe('Registration root resolvers', () => {
               system: 'urn:ietf:rfc:3986',
               value: 'BewpkiM'
             }
-          })
+          }),
+          { status: 200 }
         ]
       )
 
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         { headers: undefined }
@@ -631,10 +750,11 @@ describe('Registration root resolvers', () => {
       })
     })
     it('checks no task entry with draftId', async () => {
-      fetch.mockResponses([JSON.stringify({})])
+      fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
       const result = await lookForComposition(
-        '9633042c-ca34-4b9f-959b-9d16909fd85c'
+        '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        {} as any
       )
 
       expect(result).toBeUndefined()
@@ -651,8 +771,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
-        [JSON.stringify([])],
+        [JSON.stringify({}), { status: 200 }],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -666,7 +786,8 @@ describe('Registration root resolvers', () => {
               }
             ],
             type: 'transaction-response'
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -676,10 +797,11 @@ describe('Registration root resolvers', () => {
               system: 'urn:ietf:rfc:3986',
               value: 'DewpkiM'
             }
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createDeathRegistration(
+      const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
         { headers: undefined }
@@ -701,7 +823,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle as registrar', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -709,7 +831,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
-        [JSON.stringify([])],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -726,7 +848,8 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -737,7 +860,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -791,10 +914,11 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createDeathRegistration(
+      const result = await resolvers.Mutation!.createDeathRegistration(
         {},
         { details },
         {
@@ -826,7 +950,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify([])],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -840,7 +964,8 @@ describe('Registration root resolvers', () => {
               }
             ],
             type: 'transaction-response'
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -850,10 +975,11 @@ describe('Registration root resolvers', () => {
               system: 'urn:ietf:rfc:3986',
               value: 'BewpkiM'
             }
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         { headers: undefined }
@@ -876,7 +1002,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle as registrar', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -884,7 +1010,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
-        [JSON.stringify([])],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -898,7 +1024,8 @@ describe('Registration root resolvers', () => {
               }
             ],
             type: 'transaction-response'
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -909,7 +1036,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -967,10 +1094,11 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.createBirthRegistration(
+      const result = await resolvers.Mutation!.createBirthRegistration(
         {},
         { details },
         {
@@ -988,7 +1116,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
-        [JSON.stringify([])],
+        [JSON.stringify([]), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1002,17 +1130,19 @@ describe('Registration root resolvers', () => {
               }
             ],
             type: 'transaction-response'
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
             resourceType: 'Composition'
-          })
+          }),
+          { status: 200 }
         ]
       )
       await expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           { details },
           { headers: undefined }
@@ -1023,17 +1153,14 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the response isn't what we expect", async () => {
-      fetch.mockResponse(
-        [JSON.stringify({})],
-        [JSON.stringify({ unexpected: true })]
-      )
+      fetch.mockResponse(JSON.stringify({}))
       fetch.mockResponse(
         JSON.stringify({
           refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
         })
       )
       await expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           { details },
           { headers: undefined }
@@ -1044,8 +1171,8 @@ describe('Registration root resolvers', () => {
   describe('markEventAsVoided()', () => {
     it('updates a task with rejected status, reason and comment', async () => {
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
-        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify(mockTaskBundle), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1057,13 +1184,14 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
-      const result = await resolvers.Mutation.markEventAsVoided(
+      const result = await resolvers.Mutation!.markEventAsVoided(
         {},
         { id, reason, comment },
         { headers: authHeaderRegCert }
@@ -1077,12 +1205,15 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
       await expect(
-        resolvers.Mutation.markEventAsVoided(
+        resolvers.Mutation!.markEventAsVoided(
           {},
           { id, reason, comment },
           { headers: authHeaderNotRegCert }
@@ -1094,12 +1225,12 @@ describe('Registration root resolvers', () => {
   describe('markEventAsArchived()', () => {
     it('updates a task with archived status', async () => {
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
-        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify(mockTaskBundle), { status: 200 }],
         [JSON.stringify('ok'), { status: 200 }]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markEventAsArchived(
+      const result = await resolvers.Mutation!.markEventAsArchived(
         {},
         { id },
         { headers: authHeaderRegCert }
@@ -1112,10 +1243,13 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markEventAsArchived(
+        resolvers.Mutation!.markEventAsArchived(
           {},
           { id },
           { headers: authHeaderNotRegCert }
@@ -1132,12 +1266,12 @@ describe('Registration root resolvers', () => {
       const taskHistoryBundle = cloneDeep(mockTaskBundle)
       taskHistoryBundle.entry.push(mockTaskBundle.entry[0])
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
-        [JSON.stringify(archivedTaskBundle)],
-        [JSON.stringify(taskHistoryBundle)],
-        [JSON.stringify({})]
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify(archivedTaskBundle), { status: 200 }],
+        [JSON.stringify(taskHistoryBundle), { status: 200 }],
+        [JSON.stringify({}), { status: 200 }]
       )
-      await resolvers.Mutation.markEventAsReinstated(
+      await resolvers.Mutation!.markEventAsReinstated(
         {},
         { id: archivedTaskBundle.id },
         { headers: authHeaderRegCert }
@@ -1151,10 +1285,13 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markEventAsReinstated(
+        resolvers.Mutation!.markEventAsReinstated(
           {},
           { id },
           { headers: authHeaderNotRegCert }
@@ -1234,12 +1371,13 @@ describe('Registration root resolvers', () => {
         }
       }
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
             entry: []
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -1249,10 +1387,11 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markBirthAsValidated(
+      const result = await resolvers.Mutation!.markBirthAsValidated(
         {},
         { id: compositionID, details: compositionDetails },
         { headers: authHeaderValidate }
@@ -1268,7 +1407,7 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1290,7 +1429,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -1365,7 +1504,8 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -1375,10 +1515,11 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markBirthAsValidated(
+      const result = await resolvers.Mutation!.markBirthAsValidated(
         {},
         { id: compositionID },
         { headers: authHeaderValidate }
@@ -1392,9 +1533,12 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if no task entry found by given id', async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      fetch.mockResponseOnce([
+      fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
           id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
@@ -1411,9 +1555,9 @@ describe('Registration root resolvers', () => {
           ],
           entry: []
         })
-      ])
+      )
       expect(
-        resolvers.Mutation.markBirthAsValidated(
+        resolvers.Mutation!.markBirthAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderValidate }
@@ -1422,10 +1566,13 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markBirthAsValidated(
+        resolvers.Mutation!.markBirthAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1541,7 +1688,7 @@ describe('Registration root resolvers', () => {
         _fhirIDMap: { composition: 'd7e273e7-e4d3-4342-905e-f3514fa2c10a' }
       }
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1592,7 +1739,8 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -1602,10 +1750,11 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markDeathAsValidated(
+      const result = await resolvers.Mutation!.markDeathAsValidated(
         {},
         { id: compositionID, details: compositionDetails },
         { headers: authHeaderValidate }
@@ -1621,7 +1770,7 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
+        [JSON.stringify({ userId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1643,7 +1792,7 @@ describe('Registration root resolvers', () => {
                   'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
                 resource: {
                   resourceType: 'Task',
-                  status: 'requested',
+                  status: 'ready',
                   code: {
                     coding: [
                       {
@@ -1710,7 +1859,8 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
@@ -1720,10 +1870,11 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const result = await resolvers.Mutation.markDeathAsValidated(
+      const result = await resolvers.Mutation!.markDeathAsValidated(
         {},
         { id: compositionID },
         { headers: authHeaderValidate }
@@ -1738,7 +1889,10 @@ describe('Registration root resolvers', () => {
 
     it('throws error if no task entry found by given id', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -1758,7 +1912,7 @@ describe('Registration root resolvers', () => {
         })
       )
       return expect(
-        resolvers.Mutation.markDeathAsValidated(
+        resolvers.Mutation!.markDeathAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderValidate }
@@ -1767,10 +1921,13 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markDeathAsValidated(
+        resolvers.Mutation!.markDeathAsValidated(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1780,134 +1937,15 @@ describe('Registration root resolvers', () => {
   })
 
   describe('markBirthAsRegistered()', () => {
-    it('updates status successfully when only composition id is sent', async () => {
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      const resultingComposition = {
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: '097e0133-520c-4645-97d6-acda7d010e05'
-        },
-        resourceType: 'Composition',
-        status: 'preliminary',
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-types',
-              code: 'birth-declaration'
-            }
-          ],
-          text: 'Birth Declaration'
-        },
-        class: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-classes',
-              code: 'crvs-document'
-            }
-          ],
-          text: 'CRVS Document'
-        },
-        title: 'Birth Declaration',
-        section: [
-          {
-            title: 'Birth encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'birth-encounter'
-                }
-              ],
-              text: 'Birth encounter'
-            },
-            entry: [
-              {
-                reference: 'Encounter/f81a64c1-bbf4-4ffc-b992-8c6d28804de8'
-              }
-            ]
-          },
-          {
-            title: 'Child details',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'child-details'
-                }
-              ],
-              text: 'Child details'
-            },
-            entry: [
-              {
-                reference: 'Patient/9ee30e57-98c5-46ef-93f9-f3cfe775fb1a'
-              }
-            ]
-          },
-          {
-            title: "Mother's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'mother-details'
-                }
-              ],
-              text: "Mother's details"
-            },
-            entry: [
-              {
-                reference: 'Patient/2f2b7f28-a420-41f5-916c-92c4669caba5'
-              }
-            ]
-          }
-        ],
-        subject: {},
-        date: '2019-11-06T07:02:01.382Z',
-        author: [],
-        id: '3a68141b-0382-4362-89b0-2fa2610b48f6',
-        meta: {
-          lastUpdated: '2019-11-06T07:02:01.901+00:00',
-          versionId: '17d09268-d82c-44a6-8325-f0391c7453ee'
-        }
-      }
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
-        [
-          // Response for when the status is updated
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Task/12423/_history/1' }
-              }
-            ]
-          })
-        ],
-        // Response for refetching the composition
-        [JSON.stringify(resultingComposition)]
-      )
-      const result = await resolvers.Mutation.markBirthAsRegistered(
-        {},
-        { id: compositionID },
-        { headers: authHeaderRegCert }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual(resultingComposition)
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ method: 'POST' })
-      )
-    })
     it('throws error if has no assigned user id', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify({})]
+        [JSON.stringify(mockTaskBundle), { status: 200 }],
+        [JSON.stringify({}), { status: 200 }]
       )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
 
       expect(
-        resolvers.Mutation.markBirthAsRegistered(
+        resolvers.Mutation!.markBirthAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderRegCert }
@@ -1916,10 +1954,13 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markBirthAsRegistered(
+        resolvers.Mutation!.markBirthAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderNotRegCert }
@@ -1928,129 +1969,14 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('markDeathAsRegistered', () => {
-    it('updates status successfully when only composition id is sent', async () => {
-      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      const resultingComposition = {
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: 'DAUJP9D'
-        },
-        resourceType: 'Composition',
-        status: 'preliminary',
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-types',
-              code: 'death-declaration'
-            }
-          ],
-          text: 'Death Declaration'
-        },
-        class: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-classes',
-              code: 'crvs-document'
-            }
-          ],
-          text: 'CRVS Document'
-        },
-        title: 'Death Declaration',
-        section: [
-          {
-            title: 'Deceased details',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'deceased-details'
-                }
-              ],
-              text: 'Deceased details'
-            },
-            entry: [
-              {
-                reference: 'Patient/398372dd-9cb8-47ef-a46b-89b3f8c5b027'
-              }
-            ]
-          },
-          {
-            title: "Informant's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'informant-details'
-                }
-              ],
-              text: "Informant's details"
-            },
-            entry: [
-              {
-                reference: 'RelatedPerson/53737437-423f-4a0f-898c-23b36ffcf885'
-              }
-            ]
-          },
-          {
-            title: 'Death encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'death-encounter'
-                }
-              ],
-              text: 'Death encounter'
-            },
-            entry: [
-              {
-                reference: 'Encounter/6e3481b1-4783-4e75-b50b-dc2ff56bdb1d'
-              }
-            ]
-          }
-        ],
-        subject: {},
-        date: '2019-11-06T09:04:20.268Z',
-        author: [],
-        meta: {
-          lastUpdated: '2019-11-06T09:04:21.700+00:00',
-          versionId: 'adaefdf1-10d5-4ffb-a4ce-4684c796d28d'
-        },
-        id: '02ffb3a5-303f-4828-b63f-5847d4a4eff7'
-      }
-      fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' })],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Task/12423/_history/1' }
-              }
-            ]
-          })
-        ],
-        [JSON.stringify(resultingComposition)]
-      )
-      const result = await resolvers.Mutation.markDeathAsRegistered(
-        {},
-        { id: compositionID },
-        { headers: authHeaderRegCert }
-      )
-
-      expect(result).toBeDefined()
-      expect(result).toEqual(resultingComposition)
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ method: 'POST' })
-      )
-    })
-
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
+      fetch.mockResponses([
+        JSON.stringify({ userId: '121221' }),
+        { status: 200 }
+      ])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
-        resolvers.Mutation.markDeathAsRegistered(
+        resolvers.Mutation!.markDeathAsRegistered(
           {},
           { id: compositionID },
           { headers: authHeaderNotRegCert }
@@ -2073,7 +1999,6 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2084,7 +2009,7 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      const result = await resolvers.Mutation.updateBirthRegistration(
+      const result = await resolvers.Mutation!.updateBirthRegistration(
         {},
         { details },
         { headers: authHeaderRegCert }
@@ -2101,7 +2026,7 @@ describe('Registration root resolvers', () => {
     it("throws error when user doesn't have a register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.updateBirthRegistration(
+        resolvers.Mutation!.updateBirthRegistration(
           {},
           { details },
           { headers: authHeaderNotRegCert }
@@ -2117,7 +2042,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Mutation.updateBirthRegistration(
+        resolvers.Mutation!.updateBirthRegistration(
           {},
           { details },
           { headers: authHeaderRegCert }
@@ -2149,9 +2074,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockUserDetails)],
-        [JSON.stringify(mockUserDetails)],
-        ['[]'],
+        [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2160,16 +2083,18 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
             refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-          })
+          }),
+          { status: 200 }
         ]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markBirthAsCertified(
+      const result = await resolvers.Mutation!.markBirthAsCertified(
         {},
         { id, details },
         { headers: authHeaderRegCert }
@@ -2185,8 +2110,8 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockUserDetails)],
-        [JSON.stringify(mockUserDetails)]
+        [JSON.stringify(mockUserDetails), { status: 200 }],
+        [JSON.stringify(mockUserDetails), { status: 200 }]
       )
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       fetch.mockResponse(
@@ -2196,7 +2121,7 @@ describe('Registration root resolvers', () => {
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markBirthAsCertified(
+        resolvers.Mutation!.markBirthAsCertified(
           {},
           { id, details },
           { headers: authHeaderRegCert }
@@ -2207,7 +2132,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the user doesn't have a certify scope", async () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markBirthAsCertified(
+        resolvers.Mutation!.markBirthAsCertified(
           {},
           { id, details },
           { headers: authHeaderNotRegCert }
@@ -2239,9 +2164,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockUserDetails)],
-        [JSON.stringify(mockUserDetails)],
-        [JSON.stringify([])],
+        [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2250,16 +2173,18 @@ describe('Registration root resolvers', () => {
                 response: { location: 'Task/12423/_history/1' }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
             refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-          })
+          }),
+          { status: 200 }
         ]
       )
 
-      const result = await resolvers.Mutation.markDeathAsCertified(
+      const result = await resolvers.Mutation!.markDeathAsCertified(
         {},
         { details },
         { headers: authHeaderRegCert }
@@ -2275,11 +2200,11 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have a certify scope", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
+        [JSON.stringify(mockTaskBundle), { status: 200 }],
+        [JSON.stringify(mockUserDetails), { status: 200 }]
       )
       await expect(
-        resolvers.Mutation.markDeathAsCertified(
+        resolvers.Mutation!.markDeathAsCertified(
           {},
           { details },
           authHeaderNotRegCert
@@ -2306,9 +2231,10 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
-        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify(mockTaskBundle), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2322,11 +2248,12 @@ describe('Registration root resolvers', () => {
               }
             ],
             type: 'transaction-response'
-          })
+          }),
+          { status: 200 }
         ]
       )
       // @ts-ignore
-      const result = await resolvers.Mutation.markEventAsNotDuplicate(
+      const result = await resolvers.Mutation!.markEventAsNotDuplicate(
         {},
         {
           id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2340,11 +2267,12 @@ describe('Registration root resolvers', () => {
 
     it('throws error from fhir', async () => {
       fetch.mockResponses([
-        () => Promise.reject(new Error('Some error in fhir'))
+        () => Promise.reject(new Error('Some error in fhir')),
+        { status: 200 }
       ])
 
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2372,13 +2300,17 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
-        [() => Promise.reject(new Error('Some error from search'))]
+        [
+          () => Promise.reject(new Error('Some error from search')),
+          { status: 200 }
+        ]
       )
 
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2391,7 +2323,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.markEventAsNotDuplicate(
+        resolvers.Mutation!.markEventAsNotDuplicate(
           {},
           {
             id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
@@ -2420,15 +2352,17 @@ describe('Registration root resolvers', () => {
                 }
               }
             ]
-          })
+          }),
+          { status: 200 }
         ],
         [
           JSON.stringify({
             id: '80b90ac3-1032-4f98-af64-627d2b7443f3'
-          })
+          }),
+          { status: 200 }
         ]
       )
-      const composition = await resolvers.Query.queryRegistrationByIdentifier(
+      const composition = await resolvers.Query!.queryRegistrationByIdentifier(
         {},
         { identifier: '2019333494BAQFYEG6' },
         { headers: authHeaderRegCert }
@@ -2439,7 +2373,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           { headers: authHeaderRegCert }
@@ -2463,7 +2397,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           { headers: authHeaderRegCert }
@@ -2473,7 +2407,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have register or validate scope", async () => {
       await expect(
-        resolvers.Query.queryRegistrationByIdentifier(
+        resolvers.Query!.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
@@ -2518,7 +2452,7 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      const composition = await resolvers.Query.queryPersonByIdentifier(
+      const composition = await resolvers.Query!.queryPersonByIdentifier(
         {},
         { identifier: '1234567898765' },
         { headers: authHeaderRegCert }
@@ -2529,7 +2463,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Query.queryPersonByIdentifier(
+        resolvers.Query!.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
           { headers: authHeaderRegCert }
@@ -2541,7 +2475,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.queryPersonByIdentifier(
+        resolvers.Query!.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
           authHeaderCertify
@@ -2572,7 +2506,7 @@ describe('Registration root resolvers', () => {
 
     it('returns person with name and gender', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
-      const data = await resolvers.Query.queryPersonByNidIdentifier(
+      const data = await resolvers.Query!.queryPersonByNidIdentifier(
         {},
         {
           dob: '1992-12-30',
@@ -2597,7 +2531,7 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        resolvers.Query.queryPersonByNidIdentifier(
+        resolvers.Query!.queryPersonByNidIdentifier(
           {},
           {
             dob: '1992-12-30',
@@ -2612,7 +2546,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.queryPersonByNidIdentifier(
+        resolvers.Query!.queryPersonByNidIdentifier(
           {},
           {
             dob: '1992-12-30',
@@ -2646,7 +2580,7 @@ describe('Registration root resolvers', () => {
 
     it('returns status wise registration counts', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
-      const data = await resolvers.Query.fetchRegistrationCountByStatus(
+      const data = await resolvers.Query!.fetchRegistrationCountByStatus(
         {},
         {
           locationId: '123',
@@ -2661,7 +2595,7 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       return expect(
-        resolvers.Query.fetchRegistrationCountByStatus(
+        resolvers.Query!.fetchRegistrationCountByStatus(
           {},
           {
             locationId: '123',
@@ -2676,7 +2610,7 @@ describe('Registration root resolvers', () => {
   describe('AttachmentInput type only accepts image/* mime type', () => {
     it('throws an error if a non-supported file is uploaded', async () => {
       return expect(
-        resolvers.Mutation.createBirthRegistration(
+        resolvers.Mutation!.createBirthRegistration(
           {},
           {
             details: {
@@ -2699,7 +2633,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error if file base64 headers are manipulated', async () => {
       return expect(
-        resolvers.Mutation.createDeathRegistration(
+        resolvers.Mutation!.createDeathRegistration(
           {},
           {
             details: {
@@ -2723,30 +2657,37 @@ describe('Registration root resolvers', () => {
 describe('markEventAsUnassigned()', () => {
   it('updates a task with rejected status, reason and comment', async () => {
     fetch.mockResponses(
-      [JSON.stringify(mockTaskBundle)],
-      [JSON.stringify(mockTaskBundle)]
+      [JSON.stringify(mockTaskBundle), { status: 200 }],
+      [JSON.stringify(mockTaskBundle), { status: 200 }]
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-    const result = await resolvers.Mutation.markEventAsUnassigned(
+    const result = await resolvers.Mutation!.markEventAsUnassigned(
       {},
       { id },
       { headers: authHeaderRegCert }
     )
-    const postData = JSON.parse(fetch.mock.calls[1][1].body)
+    const bundle: Bundle = JSON.parse(fetch.mock.calls[1][1].body)
+    const task = bundle.entry.map(({ resource }) => resource).find(isTask)!
+
     expect(
-      findExtension(ASSIGNED_EXTENSION_URL, postData.extension)
+      findExtension(ASSIGNED_EXTENSION_URL, task.extension)
     ).toBeUndefined()
+
     expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
   })
 
   it('throws error if user does not have register or validate scope', async () => {
     fetch.mockResponses(
-      [JSON.stringify(mockTaskBundle)],
-      [JSON.stringify(mockUserDetails)]
+      [JSON.stringify(mockTaskBundle), { status: 200 }],
+      [JSON.stringify(mockUserDetails), { status: 200 }]
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
     await expect(
-      resolvers.Mutation.markEventAsUnassigned({}, { id }, authHeaderNotRegCert)
+      resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        authHeaderNotRegCert
+      )
     ).rejects.toThrowError('User does not have a register or validate scope')
   })
 })

@@ -3,38 +3,24 @@
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
-      "@search/*": [
-        "./*"
-      ]
+      "@search/*": ["./*"]
     },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": [
-      "esnext.asynciterable",
-      "es6",
-      "es2017"
-    ],
+    "lib": ["esnext.asynciterable", "es6", "es2017"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": [
-      "fhir",
-      "jest"
-    ]
+    "types": ["fhir", "jest"]
   },
-  "include": [
-    "src/**/*.ts",
-    "typings",
-    "__mocks__/elasticsearch.ts"
-  ],
+  "include": ["src/**/*.ts", "typings", "__mocks__/elasticsearch.ts"],
   "exclude": [
     "node_modules",
     "build",
