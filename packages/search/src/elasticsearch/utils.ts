@@ -9,12 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
-  searchByCompositionId,
-  updateComposition
-} from '@search/elasticsearch/dbhelper'
-import {
-  addDuplicatesToComposition,
   findName,
   findNameLocale,
   findTaskExtension
@@ -357,34 +353,6 @@ export const createStatusHistory = async (
   }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
-}
-
-export async function updateCompositionWithDuplicates(
-  composition: fhir.Composition,
-  duplicates: string[]
-) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map((duplicate) => getCompositionById(duplicate))
-  )
-
-  const duplicateCompositionIds = duplicateCompositions.map(
-    (dupComposition) => dupComposition.id
-  )
-
-  if (composition && composition.id) {
-    const body: ICompositionBody = {}
-    body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body, client)
-  }
-  const compositionFromFhir = (await getCompositionById(
-    composition.id as string
-  )) as fhir.Composition
-  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
-
-  return updateInHearth(
-    `/Composition/${compositionFromFhir.id}`,
-    compositionFromFhir
-  )
 }
 
 function isDeclarationInStatus(
