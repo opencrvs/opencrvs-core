@@ -79,6 +79,7 @@ services:
       - OPENHIM_URL=http://openhim-core:5001
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   search:
     image: opencrvs/ocrvs-search:${VERSION}
     build:
@@ -91,6 +92,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION}
     build:
@@ -110,6 +112,7 @@ services:
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION}
@@ -133,6 +136,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - METRICS_URL=http://metrics:1050
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   user-mgnt:
     image: opencrvs/ocrvs-user-mgnt:${VERSION}
     build:
@@ -145,6 +149,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     build:
@@ -159,6 +164,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   notification:
     image: opencrvs/ocrvs-notification:${VERSION}
     build:
@@ -169,6 +175,7 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc
   config:
     image: opencrvs/ocrvs-config:${VERSION}
     build:
@@ -214,3 +221,4 @@ services:
     environment:
       - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - GIT_HASH=4d6c61e0f800c7deb41b9ce2e1ca73b7d6ba3efc

@@ -34,6 +34,20 @@ import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 
+import { GIT_HASH } from './constants'
+import fetch from 'node-fetch'
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:27017/', {
+      method: 'GET'
+    })
+    return response.json()
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
+
 export const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
@@ -50,10 +64,13 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
         return {
-          success: true
+          git_hash: GIT_HASH,
+          status: 'ok',
+          dependencies: { MongoDB: dependencyStatus }
         }
       },
       config: {

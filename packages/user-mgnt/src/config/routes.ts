@@ -102,7 +102,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
-import * as mongoose from 'mongoose'
+import { GIT_HASH } from '@user-mgnt/constants'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -116,21 +116,31 @@ const enum RouteScope {
   VERIFY = 'verify'
 }
 
-export const getRoutes: () => Hapi.ServerRoute[] = () => {
-  return [
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:9200/_cluster/health', {
+      method: 'GET'
+    })
+    return response.json()
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
+
+export const getRoutes = () => {
+  const routes = [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
       handler: async (request: any, h: any) => {
-        try {
-          return {
-            success: mongoose.connection.readyState === 1
-          }
-        } catch (error) {
-          return {
-            success: false
-          }
+        // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
+
+        return {
+          git_hash: GIT_HASH,
+          status: 'ok',
+          dependencies: { MongoDB: dependencyStatus }
         }
       },
       config: {
@@ -775,4 +785,5 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       }
     }
   ]
+  return routes
 }

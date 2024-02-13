@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Route authorization health check 1`] = `"{\\"git_hash\\":\\"\\",\\"status\\":\\"ok\\"}"`;

@@ -42,6 +42,8 @@ import {
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
 
+import { GIT_HASH } from '@notification/constants'
+
 const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
@@ -59,7 +61,8 @@ export default function getRoutes() {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
-          success: true
+          git_hash: GIT_HASH,
+          status: 'ok'
         }
       },
       config: {

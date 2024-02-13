@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { GIT_HASH } from '@workflow/constants'
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
@@ -32,7 +33,8 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
-          success: true
+          git_hash: GIT_HASH,
+          status: 'ok'
         }
       },
       config: {

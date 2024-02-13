@@ -21,6 +21,20 @@ import {
   deathRegisteredHandler,
   marriageRegisteredHandler
 } from '@webhooks/features/event/handler'
+import { GIT_HASH } from '@webhooks/constants'
+import fetch from 'node-fetch'
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:27017', {
+      method: 'GET'
+    })
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
+  } catch (error) {
+    return { status: 'error' }
+  }
+}
 
 export const getRoutes = () => {
   const routes = [
@@ -28,10 +42,13 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
+        const dependencyStatus = await dependencyHealth()
         return {
-          success: true
+          git_hash: GIT_HASH,
+          status: 'ok',
+          dependencies: { MongoDB: dependencyStatus }
         }
       },
       config: {

@@ -17,23 +17,19 @@ import {
   METRICS_URL,
   NOTIFICATION_URL,
   COUNTRY_CONFIG_URL,
-  WORKFLOW_URL
+  WORKFLOW_URL,
+  DOCUMENTS_URL,
+  WEBHOOK_URL,
+  APPLICATION_CONFIG_URL
 } from '@gateway/constants'
-import fetch from '@gateway/fetch'
-
-export async function checkServiceHealth(url: string) {
-  const res = await fetch(url, {
-    method: 'GET'
-  })
-
-  const body = await res.json()
-
-  if (body.success === true) {
-    return true
-  }
-
-  return false
-}
+import {
+  getDependencyHealth,
+  getServiceHealth,
+  PingService,
+  PingDependency
+} from './api'
+import { performance } from 'perf_hooks'
+import { logger } from '@gateway/logger'
 
 enum Services {
   AUTH = 'auth',
@@ -43,7 +39,60 @@ enum Services {
   COUNTRY_CONFIG = 'countryconfig',
   SEARCH = 'search',
   WORKFLOW = 'workflow',
-  GATEWAY = 'gateway'
+  GATEWAY = 'gateway',
+  DOCUMENTS = 'documents',
+  WEBHOOKS = 'webhooks',
+  APPLICATION_CONFIG = 'applicationconfig'
+}
+
+enum Dependencies {
+  REDIS = 'redis',
+  ELASTICSEARCH = 'elasticsearch',
+  MONGODB = 'mongodb',
+  INFLUXDB = 'influxdb',
+  MINIO = 'minio',
+  KIBANA = 'kibana',
+  OPENHIM = 'openhim',
+  HEARTH = 'hearth'
+}
+
+const SERVICES_TO_CHECK: readonly PingService[] = [
+  { name: 'auth', url: new URL('ping', AUTH_URL) },
+  { name: 'user-mgnt', url: new URL('ping', USER_MANAGEMENT_URL) },
+  { name: 'metrics', url: new URL('ping', METRICS_URL) },
+  { name: 'notification', url: new URL('ping', NOTIFICATION_URL) },
+  { name: 'countryconfig', url: new URL('ping', COUNTRY_CONFIG_URL) },
+  { name: 'search', url: new URL('ping', SEARCH_URL) },
+  { name: 'workflow', url: new URL('ping', WORKFLOW_URL) },
+  { name: 'documents', url: new URL('ping', DOCUMENTS_URL) },
+  { name: 'webhooks', url: new URL('ping', WEBHOOK_URL) },
+  { name: 'applicationconfig', url: new URL('ping', APPLICATION_CONFIG_URL) }
+]
+const DEPENDENCIES_TO_CHECK: readonly PingDependency[] = [
+  { name: 'elasticSearch', url: 'http://localhost:9200/_cluster/health' },
+  { name: 'minio', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'mongodb', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'influxdb', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'redis', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'kibana', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'openhim', url: 'http://localhost:3535/minio/health/live' },
+  { name: 'hearth', url: 'http://localhost:3535/minio/health/live' }
+]
+export async function checkServiceHealth(service: PingService) {
+  try {
+    const timeStart = performance.now()
+    const serviceHealth = await getServiceHealth(service)
+    const timeEnd = performance.now()
+    return {
+      ...service,
+      ...serviceHealth,
+      ping: timeEnd - timeStart,
+      url: service.url.href
+    }
+  } catch (e) {
+    logger.error(e)
+    return { ...service, status: 'error' }
+  }
 }
 
 const SERVICES = {
@@ -60,18 +109,100 @@ export default async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const responses = {} as Record<keyof typeof SERVICES, boolean>
+  const { service } = request.query
+  const { dependency } = request.query
 
-  for (const [key, value] of Object.entries(SERVICES)) {
-    try {
-      const res = await checkServiceHealth(value)
-      responses[key as keyof typeof SERVICES] = res
-    } catch (err) {
-      responses[key as keyof typeof SERVICES] = false
+  if (service) {
+    let response
+
+    switch (service[0]) {
+      case Services.GATEWAY:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[0])
+        break
+      case Services.AUTH:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[0])
+        break
+      case Services.SEARCH:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[5])
+        break
+      case Services.USER_MGNT:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[1])
+        break
+      case Services.METRICS:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[2])
+        break
+      case Services.NOTIFICATION:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[3])
+        break
+      case Services.COUNTRY_CONFIG:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[4])
+        break
+      case Services.WORKFLOW:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[6])
+        break
+      case Services.DOCUMENTS:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[7])
+        break
+      case Services.WEBHOOKS:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[8])
+        break
+      case Services.APPLICATION_CONFIG:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[9])
+        break
+      default:
+        response = await checkServiceHealth(SERVICES_TO_CHECK[0])
     }
+    return response
+  } else if (dependency) {
+    let response
+
+    switch (dependency[0]) {
+      case Dependencies.ELASTICSEARCH:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[0])
+        break
+      case Dependencies.MINIO:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[1])
+        break
+      case Dependencies.MONGODB:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[2])
+        break
+      case Dependencies.INFLUXDB:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[3])
+        break
+      case Dependencies.REDIS:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[4])
+        break
+      case Dependencies.KIBANA:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[5])
+        break
+      case Dependencies.OPENHIM:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[6])
+        break
+      case Dependencies.HEARTH:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[7])
+        break
+      default:
+        response = await getDependencyHealth(DEPENDENCIES_TO_CHECK[0])
+    }
+    return response
+  } else {
+    const servicesResponse = await Promise.all(
+      SERVICES_TO_CHECK.map(checkServiceHealth)
+    )
+    const dependenciesResponse = await Promise.all(
+      DEPENDENCIES_TO_CHECK.map(getDependencyHealth)
+    )
+    return { dependencies: dependenciesResponse, services: servicesResponse }
   }
-  return responses
 }
+
+export const serviceHealthSchema = Joi.array().items(
+  Joi.object({
+    name: Joi.string(),
+    url: Joi.string(),
+    status: Joi.string().valid('error', 'ok')
+  }).unknown()
+)
 
 export const querySchema = Joi.object({
   service: Joi.array()
@@ -84,7 +215,24 @@ export const querySchema = Joi.object({
         Services.COUNTRY_CONFIG,
         Services.SEARCH,
         Services.WORKFLOW,
-        Services.GATEWAY
+        Services.GATEWAY,
+        Services.DOCUMENTS,
+        Services.WEBHOOKS,
+        Services.APPLICATION_CONFIG
+      )
+    )
+    .single(),
+  dependency: Joi.array()
+    .items(
+      Joi.string().valid(
+        Dependencies.REDIS,
+        Dependencies.ELASTICSEARCH,
+        Dependencies.INFLUXDB,
+        Dependencies.MONGODB,
+        Dependencies.MINIO,
+        Dependencies.KIBANA,
+        Dependencies.OPENHIM,
+        Dependencies.HEARTH
       )
     )
     .single()

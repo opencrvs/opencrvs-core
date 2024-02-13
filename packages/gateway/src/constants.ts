@@ -84,3 +84,4 @@ export const OIDP_CLIENT_PRIVATE_KEY =
   process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY
 /** Value for "aud" claim when getting access token for fetching Open ID provider user info */
 export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
+export const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:2525'

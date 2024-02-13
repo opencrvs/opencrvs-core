@@ -23,6 +23,8 @@ import {
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
+import { healthCheckHandler } from '@search/features/health-check/handler'
+import { marriageEventHandler } from '@search/features/registration/marriage/handler'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { recordHandler } from '@search/features/registration/record/handler'
@@ -56,25 +58,7 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: async (request: any, h: any) => {
-        try {
-          const res = await client.ping()
-          logger.info(res)
-          return {
-            success: res.meta.connection.status === 'alive'
-          }
-        } catch (error) {
-          logger.error(error)
-          if (error?.meta?.connection?.status === 'alive') {
-            return {
-              success: true
-            }
-          }
-          return {
-            success: false
-          }
-        }
-      },
+      handler: healthCheckHandler,
       config: {
         auth: false,
         tags: ['api'],

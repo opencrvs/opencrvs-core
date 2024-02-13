@@ -15,6 +15,8 @@ export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
 export const CLIENT_APP_URL =
   process.env.CLIENT_APP_URL || 'http://localhost:3000/'
 export const PORT = process.env.PORT || 2021
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 // Services
 export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070/'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'

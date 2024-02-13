@@ -78,7 +78,8 @@ import {
   performanceDataRefreshHandler,
   refresh
 } from '@metrics/features/performance/viewRefresher'
-import { PRODUCTION, QA_ENV } from '@metrics/constants'
+import { PRODUCTION, QA_ENV, GIT_HASH } from '@metrics/constants'
+import fetch from 'node-fetch'
 import * as Hapi from '@hapi/hapi'
 
 const enum RouteScope {
@@ -108,6 +109,18 @@ function analyticsDataRefreshingRoute<
       refresh(request.headers.authorization)
     }
     return handler(request, response)
+  }
+}
+
+async function dependencyHealth() {
+  try {
+    const response = await fetch('http://localhost:3535/minio/health/live', {
+      method: 'GET'
+    })
+    if (response.status === 200) return { status: 'ok' }
+    else return { status: 'error' }
+  } catch (error) {
+    return { status: 'error' }
   }
 }
 
@@ -746,10 +759,17 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: async (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
-        return {
-          success: true
+        const dependencyStatus = await dependencyHealth()
+        try {
+          return {
+            git_hash: GIT_HASH,
+            status: 'ok',
+            dependencies: { InfluxDB: dependencyStatus }
+          }
+        } catch (error) {
+          return { status: 'Internal server error' }
         }
       },
       config: {

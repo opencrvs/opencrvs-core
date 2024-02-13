@@ -19,7 +19,10 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping'
     })
-    expect(res.result).toEqual({ success: true })
+    // expect(res.result).toEqual({ status: 'ok' })
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toMatchSnapshot()
+    // expect(res.payload).toBe(JSON.stringify({ git_hash: '', status: 'ok' }))
   })
   it('blocks requests without a token', async () => {
     const server = await createServer()
