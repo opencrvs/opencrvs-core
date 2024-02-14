@@ -360,7 +360,12 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
-          ...(isCertificateForPrintInAdvance(draft) && { printInAdvance: true })
+          ...(isCertificateForPrintInAdvance(draft) && {
+            printInAdvance: true
+          }),
+          ...(draft.data.deceased?.ageOfIndividualInYears && {
+            ageOfDeceasedInYears: draft.data.deceased.ageOfIndividualInYears
+          })
         }
       }
     },
