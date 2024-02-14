@@ -25,7 +25,7 @@ metabase_jar='./metabase.jar'
 
 if [ ! -f "$metabase_jar" ]; then
   echo "You don't seem to have Metabase installed. Downloading Metabase..."
-  curl https://downloads.metabase.com/v0.46.6.1/metabase.jar --output $metabase_jar
+  curl https://downloads.metabase.com/v0.48.6/metabase.jar --output $metabase_jar
 fi
 
 if [ -f .env ]
