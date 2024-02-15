@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IDeclaration, IPrintableDeclaration } from '@client/declarations'
+import { IDeclaration, writeDeclaration } from '@client/declarations'
+import { useDeclaration } from '@client/declarations/selectors'
 import { isDefaultCountry } from '@client/forms/utils'
 import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import formatDate from '@client/utils/date-formatting'
 import { camelCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useRouteMatch } from 'react-router'
 import { v4 as uuid } from 'uuid'
 
 const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY = 'oidp-verification-nonce'
@@ -63,8 +66,8 @@ interface UserInfo {
 
 interface INidCallbackState {
   pathname: string | undefined
-  declarationId: string | undefined
-  section: string | undefined
+  declarationId: string
+  section: string
 }
 
 export function useQueryParams() {
@@ -196,19 +199,38 @@ function splitName(name: string | undefined | null = '') {
   }
 }
 
-export function saveDraftAndRedirectToNidIntegration(
-  declaration: IDeclaration | IPrintableDeclaration,
-  writeDeclration: (
-    declaration: IDeclaration | IPrintableDeclaration,
-    callback?: (() => void) | undefined
-  ) => void,
+export const useNidAuthentication = () => {
+  const dispatch = useDispatch()
+  const match = useRouteMatch()
+  const matchParams = match.params as {
+    declarationId: string
+    groupId: string
+    pageId: string
+  }
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const declaration = useDeclaration(matchParams.declarationId)
+
+  const onClick = () =>
+    dispatch(
+      writeDeclaration(declaration, () => {
+        redirectToNidIntegration(
+          offlineCountryConfig,
+          matchParams.declarationId,
+          matchParams.pageId,
+          match.url
+        )
+      })
+    )
+
+  return { onClick }
+}
+
+export function redirectToNidIntegration(
   offlineCountryConfig: IOfflineData,
   declarationId: string,
   currentSection: string,
   currentPathname: string
 ) {
-  writeDeclration(declaration)
-
   const nonce = generateNonce()
   window.localStorage.setItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY, nonce)
   const nidSystemSetting = offlineCountryConfig.systems.find(

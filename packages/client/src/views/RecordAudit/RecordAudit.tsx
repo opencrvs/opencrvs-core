@@ -22,7 +22,7 @@ import {
   BackArrow,
   Duplicate
 } from '@opencrvs/components/lib/icons'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps, Redirect, useParams } from 'react-router'
 import {
   goToHomeTab,
@@ -114,7 +114,7 @@ import {
   REINSTATE_BIRTH_DECLARATION,
   REINSTATE_DEATH_DECLARATION
 } from './mutations'
-import { selectDeclaration } from '@client/declarations/selectors'
+import { useDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
@@ -226,9 +226,7 @@ function ReinstateButton({
   const { declarationId } = useParams<{ declarationId: string }>()
   const intl = useIntl()
   const dispatch = useDispatch()
-  const declaration = useSelector((store: IStoreState) =>
-    selectDeclaration(store, declarationId)
-  )
+  const declaration = useDeclaration(declarationId)
 
   if (!declaration) {
     return <Redirect to={HOME} />
