@@ -16,11 +16,10 @@ import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { useParams } from 'react-router'
 import { IPrintableDeclaration } from '@client/declarations'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectDeclaration } from '@client/declarations/selectors'
-import { IStoreState } from '@client/store'
+import { useDispatch } from 'react-redux'
+import { useDeclaration } from '@client/declarations/selectors'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
-import { goBack, goToHomeTab } from '@client/navigation'
+import { goToHomeTab } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
@@ -33,9 +32,7 @@ export function IssueCertificate() {
     pageId: string
   }>()
 
-  const declaration = useSelector((store: IStoreState) =>
-    selectDeclaration(store, registrationId)
-  ) as IPrintableDeclaration
+  const declaration = useDeclaration<IPrintableDeclaration>(registrationId)
 
   return (
     <Frame
