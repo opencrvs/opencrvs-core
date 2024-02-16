@@ -18,13 +18,17 @@ import {
   IDeclaration,
   SUBMISSION_STATUS,
   updateWorkqueueData,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  RemoveUnassignedDeclarationActionCreator
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLEventSearchResultSet,
+  GQLEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -127,6 +131,50 @@ export function updateRegistrarWorkqueue(
       isFieldAgent
     }
   }
+}
+
+async function getFilteredDeclarations(
+  workqueue: IWorkqueue,
+  getState: () => IStoreState
+): Promise<Array<IDeclaration>> {
+  const uID = await getCurrentUserID()
+  const state = getState()
+  const scope = getScope(state)
+  const declarations = state.declarationsState.declarations
+  const declarationIds = declarations.map((dec) => dec.id)
+
+  const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
+    (queryData) => {
+      return queryData[1].results
+    }
+  ) as Array<GQLEventSearchSet | null>
+
+  const unassignedDeclarations = workqueueDeclarations
+    .filter(
+      (dec) =>
+        !scope?.includes('declare') &&
+        dec &&
+        dec.registration &&
+        declarationIds.includes(dec.id) &&
+        dec?.registration.assignment?.userId !== uID &&
+        !(
+          scope?.includes('validate') &&
+          dec?.registration?.status === 'VALIDATED'
+        )
+    )
+    .map((dec) => declarations.find((d) => d.id === dec?.id)!)
+    .filter(Boolean)
+
+  let currentlyDownloadedDeclarations = declarations.filter(
+    (dec) =>
+      !unassignedDeclarations
+        .map((unassigned) => unassigned.id)
+        .includes(dec.id)
+  )
+
+  if (scope?.includes('declare')) currentlyDownloadedDeclarations = declarations
+
+  return currentlyDownloadedDeclarations
 }
 
 async function getWorkqueueOfCurrentUser(): Promise<string> {
@@ -400,10 +448,16 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
 
-        return {
-          ...state,
-          workqueue
-        }
+        return loop(
+          {
+            ...state,
+            workqueue
+          },
+          Cmd.run(getFilteredDeclarations, {
+            successActionCreator: RemoveUnassignedDeclarationActionCreator,
+            args: [workqueue, Cmd.getState]
+          })
+        )
       }
       return state
 

@@ -105,6 +105,8 @@ const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
+const REMOVE_UNASSIGNED_DECLARATIONS =
+  'DECLARATION/REMOVE_UNASSIGNED_DECLARATIONS'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -395,6 +397,11 @@ interface IDownloadDeclaration {
   }
 }
 
+interface IRemoveUnassignedDeclarationAction {
+  type: typeof REMOVE_UNASSIGNED_DECLARATIONS
+  payload: IDeclaration[]
+}
+
 interface IDownloadDeclarationSuccess {
   type: typeof DOWNLOAD_DECLARATION_SUCCESS
   payload: {
@@ -467,6 +474,7 @@ export type Action =
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
+  | IRemoveUnassignedDeclarationAction
 
 export interface IUserData {
   userID: string
@@ -590,6 +598,13 @@ export function archiveDeclaration(
     payload: { declarationId, reason, comment, duplicateTrackingId }
   }
 }
+
+export const RemoveUnassignedDeclarationActionCreator = (
+  response: IDeclaration[]
+): IRemoveUnassignedDeclarationAction => ({
+  type: REMOVE_UNASSIGNED_DECLARATIONS,
+  payload: response
+})
 
 export function deleteDeclaration(
   declarationId: string,
@@ -1859,6 +1874,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           { sequence: true }
         )
       )
+    case REMOVE_UNASSIGNED_DECLARATIONS:
+      return {
+        ...state,
+        declarations: action.payload
+      }
     default:
       return state
   }
