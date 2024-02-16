@@ -24,8 +24,7 @@ import {
   Task,
   buildFHIRBundle,
   taskBundleWithExtension,
-  getComposition,
-  isTaskBundleEntry
+  getComposition
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -59,7 +58,8 @@ import {
   fetchRegistrationForDownloading,
   reinstateRegistration,
   duplicateRegistration,
-  viewDeclaration
+  viewDeclaration,
+  verifyRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
@@ -343,24 +343,7 @@ export const resolvers: GQLResolver = {
     async fetchRecordDetailsForVerification(_, { id }, context) {
       const token = await getAnonymousToken()
       context.headers.Authorization = `Bearer ${token}`
-      context.record = await getRecordById(id, context.headers.Authorization)
-
-      const taskEntry = context.record.entry.find(isTaskBundleEntry)
-
-      if (!taskEntry) {
-        throw new Error('Task entry not found for verification')
-      }
-
-      const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: 'http://opencrvs.org/specs/extension/regVerified',
-        valueString: context.headers['x-real-ip']!
-      })
-      await fetchFHIR(
-        '/Task',
-        context.headers,
-        'PUT',
-        JSON.stringify(taskBundle)
-      )
+      context.record = await verifyRegistration(id, context.headers)
 
       return context.record
     }

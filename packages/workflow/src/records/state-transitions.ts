@@ -91,6 +91,7 @@ import {
   createUpdatedTask,
   createValidateTask,
   createViewTask,
+  createVerifyRecordTask,
   createWaitingForValidationTask,
   getTaskHistory,
   createRelatedPersonEntries,
@@ -812,6 +813,26 @@ export async function toUnassigned(
   }
 
   return unassignedRecordWithTaskOnly
+}
+
+export async function toVerified(
+  record: RegisteredRecord | IssuedRecord,
+  ipInfo: string
+) {
+  const previousTask = getTaskFromSavedBundle(record)
+  const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
+
+  return {
+    ...record,
+    entry: [
+      ...record.entry.filter((e) => e.resource.resourceType !== 'Task'),
+      {
+        fullUrl: record.entry.find((e) => e.resource.resourceType === 'Task')!
+          .fullUrl,
+        resource: verifyRecordTask
+      }
+    ]
+  }
 }
 
 export async function toCorrectionRejected(

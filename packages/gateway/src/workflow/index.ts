@@ -331,3 +331,13 @@ export async function viewDeclaration(id: string, authHeader: IAuthHeader) {
 
   return viewedRecord
 }
+
+export async function verifyRegistration(id: string, authHeader: IAuthHeader) {
+  if (!authHeader['x-real-ip']) {
+    throw new Error('No ip address provided')
+  }
+
+  return await createRequest('POST', `/records/${id}/verify`, authHeader, {
+    'x-real-ip': authHeader['x-real-ip']
+  })
+}

@@ -41,7 +41,7 @@ const requestSchema = z.object({
   details: z.custom<
     BirthRegistration | DeathRegistration | MarriageRegistration
   >(),
-  id: z.custom<string>()
+  id: z.string()
 })
 
 export const updateRoute = [

@@ -24,6 +24,7 @@ import { reinstateRoute } from '@workflow/records/handler/reinstate'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
 import { viewRecordHandler } from '@workflow/records/handler/view'
+import { verifyRecordHandler } from '@workflow/records/handler/verify'
 
 export const getRoutes = () => {
   const routes = [
@@ -126,6 +127,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Unassign record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/verify',
+      handler: verifyRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Verify record endpoint'
       }
     }
   ]
