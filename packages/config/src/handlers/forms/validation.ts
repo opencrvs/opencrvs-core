@@ -330,6 +330,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'informantNidVerification',
     'primaryAddressSameAsOtherPrimary',
     'informantBirthDate',
+    'occupation',
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
