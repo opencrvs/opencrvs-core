@@ -277,11 +277,14 @@ class Component extends React.Component<
         {unassignedDeclarations.length > 0 && (
           <Toast
             id="unassignedDeclarationsToast"
-            type="error"
+            type="info"
             onClose={this.hideUnassignedDeclarationsToast}
           >
             {intl.formatMessage(messages.unassigned, {
-              trackingId: unassignedDeclarations.toString()
+              trackingId:
+                unassignedDeclarations.length > 3
+                  ? `${unassignedDeclarations.slice(0, 3).join(', ')}...`
+                  : unassignedDeclarations.join(', ')
             })}
           </Toast>
         )}
