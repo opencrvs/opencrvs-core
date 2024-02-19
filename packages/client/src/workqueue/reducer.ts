@@ -23,11 +23,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import {
-  getUserLocation,
-  hasStatusChanged,
-  UserDetails
-} from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
   GQLEventSearchResultSet,
@@ -225,6 +221,18 @@ async function getWorkqueueOfCurrentUser(): Promise<string> {
     workqueueInitialState.workqueue
 
   return JSON.stringify(currentUserWorkqueue)
+}
+
+function hasStatusChanged(
+  currentDeclaration: GQLEventSearchSet | null,
+  savedDeclarations: IDeclaration[]
+) {
+  const currentDeclarationStatus = currentDeclaration?.registration?.status
+  const declarationStatusInStore = savedDeclarations.find(
+    (dec) => dec.id === currentDeclaration?.id
+  )?.registrationStatus
+
+  return currentDeclarationStatus !== declarationStatusInStore
 }
 
 function mergeWorkQueueData(
