@@ -149,33 +149,43 @@ async function getFilteredDeclarations(
     }
   ) as Array<GQLEventSearchSet | null>
 
-  const unassignedDeclarations = workqueueDeclarations
-    .filter(
-      (dec) =>
-        !scope?.includes('declare') &&
-        dec &&
-        dec.registration &&
-        (dec.registration.assignment ||
-          !hasStatusChanged(dec, savedDeclarations)) &&
-        declarationIds.includes(dec.id) &&
-        dec.registration.assignment?.userId !== uID &&
-        !(
-          scope?.includes('validate') &&
-          dec?.registration?.status === 'VALIDATED'
-        )
-    )
-    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
-    .filter(Boolean)
+  let [currentlyDownloadedDeclarations, unassignedDeclarations]: [
+    IDeclaration[],
+    IDeclaration[]
+  ] = [[], []]
 
-  let currentlyDownloadedDeclarations = savedDeclarations.filter(
-    (dec) =>
-      !unassignedDeclarations
-        .map((unassigned) => unassigned?.id)
-        .includes(dec.id)
-  )
+  // for field agent, there are no declarations to unassign
+  // for registration agent, sent for approval declarations should not be unassigned
 
+  // for other agents, check if the user of workqueue declaration
+  // is the same as the current user and if that declaration is saved in the store
   if (scope?.includes('declare'))
     currentlyDownloadedDeclarations = savedDeclarations
+  else {
+    unassignedDeclarations = workqueueDeclarations
+      .filter(
+        (dec) =>
+          dec &&
+          dec.registration &&
+          (dec.registration.assignment ||
+            !hasStatusChanged(dec, savedDeclarations)) &&
+          declarationIds.includes(dec.id) &&
+          dec.registration.assignment?.userId !== uID &&
+          !(
+            scope?.includes('validate') &&
+            dec?.registration?.status === 'VALIDATED'
+          )
+      )
+      .map((dec) => savedDeclarations.find((d) => d.id === dec?.id)!)
+      .filter(Boolean)
+
+    currentlyDownloadedDeclarations = savedDeclarations.filter(
+      (dec) =>
+        !unassignedDeclarations
+          .map((unassigned) => unassigned.id)
+          .includes(dec.id)
+    )
+  }
 
   const userData = await getUserData(uID)
   const { allUserData } = userData
