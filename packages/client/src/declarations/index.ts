@@ -66,7 +66,9 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast
+  ShowDownloadDeclarationFailedToast,
+  ShowUnassignedDeclarations,
+  showUnassignedDeclarations
 } from '@client/notification/actions'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
@@ -478,6 +480,7 @@ export type Action =
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
   | IRemoveUnassignedDeclarationAction
+  | ShowUnassignedDeclarations
 
 export interface IUserData {
   userID: string
@@ -1879,10 +1882,18 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       )
     case REMOVE_UNASSIGNED_DECLARATIONS:
-      return {
-        ...state,
-        declarations: action.payload.currentlyDownloadedDeclarations
-      }
+      const unassignedDeclarationTrackingIds =
+        action.payload.unassignedDeclarations.map(
+          (dec) => dec.data.registration.trackingId
+        ) as string[]
+
+      return loop(
+        {
+          ...state,
+          declarations: action.payload.currentlyDownloadedDeclarations
+        },
+        Cmd.action(showUnassignedDeclarations(unassignedDeclarationTrackingIds))
+      )
     default:
       return state
   }
