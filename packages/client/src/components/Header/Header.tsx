@@ -360,7 +360,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     if (
       fieldNames.includes('iD') ||
       fieldNames.includes('deceasedID') ||
-      fieldNames.includes('informantID')
+      fieldNames.includes('informantID') ||
+      fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
         label: intl.formatMessage(messages.nationalId),
