@@ -143,6 +143,10 @@ async function getFilteredDeclarations(
   const declarations = state.declarationsState.declarations
   const declarationIds = declarations.map((dec) => dec.id)
 
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
     (queryData) => {
       return queryData[1].results
@@ -174,6 +178,18 @@ async function getFilteredDeclarations(
 
   if (scope?.includes('declare')) currentlyDownloadedDeclarations = declarations
 
+  if (currentUserData) {
+    currentUserData.declarations = currentlyDownloadedDeclarations
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: currentlyDownloadedDeclarations,
+      workqueue
+    }
+    allUserData.push(currentUserData)
+  }
+
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   return { currentlyDownloadedDeclarations, unassignedDeclarations }
 }
 
@@ -447,7 +463,6 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
-
         return loop(
           {
             ...state,
