@@ -23,7 +23,11 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import {
+  getUserLocation,
+  hasStatusChanged,
+  UserDetails
+} from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
   GQLEventSearchResultSet,
@@ -140,12 +144,8 @@ async function getFilteredDeclarations(
   const uID = await getCurrentUserID()
   const state = getState()
   const scope = getScope(state)
-  const declarations = state.declarationsState.declarations
-  const declarationIds = declarations.map((dec) => dec.id)
-
-  const userData = await getUserData(uID)
-  const { allUserData } = userData
-  let { currentUserData } = userData
+  const savedDeclarations = state.declarationsState.declarations
+  const declarationIds = savedDeclarations.map((dec) => dec.id)
 
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
     (queryData) => {
@@ -159,25 +159,31 @@ async function getFilteredDeclarations(
         !scope?.includes('declare') &&
         dec &&
         dec.registration &&
+        (dec.registration.assignment ||
+          !hasStatusChanged(dec, savedDeclarations)) &&
         declarationIds.includes(dec.id) &&
-        dec?.registration.assignment?.userId !== uID &&
+        dec.registration.assignment?.userId !== uID &&
         !(
           scope?.includes('validate') &&
           dec?.registration?.status === 'VALIDATED'
         )
     )
-    .map((dec) => declarations.find((d) => d.id === dec?.id)!)
+    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
     .filter(Boolean)
 
-  let currentlyDownloadedDeclarations = declarations.filter(
+  let currentlyDownloadedDeclarations = savedDeclarations.filter(
     (dec) =>
       !unassignedDeclarations
-        .map((unassigned) => unassigned.id)
+        .map((unassigned) => unassigned?.id)
         .includes(dec.id)
   )
 
-  if (scope?.includes('declare')) currentlyDownloadedDeclarations = declarations
+  if (scope?.includes('declare'))
+    currentlyDownloadedDeclarations = savedDeclarations
 
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
   if (currentUserData) {
     currentUserData.declarations = currentlyDownloadedDeclarations
   } else {

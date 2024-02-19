@@ -14,6 +14,8 @@ import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { IDeclaration } from '@client/declarations'
+import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -59,4 +61,16 @@ export function useUserName() {
     const { userDetails } = state.profile
     return getUserName(userDetails)
   })
+}
+
+export function hasStatusChanged(
+  currentDeclaration: GQLEventSearchSet | null,
+  savedDeclarations: IDeclaration[]
+) {
+  const currentDeclarationStatus = currentDeclaration?.registration?.status
+  const declarationStatusInStore = savedDeclarations.find(
+    (dec) => dec.id === currentDeclaration?.id
+  )?.registrationStatus
+
+  return currentDeclarationStatus !== declarationStatusInStore
 }
