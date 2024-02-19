@@ -19,7 +19,7 @@ import {
   SUBMISSION_STATUS,
   updateWorkqueueData,
   DOWNLOAD_STATUS,
-  RemoveUnassignedDeclarationActionCreator
+  RemoveUnassignedDeclarationsActionCreator
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
@@ -136,7 +136,7 @@ export function updateRegistrarWorkqueue(
 async function getFilteredDeclarations(
   workqueue: IWorkqueue,
   getState: () => IStoreState
-): Promise<Array<IDeclaration>> {
+) {
   const uID = await getCurrentUserID()
   const state = getState()
   const scope = getScope(state)
@@ -174,7 +174,7 @@ async function getFilteredDeclarations(
 
   if (scope?.includes('declare')) currentlyDownloadedDeclarations = declarations
 
-  return currentlyDownloadedDeclarations
+  return { currentlyDownloadedDeclarations, unassignedDeclarations }
 }
 
 async function getWorkqueueOfCurrentUser(): Promise<string> {
@@ -454,7 +454,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
             workqueue
           },
           Cmd.run(getFilteredDeclarations, {
-            successActionCreator: RemoveUnassignedDeclarationActionCreator,
+            successActionCreator: RemoveUnassignedDeclarationsActionCreator,
             args: [workqueue, Cmd.getState]
           })
         )

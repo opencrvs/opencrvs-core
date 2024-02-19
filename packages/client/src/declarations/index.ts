@@ -399,7 +399,10 @@ interface IDownloadDeclaration {
 
 interface IRemoveUnassignedDeclarationAction {
   type: typeof REMOVE_UNASSIGNED_DECLARATIONS
-  payload: IDeclaration[]
+  payload: {
+    currentlyDownloadedDeclarations: IDeclaration[]
+    unassignedDeclarations: IDeclaration[]
+  }
 }
 
 interface IDownloadDeclarationSuccess {
@@ -599,11 +602,12 @@ export function archiveDeclaration(
   }
 }
 
-export const RemoveUnassignedDeclarationActionCreator = (
-  response: IDeclaration[]
-): IRemoveUnassignedDeclarationAction => ({
+export const RemoveUnassignedDeclarationsActionCreator = (payload: {
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}): IRemoveUnassignedDeclarationAction => ({
   type: REMOVE_UNASSIGNED_DECLARATIONS,
-  payload: response
+  payload: payload
 })
 
 export function deleteDeclaration(
@@ -1877,7 +1881,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
     case REMOVE_UNASSIGNED_DECLARATIONS:
       return {
         ...state,
-        declarations: action.payload
+        declarations: action.payload.currentlyDownloadedDeclarations
       }
     default:
       return state
