@@ -40,7 +40,8 @@
     "packages/dashboards/*.jar",
     "packages/dashboards/plugins/*.jar",
     "packages/dashboards/data/metabase/*.db",
-    "packages/client/dev-dist"
+    "packages/client/dev-dist",
+    "CHANGELOG"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
