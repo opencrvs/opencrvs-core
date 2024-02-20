@@ -754,18 +754,30 @@ function createAgeOfIndividualInYearsBuilder(
     })
   }
 
+  logger.info(`INPUT AGE: ${fieldValue}`)
   const age = parseInt(fieldValue.toString(), 10)
+  logger.info(`PARSED AGE: ${age}`)
   if (resource.deceasedDateTime) {
+    logger.info(`DECEASED DATE TIME: ${resource.deceasedDateTime}`)
     const birthDate = subYears(new Date(resource.deceasedDateTime), age)
+    logger.info(`CALCULATED BIRTH DATE: ${birthDate}`)
     resource.birthDate = format(birthDate, 'yyyy-MM-dd')
+    logger.info(`FORMATTED BIRTH DATE: ${resource.birthDate}`)
     return
   }
   // for storing an assumed birthdate when exact DOB is not known
   const birthYear = new Date().getFullYear() - age
+  logger.info(`CALCULATED BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${birthYear}`)
   const firstDayOfBirthYear = new Date(birthYear, 0, 1)
+  logger.info(
+    `CALCULATED FIRST DAY OF BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${birthYear}`
+  )
   resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
     firstDayOfBirthYear.getMonth() + 1
   ).padStart(2, '0')}-${String(firstDayOfBirthYear.getDate()).padStart(2, '0')}`
+  logger.info(
+    `FORMATTED FIRST DAY OF BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${resource.birthDate}`
+  )
 }
 
 function createEducationalAttainmentBuilder(
