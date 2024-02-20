@@ -144,7 +144,6 @@ async function getFilteredDeclarations(
   const state = getState()
   const scope = getScope(state)
   const savedDeclarations = state.declarationsState.declarations
-  // const declarationIds = savedDeclarations.map((dec) => dec.id)
 
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
     (queryData) => {
@@ -181,8 +180,10 @@ async function getFilteredDeclarations(
           dec?.registration?.status === 'VALIDATED'
         )
     )
-    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id)!)
-    .filter(Boolean)
+    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
+    .filter((maybeDeclaration): maybeDeclaration is IDeclaration =>
+      Boolean(maybeDeclaration)
+    )
 
   currentlyDownloadedDeclarations = savedDeclarations.filter(
     (dec) =>
