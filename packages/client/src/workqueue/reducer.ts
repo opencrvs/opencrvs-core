@@ -136,12 +136,15 @@ export function updateRegistrarWorkqueue(
 async function getFilteredDeclarations(
   workqueue: IWorkqueue,
   getState: () => IStoreState
-) {
+): Promise<{
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}> {
   const uID = await getCurrentUserID()
   const state = getState()
   const scope = getScope(state)
   const savedDeclarations = state.declarationsState.declarations
-  const declarationIds = savedDeclarations.map((dec) => dec.id)
+  // const declarationIds = savedDeclarations.map((dec) => dec.id)
 
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
     (queryData) => {
@@ -160,32 +163,33 @@ async function getFilteredDeclarations(
   // for other agents, check if the user of workqueue declaration
   // is the same as the current user and if that declaration is saved in the store
   if (scope?.includes('declare'))
-    currentlyDownloadedDeclarations = savedDeclarations
-  else {
-    unassignedDeclarations = workqueueDeclarations
-      .filter(
-        (dec) =>
-          dec &&
-          dec.registration &&
-          (dec.registration.assignment ||
-            !hasStatusChanged(dec, savedDeclarations)) &&
-          declarationIds.includes(dec.id) &&
-          dec.registration.assignment?.userId !== uID &&
-          !(
-            scope?.includes('validate') &&
-            dec?.registration?.status === 'VALIDATED'
-          )
-      )
-      .map((dec) => savedDeclarations.find((d) => d.id === dec?.id)!)
-      .filter(Boolean)
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations: []
+    }
 
-    currentlyDownloadedDeclarations = savedDeclarations.filter(
+  unassignedDeclarations = workqueueDeclarations
+    .filter(
       (dec) =>
-        !unassignedDeclarations
-          .map((unassigned) => unassigned.id)
-          .includes(dec.id)
+        dec &&
+        dec.registration &&
+        (dec.registration.assignment ||
+          !hasStatusChanged(dec, savedDeclarations)) &&
+        dec.registration.assignment?.userId !== uID &&
+        !(
+          scope?.includes('validate') &&
+          dec?.registration?.status === 'VALIDATED'
+        )
     )
-  }
+    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id)!)
+    .filter(Boolean)
+
+  currentlyDownloadedDeclarations = savedDeclarations.filter(
+    (dec) =>
+      !unassignedDeclarations
+        .map((unassigned) => unassigned.id)
+        .includes(dec.id)
+  )
 
   const userData = await getUserData(uID)
   const { allUserData } = userData
