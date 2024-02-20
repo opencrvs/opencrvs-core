@@ -105,7 +105,6 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { subYears, format } from 'date-fns'
-import { logger } from '@gateway/logger'
 
 export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
@@ -754,30 +753,18 @@ function createAgeOfIndividualInYearsBuilder(
     })
   }
 
-  logger.info(`INPUT AGE: ${fieldValue}`)
   const age = parseInt(fieldValue.toString(), 10)
-  logger.info(`PARSED AGE: ${age}`)
   if (resource.deceasedDateTime) {
-    logger.info(`DECEASED DATE TIME: ${resource.deceasedDateTime}`)
     const birthDate = subYears(new Date(resource.deceasedDateTime), age)
-    logger.info(`CALCULATED BIRTH DATE: ${birthDate}`)
     resource.birthDate = format(birthDate, 'yyyy-MM-dd')
-    logger.info(`FORMATTED BIRTH DATE: ${resource.birthDate}`)
     return
   }
   // for storing an assumed birthdate when exact DOB is not known
   const birthYear = new Date().getFullYear() - age
-  logger.info(`CALCULATED BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${birthYear}`)
   const firstDayOfBirthYear = new Date(birthYear, 0, 1)
-  logger.info(
-    `CALCULATED FIRST DAY OF BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${birthYear}`
-  )
   resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
     firstDayOfBirthYear.getMonth() + 1
   ).padStart(2, '0')}-${String(firstDayOfBirthYear.getDate()).padStart(2, '0')}`
-  logger.info(
-    `FORMATTED FIRST DAY OF BIRTH YEAR WHEN EXACT DOB UNKNOWN: ${resource.birthDate}`
-  )
 }
 
 function createEducationalAttainmentBuilder(
@@ -1933,22 +1920,18 @@ export const builders: IFieldBuilders = {
          * & age builder as it depends on which
          * one gets called second
          */
-        logger.info(`INPUT DEATH DATE: ${fieldValue}`)
         const age = person.extension?.find(
           ({ url }) =>
             url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
         )?.valueString
 
-        logger.info(`INPUT AGE: ${age}`)
         if (age) {
           const birthDate = subYears(
             new Date(fieldValue as string),
             parseInt(age, 10)
           )
-          logger.info(`CALCULATED BIRTH DATE: ${birthDate}`)
           person.birthDate = format(birthDate, 'yyyy-MM-dd')
-          logger.info(`FORMATTED BIRTH DATE: ${person.birthDate}`)
         }
         person.deceasedDateTime = fieldValue as string
       }
