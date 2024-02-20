@@ -125,6 +125,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             name {
               use
               firstNames
+              middleName
               familyName
             }
             telecom {
@@ -142,6 +143,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -160,6 +162,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           occupation
@@ -182,6 +185,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           multipleBirth
@@ -219,6 +223,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -277,6 +282,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -318,6 +324,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           nationality
@@ -344,6 +351,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -381,6 +389,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -418,6 +427,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -497,6 +507,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           occupation
@@ -519,6 +530,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
             marriedLastName
           }
@@ -552,6 +564,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
             marriedLastName
           }
@@ -593,6 +606,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -609,6 +623,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
