@@ -105,6 +105,7 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { subYears, format } from 'date-fns'
+import { logger } from '@gateway/logger'
 
 export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
@@ -1920,18 +1921,22 @@ export const builders: IFieldBuilders = {
          * & age builder as it depends on which
          * one gets called second
          */
+        logger.info(`INPUT DEATH DATE: ${fieldValue}`)
         const age = person.extension?.find(
           ({ url }) =>
             url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
         )?.valueString
 
+        logger.info(`INPUT AGE: ${age}`)
         if (age) {
           const birthDate = subYears(
             new Date(fieldValue as string),
             parseInt(age, 10)
           )
+          logger.info(`CALCULATED BIRTH DATE: ${birthDate}`)
           person.birthDate = format(birthDate, 'yyyy-MM-dd')
+          logger.info(`FORMATTED BIRTH DATE: ${person.birthDate}`)
         }
         person.deceasedDateTime = fieldValue as string
       }
