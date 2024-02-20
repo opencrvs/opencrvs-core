@@ -62,6 +62,7 @@ import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
@@ -351,6 +352,8 @@ function mapStatetoProps(
   const event = getEvent(draft.event)
   const offlineCountryConfig = getOfflineData(state)
 
+  const userDetails = getUserDetails(state)
+
   return {
     event,
     registrationId,
@@ -360,13 +363,17 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
-          ...(isCertificateForPrintInAdvance(draft) && { printInAdvance: true })
+          ...(isCertificateForPrintInAdvance(draft) && {
+            printInAdvance: true
+          }),
+          certificateDate: formatLongDate(new Date().toISOString()),
+          certificationOffice: userDetails?.primaryOffice?.name ?? ''
         }
       }
     },
     scope: getScope(state),
     countries: getCountryTranslations(state.i18n.languages, countries),
-    userDetails: getUserDetails(state),
+    userDetails,
     offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event),
     state
