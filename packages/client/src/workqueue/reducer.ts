@@ -140,7 +140,6 @@ async function getFilteredDeclarations(
   currentlyDownloadedDeclarations: IDeclaration[]
   unassignedDeclarations: IDeclaration[]
 }> {
-  const uID = await getCurrentUserID()
   const state = getState()
   const scope = getScope(state)
   const savedDeclarations = state.declarationsState.declarations
@@ -156,29 +155,24 @@ async function getFilteredDeclarations(
     IDeclaration[]
   ] = [[], []]
 
-  // for field agent, there are no declarations to unassign
+  // for field agent, no declarations should be unassigned
   // for registration agent, sent for approval declarations should not be unassigned
 
-  // for other agents, check if the user of workqueue declaration
-  // is the same as the current user and if that declaration is saved in the store
+  // for other agents, check if the status of workqueue declaration
+  // has changed and if that declaration is saved in the store
+  // also declaration should not show as unassigned when it is being submitted
   if (scope?.includes('declare'))
     return {
       currentlyDownloadedDeclarations: savedDeclarations,
-      unassignedDeclarations: []
+      unassignedDeclarations
     }
 
   unassignedDeclarations = workqueueDeclarations
     .filter(
       (dec) =>
         dec &&
-        dec.registration &&
-        (dec.registration.assignment ||
-          !hasStatusChanged(dec, savedDeclarations)) &&
-        dec.registration.assignment?.userId !== uID &&
-        !(
-          scope?.includes('validate') &&
-          dec?.registration?.status === 'VALIDATED'
-        )
+        hasStatusChanged(dec, savedDeclarations) &&
+        isNotSubmitting(dec, savedDeclarations)
     )
     .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
     .filter((maybeDeclaration): maybeDeclaration is IDeclaration =>
@@ -192,6 +186,13 @@ async function getFilteredDeclarations(
         .includes(dec.id)
   )
 
+  if (unassignedDeclarations.length === 0)
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations
+    }
+
+  const uID = await getCurrentUserID()
   const userData = await getUserData(uID)
   const { allUserData } = userData
   let { currentUserData } = userData
@@ -238,8 +239,31 @@ async function getWorkqueueOfCurrentUser(): Promise<string> {
   return JSON.stringify(currentUserWorkqueue)
 }
 
+function isNotSubmitting(
+  workqueueDeclaration: GQLEventSearchSet,
+  savedDeclarations: IDeclaration[]
+) {
+  const declarationInStore = savedDeclarations.find(
+    (dec) => dec.id === workqueueDeclaration.id
+  )!
+  if (declarationInStore?.submissionStatus)
+    return !Boolean(
+      [
+        SUBMISSION_STATUS.SUBMITTING,
+        SUBMISSION_STATUS.APPROVING,
+        SUBMISSION_STATUS.REGISTERING,
+        SUBMISSION_STATUS.REJECTING,
+        SUBMISSION_STATUS.ARCHIVING,
+        SUBMISSION_STATUS.CERTIFYING,
+        SUBMISSION_STATUS.ISSUING,
+        SUBMISSION_STATUS.REQUESTING_CORRECTION
+      ].includes(declarationInStore.submissionStatus as SUBMISSION_STATUS)
+    )
+  return true
+}
+
 function hasStatusChanged(
-  currentDeclaration: GQLEventSearchSet | null,
+  currentDeclaration: GQLEventSearchSet,
   savedDeclarations: IDeclaration[]
 ) {
   const currentDeclarationStatus = currentDeclaration?.registration?.status
