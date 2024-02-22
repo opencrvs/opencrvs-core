@@ -689,7 +689,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         data: {
           ...modifiedDeclaration.data,
           informant: {
-            informantType: modifiedDeclaration.data.informant.informantType
+            informantType: modifiedDeclaration.data.informant?.informantType
           }
         }
       }
@@ -710,7 +710,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       // this is to forcefully remount the component
       // to reset the initial values of formik
       this.setState({
-        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant.informantType}`
+        formFieldKey: `${this.props.activeSection.id}-${declaration.data.informant?.informantType}`
       })
     }
 
