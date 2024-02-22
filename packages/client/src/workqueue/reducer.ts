@@ -150,11 +150,6 @@ async function getFilteredDeclarations(
     }
   ) as Array<GQLEventSearchSet | null>
 
-  let [currentlyDownloadedDeclarations, unassignedDeclarations]: [
-    IDeclaration[],
-    IDeclaration[]
-  ] = [[], []]
-
   // for field agent, no declarations should be unassigned
   // for registration agent, sent for approval declarations should not be unassigned
 
@@ -164,10 +159,10 @@ async function getFilteredDeclarations(
   if (scope?.includes('declare'))
     return {
       currentlyDownloadedDeclarations: savedDeclarations,
-      unassignedDeclarations
+      unassignedDeclarations: []
     }
 
-  unassignedDeclarations = workqueueDeclarations
+  const unassignedDeclarations = workqueueDeclarations
     .filter(
       (dec) =>
         dec &&
@@ -179,11 +174,11 @@ async function getFilteredDeclarations(
       Boolean(maybeDeclaration)
     )
 
-  currentlyDownloadedDeclarations = savedDeclarations.filter(
-    (dec) =>
-      !unassignedDeclarations
-        .map((unassigned) => unassigned.id)
-        .includes(dec.id)
+  const unassignedDeclarationIds = unassignedDeclarations.map(
+    (unassigned) => unassigned.id
+  )
+  const currentlyDownloadedDeclarations = savedDeclarations.filter(
+    (dec) => !unassignedDeclarationIds.includes(dec.id)
   )
 
   if (unassignedDeclarations.length === 0)
