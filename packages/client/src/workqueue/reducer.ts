@@ -181,6 +181,7 @@ async function getFilteredDeclarations(
     (dec) => !unassignedDeclarationIds.includes(dec.id)
   )
 
+  // don't need to update indexDb if there are no unassigned declarations
   if (unassignedDeclarations.length === 0)
     return {
       currentlyDownloadedDeclarations: savedDeclarations,
