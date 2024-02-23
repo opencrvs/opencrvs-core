@@ -8,18 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import {
-  toRejected,
+  initiateRegistration,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
-import { invokeRegistrationValidation } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import { auditEvent } from '@workflow/records/audit'
+import { isRejected } from '@opencrvs/commons/types'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
@@ -40,40 +37,33 @@ export const registerRoute = [
         request.payload
       )
 
-      const practitioner = await getLoggedInPractitionerResource(token)
       const recordInWaitingValidationState =
         await toWaitingForExternalValidationState(
           record,
-          practitioner,
+          token,
           payload.comments,
           payload.timeLoggedMS
         )
 
-      await sendBundleToHearth(recordInWaitingValidationState)
       await indexBundle(recordInWaitingValidationState, token)
+      await auditEvent(
+        'waiting-external-validation',
+        recordInWaitingValidationState,
+        token
+      )
 
-      try {
-        await invokeRegistrationValidation(
-          recordInWaitingValidationState,
-          request.headers
-        )
-      } catch (error) {
-        const statusReason: fhir3.CodeableConcept = {
-          text: REG_NUMBER_GENERATION_FAILED
-        }
-        const { rejectedRecord: recordInRejectedState } = await toRejected(
-          record,
-          practitioner,
-          statusReason
-        )
+      const rejectedOrWaitingValidationRecord = await initiateRegistration(
+        recordInWaitingValidationState,
+        request.headers,
+        token
+      )
 
-        await sendBundleToHearth(recordInRejectedState)
-        await indexBundle(recordInRejectedState, token)
-
-        return recordInRejectedState
+      if (isRejected(rejectedOrWaitingValidationRecord)) {
+        await indexBundle(rejectedOrWaitingValidationRecord, token)
+        await auditEvent('sent-for-updates', record, token)
       }
 
-      return recordInWaitingValidationState
+      return rejectedOrWaitingValidationRecord
     }
   })
 ]

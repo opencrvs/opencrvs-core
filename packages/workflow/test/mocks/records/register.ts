@@ -18,6 +18,7 @@ import {
   PractitionerRole,
   RegistrationNumber,
   RelatedPerson,
+  ResourceIdentifier,
   SavedBundle,
   Task,
   TrackingID,
@@ -83,7 +84,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/RelatedPerson/7a661dba-080b-4481-8e1d-ec46b33ed979/_history/14d11990-4c07-4d9f-8cae-25be3f31761c' as URLReference
+                  'RelatedPerson/7a661dba-080b-4481-8e1d-ec46b33ed979' as ResourceIdentifier
               }
             ]
           },
@@ -101,7 +102,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/53f84c51-e087-4011-9d20-f308b0040696/_history/68919fdd-0fb5-4e5e-9b8b-f27f37935511' as URLReference
+                  'Patient/53f84c51-e087-4011-9d20-f308b0040696' as ResourceIdentifier
               }
             ]
           },
@@ -119,7 +120,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/25821f78-fe9f-4e52-bba4-bd0809fe3698/_history/7a5bc612-4482-445e-8606-9b457ae7a56b' as URLReference
+                  'Patient/25821f78-fe9f-4e52-bba4-bd0809fe3698' as ResourceIdentifier
               }
             ]
           },
@@ -137,7 +138,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/7e1a2bb0-d738-4668-aacb-ecc72e5d4a58/_history/b201720b-f819-4714-aefe-6d58342e98d6' as URLReference
+                  'Patient/7e1a2bb0-d738-4668-aacb-ecc72e5d4a58' as ResourceIdentifier
               }
             ]
           },
@@ -155,7 +156,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Encounter/2add7704-6b78-4e10-91ca-21158d2ef6b0/_history/94601b86-03f2-4bc4-826e-1c715bd5bf5f' as URLReference
+                  'Encounter/2add7704-6b78-4e10-91ca-21158d2ef6b0' as ResourceIdentifier
               }
             ]
           }
@@ -180,7 +181,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           {
             location: {
               reference:
-                '/fhir/Location/0e088936-4a22-426e-9beb-4c30bc3a4b4c/_history/ba48b3f8-1c94-4183-8831-035ce12e3981' as URLReference
+                'Location/0e088936-4a22-426e-9beb-4c30bc3a4b4c' as ResourceIdentifier
             }
           }
         ],
@@ -207,7 +208,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         },
         patient: {
           reference:
-            '/fhir/Patient/53f84c51-e087-4011-9d20-f308b0040696/_history/68919fdd-0fb5-4e5e-9b8b-f27f37935511' as URLReference
+            'Patient/53f84c51-e087-4011-9d20-f308b0040696' as ResourceIdentifier
         },
         meta: {
           lastUpdated: '2024-01-05T09:34:52.671+00:00',

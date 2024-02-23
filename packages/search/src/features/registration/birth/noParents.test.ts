@@ -48,7 +48,26 @@ describe('Verify handlers', () => {
         ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }]
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
 
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
@@ -59,7 +78,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/new-declaration',
+        url: '/record',
         payload: mockBirthFhirBundleWithoutParents,
         headers: {
           Authorization: `Bearer ${token}`

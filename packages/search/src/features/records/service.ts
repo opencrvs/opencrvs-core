@@ -10,13 +10,10 @@
  */
 import {
   Bundle,
-  BundleEntry,
   FhirResourceType,
   StateIdenfitiers,
   getFromBundleById,
-  isComposition,
-  isEncounter,
-  isRelatedPerson
+  isComposition
 } from '@opencrvs/commons/types'
 import { HEARTH_MONGO_URL } from '@search/constants'
 import { MongoClient } from 'mongodb'
@@ -1008,15 +1005,10 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     return 1
   })
 
-  const bundleWithFullURLReferences = resolveReferenceFullUrls(
-    bundle,
-    entriesInBackwardsCompatibleOrder
-  )
-
   const record = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: bundleWithFullURLReferences.map((entry) => {
+    entry: entriesInBackwardsCompatibleOrder.map((entry) => {
       const { _id, ...resourceWithoutMongoId } = entry.resource
       return {
         ...entry,
@@ -1026,37 +1018,4 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   }
 
   return record as StateIdenfitiers[T[number]]
-}
-
-function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
-  return entries.map((entry) => {
-    const resource = entry.resource!
-    if (isComposition(resource)) {
-      resource.section?.forEach((section) => {
-        section.entry?.forEach((entry) => {
-          entry.reference = getFromBundleById(
-            bundle,
-            entry.reference!.split('/')[1]
-          )?.fullUrl
-        })
-      })
-    }
-    if (isEncounter(resource)) {
-      resource.location?.forEach(({ location }) => {
-        location.reference = getFromBundleById(
-          bundle,
-          location.reference.split('/')[1]
-        )?.fullUrl
-      })
-    }
-
-    if (isRelatedPerson(resource) && resource.patient?.reference) {
-      resource.patient.reference = getFromBundleById(
-        bundle,
-        resource.patient.reference.split('/')[1]
-      ).fullUrl
-    }
-
-    return entry
-  })
 }

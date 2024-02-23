@@ -24,8 +24,7 @@ import {
   Patient,
   RelatedPerson,
   resourceIdentifierToUUID,
-  SavedRelatedPerson,
-  urlReferenceToUUID
+  SavedRelatedPerson
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
@@ -58,14 +57,14 @@ function getInformantName(record: InProgressRecord) {
   const informantRelation: Partial<SavedRelatedPerson> =
     getResourceFromBundleById<RelatedPerson>(
       record,
-      urlReferenceToUUID(informantSection.entry[0].reference)
+      resourceIdentifierToUUID(informantSection.entry[0].reference)
     )
   if (!informantRelation.patient?.reference) {
     return null
   }
   const informant = findResourceFromBundleById<Patient>(
     record,
-    urlReferenceToUUID(informantRelation.patient.reference)
+    resourceIdentifierToUUID(informantRelation.patient.reference)
   )
   const name = informant?.name?.find(({ use }) => use === 'en')
   if (!name) {

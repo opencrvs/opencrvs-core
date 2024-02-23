@@ -11,9 +11,8 @@
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { indexBundle } from '@workflow/records/search'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toValidated } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
+import { auditEvent } from '@workflow/records/audit'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
@@ -33,20 +32,17 @@ export const validateRoute = [
         request.payload
       )
 
-      const practitioner = await getLoggedInPractitionerResource(token)
-
-      const recordInValidatedRequestedState = await toValidated(
+      const validatedRecord = await toValidated(
         record,
-        practitioner,
+        token,
         payload.comments,
         payload.timeLoggedMS
       )
 
-      await sendBundleToHearth(recordInValidatedRequestedState)
+      await indexBundle(validatedRecord, token)
+      await auditEvent('sent-for-approval', validatedRecord, token)
 
-      await indexBundle(recordInValidatedRequestedState, token)
-
-      return recordInValidatedRequestedState
+      return validatedRecord
     }
   })
 ]

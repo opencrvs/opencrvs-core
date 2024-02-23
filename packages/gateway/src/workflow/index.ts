@@ -19,10 +19,10 @@ import {
   CertifiedRecord,
   ReadyForReviewRecord,
   RejectedRecord,
-  ValidRecord,
   getTaskFromSavedBundle,
   getBusinessStatus,
-  IssuedRecord
+  IssuedRecord,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -35,7 +35,6 @@ import {
   GQLMarriageRegistrationInput,
   GQLPaymentInput
 } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils/index'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -135,14 +134,6 @@ export async function createRegistration(
     trackingId: string
     isPotentiallyDuplicate: boolean
   }>('POST', '/create-record', authHeader, { record, event })
-
-  if (hasScope(authHeader, 'validate') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/validate`, authHeader)
-  }
-
-  if (hasScope(authHeader, 'register') && !res.isPotentiallyDuplicate) {
-    createRequest('POST', `/records/${res.compositionId}/register`, authHeader)
-  }
 
   return res
 }
@@ -334,4 +325,24 @@ export async function reinstateRegistration(
   const task = getTaskFromSavedBundle(reinstatedRecord)
 
   return { taskId: task.id, prevRegStatus: getBusinessStatus(task) }
+}
+
+export async function viewDeclaration(id: string, authHeader: IAuthHeader) {
+  const viewedRecord: ValidRecord = await createRequest(
+    'POST',
+    `/records/${id}/view`,
+    authHeader
+  )
+
+  return viewedRecord
+}
+
+export async function verifyRegistration(id: string, authHeader: IAuthHeader) {
+  if (!authHeader['x-real-ip']) {
+    throw new Error('No ip address provided')
+  }
+
+  return await createRequest('POST', `/records/${id}/verify`, authHeader, {
+    'x-real-ip': authHeader['x-real-ip']
+  })
 }
