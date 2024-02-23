@@ -1737,6 +1737,20 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR request failed: Some error from search')
     })
 
+    it("throws an error when the user doesn't have register scope", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ userId: '121221' }))
+
+      await expect(
+        resolvers.Mutation!.markEventAsNotDuplicate(
+          {},
+          {
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
+          },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User does not have a register scope')
+    })
+
     it('throws an error when the declaration is not assigned', async () => {
       await expect(
         resolvers.Mutation!.markEventAsNotDuplicate(
