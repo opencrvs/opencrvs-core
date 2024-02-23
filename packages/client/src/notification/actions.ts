@@ -48,9 +48,6 @@ export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
 
 export const SHOW_UNASSIGNED = 'SHOW_UNASSIGNED'
 export const HIDE_UNASSIGNED = 'HIDE_UNASSIGNED'
-export const SHOW_UNASSIGNED_DECLARATIONS = 'SHOW_UNASSIGNED_DECLARATIONS'
-export const HIDE_UNASSIGNED_DECLARATIONS_TOAST =
-  'HIDE_UNASSIGNED_DECLARATIONS_TOAST'
 
 type ConfigurationErrorAction = {
   type: typeof CONFIGURATION_ERROR
@@ -122,10 +119,6 @@ type HideCreateUserDuplicateEmailErrorToast = {
   type: typeof HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
 }
 
-type HideUnassignedDeclarationsToast = {
-  type: typeof HIDE_UNASSIGNED_DECLARATIONS_TOAST
-}
-
 export type ShowUserAuditSuccessToast = {
   type: typeof SHOW_USER_AUDIT_SUCCESS_TOAST
   payload: {
@@ -174,11 +167,6 @@ type SessionExpiredAction = {
 
 export interface ShowUnassignedPayload extends Record<string, string> {
   trackingId: string
-}
-
-export type ShowUnassignedDeclarations = {
-  type: typeof SHOW_UNASSIGNED_DECLARATIONS
-  payload: string[]
 }
 
 type ShowUnassigned = {
@@ -317,21 +305,9 @@ export const showUnassigned = (
   payload: data
 })
 
-export const showUnassignedDeclarations = (
-  unassignedDeclarationTrackingIds: string[]
-): ShowUnassignedDeclarations => ({
-  type: SHOW_UNASSIGNED_DECLARATIONS,
-  payload: unassignedDeclarationTrackingIds
-})
-
 export const hideUnassignedModal = (): HideUnassigned => ({
   type: HIDE_UNASSIGNED
 })
-
-export const hideUnassignedDeclarationsToast =
-  (): HideUnassignedDeclarationsToast => ({
-    type: HIDE_UNASSIGNED_DECLARATIONS_TOAST
-  })
 
 export type Action =
   | SessionExpiredAction
@@ -359,5 +335,3 @@ export type Action =
   | HideDuplicateRecordsToast
   | ShowUserReconnectedToastAction
   | HideUserReconnectedToastAction
-  | ShowUnassignedDeclarations
-  | HideUnassignedDeclarationsToast
