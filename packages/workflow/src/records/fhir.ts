@@ -946,6 +946,7 @@ function createNewTaskResource(
       agent: { reference: `Practitioner/${practitionerId}` }
     },
     identifier: previousTask.identifier,
+    note: previousTask.note,
     extension: previousTask.extension
       .filter((extension) =>
         [
