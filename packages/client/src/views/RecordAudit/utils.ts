@@ -352,7 +352,7 @@ const getDraftDeclarationName = (declaration: IDeclaration) => {
   if (declarationName) {
     name = declarationName
       .map((obj) =>
-        [obj?.firstNamesEng, obj?.familyNameEng]
+        [obj?.firstNamesEng, obj?.middleNameEng, obj?.familyNameEng]
           .filter((part) => Boolean(part))
           .join(' ')
       )

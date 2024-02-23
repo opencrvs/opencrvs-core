@@ -218,11 +218,11 @@ async function createChildIndex(
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
-  body.childFirstNames =
-    childName && childName.given && childName.given.join(' ')
+  body.childFirstNames = childName?.given?.at(0)
+  body.childMiddleName = childName?.given?.at(1)
   body.childFamilyName = childName && childName.family && childName.family[0]
-  body.childFirstNamesLocal =
-    childNameLocal && childNameLocal.given && childNameLocal.given.join(' ')
+  body.childFirstNamesLocal = childNameLocal?.given?.at(0)
+  body.childMiddleNameLocal = childNameLocal?.given?.at(1)
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child.birthDate
@@ -247,12 +247,12 @@ function createMotherIndex(
   const motherName = findName(NAME_EN, mother.name)
   const motherNameLocal = findNameLocale(mother.name)
 
-  body.motherFirstNames =
-    motherName && motherName.given && motherName.given.join(' ')
+  body.motherFirstNames = motherName?.given?.at(0)
+  body.motherMiddleName = motherName?.given?.at(1)
   body.motherFamilyName =
     motherName && motherName.family && motherName.family[0]
-  body.motherFirstNamesLocal =
-    motherNameLocal && motherNameLocal.given && motherNameLocal.given.join(' ')
+  body.motherFirstNamesLocal = motherNameLocal?.given?.at(0)
+  body.motherMiddleNameLocal = motherNameLocal?.given?.at(1)
   body.motherFamilyNameLocal =
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
@@ -278,12 +278,12 @@ function createFatherIndex(
   const fatherName = findName(NAME_EN, father.name)
   const fatherNameLocal = findNameLocale(father.name)
 
-  body.fatherFirstNames =
-    fatherName && fatherName.given && fatherName.given.join(' ')
+  body.fatherFirstNames = fatherName?.given?.at(0)
+  body.fatherMiddleName = fatherName?.given?.at(1)
   body.fatherFamilyName =
     fatherName && fatherName.family && fatherName.family[0]
-  body.fatherFirstNamesLocal =
-    fatherNameLocal && fatherNameLocal.given && fatherNameLocal.given.join(' ')
+  body.fatherFirstNamesLocal = fatherNameLocal?.given?.at(0)
+  body.fatherMiddleNameLocal = fatherNameLocal?.given?.at(1)
   body.fatherFamilyNameLocal =
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
@@ -318,14 +318,12 @@ function createInformantIndex(
   const informantName = findName(NAME_EN, informant.name)
   const informantNameLocal = findNameLocale(informant.name)
 
-  body.informantFirstNames =
-    informantName && informantName.given && informantName.given.join(' ')
+  body.informantFirstNames = informantName?.given?.at(0)
+  body.informantMiddleName = informantName?.given?.at(1)
   body.informantFamilyName =
     informantName && informantName.family && informantName.family[0]
-  body.informantFirstNamesLocal =
-    informantNameLocal &&
-    informantNameLocal.given &&
-    informantNameLocal.given.join(' ')
+  body.informantFirstNamesLocal = informantNameLocal?.given?.at(0)
+  body.informantMiddleNameLocal = informantNameLocal?.given?.at(1)
   body.informantFamilyNameLocal =
     informantNameLocal &&
     informantNameLocal.family &&

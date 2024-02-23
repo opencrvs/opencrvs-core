@@ -1004,6 +1004,7 @@ type IdentityType {
 type HumanName {
   use: String
   firstNames: String
+  middleName: String
   familyName: String
   marriedLastName: String
 }
@@ -1347,6 +1348,7 @@ input MedicalPractitionerInput {
 input HumanNameInput {
   use: String
   firstNames: String
+  middleName: String
   familyName: String
   marriedLastName: String
 }

@@ -360,13 +360,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     if (
       fieldNames.includes('iD') ||
       fieldNames.includes('deceasedID') ||
-      fieldNames.includes('informantID')
+      fieldNames.includes('informantID') ||
+      fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
-        label: intl.formatMessage(messages.nationalId),
+        label: intl.formatMessage(constantsMessages.id),
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+        placeHolderText: intl.formatMessage(messages.placeholderId)
       })
     }
     if (fieldNames.includes('registrationEmail')) {
