@@ -14,6 +14,7 @@ import { FHIR_URL } from '@webhooks/constants'
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { IAuthHeader } from '@webhooks/features/event/handler'
+import { uniqBy } from 'lodash'
 
 export function createRequestSignature(
   requestSigningVersion: string,
@@ -128,7 +129,8 @@ export const getPermissionsBundle = async (
       bundle.entry!.push({ resource })
     }
   })
-
+  // @TODO: Hack, for some reason the bundle has many duplicates. Remove them.
+  bundle.entry = uniqBy(bundle.entry, ({ resource }) => resource?.id)
   return bundle
 }
 
