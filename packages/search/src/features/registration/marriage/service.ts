@@ -44,8 +44,9 @@ import {
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
-  RelatedPerson,
-  SavedBundle
+  SavedBundle,
+  resourceIdentifierToUUID,
+  SavedRelatedPerson
 } from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
@@ -198,7 +199,7 @@ function createWitnessOneIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const witnessRef = findEntry<RelatedPerson>(
+  const witnessRef = findEntry<SavedRelatedPerson>(
     WITNESS_ONE_CODE,
     composition,
     bundle
@@ -210,7 +211,7 @@ function createWitnessOneIndex(
 
   const witness = getFromBundleById<Patient>(
     bundle,
-    witnessRef.patient.reference.split('/')[1]
+    resourceIdentifierToUUID(witnessRef.patient.reference)
   ).resource
 
   if (!witness) {
@@ -237,7 +238,7 @@ function createWitnessTwoIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const witnessRef = findEntry<RelatedPerson>(
+  const witnessRef = findEntry<SavedRelatedPerson>(
     WITNESS_TWO_CODE,
     composition,
     bundle
@@ -249,7 +250,7 @@ function createWitnessTwoIndex(
 
   const witness = getFromBundleById<Patient>(
     bundle,
-    witnessRef.patient.reference.split('/')[1]
+    resourceIdentifierToUUID(witnessRef.patient.reference)
   ).resource
 
   if (!witness) {
