@@ -24,7 +24,6 @@ import {
 } from '@search/features/registration/deduplicate/service'
 import {
   getFromBundleById,
-  OpenCRVSPatientName,
   SavedBundle,
   SavedLocation,
   SavedTask
@@ -254,7 +253,7 @@ interface IUserRole {
 export interface IUserModelData {
   _id: string
   role: IUserRole
-  name: OpenCRVSPatientName[]
+  name: fhir.HumanName[]
 }
 
 export async function detectBirthDuplicates(

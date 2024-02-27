@@ -21,8 +21,6 @@ import {
   NAME_EN,
   IOperationHistory,
   REJECTED_STATUS,
-  DECLARED_STATUS,
-  IN_PROGRESS_STATUS,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import {
@@ -47,7 +45,8 @@ import {
   getFromBundleById,
   getTaskFromSavedBundle,
   SavedTask,
-  RelatedPerson
+  resourceIdentifierToUUID,
+  SavedRelatedPerson
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -114,9 +113,7 @@ async function indexAndSearchComposition(
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
   await createIndexBody(body, composition, authHeader, bundle)
-  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    updateIndexBodyWithDuplicateIds(composition, body)
-  }
+  updateIndexBodyWithDuplicateIds(composition, body)
   await indexComposition(compositionId, body, client)
 }
 
@@ -223,7 +220,7 @@ function createInformantIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const informantRef = findEntry<RelatedPerson>(
+  const informantRef = findEntry<SavedRelatedPerson>(
     INFORMANT_CODE,
     composition,
     bundle
@@ -233,10 +230,10 @@ function createInformantIndex(
     return
   }
 
-  const informant = getFromBundleById(
+  const informant = getFromBundleById<Patient>(
     bundle,
-    informantRef.patient.reference.split('/')[1]
-  )?.resource as unknown as Patient
+    resourceIdentifierToUUID(informantRef.patient.reference)
+  )?.resource
 
   if (!informant) {
     return
@@ -357,7 +354,7 @@ export function updateIndexBodyWithDuplicateIds(
   logger.info(
     `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-  body.relatesTo = duplicates.map(
-    (rel) => rel.targetReference!.reference!.split('/')[1]
+  body.relatesTo = duplicates.map((rel) =>
+    resourceIdentifierToUUID(rel.targetReference.reference)
   )
 }

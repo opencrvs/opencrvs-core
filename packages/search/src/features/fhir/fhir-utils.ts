@@ -153,15 +153,30 @@ export function findEntryResourceByUrl<T extends fhir.Resource = fhir.Resource>(
     bundleEntries.find((obj: fhir.BundleEntry) => obj.fullUrl === url)
   return bundleEntry && (bundleEntry.resource as T)
 }
-
+export function findName(
+  code: string,
+  names: fhir.HumanName[] | undefined
+): fhir.HumanName | undefined
 export function findName(
   code: string,
   names: OpenCRVSPatientName[] | undefined
+): OpenCRVSPatientName | undefined
+export function findName(
+  code: string,
+  names: (OpenCRVSPatientName | fhir.HumanName)[] | undefined
 ) {
   return names && names.find((name) => name.use === code)
 }
 
-export function findNameLocale(names: OpenCRVSPatientName[] | undefined) {
+export function findNameLocale(
+  names: fhir.HumanName[] | undefined
+): fhir.HumanName | undefined
+export function findNameLocale(
+  names: OpenCRVSPatientName[] | undefined
+): OpenCRVSPatientName | undefined
+export function findNameLocale(
+  names: (OpenCRVSPatientName | fhir.HumanName)[] | undefined
+) {
   return names && names.find((name) => name.use !== 'en')
 }
 

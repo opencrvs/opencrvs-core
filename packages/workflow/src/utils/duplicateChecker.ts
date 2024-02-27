@@ -19,7 +19,6 @@ import {
   EVENT_TYPE,
   Extension,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
-  SavedComposition,
   SavedTask
 } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
@@ -179,5 +178,5 @@ export function updateCompositionWithDuplicateIds(
       }
     })
   )
-  return addRelatesToToComposition(composition, relatesTo) as SavedComposition
+  return addRelatesToToComposition(composition, relatesTo)
 }

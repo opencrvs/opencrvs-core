@@ -67,7 +67,7 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   const userFamilyName = userName?.family || ''
 
   body.assignment.firstName = userFirstNames
-  body.assignment.lastName = userFamilyName && userFamilyName.join(' ')
+  body.assignment.lastName = userFamilyName
 
   await updateComposition(compositionId, body, client)
 }
