@@ -1,6 +1,10 @@
 {
   "name": "@opencrvs/config",
+<<<<<<< HEAD
   "version": "1.3.3",
+=======
+  "version": "1.4.0",
+>>>>>>> a6d70584d928224de274b1d88ede3b6a64622c8c
   "description": "OpenCRVS public configuration microservice",
   "license": "MPL-2.0",
   "scripts": {
