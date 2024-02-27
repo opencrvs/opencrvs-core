@@ -21,6 +21,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -62,6 +63,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         nationality
@@ -88,6 +90,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -125,6 +128,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -162,6 +166,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -374,6 +379,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -415,6 +421,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         nationality
@@ -439,6 +446,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -447,6 +455,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -455,6 +464,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }

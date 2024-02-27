@@ -99,6 +99,9 @@ const REQUIRED_PRIMARY_ADDRESS_FIELDS = ['countryPrimary', 'statePrimary']
 
 const OPTIONAL_EVENT_ADDRESS_FIELDS = [
   'district',
+  'locationLevel3',
+  'locationLevel4',
+  'locationLevel5',
   'ruralOrUrban',
   'city',
   'addressLine3UrbanOption',
@@ -121,6 +124,9 @@ const OPTIONAL_EVENT_ADDRESS_FIELDS = [
 
 const OPTIONAL_PRIMARY_ADDRESS_FIELDS = [
   'districtPrimary',
+  'locationLevel3Primary',
+  'locationLevel4Primary',
+  'locationLevel5Primary',
   'ruralOrUrbanPrimary',
   'cityPrimary',
   'addressLine3UrbanOptionPrimary',
@@ -227,12 +233,14 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
 
 const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   child: [
+    'middleNameEng',
     'attendantAtBirth',
     'birthType',
     'weightAtBirth',
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
   ],
   mother: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -246,6 +254,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -259,15 +268,18 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'deceasedID',
     'maritalStatus',
+    'occupation',
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   spouse: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -294,6 +306,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
   ],
   groom: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -303,6 +316,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
+    'middleNameEng',
     'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
@@ -312,6 +326,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
+    'middleNameEng',
     'primaryAddress',
     'registrationPhone',
     'registrationEmail',
@@ -324,8 +339,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
-  witnessOne: [],
-  witnessTwo: []
+  witnessOne: ['middleNameEng'],
+  witnessTwo: ['middleNameEng']
 }
 
 const form = z.object({
