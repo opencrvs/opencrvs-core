@@ -31,7 +31,7 @@ import {
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { countries } from '@client/utils/countries'
-import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
+import { OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
@@ -164,7 +164,7 @@ describe('when field definition has location search input', () => {
             label: formMessages.placeOfBirth,
             initialValue: '',
             searchableResource: ['facilities'],
-            searchableType: [LocationType.HEALTH_FACILITY],
+            searchableType: ['HEALTH_FACILITY'],
             locationList: []
           }
         ]}

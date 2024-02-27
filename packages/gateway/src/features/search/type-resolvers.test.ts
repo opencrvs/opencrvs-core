@@ -62,22 +62,24 @@ describe('Search type resolvers', () => {
         _id: '123',
         _source: {
           event: 'Birth',
-          childFirstNames: 'Anik',
-          childFamilyName: 'Hoque',
-          childFirstNamesLocal: 'অনিক',
-          childFamilyNameLocal: 'হক'
+          childFirstNames: 'Bishal',
+          childMiddleName: 'Bashak',
+          childFamilyName: 'Papon',
+          childFirstNamesLocal: 'বিশাল',
+          childMiddleNameLocal: 'বসাক',
+          childFamilyNameLocal: 'পাপন'
         }
       })
       expect(name).toEqual([
         {
           use: 'en',
-          given: ['Anik'],
-          family: ['Hoque']
+          given: ['Bishal', 'Bashak'],
+          family: ['Papon']
         },
         {
           use: 'bn',
-          given: ['অনিক'],
-          family: ['হক']
+          given: ['বিশাল', 'বসাক'],
+          family: ['পাপন']
         }
       ])
     })
@@ -256,22 +258,24 @@ describe('Search type resolvers', () => {
         _id: '123',
         _source: {
           event: 'Death',
-          deceasedFirstNames: 'Anik',
-          deceasedFamilyName: 'Hoque',
-          deceasedFirstNamesLocal: 'অনিক',
-          deceasedFamilyNameLocal: 'হক'
+          deceasedFirstNames: 'Bishal',
+          deceasedMiddleName: 'Bashak',
+          deceasedFamilyName: 'Papon',
+          deceasedFirstNamesLocal: 'বিশাল',
+          deceasedMiddleNameLocal: 'বসাক',
+          deceasedFamilyNameLocal: 'পাপন'
         }
       })
       expect(name).toEqual([
         {
           use: 'en',
-          given: ['Anik'],
-          family: ['Hoque']
+          given: ['Bishal', 'Bashak'],
+          family: ['Papon']
         },
         {
           use: 'bn',
-          given: ['অনিক'],
-          family: ['হক']
+          given: ['বিশাল', 'বসাক'],
+          family: ['পাপন']
         }
       ])
     })
@@ -505,20 +509,22 @@ describe('Search type resolvers', () => {
         _source: {
           event: 'Birth',
           childFirstNames: 'Jon',
+          childMiddleName: 'C.',
           childFamilyName: 'Doe',
           childFirstNamesLocal: 'জন',
+          childMiddleNameLocal: 'সি.',
           childFamilyNameLocal: 'ডো'
         }
       })
       expect(childName).toEqual([
         {
           use: 'en',
-          given: ['Jon'],
+          given: ['Jon', 'C.'],
           family: ['Doe']
         },
         {
           use: 'bn',
-          given: ['জন'],
+          given: ['জন', 'সি.'],
           family: ['ডো']
         }
       ])
@@ -528,20 +534,22 @@ describe('Search type resolvers', () => {
         _source: {
           event: 'Death',
           deceasedFirstNames: 'Jon',
+          deceasedMiddleName: 'C.',
           deceasedFamilyName: 'Doe',
           deceasedFirstNamesLocal: 'জন',
+          deceasedMiddleNameLocal: 'সি.',
           deceasedFamilyNameLocal: 'ডো'
         }
       })
       expect(deceasedName).toEqual([
         {
           use: 'en',
-          given: ['Jon'],
+          given: ['Jon', 'C.'],
           family: ['Doe']
         },
         {
           use: 'bn',
-          given: ['জন'],
+          given: ['জন', 'সি.'],
           family: ['ডো']
         }
       ])

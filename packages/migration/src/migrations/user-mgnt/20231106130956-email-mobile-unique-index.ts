@@ -15,6 +15,31 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      console.log('Checking if mobile field already have indices')
+      const indexes = Object.keys(
+        (await db.collection('users').stats()).indexSizes
+      )
+      const mobileHasIndex = indexes.some(
+        (index) => index.split('_')[0] === ('mobile' as const)
+      )
+
+      if (mobileHasIndex) {
+        console.log('Removing index of mobile')
+        await db.collection('users').dropIndex({ mobile: 1 } as any)
+      }
+
+      // Ensure that the "mobile" field in the "users" collection does not contain null or duplicate values
+      // Before making the field sparse, which allows it to have null values but ensures uniqueness
+      const updateResult = await db.collection('users').updateMany(
+        { mobile: { $in: [null, ''] } },
+        {
+          $unset: {
+            mobile: ''
+          }
+        }
+      )
+      console.log('Number of documents updated:', updateResult.modifiedCount)
+
       // eslint-disable-next-line no-console
       console.log('Updating indices for collection: users')
       await db

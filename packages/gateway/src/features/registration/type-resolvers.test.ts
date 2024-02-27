@@ -223,13 +223,22 @@ describe('Registration type resolvers', () => {
     expect(given).toBe('')
   })
 
-  it('returns first names part with multiple naems', () => {
+  it('returns first names part with multiple names', () => {
     // @ts-ignore
     const given = typeResolvers.HumanName!.firstNames({
       use: 'test',
-      given: ['John', 'Dean']
+      given: ['John Dean']
     })
     expect(given).toBe('John Dean')
+  })
+
+  it('returns middle part of name', () => {
+    // @ts-ignore
+    const middle = typeResolvers.HumanName!.middleName({
+      use: 'test',
+      given: ['', 'Smith']
+    })
+    expect(middle).toBe('Smith')
   })
 
   it('returns family part of name', () => {

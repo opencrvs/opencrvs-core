@@ -16,18 +16,21 @@ interface INamesMap {
   [key: string]: string
 }
 
+function generateName(name: HumanName) {
+  return [name.firstNames, name.middleName, name.familyName]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+}
+
 export const createNamesMap = (names: HumanName[]): INamesMap =>
   names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
     if (!name.use) {
-      prevNamesMap['default'] = `${name.firstNames || ''} ${
-        name.familyName || ''
-      }`.trim()
+      prevNamesMap['default'] = generateName(name)
       return prevNamesMap
     }
 
-    prevNamesMap[name.use] = `${name.firstNames || ''} ${
-      name.familyName || ''
-    }`.trim()
+    prevNamesMap[name.use] = generateName(name)
     prevNamesMap[name.use] =
       prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
     return prevNamesMap

@@ -49,7 +49,6 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
 import { formMessages } from '@client/i18n/messages'
-import { LocationType } from '@client/offline/reducer'
 import { vi, Mock, SpyInstance } from 'vitest'
 
 const { store, history } = createStore()
@@ -576,7 +575,7 @@ describe('when in device of large viewport', () => {
                       name: 'birthLocation',
                       type: LOCATION_SEARCH_INPUT,
                       searchableResource: ['facilities'],
-                      searchableType: [LocationType.HEALTH_FACILITY],
+                      searchableType: ['HEALTH_FACILITY'],
                       locationList: [],
                       required: true,
                       validator: [],
