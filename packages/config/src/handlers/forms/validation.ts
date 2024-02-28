@@ -99,6 +99,8 @@ const REQUIRED_PRIMARY_ADDRESS_FIELDS = ['countryPrimary', 'statePrimary']
 
 const OPTIONAL_EVENT_ADDRESS_FIELDS = [
   'district',
+  'locationLevel3',
+  'locationLevel4',
   'ruralOrUrban',
   'city',
   'addressLine3UrbanOption',
@@ -121,6 +123,8 @@ const OPTIONAL_EVENT_ADDRESS_FIELDS = [
 
 const OPTIONAL_PRIMARY_ADDRESS_FIELDS = [
   'districtPrimary',
+  'locationLevel3Primary',
+  'locationLevel4Primary',
   'ruralOrUrbanPrimary',
   'cityPrimary',
   'addressLine3UrbanOptionPrimary',
