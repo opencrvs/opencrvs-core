@@ -12,7 +12,7 @@ RUN rm -rf /app/packages/*
 COPY packages/login /app/packages/login
 COPY packages/components /app/packages/components
 
-RUN apk update && apk add make python3 g++
+RUN apk update && apk upgrade && apk add --no-cache make python3 g++
 
 RUN yarn install
 
@@ -31,6 +31,7 @@ RUN yarn build
 
 FROM nginx
 
+RUN apt-get update && apt-get upgrade -y
 
 COPY --from=0 /app/packages/login/build/ /usr/share/nginx/html/
 

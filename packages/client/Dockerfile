@@ -3,6 +3,8 @@
 FROM node:hydrogen-alpine
 WORKDIR /app
 
+RUN apk update && apk upgrade
+
 COPY . .
 
 # Remove packages we don't need to speed up yarn install
@@ -14,7 +16,7 @@ COPY packages/components /app/packages/components
 COPY packages/commons /app/packages/commons
 COPY packages/gateway /app/packages/gateway
 
-RUN apk update && apk add make python3 g++
+RUN apk update && apk upgrade && apk add --no-cache make python3 g++
 
 RUN yarn install
 
@@ -32,6 +34,7 @@ RUN yarn build
 
 FROM nginx
 
+RUN apt-get update && apt-get upgrade -y
 
 COPY --from=0 /app/packages/client/build/ /usr/share/nginx/html/
 
