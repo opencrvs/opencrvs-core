@@ -31,9 +31,8 @@ export async function notifyCountryConfig(
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
     logger.info(
-      `Sending the following message: "${templateName}" to ${recipient}`
+      `Sending the following message template "${templateName}" from notifyCountryConfig`
     )
-    logger.info('Notifying the country config with above payload')
     return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({

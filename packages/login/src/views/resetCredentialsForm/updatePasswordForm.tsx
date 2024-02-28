@@ -95,7 +95,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
   }
   validateLength = (value: string) => {
     this.setState(() => ({
-      validLength: value.length >= 8
+      validLength: value.length >= 12
     }))
   }
   validateNumber = (value: string) => {
@@ -265,7 +265,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                     <span>
                       {intl.formatMessage(
                         messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                        { min: 8 }
+                        { min: 12 }
                       )}
                     </span>
                   </div>

@@ -232,14 +232,12 @@ async function createDeceasedIndex(
   const deceasedName = findName(NAME_EN, deceased.name)
   const deceasedNameLocal = findNameLocale(deceased.name)
 
-  body.deceasedFirstNames =
-    deceasedName && deceasedName.given && deceasedName.given.join(' ')
+  body.deceasedFirstNames = deceasedName?.given?.at(0)
+  body.deceasedMiddleName = deceasedName?.given?.at(1)
   body.deceasedFamilyName =
     deceasedName && deceasedName.family && deceasedName.family[0]
-  body.deceasedFirstNamesLocal =
-    deceasedNameLocal &&
-    deceasedNameLocal.given &&
-    deceasedNameLocal.given.join(' ')
+  body.deceasedFirstNamesLocal = deceasedNameLocal?.given?.at(0)
+  body.deceasedMiddleNameLocal = deceasedNameLocal?.given?.at(1)
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased.deceasedDateTime
@@ -267,12 +265,12 @@ function createMotherIndex(
   const motherName = findName(NAME_EN, mother.name)
   const motherNameLocal = findNameLocale(mother.name)
 
-  body.motherFirstNames =
-    motherName && motherName.given && motherName.given.join(' ')
+  body.motherFirstNames = motherName?.given?.at(0)
+  body.motherMiddleName = motherName?.given?.at(1)
   body.motherFamilyName =
     motherName && motherName.family && motherName.family[0]
-  body.motherFirstNamesLocal =
-    motherNameLocal && motherNameLocal.given && motherNameLocal.given.join(' ')
+  body.motherFirstNamesLocal = motherNameLocal?.given?.at(0)
+  body.motherMiddleNameLocal = motherNameLocal?.given?.at(1)
   body.motherFamilyNameLocal =
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
 }
@@ -295,12 +293,12 @@ function createFatherIndex(
   const fatherName = findName(NAME_EN, father.name)
   const fatherNameLocal = findNameLocale(father.name)
 
-  body.fatherFirstNames =
-    fatherName && fatherName.given && fatherName.given.join(' ')
+  body.fatherFirstNames = fatherName?.given?.at(0)
+  body.fatherMiddleName = fatherName?.given?.at(1)
   body.fatherFamilyName =
     fatherName && fatherName.family && fatherName.family[0]
-  body.fatherFirstNamesLocal =
-    fatherNameLocal && fatherNameLocal.given && fatherNameLocal.given.join(' ')
+  body.fatherFirstNamesLocal = fatherNameLocal?.given?.at(0)
+  body.fatherMiddleNameLocal = fatherNameLocal?.given?.at(1)
   body.fatherFamilyNameLocal =
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
 }
@@ -323,12 +321,12 @@ function createSpouseIndex(
   const spouseName = findName(NAME_EN, spouse.name)
   const spouseNameLocal = findNameLocale(spouse.name)
 
-  body.spouseFirstNames =
-    spouseName && spouseName.given && spouseName.given.join(' ')
+  body.spouseFirstNames = spouseName?.given?.at(0)
+  body.spouseMiddleName = spouseName?.given?.at(1)
   body.spouseFamilyName =
     spouseName && spouseName.family && spouseName.family[0]
-  body.spouseFirstNamesLocal =
-    spouseNameLocal && spouseNameLocal.given && spouseNameLocal.given.join(' ')
+  body.spouseFirstNamesLocal = spouseNameLocal?.given?.at(0)
+  body.spouseMiddleNameLocal = spouseNameLocal?.given?.at(1)
   body.spouseFamilyNameLocal =
     spouseNameLocal && spouseNameLocal.family && spouseNameLocal.family[0]
 }
@@ -360,14 +358,12 @@ function createInformantIndex(
   const informantName = findName(NAME_EN, informant.name)
   const informantNameLocal = findNameLocale(informant.name)
 
-  body.informantFirstNames =
-    informantName && informantName.given && informantName.given.join(' ')
+  body.informantFirstNames = informantName?.given?.at(0)
+  body.informantMiddleName = informantName?.given?.at(1)
   body.informantFamilyName =
     informantName && informantName.family && informantName.family[0]
-  body.informantFirstNamesLocal =
-    informantNameLocal &&
-    informantNameLocal.given &&
-    informantNameLocal.given.join(' ')
+  body.informantFirstNamesLocal = informantNameLocal?.given?.at(0)
+  body.informantMiddleNameLocal = informantNameLocal?.given?.at(1)
   body.informantFamilyNameLocal =
     informantNameLocal &&
     informantNameLocal.family &&

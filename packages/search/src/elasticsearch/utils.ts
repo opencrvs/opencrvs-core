@@ -157,27 +157,35 @@ export interface ICompositionBody {
 
 export interface IBirthCompositionBody extends ICompositionBody {
   childFirstNames?: string
+  childMiddleName?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  childMiddleNameLocal?: string
   childFamilyNameLocal?: string
   childDoB?: string
   childIdentifier?: string
   gender?: string
   motherFirstNames?: string
+  motherMiddleName?: string
   motherFamilyName?: string
   motherFirstNamesLocal?: string
+  motherMiddleNameLocal?: string
   motherFamilyNameLocal?: string
   motherDoB?: string
   motherIdentifier?: string
   fatherFirstNames?: string
+  fatherMiddleName?: string
   fatherFamilyName?: string
   fatherFirstNamesLocal?: string
+  fatherMiddleNameLocal?: string
   fatherFamilyNameLocal?: string
   fatherDoB?: string
   fatherIdentifier?: string
   informantFirstNames?: string
+  informantMiddleName?: string
   informantFamilyName?: string
   informantFirstNamesLocal?: string
+  informantMiddleNameLocal?: string
   informantFamilyNameLocal?: string
   informantDoB?: string
   informantIdentifier?: string
@@ -185,28 +193,38 @@ export interface IBirthCompositionBody extends ICompositionBody {
 
 export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNames?: string
+  deceasedMiddleName?: string
   deceasedFamilyName?: string
   deceasedFirstNamesLocal?: string
+  deceasedMiddleNameLocal?: string
   deceasedFamilyNameLocal?: string
   deceasedDoB?: string
   gender?: string
   deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string
+  motherMiddleName?: string
   motherFamilyName?: string
   motherFirstNamesLocal?: string
+  motherMiddleNameLocal?: string
   motherFamilyNameLocal?: string
   fatherFirstNames?: string
+  fatherMiddleName?: string
   fatherFamilyName?: string
   fatherFirstNamesLocal?: string
+  fatherMiddleNameLocal?: string
   fatherFamilyNameLocal?: string
   spouseFirstNames?: string
+  spouseMiddleName?: string
   spouseFamilyName?: string
   spouseFirstNamesLocal?: string
+  spouseMiddleNameLocal?: string
   spouseFamilyNameLocal?: string
   informantFirstNames?: string
+  informantMiddleName?: string
   informantFamilyName?: string
   informantFirstNamesLocal?: string
+  informantMiddleNameLocal?: string
   informantFamilyNameLocal?: string
   informantDoB?: string
   informantIdentifier?: string
@@ -214,25 +232,33 @@ export interface IDeathCompositionBody extends ICompositionBody {
 
 export interface IMarriageCompositionBody extends ICompositionBody {
   brideFirstNames?: string
-  groomFirstNames?: string
+  brideMiddleName?: string
   brideFamilyName?: string
-  groomFamilyName?: string
   brideFirstNamesLocal?: string
-  groomFirstNamesLocal?: string
+  brideMiddleNameLocal?: string
   brideFamilyNameLocal?: string
-  groomFamilyNameLocal?: string
   brideDoB?: string
-  groomDoB?: string
-  marriageDate?: string
   brideIdentifier?: string
+  groomFirstNames?: string
+  groomMiddleName?: string
+  groomFamilyName?: string
+  groomFirstNamesLocal?: string
+  groomMiddleNameLocal?: string
+  groomFamilyNameLocal?: string
+  groomDoB?: string
   groomIdentifier?: string
+  marriageDate?: string
   witnessOneFirstNames?: string
+  witnessOneMiddleName?: string
   witnessOneFamilyName?: string
   witnessOneFirstNamesLocal?: string
+  witnessOneMiddleNameLocal?: string
   witnessOneFamilyNameLocal?: string
   witnessTwoFirstNames?: string
+  witnessTwoMiddleName?: string
   witnessTwoFamilyName?: string
   witnessTwoFirstNamesLocal?: string
+  witnessTwoMiddleNameLocal?: string
   witnessTwoFamilyNameLocal?: string
 }
 
