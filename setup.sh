@@ -226,7 +226,7 @@ do
             echo
             echo "nvm install 16.20.0"
             echo
-            echo "When the version is installed, us it:"
+            echo "When the version is installed, use it:"
             echo
             echo "nvm use 16.20.0"
             echo
