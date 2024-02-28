@@ -16,6 +16,7 @@ import {
   KnownExtensionType,
   OpenCRVSPatientName,
   Resource,
+  resourceIdentifierToUUID,
   SavedBundle,
   SavedComposition,
   SavedTask
@@ -23,6 +24,7 @@ import {
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
+  ICompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
@@ -370,4 +372,21 @@ export const fetchHearth = async <T = any>(
     )
   }
   return res.json()
+}
+
+export function updateCompositionBodyWithDuplicateIds(
+  composition: SavedComposition,
+  body: ICompositionBody
+) {
+  const duplicates =
+    composition.relatesTo?.filter((rel) => rel.code === 'duplicate') || []
+  if (!duplicates.length) {
+    return
+  }
+  logger.info(
+    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
+  )
+  body.relatesTo = duplicates.map((rel) =>
+    resourceIdentifierToUUID(rel.targetReference.reference)
+  )
 }

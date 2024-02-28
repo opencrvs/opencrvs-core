@@ -20,8 +20,7 @@ import {
   IBirthCompositionBody,
   NAME_EN,
   IOperationHistory,
-  REJECTED_STATUS,
-  IDeathCompositionBody
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -30,9 +29,9 @@ import {
   findTaskExtension,
   findTaskIdentifier,
   addEventLocation,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
@@ -113,7 +112,7 @@ async function indexAndSearchComposition(
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
   await createIndexBody(body, composition, authHeader, bundle)
-  updateIndexBodyWithDuplicateIds(composition, body)
+  updateCompositionBodyWithDuplicateIds(composition, body)
   await indexComposition(compositionId, body, client)
 }
 
@@ -340,21 +339,4 @@ async function createDeclarationIndex(
 
   body.createdBy = createdBy || regLastUser
   body.updatedBy = regLastUser
-}
-
-export function updateIndexBodyWithDuplicateIds(
-  composition: SavedComposition,
-  body: IBirthCompositionBody | IDeathCompositionBody
-) {
-  const duplicates =
-    composition.relatesTo?.filter((rel) => rel.code === 'duplicate') || []
-  if (!duplicates.length) {
-    return
-  }
-  logger.info(
-    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
-  )
-  body.relatesTo = duplicates.map((rel) =>
-    resourceIdentifierToUUID(rel.targetReference.reference)
-  )
 }

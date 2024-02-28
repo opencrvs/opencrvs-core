@@ -30,7 +30,8 @@ import {
   findNameLocale,
   findTaskExtension,
   findTaskIdentifier,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
@@ -46,7 +47,6 @@ import {
   SavedRelatedPerson,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { updateIndexBodyWithDuplicateIds } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -99,7 +99,7 @@ async function indexDeclaration(
   }
 
   await createIndexBody(body, composition, authHeader, bundle)
-  updateIndexBodyWithDuplicateIds(composition, body)
+  updateCompositionBodyWithDuplicateIds(composition, body)
   await indexComposition(compositionId, body, client)
 }
 
