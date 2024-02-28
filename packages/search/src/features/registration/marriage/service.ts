@@ -27,10 +27,8 @@ import {
   findEntry,
   findName,
   findNameLocale,
-  findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
   getdeclarationJurisdictionIds,
   addEventLocation,
   findExtension
@@ -42,7 +40,13 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord
+  ValidRecord,
+  getFromBundleById,
+  getTaskFromSavedBundle,
+  Patient,
+  SavedBundle,
+  resourceIdentifierToUUID,
+  SavedRelatedPerson
 } from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
@@ -53,22 +57,21 @@ const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as ValidRecord
-  const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
   const composition = getComposition(bundle)
 
-  await indexDeclaration(composition, authHeader, bundleEntries)
+  await indexDeclaration(composition, authHeader, bundle)
 }
 
 async function indexDeclaration(
   composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundle)
   const body: ICompositionBody = {
     event: EVENT.MARRIAGE,
     createdAt:
@@ -105,41 +108,37 @@ async function indexDeclaration(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  await createIndexBody(body, composition, authHeader, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundle)
   await indexComposition(compositionId, body, client)
 }
 
 async function createIndexBody(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
-  await createBrideIndex(body, composition, bundleEntries)
-  await createGroomIndex(body, composition, bundleEntries)
-  createWitnessOneIndex(body, composition, bundleEntries)
-  createWitnessTwoIndex(body, composition, bundleEntries)
-  await createDeclarationIndex(body, composition, bundleEntries)
-  const task = findTask(bundleEntries)
-  await createStatusHistory(body, task, authHeader)
+  await createBrideIndex(body, composition, bundle)
+  await createGroomIndex(body, composition, bundle)
+  createWitnessOneIndex(body, composition, bundle)
+  createWitnessTwoIndex(body, composition, bundle)
+  await createDeclarationIndex(body, composition, bundle)
+  const task = getTaskFromSavedBundle(bundle)
+  await createStatusHistory(body, task, authHeader, bundle)
 }
 
 async function createBrideIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const bride = findEntry(
-    BRIDE_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
+  const bride = findEntry<Patient>(BRIDE_CODE, composition, bundle)
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-    bride?.extension as fhir.Extension[]
+    bride?.extension
   )
 
   const brideName = bride && findName(NAME_EN, bride.name)
@@ -163,20 +162,16 @@ async function createBrideIndex(
 
 async function createGroomIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const groom = findEntry(
-    GROOM_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
+  const groom = findEntry<Patient>(GROOM_CODE, composition, bundle)
 
   await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-    groom?.extension as fhir.Extension[]
+    groom?.extension
   )
 
   const groomName = groom && findName(NAME_EN, groom.name)
@@ -201,23 +196,23 @@ async function createGroomIndex(
 
 function createWitnessOneIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const witnessRef = findEntry(
+  const witnessRef = findEntry<SavedRelatedPerson>(
     WITNESS_ONE_CODE,
     composition,
-    bundleEntries
-  ) as fhir.RelatedPerson
+    bundle
+  )
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = findEntryResourceByUrl(
-    witnessRef.patient.reference,
-    bundleEntries
-  ) as fhir.Patient
+  const witness = getFromBundleById<Patient>(
+    bundle,
+    resourceIdentifierToUUID(witnessRef.patient.reference)
+  ).resource
 
   if (!witness) {
     return
@@ -240,23 +235,23 @@ function createWitnessOneIndex(
 
 function createWitnessTwoIndex(
   body: IMarriageCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const witnessRef = findEntry(
+  const witnessRef = findEntry<SavedRelatedPerson>(
     WITNESS_TWO_CODE,
     composition,
-    bundleEntries
-  ) as fhir.RelatedPerson
+    bundle
+  )
 
   if (!witnessRef || !witnessRef.patient) {
     return
   }
 
-  const witness = findEntryResourceByUrl(
-    witnessRef.patient.reference,
-    bundleEntries
-  ) as fhir.Patient
+  const witness = getFromBundleById<Patient>(
+    bundle,
+    resourceIdentifierToUUID(witnessRef.patient.reference)
+  ).resource
 
   if (!witness) {
     return
@@ -279,9 +274,9 @@ function createWitnessTwoIndex(
 async function createDeclarationIndex(
   body: IMarriageCompositionBody,
   composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  bundleEntries: SavedBundle
 ) {
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundleEntries)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'

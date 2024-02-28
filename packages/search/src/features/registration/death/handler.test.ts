@@ -18,7 +18,6 @@ import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockLocationResponse,
-  mockMinimalDeathFhirBundle,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockUserModelResponse,
@@ -115,47 +114,6 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/death/new-declaration',
         payload: mockDeathFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('should return status code 200 if the some sections is missing too', async () => {
-      fetch.resetMocks()
-      const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId =
-        searchByCompositionId as jest.Mocked<any>
-      mockedIndexComposition.mockResolvedValue({})
-      mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
-
-      fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/0' } }),
-          { status: 200 }
-        ],
-        [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }]
-      )
-
-      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/new-declaration',
-        payload: mockMinimalDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

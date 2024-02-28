@@ -28,7 +28,9 @@ import {
   isInProgress,
   isReadyForReview,
   isValidated,
-  isWaitingExternalValidation
+  isWaitingExternalValidation,
+  isComposition,
+  getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -45,7 +47,11 @@ import {
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { validateRequest } from '@workflow/utils'
-import { hasDuplicates } from '@workflow/utils/duplicateChecker'
+import {
+  findDuplicateIds,
+  updateCompositionWithDuplicateIds,
+  updateTaskWithDuplicateIds
+} from '@workflow/utils/duplicateChecker'
 import {
   generateTrackingIdForEvents,
   isHospitalNotification,
@@ -64,6 +70,7 @@ import {
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
+import { logger } from '@workflow/logger'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -134,7 +141,8 @@ function createInProgressOrReadyForReviewTask(
 async function createRecord(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
-  token: string
+  token: string,
+  duplicateIds: Array<{ id: string; trackingId: string }>
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
   const inputBundle = buildFHIRBundle(recordDetails, event)
   const trackingId = await generateTrackingIdForEvents(
@@ -161,6 +169,15 @@ async function createRecord(
     await withPractitionerDetails(task, token)
 
   inputBundle.entry = inputBundle.entry.map((e) => {
+    if (isComposition(e.resource) && duplicateIds.length > 0) {
+      logger.info(
+        `Workflow/service:createRecord: ${duplicateIds.length} duplicate composition(s) found`
+      )
+      return {
+        ...e,
+        resource: updateCompositionWithDuplicateIds(e.resource, duplicateIds)
+      }
+    }
     if (e.resource.resourceType !== 'Task') {
       return e
     }
@@ -223,7 +240,7 @@ export default async function createRecordHandler(
       isPotentiallyDuplicate: false
     }
   }
-  const isPotentiallyDuplicate = await hasDuplicates(
+  const duplicateIds = await findDuplicateIds(
     recordDetails,
     { Authorization: token },
     event
@@ -236,7 +253,8 @@ export default async function createRecordHandler(
   let record: CreatedRecord = await createRecord(
     recordInputWithUploadedAttachments,
     event,
-    token
+    token,
+    duplicateIds
   )
 
   await auditEvent(
@@ -245,7 +263,20 @@ export default async function createRecordHandler(
     token
   )
 
-  if (hasValidateScope(request)) {
+  if (duplicateIds.length) {
+    await indexBundle(record, token)
+    let task = getTaskFromSavedBundle(record)
+    task = updateTaskWithDuplicateIds(task, duplicateIds)
+    await sendBundleToHearth({
+      ...record,
+      entry: [{ resource: task }]
+    })
+    return {
+      compositionId: getComposition(record).id,
+      trackingId: getTrackingIdFromRecord(record),
+      isPotentiallyDuplicate: true
+    }
+  } else if (hasValidateScope(request)) {
     record = await toValidated(record, token)
     await auditEvent('sent-for-approval', record, token)
   } else if (hasRegisterScope(request) && !isInProgress(record)) {
@@ -289,6 +320,6 @@ export default async function createRecordHandler(
   return {
     compositionId: getComposition(record).id,
     trackingId: getTrackingIdFromRecord(record),
-    isPotentiallyDuplicate
+    isPotentiallyDuplicate: false
   }
 }

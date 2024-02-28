@@ -14,38 +14,38 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
   IBirthCompositionBody,
   NAME_EN,
   IOperationHistory,
-  REJECTED_STATUS,
-  DECLARED_STATUS,
-  IN_PROGRESS_STATUS,
-  updateCompositionWithDuplicates
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
   findName,
   findNameLocale,
-  findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
   addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate
+  updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord
+  ValidRecord,
+  SavedBundle,
+  Patient,
+  getFromBundleById,
+  getTaskFromSavedBundle,
+  SavedTask,
+  resourceIdentifierToUUID,
+  SavedRelatedPerson
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -54,30 +54,25 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
-function getTypeFromTask(task: fhir.Task) {
+function getTypeFromTask(task: SavedTask) {
   return task?.businessStatus?.coding?.[0]?.code
 }
 
 export async function upsertEvent(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as ValidRecord
-  const bundleEntries = bundle.entry
   const authHeader = requestBundle.headers.authorization
 
-  await indexAndSearchComposition(
-    getComposition(bundle),
-    authHeader,
-    bundleEntries
-  )
+  await indexAndSearchComposition(getComposition(bundle), authHeader, bundle)
 }
 
 async function indexAndSearchComposition(
   composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundle)
 
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
@@ -116,35 +111,32 @@ async function indexAndSearchComposition(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  await createIndexBody(body, composition, authHeader, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundle)
+  updateCompositionBodyWithDuplicateIds(composition, body)
   await indexComposition(compositionId, body, client)
-
-  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
-    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
-  }
 }
 
 async function createIndexBody(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
+  composition: SavedComposition,
   authHeader: string,
-  bundleEntries?: fhir.BundleEntry[]
+  bundle: SavedBundle
 ) {
-  await createChildIndex(body, composition, bundleEntries)
-  createMotherIndex(body, composition, bundleEntries)
-  createFatherIndex(body, composition, bundleEntries)
-  createInformantIndex(body, composition, bundleEntries)
-  await createDeclarationIndex(body, composition, bundleEntries)
-  const task = findTask(bundleEntries)
-  await createStatusHistory(body, task, authHeader)
+  await createChildIndex(body, composition, bundle)
+  createMotherIndex(body, composition, bundle)
+  createFatherIndex(body, composition, bundle)
+  createInformantIndex(body, composition, bundle)
+  await createDeclarationIndex(body, composition, bundle)
+  const task = getTaskFromSavedBundle(bundle)
+  await createStatusHistory(body, task, authHeader, bundle)
 }
 
 async function createChildIndex(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const child = findEntry<fhir.Patient>(CHILD_CODE, composition, bundleEntries)
+  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)
 
   if (!child) {
     return
@@ -170,14 +162,10 @@ async function createChildIndex(
 
 function createMotherIndex(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const mother = findEntry<fhir.Patient>(
-    MOTHER_CODE,
-    composition,
-    bundleEntries
-  )
+  const mother = findEntry<Patient>(MOTHER_CODE, composition, bundle)
 
   if (!mother) {
     return
@@ -201,14 +189,10 @@ function createMotherIndex(
 
 function createFatherIndex(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const father = findEntry<fhir.Patient>(
-    FATHER_CODE,
-    composition,
-    bundleEntries
-  )
+  const father = findEntry<Patient>(FATHER_CODE, composition, bundle)
 
   if (!father) {
     return
@@ -232,23 +216,23 @@ function createFatherIndex(
 
 function createInformantIndex(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const informantRef = findEntry<fhir.RelatedPerson>(
+  const informantRef = findEntry<SavedRelatedPerson>(
     INFORMANT_CODE,
     composition,
-    bundleEntries
+    bundle
   )
 
   if (!informantRef || !informantRef.patient) {
     return
   }
 
-  const informant = findEntryResourceByUrl<fhir.Patient>(
-    informantRef.patient.reference,
-    bundleEntries
-  )
+  const informant = getFromBundleById<Patient>(
+    bundle,
+    resourceIdentifierToUUID(informantRef.patient.reference)
+  )?.resource
 
   if (!informant) {
     return
@@ -276,10 +260,10 @@ function createInformantIndex(
 
 async function createDeclarationIndex(
   body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: SavedComposition,
+  bundle: SavedBundle
 ) {
-  const task = findTask(bundleEntries)
+  const task = getTaskFromSavedBundle(bundle)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'
@@ -355,26 +339,4 @@ async function createDeclarationIndex(
 
   body.createdBy = createdBy || regLastUser
   body.updatedBy = regLastUser
-}
-
-async function detectAndUpdateBirthDuplicates(
-  compositionId: string,
-  composition: fhir.Composition,
-  body: IBirthCompositionBody
-) {
-  const duplicates = await detectBirthDuplicates(compositionId, body)
-  if (!duplicates.length) {
-    return
-  }
-  logger.info(
-    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
-  )
-  await addFlaggedAsPotentialDuplicate(
-    duplicates.map((ite) => ite.trackingId).join(','),
-    compositionId
-  )
-  return await updateCompositionWithDuplicates(
-    composition,
-    duplicates.map((it) => it.id)
-  )
 }

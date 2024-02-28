@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Reference, SavedReference } from '.'
+import { Reference, SavedReference, SavedComposition, Composition } from '.'
 
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
@@ -199,4 +199,23 @@ export type CompositionSection = Section<ReferenceType['code']>
 
 export type SavedCompositionSection = Omit<CompositionSection, 'entry'> & {
   entry: Array<SavedReference>
+}
+
+export function addRelatesToToComposition(
+  composition: Composition | SavedComposition,
+  relatesTo: NonNullable<Composition['relatesTo']>
+) {
+  return {
+    ...composition,
+    relatesTo: (composition.relatesTo ?? [])
+      .filter(
+        (rlt) =>
+          !relatesTo.some((r) => {
+            return (
+              r.targetReference?.reference === rlt.targetReference?.reference
+            )
+          })
+      )
+      .concat(relatesTo)
+  }
 }

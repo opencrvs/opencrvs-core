@@ -9,18 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
-  searchByCompositionId,
-  updateComposition
-} from '@search/elasticsearch/dbhelper'
-import {
-  addDuplicatesToComposition,
   findName,
   findNameLocale,
-  findTaskExtension,
-  getCompositionById,
-  getFromFhir,
-  updateInHearth
+  findTaskExtension
 } from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
@@ -29,6 +22,12 @@ import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import {
+  getFromBundleById,
+  SavedBundle,
+  SavedLocation,
+  SavedTask
+} from '@opencrvs/commons/types'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -262,7 +261,7 @@ export async function detectBirthDuplicates(
   body: IBirthCompositionBody
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
-  const duplicates = findBirthDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -271,7 +270,7 @@ export async function detectDeathDuplicates(
   body: IDeathCompositionBody
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
-  const duplicates = findDeathDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -289,8 +288,9 @@ export const getStatus = async (compositionId: string) => {
 
 export const createStatusHistory = async (
   body: ICompositionBody,
-  task: fhir.Task | undefined,
-  authHeader: string
+  task: SavedTask,
+  authHeader: string,
+  bundle: SavedBundle
 ) => {
   if (!isValidOperationHistory(body)) {
     return
@@ -310,9 +310,13 @@ export const createStatusHistory = async (
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
-  const office: fhir.Location = await getFromFhir(
-    `/${regLasOfficeExtension?.valueReference?.reference}`
-  )
+  let office: SavedLocation | undefined
+  if (regLasOfficeExtension) {
+    office = getFromBundleById<SavedLocation>(
+      bundle,
+      regLasOfficeExtension.valueReference.reference.split('/')[1]
+    )?.resource
+  }
 
   const operationHistory = {
     operationType: body.type,
@@ -335,9 +339,10 @@ export const createStatusHistory = async (
     isNotification(body) &&
     body.eventLocationId
   ) {
-    const facility: fhir.Location = await getFromFhir(
-      `/Location/${body.eventLocationId}`
-    )
+    const facility = getFromBundleById<SavedLocation>(
+      bundle,
+      body.eventLocationId
+    ).resource
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
@@ -347,34 +352,6 @@ export const createStatusHistory = async (
   }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
-}
-
-export async function updateCompositionWithDuplicates(
-  composition: fhir.Composition,
-  duplicates: string[]
-) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map((duplicate) => getCompositionById(duplicate))
-  )
-
-  const duplicateCompositionIds = duplicateCompositions.map(
-    (dupComposition) => dupComposition.id
-  )
-
-  if (composition && composition.id) {
-    const body: ICompositionBody = {}
-    body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body, client)
-  }
-  const compositionFromFhir = (await getCompositionById(
-    composition.id as string
-  )) as fhir.Composition
-  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
-
-  return updateInHearth(
-    `/Composition/${compositionFromFhir.id}`,
-    compositionFromFhir
-  )
 }
 
 function isDeclarationInStatus(
@@ -392,30 +369,13 @@ function isNotification(body: ICompositionBody): boolean {
   )
 }
 
-function findBirthDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
+export function findDuplicateIds(
+  results: ISearchResponse<
+    IBirthCompositionBody | IDeathCompositionBody
+  >['hits']['hits']
 ) {
   return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
-    .map((hit) => ({
-      id: hit._id,
-      trackingId: hit._source.trackingId
-    }))
-}
-
-function findDeathDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IDeathCompositionBody>['hits']['hits']
-) {
-  return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
+    .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
       id: hit._id,
       trackingId: hit._source.trackingId
@@ -462,7 +422,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
 function updateOperationHistoryWithCorrection(
   operationHistory: IOperationHistory,
-  task?: fhir.Task
+  task: SavedTask
 ) {
   if (
     task?.input?.length &&

@@ -190,8 +190,9 @@ export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {
   section: Array<CompositionSection>
   relatesTo?: Array<
-    Omit<fhir3.CompositionRelatesTo, 'code'> & {
+    Omit<fhir3.CompositionRelatesTo, 'code' | 'targetReference'> & {
       code: fhir3.CompositionRelatesTo['code'] | 'duplicate'
+      targetReference: SavedReference
     }
   >
 }
