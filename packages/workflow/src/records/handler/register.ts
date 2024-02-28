@@ -17,6 +17,8 @@ import {
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { isRejected } from '@opencrvs/commons/types'
+import { validateRequest } from '@workflow/utils/index'
+import * as z from 'zod'
 
 export const registerRoute = [
   createRoute({
@@ -27,8 +29,21 @@ export const registerRoute = [
     handler: async (request, record) => {
       const token = getToken(request)
 
+      const payload = validateRequest(
+        z.object({
+          comments: z.string().optional(),
+          timeLoggedMS: z.number().optional()
+        }),
+        request.payload
+      )
+
       const recordInWaitingValidationState =
-        await toWaitingForExternalValidationState(record, token)
+        await toWaitingForExternalValidationState(
+          record,
+          token,
+          payload.comments,
+          payload.timeLoggedMS
+        )
 
       await indexBundle(recordInWaitingValidationState, token)
       await auditEvent(

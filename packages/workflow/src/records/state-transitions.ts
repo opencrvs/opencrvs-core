@@ -389,13 +389,17 @@ export async function toRejected(
 
 export async function toWaitingForExternalValidationState(
   record: ReadyForReviewRecord | ValidatedRecord,
-  token: string
+  token: string,
+  comments?: string,
+  timeLoggedMS?: number
 ): Promise<WaitingForValidationRecord> {
   const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitonerExtensions = createWaitingForValidationTask(
     previousTask,
-    practitioner
+    practitioner,
+    comments,
+    timeLoggedMS
   )
 
   const [waitingExternalValidationTask, practitionerResourcesBundle] =
@@ -694,13 +698,17 @@ export async function toDuplicated(
 
 export async function toValidated(
   record: InProgressRecord | ReadyForReviewRecord,
-  token: string
+  token: string,
+  comments?: string,
+  timeLoggedMS?: number
 ): Promise<ValidatedRecord> {
   const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitionerExtensions = createValidateTask(
     previousTask,
-    practitioner
+    practitioner,
+    comments,
+    timeLoggedMS
   )
 
   const [validatedTask, practitionerResourcesBundle] =

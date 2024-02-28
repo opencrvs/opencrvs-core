@@ -13,6 +13,8 @@ import { getToken } from '@workflow/utils/authUtils'
 import { indexBundle } from '@workflow/records/search'
 import { toValidated } from '@workflow/records/state-transitions'
 import { auditEvent } from '@workflow/records/audit'
+import { validateRequest } from '@workflow/utils/index'
+import * as z from 'zod'
 
 export const validateRoute = [
   createRoute({
@@ -22,8 +24,20 @@ export const validateRoute = [
     action: 'VALIDATE',
     handler: async (request, record) => {
       const token = getToken(request)
+      const payload = validateRequest(
+        z.object({
+          comments: z.string().optional(),
+          timeLoggedMS: z.number().optional()
+        }),
+        request.payload
+      )
 
-      const validatedRecord = await toValidated(record, token)
+      const validatedRecord = await toValidated(
+        record,
+        token,
+        payload.comments,
+        payload.timeLoggedMS
+      )
 
       await indexBundle(validatedRecord, token)
       await auditEvent('sent-for-approval', validatedRecord, token)
