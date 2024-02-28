@@ -1163,8 +1163,9 @@ function createNewTaskResource(
 ): SavedTask {
   return {
     resourceType: 'Task',
-    status: 'accepted',
+    status: previousTask.status ?? 'accepted',
     intent: 'proposal',
+    ...(previousTask.encounter && { encounter: previousTask.encounter }),
     code: previousTask.code,
     focus: previousTask.focus,
     id: previousTask.id,
