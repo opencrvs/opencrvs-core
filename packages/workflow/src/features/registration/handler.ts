@@ -221,48 +221,38 @@ export async function markEventAsRegisteredCallbackHandler(
     throw new Error(`Callback triggered with an error: ${error}`)
   }
 
-  try {
-    const savedRecord = await getRecordById(
-      compositionId,
-      request.headers.authorization,
-      ['WAITING_VALIDATION']
-    )
-    if (!savedRecord) {
-      throw new Error('No record found in waiting validation state')
-    }
-    const practitioner = await getLoggedInPractitionerResource(
-      getToken(request)
-    )
-
-    const event = getEventType(savedRecord)
-
-    const registeredBundle = await toRegistered(
-      request,
-      savedRecord,
-      practitioner,
-      registrationNumber,
-      childIdentifiers
-    )
-    await sendBundleToHearth(registeredBundle)
-    await indexBundle(registeredBundle, token)
-    await auditEvent('registered', registeredBundle, token)
-
-    // Notification not implemented for marriage yet
-    // don't forward hospital notifications
-    if (
-      event !== EVENT_TYPE.MARRIAGE &&
-      (await isNotificationEnabled('registered', event, token))
-    ) {
-      await sendNotification('registered', registeredBundle, token)
-    }
-
-    return h.response(registeredBundle).code(200)
-  } catch (error) {
-    logger.error(
-      `Workflow/markEventAsRegisteredCallbackHandler: error: ${error}`
-    )
-    throw new Error(error)
+  const savedRecord = await getRecordById(
+    compositionId,
+    request.headers.authorization,
+    ['WAITING_VALIDATION']
+  )
+  if (!savedRecord) {
+    throw new Error('Could not find record in elastic search!')
   }
+  const practitioner = await getLoggedInPractitionerResource(getToken(request))
+
+  const event = getEventType(savedRecord)
+
+  const registeredBundle = await toRegistered(
+    request,
+    savedRecord,
+    practitioner,
+    registrationNumber,
+    childIdentifiers
+  )
+  await sendBundleToHearth(registeredBundle)
+  await indexBundle(registeredBundle, getToken(request))
+  await auditEvent('registered', registeredBundle, token)
+
+  // Notification not implemented for marriage yet
+  if (
+    event !== EVENT_TYPE.MARRIAGE &&
+    (await isNotificationEnabled('registered', event, token))
+  ) {
+    await sendNotification('registered', registeredBundle, token)
+  }
+
+  return h.response(registeredBundle).code(200)
 }
 
 export async function markEventAsWaitingValidationHandler(
