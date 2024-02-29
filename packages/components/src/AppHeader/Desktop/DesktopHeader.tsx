@@ -32,21 +32,17 @@ const HeaderContainer = styled.div`
   z-index: 2;
   background: ${({ theme }) => theme.colors.white};
 `
-export class DesktopHeader extends React.Component<
-  IDesktopHeaderProps & IDomProps
-> {
-  render() {
-    const { id, className, desktopRightMenu } = this.props
-
-    return (
-      <HeaderContainer id={id} className={className}>
-        {desktopRightMenu &&
-          desktopRightMenu.map((item: IRightMenu, index) =>
-            React.cloneElement(item.element, {
-              key: index
-            })
-          )}
-      </HeaderContainer>
-    )
-  }
-}
+export const DesktopHeader = ({
+  id,
+  className,
+  desktopRightMenu
+}: IDesktopHeaderProps & IDomProps) => (
+  <HeaderContainer id={id} className={className}>
+    {desktopRightMenu &&
+      desktopRightMenu.map((item: IRightMenu, index) =>
+        React.cloneElement(item.element, {
+          key: index
+        })
+      )}
+  </HeaderContainer>
+)
