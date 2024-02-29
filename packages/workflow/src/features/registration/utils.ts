@@ -416,11 +416,7 @@ async function sendNotification(
     recipient,
     ...notificationPayload
   }
-  logger.info(
-    `Sending sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
-      payload
-    )}`
-  )
+  logger.info(`Notifying to ${NOTIFICATION_SERVICE_URL}${smsType}`)
   try {
     await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
       method: 'POST',
@@ -593,7 +589,7 @@ export interface IMosipSeederResponse {
 export async function getMosipUINToken(
   patient: Patient
 ): Promise<IMosipSeederResponse> {
-  logger.info(`getMosipUINToken: ${JSON.stringify(patient)}`)
+  logger.info(`getMosipUINToken for Patient id ${patient.id}`)
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir3.Identifier) => {
@@ -620,7 +616,6 @@ export async function getMosipUINToken(
       }
     }
   }
-  logger.info(`IMosipSeederPayload: ${JSON.stringify(payload)}`)
   const res = await fetch(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, {
     method: 'POST',
     body: JSON.stringify(payload),

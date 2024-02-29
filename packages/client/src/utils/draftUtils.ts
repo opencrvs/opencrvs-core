@@ -34,7 +34,14 @@ const getInformantEngName = (
       sectionData.firstNamesEng ?? ''
     }`
   }
-  return `${sectionData.firstNamesEng ?? ''} ${sectionData.familyNameEng ?? ''}`
+  return [
+    sectionData.firstNamesEng,
+    sectionData.middleNameEng,
+    sectionData.familyNameEng
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
 }
 
 const getInformantOthreName = (sectionData: IFormSectionData): string => {
@@ -115,6 +122,8 @@ const transformBirthSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleNameEng:
+      data.childName?.find((name) => name?.use === 'en')?.middleName ?? '',
     familyNameEng:
       (data.childName &&
         data.childName
@@ -127,6 +136,8 @@ const transformBirthSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleName:
+      data.childName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     familyName:
       (data.childName &&
         data.childName
@@ -148,6 +159,8 @@ const transformDeathSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleNameEng:
+      data.deceasedName?.find((name) => name?.use === 'en')?.middleName ?? '',
     familyNameEng:
       (data.deceasedName &&
         data.deceasedName
@@ -160,6 +173,8 @@ const transformDeathSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleName:
+      data.deceasedName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     familyName:
       (data.deceasedName &&
         data.deceasedName
@@ -181,6 +196,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    brideMiddleNameEng:
+      data.brideName?.find((name) => name?.use === 'en')?.middleName ?? '',
     brideFamilyNameEng:
       (data.brideName &&
         data.brideName
@@ -193,6 +210,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    brideMiddleName:
+      data.brideName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     brideFamilyName:
       (data.brideName &&
         data.brideName
@@ -209,6 +228,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    groomMiddleNameEng:
+      data.groomName?.find((name) => name?.use === 'en')?.middleName ?? '',
     groomFamilyNameEng:
       (data.groomName &&
         data.groomName
@@ -221,6 +242,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    groomMiddleName:
+      data.groomName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     groomFamilyName:
       (data.groomName &&
         data.groomName

@@ -15,7 +15,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { LocationType } from '@client/offline/reducer'
+
 describe('Transforms advancedSearch local state to advancedSearch store state properly', () => {
   const mockLocalState: IBaseAdvancedSearchState = {
     event: 'birth',
@@ -25,7 +25,7 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
       mockOfflineData.facilities['627fc0cc-e0e2-4c09-804d-38a9fa1807ee'].id,
     placeOfRegistration:
       mockOfflineData.offices['0d8474da-0361-4d32-979e-af91f012340a'].id,
-    eventLocationType: LocationType.HEALTH_FACILITY,
+    eventLocationType: 'HEALTH_FACILITY',
     dateOfRegistration: {
       exact: '1995-09-19',
       isDateRangeActive: false,
@@ -47,7 +47,7 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
     transformAdvancedSearchLocalStateToStoreData(
       {
         ...mockLocalState,
-        eventLocationType: LocationType.ADMIN_STRUCTURE,
+        eventLocationType: 'ADMIN_STRUCTURE',
         placeOfRegistration:
           mockOfflineData.locations['65cf62cb-864c-45e3-9c0d-5c70f0074cb4'].id
       },
