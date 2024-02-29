@@ -167,7 +167,7 @@ async function getFilteredDeclarations(
       (dec) =>
         dec &&
         hasStatusChanged(dec, savedDeclarations) &&
-        isNotSubmitting(dec, savedDeclarations)
+        isNotSubmittingOrDownloading(dec, savedDeclarations)
     )
     .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
     .filter((maybeDeclaration): maybeDeclaration is IDeclaration =>
@@ -235,13 +235,16 @@ async function getWorkqueueOfCurrentUser(): Promise<string> {
   return JSON.stringify(currentUserWorkqueue)
 }
 
-function isNotSubmitting(
+function isNotSubmittingOrDownloading(
   workqueueDeclaration: GQLEventSearchSet,
   savedDeclarations: IDeclaration[]
 ) {
   const declarationInStore = savedDeclarations.find(
     (dec) => dec.id === workqueueDeclaration.id
   )!
+  if (declarationInStore?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING)
+    return false
+
   if (declarationInStore?.submissionStatus)
     return !Boolean(
       [
