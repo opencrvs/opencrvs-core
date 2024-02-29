@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import { getToken } from '@workflow/utils/authUtils'
 import { getRecordById } from '@workflow/records/index'
-import { indexBundleForAssignment } from '@workflow/records/search'
+import { indexBundleToRoute } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { toNotDuplicated } from '@workflow/records/state-transitions'
 
@@ -26,11 +26,7 @@ export async function markAsNotDuplicateHandler(
 
   const notDuplicateBundle = await toNotDuplicated(record, token)
 
-  await indexBundleForAssignment(
-    notDuplicateBundle,
-    token,
-    '/events/not-duplicate'
-  )
+  await indexBundleToRoute(notDuplicateBundle, token, '/events/not-duplicate')
   await auditEvent('not-duplicate', notDuplicateBundle, token)
 
   return notDuplicateBundle

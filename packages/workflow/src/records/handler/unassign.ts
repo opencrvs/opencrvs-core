@@ -15,7 +15,7 @@ import * as z from 'zod'
 import { getRecordById } from '@workflow/records/index'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUnassigned } from '@workflow/records/state-transitions'
-import { indexBundleForAssignment } from '@workflow/records/search'
+import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 
 export async function unassignRecordHandler(
@@ -51,7 +51,7 @@ export async function unassignRecordHandler(
   )
 
   await sendBundleToHearth(unassignedRecordWithTaskOnly)
-  await indexBundleForAssignment(
+  await indexBundleToRoute(
     unassignedRecordWithTaskOnly,
     token,
     '/events/unassigned'

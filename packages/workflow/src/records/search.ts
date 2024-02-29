@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Bundle, SavedTask, ValidRecord } from '@opencrvs/commons/types'
+import { Bundle, ValidRecord } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
@@ -32,10 +32,10 @@ export async function indexBundle(bundle: ValidRecord, authToken: string) {
   return res
 }
 
-export async function indexBundleForAssignment(
-  bundle: Bundle<SavedTask> | Bundle,
+export async function indexBundleToRoute(
+  bundle: Bundle,
   authToken: string,
-  path = '/record'
+  path: string
 ) {
   const res = await fetch(new URL(path, SEARCH_URL).href, {
     method: 'POST',
@@ -48,7 +48,7 @@ export async function indexBundleForAssignment(
 
   if (!res.ok) {
     throw new Error(
-      `Indexing a bundle to search service for assignment failed with [${
+      `Indexing a bundle to search service to ${path} failed with [${
         res.status
       }] body: ${await res.text()}`
     )

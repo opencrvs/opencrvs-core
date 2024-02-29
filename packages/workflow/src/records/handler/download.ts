@@ -28,7 +28,7 @@ import {
   inScope
 } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { indexBundleForAssignment } from '@workflow/records/search'
+import { indexBundleToRoute } from '@workflow/records/search'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { logger } from '@workflow/logger'
 
@@ -102,7 +102,7 @@ export async function downloadRecordHandler(
       // Here the sent bundle is saved with task only
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
 
-      await indexBundleForAssignment(
+      await indexBundleToRoute(
         downloadedRecordWithTaskOnly,
         token,
         '/events/assigned'
