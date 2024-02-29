@@ -16,7 +16,6 @@ import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advan
 import { constantsMessages, formMessages } from '@client/i18n/messages'
 import {
   IOfflineData,
-  LocationType,
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
@@ -28,7 +27,6 @@ import { IntlShape } from 'react-intl'
 import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import format from '@client/utils/date-formatting'
 import { ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
 
@@ -181,7 +179,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     }
   }
 
-  if (localState.eventLocationType === LocationType.HEALTH_FACILITY) {
+  if (localState.eventLocationType === 'HEALTH_FACILITY') {
     eventLocationId = localState.eventLocationId
     eventCountry = ''
     eventLocationLevel1 = ''
@@ -329,12 +327,12 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   localState.eventCountry = ''
   localState.eventLocationType = ''
   if (reduxState.eventLocationId) {
-    localState.eventLocationType = LocationType.HEALTH_FACILITY
+    localState.eventLocationType = 'HEALTH_FACILITY'
     localState.eventLocationId = reduxState.eventLocationId
   }
 
   if (reduxState.eventCountry) {
-    localState.eventLocationType = LocationType.PRIVATE_HOME
+    localState.eventLocationType = 'PRIVATE_HOME'
     localState.eventCountry = reduxState.eventCountry
     localState.eventLocationLevel1 = reduxState.eventLocationLevel1 || ''
     localState.eventLocationLevel2 = reduxState.eventLocationLevel2 || ''
@@ -576,7 +574,7 @@ const getLabelForRegistrationStatus = (
     WAITING_VALIDATION: [RegStatus.WaitingValidation]
   }
 
-  const statusType = Object.keys(statusLabelMapping).find((key, i) => {
+  const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
@@ -615,7 +613,7 @@ const getLabelForRegistrationStatus = (
   ]
 
   const formattedLabel =
-    forMattedStatusList.find((e, i) => statusType === e.value)?.label ||
+    forMattedStatusList.find((e) => statusType === e.value)?.label ||
     statusList[0]
 
   return formattedLabel
@@ -630,8 +628,8 @@ const formatDateRangeLabel = (
     return
   }
   const dateStartLocale =
-    rangeStart && format(new Date(rangeStart), 'MMMM yyyy')
-  const dateEndLocale = rangeEnd && format(new Date(rangeEnd), 'MMMM yyyy')
+    rangeStart && formatDate(new Date(rangeStart), 'MMMM yyyy')
+  const dateEndLocale = rangeEnd && formatDate(new Date(rangeEnd), 'MMMM yyyy')
 
   return intl.formatMessage(formMessages.dateRangePickerCheckboxLabel, {
     rangeStart: dateStartLocale,

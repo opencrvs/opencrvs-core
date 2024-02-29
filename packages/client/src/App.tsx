@@ -381,11 +381,20 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.LocalRegistrar,
+                                                SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalSystemAdmin,
+                                                SystemRoleType.PerformanceManagement
+                                              ]}
                                               path={routes.TEAM_USER_LIST}
                                               component={UserList}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.NationalSystemAdmin
+                                              ]}
                                               path={routes.SYSTEM_LIST}
                                               component={SystemList}
                                             />
@@ -431,6 +440,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalSystemAdmin,
+                                                SystemRoleType.PerformanceManagement
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_STATISTICS
                                               }
@@ -438,6 +452,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalSystemAdmin,
+                                                SystemRoleType.PerformanceManagement
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_LEADER_BOARDS
                                               }
@@ -445,6 +464,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              roles={[
+                                                SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalSystemAdmin,
+                                                SystemRoleType.PerformanceManagement
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_DASHBOARD
                                               }

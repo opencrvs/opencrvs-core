@@ -41,8 +41,7 @@ import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
   OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY,
-  LocationType
+  OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/utils/countries'
@@ -50,12 +49,9 @@ import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption, getFieldOptions } from '@client/forms/utils'
 import {
   countryAlpha3toAlpha2,
+  getLocationHierarchy,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-
-interface IName {
-  [key: string]: any
-}
 
 type QueryData = BirthRegistration | DeathRegistration | MarriageRegistration
 
@@ -814,20 +810,6 @@ export const dateFormatTransformer =
     }
   }
 
-const isLocationFacilityOrCRVSOffice = (
-  type: string
-): type is Exclude<
-  LocationType,
-  LocationType.HEALTH_FACILITY | LocationType.CRVS_OFFICE
-> => {
-  return Boolean(
-    type &&
-      [LocationType.HEALTH_FACILITY, LocationType.CRVS_OFFICE].includes(
-        type as LocationType
-      )
-  )
-}
-
 enum FHIRPropLocationLevel {
   city,
   district,
@@ -848,20 +830,20 @@ const setAddressPropFromFHIRProp = (
     fhirProp === 'country'
       ? (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
           ?.label.defaultMessage as string) || ''
-      : offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-          addressFromQuery[
-            fhirProp as keyof typeof FHIRPropLocationLevel
-          ] as string
-        ]?.name ||
-        addressFromQuery[fhirProp as keyof typeof FHIRPropLocationLevel] ||
-        ''
+      : addressFromQuery[fhirProp] || ''
   if (fhirProp === 'country') {
     transformedData[sectionId][fieldName] = value
   } else if (
     addressFromQuery?.['country'] === window.config.COUNTRY &&
     !fieldName.includes('international')
   ) {
-    transformedData[sectionId][fieldName] = value
+    if (offlineData?.[OFFLINE_LOCATIONS_KEY][value]) {
+      transformedData[sectionId][fieldName] =
+        offlineData[OFFLINE_LOCATIONS_KEY][value].name
+      transformedData[sectionId][`${fieldName}Id`] = value
+    } else {
+      transformedData[sectionId][fieldName] = value
+    }
   } else if (
     addressFromQuery?.['country'] !== window.config.COUNTRY &&
     fieldName.includes('international')
@@ -912,13 +894,13 @@ export const addressLineTemplateTransformer =
     addressCase: AddressCases,
     lineNumber: number,
     transformedFieldName: string,
-    location: '' | FHIRAddressLineLocationLevel
+    _location: '' | FHIRAddressLineLocationLevel
   ) =>
   (
     transformedData: IFormData,
     queryData: QueryData,
     sectionId: SectionId,
-    field: IFormField,
+    _field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
   ) => {
@@ -926,18 +908,17 @@ export const addressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
     const address = queryData[sectionId]?.address
-    const addressFromQuery: Address = (address || []).find(
+    const addressFromQuery: Address | undefined = (address || []).find(
       (addr: { type: AddressCases }) => addr.type === addressCase
     )
-    if (addressFromQuery && addressFromQuery.line) {
-      if (location in FHIRAddressLineLocationLevel) {
+    if (addressFromQuery?.line) {
+      const idOrValue = addressFromQuery.line[lineNumber] || ''
+      if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
         transformedData[sectionId][transformedFieldName] =
-          offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-            addressFromQuery.line[lineNumber] as string
-          ]?.name || ''
+          offlineData[OFFLINE_LOCATIONS_KEY][idOrValue].name
+        transformedData[sectionId][`${transformedFieldName}Id`] = idOrValue
       } else {
-        transformedData[sectionId][transformedFieldName] =
-          addressFromQuery.line[lineNumber] || ''
+        transformedData[sectionId][transformedFieldName] = idOrValue
       }
     }
   }
@@ -952,7 +933,7 @@ export const eventLocationAddressLineTemplateTransformer =
     transformedData: IFormData,
     queryData: QueryData,
     sectionId: SectionId,
-    field: IFormField,
+    _field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
   ) => {
@@ -962,23 +943,39 @@ export const eventLocationAddressLineTemplateTransformer =
 
     const addressFromQuery = queryData.eventLocation?.address
 
-    if (addressFromQuery && addressFromQuery.line) {
+    if (addressFromQuery?.line) {
       if (
         queryData.eventLocation?.type &&
         queryData.eventLocation?.type === 'HEALTH_FACILITY'
       ) {
-        // Requires health facility address lines to be saved in seeded data
-        // Currently not a requirement
+        if (!offlineData || !location) {
+          return
+        }
+        const facility =
+          offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
+
+        if (!facility) {
+          return
+        }
+        const locationHierarchy = getLocationHierarchy(
+          facility.partOf.split('/').at(1)!,
+          offlineData.locations
+        )
+        const locationId = locationHierarchy[location]
+        if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
+          transformedData[sectionId][transformedFieldName] =
+            offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
+          transformedData[sectionId][`${transformedFieldName}Id`] = locationId
+        }
         return
       }
-      if (location in FHIRAddressLineLocationLevel) {
+      const idOrValue = addressFromQuery.line[lineNumber] || ''
+      if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
         transformedData[sectionId][transformedFieldName] =
-          offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
-            addressFromQuery.line[lineNumber] as string
-          ]?.name || ''
+          offlineData[OFFLINE_LOCATIONS_KEY][idOrValue].name
+        transformedData[sectionId][`${transformedFieldName}Id`] = idOrValue
       } else {
-        transformedData[sectionId][transformedFieldName] =
-          addressFromQuery.line[lineNumber] || ''
+        transformedData[sectionId][transformedFieldName] = idOrValue
       }
     }
   }
@@ -1016,19 +1013,22 @@ export const eventLocationAddressFHIRPropertyTemplateTransformer =
       if (!offlineData) {
         return
       }
-      const selectedLocation =
+      const facility =
         offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
 
-      if (selectedLocation) {
-        const locationNameMap = getLocationNameMapOfFacility(
-          selectedLocation,
-          offlineData.locations,
-          true
-        )
-        transformedData[sectionId][field.name] = get(
-          locationNameMap,
-          fhirProp
-        ) as string
+      if (!facility) {
+        return
+      }
+      const locationHierarchy = getLocationHierarchy(
+        facility.partOf.split('/').at(1)!,
+        offlineData.locations
+      )
+      const locationId =
+        locationHierarchy[fhirProp as keyof typeof locationHierarchy]
+      if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
+        transformedData[sectionId][field.name] =
+          offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
+        transformedData[sectionId][`${field.name}Id`] = locationId
       }
     } else if (
       queryData.eventLocation?.type &&
