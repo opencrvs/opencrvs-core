@@ -18,13 +18,17 @@ import {
   IDeclaration,
   SUBMISSION_STATUS,
   updateWorkqueueData,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  RemoveUnassignedDeclarationsActionCreator
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
+import type {
+  GQLEventSearchResultSet,
+  GQLEventSearchSet
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -130,6 +134,80 @@ export function updateRegistrarWorkqueue(
   }
 }
 
+async function getFilteredDeclarations(
+  workqueue: IWorkqueue,
+  getState: () => IStoreState
+): Promise<{
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}> {
+  const state = getState()
+  const scope = getScope(state)
+  const savedDeclarations = state.declarationsState.declarations
+
+  const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
+    (queryData) => {
+      return queryData[1].results
+    }
+  ) as Array<GQLEventSearchSet | null>
+
+  // for field agent, no declarations should be unassigned
+  // for registration agent, sent for approval declarations should not be unassigned
+
+  // for other agents, check if the status of workqueue declaration
+  // has changed and if that declaration is saved in the store
+  // also declaration should not show as unassigned when it is being submitted
+  if (scope?.includes('declare'))
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations: []
+    }
+
+  const unassignedDeclarations = workqueueDeclarations
+    .filter(
+      (dec) =>
+        dec &&
+        hasStatusChanged(dec, savedDeclarations) &&
+        isNotSubmitting(dec, savedDeclarations)
+    )
+    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
+    .filter((maybeDeclaration): maybeDeclaration is IDeclaration =>
+      Boolean(maybeDeclaration)
+    )
+
+  const unassignedDeclarationIds = unassignedDeclarations.map(
+    (unassigned) => unassigned.id
+  )
+  const currentlyDownloadedDeclarations = savedDeclarations.filter(
+    (dec) => !unassignedDeclarationIds.includes(dec.id)
+  )
+
+  // don't need to update indexDb if there are no unassigned declarations
+  if (unassignedDeclarations.length === 0)
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations
+    }
+
+  const uID = await getCurrentUserID()
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+  if (currentUserData) {
+    currentUserData.declarations = currentlyDownloadedDeclarations
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: currentlyDownloadedDeclarations,
+      workqueue
+    }
+    allUserData.push(currentUserData)
+  }
+
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  return { currentlyDownloadedDeclarations, unassignedDeclarations }
+}
+
 async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
@@ -156,6 +234,41 @@ async function getWorkqueueOfCurrentUser(): Promise<string> {
     workqueueInitialState.workqueue
 
   return JSON.stringify(currentUserWorkqueue)
+}
+
+function isNotSubmitting(
+  workqueueDeclaration: GQLEventSearchSet,
+  savedDeclarations: IDeclaration[]
+) {
+  const declarationInStore = savedDeclarations.find(
+    (dec) => dec.id === workqueueDeclaration.id
+  )!
+  if (declarationInStore?.submissionStatus)
+    return !Boolean(
+      [
+        SUBMISSION_STATUS.SUBMITTING,
+        SUBMISSION_STATUS.APPROVING,
+        SUBMISSION_STATUS.REGISTERING,
+        SUBMISSION_STATUS.REJECTING,
+        SUBMISSION_STATUS.ARCHIVING,
+        SUBMISSION_STATUS.CERTIFYING,
+        SUBMISSION_STATUS.ISSUING,
+        SUBMISSION_STATUS.REQUESTING_CORRECTION
+      ].includes(declarationInStore.submissionStatus as SUBMISSION_STATUS)
+    )
+  return true
+}
+
+function hasStatusChanged(
+  currentDeclaration: GQLEventSearchSet,
+  savedDeclarations: IDeclaration[]
+) {
+  const currentDeclarationStatus = currentDeclaration?.registration?.status
+  const declarationStatusInStore = savedDeclarations.find(
+    (dec) => dec.id === currentDeclaration?.id
+  )?.registrationStatus
+
+  return currentDeclarationStatus !== declarationStatusInStore
 }
 
 function mergeWorkQueueData(
@@ -404,11 +517,16 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
-
-        return {
-          ...state,
-          workqueue
-        }
+        return loop(
+          {
+            ...state,
+            workqueue
+          },
+          Cmd.run(getFilteredDeclarations, {
+            successActionCreator: RemoveUnassignedDeclarationsActionCreator,
+            args: [workqueue, Cmd.getState]
+          })
+        )
       }
       return state
 

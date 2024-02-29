@@ -11,16 +11,26 @@
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
 import { ILanguage } from '@client/i18n/reducer'
-import { ILocation } from '@client/offline/reducer'
+import {
+  AdminStructure,
+  CRVSOffice,
+  Facility,
+  ILocation
+} from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
 import { IntlShape } from 'react-intl'
+
 export interface ILocationDataResponse {
-  [locationId: string]: ILocation
+  [locationId: string]: AdminStructure
 }
 export interface IFacilitiesDataResponse {
-  [facilityId: string]: ILocation
+  [facilityId: string]: Facility
+}
+
+export interface IOfficesDataResponse {
+  [facilityId: string]: CRVSOffice
 }
 
 type FontFamilyTypes = {

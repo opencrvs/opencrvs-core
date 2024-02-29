@@ -34,7 +34,7 @@ describe('.sendSMS()', () => {
         'en'
       )
     )
-    expect(logSpy).toBeCalledTimes(2)
+    expect(logSpy).toBeCalledTimes(1)
   })
 
   it('should throw when the fetch throws', async () => {

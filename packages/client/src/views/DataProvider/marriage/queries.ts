@@ -30,6 +30,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         occupation
@@ -52,6 +53,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
           marriedLastName
         }
@@ -85,6 +87,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
           marriedLastName
         }
@@ -126,6 +129,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -142,6 +146,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -336,6 +341,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         occupation
@@ -358,6 +364,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
           marriedLastName
         }
@@ -391,6 +398,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
           marriedLastName
         }
@@ -432,6 +440,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -448,6 +457,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }

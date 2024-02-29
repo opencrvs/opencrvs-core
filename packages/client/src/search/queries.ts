@@ -65,6 +65,7 @@ export const SEARCH_EVENTS = gql`
           dateOfBirth
           childName {
             firstNames
+            middleName
             familyName
             use
           }
@@ -73,6 +74,7 @@ export const SEARCH_EVENTS = gql`
           dateOfDeath
           deceasedName {
             firstNames
+            middleName
             familyName
             use
           }
@@ -81,11 +83,13 @@ export const SEARCH_EVENTS = gql`
           dateOfMarriage
           brideName {
             firstNames
+            middleName
             familyName
             use
           }
           groomName {
             firstNames
+            middleName
             familyName
             use
           }

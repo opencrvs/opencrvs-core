@@ -177,7 +177,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
                 {validLength && <TickOn />}
                 {!validLength && <TickOff />}
                 <span>
-                  {intl.formatMessage(messages.minLength, { min: 8 })}
+                  {intl.formatMessage(messages.minLength, { min: 12 })}
                 </span>
               </div>
               <div>
