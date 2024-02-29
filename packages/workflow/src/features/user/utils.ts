@@ -12,7 +12,7 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { Practitioner } from '@opencrvs/commons/types'
+import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
 export async function getUser(
@@ -145,7 +145,7 @@ export async function getLoggedInPractitionerLocations(
 
 export async function getLoggedInPractitionerResource(
   token: string
-): Promise<Practitioner> {
+): Promise<SavedPractitioner> {
   const tokenPayload = getTokenPayload(token)
   const isNotificationAPIUser =
     tokenPayload.scope.indexOf('notification-api') > -1

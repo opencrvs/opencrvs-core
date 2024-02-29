@@ -705,7 +705,11 @@ export async function toNotDuplicated(
   token: string
 ): Promise<ValidRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerExtensions = createNotDuplicateTask(previousTask)
+  const practitioner = await getLoggedInPractitionerResource(token)
+  const taskWithoutPractitionerExtensions = createNotDuplicateTask(
+    previousTask,
+    practitioner.id
+  )
 
   const [notDuplicateTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
