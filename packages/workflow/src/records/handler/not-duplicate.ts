@@ -12,10 +12,8 @@
 import * as Hapi from '@hapi/hapi'
 import { getToken } from '@workflow/utils/authUtils'
 import { getRecordById } from '@workflow/records/index'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleForAssignment } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toNotDuplicated } from '@workflow/records/state-transitions'
 
 export async function markAsNotDuplicateHandler(
@@ -26,12 +24,8 @@ export async function markAsNotDuplicateHandler(
   const token = getToken(request)
   const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
 
-  const notDuplicateBundle = await toNotDuplicated(
-    record,
-    await getLoggedInPractitionerResource(token)
-  )
+  const notDuplicateBundle = await toNotDuplicated(record, token)
 
-  await sendBundleToHearth(notDuplicateBundle)
   await indexBundleForAssignment(
     notDuplicateBundle,
     token,

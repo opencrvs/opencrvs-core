@@ -40,8 +40,7 @@ const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   details: z.custom<
     BirthRegistration | DeathRegistration | MarriageRegistration
-  >(),
-  id: z.string()
+  >()
 })
 
 export const updateRoute = [

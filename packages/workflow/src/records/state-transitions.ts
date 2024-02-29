@@ -702,34 +702,31 @@ export async function toDuplicated(
 
 export async function toNotDuplicated(
   record: ReadyForReviewRecord,
-  practitioner: Practitioner
-): Promise<Bundle> {
+  token: string
+): Promise<ValidRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const notDuplicateTask = createNotDuplicateTask(previousTask)
+  const taskWithoutPractitionerExtensions = createNotDuplicateTask(previousTask)
 
-  const notDuplicateTaskWithPractitionerExtensions = setupLastRegUser(
-    notDuplicateTask,
-    practitioner
-  )
-
-  const notDuplicateTaskWithLocationExtensions = await setupLastRegLocation(
-    notDuplicateTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [notDuplicateTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 
   const updatedComposition = removeDuplicatesFromComposition(
     getComposition(record)
   )
-  const updatedBundle: Bundle = {
+
+  const changedResources: Bundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [
-      { resource: updatedComposition },
-      { resource: notDuplicateTaskWithLocationExtensions }
-    ]
+    entry: [{ resource: updatedComposition }, { resource: notDuplicateTask }]
   }
 
-  return updatedBundle
+  const notDuplicateBundle = await mergeChangedResourcesIntoRecord(
+    record,
+    changedResources,
+    practitionerResourcesBundle
+  )
+
+  return notDuplicateBundle
 }
 
 export async function toValidated(
