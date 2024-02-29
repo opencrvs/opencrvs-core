@@ -17,9 +17,11 @@ import * as jwt from 'jsonwebtoken'
 import {
   getTaskFromSavedBundle,
   SavedTask,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 function hasDeduplicateExtension(task: SavedTask) {
   return task.extension.find(
@@ -48,6 +50,35 @@ describe('not-duplicate record endpoint', () => {
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:workflow-user'
       }
+    )
+
+    // Hearth response
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        // we only test response of composition and task
+        // in an actual response there should be response entries for all payload entriest
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Composition/c8b8e843-c5e0-49b5-96d9-a702ddb46454/_history/2707745b-5e16-4cc0-bcbc-a4a85c5e64df' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
+      })
     )
 
     // Fetches a record from search
