@@ -8,22 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
-import { server as mswServer } from '@test/setupServer'
-import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
-import { ReadyForReviewRecord, RegisteredRecord } from '@opencrvs/commons/types'
-import { ARCHIVED_BIRTH_RECORD } from '@test/mocks/records/archive'
+import { rest } from 'msw'
+import { server as mswServer } from '@test/setupServer'
+import {
+  getTaskFromSavedBundle,
+  REGISTERED_RECORD,
+  Task
+} from '@opencrvs/commons/types'
 
-function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
-  const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')
-  //@ts-ignore
-  return taskEntry?.resource.businessStatus.coding[0].code
+function checkForVerifiedExtension(task: Task) {
+  return task.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regVerified'
+  )
 }
 
-describe('reinstate record endpoint', () => {
+function findVerificationIp(task: Task) {
+  return task.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regVerified'
+    //@ts-ignore
+  )!.valueString
+}
+
+describe('verify record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {
@@ -35,9 +44,9 @@ describe('reinstate record endpoint', () => {
     await server.stop()
   })
 
-  it('returns OK after reinstating a birth declaration', async () => {
+  it('returns OK after verifying a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: ['verify'] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
@@ -51,24 +60,28 @@ describe('reinstate record endpoint', () => {
       rest.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
         (_, res, ctx) => {
-          return res(ctx.json(ARCHIVED_BIRTH_RECORD))
+          return res(ctx.json(REGISTERED_RECORD))
         }
       )
     )
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/reinstate',
-      payload: {},
+      url: '/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/verify',
+      payload: {
+        'x-real-ip': '119.148.49.98'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
-    const reinstatedEndpointResponse: ReadyForReviewRecord | RegisteredRecord =
-      JSON.parse(res.payload)
+    const verifiedRecord = JSON.parse(res.payload)
+    const task = getTaskFromSavedBundle(verifiedRecord)
+    const isVerified = checkForVerifiedExtension(task)
 
+    expect(findVerificationIp(task)).toBe('119.148.49.98')
+    expect(!!isVerified).toBe(true)
     expect(res.statusCode).toBe(200)
-    expect(getRegStatus(reinstatedEndpointResponse)).toBe('DECLARED')
   })
 })

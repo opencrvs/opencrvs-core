@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Reference, URLReference, SavedReference, URNReference } from '.'
+import { Reference, SavedReference, SavedComposition, Composition } from '.'
 
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
@@ -69,97 +69,97 @@ export type CompositionSectionEncounterReference =
 type ReferenceType =
   | {
       code: typeof ATTACHMENT_DOCS_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof ATTACHMENT_DOCS_TITLE
     }
   | {
       code: typeof CORRECTION_CERTIFICATE_DOCS_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof CORRECTION_CERTIFICATE_DOCS_TITLE
     }
   | {
       code: typeof CERTIFICATE_DOCS_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof CERTIFICATE_DOCS_TITLE
     }
   | {
       code: typeof BIRTH_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof BIRTH_ENCOUNTER_TITLE
     }
   | {
       code: typeof MARRIAGE_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof MARRIAGE_ENCOUNTER_TITLE
     }
   | {
       code: typeof DEATH_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof DEATH_ENCOUNTER_TITLE
     }
   | {
       code: typeof BIRTH_CORRECTION_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof BIRTH_CORRECTION_ENCOUNTER_TITLE
     }
   | {
       code: typeof DEATH_CORRECTION_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof DEATH_CORRECTION_ENCOUNTER_TITLE
     }
   | {
       code: typeof MARRIAGE_CORRECTION_ENCOUNTER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof MARRIAGE_CORRECTION_ENCOUNTER_TITLE
     }
   | {
       code: typeof MOTHER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof MOTHER_TITLE
     }
   | {
       code: typeof FATHER_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof FATHER_TITLE
     }
   | {
       code: typeof CHILD_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof CHILD_TITLE
     }
   | {
       code: typeof DECEASED_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof DECEASED_TITLE
     }
   | {
       code: typeof SPOUSE_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof SPOUSE_TITLE
     }
   | {
       code: typeof BRIDE_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof BRIDE_TITLE
     }
   | {
       code: typeof GROOM_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof GROOM_TITLE
     }
   | {
       code: typeof INFORMANT_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof INFORMANT_TITLE
     }
   | {
       code: typeof WITNESS_ONE_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof WITNESS_ONE_TITLE
     }
   | {
       code: typeof WITNESS_TWO_CODE
-      reference: URLReference | URNReference
+      reference: Reference['reference']
       title: typeof WITNESS_TWO_TITLE
     }
 
@@ -199,4 +199,23 @@ export type CompositionSection = Section<ReferenceType['code']>
 
 export type SavedCompositionSection = Omit<CompositionSection, 'entry'> & {
   entry: Array<SavedReference>
+}
+
+export function addRelatesToToComposition(
+  composition: Composition | SavedComposition,
+  relatesTo: NonNullable<Composition['relatesTo']>
+) {
+  return {
+    ...composition,
+    relatesTo: (composition.relatesTo ?? [])
+      .filter(
+        (rlt) =>
+          !relatesTo.some((r) => {
+            return (
+              r.targetReference?.reference === rlt.targetReference?.reference
+            )
+          })
+      )
+      .concat(relatesTo)
+  }
 }

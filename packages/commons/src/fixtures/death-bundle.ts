@@ -89,7 +89,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593/_history/02a4ebde-26ec-4192-8cfc-d032f47b8ec8' as URLReference
+                  'Encounter/e668f0dc-aacd-45be-bd5f-2a81c3161593' as ResourceIdentifier
               }
             ]
           },
@@ -107,7 +107,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d/_history/50cef67d-a167-436b-af68-384393949b9f' as URLReference
+                  'RelatedPerson/7106d752-1e34-47fe-8726-a9fd11042a4d' as ResourceIdentifier
               }
             ]
           },
@@ -125,11 +125,11 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c/_history/f38dcdd1-5329-4922-a959-0c5405933eca' as URLReference
+                  'DocumentReference/b494d60d-676f-437e-95aa-6ebb7792b58c' as ResourceIdentifier
               },
               {
                 reference:
-                  '/fhir/DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735/_history/e1f017d5-f4e4-4aef-bff9-d27c118c1b82' as URLReference
+                  'DocumentReference/13a8cc00-189e-4882-9e23-29bc6d7fa735' as ResourceIdentifier
               }
             ]
           },
@@ -147,7 +147,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/d55283fe-b5bc-497d-86f3-5370957b0642/_history/dcd40b11-003a-4ea5-8f14-11052f549e3d' as URLReference
+                  'Patient/d55283fe-b5bc-497d-86f3-5370957b0642' as ResourceIdentifier
               }
             ]
           },
@@ -165,7 +165,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c/_history/e5401779-ca79-49e5-9011-91115560f4c1' as URLReference
+                  'Patient/977cee5f-ebbf-4744-a184-ccba8d919d1c' as ResourceIdentifier
               }
             ]
           },
@@ -183,7 +183,7 @@ export const DEATH_BUNDLE: SavedBundle<
             entry: [
               {
                 reference:
-                  '/fhir/Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7/_history/6e50611f-ccf5-4560-a67c-b0e9f1f58363' as URLReference
+                  'Patient/d89b25da-edd5-4941-b2dd-84e93868c1a7' as ResourceIdentifier
               }
             ]
           }
@@ -215,7 +215,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             location: {
               reference:
-                '/fhir/Location/4ba43b39-547b-41a8-8af1-c515786f36e5/_history/c0bb92c4-1dc9-4d78-aaac-8ea8cd8965cc' as URLReference
+                'Location/4ba43b39-547b-41a8-8af1-c515786f36e5' as ResourceIdentifier
             }
           }
         ],
@@ -242,7 +242,7 @@ export const DEATH_BUNDLE: SavedBundle<
         id: '7106d752-1e34-47fe-8726-a9fd11042a4d' as UUID,
         patient: {
           reference:
-            '/fhir/Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e/_history/02480691-fba2-4a6d-8b04-4b28deeae3ca' as URLReference
+            'Patient/9fbbb561-dd3c-4b9f-8765-829a4c75493e' as ResourceIdentifier
         },
         meta: {
           lastUpdated: '2023-09-13T12:39:48.106+00:00',

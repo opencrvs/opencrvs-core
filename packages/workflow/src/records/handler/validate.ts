@@ -11,9 +11,10 @@
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { indexBundle } from '@workflow/records/search'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toValidated } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
+import { auditEvent } from '@workflow/records/audit'
+import { validateRequest } from '@workflow/utils/index'
+import * as z from 'zod'
 
 export const validateRoute = [
   createRoute({
@@ -23,19 +24,25 @@ export const validateRoute = [
     action: 'VALIDATE',
     handler: async (request, record) => {
       const token = getToken(request)
-
-      const practitioner = await getLoggedInPractitionerResource(token)
-
-      const recordInValidatedRequestedState = await toValidated(
-        record,
-        practitioner
+      const payload = validateRequest(
+        z.object({
+          comments: z.string().optional(),
+          timeLoggedMS: z.number().optional()
+        }),
+        request.payload
       )
 
-      await sendBundleToHearth(recordInValidatedRequestedState)
+      const validatedRecord = await toValidated(
+        record,
+        token,
+        payload.comments,
+        payload.timeLoggedMS
+      )
 
-      await indexBundle(recordInValidatedRequestedState, token)
+      await indexBundle(validatedRecord, token)
+      await auditEvent('sent-for-approval', validatedRecord, token)
 
-      return recordInValidatedRequestedState
+      return validatedRecord
     }
   })
 ]

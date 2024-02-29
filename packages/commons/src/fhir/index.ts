@@ -21,6 +21,7 @@ import {
   SavedCompositionSection
 } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
+import { Practitioner, SavedPractitioner } from './practitioner'
 
 export * from './practitioner'
 export * from './task'
@@ -47,8 +48,20 @@ export type ResourceIdentifier<
 // /fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
 
+export type Reference = Omit<fhir3.Reference, 'reference'> & {
+  reference: URNReference | ResourceIdentifier
+}
+
+export type SavedReference = Omit<Reference, 'reference'> & {
+  reference: ResourceIdentifier
+}
+
 export function isURLReference(id: string): id is URLReference {
   return id.startsWith('/fhir')
+}
+
+export function isURNReference(id: string): id is URNReference {
+  return id.startsWith('urn:uuid:')
 }
 
 export function urlReferenceToUUID(reference: URLReference) {
@@ -97,6 +110,8 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedLocation
   : T extends Task
   ? SavedTask
+  : T extends Practitioner
+  ? SavedPractitioner
   : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
@@ -175,8 +190,9 @@ export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {
   section: Array<CompositionSection>
   relatesTo?: Array<
-    Omit<fhir3.CompositionRelatesTo, 'code'> & {
+    Omit<fhir3.CompositionRelatesTo, 'code' | 'targetReference'> & {
       code: fhir3.CompositionRelatesTo['code'] | 'duplicate'
+      targetReference: SavedReference
     }
   >
 }
@@ -196,15 +212,11 @@ export type DocumentReference = WithStrictExtensions<
 export type RelatedPerson = WithStrictExtensions<
   Omit<fhir3.RelatedPerson, 'patient'>
 > & {
-  patient?: {
-    reference: URNReference | URLReference | ResourceIdentifier
-  }
+  patient?: Reference
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient: {
-    reference: URLReference
-  }
+  patient: SavedReference
 }
 
 export type Location = WithStrictExtensions<
@@ -284,12 +296,6 @@ export type FhirResourceType =
 
 export type Identifier = fhir3.Identifier
 
-export type Reference = Omit<fhir3.Reference, 'reference'> & {
-  reference: URNReference | ResourceIdentifier | URLReference
-}
-export type SavedReference = Omit<Reference, 'reference'> & {
-  reference: URLReference
-}
 export type Coding = fhir3.Coding
 export type QuestionnaireResponse = fhir3.QuestionnaireResponse
 export type CompositionRelatesTo = fhir3.CompositionRelatesTo
@@ -359,6 +365,22 @@ export function getFromBundleById<T extends Resource = Resource>(
   return resource as SavedBundleEntry<T>
 }
 
+export function findEntryFromBundle<T extends Resource = Resource>(
+  bundle: Bundle,
+  reference: Reference['reference']
+): BundleEntryWithFullUrl<T> | SavedBundleEntry<T> | undefined {
+  return isURNReference(reference)
+    ? bundle.entry.find(
+        (entry): entry is BundleEntryWithFullUrl<T> =>
+          entry.fullUrl === reference
+      )
+    : bundle.entry.find(
+        (entry): entry is SavedBundleEntry<T> =>
+          isSaved(entry.resource) &&
+          entry.resource.id === resourceIdentifierToUUID(reference)
+      )
+}
+
 export function findCompositionSection<T extends SavedComposition>(
   code: CompositionSectionCode,
   composition: T
@@ -390,6 +412,16 @@ export function resourceToBundleEntry<T extends Resource>(
   return {
     resource,
     fullUrl: `urn:uuid:${resource.id as UUID}`
+  }
+}
+
+export function resourceToSavedBundleEntry<T extends Resource>(
+  resource: SavedResource<T>
+): SavedBundleEntry<T> {
+  return {
+    resource,
+    fullUrl:
+      `/fhir/${resource.resourceType}/${resource.id}/_history/${resource.meta?.versionId}` as URLReference
   }
 }
 

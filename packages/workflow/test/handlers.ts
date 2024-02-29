@@ -14,6 +14,7 @@ import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
 import { TransactionResponse } from '@workflow/records/fhir'
+import { RecordEvent } from '@workflow/records/recordEvents'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -66,8 +67,17 @@ const auditEventHandler = rest.post(
   'http://localhost:1050/events/birth/:action',
   (req, res, ctx) => {
     const { action } = req.params
-    const knownActions = ['new-declaration', 'mark-certified', 'mark-issued']
-    if (!knownActions.includes(action as string)) {
+    const knownActions = [
+      'sent-notification-for-review',
+      'sent-for-approval',
+      'sent-for-updates',
+      'waiting-external-validation',
+      'registered',
+      'certified',
+      'reinstated',
+      'issued'
+    ] satisfies RecordEvent[]
+    if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)
     }
     return res(ctx.status(200))

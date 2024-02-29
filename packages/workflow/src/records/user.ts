@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { getTokenPayload } from '@opencrvs/commons/authentication'
+import { getSystem, getUser } from '@workflow/features/user/utils'
+
 type Label = {
   lang: string
   label: string
@@ -62,4 +65,21 @@ export function isSystem(
   systemOrUser: IUserModelData | ISystemModelData
 ): systemOrUser is ISystemModelData {
   return (systemOrUser as ISystemModelData).client_id !== undefined
+}
+
+export async function getUserOrSystem(
+  token: string
+): Promise<IUserModelData | ISystemModelData> {
+  const tokenPayload = getTokenPayload(token)
+  const isNotificationAPIUser = tokenPayload.scope.includes('notification-api')
+  const isRecordSearchAPIUser = tokenPayload.scope.includes('recordsearch')
+
+  if (isNotificationAPIUser || isRecordSearchAPIUser) {
+    return await getSystem(tokenPayload.sub, {
+      Authorization: `Bearer ${token}`
+    })
+  }
+  return await getUser(tokenPayload.sub, {
+    Authorization: `Bearer ${token}`
+  })
 }

@@ -10,22 +10,13 @@
  */
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
-import { Bundle, Resource, ValidRecord } from '@opencrvs/commons/types'
+import { ValidRecord } from '@opencrvs/commons/types'
 import { METRICS_URL } from '@workflow/constants'
-
-type AuditAction =
-  | 'in-progress-declaration'
-  | 'new-declaration'
-  | 'mark-voided'
-  | 'mark-certified'
-  | 'mark-issued'
-  | 'mark-reinstated'
-  | 'not-duplicate'
-  | 'marked-as-duplicate'
+import { RecordEvent } from './recordEvents'
 
 export async function auditEvent(
-  action: AuditAction,
-  bundle: ValidRecord | Bundle<Resource>,
+  action: RecordEvent,
+  bundle: ValidRecord,
   authToken: string
 ) {
   const eventType = getEventType(bundle).toLowerCase()

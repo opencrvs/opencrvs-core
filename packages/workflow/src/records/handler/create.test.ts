@@ -16,7 +16,6 @@ import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
 import { TransactionResponse } from '@workflow/records/fhir'
-import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -56,7 +55,6 @@ describe('Create record endpoint', () => {
     )
 
     // response after sending bundle to hearth
-    // only the composition location is used in the handler
     mswServer.use(
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
         const responseBundle: TransactionResponse = {
@@ -69,20 +67,53 @@ describe('Create record endpoint', () => {
                 location:
                   '/fhir/Composition/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' as URLReference
               }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Task/d8aa3c7d-ae34-4cf5-a8bc-e287f1c0ce11/_history/0ab3b213-3dec-4ae2-8a01-73200bd1f321' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/RelatedPerson/b894f4df-1668-49f9-b654-0feab70bd465/_history/38c62416-9f53-4cdf-9c95-8a95f034aa0e' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Patient/d8fe5b4e-fce5-4636-bd35-12c01ae86977/_history/955f3421-a6d0-44dc-ace1-dceb934253e9' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Patient/89556e20-bc14-4cf8-8c57-5ab432f15125/_history/9511adab-4f88-4ac1-b5f0-8fc491dc46f1' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Encounter/79b67c72-6a10-43df-b766-441565109beb/_history/96fc2ce9-3798-436e-a127-1843096eeca9' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Patient/452c6036-332c-4e97-8e53-892ad417eae4/_history/d1b4800a-fefc-4c6c-88e5-8b94ad3668e3' as URLReference
+              }
             }
           ]
         }
         return res(ctx.json(responseBundle))
       })
-    )
-
-    mswServer.use(
-      rest.get(
-        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
-        }
-      )
     )
 
     // mock tracking-id generation from country confgi

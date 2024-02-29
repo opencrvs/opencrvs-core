@@ -11,9 +11,15 @@
 import nodeFetch from 'node-fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
+  addExtensionsToTask,
+  addRelatesToToComposition,
   BirthRegistration,
+  Composition,
   DeathRegistration,
-  EVENT_TYPE
+  EVENT_TYPE,
+  Extension,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  SavedTask
 } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 
@@ -29,7 +35,7 @@ function fetch(...params: Parameters<typeof nodeFetch>) {
   return nodeFetch(...params)
 }
 
-const findDeathDuplicates = async (
+const searchDeathDuplicates = async (
   authHeader: IAuthHeader,
   criteria: DeathDuplicateSearchBody
 ) => {
@@ -60,7 +66,7 @@ type BirthDuplicateSearchBody = {
   motherIdentifier?: string
 }
 
-const findBirthDuplicates = async (
+const searchBirthDuplicates = async (
   authHeader: IAuthHeader,
   criteria: BirthDuplicateSearchBody
 ) => {
@@ -81,15 +87,15 @@ const findBirthDuplicates = async (
   }
 }
 
-async function hasBirthDuplicates(
+async function findBirthDuplicateIds(
   authHeader: IAuthHeader,
   birthRegDetails: BirthRegistration
-) {
+): Promise<{ id: string; trackingId: string }[]> {
   if (!birthRegDetails || !birthRegDetails.child) {
-    return false
+    return []
   }
 
-  const res = await findBirthDuplicates(authHeader, {
+  const res = await searchBirthDuplicates(authHeader, {
     motherIdentifier: birthRegDetails.mother?.identifier?.[0]?.id,
     childFirstNames: birthRegDetails.child.name?.[0]?.firstNames,
     childFamilyName: birthRegDetails.child.name?.[0]?.familyName,
@@ -99,18 +105,18 @@ async function hasBirthDuplicates(
     motherDoB: birthRegDetails.mother?.birthDate
   })
 
-  return !res || res.length > 0
+  return res
 }
 
-async function hasDeathDuplicates(
+async function findDeathDuplicateIds(
   authHeader: IAuthHeader,
   deathRegDetails: DeathRegistration
-) {
+): Promise<{ id: string; trackingId: string }[]> {
   if (!deathRegDetails || !deathRegDetails.deceased) {
-    return false
+    return []
   }
 
-  const res = await findDeathDuplicates(authHeader, {
+  const res = await searchDeathDuplicates(authHeader, {
     deceasedFirstNames: deathRegDetails.deceased?.name?.[0]?.firstNames,
     deceasedFamilyName: deathRegDetails.deceased?.name?.[0]?.familyName,
     deceasedIdentifier: deathRegDetails.deceased?.identifier?.[0]?.id,
@@ -118,25 +124,59 @@ async function hasDeathDuplicates(
     deathDate: deathRegDetails.deceased?.deceased?.deathDate
   })
 
-  return !res || res.length > 0
+  return res
 }
 
-export async function hasDuplicates(
+export async function findDuplicateIds(
   registrationDetails: BirthRegistration | DeathRegistration,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
   if (event === EVENT_TYPE.BIRTH) {
-    return hasBirthDuplicates(
+    return findBirthDuplicateIds(
       authHeader,
       registrationDetails as BirthRegistration
     )
   } else if (event === EVENT_TYPE.DEATH) {
-    return hasDeathDuplicates(
+    return findDeathDuplicateIds(
       authHeader,
       registrationDetails as DeathRegistration
     )
   }
   // NOT IMPLEMENTED FOR MARRIAGE
-  return false
+  return []
+}
+
+export function updateTaskWithDuplicateIds(
+  task: SavedTask,
+  duplicateIds: { id: string; trackingId: string }[]
+) {
+  const extension: Extension = {
+    url: FLAGGED_AS_POTENTIAL_DUPLICATE,
+    valueString: duplicateIds
+      .map((duplicate) => duplicate.trackingId)
+      .toString()
+  }
+  return addExtensionsToTask(
+    {
+      ...task,
+      lastModified: new Date().toISOString()
+    },
+    [extension]
+  ) as SavedTask
+}
+
+export function updateCompositionWithDuplicateIds(
+  composition: Composition,
+  duplicateIds: { id: string; trackingId: string }[]
+) {
+  const relatesTo: NonNullable<Composition['relatesTo']> = duplicateIds.map(
+    (duplicate) => ({
+      code: 'duplicate',
+      targetReference: {
+        reference: `Composition/${duplicate.id}`
+      }
+    })
+  )
+  return addRelatesToToComposition(composition, relatesTo)
 }

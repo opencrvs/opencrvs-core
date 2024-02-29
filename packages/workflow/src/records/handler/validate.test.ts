@@ -17,8 +17,10 @@ import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForRevie
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -53,9 +55,30 @@ describe('Validate record endpoint', () => {
       )
     )
 
+    // Mock response from hearth
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
+      })
+    )
+
     const response = await server.server.inject({
       method: 'POST',
       url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/validate',
+      payload: {},
       headers: {
         Authorization: `Bearer ${token}`
       }

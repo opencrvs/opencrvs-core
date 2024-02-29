@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -18,7 +17,7 @@ import {
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
-import { getRecordById } from '@workflow/records/index'
+import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/authUtils'
 import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
@@ -59,20 +58,8 @@ export async function downloadRecordHandler(
 
   const token = getToken(request)
   const tokenPayload = getTokenPayload(token)
-  const record = await getRecordById(
-    // Task history is fetched rather than the task only
-    `${payload.id}?includeHistoryResources`,
-    token,
-    [
-      'CERTIFIED',
-      'VALIDATED',
-      'IN_PROGRESS',
-      'READY_FOR_REVIEW',
-      'REGISTERED',
-      'ISSUED',
-      'CORRECTION_REQUESTED'
-    ]
-  )
+  // Task history is fetched rather than the task only
+  const record = await getValidRecordById(payload.id, token, true)
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)

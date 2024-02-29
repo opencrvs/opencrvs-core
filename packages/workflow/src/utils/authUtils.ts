@@ -49,13 +49,22 @@ export const getToken = (request: Hapi.Request): string => {
 }
 
 export function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(request.headers.authorization, USER_SCOPE.REGISTER)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.REGISTER
+  )
 }
 
 export function hasValidateScope(request: Hapi.Request): boolean {
-  return hasScope(request.headers.authorization, USER_SCOPE.VALIDATE)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.VALIDATE
+  )
 }
 
 export function hasDeclareScope(request: Hapi.Request): boolean {
-  return hasScope(request.headers.authorization, USER_SCOPE.DECLARE)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.DECLARE
+  )
 }
