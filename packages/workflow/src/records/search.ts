@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Bundle, ValidRecord } from '@opencrvs/commons/types'
+import { Bundle, SavedTask, ValidRecord } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
@@ -33,9 +33,21 @@ export async function indexBundle(bundle: ValidRecord, authToken: string) {
 }
 
 export async function indexBundleToRoute(
-  bundle: Bundle,
+  bundle: ValidRecord,
   authToken: string,
-  path: string
+  path: '/events/not-duplicate'
+): Promise<void>
+
+export async function indexBundleToRoute(
+  bundle: Bundle<SavedTask>,
+  authToken: string,
+  path: `/events/${'assigned' | 'unassigned'}`
+): Promise<void>
+
+export async function indexBundleToRoute(
+  bundle: Bundle<SavedTask> | ValidRecord,
+  authToken: string,
+  path: `/events/${'assigned' | 'unassigned' | 'not-duplicate'}`
 ) {
   const res = await fetch(new URL(path, SEARCH_URL).href, {
     method: 'POST',
