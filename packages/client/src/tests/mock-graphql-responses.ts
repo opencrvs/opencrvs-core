@@ -145,7 +145,7 @@ export const birthDeclarationForReview = {
     status: [
       {
         comments: null,
-        type: 'DECLARED',
+        type: 'REJECTED',
         timestamp: '2022-04-28T15:19:12.858Z',
         __typename: 'RegWorkflow'
       },

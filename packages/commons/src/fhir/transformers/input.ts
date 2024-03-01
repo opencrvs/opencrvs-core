@@ -14,6 +14,7 @@ import { TaskStatus } from '../task'
 export interface HumanName {
   use?: string
   firstNames?: string
+  middleName?: string
   familyName?: string
   marriedLastName?: string
 }
