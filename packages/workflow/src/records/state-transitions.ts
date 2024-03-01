@@ -66,7 +66,10 @@ import {
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { IEventRegistrationCallbackPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import {
+  getTaskEventType,
+  removeDuplicatesFromComposition
+} from '@workflow/features/task/fhir/utils'
 import {
   CertifyInput,
   IssueInput,
@@ -85,6 +88,7 @@ import {
   createCorrectionRequestTask,
   createDownloadTask,
   createDuplicateTask,
+  createNotDuplicateTask,
   createRegisterTask,
   createRejectTask,
   createUnassignedTask,
@@ -694,6 +698,39 @@ export async function toDuplicated(
   } as ReadyForReviewRecord
 
   return { duplicatedRecord, duplicatedRecordWithTaskOnly }
+}
+
+export async function toNotDuplicated(
+  record: ReadyForReviewRecord,
+  token: string
+): Promise<ValidRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const practitioner = await getLoggedInPractitionerResource(token)
+  const taskWithoutPractitionerExtensions = createNotDuplicateTask(
+    previousTask,
+    practitioner.id
+  )
+
+  const [notDuplicateTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
+
+  const updatedComposition = removeDuplicatesFromComposition(
+    getComposition(record)
+  )
+
+  const changedResources: Bundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: updatedComposition }, { resource: notDuplicateTask }]
+  }
+
+  const notDuplicateBundle = await mergeChangedResourcesIntoRecord(
+    record,
+    changedResources,
+    practitionerResourcesBundle
+  )
+
+  return notDuplicateBundle
 }
 
 export async function toValidated(

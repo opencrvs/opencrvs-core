@@ -32,10 +32,22 @@ export async function indexBundle(bundle: ValidRecord, authToken: string) {
   return res
 }
 
-export async function indexBundleForAssignment(
+export async function indexBundleToRoute(
+  bundle: ValidRecord,
+  authToken: string,
+  path: '/events/not-duplicate'
+): Promise<void>
+
+export async function indexBundleToRoute(
   bundle: Bundle<SavedTask>,
   authToken: string,
-  path: string
+  path: `/events/${'assigned' | 'unassigned'}`
+): Promise<void>
+
+export async function indexBundleToRoute(
+  bundle: Bundle<SavedTask> | ValidRecord,
+  authToken: string,
+  path: `/events/${'assigned' | 'unassigned' | 'not-duplicate'}`
 ) {
   const res = await fetch(new URL(path, SEARCH_URL).href, {
     method: 'POST',
@@ -48,7 +60,7 @@ export async function indexBundleForAssignment(
 
   if (!res.ok) {
     throw new Error(
-      `Indexing a bundle to search service for assignment failed with [${
+      `Indexing a bundle to search service to ${path} failed with [${
         res.status
       }] body: ${await res.text()}`
     )

@@ -58,7 +58,6 @@ describe('Update record endpoint', () => {
       method: 'POST',
       url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/update',
       payload: {
-        id: '7c3af302-08c9-41af-8701-92de9a71a3e4',
         event: 'BIRTH',
         details: updateBirthRegistrationPayload
       },

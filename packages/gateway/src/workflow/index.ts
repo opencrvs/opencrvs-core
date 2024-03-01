@@ -22,7 +22,8 @@ import {
   getTaskFromSavedBundle,
   getBusinessStatus,
   IssuedRecord,
-  ValidRecord
+  ValidRecord,
+  getComposition
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -223,6 +224,16 @@ export function certifyRegistration(
       event
     }
   )
+}
+
+export async function markNotADuplicate(id: string, authHeader: IAuthHeader) {
+  const response = await createRequest<Bundle<Resource>>(
+    'POST',
+    `/records/${id}/not-duplicate`,
+    authHeader
+  )
+
+  return getComposition(response)
 }
 
 export async function archiveRegistration(

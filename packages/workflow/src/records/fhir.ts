@@ -913,6 +913,21 @@ export function createArchiveTask(
   return updatedArchivedTask
 }
 
+export function createNotDuplicateTask(
+  previousTask: SavedTask,
+  practitionerId: string
+): SavedTask {
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate' as const
+      }
+    ],
+    practitionerId
+  )
+}
+
 export function createDuplicateTask(
   previousTask: SavedTask,
   practitioner: Practitioner,
