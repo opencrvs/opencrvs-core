@@ -30,6 +30,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         exactDateOfBirthUnknown
         gender
         maritalStatus
+        occupation
         nationality
         identifier {
           id
@@ -388,6 +389,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         exactDateOfBirthUnknown
         gender
         maritalStatus
+        occupation
         nationality
         identifier {
           id
