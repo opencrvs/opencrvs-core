@@ -44,14 +44,15 @@ const getInformantEngName = (
     .trim()
 }
 
-const getInformantOthreName = (sectionData: IFormSectionData): string => {
-  if (sectionData.firstNames) {
-    return `${sectionData.firstNames as string} ${
-      sectionData.familyName as string
-    }`
-  } else {
-    return sectionData.familyName as string
-  }
+const getInformantOtherName = (sectionData: IFormSectionData): string => {
+  return [
+    sectionData.firstNames,
+    sectionData.middleName,
+    sectionData.familyName
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
 }
 
 const getInformantFullName = (
@@ -59,24 +60,16 @@ const getInformantFullName = (
   language = 'en',
   lastNameFirst = false
 ): string => {
-  let fullName: string
   if (!sectionData) {
     return EMPTY_STRING
   }
   if (language === 'en') {
-    fullName = getInformantEngName(sectionData, lastNameFirst).trim()
-  } else {
-    if (sectionData.firstNames && sectionData.familyName) {
-      fullName = `${sectionData.firstNames as string} ${
-        sectionData.familyName as string
-      }`
-    } else {
-      fullName =
-        getInformantOthreName(sectionData) ||
-        getInformantEngName(sectionData, lastNameFirst).trim()
-    }
+    return getInformantEngName(sectionData, lastNameFirst)
   }
-  return fullName
+  return (
+    getInformantOtherName(sectionData) ||
+    getInformantEngName(sectionData, lastNameFirst)
+  )
 }
 
 /*
