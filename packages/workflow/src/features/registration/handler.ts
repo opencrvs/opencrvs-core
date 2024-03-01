@@ -8,37 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { HEARTH_URL } from '@workflow/constants'
-import {
-  markBundleAsCertified,
-  markBundleAsValidated,
-  modifyRegistrationBundle,
-  markBundleAsWaitingValidation,
-  touchBundle,
-  markBundleAsDeclarationUpdated,
-  makeTaskAnonymous,
-  markBundleAsIssued
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import {
-  getSharedContactMsisdn,
-  postToHearth,
-  mergePatientIdentifier,
-  getSharedContactEmail
-} from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  sendEventNotification,
-  isEventNonNotifiable,
-  getEventType
-} from '@workflow/features/registration/utils'
-import { taskHasInput } from '@workflow/features/task/fhir/utils'
-import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import fetch from 'node-fetch'
-import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
-import { triggerEvent } from '@workflow/features/events/handler'
-import { Events } from '@workflow/features/events/utils'
-import { Bundle, BundleEntry, EVENT_TYPE, Saved } from '@opencrvs/commons/types'
+import { getEventType } from '@workflow/features/registration/utils'
+import { Bundle, BundleEntry, EVENT_TYPE } from '@opencrvs/commons/types'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
@@ -48,6 +21,7 @@ import {
   sendNotification
 } from '@workflow/records/notification'
 import { auditEvent } from '@workflow/records/audit'
+import { sendBundleToHearth } from '@workflow/records/fhir'
 
 export interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -58,23 +32,6 @@ export interface IEventRegistrationCallbackPayload {
     type: string
     value: string
   }[]
-}
-
-async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
-  const res = await fetch(HEARTH_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-  if (!res.ok) {
-    throw new Error(
-      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
-    )
-  }
-
-  return res.json()
 }
 
 function getSectionFromResponse(
@@ -149,66 +106,6 @@ export function populateCompositionWithID(payload: Bundle, response: Bundle) {
   }
 }
 
-export async function createRegistrationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    const token = getToken(request)
-    let payload = await modifyRegistrationBundle(
-      request.payload as Saved<Bundle>,
-      token
-    )
-    if (
-      [
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-      ].includes(event)
-    ) {
-      payload = await markBundleAsWaitingValidation(payload, token)
-    } else if (
-      [
-        Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
-        Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION,
-        Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION
-      ].includes(event)
-    ) {
-      payload = await markBundleAsValidated(payload, token)
-    }
-    const resBundle = await sendBundleToHearth(payload)
-    populateCompositionWithID(payload, resBundle)
-
-    if (isEventNonNotifiable(event)) {
-      return { resBundle, payloadForInvokingValidation: payload }
-    }
-
-    /* sending notification to the contact */
-    const sms = await getSharedContactMsisdn(payload)
-    const email = await getSharedContactEmail(payload)
-    if (!sms && !email) {
-      logger.info('createRegistrationHandler could not send event notification')
-      return { resBundle, payloadForInvokingValidation: payload }
-    }
-    logger.info('createRegistrationHandler sending event notification')
-    sendEventNotification(
-      payload,
-      event,
-      { sms, email },
-      {
-        Authorization: request.headers.authorization
-      }
-    )
-    return { resBundle, payloadForInvokingValidation: payload }
-  } catch (error) {
-    logger.error(
-      `Workflow/createRegistrationHandler[${event}]: error: ${error}`
-    )
-    throw new Error(error)
-  }
-}
-
 export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -253,127 +150,4 @@ export async function markEventAsRegisteredCallbackHandler(
   }
 
   return h.response(registeredBundle).code(200)
-}
-
-export async function markEventAsWaitingValidationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    let payload: Saved<Bundle>
-
-    const taskResource = getTaskResourceFromFhirBundle(
-      request.payload as Bundle
-    )
-
-    // In case the record was updated then there will be input output in payload
-    if (taskHasInput(taskResource)) {
-      payload = await markBundleAsDeclarationUpdated(
-        request.payload as Saved<Bundle>,
-        getToken(request)
-      )
-      await postToHearth(payload)
-      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
-      delete taskResource.input
-      delete taskResource.output
-    }
-
-    payload = await markBundleAsWaitingValidation(
-      request.payload as Saved<Bundle>,
-      getToken(request)
-    )
-    const resBundle = await postToHearth(payload)
-    populateCompositionWithID(payload, resBundle)
-
-    return { resBundle, payloadForInvokingValidation: payload }
-  } catch (error) {
-    logger.error(
-      `Workflow/markAsWaitingValidationHandler[${event}]: error: ${error}`
-    )
-    throw new Error(error)
-  }
-}
-
-export async function markEventAsCertifiedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const payload = await markBundleAsCertified(
-      request.payload as Bundle,
-      getToken(request)
-    )
-    await mergePatientIdentifier(payload)
-    const resBundle = await postToHearth(payload)
-    populateCompositionWithID(payload, resBundle)
-    return resBundle
-  } catch (error) {
-    logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-export async function markEventAsIssuedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const payload = await markBundleAsIssued(
-      request.payload as Bundle,
-      getToken(request)
-    )
-    await mergePatientIdentifier(payload)
-    const resBundle = await postToHearth(payload)
-    populateCompositionWithID(payload, resBundle)
-    return resBundle
-  } catch (error) {
-    logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-export async function actionEventHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    let payload = request.payload as Bundle
-    payload = await touchBundle(payload, getToken(request))
-    const taskResource = payload.entry?.[0].resource as fhir3.Task
-    return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
-      method: 'PUT',
-      body: JSON.stringify(taskResource),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    })
-  } catch (error) {
-    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
-    throw new Error(error)
-  }
-}
-export async function anonymousActionEventHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit,
-  event: Events
-) {
-  try {
-    const payload = request.payload as Bundle
-    const anonymousPayload = makeTaskAnonymous(payload)
-
-    const taskResource = anonymousPayload.entry?.[0].resource as fhir3.Task
-    const res = await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
-      method: 'PUT',
-      body: JSON.stringify(taskResource),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    })
-    return res
-  } catch (error) {
-    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
-    throw new Error(error)
-  }
 }

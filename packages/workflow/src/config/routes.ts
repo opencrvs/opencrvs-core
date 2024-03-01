@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
-import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import { certifyRoute } from '@workflow/records/handler/certify'
 import { archiveRoute } from '@workflow/records/handler/archive'
@@ -67,16 +66,6 @@ export const getRoutes = () => {
       }
     },
     ...correctionRoutes,
-    {
-      method: '*',
-      path: '/fhir/{path*}',
-      handler: fhirWorkflowEventHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
-      }
-    },
     {
       method: 'POST',
       path: '/create-record',
