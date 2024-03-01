@@ -13,13 +13,11 @@ import {
   HEARTH_URL,
   MOSIP_TOKEN_SEEDER_URL
 } from '@workflow/constants'
-import { Events } from '@workflow/features/events/utils'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
 import { logger } from '@workflow/logger'
 import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
-
 import {
   Bundle,
   BundleEntry,
@@ -186,18 +184,6 @@ export function isHospitalNotification(fhirBundle: Bundle) {
   )
 }
 
-export function isEventNonNotifiable(event: Events) {
-  return (
-    [
-      Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-    ].indexOf(event) >= 0
-  )
-}
 interface IMosipAuthData {
   vid?: string
   name?: string
@@ -356,17 +342,4 @@ export const fetchHearth = async <T = any>(
 export async function fetchTaskByCompositionIdFromHearth(id: string) {
   const taskBundle: Bundle = await fetchHearth(`/Task?focus=Composition/${id}`)
   return taskBundle.entry?.[0]?.resource as Task
-}
-
-export function getVoidEvent(event: EVENT_TYPE): Events {
-  switch (event) {
-    case EVENT_TYPE.MARRIAGE:
-      return Events.MARRIAGE_MARK_VOID
-    case EVENT_TYPE.BIRTH:
-      return Events.BIRTH_MARK_VOID
-    case EVENT_TYPE.DEATH:
-      return Events.DEATH_MARK_VOID
-    default:
-      return Events.BIRTH_MARK_VOID
-  }
 }
