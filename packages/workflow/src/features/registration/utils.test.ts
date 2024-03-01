@@ -20,6 +20,9 @@ import {
 import * as fetchAny from 'jest-fetch-mock'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { Bundle } from '@opencrvs/commons/types'
+import { server as mswServer } from '@test/setupServer'
+import { rest } from 'msw'
+import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
 
 const fetch = fetchAny as any
 
@@ -29,7 +32,11 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper birth tracking id successfully', async () => {
-    fetch.mockResponseOnce(null, { status: 404 })
+    mswServer.use(
+      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
+        res(ctx.status(404))
+      )
+    )
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.BIRTH,
       {} as Bundle,
@@ -41,7 +48,11 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper death tracking id successfully', async () => {
-    fetch.mockResponseOnce(null, { status: 404 })
+    mswServer.use(
+      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
+        res(ctx.status(404))
+      )
+    )
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.DEATH,
       {} as Bundle,
@@ -54,7 +65,11 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper marriage tracking id successfully', async () => {
-    fetch.mockResponseOnce(null, { status: 404 })
+    mswServer.use(
+      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
+        res(ctx.status(404))
+      )
+    )
     const trackingId = await generateTrackingIdForEvents(
       EVENT_TYPE.MARRIAGE,
       {} as Bundle,
@@ -79,9 +94,12 @@ describe('getMosipUINToken functions', () => {
     fetch.mockClear()
   })
   it('Calls mosip token seeder function and returns success', async () => {
-    fetch.mockResponse(mosipSuccessMock)
+    mswServer.use(
+      rest.post(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, (_, res, ctx) =>
+        res(ctx.json(mosipSuccessMock))
+      )
+    )
     const mosipResponse = await getMosipUINToken(mosipDeceasedPatientMock)
-    const response = await JSON.parse(mosipSuccessMock)
-    expect(mosipResponse).toEqual(response)
+    expect(mosipResponse).toEqual(mosipSuccessMock)
   })
 })

@@ -17,7 +17,6 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
-  findPersonEntry,
   getSectionEntryBySectionCode,
   findRelatedPersonEntry,
   getTaskResourceFromFhirBundle
@@ -82,21 +81,6 @@ export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
     .concat(name.family.join(' '))
 }
 
-export async function getSubjectName(
-  fhirBundle: Bundle,
-  sectionCode: string = CHILD_SECTION_CODE
-) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
-  }
-  const person = await findPersonEntry(sectionCode, fhirBundle)
-  if (!person || !person.name) {
-    throw new Error("Didn't find subject's name information")
-  }
-
-  return concatenateName(person.name)
-}
-
 export async function getInformantName(
   fhirBundle: Bundle,
   sectionCode: string = CHILD_SECTION_CODE
@@ -109,31 +93,6 @@ export async function getInformantName(
     throw new Error("Didn't find informant's name information")
   }
   return concatenateName(informant.name)
-}
-
-export async function getCRVSOfficeName(fhirBundle: Bundle) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
-    )
-  }
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle as Bundle)
-  const regLastOfficeExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-    taskResource?.extension || []
-  )
-  if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
-    throw new Error('No last registration office found on the bundle')
-  }
-  const office: Location = await getFromFhir(
-    `/${regLastOfficeExt.valueReference.reference}`
-  )
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? office.name
-      : (office.alias && office.alias[0]) || office.name) || ''
-  )
 }
 
 export async function getRegistrationLocation(fhirBundle: Bundle) {

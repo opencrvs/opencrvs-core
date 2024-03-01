@@ -41,13 +41,7 @@ import {
   getRegStatusCode,
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  generateTrackingIdForEvents,
-  getEventType,
-  getMosipUINToken,
-  isHospitalNotification,
-  isInProgressDeclaration
-} from '@workflow/features/registration/utils'
+import { getMosipUINToken } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
@@ -63,51 +57,6 @@ import {
   getTokenPayload
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
-
-export async function modifyRegistrationBundle<T extends Bundle>(
-  fhirBundle: T,
-  token: string
-): Promise<T> {
-  if (
-    !fhirBundle ||
-    !fhirBundle.entry ||
-    !fhirBundle.entry[0] ||
-    !fhirBundle.entry[0].resource
-  ) {
-    throw new Error('Invalid FHIR bundle found for declaration')
-  }
-  /* setting unique trackingid here */
-  const bundleWithTrackingId = await setTrackingId(fhirBundle, token)
-
-  const taskResource = getTaskResourceFromFhirBundle(bundleWithTrackingId)
-
-  const eventType = getEventType(bundleWithTrackingId)
-  /* setting registration type here */
-  setupRegistrationType(taskResource, eventType)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    isInProgressDeclaration(bundleWithTrackingId)
-      ? RegStatus.IN_PROGRESS
-      : RegStatus.DECLARED
-  )
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  if (!isHospitalNotification(bundleWithTrackingId)) {
-    /* setting lastRegLocation here */
-    await setupLastRegLocation(taskResource, practitioner)
-  }
-
-  /* setting author and time on notes here */
-  setupAuthorOnNotes(taskResource, practitioner)
-
-  return bundleWithTrackingId as T
-}
 
 export async function markBundleAsValidated<T extends Bundle>(
   bundle: T,
@@ -309,63 +258,6 @@ export async function touchBundle(
   setupLastRegUser(taskResource, practitioner)
 
   return bundle
-}
-
-export async function setTrackingId(
-  fhirBundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const eventType = getEventType(fhirBundle)
-  const trackingId = await generateTrackingIdForEvents(
-    eventType,
-    fhirBundle,
-    token
-  )
-  const trackingIdFhirName = `${
-    eventType.toLowerCase() as Lowercase<typeof eventType>
-  }-tracking-id` as const
-
-  if (
-    !fhirBundle ||
-    !fhirBundle.entry ||
-    !fhirBundle.entry[0] ||
-    !fhirBundle.entry[0].resource
-  ) {
-    fail('Invalid FHIR bundle found for declaration')
-    throw new Error('Invalid FHIR bundle found for declaration')
-  }
-
-  const compositionResource = fhirBundle.entry[0].resource as fhir3.Composition
-  if (!compositionResource.identifier) {
-    compositionResource.identifier = {
-      system: 'urn:ietf:rfc:3986',
-      value: trackingId
-    }
-  } else {
-    compositionResource.identifier.value = trackingId
-  }
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
-  if (!taskResource.identifier) {
-    taskResource.identifier = []
-  }
-  const existingTrackingId = taskResource.identifier.find(
-    (identifier) =>
-      identifier.system ===
-      `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
-  )
-
-  const systemIdentifierUrl =
-    `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}` as const
-  if (existingTrackingId) {
-    existingTrackingId.value = trackingId
-  } else {
-    taskResource.identifier.push({
-      system: systemIdentifierUrl,
-      value: trackingId
-    })
-  }
-
-  return fhirBundle
 }
 
 export function setupRegistrationType(
@@ -672,6 +564,7 @@ export async function validateDeceasedDetails(
         logger.info(
           `MOSIP RESPONSE: ${JSON.stringify(mosipTokenSeederResponse)}`
         )
+
         if (
           (mosipTokenSeederResponse.errors &&
             mosipTokenSeederResponse.errors.length) ||
