@@ -18,7 +18,6 @@
     ".env*",
     ".vs",
     "**/.DS_Store",
-    "CHANGELOG",
     "AUTHORS",
     "LICENSE",
     "license-header.txt",
