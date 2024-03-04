@@ -17,7 +17,11 @@ import {
 import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import {
+  AdminStructure,
+  ILocation,
+  IOfflineData
+} from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import {
@@ -31,7 +35,10 @@ import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
-import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
+import {
+  countryAlpha3toAlpha2,
+  getLocationHierarchy
+} from '@client/utils/locationUtils'
 
 /** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
@@ -114,7 +121,7 @@ export const convertToLocal = (
 }
 
 export const localPhoneTransformer =
-  (transformedFieldName?: string, codeReplacement?: string) =>
+  (transformedFieldName?: string, _codeReplacement?: string) =>
   (
     transformedData: TransformedData,
     queryData: IFormData,
@@ -168,26 +175,30 @@ export const userTransformer =
           !action && regStatus && statuses.includes(regStatus)
       )
 
-    if (history) {
-      const district = history.location?.id
-        ? offlineData?.locations?.[history.location.id]
-        : null
-      const state = district
-        ? offlineData?.locations?.[district.partOf.split('/')[1]]
-        : null
-      const province = state
-        ? offlineData?.locations?.[state.partOf.split('/')[1]]
-        : null
+    if (history?.location && offlineData) {
+      const { country, ...locationHierarchyIds } = getLocationHierarchy(
+        history.location.id,
+        offlineData.locations
+      )
+      const locationHierarchy: Record<
+        string,
+        string | AdminStructure | undefined
+      > = { country }
+
+      for (const [key, value] of Object.entries(locationHierarchyIds)) {
+        locationHierarchy[`${key}Id`] = value
+        locationHierarchy[key] = offlineData.locations[value]
+      }
+
       transformedData[targetSectionId || sectionId][
         targetFieldName || 'registrar'
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
         office: history.office,
+        officeId: history.office?.id,
         date: history.date,
-        district,
-        state,
-        province,
+        ...locationHierarchy,
         signature: getUserSignature(history),
         comments: history.comments?.[0]?.comment
       } as IFormSectionData

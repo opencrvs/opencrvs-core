@@ -74,7 +74,28 @@ jobs:
 
       - name: Build ${{ matrix.service }}
         run: |
+          export VERSION="${{ needs.base.outputs.version }}"
           echo ${{ matrix.service }}
-          export VERSION=`git log -1 --pretty=format:%h`
           docker-compose build ${{ matrix.service }}
           docker-compose push ${{ matrix.service }}
+
+  security-scans:
+    needs: [base, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            trivy.yaml
+            .trivyignore.yaml
+          sparse-checkout-cone-mode: false
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          trivy-config: trivy.yaml

@@ -155,7 +155,27 @@ function createNameBuilder(
       setObjectPropInResourceArray(
         person,
         'name',
-        fieldValue.split(' '),
+        [
+          fieldValue,
+          (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+        ],
+        'given',
+        context
+      )
+    },
+    middleName: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'name',
+        [
+          (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+          fieldValue
+        ],
         'given',
         context
       )
@@ -1925,6 +1945,19 @@ const builders: IFieldBuilders = {
           person,
           'name',
           fieldValue.split(' '),
+          'given',
+          context
+        )
+      },
+      middleName: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
           'given',
           context
         )

@@ -1,6 +1,8 @@
-FROM node:gallium-alpine
+FROM node:hydrogen-alpine
 
 WORKDIR /app
+
+RUN apk update && apk upgrade
 
 COPY . .
 
@@ -16,5 +18,10 @@ RUN yarn build
 
 WORKDIR /app/packages/metrics
 RUN yarn build
+
+# FIXME: to be replaced later with whole build running as node
+RUN chown -R node:node /app
+
+USER node
 
 CMD yarn start:prod

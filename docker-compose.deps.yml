@@ -19,13 +19,13 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
     restart: unless-stopped
     environment:
       - discovery.type=single-node
 
   influxdb:
-    image: influxdb:1.8.0
+    image: influxdb:1.8.10
     restart: unless-stopped
 
   hearth:
