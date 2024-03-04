@@ -7062,15 +7062,10 @@
   resolved "https://registry.yarnpkg.com/@types/fetch-mock/-/fetch-mock-7.3.8.tgz#2fd769cb7881ac029d06ab2c23a254a9f208a034"
   integrity sha512-ztsIGiyUvD0GaqPc9/hb8k20gnr6lupqA6SFtqt+8v2mtHhNO/Ebb6/b7N6af/7x0A7s1C8nxrEGzajMBqz8qA==
 
-"@types/fhir@0.0.30", "@types/fhir@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.30.tgz#a0aec3b2d7dd2a7584474dac446ede5f9a4d7a13"
-  integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
-
-"@types/fhir@0.0.37", "@types/fhir@^0.0.37":
-  version "0.0.37"
-  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.37.tgz#54835d905009b34360437ba014564299c530253c"
-  integrity sha512-fR1y6tPfDmxYDWN4JkJhuI5F5QpbaFVSoNo3pu9A6nzuoojANqg0UBnNZTVegTz/MilV3PSjyvFe6/vO55geKA==
+"@types/fhir@0.0.41", "@types/fhir@^0.0.41":
+  version "0.0.41"
+  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.41.tgz#c5215e2fda46d694111cdd36e12fd8124a3f12d6"
+  integrity sha512-MAQAFufNZBZ6V0F94Nhknmmh/E3iMXFK4n/L8RkSNjKtOJnvaAJERivNOj35VVx9VCQBJbE0BHSzikfBahoRhA==
 
 "@types/find-cache-dir@^3.2.1":
   version "3.2.1"
