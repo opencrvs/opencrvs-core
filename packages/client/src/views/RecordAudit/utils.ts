@@ -49,7 +49,7 @@ import {
   HumanName
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 
 export interface IDeclarationData {
   id: string
@@ -346,7 +346,7 @@ export const getDraftDeclarationData = (
 ): IDeclarationData => {
   return {
     id: declaration.id,
-    name: getDraftInformantFullName(declaration),
+    name: getDeclarationFullName(declaration),
     type: declaration.event || EMPTY_STRING,
     registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||

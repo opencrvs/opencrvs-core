@@ -50,7 +50,7 @@ import {
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 
 const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
@@ -160,7 +160,7 @@ export function Outbox() {
 
   function transformDeclarationsReadyToSend() {
     const items = declarations.map((declaration, index) => {
-      const name = getDraftInformantFullName(declaration)
+      const name = getDeclarationFullName(declaration)
       let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
         dateOfEvent = declaration.data?.child?.childBirthDate as string

@@ -25,7 +25,7 @@ import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 
-const getInformantEngName = (
+const getEngName = (
   sectionData: IFormSectionData,
   lastNameFirst: boolean
 ): string => {
@@ -44,7 +44,7 @@ const getInformantEngName = (
     .trim()
 }
 
-const getInformantOtherName = (sectionData: IFormSectionData): string => {
+const getOtherName = (sectionData: IFormSectionData): string => {
   return [
     sectionData.firstNames,
     sectionData.middleName,
@@ -55,7 +55,7 @@ const getInformantOtherName = (sectionData: IFormSectionData): string => {
     .trim()
 }
 
-const getInformantFullName = (
+const getFullName = (
   sectionData: IFormSectionData,
   language = 'en',
   lastNameFirst = false
@@ -64,38 +64,27 @@ const getInformantFullName = (
     return EMPTY_STRING
   }
   if (language === 'en') {
-    return getInformantEngName(sectionData, lastNameFirst)
+    return getEngName(sectionData, lastNameFirst)
   }
-  return (
-    getInformantOtherName(sectionData) ||
-    getInformantEngName(sectionData, lastNameFirst)
-  )
+  return getOtherName(sectionData) || getEngName(sectionData, lastNameFirst)
 }
 
 /*
  * lastNameFirst needs to be removed in #4464
  */
-export const getDraftInformantFullName = (
+export const getDeclarationFullName = (
   draft: IDeclaration,
   language?: string,
   lastNameFirst?: boolean
 ) => {
   switch (draft.event) {
     case Event.Birth:
-      return getInformantFullName(draft.data.child, language, lastNameFirst)
+      return getFullName(draft.data.child, language, lastNameFirst)
     case Event.Death:
-      return getInformantFullName(draft.data.deceased, language, lastNameFirst)
+      return getFullName(draft.data.deceased, language, lastNameFirst)
     case Event.Marriage:
-      const brideName = getInformantFullName(
-        draft.data.bride,
-        language,
-        lastNameFirst
-      )
-      const groomName = getInformantFullName(
-        draft.data.groom,
-        language,
-        lastNameFirst
-      )
+      const brideName = getFullName(draft.data.bride, language, lastNameFirst)
+      const groomName = getFullName(draft.data.groom, language, lastNameFirst)
       if (brideName && groomName) {
         return `${groomName} & ${brideName}`
       } else {
