@@ -28,7 +28,7 @@ import {
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { useParams } from 'react-router'
 import {
   goToOrganizationList,
@@ -178,11 +178,11 @@ export function AdministrativeLevels() {
                       <Link
                         element="a"
                         onClick={(e) => {
-                          if (level.type === LocationType.ADMIN_STRUCTURE) {
+                          if (level.type === 'ADMIN_STRUCTURE') {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }
-                          if (level.type === LocationType.CRVS_OFFICE)
+                          if (level.type === 'CRVS_OFFICE')
                             dispatch(goToTeamUserList(level.id))
                         }}
                       >

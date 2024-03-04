@@ -22,16 +22,7 @@ import {
   Query as ApolloQuery,
   QueryComponentOptions
 } from '@apollo/client/react/components'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 
 export function Query<T = any>(props: QueryComponentOptions<T>) {
-  return (
-    <ApolloQuery<T>
-      onError={(error: Error) => {
-        Sentry.captureException(error)
-      }}
-      {...props}
-    />
-  )
+  return <ApolloQuery<T> {...props} />
 }

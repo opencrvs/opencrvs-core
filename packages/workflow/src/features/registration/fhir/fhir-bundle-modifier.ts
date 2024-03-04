@@ -658,9 +658,7 @@ export async function validateDeceasedDetails(
         new Error(`Config request failed: ${error.message}`)
       )
     })
-  logger.info(
-    `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
-  )
+  logger.info('validateDeceasedDetails response successful')
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
       return integration.integratingSystemType === 'MOSIP'
@@ -669,9 +667,7 @@ export async function validateDeceasedDetails(
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
       try {
         const mosipTokenSeederResponse = await getMosipUINToken(patient)
-        logger.info(
-          `MOSIP RESPONSE: ${JSON.stringify(mosipTokenSeederResponse)}`
-        )
+        logger.info(`MOSIP responded successfully`)
         if (
           (mosipTokenSeederResponse.errors &&
             mosipTokenSeederResponse.errors.length) ||
@@ -693,9 +689,7 @@ export async function validateDeceasedDetails(
             `/Patient?identifier=${mosipTokenSeederResponse.response.authToken}`
           )
           logger.info(
-            `Patient bundle returned by MOSIP Token Seeder search: ${JSON.stringify(
-              birthPatientBundle
-            )}`
+            `Patient bundle returned by MOSIP Token Seeder search. Bundle id: ${birthPatientBundle.id}`
           )
           let birthPatient: Partial<Patient> & Pick<Patient, 'resourceType'> = {
             resourceType: 'Patient'
@@ -722,7 +716,7 @@ export async function validateDeceasedDetails(
               }
             })
           }
-          logger.info(`birthPatient: ${JSON.stringify(birthPatient)}`)
+          logger.info(`birthPatient id: ${JSON.stringify(birthPatient.id)}`)
           if (
             birthPatient &&
             birthPatient.identifier &&

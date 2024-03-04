@@ -158,8 +158,11 @@ export const typeResolvers: GQLResolver = {
     }
   },
   HumanName: {
-    firstNames(name) {
-      return (name.given && name.given.join(' ')) || ''
+    firstNames(name: fhir3.HumanName) {
+      return name.given?.at(0) ?? ''
+    },
+    middleName(name: fhir3.HumanName) {
+      return name.given?.at(1) ?? ''
     },
     familyName(name) {
       if (!name.family) {

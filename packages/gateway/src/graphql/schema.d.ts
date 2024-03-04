@@ -896,6 +896,7 @@ export interface GQLIdentityType {
 export interface GQLHumanName {
   use?: string
   firstNames?: string
+  middleName?: string
   familyName?: string
   marriedLastName?: string
 }
@@ -1304,6 +1305,7 @@ export const enum GQLRegStatus {
 export interface GQLHumanNameInput {
   use?: string
   firstNames?: string
+  middleName?: string
   familyName?: string
   marriedLastName?: string
 }
@@ -7561,6 +7563,7 @@ export interface IdentityTypeToFieldsModifiedByIdentityResolver<
 export interface GQLHumanNameTypeResolver<TParent = any> {
   use?: HumanNameToUseResolver<TParent>
   firstNames?: HumanNameToFirstNamesResolver<TParent>
+  middleName?: HumanNameToMiddleNameResolver<TParent>
   familyName?: HumanNameToFamilyNameResolver<TParent>
   marriedLastName?: HumanNameToMarriedLastNameResolver<TParent>
 }
@@ -7575,6 +7578,15 @@ export interface HumanNameToUseResolver<TParent = any, TResult = any> {
 }
 
 export interface HumanNameToFirstNamesResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HumanNameToMiddleNameResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
