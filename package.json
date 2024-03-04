@@ -3,6 +3,13 @@
   "license": "MPL-2.0",
   "version": "1.4.0",
   "private": true,
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "engines": {
+    "node": "18.19.x"
+  },
   "workspaces": [
     "packages/*"
   ],
