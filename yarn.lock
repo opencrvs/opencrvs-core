@@ -7058,9 +7058,9 @@
     "@types/serve-static" "*"
 
 "@types/fetch-mock@^7.3.0":
-  version "7.3.7"
-  resolved "https://registry.yarnpkg.com/@types/fetch-mock/-/fetch-mock-7.3.7.tgz#de913c0d905068c340072cca3e342fc2c335332e"
-  integrity sha512-VKtaL2UUTFLXN+JoBOhF0elvQ5eu7ViSVAJDnogsDz4ygWV8/SaAKfJjFbZkHeV/jpAotObjitXM+VZcs+mwGQ==
+  version "7.3.8"
+  resolved "https://registry.yarnpkg.com/@types/fetch-mock/-/fetch-mock-7.3.8.tgz#2fd769cb7881ac029d06ab2c23a254a9f208a034"
+  integrity sha512-ztsIGiyUvD0GaqPc9/hb8k20gnr6lupqA6SFtqt+8v2mtHhNO/Ebb6/b7N6af/7x0A7s1C8nxrEGzajMBqz8qA==
 
 "@types/fhir@0.0.30", "@types/fhir@^0.0.30":
   version "0.0.30"
