@@ -7184,13 +7184,12 @@
     "@types/node" "*"
 
 "@types/hapi__vision@^5.5.3":
-  version "5.5.7"
-  resolved "https://registry.yarnpkg.com/@types/hapi__vision/-/hapi__vision-5.5.7.tgz#ed4b452b460ecc08a2ba5b28094c674ab63c9bf5"
-  integrity sha512-+w9nMJXICXTUS/cP10hURywUCAnt70I/+d27etVg4EuGXqWv3UTtC9VM67BMAtcuGUVWZCaKCX+D4eYig7I2+Q==
+  version "5.5.8"
+  resolved "https://registry.yarnpkg.com/@types/hapi__vision/-/hapi__vision-5.5.8.tgz#6e04f4764af0c642abcc10f9facf559cbe087f4a"
+  integrity sha512-kDtFpXv1yhlXZ4gLaV//Rri4ZmuhZvxWjLayaToQmv7zeH7ztc9rE50wljMI+KggQtLxIJ0/S5/SK/2Nr0OPiQ==
   dependencies:
     "@hapi/hapi" "^21.1.0"
     "@types/node" "*"
-    handlebars "^4.1"
     joi "^17.7.0"
 
 "@types/history@^4.6.2", "@types/history@^4.7.11":
@@ -13712,7 +13711,7 @@ gunzip-maybe@^1.4.2:
     pumpify "^1.3.3"
     through2 "^2.0.3"
 
-handlebars@*, handlebars@4.x.x, handlebars@^4.1, handlebars@^4.7.6, handlebars@^4.7.7:
+handlebars@*, handlebars@4.x.x, handlebars@^4.7.6, handlebars@^4.7.7:
   version "4.7.8"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.8.tgz#41c42c18b1be2365439188c77c6afae71c0cd9e9"
   integrity sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==
