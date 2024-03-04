@@ -56,7 +56,12 @@ const getChildName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.childFirstNames && [source.childFirstNames]) || null,
+      given:
+        ((source.childFirstNames || source.childMiddleName) && [
+          source.childFirstNames,
+          source.childMiddleName
+        ]) ||
+        null,
       family: (source.childFamilyName && [source.childFamilyName]) || null
     }
   ]
@@ -65,7 +70,11 @@ const getChildName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.childFirstNamesLocal && [source.childFirstNamesLocal]) || null,
+        ((source.childFirstNamesLocal || source.childMiddleNameLocal) && [
+          source.childFirstNamesLocal,
+          source.childMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.childFamilyNameLocal && [source.childFamilyNameLocal]) || null
     })
@@ -82,7 +91,12 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.deceasedFirstNames && [source.deceasedFirstNames]) || null,
+      given:
+        ((source.deceasedFirstNames || source.deceasedMiddleName) && [
+          source.deceasedFirstNames,
+          source.deceasedMiddleName
+        ]) ||
+        null,
       family: (source.deceasedFamilyName && [source.deceasedFamilyName]) || null
     }
   ]
@@ -91,7 +105,10 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.deceasedFirstNamesLocal && [source.deceasedFirstNamesLocal]) ||
+        ((source.deceasedFirstNamesLocal || source.deceasedMiddleNameLocal) && [
+          source.deceasedFirstNamesLocal,
+          source.deceasedMiddleNameLocal
+        ]) ||
         null,
       family:
         (source.deceasedFamilyNameLocal && [source.deceasedFamilyNameLocal]) ||
@@ -109,7 +126,12 @@ const getBrideName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.brideFirstNames && [source.brideFirstNames]) || null,
+      given:
+        ((source.brideFirstNames || source.brideMiddleName) && [
+          source.brideFirstNames,
+          source.brideMiddleName
+        ]) ||
+        null,
       family: (source.brideFamilyName && [source.brideFamilyName]) || null
     }
   ]
@@ -118,7 +140,11 @@ const getBrideName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.brideFirstNamesLocal && [source.brideFirstNamesLocal]) || null,
+        ((source.brideFirstNamesLocal || source.brideMiddleNameLocal) && [
+          source.brideFirstNamesLocal,
+          source.brideMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.brideFamilyNameLocal && [source.brideFamilyNameLocal]) || null
     })
@@ -134,7 +160,12 @@ const getGroomName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.groomFirstNames && [source.groomFirstNames]) || null,
+      given:
+        ((source.groomFirstNames || source.groomMiddleName) && [
+          source.groomFirstNames,
+          source.groomMiddleName
+        ]) ||
+        null,
       family: (source.groomFamilyName && [source.groomFamilyName]) || null
     }
   ]
@@ -143,7 +174,11 @@ const getGroomName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.groomFirstNamesLocal && [source.groomFirstNamesLocal]) || null,
+        ((source.groomFirstNamesLocal || source.groomMiddleNameLocal) && [
+          source.groomFirstNamesLocal,
+          source.groomMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.groomFamilyNameLocal && [source.groomFamilyNameLocal]) || null
     })

@@ -21,17 +21,6 @@ interface ILocationMessages
 }
 
 const messagesToDefine: ILocationMessages = {
-  /* UNION & DIVISION is needed for unit tests. Can be removed after the tests are refactored */
-  UNION: {
-    id: 'form.field.label.UNION',
-    defaultMessage: 'Union',
-    description: 'Label for Union'
-  },
-  DIVISION: {
-    id: 'form.field.label.DIVISION',
-    defaultMessage: 'Division',
-    description: 'Label for Division'
-  },
   DISTRICT: {
     id: 'form.field.label.district',
     defaultMessage: 'District',

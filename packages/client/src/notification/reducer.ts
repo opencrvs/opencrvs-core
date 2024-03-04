@@ -49,6 +49,7 @@ export type NotificationState = {
   duplicateTrackingId: string | null
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
+  unassignedDeclarations: string[]
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
   userCreateDuplicateEmailFailedToast: userCreateDuplicateEmailFailedToastState
   userReconnectedToast: boolean
@@ -78,7 +79,8 @@ const initialState: NotificationState = {
     visible: false,
     email: null
   },
-  userReconnectedToast: false
+  userReconnectedToast: false,
+  unassignedDeclarations: []
 }
 
 export const notificationReducer: LoopReducer<
@@ -227,6 +229,16 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         unassignedModal: action.payload
+      }
+    case actions.SHOW_UNASSIGNED_DECLARATIONS:
+      return {
+        ...state,
+        unassignedDeclarations: action.payload
+      }
+    case actions.HIDE_UNASSIGNED_DECLARATIONS_TOAST:
+      return {
+        ...state,
+        unassignedDeclarations: []
       }
     case actions.HIDE_UNASSIGNED:
       return {

@@ -906,6 +906,7 @@ export interface GQLIdentityType {
 export interface GQLHumanName {
   use?: string
   firstNames?: string
+  middleName?: string
   familyName?: string
   marriedLastName?: string
 }

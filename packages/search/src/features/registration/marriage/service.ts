@@ -144,11 +144,11 @@ async function createBrideIndex(
   const brideName = bride && findName(NAME_EN, bride.name)
   const brideNameLocal = bride && findNameLocale(bride.name)
 
-  body.brideFirstNames =
-    brideName && brideName.given && brideName.given.join(' ')
+  body.brideFirstNames = brideName?.given?.at(0)
+  body.brideMiddleName = brideName?.given?.at(1)
   body.brideFamilyName = brideName && brideName.family && brideName.family[0]
-  body.brideFirstNamesLocal =
-    brideNameLocal && brideNameLocal.given && brideNameLocal.given.join(' ')
+  body.brideFirstNamesLocal = brideNameLocal?.given?.at(0)
+  body.brideMiddleNameLocal = brideNameLocal?.given?.at(1)
   body.brideFamilyNameLocal =
     brideNameLocal && brideNameLocal.family && brideNameLocal.family[0]
   if (marriageExtension) {
@@ -177,11 +177,11 @@ async function createGroomIndex(
   const groomName = groom && findName(NAME_EN, groom.name)
   const groomNameLocal = groom && findNameLocale(groom.name)
 
-  body.groomFirstNames =
-    groomName && groomName.given && groomName.given.join(' ')
+  body.groomFirstNames = groomName?.given?.at(0)
+  body.groomMiddleName = groomName?.given?.at(1)
   body.groomFamilyName = groomName && groomName.family && groomName.family[0]
-  body.groomFirstNamesLocal =
-    groomNameLocal && groomNameLocal.given && groomNameLocal.given.join(' ')
+  body.groomFirstNamesLocal = groomNameLocal?.given?.at(0)
+  body.groomMiddleNameLocal = groomNameLocal?.given?.at(1)
   body.groomFamilyNameLocal =
     groomNameLocal && groomNameLocal.family && groomNameLocal.family[0]
 
@@ -221,14 +221,12 @@ function createWitnessOneIndex(
   const witnessName = findName(NAME_EN, witness.name)
   const witnessNameLocal = findNameLocale(witness.name)
 
-  body.witnessOneFirstNames =
-    witnessName && witnessName.given && witnessName.given.join(' ')
+  body.witnessOneFirstNames = witnessName?.given?.at(0)
+  body.witnessOneMiddleName = witnessName?.given?.at(1)
   body.witnessOneFamilyName =
     witnessName && witnessName.family && witnessName.family[0]
-  body.witnessOneFirstNamesLocal =
-    witnessNameLocal &&
-    witnessNameLocal.given &&
-    witnessNameLocal.given.join(' ')
+  body.witnessOneFirstNamesLocal = witnessNameLocal?.given?.at(0)
+  body.witnessOneMiddleNameLocal = witnessNameLocal?.given?.at(1)
   body.witnessOneFamilyNameLocal =
     witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
 }
@@ -259,14 +257,12 @@ function createWitnessTwoIndex(
 
   const witnessName = findName(NAME_EN, witness.name)
   const witnessNameLocal = findNameLocale(witness.name)
-  body.witnessTwoFirstNames =
-    witnessName && witnessName.given && witnessName.given.join(' ')
+  body.witnessTwoFirstNames = witnessName?.given?.at(0)
+  body.witnessTwoMiddleName = witnessName?.given?.at(1)
   body.witnessTwoFamilyName =
     witnessName && witnessName.family && witnessName.family[0]
-  body.witnessTwoFirstNamesLocal =
-    witnessNameLocal &&
-    witnessNameLocal.given &&
-    witnessNameLocal.given.join(' ')
+  body.witnessTwoFirstNamesLocal = witnessNameLocal?.given?.at(0)
+  body.witnessTwoMiddleNameLocal = witnessNameLocal?.given?.at(1)
   body.witnessTwoFamilyNameLocal =
     witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
 }
