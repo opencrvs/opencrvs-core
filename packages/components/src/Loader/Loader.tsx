@@ -40,16 +40,14 @@ const LoadingTextContainer = styled.div`
   text-align: center;
 `
 
-export class Loader extends React.Component<ILoader> {
-  render() {
-    const { id, loadingText, marginPercent, spinnerDiameter } = this.props
-    return (
-      <LoadingContainer id={id} marginPercent={marginPercent}>
-        <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
-        {loadingText && (
-          <LoadingTextContainer>{loadingText}</LoadingTextContainer>
-        )}
-      </LoadingContainer>
-    )
-  }
-}
+export const Loader = ({
+  id,
+  loadingText,
+  marginPercent,
+  spinnerDiameter
+}: ILoader) => (
+  <LoadingContainer id={id} marginPercent={marginPercent}>
+    <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
+    {loadingText && <LoadingTextContainer>{loadingText}</LoadingTextContainer>}
+  </LoadingContainer>
+)
