@@ -1,4 +1,4 @@
-FROM node:gallium-alpine
+FROM node:hydrogen-alpine
 WORKDIR /app
 
 RUN apk update && apk upgrade

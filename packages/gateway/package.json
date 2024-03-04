@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ../../node_modules/graphql-schema-typescript/**/* || npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/* || true; fi",
-    "start": "yarn gen:schema && yarn gen:types && concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
+    "start": "yarn gen:schema && yarn gen:types && concurrently \"NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest && yarn test:compilation",
     "test:watch": "jest --watch",

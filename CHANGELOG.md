@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.0 (TBD)
+
+## Breaking changes
+
+- #### Upgrade node version to 18
+  This version enforces environment to have Node 18 installed (supported until April 2025) and removes support for Node 16
+  - Supports node version `18.19.x`
+  - Specified operating systems in js modules as `darwin, linux`
+  - Dev scripts run with an environment variable `NODE_OPTIONS=--dns-result-order=ipv4first` to resolve ipv4 addresses for `localhost` to support systems that resolves ipv6 addresses by default in Node versions >=17
+
+## New features
+
+## Bug fixes
+
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 
 In this release, we made **no changes** to OpenCRVS Core. All changes in this release apply only to the [OpenCRVS country configuration](https://github.com/opencrvs/opencrvs-countryconfig/releases/tag/v1.4.0) repository.
