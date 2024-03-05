@@ -204,10 +204,16 @@ function createLocationSegments(locations: Location[]): Location[][] {
   return segments
 }
 
-async function batchLocationsHandler(locations: Location[]) {
+async function batchLocationsHandler(
+  locations: Location[]
+): Promise<fhir.Bundle> {
   let statisticalToFhirIDMapOfParentLocations: Map<string, string> = new Map()
   const locationSegments = createLocationSegments(locations)
-  let cumulativeResponse
+  const cumulativeResponse = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [] as fhir.BundleEntry[]
+  }
   for (const each of locationSegments) {
     const locationsBundle = {
       resourceType: 'Bundle',
@@ -246,11 +252,7 @@ async function batchLocationsHandler(locations: Location[]) {
         ])
       )
     )
-    if (!cumulativeResponse) {
-      cumulativeResponse = res
-    } else {
-      cumulativeResponse.entry = cumulativeResponse.entry.concat(res.entry)
-    }
+    cumulativeResponse.entry = cumulativeResponse.entry.concat(res.entry)
   }
   return cumulativeResponse
 }

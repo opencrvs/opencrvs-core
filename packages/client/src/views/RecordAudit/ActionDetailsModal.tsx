@@ -146,8 +146,9 @@ const requesterLabelMapper = (
   const requesterIndividual = CorrectorRelationLabelArray.find(
     (labelItem) => labelItem.value === requester
   )
-  const informant = (declaration.data.informant.otherInformantType ||
-    declaration.data.informant.informantType) as string
+  const informant =
+    ((declaration.data?.informant?.otherInformantType ||
+      declaration.data?.informant?.informantType) as string) ?? ''
 
   // informant info added for corrector being informant
   return requesterIndividual?.label

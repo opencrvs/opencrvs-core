@@ -46,7 +46,8 @@ import {
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
-  modifyDeclaration
+  modifyDeclaration,
+  writeDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -243,12 +244,15 @@ function ReinstateButton({
           ? REINSTATE_BIRTH_DECLARATION
           : REINSTATE_DEATH_DECLARATION
       }
-      onCompleted={() => {
+      // update the store and indexDb with the latest status of the declaration
+      onCompleted={(data) => {
         refetchDeclarationInfo?.()
         dispatch(
-          modifyDeclaration({
+          writeDeclaration({
             ...declaration,
-            submissionStatus: ''
+            submissionStatus: '',
+            registrationStatus: data.markEventAsReinstated
+              ?.registrationStatus as string
           })
         )
       }}
