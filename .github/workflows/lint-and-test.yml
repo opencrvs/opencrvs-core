@@ -40,8 +40,3 @@ jobs:
 
       - name: Run Unit Test
         run: yarn test
-
-      - name: Run code coverage
-        run: |
-          npm install codecov
-          ./node_modules/.bin/codecov
