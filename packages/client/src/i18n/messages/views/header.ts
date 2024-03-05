@@ -20,6 +20,7 @@ interface IHeaderMessages
   placeHolderPhone: MessageDescriptor
   placeHolderNationalId: MessageDescriptor
   placeHolderEmail: MessageDescriptor
+  placeholderId: MessageDescriptor
   systemTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   helpTitle: MessageDescriptor
@@ -69,6 +70,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeHolderNationalId',
     defaultMessage: 'Search for a national ID.',
     description: 'Search menu national ID place holder'
+  },
+  placeholderId: {
+    id: 'home.header.placeHolderId',
+    defaultMessage: 'Search for an ID.',
+    description: 'Search menu ID place holder'
   },
   placeHolderEmail: {
     id: 'home.header.placeHolderEmail',

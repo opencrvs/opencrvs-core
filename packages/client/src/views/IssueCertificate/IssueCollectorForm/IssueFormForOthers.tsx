@@ -22,7 +22,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import { FormFieldGenerator } from '@client/components/form'
 import { useDispatch } from 'react-redux'
-import { goToIssueCertificatePayment } from '@client/navigation'
+import { formatUrl, goToIssueCertificatePayment } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import {
@@ -31,6 +31,9 @@ import {
   collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Event } from '@client/utils/gateway'
+import { Redirect } from 'react-router'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 function collectorFormFieldsForOthers(event: Event) {
   const collectCertFormSection =
@@ -78,6 +81,17 @@ export const IssueCollectorFormForOthers = ({
           }
         }
       })
+    )
+  }
+
+  if (!declaration) {
+    return (
+      <Redirect
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToIssue,
+          selectorId: ''
+        })}
+      />
     )
   }
 

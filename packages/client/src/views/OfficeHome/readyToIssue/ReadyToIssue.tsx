@@ -23,7 +23,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
-import { useIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   buttonMessages,
