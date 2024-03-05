@@ -45,7 +45,7 @@ describe('reports utils tests', () => {
         alias: 'বরিশাল',
         physicalType: 'Jurisdiction',
         statisticalId: '123',
-        jurisdictionType: 'DIVISION',
+        jurisdictionType: 'STATE',
         type: 'ADMIN_STRUCTURE',
         status: 'active',
         partOf: 'Location/0'

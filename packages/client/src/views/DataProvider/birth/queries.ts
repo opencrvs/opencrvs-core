@@ -26,6 +26,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -45,6 +46,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         occupation
@@ -67,6 +69,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         multipleBirth
@@ -105,6 +108,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -330,6 +334,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -340,6 +345,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -376,6 +382,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -420,6 +427,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         nationality

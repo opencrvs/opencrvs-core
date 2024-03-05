@@ -41,7 +41,6 @@ import {
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
   ADVANCED_SEARCH_TEXT,
-  REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES,
@@ -62,12 +61,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { RouteComponentProps, withRouter } from 'react-router'
-import {
-  HOME,
-  PERFORMANCE_HOME,
-  REGISTRAR_HOME,
-  TEAM_USER_LIST
-} from '@client/navigation/routes'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
@@ -306,24 +300,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     this.props.redirectToAuthentication()
   }
 
-  isLandingPage = () => {
-    const role = this.props.userDetails && this.props.userDetails.systemRole
-    const location = this.props.history.location.pathname
-    if (
-      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
-      (NATL_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
-      (SYS_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
-      (REGISTRAR_ROLES.includes(role as string) &&
-        REGISTRAR_HOME.includes(location))
-    ) {
-      return true
-    } else {
-      return false
-    }
-  }
-
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
@@ -360,13 +336,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     if (
       fieldNames.includes('iD') ||
       fieldNames.includes('deceasedID') ||
-      fieldNames.includes('informantID')
+      fieldNames.includes('informantID') ||
+      fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
-        label: intl.formatMessage(messages.nationalId),
+        label: intl.formatMessage(constantsMessages.id),
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+        placeHolderText: intl.formatMessage(messages.placeholderId)
       })
     }
     if (fieldNames.includes('registrationEmail')) {

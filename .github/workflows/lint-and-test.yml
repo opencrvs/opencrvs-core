@@ -7,7 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-name: Lint and run unit tests
+name: Lint, run unit tests and security scans
 
 on: [pull_request]
 
@@ -67,11 +67,11 @@ jobs:
             fi
           fi
 
-      - name: Use Node.js 16.20
+      - name: Use Node.js 18.19
         if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v2
         with:
-          node-version: '16.20'
+          node-version: '18.19'
           cache: 'npm'
 
       - name: Remove other package directories
@@ -110,3 +110,16 @@ jobs:
       - name: Run Unit Test
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
+
+  security-scans:
+    needs: setup
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml

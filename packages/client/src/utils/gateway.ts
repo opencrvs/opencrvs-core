@@ -862,6 +862,7 @@ export type HumanName = {
   familyName?: Maybe<Scalars['String']>
   firstNames?: Maybe<Scalars['String']>
   marriedLastName?: Maybe<Scalars['String']>
+  middleName?: Maybe<Scalars['String']>
   use?: Maybe<Scalars['String']>
 }
 
@@ -869,6 +870,7 @@ export type HumanNameInput = {
   familyName?: InputMaybe<Scalars['String']>
   firstNames?: InputMaybe<Scalars['String']>
   marriedLastName?: InputMaybe<Scalars['String']>
+  middleName?: InputMaybe<Scalars['String']>
   use?: InputMaybe<Scalars['String']>
 }
 
@@ -3517,6 +3519,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -3542,6 +3545,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       address?: Array<{
@@ -3573,6 +3577,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -3615,6 +3620,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -3867,6 +3873,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -3887,6 +3894,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -3928,6 +3936,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -3973,6 +3982,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       address?: Array<{
@@ -4283,6 +4293,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -4324,6 +4335,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       telecom?: Array<{
@@ -4359,6 +4371,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -4401,6 +4414,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -4443,6 +4457,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -4702,6 +4717,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       identifier?: Array<{
@@ -4741,6 +4757,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       telecom?: Array<{
@@ -4766,6 +4783,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -4776,6 +4794,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -4786,6 +4805,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -5100,6 +5120,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       address?: Array<{
@@ -5126,6 +5147,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
         marriedLastName?: string | null
       } | null> | null
@@ -5164,6 +5186,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
         marriedLastName?: string | null
       } | null> | null
@@ -5205,6 +5228,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -5224,6 +5248,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -5454,6 +5479,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
       address?: Array<{
@@ -5480,6 +5506,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
         marriedLastName?: string | null
       } | null> | null
@@ -5518,6 +5545,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
         marriedLastName?: string | null
       } | null> | null
@@ -5559,6 +5587,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
@@ -5578,6 +5607,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
+        middleName?: string | null
         familyName?: string | null
       } | null> | null
     } | null
