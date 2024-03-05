@@ -24,8 +24,7 @@ import {
   BundleEntry,
   Saved,
   URLReference,
-  Location as FhirLocation,
-  URNReference
+  Location as FhirLocation
 } from '@opencrvs/commons/types'
 
 export enum Code {
@@ -157,6 +156,8 @@ export const requestParamsSchema = Joi.object({
   locationId: Joi.string().uuid()
 })
 
+const LOCATION_CHUNK_SIZE = 400
+
 export async function fetchLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -188,37 +189,80 @@ export async function fetchLocationHandler(
   return response
 }
 
-function batchLocationsHandler(locations: Location[]) {
-  const locationsMap = new Map(
-    locations.map((location) => [
-      location.statisticalID,
-      { ...location, uid: `urn:uuid:${uuid()}` as URNReference }
-    ])
-  )
-  const locationsBundle = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: locations
-      .map((location) => ({
-        ...location,
-        // partOf is either Location/{statisticalID} of another location or 'Location/0'
-        partOf:
-          locationsMap.get(location.partOf.split('/')[1])?.uid ??
-          location.partOf
-      }))
-      .map(
-        (location): BundleEntry<FhirLocation> => ({
-          fullUrl: locationsMap.get(location.statisticalID)!.uid,
-          resource: {
-            ...composeFhirLocation(location),
-            ...(location.statistics && {
-              extension: generateStatisticalExtensions(location.statistics)
-            })
-          }
-        })
-      )
+function createChunks<T>(array: T[], limit: number): T[][] {
+  const result = []
+  for (let i = 0; i < array.length; i += limit) {
+    result.push(array.slice(i, i + limit))
   }
-  return fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
+  return result
+}
+
+function createLocationSegments(locations: Location[]): Location[][] {
+  const segments = []
+  for (const jurisdictionType of Object.keys(JurisdictionType)) {
+    const jurisdictionLocations = locations.filter(
+      (loc) => loc.jurisdictionType === jurisdictionType
+    )
+    if (jurisdictionLocations.length) {
+      segments.push(...createChunks(jurisdictionLocations, LOCATION_CHUNK_SIZE))
+    }
+  }
+  const facilitiesOrOffices = locations.filter((loc) => !loc.jurisdictionType)
+  if (facilitiesOrOffices.length) {
+    segments.push(...createChunks(facilitiesOrOffices, LOCATION_CHUNK_SIZE))
+  }
+  return segments
+}
+
+async function batchLocationsHandler(locations: Location[]) {
+  let statisticalToFhirIDMapOfParentLocations: Map<string, string> = new Map()
+  const locationSegments = createLocationSegments(locations)
+  let cumulativeResponse
+  for (const each of locationSegments) {
+    const locationsBundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: each
+        .map((location) => ({
+          ...location,
+          // partOf is either Location/{fhirID} of another location or 'Location/0'
+          partOf:
+            statisticalToFhirIDMapOfParentLocations?.get(
+              location.partOf.split('/')[1]
+            ) ?? location.partOf
+        }))
+        .map(
+          (location): BundleEntry<FhirLocation> => ({
+            fullUrl: `urn:uuid:${uuid()}`,
+            resource: {
+              ...composeFhirLocation(location),
+              ...(location.statistics && {
+                extension: generateStatisticalExtensions(location.statistics)
+              })
+            }
+          })
+        )
+    }
+    const res = await fetchFromHearth(
+      '',
+      'POST',
+      JSON.stringify(locationsBundle)
+    )
+    statisticalToFhirIDMapOfParentLocations = new Map(
+      Array.from(statisticalToFhirIDMapOfParentLocations.entries()).concat(
+        each.map((loc, i) => [
+          loc.statisticalID,
+          'Location/' + res?.entry?.[i]?.response?.location?.split('/')?.[3]
+        ])
+      )
+    )
+    if (!cumulativeResponse) {
+      cumulativeResponse = res
+    } else {
+      cumulativeResponse.entry = cumulativeResponse.entry.concat(res.entry)
+    }
+  }
+  return cumulativeResponse
 }
 
 export async function createLocationHandler(

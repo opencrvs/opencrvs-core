@@ -66,7 +66,9 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast
+  ShowDownloadDeclarationFailedToast,
+  ShowUnassignedDeclarations,
+  showUnassignedDeclarations
 } from '@client/notification/actions'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
@@ -105,6 +107,8 @@ const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
+const REMOVE_UNASSIGNED_DECLARATIONS =
+  'DECLARATION/REMOVE_UNASSIGNED_DECLARATIONS'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -397,6 +401,14 @@ interface IDownloadDeclaration {
   }
 }
 
+interface IRemoveUnassignedDeclarationAction {
+  type: typeof REMOVE_UNASSIGNED_DECLARATIONS
+  payload: {
+    currentlyDownloadedDeclarations: IDeclaration[]
+    unassignedDeclarations: IDeclaration[]
+  }
+}
+
 interface IDownloadDeclarationSuccess {
   type: typeof DOWNLOAD_DECLARATION_SUCCESS
   payload: {
@@ -469,6 +481,8 @@ export type Action =
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
+  | IRemoveUnassignedDeclarationAction
+  | ShowUnassignedDeclarations
 
 export interface IUserData {
   userID: string
@@ -592,6 +606,14 @@ export function archiveDeclaration(
     payload: { declarationId, reason, comment, duplicateTrackingId }
   }
 }
+
+export const RemoveUnassignedDeclarationsActionCreator = (payload: {
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}): IRemoveUnassignedDeclarationAction => ({
+  type: REMOVE_UNASSIGNED_DECLARATIONS,
+  payload: payload
+})
 
 export function deleteDeclaration(
   declarationId: string,
@@ -1860,6 +1882,19 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ],
           { sequence: true }
         )
+      )
+    case REMOVE_UNASSIGNED_DECLARATIONS:
+      const unassignedDeclarationTrackingIds =
+        action.payload.unassignedDeclarations.map(
+          (dec) => dec.data.registration.trackingId
+        ) as string[]
+
+      return loop(
+        {
+          ...state,
+          declarations: action.payload.currentlyDownloadedDeclarations
+        },
+        Cmd.action(showUnassignedDeclarations(unassignedDeclarationTrackingIds))
       )
     default:
       return state

@@ -18,7 +18,6 @@ import {
   getJurisidictionType,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-import { LocationType } from '@client/offline/reducer'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
 
@@ -58,7 +57,7 @@ describe('locationUtil tests', () => {
             partOf: 'Location/123'
           }
         },
-        LocationType.ADMIN_STRUCTURE,
+        'ADMIN_STRUCTURE',
         {
           locationLevel: 'partOf',
           locationId: 'Location/123'
@@ -104,7 +103,7 @@ describe('locationUtil tests', () => {
             partOf: 'Location/123'
           }
         },
-        LocationType.CRVS_OFFICE,
+        'CRVS_OFFICE',
         {
           locationLevel: 'partOf'
         }
@@ -121,7 +120,7 @@ describe('locationUtil tests', () => {
       const locations = mockOfflineData.locations
       const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
 
-      expect(getJurisidictionType(locations, locationId)).toEqual('DIVISION')
+      expect(getJurisidictionType(locations, locationId)).toEqual('STATE')
     })
   })
 

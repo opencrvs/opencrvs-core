@@ -1029,6 +1029,7 @@ type IdentityType {
 type HumanName {
   use: String
   firstNames: String
+  middleName: String
   familyName: String
   marriedLastName: String
 }
@@ -1413,6 +1414,7 @@ enum RegStatus {
 input HumanNameInput {
   use: String
   firstNames: String
+  middleName: String
   familyName: String
   marriedLastName: String
 }

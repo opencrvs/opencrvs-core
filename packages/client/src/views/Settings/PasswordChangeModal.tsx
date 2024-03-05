@@ -153,7 +153,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
   }
   validateLength = (value: string) => {
     this.setState(() => ({
-      validLength: value.length >= 8
+      validLength: value.length >= 12
     }))
   }
   validateNumber = (value: string) => {
@@ -335,9 +335,9 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                         messages.passwordLengthCharacteristicsForPasswordUpdateForm,
                         {
                           min: intl.formatMessage({
-                            defaultMessage: '8',
+                            defaultMessage: '12',
                             description: 'Minimum length password',
-                            id: 'number.eight'
+                            id: 'number.twelve'
                           })
                         }
                       )}
@@ -404,9 +404,9 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     messages.passwordLengthCharacteristicsForPasswordUpdateForm,
                     {
                       min: intl.formatMessage({
-                        defaultMessage: '8',
+                        defaultMessage: '12',
                         description: 'Minimum length password',
-                        id: 'number.eight'
+                        id: 'number.twelve'
                       })
                     }
                   )}
