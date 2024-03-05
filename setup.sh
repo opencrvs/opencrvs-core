@@ -226,7 +226,7 @@ do
             echo
             echo "nvm install 16.20.0"
             echo
-            echo "When the version is installed, us it:"
+            echo "When the version is installed, use it:"
             echo
             echo "nvm use 16.20.0"
             echo
@@ -294,9 +294,8 @@ echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED
 echo
 
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-versionTest=$(do_version_check $myNodeVersion 16.20.0)
-if [ "$versionTest" == "LOWER" ] ; then
-  echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
+if [[ $myNodeVersion != 16.* ]]; then
+  echo "Sorry your Node version is not supported.  Your node version is $myNodeVersion."
   echo "We recommend you install Node v16.20.0 as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
