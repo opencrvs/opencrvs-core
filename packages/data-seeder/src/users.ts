@@ -16,7 +16,8 @@ import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
 
-const MAX_RETRY = 3
+const MAX_RETRY = 5
+const RETRY_DELAY_IN_MILLISECONDS = 5000
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -195,7 +196,7 @@ export async function seedUsers(
     do {
       ++tryNumber
       if (tryNumber > 1) {
-        await delay(1000)
+        await delay(RETRY_DELAY_IN_MILLISECONDS)
         console.log('Trying again for time: ', tryNumber)
       }
       res = await callCreateUserMutation(token, userPayload)
