@@ -160,20 +160,20 @@ export async function seedUsers(
       console.log(
         `User with the username "${username}" already exists. Skipping user "${username}"`
       )
-      return
+      continue
     }
     const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
     if (!primaryOffice) {
       console.log(
         `No office found with id ${officeIdentifier}. Skipping user "${username}"`
       )
-      return
+      continue
     }
     if (!roleIdMap[role]) {
       console.log(
         `Role "${role}" is not recognized by system. Skipping user "${username}"`
       )
-      return
+      continue
     }
     const userPayload = {
       ...user,
