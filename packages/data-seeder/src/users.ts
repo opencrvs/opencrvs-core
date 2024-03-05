@@ -11,12 +11,12 @@
 import fetch from 'node-fetch'
 import { ACTIVATE_USERS, COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import { z } from 'zod'
-import { parseGQLResponse, raise } from './utils'
+import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
 
-const MAX_RETRY = 5
+const MAX_RETRY = 3
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -195,11 +195,16 @@ export async function seedUsers(
     do {
       ++tryNumber
       if (tryNumber > 1) {
+        await delay(1000)
         console.log('Trying again for time: ', tryNumber)
       }
       res = await callCreateUserMutation(token, userPayload)
       jsonRes = await res.json()
-    } while (tryNumber < MAX_RETRY && 'errors' in jsonRes)
+    } while (
+      tryNumber < MAX_RETRY &&
+      'errors' in jsonRes &&
+      jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
+    )
     parseGQLResponse(jsonRes)
   }
 }
