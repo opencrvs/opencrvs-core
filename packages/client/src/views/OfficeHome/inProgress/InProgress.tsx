@@ -56,7 +56,7 @@ import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
 import { Event, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
@@ -356,7 +356,7 @@ class InProgressComponent extends React.Component<
       } else if (draft.event && draft.event.toString() === 'marriage') {
         pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
-      const name = getDraftInformantFullName(draft, locale)
+      const name = getDeclarationFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions: IAction[] = []
 

@@ -5,6 +5,14 @@
 - Fix Metabase versions in Dashboards service. Previously the version used for local development wasn't the one built into the docker image, which caused the locally generated initialisation file to fail in deployed environments.
 - Fix a seeding script bug, where it failed when done too quickly [#6553](https://github.com/opencrvs/opencrvs-core/issues/6553)
 - Update minimum password length validation [#6559](https://github.com/opencrvs/opencrvs-core/issues/6559)
+- Include middlename when generating fullnames
+  - Refactored out the scattered logic for generating fullnames and converged them into a single function
+  - Make lastname optional for a registered declaration
+- Recognize occupation as an optional field in informant section
+- Fix download failure when `arrayToFieldTransormer` is used in template mapping
+- Fix multiple records not being downloaded simultaneously [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- Fix showing unassigned toast for reinstated declarations [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
 
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 
