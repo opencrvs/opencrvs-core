@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
@@ -169,80 +169,81 @@ interface IProps {
   children?: React.ReactNode
 }
 
-export class ResponsiveModal extends React.Component<IProps> {
-  toggleScroll = () => {
+export const ResponsiveModal = ({
+  title,
+  show,
+  responsive = true,
+  handleClose,
+  id,
+  actions,
+  width,
+  contentHeight,
+  titleHeightAuto,
+  autoHeight,
+  contentScrollableY,
+  hideHeaderBoxShadow,
+  preventClickOnParent,
+  showHeaderBorder,
+  children
+}: IProps) => {
+  const toggleScroll = () => {
     const body = document.querySelector('body') as HTMLBodyElement
-    if (this.props.show) {
-      body.style.overflow = 'hidden'
-    } else {
+    if (show) {
+      return (body.style.overflow = 'hidden')
+    }
+    return body.style.removeProperty('overflow')
+  }
+
+  useEffect(() => {
+    toggleScroll()
+
+    return () => {
+      const body = document.querySelector('body') as HTMLBodyElement
       body.style.removeProperty('overflow')
     }
-  }
-  componentWillUnmount = () => {
-    const body = document.querySelector('body') as HTMLBodyElement
-    body.style.removeProperty('overflow')
-  }
-  render() {
-    const {
-      title,
-      show,
-      responsive = true,
-      handleClose,
-      id,
-      actions,
-      width,
-      contentHeight,
-      titleHeightAuto,
-      autoHeight,
-      contentScrollableY,
-      hideHeaderBoxShadow,
-      preventClickOnParent,
-      showHeaderBorder
-    } = this.props
+  }, [show])
 
-    this.toggleScroll()
-    if (!show) {
-      return null
-    }
-
-    return (
-      <ModalContainer
-        id={id}
-        onClick={(e) => {
-          if (preventClickOnParent) {
-            e.stopPropagation()
-          }
-        }}
-      >
-        <ScreenBlocker />
-        <ModalContent width={width} responsive={responsive}>
-          <Header
-            responsive={responsive}
-            hideBoxShadow={hideHeaderBoxShadow}
-            titleHeightAuto={titleHeightAuto}
-            showHeaderBorder={showHeaderBorder}
-          >
-            <Title>{title}</Title>
-            <CircleButton id="close-btn" type="button" onClick={handleClose}>
-              <Cross color="currentColor" />
-            </CircleButton>
-          </Header>
-          <Body
-            height={contentHeight}
-            scrollableY={contentScrollableY}
-            autoHeight={autoHeight}
-          >
-            {this.props.children}
-          </Body>
-          {actions.length > 0 && (
-            <Footer responsive={responsive}>
-              {actions.map((action, i) => (
-                <Action key={i}>{action}</Action>
-              ))}
-            </Footer>
-          )}
-        </ModalContent>
-      </ModalContainer>
-    )
+  if (!show) {
+    return null
   }
+
+  return (
+    <ModalContainer
+      id={id}
+      onClick={(e) => {
+        if (preventClickOnParent) {
+          e.stopPropagation()
+        }
+      }}
+    >
+      <ScreenBlocker />
+      <ModalContent width={width} responsive={responsive}>
+        <Header
+          responsive={responsive}
+          hideBoxShadow={hideHeaderBoxShadow}
+          titleHeightAuto={titleHeightAuto}
+          showHeaderBorder={showHeaderBorder}
+        >
+          <Title>{title}</Title>
+          <CircleButton id="close-btn" type="button" onClick={handleClose}>
+            <Cross color="currentColor" />
+          </CircleButton>
+        </Header>
+        <Body
+          height={contentHeight}
+          scrollableY={contentScrollableY}
+          autoHeight={autoHeight}
+        >
+          {children}
+        </Body>
+        {actions.length > 0 && (
+          <Footer responsive={responsive}>
+            {actions.map((action, i) => (
+              <Action key={i}>{action}</Action>
+            ))}
+          </Footer>
+        )}
+      </ModalContent>
+    </ModalContainer>
+  )
 }
