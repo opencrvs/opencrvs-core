@@ -76,7 +76,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - HEARTH_URL=http://hearth:3447/fhir
-      - OPENHIM_URL=http://openhim-core:5001
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
