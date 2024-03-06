@@ -1,4 +1,13 @@
-## [1.3.3](https://github.com/opencrvs/opencrvs-core/compare/v1.3.2...v1.3.3) (TBD)
+## [1.3.4](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.3.4) (TBD)
+
+## Bug fixes
+- #### Include middlename when generating fullnames
+  - Refactored out the scattered logic for generating fullnames and converged them into a single function
+  - Make lastname optional for a registered declaration
+- #### Recognize occupation as an optional field in informant section
+- #### Fix download failure when `arrayToFieldTransormer` is used in template mapping
+
+## [1.3.3](https://github.com/opencrvs/opencrvs-core/compare/v1.3.2...v1.3.3)
 
 ## Breaking changes
 
