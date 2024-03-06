@@ -6,6 +6,9 @@
   - Make lastname optional for a registered declaration
 - #### Recognize occupation as an optional field in informant section
 - #### Fix download failure when `arrayToFieldTransormer` is used in template mapping
+- #### Fix multiple records not being downloaded simultaneously [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- #### Fix showing unassigned toast for reinstated declarations [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- #### Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
 
 ## [1.3.3](https://github.com/opencrvs/opencrvs-core/compare/v1.3.2...v1.3.3)
 
