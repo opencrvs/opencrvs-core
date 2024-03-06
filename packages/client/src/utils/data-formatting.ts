@@ -23,18 +23,20 @@ function generateName(name: HumanName) {
     .trim()
 }
 
-export const createNamesMap = (names: HumanName[]): INamesMap =>
-  names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
-    if (!name.use) {
-      prevNamesMap['default'] = generateName(name)
-      return prevNamesMap
-    }
+export const createNamesMap = (names: (HumanName | null)[]): INamesMap =>
+  names
+    .filter((name): name is HumanName => Boolean(name))
+    .reduce((prevNamesMap: INamesMap, name) => {
+      if (!name.use) {
+        prevNamesMap['default'] = generateName(name)
+        return prevNamesMap
+      }
 
-    prevNamesMap[name.use] = generateName(name)
-    prevNamesMap[name.use] =
-      prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
-    return prevNamesMap
-  }, {})
+      prevNamesMap[name.use] = generateName(name)
+      prevNamesMap[name.use] =
+        prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
+      return prevNamesMap
+    }, {})
 
 export const extractCommentFragmentValue = (
   comments: GQLComment[],

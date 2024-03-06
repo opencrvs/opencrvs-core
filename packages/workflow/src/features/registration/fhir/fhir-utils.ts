@@ -52,15 +52,14 @@ export function concatenateName(fhirNames: fhir.HumanName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: fhir.HumanName) => {
     return humanName.use === language
-  })
+  }) as (Omit<fhir.HumanName, 'family'> & { family?: string[] }) | undefined
 
-  if (!name || !name.family) {
+  if (!name) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family)
+  return [...(name.given ?? []), ...(name.family ?? [])]
+    .filter(Boolean)
+    .join(' ')
 }
 
 export async function getSubjectName(
@@ -406,23 +405,11 @@ export async function getEventInformantName(
 
   const subject =
     subjectSection && (await getFromFhir(`/${subjectSection.reference}`))
-  const language = getDefaultLanguage()
   if (!subject || !subject.name) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const name = subject.name.find((humanName: fhir.HumanName) => {
-    return humanName.use === language
-  })
-
-  if (!name || !name.family) {
-    throw new Error(`Didn't found informant's ${language} name`)
-  }
-
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family)
+  return concatenateName(subject.name)
 }
 
 export function generateEmptyBundle(): fhir.Bundle {

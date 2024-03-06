@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IFormField,
-  IRadioGroupFormField,
-  ISelectOption,
-  IFormSectionData,
-  IContactPointPhone
-} from '@client/forms'
+import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
@@ -55,6 +49,7 @@ import {
   HumanName
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 
 export interface IDeclarationData {
   id: string
@@ -338,39 +333,9 @@ const isMarriageDeclaration = (
   return (declaration && declaration.type === 'Marriage') || false
 }
 
-const getDraftDeclarationName = (declaration: IDeclaration) => {
-  let name = EMPTY_STRING
-  const declarationName = []
-  if (declaration.event === Event.Birth) {
-    declarationName.push(declaration.data?.child)
-  } else if (declaration.event === Event.Death) {
-    declarationName.push(declaration.data?.deceased)
-  } else if (declaration.event === Event.Marriage) {
-    declarationName.push(declaration.data?.groom)
-    declarationName.push(declaration.data?.bride)
-  }
-  if (declarationName) {
-    name = declarationName
-      .map((obj) =>
-        [obj?.firstNamesEng, obj?.middleNameEng, obj?.familyNameEng]
-          .filter((part) => Boolean(part))
-          .join(' ')
-      )
-      .filter((part) => Boolean(part))
-      .join(' & ')
-  }
-  return name
-}
-
 export const getName = (names: (HumanName | null)[], language: string) => {
-  if (names && names.length) {
-    return (
-      (createNamesMap(names as HumanName[])[language] as string) ||
-      (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
-      EMPTY_STRING
-    )
-  }
-  return EMPTY_STRING
+  const nameMap = createNamesMap(names)
+  return nameMap[language] || nameMap[LANG_EN] || EMPTY_STRING
 }
 
 export const getDraftDeclarationData = (
@@ -381,7 +346,7 @@ export const getDraftDeclarationData = (
 ): IDeclarationData => {
   return {
     id: declaration.id,
-    name: getDraftDeclarationName(declaration),
+    name: getDeclarationFullName(declaration),
     type: declaration.event || EMPTY_STRING,
     registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||
