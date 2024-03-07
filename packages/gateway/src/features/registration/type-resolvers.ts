@@ -1645,7 +1645,7 @@ export const typeResolvers: GQLResolver = {
       const composition = getComposition(record)
       const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return {
           composition: composition.id
         }
@@ -1718,7 +1718,7 @@ export const typeResolvers: GQLResolver = {
     async eventLocation(record: Saved<Bundle>) {
       const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return null
       }
 
@@ -1820,7 +1820,7 @@ export const typeResolvers: GQLResolver = {
 
       const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return {
           composition: composition.id
         }
@@ -1947,7 +1947,7 @@ export const typeResolvers: GQLResolver = {
     async eventLocation(record: Saved<Bundle>) {
       const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return null
       }
 
@@ -1972,7 +1972,7 @@ export const typeResolvers: GQLResolver = {
       const composition = getComposition(record)
       const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return {
           composition: composition.id
         }
@@ -2080,7 +2080,7 @@ export const typeResolvers: GQLResolver = {
     async eventLocation(record: Saved<Bundle>) {
       const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
 
-      if (!encounter) {
+      if (!encounter || !encounter.location) {
         return null
       }
 
