@@ -31,7 +31,7 @@ describe('Verify utility functions', () => {
     fetch.resetMocks()
   })
 
-  it('Generates proper birth tracking id successfully', async () => {
+  it('Generates proper birth tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
       rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
         res(ctx.status(404))
@@ -47,7 +47,7 @@ describe('Verify utility functions', () => {
     expect(trackingId).toMatch(/^B/)
   })
 
-  it('Generates proper death tracking id successfully', async () => {
+  it('Generates proper death tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
       rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
         res(ctx.status(404))
@@ -64,7 +64,7 @@ describe('Verify utility functions', () => {
     expect(trackingId).toMatch(/^D/)
   })
 
-  it('Generates proper marriage tracking id successfully', async () => {
+  it('Generates proper marriage tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
       rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
         res(ctx.status(404))
