@@ -241,9 +241,17 @@ function isNotSubmittingOrDownloading(
 ) {
   const declarationInStore = savedDeclarations.find(
     (dec) => dec.id === workqueueDeclaration.id
-  )!
-  if (declarationInStore?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING)
+  )
+
+  if (
+    declarationInStore &&
+    declarationInStore.downloadStatus &&
+    [DOWNLOAD_STATUS.DOWNLOADING, DOWNLOAD_STATUS.READY_TO_DOWNLOAD].includes(
+      declarationInStore.downloadStatus
+    )
+  ) {
     return false
+  }
 
   if (declarationInStore?.submissionStatus)
     return !Boolean(
@@ -269,6 +277,8 @@ function hasStatusChanged(
   const declarationStatusInStore = savedDeclarations.find(
     (dec) => dec.id === currentDeclaration?.id
   )?.registrationStatus
+
+  if (!declarationStatusInStore) return false
 
   return currentDeclarationStatus !== declarationStatusInStore
 }
