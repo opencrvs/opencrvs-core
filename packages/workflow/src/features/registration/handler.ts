@@ -21,7 +21,6 @@ import {
   sendNotification
 } from '@workflow/records/notification'
 import { auditEvent } from '@workflow/records/audit'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 
 export interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -63,9 +62,9 @@ export async function markEventAsRegisteredCallbackHandler(
     savedRecord,
     practitioner,
     registrationNumber,
+    token,
     childIdentifiers
   )
-  await sendBundleToHearth(registeredBundle)
   await indexBundle(registeredBundle, getToken(request))
   await auditEvent('registered', registeredBundle, token)
 

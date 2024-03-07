@@ -103,7 +103,6 @@ import {
   createIssuedTask,
   createCertifiedTask,
   withPractitionerDetails,
-  sendBundleToHearth,
   mergeChangedResourcesIntoRecord
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
@@ -258,10 +257,11 @@ export async function toUpdated(
     practitioner
   )
 
-  const [updatedTask] = await withPractitionerDetails(
-    updatedTaskWithoutPractitionerExtensions,
-    token
-  )
+  const [updatedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(
+      updatedTaskWithoutPractitionerExtensions,
+      token
+    )
 
   const recordWithUpdatedTask = {
     ...record,
@@ -277,8 +277,16 @@ export async function toUpdated(
       })
     ]
   }
-  await sendBundleToHearth(recordWithUpdatedTask)
-  return recordWithUpdatedTask
+
+  return changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      recordWithUpdatedTask,
+      practitionerResourcesBundle
+    ),
+    ['IN_PROGRESS', 'READY_FOR_REVIEW']
+  )
+  // return recordWithUpdatedTask
 }
 
 export async function toViewed<T extends ValidRecord>(
@@ -446,15 +454,20 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   practitioner: Practitioner,
   registrationNumber: IEventRegistrationCallbackPayload['registrationNumber'],
+  token: string,
   childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const registeredTask = createRegisterTask(previousTask, practitioner)
-
-  const registerTaskWithPractitionerExtensions = setupLastRegUser(
-    registeredTask,
+  const registeredTaskWithoutPractitionerExtensions = createRegisterTask(
+    previousTask,
     practitioner
   )
+
+  const [registeredTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(
+      registeredTaskWithoutPractitionerExtensions,
+      token
+    )
 
   const event = getTaskEventType(registeredTask) as EVENT_TYPE
   const composition = getComposition(record)
@@ -512,10 +525,6 @@ export async function toRegistered(
     )
   }
 
-  const registeredTaskWithLocationExtensions = await setupLastRegLocation(
-    registerTaskWithPractitionerExtensions,
-    practitioner
-  )
   const patientIds = patientsWithRegNumber.map((p) => p.id)
 
   const entriesWithUpdatedPatients = [
@@ -529,16 +538,19 @@ export async function toRegistered(
       }
     })
   ]
+
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [...entriesWithUpdatedPatients, { resource: registeredTask }]
+  }
+
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...entriesWithUpdatedPatients.filter(
-          (entry) => entry.resource.id !== previousTask.id
-        ),
-        { resource: registeredTaskWithLocationExtensions }
-      ]
-    },
+    await mergeChangedResourcesIntoRecord(
+      record,
+      unsavedChangedResources,
+      practitionerResourcesBundle
+    ),
     'REGISTERED'
   )
 }
