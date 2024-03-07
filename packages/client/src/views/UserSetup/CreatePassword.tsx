@@ -75,7 +75,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   const [continuePressed, setContinuePressed] = React.useState(false)
 
   const validateLength = (value: string) => {
-    setValidLength(value.length >= 8)
+    setValidLength(value.length >= 12)
   }
   const validateNumber = (value: string) => {
     setHasNumber(/\d/.test(value))
