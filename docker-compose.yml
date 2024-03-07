@@ -46,7 +46,6 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
-      - FHIR_URL=http://openhim-core:5001/fhir
       - HEARTH_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
@@ -102,7 +101,6 @@ services:
       - INFLUX_DB=ocrvs
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
-      - FHIR_URL=http://openhim-core:5001/fhir
       - MONGO_URL=mongodb://mongo1/metrics
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
@@ -141,7 +139,6 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-      - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
   webhooks:
@@ -155,7 +152,6 @@ services:
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
   notification:
@@ -180,7 +176,6 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
-      - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
