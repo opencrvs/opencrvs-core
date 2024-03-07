@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL, HEARTH_URL } from '@gateway/constants'
+import { HEARTH_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
@@ -26,7 +26,7 @@ export const fetchFHIR = <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  return fetch(`${FHIR_URL}${suffix}`, {
+  return fetch(`${HEARTH_URL}${suffix}`, {
     method,
     headers: {
       'Content-Type': 'application/fhir+json',
@@ -156,7 +156,7 @@ export const sendToFhir = async (
   method: string,
   token: string
 ) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
+  return fetch(`${HEARTH_URL}${suffix}`, {
     method,
     body,
     headers: {

@@ -10,13 +10,13 @@
  */
 // eslint-disable-next-line import/no-relative-parent-imports
 import { getResourceFromBundleById } from '@opencrvs/commons/types'
-import { FHIR_URL } from '@gateway/constants'
+import { HEARTH_URL } from '@gateway/constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class PatientAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = `${FHIR_URL}/Patient`
+    this.baseURL = `${HEARTH_URL}/Patient`
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
