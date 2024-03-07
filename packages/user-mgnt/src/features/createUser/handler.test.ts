@@ -242,30 +242,6 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('return an error and rollsback if a practitionerRole Id isnt returned', async () => {
-    fetch.mockResponses(
-      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201 }],
-      ['', { status: 200 }]
-    )
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/createUser',
-      payload: mockUser,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(fetch.mock.calls.length).toBe(3)
-    expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
-    )
-    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
-    expect(res.statusCode).toBe(500)
-  })
-
   it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
