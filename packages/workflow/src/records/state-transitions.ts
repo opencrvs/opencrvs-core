@@ -526,23 +526,14 @@ export async function toRegistered(
   }
 
   const patientIds = patientsWithRegNumber.map((p) => p.id)
-
-  const entriesWithUpdatedPatients = [
-    ...record.entry.map((e) => {
-      if (!patientIds.includes(e.resource.id)) {
-        return e
-      }
-      return {
-        ...e,
-        resource: patientsWithRegNumber.find(({ id }) => id === e.resource.id)!
-      }
-    })
-  ]
+  const patientsEntriesWithRN = record.entry.filter((e) =>
+    patientIds.includes(e.resource.id)
+  )
 
   const unsavedChangedResources: Bundle = {
     type: 'document',
     resourceType: 'Bundle',
-    entry: [...entriesWithUpdatedPatients, { resource: registeredTask }]
+    entry: [...patientsEntriesWithRN, { resource: registeredTask }]
   }
 
   return changeState(
