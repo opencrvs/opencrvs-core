@@ -25,6 +25,8 @@ import { cloneDeep } from 'lodash'
 import { BIRTH_BUNDLE, DEATH_BUNDLE } from '@opencrvs/commons/fixtures'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
+import { TransactionResponse } from '@workflow/records/fhir'
+import { URLReference } from '@workflow/../../commons/build/dist/types'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -136,6 +138,32 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       )
     )
 
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
+      })
+    )
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
@@ -168,6 +196,32 @@ describe('markEventAsRegisteredCallbackHandler', () => {
         'http://localhost:1050/events/death/registered',
         (_, res, ctx) => res(ctx.json({}))
       )
+    )
+
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'batch-response',
+          entry: [
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
+            }
+          ]
+        }
+        return res(ctx.json(responseBundle))
+      })
     )
 
     const res = await server.server.inject({

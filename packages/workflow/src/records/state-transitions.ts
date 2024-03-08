@@ -286,7 +286,6 @@ export async function toUpdated(
     ),
     ['IN_PROGRESS', 'READY_FOR_REVIEW']
   )
-  // return recordWithUpdatedTask
 }
 
 export async function toViewed<T extends ValidRecord>(
