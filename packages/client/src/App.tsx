@@ -382,8 +382,10 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               roles={[
+                                                SystemRoleType.RegistrationAgent,
                                                 SystemRoleType.LocalRegistrar,
                                                 SystemRoleType.LocalSystemAdmin,
+                                                SystemRoleType.NationalRegistrar,
                                                 SystemRoleType.NationalSystemAdmin,
                                                 SystemRoleType.PerformanceManagement
                                               ]}
