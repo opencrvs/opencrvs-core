@@ -27,6 +27,15 @@ type Notification { # -> Composition(type='birth-notification')
   updatedAt: Date # -> .date
 }
 
+enum NotificationType {
+  EMAIL
+  SMS
+}
+
+type NotificationResult {
+  success: Boolean!
+}
+
 type Query {
   listNotifications(
     locationIds: [String]
@@ -35,6 +44,11 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
+  sendNotificationToAllUsers(
+    subject: String!
+    body: String!
+    type: NotificationType = EMAIL
+  ): NotificationResult
 }
 
 type Mutation {

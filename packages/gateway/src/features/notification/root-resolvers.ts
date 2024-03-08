@@ -1,3 +1,8 @@
+import { GQLNotificationType, GQLResolver } from '@gateway/graphql/schema'
+import { inScope } from '@gateway/features/user/utils'
+import { sendEmailToAllUsers } from './service'
+import { unauthorized } from '@hapi/boom'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,11 +13,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const resolvers = {
+export const resolvers: GQLResolver = {
   Query: {
     listNotifications(_: any, { locations, status }: any) {
       // query composition
       return [{ id: '123' }, { id: '321' }]
+    },
+    async sendNotificationToAllUsers(
+      _: any,
+      { subject, body, type },
+      { headers: authHeader }
+    ) {
+      if (!inScope(authHeader, ['natlsysadmin'])) {
+        throw unauthorized(
+          'Sending mass notification is only allowed for national system admin'
+        )
+      }
+      if (type === GQLNotificationType.EMAIL) {
+        return sendEmailToAllUsers(subject, body, authHeader)
+      } else {
+        throw new Error('Unsupported notification type')
+      }
     }
   },
   Mutation: {
