@@ -79,7 +79,9 @@ export function Language() {
             ...choices,
             {
               value: lang,
-              label: languages[lang].displayName
+              label: intl.formatMessage(userMessages.language, {
+                language: languages[lang].lang
+              })
             }
           ]
         : choices,
@@ -95,7 +97,11 @@ export function Language() {
           </LabelContainer>
         }
         value={
-          <ValueContainer>{languages[language].displayName}</ValueContainer>
+          <ValueContainer>
+            {intl.formatMessage(userMessages.language, {
+              language: languages[language].lang
+            })}
+          </ValueContainer>
         }
         actions={
           <DynamicHeightLinkButton

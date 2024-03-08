@@ -510,6 +510,10 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'System language',
     description: 'Label for system language'
   },
+  language: {
+    id: 'system.user.settings.language',
+    defaultMessage: '{language}'
+  },
   profileImage: {
     id: 'system.user.settings.profileImage',
     defaultMessage: 'Profile Image',

@@ -19,6 +19,7 @@ import styled from 'styled-components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
+import { defineMessages, useIntl } from 'react-intl'
 
 const SelectContainer = styled.div`
   ${({ theme }) => theme.colors.primary};
@@ -28,15 +29,26 @@ const SelectContainer = styled.div`
   padding: 24px 24px 8px;
 `
 
+const messages = defineMessages({
+  language: {
+    id: 'login.language',
+    defaultMessage: '{language}'
+  }
+})
+
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLanguages = window.config.LANGUAGES.split(',')
   const history = useHistory()
   const location = useLocation()
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
+  const intl = useIntl()
 
   const languageOptions: ISelect2Option[] = Object.values(languages)
-    .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
+    .map(({ lang }) => ({
+      value: lang,
+      label: intl.formatMessage(messages.language, { language: lang })
+    }))
     .filter(({ value }) => applicationLanguages.includes(value))
 
   const onChange = ({ value }: ISelect2Option) => {
