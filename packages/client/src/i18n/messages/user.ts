@@ -134,7 +134,7 @@ const messagesToDefine: IUserMessages = {
     id: 'settings.message.changeLanguage'
   },
   changeLanguageSuccessMessage: {
-    defaultMessage: 'Language updated to {language}',
+    defaultMessage: 'Language updated',
     description: 'Change language success',
     id: 'settings.changeLanguage.success'
   },
