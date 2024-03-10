@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { EyeOn, EyeOff } from '../icons'
 import { CircleButton } from '../buttons'
@@ -22,10 +22,6 @@ interface ICustomProps {
   ignoreVisibility?: boolean
   showIcon?: React.ReactNode
   hideIcon?: React.ReactNode
-}
-
-interface IPasswordInputState {
-  isVisible: boolean
 }
 
 export type IPasswordInputProps = ICustomProps &
@@ -132,67 +128,62 @@ const IconButton = styled((props) => <CircleButton {...props} />)`
   }
 `
 
-export class PasswordInput extends React.Component<
-  IPasswordInputProps,
-  IPasswordInputState
-> {
-  private $element: React.RefObject<HTMLInputElement>
-  constructor(props: IPasswordInputProps) {
-    super(props)
-    this.$element = React.createRef()
-    this.state = {
-      isVisible: false
-    }
-    this.toggleVisibility = this.toggleVisibility.bind(this)
-  }
-  focusField(): void {
+export const PasswordInput = ({
+  error,
+  touched,
+  focusInput,
+  ignoreMediaQuery,
+  hideBorder,
+  ignoreVisibility,
+  showIcon,
+  hideIcon,
+  ...props
+}: ICustomProps) => {
+  const [isVisible, setIsVisible] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const toggleVisibility = () => setIsVisible(!isVisible)
+
+  const focusField = () => {
     /*
      * Needs to be run on the next tick
      * so that 'value' prop has enough time to flow back here
      * if the focusInput prop is called right after keydown
      */
     setTimeout(() => {
-      if (this.$element.current) {
-        this.$element.current!.focus()
+      if (inputRef.current) {
+        inputRef.current!.focus()
       }
     })
   }
-  componentDidUpdate(prevProps: IPasswordInputProps) {
-    if (!prevProps.focusInput && this.props.focusInput) {
-      this.focusField()
+  useEffect(() => {
+    if (focusInput) {
+      focusField()
     }
-  }
-  toggleVisibility() {
-    this.setState({
-      isVisible: !this.state.isVisible
-    })
-  }
+  }, [focusInput])
 
-  render() {
-    const { showIcon, hideIcon, ignoreVisibility } = this.props
-    return (
-      <StyledField>
-        <StyledInput
-          ref={this.$element}
-          {...this.props}
-          type={this.state.isVisible ? 'text' : 'password'}
-        />
-        {!ignoreVisibility && (
-          <IconButton onClick={this.toggleVisibility} type="button">
-            {this.state.isVisible ? (
-              hideIcon ? (
-                hideIcon
-              ) : (
-                <EyeOn />
-              )
-            ) : showIcon ? (
-              showIcon
+  return (
+    <StyledField>
+      <StyledInput
+        ref={inputRef}
+        {...props}
+        type={isVisible ? 'text' : 'password'}
+      />
+      {!ignoreVisibility && (
+        <IconButton onClick={toggleVisibility} type="button">
+          {isVisible ? (
+            hideIcon ? (
+              hideIcon
             ) : (
-              <EyeOff />
-            )}
-          </IconButton>
-        )}
-      </StyledField>
-    )
-  }
+              <EyeOn />
+            )
+          ) : showIcon ? (
+            showIcon
+          ) : (
+            <EyeOff />
+          )}
+        </IconButton>
+      )}
+    </StyledField>
+  )
 }
