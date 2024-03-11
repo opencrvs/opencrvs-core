@@ -445,7 +445,8 @@ export function App(props: IAppProps) {
                                               roles={[
                                                 SystemRoleType.LocalSystemAdmin,
                                                 SystemRoleType.NationalSystemAdmin,
-                                                SystemRoleType.PerformanceManagement
+                                                SystemRoleType.PerformanceManagement,
+                                                SystemRoleType.NationalRegistrar
                                               ]}
                                               path={
                                                 routes.PERFORMANCE_STATISTICS
@@ -457,7 +458,8 @@ export function App(props: IAppProps) {
                                               roles={[
                                                 SystemRoleType.LocalSystemAdmin,
                                                 SystemRoleType.NationalSystemAdmin,
-                                                SystemRoleType.PerformanceManagement
+                                                SystemRoleType.PerformanceManagement,
+                                                SystemRoleType.NationalRegistrar
                                               ]}
                                               path={
                                                 routes.PERFORMANCE_LEADER_BOARDS
@@ -469,7 +471,8 @@ export function App(props: IAppProps) {
                                               roles={[
                                                 SystemRoleType.LocalSystemAdmin,
                                                 SystemRoleType.NationalSystemAdmin,
-                                                SystemRoleType.PerformanceManagement
+                                                SystemRoleType.PerformanceManagement,
+                                                SystemRoleType.NationalRegistrar
                                               ]}
                                               path={
                                                 routes.PERFORMANCE_DASHBOARD
