@@ -15,7 +15,7 @@ import {
   EVENT_TYPE,
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
+import { FHIR_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getSectionEntryBySectionCode,
   findRelatedPersonEntry,
@@ -235,7 +235,7 @@ export function getEntryId(fhirBundle: Bundle) {
   return composition.id
 }
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }
@@ -276,7 +276,7 @@ export async function forwardToHearth(
   } else if (request.method === 'get') {
     path = `${request.path}${request.url.search}`
   }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
+  const res = await fetch(FHIR_URL + path.replace('/fhir', ''), requestOpts)
   const resBody = await res.text()
   const response = h.response(resBody)
 
@@ -290,7 +290,7 @@ export async function forwardToHearth(
 
 export async function postToHearth(payload: any) {
   /* hearth will do put calls if it finds id on the bundle */
-  const res = await fetch(HEARTH_URL, {
+  const res = await fetch(FHIR_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
@@ -307,7 +307,7 @@ export async function postToHearth(payload: any) {
 
 export async function updateResourceInHearth(resource: Resource) {
   const res = await fetch(
-    `${HEARTH_URL}/${resource.resourceType}/${resource.id}`,
+    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
     {
       method: 'PUT',
       body: JSON.stringify(resource),
@@ -484,7 +484,7 @@ export async function forwardEntriesToHearth(
   const res = await Promise.all(
     payload.entry.map((entry) => {
       return fetch(
-        `${HEARTH_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
+        `${FHIR_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
         {
           method: 'PUT',
           body: JSON.stringify(entry.resource),

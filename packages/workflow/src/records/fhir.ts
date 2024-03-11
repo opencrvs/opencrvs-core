@@ -51,7 +51,7 @@ import {
   isTask,
   urlReferenceToResourceIdentifier
 } from '@opencrvs/commons/types'
-import { HEARTH_URL } from '@workflow/constants'
+import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -1231,7 +1231,7 @@ export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
 export async function sendBundleToHearth(
   bundle: Bundle
 ): Promise<TransactionResponse> {
-  const res = await fetch(HEARTH_URL, {
+  const res = await fetch(FHIR_URL, {
     method: 'POST',
     body: JSON.stringify(bundle),
     headers: {
@@ -1534,7 +1534,7 @@ export async function findTaskFromIdentifier(
   identifier: string
 ): Promise<Bundle<SavedTask>> {
   const res = await fetch(
-    new URL(`/fhir/Task?identifier=${identifier}`, HEARTH_URL).href,
+    new URL(`/fhir/Task?identifier=${identifier}`, FHIR_URL).href,
     {
       method: 'GET',
       headers: {
@@ -1553,7 +1553,7 @@ export async function findTaskFromIdentifier(
 
 export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
   const res = await fetch(
-    new URL(`/fhir/Task/${taskId}/_history?_count=100`, HEARTH_URL).href,
+    new URL(`/fhir/Task/${taskId}/_history?_count=100`, FHIR_URL).href,
     {
       method: 'GET',
       headers: {

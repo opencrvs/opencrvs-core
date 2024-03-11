@@ -20,12 +20,12 @@ import {
   isSaved
 } from '@opencrvs/commons/types'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { HEARTH_URL } from '@gateway/constants'
+import { FHIR_URL } from '@gateway/constants'
 
 export default class FHIRAPI extends RESTDataSource<Context> {
   constructor() {
     super()
-    this.baseURL = `${HEARTH_URL}`
+    this.baseURL = `${FHIR_URL}`
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {

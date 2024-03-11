@@ -10,7 +10,7 @@
  */
 
 // eslint-disable-next-line import/no-relative-parent-imports
-import { HEARTH_URL } from '@gateway/constants'
+import { FHIR_URL } from '@gateway/constants'
 import { Bundle, BundleEntry, DocumentReference } from '@opencrvs/commons/types'
 
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
@@ -18,7 +18,7 @@ import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 export default class DocumentsAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = `${HEARTH_URL}/DocumentReference`
+    this.baseURL = `${FHIR_URL}/DocumentReference`
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {

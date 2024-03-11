@@ -46,7 +46,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
-      - HEARTH_URL=http://hearth:3447/fhir
+      - FHIR_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
@@ -74,7 +74,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - HEARTH_URL=http://hearth:3447/fhir
+      - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
@@ -88,7 +88,7 @@ services:
       - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
-      - HEARTH_URL=http://hearth:3447/fhir
+      - FHIR_URL=http://hearth:3447/fhir
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION}
     build:
@@ -107,6 +107,7 @@ services:
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
+      - FHIR_URL=http://hearth:3447/fhir
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION}
@@ -141,6 +142,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
+      - FHIR_URL=http://hearth:3447/fhir
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     build:
@@ -154,6 +156,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
+      - FHIR_URL=http://hearth:3447/fhir
   notification:
     image: opencrvs/ocrvs-notification:${VERSION}
     build:

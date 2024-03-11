@@ -10,7 +10,7 @@
  */
 import {
   COUNTRY_CONFIG_URL,
-  HEARTH_URL,
+  FHIR_URL,
   MOSIP_TOKEN_SEEDER_URL
 } from '@workflow/constants'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
@@ -322,7 +322,7 @@ export const fetchHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: method,
     body,
     headers: {

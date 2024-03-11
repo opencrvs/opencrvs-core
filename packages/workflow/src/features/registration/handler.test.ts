@@ -26,7 +26,7 @@ import { BIRTH_BUNDLE, DEATH_BUNDLE } from '@opencrvs/commons/fixtures'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { TransactionResponse } from '@workflow/records/fhir'
-import { URLReference } from '@workflow/../../commons/build/dist/types'
+import { URLReference } from '@opencrvs/commons/types'
 const fetch = fetchAny as any
 
 const mockInput = [
