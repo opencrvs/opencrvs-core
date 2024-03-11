@@ -1645,7 +1645,7 @@ export const typeResolvers: GQLResolver = {
       const composition = getComposition(record)
       const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      if (!encounter || !encounter.location) {
+      if (!encounter) {
         return {
           composition: composition.id
         }
@@ -1695,9 +1695,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: resourceIdentifierToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
@@ -1820,7 +1824,7 @@ export const typeResolvers: GQLResolver = {
 
       const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
 
-      if (!encounter || !encounter.location) {
+      if (!encounter) {
         return {
           composition: composition.id
         }
@@ -1868,9 +1872,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: resourceIdentifierToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
@@ -1972,7 +1980,7 @@ export const typeResolvers: GQLResolver = {
       const composition = getComposition(record)
       const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
 
-      if (!encounter || !encounter.location) {
+      if (!encounter) {
         return {
           composition: composition.id
         }
@@ -2016,9 +2024,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: resourceIdentifierToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
