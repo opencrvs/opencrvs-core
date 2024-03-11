@@ -34,18 +34,15 @@ import {
   Summary,
   Currency,
   ResponsiveModal
-} from '@client/../../components/lib'
-import {
-  SuccessButton,
-  TertiaryButton
-} from '@client/../../components/lib/buttons'
+} from '@opencrvs/components/lib'
+import { SuccessButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { Event } from '@client/utils/gateway'
-import { Button } from '@client/../../components/src/Button'
+import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
