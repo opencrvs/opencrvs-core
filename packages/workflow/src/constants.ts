@@ -10,8 +10,7 @@
  */
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 5050
-export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
-export const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 export const APPLICATION_CONFIG_URL =
   process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false

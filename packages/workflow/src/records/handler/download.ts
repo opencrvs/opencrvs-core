@@ -102,11 +102,12 @@ export async function downloadRecordHandler(
       // Here the sent bundle is saved with task only
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
 
-      await indexBundleToRoute(
-        downloadedRecordWithTaskOnly,
-        token,
-        '/events/assigned'
-      )
+      if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
+        await indexBundleToRoute(
+          downloadedRecordWithTaskOnly,
+          token,
+          '/events/assigned'
+        )
     } catch (error) {
       logger.error(error)
     }

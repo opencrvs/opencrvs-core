@@ -139,6 +139,13 @@ describe('Register record endpoint', () => {
                 location:
                   '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
               }
+            },
+            {
+              response: {
+                status: '200',
+                location:
+                  '/fhir/Patient/8cb74e54-1c02-41a7-86a3-415c4031c9ba/_history/dc39332f-a5d7-4422-ba7b-bc99a958e8cb' as URLReference
+              }
             }
           ]
         }

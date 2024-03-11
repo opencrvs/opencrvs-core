@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HEARTH_URL = 'http://localhost:3447/fhir'
+export const FHIR_URL = 'http://localhost:3447/fhir'
 export const CERT_PUBLIC_KEY_PATH = './test/cert.key.pub'
 export const USER_MANAGEMENT_URL = 'http://localhost:3030/'
 export const SEARCH_URL = 'http://localhost:9090/'
@@ -17,3 +17,7 @@ export const DOCUMENTS_URL = 'http://localhost:9050'
 export const NOTIFICATION_SERVICE_URL = 'http://localhost:2020/'
 export const APPLICATION_CONFIG_URL = 'http://localhost:2021/'
 export const COUNTRY_CONFIG_URL = 'http://localhost:3040'
+export const MOSIP_TOKEN_SEEDER_URL = 'http://localhost:8085'
+export function getDefaultLanguage() {
+  return 'en'
+}

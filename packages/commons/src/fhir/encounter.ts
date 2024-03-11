@@ -34,7 +34,7 @@ export type Encounter = Omit<fhir3.Encounter, 'location' | 'status'> & {
 
 export type SavedEncounter = Omit<Encounter, 'location'> & {
   id: UUID
-  location: Array<{
+  location?: Array<{
     location: SavedReference
   }>
 }

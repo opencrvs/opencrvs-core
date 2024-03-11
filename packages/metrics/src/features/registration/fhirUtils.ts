@@ -43,7 +43,7 @@ export function getSectionBySectionCode(
   const sectionRef = personSection.entry[0].reference
   const personEntry =
     bundle.entry &&
-    bundle.entry.find((entry: any) => entry.fullUrl === sectionRef)
+    bundle.entry.find((entry: any) => entry.fullUrl?.includes(sectionRef))
 
   if (!personEntry) {
     throw new Error(

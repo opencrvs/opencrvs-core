@@ -63,15 +63,6 @@ export async function getSystem(
   return body
 }
 
-// @todo remove this as it's not used anywhere (other than tests)
-export async function getLoggedInPractitionerPrimaryLocation(
-  token: string
-): Promise<fhir3.Location> {
-  return getPrimaryLocationFromLocationList(
-    await getLoggedInPractitionerLocations(token)
-  )
-}
-
 export async function getPractitionerPrimaryLocation(
   practitionerId: string
 ): Promise<fhir3.Location> {

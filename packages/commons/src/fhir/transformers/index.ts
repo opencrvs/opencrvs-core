@@ -1014,7 +1014,9 @@ function setResourceIdentifier(
     value: fieldValue
   } as TaskIdentifier
 
-  resource.identifier.push(identifier)
+  resource.identifier
+    .filter((obj) => obj.system !== identifier.system)
+    .push(identifier)
 }
 
 function createRegStatusComment(

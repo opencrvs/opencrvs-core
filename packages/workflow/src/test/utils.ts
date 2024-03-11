@@ -2621,7 +2621,7 @@ export const mosipDeceasedPatientMock: Saved<Patient> = {
   id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1' as UUID,
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
       family: ['Hasan']
     }
@@ -2638,7 +2638,7 @@ export const mosipUpdatedDeceasedPatientMock = {
   id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
       family: ['Hasan']
     }
@@ -2666,7 +2666,7 @@ export const mosipBirthPatientMock = {
   identifier: [brnIdentifier, mosipPsutTokenIdentifier]
 }
 
-export const mosipBirthPatientBundleMock = JSON.stringify({
+export const mosipBirthPatientBundleMock = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -2675,7 +2675,7 @@ export const mosipBirthPatientBundleMock = JSON.stringify({
       resource: mosipBirthPatientMock
     }
   ]
-})
+}
 
 export const mosipErrorMock = JSON.stringify({
   transactionID: '6810356436',
@@ -2694,7 +2694,7 @@ export const mosipErrorMock = JSON.stringify({
     authToken: '278978890917620599774520674456334033'
   }
 })
-export const mosipSuccessMock = JSON.stringify({
+export const mosipSuccessMock = {
   transactionID: '5763906453',
   version: '1.0',
   id: 'mosip.identity.auth',
@@ -2704,7 +2704,7 @@ export const mosipSuccessMock = JSON.stringify({
     authStatus: true,
     authToken: '257803821990055124230310596669133515'
   }
-})
-export const mosipConfigMock = JSON.stringify([
+}
+export const mosipConfigMock = [
   { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
-])
+]

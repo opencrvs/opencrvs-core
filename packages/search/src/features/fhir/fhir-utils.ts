@@ -21,7 +21,7 @@ import {
   SavedComposition,
   SavedTask
 } from '@opencrvs/commons/types'
-import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
+import { FLAGGED_AS_POTENTIAL_DUPLICATE, FHIR_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
   ICompositionBody,
@@ -253,7 +253,7 @@ function existsAsDuplicate(
 }
 
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }
@@ -267,7 +267,7 @@ export const getFromFhir = (suffix: string) => {
 }
 
 export async function updateInHearth(suffix: string, payload: any) {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
     headers: {
@@ -358,7 +358,7 @@ export const fetchHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: method,
     body,
     headers: {
