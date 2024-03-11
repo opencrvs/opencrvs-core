@@ -42,8 +42,4 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   }
 `
 
-export class TextArea extends React.Component<ITextAreaProps> {
-  render() {
-    return <StyledTextArea {...this.props} />
-  }
-}
+export const TextArea = (props: ITextAreaProps) => <StyledTextArea {...props} />

@@ -80,40 +80,39 @@ export interface IDataProps {
   actionsMenu?: React.ReactNode
 }
 
-export class DataRow extends React.Component<IDataProps> {
-  render() {
-    const { id, label, value, placeHolder, action, actionsMenu } = this.props
-
-    return (
-      <Container id={id}>
-        {label && (
-          <>
-            <DataContainer>
-              <Label id={`${id}_label`}>{label}</Label>
-              {value && <Value id={`${id}_value`}>{value}</Value>}
-              {placeHolder && (
-                <PlaceHolder id={`${id}_placeholder`}>
-                  {placeHolder}
-                </PlaceHolder>
-              )}
-            </DataContainer>
-            {action && (
-              <Action>
-                <Link
-                  font="reg14"
-                  id={action.id}
-                  disabled={action.disabled}
-                  onClick={action.handler}
-                >
-                  {action.label}
-                </Link>
-              </Action>
-            )}
-            {actionsMenu && <div>{actionsMenu}</div>}
-          </>
+export const DataRow = ({
+  id,
+  label,
+  value,
+  placeHolder,
+  action,
+  actionsMenu
+}: IDataProps) => (
+  <Container id={id}>
+    {label && (
+      <>
+        <DataContainer>
+          <Label id={`${id}_label`}>{label}</Label>
+          {value && <Value id={`${id}_value`}>{value}</Value>}
+          {placeHolder && (
+            <PlaceHolder id={`${id}_placeholder`}>{placeHolder}</PlaceHolder>
+          )}
+        </DataContainer>
+        {action && (
+          <Action>
+            <Link
+              font="reg14"
+              id={action.id}
+              disabled={action.disabled}
+              onClick={action.handler}
+            >
+              {action.label}
+            </Link>
+          </Action>
         )}
-        {!label && <ValueContainer>{value}</ValueContainer>}
-      </Container>
-    )
-  }
-}
+        {actionsMenu && <div>{actionsMenu}</div>}
+      </>
+    )}
+    {!label && <ValueContainer>{value}</ValueContainer>}
+  </Container>
+)
