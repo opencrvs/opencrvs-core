@@ -7,26 +7,25 @@ title: Fetch birth registration (mark as assigned)
 
 sequenceDiagram
     autonumber
-    participant GraphQL gateway
-    participant OpenHIM
+    participant GraphQL Gateway
     participant Workflow
     participant User management
     participant Hearth
+    participant Search
     participant Config
     participant Metrics
     participant Notifications
     participant Influx DB
-    participant Search
     participant ElasticSearch
 
     % markRecordAsDownloadedOrAssigned
       % getTaskEntry
-    GraphQL gateway->>OpenHIM: Get Task by Composition id
-    OpenHIM->>Hearth: Get Task by Composition id
+    GraphQL Gateway->>Workflow: CompositionId
+    Workflow->>Search: Get Record by id
 
-    GraphQL gateway->>OpenHIM: Put modified Task
-    OpenHIM->>Hearth: Put modified Task
+    Workflow->>User management: Fetch user/system info
+    Workflow->>Hearth: Bundle with modified Task
+    Workflow->>Search: Bundle with modified Task
 
-    GraphQL gateway->>OpenHIM: Return full Composition
-    OpenHIM->>Hearth: Return full Composition
+    Workflow->>GraphQL Gateway: Return full updated record
 ```

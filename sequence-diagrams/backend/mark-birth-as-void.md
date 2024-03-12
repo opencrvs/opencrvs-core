@@ -8,7 +8,6 @@ title: Mark birth as rejected (mark as voided)
 sequenceDiagram
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth
@@ -22,77 +21,27 @@ sequenceDiagram
     GraphQL gateway->>Search: Search for assignment
     Search->>ElasticSearch: Search by Composition id
     Note over GraphQL gateway,ElasticSearch: Check if the user has been assigned to this record
-    GraphQL gateway->>OpenHIM: Get Task by Composition id
-    OpenHIM->>Hearth: Get Task by Composition id
-    Note over GraphQL gateway,Hearth: Mark Task as rejected
-    GraphQL gateway->>OpenHIM: Put Task
-    OpenHIM->>Workflow: Put Task
-    Workflow->>Hearth: Get Task by Task id
-    Note over Workflow,Hearth: Check for duplicate status update
 
-    Workflow->>User management: Get Practitioner id by token
-    Workflow->>Hearth: Get Practitioner
-    Note over Workflow,Hearth: Finds practitioner to<br />1) set user to bundle<br />2) later fetch office & location to bundle
+    GraphQL gateway->>Workflow: POST /records/{recordId}/reject
+    Workflow->>Search: Get record by id (by createRoute)
 
-    Workflow->>Config: Get form draft status
-    Note over Workflow,Config: Adds configuration extension to the Task Bundle distinguish records made when form is in draft
-
-    Workflow->>Hearth: Get PractitionerRole
+    Workflow->>User management: Fetch user/system info
     loop PractitionerRole Locations
-        Workflow->>Hearth: Get Location
-    end
-    Note over Workflow,Hearth: Adds primary location to Task Bundle
-    Workflow->>Hearth: Get PractitionerRole
-    loop PractitionerRole Locations
-        Workflow->>Hearth: Get Location
+      Workflow->>Hearth: Get Location by user's practitionerId
     end
     Note over Workflow,Hearth: Adds office to the Task Bundle
 
-    Workflow->>Hearth: Get FHIR Composition
-    Workflow->>Hearth: Get person
-    Workflow->>Notifications: Send notification to the person
-    Workflow->>Hearth: Put updated Task Bundle
-    Workflow--)OpenHIM: Trigger mark event as void event
+    Note over Workflow: Modify task entry
 
+    Workflow->>Hearth: Save bundle to hearth
+    Note over Workflow,Hearth: Get hearth response for all entries
 
-    OpenHIM--)Metrics: Post bundle
-    Metrics-->Hearth: Get Task history
+    Note over Workflow: Merge changed resources into record
 
-    loop location levels 4, 3, 2
-        Metrics->>OpenHIM: Get parent of Location
-        OpenHIM->>Workflow: Get parent of Location
-        Workflow->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate rejected points
-
-    loop location levels 4, 3, 2
-        Metrics->>OpenHIM: Get parent of Location
-        OpenHIM->>Workflow: Get parent of Location
-        Workflow->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate time logged point
-
-    Metrics->>Hearth: Get previous task of Task History
-    Note over Metrics,Hearth: Generate event duration point
-    Metrics->>Influx DB: Write points
-    OpenHIM--)Search: Post bundle
-
+    Workflow->>Search: Send full bundle to search
     %% upsertEvent
-    %% updateEvent
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Get operation history
-    %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
-    Note over Search,Hearth: Compose new history entry
-    %% updateComposition
-    Search->>ElasticSearch: Update composition
-
-    %% indexAndSearchComposition
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdAt
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find operation history
+    Search->>ElasticSearch: Search by composition id
+    Note over Search,ElasticSearch: Get operation history and createdAt
 
     %% createIndexBody
       %% createChildIndex
@@ -100,35 +49,34 @@ sequenceDiagram
     Search->>Hearth: Get Encounter
     Search->>Hearth: Get Encounter location
 
-      %% createDeclarationIndex
+    %% createDeclarationIndex
       %% getCreatedBy
     Search->>ElasticSearch: Get composition
     Note over Search,ElasticSearch: Find createdBy
 
-      %% createStatusHistory
+    %% createStatusHistory
     Search->>User management: Get user
     Search->>Hearth: Get office location
     Note over Search,Hearth: Compose new history entry
 
-    %% indexComposition
     Search->>ElasticSearch: Index composition
 
-    %% detectAndUpdateduplicates
-      %% detectDuplicates
-        %% searchComposition
-    Search->>ElasticSearch: Search Compositions for duplicates
-      %% updateCompositionWithDuplicates
+    Workflow->>Metrics: Send full bundle to metrics
+    Metrics-->Hearth: Get Task history
 
-    loop no of duplicates
-        Search->>Hearth: Get Composition by id
+    loop location levels 4, 3, 2
+        Metrics->>Hearth: Get parent of Location
     end
+    Note over Metrics,Hearth: Generate rejected points
 
-    Search->>ElasticSearch: Update Composition
-    Note over Search,ElasticSearch: Add duplicates to "relatesTo"
+    loop location levels 4, 3, 2
+        Metrics->>Hearth: Get parent of Location
+    end
+    Note over Metrics,Hearth: Generate time logged point
 
-    Search->>Hearth: Get Composition by id
-    Note over Search,Hearth: Add duplicates to Composition
+    Metrics->>Hearth: Get previous task of Task History
+    Note over Metrics,Hearth: Generate event duration point
+    Metrics->>Influx DB: Write points
 
-    Search->>Hearth: Put Composition
-    Note over Search,Hearth: Update duplicates to Hearth 'relatesTo'
+    Workflow->>GraphQL gateway: Return full bundle
 ```
