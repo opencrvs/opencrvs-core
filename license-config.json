@@ -20,7 +20,6 @@
     "**/.DS_Store",
     "AUTHORS",
     "LICENSE",
-    "CHANGELOG",
     "license-header.txt",
     "**/*Dockerfile",
     "**/packages/components/lib",
@@ -41,8 +40,7 @@
     "packages/dashboards/*.jar",
     "packages/dashboards/plugins/*.jar",
     "packages/dashboards/data/metabase/*.db",
-    "packages/client/dev-dist",
-    "CHANGELOG"
+    "packages/client/dev-dist"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
