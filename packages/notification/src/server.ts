@@ -19,6 +19,7 @@ import {
 import getPlugins from '@notification/config/plugins'
 import { readFileSync } from 'fs'
 import getRoutes from '@notification/config/routes'
+import * as database from '@notification/database'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -61,11 +62,13 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
+    await database.stop()
     server.log('info', 'Notification server stopped')
   }
 
   async function start() {
     await server.start()
+    await database.start()
     server.log('info', `Notification server started on ${HOST}:${PORT}`)
   }
 

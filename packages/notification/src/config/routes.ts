@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  allUsersEmailHandler,
+  allUsersEmailPayloadSchema
+} from '@notification/features/email/all-user-handler'
+import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendBirthRejectionConfirmation,
@@ -47,7 +51,8 @@ const enum RouteScope {
   VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin'
+  SYSADMIN = 'sysadmin',
+  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
 }
 
 export default function getRoutes() {
@@ -307,6 +312,21 @@ export default function getRoutes() {
         description: 'Sends an sms to a user with new username',
         validate: {
           payload: retrieveUserNameNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/allUsersEmail',
+      handler: allUsersEmailHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+        },
+        description: 'Sends emails to all users given in payload',
+        validate: {
+          payload: allUsersEmailPayloadSchema
         }
       }
     }
