@@ -52,7 +52,6 @@ interface Window {
     DEATH_REGISTRATION: boolean
     MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
-    AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
     MINIO_BUCKET: string

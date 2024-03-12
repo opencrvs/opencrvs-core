@@ -93,7 +93,9 @@ export function UserRoleManagementModal(props: IProps) {
             ...choices,
             {
               value: lang,
-              label: languages[lang].displayName
+              label: intl.formatMessage(messages.language, {
+                language: languages[lang].lang
+              })
             }
           ]
         : choices,
