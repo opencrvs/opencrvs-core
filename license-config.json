@@ -20,7 +20,6 @@
     "**/.DS_Store",
     "AUTHORS",
     "LICENSE",
-    "CHANGELOG",
     "license-header.txt",
     "**/*Dockerfile",
     "**/packages/components/lib",
