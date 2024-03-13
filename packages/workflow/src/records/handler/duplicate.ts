@@ -11,7 +11,6 @@
 
 import * as z from 'zod'
 import * as Hapi from '@hapi/hapi'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import { toDuplicated } from '@workflow/records/state-transitions'
@@ -39,7 +38,7 @@ export async function duplicateRecordHandler(
 
   const { duplicatedRecord, duplicatedRecordWithTaskOnly } = await toDuplicated(
     record,
-    await getLoggedInPractitionerResource(token),
+    token,
     reason,
     comment,
     duplicateTrackingId

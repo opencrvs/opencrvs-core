@@ -658,7 +658,7 @@ export async function toReinstated(
 
 export async function toDuplicated(
   record: ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner,
+  token: string,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -667,37 +667,30 @@ export async function toDuplicated(
   duplicatedRecordWithTaskOnly: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-  const duplicatedTask = createDuplicateTask(
+  const duplicatedTaskWithoutPractitionerExtensions = createDuplicateTask(
     previousTask,
-    practitioner,
     reason,
     comment,
     duplicateTrackingId
   )
 
-  const duplicatedTaskWithPractitionerExtensions = setupLastRegUser(
-    duplicatedTask,
-    practitioner
-  )
-
-  const duplicatedTaskWithLocationExtensions = await setupLastRegLocation(
-    duplicatedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [duplicatedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(
+      duplicatedTaskWithoutPractitionerExtensions,
+      token
+    )
 
   const duplicatedRecordWithTaskOnly: Bundle<SavedTask> = {
-    resourceType: 'Bundle',
     type: 'document',
-    entry: [{ resource: duplicatedTaskWithLocationExtensions }]
+    resourceType: 'Bundle',
+    entry: [{ resource: duplicatedTask }]
   }
 
-  const duplicatedRecord = {
-    ...record,
-    entry: [
-      ...record.entry.filter((e) => e.resource.id !== duplicatedTask.id),
-      { resource: duplicatedTaskWithLocationExtensions }
-    ]
-  } as ReadyForReviewRecord
+  const duplicatedRecord = (await mergeChangedResourcesIntoRecord(
+    record,
+    duplicatedRecordWithTaskOnly,
+    practitionerResourcesBundle
+  )) as ReadyForReviewRecord
 
   return { duplicatedRecord, duplicatedRecordWithTaskOnly }
 }

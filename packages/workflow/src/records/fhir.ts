@@ -119,7 +119,10 @@ export async function withPractitionerDetails<T extends Task>(
     identifier: task.identifier.filter(
       ({ system }) =>
         system !== 'http://opencrvs.org/specs/id/system_identifier'
-    )
+    ),
+    requester: {
+      agent: { reference: `Practitioner/${userOrSystem.practitionerId}` }
+    }
   }
   if (isSystem(userOrSystem)) {
     const { name, username, type } = userOrSystem
@@ -930,7 +933,6 @@ export function createNotDuplicateTask(
 
 export function createDuplicateTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -943,11 +945,7 @@ export function createDuplicateTask(
     })
   }
 
-  const duplicateTask = createNewTaskResource(
-    previousTask,
-    newExtensions,
-    practitioner.id
-  )
+  const duplicateTask = createNewTaskResource(previousTask, newExtensions)
 
   return {
     ...duplicateTask,
@@ -1173,7 +1171,7 @@ export function createCorrectionRequestTask(
 function createNewTaskResource(
   previousTask: SavedTask,
   newExtensions: Extension[],
-  practitionerId: Practitioner['id'],
+  practitionerId?: Practitioner['id'],
   status?: TaskStatus
 ): SavedTask {
   return {
@@ -1184,9 +1182,11 @@ function createNewTaskResource(
     code: previousTask.code,
     focus: previousTask.focus,
     id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitionerId}` }
-    },
+    requester: practitionerId
+      ? {
+          agent: { reference: `Practitioner/${practitionerId}` }
+        }
+      : previousTask.requester,
     identifier: previousTask.identifier,
     note: previousTask.note,
     extension: previousTask.extension
