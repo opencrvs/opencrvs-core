@@ -537,48 +537,38 @@ export async function toRegistered(
 
 export async function toArchived(
   record: RegisteredRecord | ReadyForReviewRecord | ValidatedRecord,
-  practitioner: Practitioner,
+  token: string,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const archivedTask = createArchiveTask(
+  const taskWithoutPractitionerExtensions = createArchiveTask(
     previousTask,
-    practitioner,
     reason,
     comment,
     duplicateTrackingId
   )
 
-  const archivedTaskWithPractitionerExtensions = setupLastRegUser(
-    archivedTask,
-    practitioner
-  )
-
-  const archivedTaskWithLocationExtensions = await setupLastRegLocation(
-    archivedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const [archivedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 
   const archivedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [{ resource: archivedTaskWithLocationExtensions }]
+    entry: [{ resource: archivedTask }]
   }
 
   const archivedRecord = changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter((e) => e.resource.id !== archivedTask.id),
-        { resource: archivedTaskWithLocationExtensions }
-      ]
-    },
+    await mergeChangedResourcesIntoRecord(
+      record,
+      archivedRecordWithTaskOnly,
+      practitionerResourcesBundle
+    ),
     'ARCHIVED'
   )
 
-  return { archivedRecord, archivedRecordWithTaskOnly }
+  return archivedRecord
 }
 
 export async function toReinstated(

@@ -880,7 +880,6 @@ export function createRegisterTask(previousTask: SavedTask): Task {
 
 export function createArchiveTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -895,7 +894,7 @@ export function createArchiveTask(
   const archivedTask = createNewTaskResource(
     previousTask,
     newExtensions,
-    practitioner.id,
+    undefined,
     'ARCHIVED'
   )
 
