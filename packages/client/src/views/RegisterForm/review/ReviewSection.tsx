@@ -1879,25 +1879,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               key={index}
                               rows={sec.items.map((item) => ({
                                 id: item.id,
-                                label: [
-                                  <Text
-                                    key={item.id}
-                                    variant="bold16"
-                                    element="h4"
-                                  >
-                                    {item.label}
-                                  </Text>
-                                ],
-                                value: [
-                                  <Text
-                                    key={item.id}
-                                    id={item.label.split(' ')[0]}
-                                    variant="reg16"
-                                    element="p"
-                                  >
-                                    {item.value}
-                                  </Text>
-                                ],
+                                label: [item.label],
+                                value: [item.value],
                                 actions: [
                                   <Link
                                     key={item.action.id}

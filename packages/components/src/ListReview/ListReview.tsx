@@ -6,7 +6,8 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
 import styled from 'styled-components'
@@ -34,7 +35,7 @@ export const ReviewHeader = styled.table`
     text-align: left;
   }
   th:first-child {
-    min-width: 280px;
+    min-width: 300px;
     padding-right: 48px;
   }
   th:nth-child(2) {
@@ -64,16 +65,19 @@ export const ReviewRow = styled.table`
   }
 
   td {
-    padding: 12px 0;
+    margin: 0;
+    padding: 14px 0;
     vertical-align: top;
   }
 
   td:first-child {
+    margin: 0;
     ${({ theme }) => theme.fonts.bold16};
-    min-width: 280px;
+    min-width: 300px;
     padding-right: 48px;
   }
   td:nth-child(2) {
+    margin: 0;
     ${({ theme }) => theme.fonts.reg16};
     width: 100%;
     padding-right: 48px;
@@ -136,13 +140,7 @@ export function ListReview({
           <tbody>
             <tr>
               {row.label && <td>{row.label}</td>}
-              {row.value && Array.isArray(row.value) && (
-                <td>
-                  {row.value.map((value: string, index: number) => (
-                    <div key={index}>{value}</div>
-                  ))}
-                </td>
-              )}
+              <td>{row.value}</td>
               {row.actions ? (
                 <td>
                   <ActionsContainer>{row.actions}</ActionsContainer>
