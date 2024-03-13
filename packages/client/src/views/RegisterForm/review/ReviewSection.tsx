@@ -1689,6 +1689,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
       ).length === 0 && !isSignatureMissing()
+    const hasValidationErrors =
+      flatten(Object.values(badInputErrors).map(Object.values)).filter(
+        (errors) => errors.errors.length > 0
+      ).length > 0
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -1996,6 +2000,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
+                          hasErrorsOnFields={hasValidationErrors}
                         />
                       </>
                     ) : (
