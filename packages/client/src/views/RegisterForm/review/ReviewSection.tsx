@@ -70,7 +70,6 @@ import {
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
   WARNING,
-  SUBSECTION_HEADER,
   DIVIDER,
   HIDDEN
 } from '@client/forms'
@@ -240,14 +239,6 @@ const FormData = styled.div`
   }
 `
 
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  ${({ theme }) => theme.fonts.h3};
-  padding: 16px 0;
-`
-
 const ReviewContainter = styled.div<{ paddingT?: boolean }>`
   padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -258,17 +249,6 @@ const StyledAlert = styled(Alert)`
   margin-top: 24px;
 `
 const DeclarationDataContainer = styled.div``
-
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
-const StyledLabel = styled.span`
-  ${({ theme }) => theme.fonts.h3}
-`
-const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
-  >>>>>>> ce41d0d7a2b22e6f1822c56d82946235618e93b8
-`
 
 const DocumentListPreviewContainer = styled.div`
   display: block;
@@ -1709,10 +1689,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
       ).length === 0 && !isSignatureMissing()
-    const hasValidationErrors =
-      flatten(Object.values(badInputErrors).map(Object.values)).filter(
-        (errors) => errors.errors.length > 0
-      ).length > 0
 
     const textAreaProps = {
       id: 'additional_comments',
