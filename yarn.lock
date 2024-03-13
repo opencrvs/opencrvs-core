@@ -7443,14 +7443,16 @@
   integrity sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==
 
 "@types/node@^16.18.39":
-  version "16.18.59"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.59.tgz#4cdbd631be6d9be266a96fb17b5d0d7ad6bbe26c"
-  integrity sha512-PJ1w2cNeKUEdey4LiPra0ZuxZFOGvetswE8qHRriV/sUkL5Al4tTmPV9D2+Y/TPIxTHHgxTfRjZVKWhPw/ORhQ==
+  version "16.18.88"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.88.tgz#ac7ddc13e0664fa78332f35678a72751c98c3dfc"
+  integrity sha512-Za3eRO5y0UWShynpsbNq/Dtqjc+g3GM9/PnrebiWiU4pYa5dOQbpCGuZ7ICqbiZ0JvLaZZ4eq7t5cSts2IEgkg==
 
 "@types/node@^18.0.0", "@types/node@^18.11.18":
-  version "18.18.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.18.6.tgz#26da694f75cdb057750f49d099da5e3f3824cb3e"
-  integrity sha512-wf3Vz+jCmOQ2HV1YUJuCWdL64adYxumkrxtc+H1VUQlnQI04+5HtH+qZCOE21lBE7gIrt+CwX2Wv8Acrw5Ak6w==
+  version "18.19.23"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.23.tgz#e02c759218bc9957423a3f7d585d511b17be2351"
+  integrity sha512-wtE3d0OUfNKtZYAqZb8HAWGxxXsImJcPUAgZNw+dWFxO6s5tIwIjyKnY76tsTatsNCLJPkVYwUpq15D38ng9Aw==
+  dependencies:
+    undici-types "~5.26.4"
 
 "@types/node@^8.10.50":
   version "8.10.66"
@@ -7458,19 +7460,19 @@
   integrity sha512-tktOkFUA4kXx2hhhrB8bIFb5TbwzS4uOhKEmwiD+NoiL0qtP2OQ9mFldbgD4dV1djrlBYP6eBuQZiWjuHUpqFw==
 
 "@types/normalize-package-data@^2.4.0":
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.3.tgz#291c243e4b94dbfbc0c0ee26b7666f1d5c030e2c"
-  integrity sha512-ehPtgRgaULsFG8x0NeYJvmyH1hmlfsNLujHe9dQEia/7MAJYdzMSi19JtchUHjmBA6XC/75dK55mzZH+RyieSg==
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.4.tgz#56e2cc26c397c038fab0e3a917a12d5c5909e901"
+  integrity sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==
 
 "@types/parse-json@^4.0.0":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.1.tgz#27f7559836ad796cea31acb63163b203756a5b4e"
-  integrity sha512-3YmXzzPAdOTVljVMkTMBdBEvlOLg2cDQaDhnnhT3nT9uDbnJzjWhKlzb+desT12Y7tGqaN6d+AbozcKzyL36Ng==
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.2.tgz#5950e50960793055845e956c427fc2b0d70c5239"
+  integrity sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==
 
 "@types/pdfkit@*":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@types/pdfkit/-/pdfkit-0.13.1.tgz#1250bde5d3256c11c2412213737c73ba2d4dab4b"
-  integrity sha512-4TCdxIj96OaP4jMPeL6/vmtbc3tsDMgFwXSKQpAceEtiVKgREJKBBLVGf0S1xTAbZkCYNL1OHuufzIgl8m+M7g==
+  version "0.13.4"
+  resolved "https://registry.yarnpkg.com/@types/pdfkit/-/pdfkit-0.13.4.tgz#e75ca9d296b4078178794bccd7f7b58ef805682a"
+  integrity sha512-ixGNDHYJCCKuamY305wbfYSphZ2WPe8FPkjn8oF4fHV+PgPV4V+hecPh2VOS2h4RNtpSB3zQcR4sCpNvvrEb1A==
   dependencies:
     "@types/node" "*"
 
@@ -22898,6 +22900,11 @@ undici-types@~5.25.1:
   version "5.25.3"
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.25.3.tgz#e044115914c85f0bcbb229f346ab739f064998c3"
   integrity sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==
+
+undici-types@~5.26.4:
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
+  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 unicode-byte-truncate@^1.0.0:
   version "1.0.0"
