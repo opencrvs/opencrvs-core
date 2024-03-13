@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS user management service",
   "license": "MPL-2.0",
   "private": true,

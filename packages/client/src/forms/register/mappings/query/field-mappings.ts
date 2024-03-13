@@ -161,6 +161,7 @@ export function arrayToFieldTransformer(
   sectionId: SectionId,
   field: IFormField
 ) {
+  transformedData[sectionId] ??= {}
   if (
     queryData[sectionId] &&
     queryData[sectionId][field.name] &&

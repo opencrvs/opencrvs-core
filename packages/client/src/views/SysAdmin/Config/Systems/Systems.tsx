@@ -226,9 +226,6 @@ export function SystemList() {
     [IntegratingSystemType.Mosip]: intl.formatMessage(
       integrationMessages.integratingSystemTypeMosip
     ),
-    [IntegratingSystemType.Osia]: intl.formatMessage(
-      integrationMessages.integratingSystemTypeOsia
-    ),
     [IntegratingSystemType.Other]: intl.formatMessage(
       integrationMessages.nationalID
     )
@@ -601,13 +598,6 @@ export function SystemList() {
                       },
                       {
                         label: intl.formatMessage(
-                          integrationMessages.integratingSystemTypeOsia
-                        ),
-                        value: IntegratingSystemType.Osia,
-                        disabled: true
-                      },
-                      {
-                        label: intl.formatMessage(
                           integrationMessages.integratingSystemTypeOther
                         ),
                         value: IntegratingSystemType.Other,
@@ -647,10 +637,6 @@ export function SystemList() {
                 {newIntegratingSystemType === IntegratingSystemType.Mosip &&
                   intl.formatMessage(
                     integrationMessages.integratingSystemTypeAlertMosip
-                  )}
-                {newIntegratingSystemType === IntegratingSystemType.Osia &&
-                  intl.formatMessage(
-                    integrationMessages.integratingSystemTypeAlertOsia
                   )}
                 {newIntegratingSystemType === IntegratingSystemType.Other &&
                   intl.formatMessage(
