@@ -70,13 +70,13 @@ export const ReviewRow = styled.table`
 
   td:first-child {
     margin: 0;
-    ${({ theme }) => theme.fonts.bold16};
+    ${({ theme }) => theme.fonts.bold16}
     min-width: 300px;
     padding-right: 48px;
   }
   td:nth-child(2) {
     margin: 0;
-    ${({ theme }) => theme.fonts.reg16};
+    ${({ theme }) => theme.fonts.reg16}
     width: 100%;
     padding-right: 48px;
   }
