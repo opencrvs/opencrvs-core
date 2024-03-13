@@ -786,7 +786,6 @@ export async function createDownloadTask(
 
 export function createRejectTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comment: fhir3.CodeableConcept,
   reason?: string
 ): SavedTask {
@@ -798,7 +797,7 @@ export function createRejectTask(
         valueInteger: 0
       }
     ],
-    practitioner.id,
+    undefined,
     'REJECTED'
   )
 
@@ -815,7 +814,6 @@ export function createRejectTask(
 
 export function createValidateTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comments?: string,
   timeLoggedMS?: number
 ): SavedTask {
@@ -827,7 +825,7 @@ export function createValidateTask(
         valueInteger: timeLoggedMS ?? 0
       }
     ],
-    practitioner.id,
+    undefined,
     'VALIDATED'
   )
 
@@ -839,7 +837,6 @@ export function createValidateTask(
 
 export function createWaitingForValidationTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comments?: string,
   timeLoggedMS?: number
 ): Task {
@@ -851,7 +848,7 @@ export function createWaitingForValidationTask(
         valueInteger: timeLoggedMS ?? 0
       }
     ],
-    practitioner.id,
+    undefined,
     'WAITING_VALIDATION'
   )
 
@@ -861,10 +858,7 @@ export function createWaitingForValidationTask(
   }
 }
 
-export function createRegisterTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): Task {
+export function createRegisterTask(previousTask: SavedTask): Task {
   const timeLoggedMSExtension = previousTask.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
   )!
@@ -872,7 +866,7 @@ export function createRegisterTask(
   const registeredTask = createNewTaskResource(
     previousTask,
     [timeLoggedMSExtension],
-    practitioner.id,
+    undefined,
     'REGISTERED'
   )
 
@@ -916,19 +910,12 @@ export function createArchiveTask(
   return updatedArchivedTask
 }
 
-export function createNotDuplicateTask(
-  previousTask: SavedTask,
-  practitionerId: string
-): SavedTask {
-  return createNewTaskResource(
-    previousTask,
-    [
-      {
-        url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate' as const
-      }
-    ],
-    practitionerId
-  )
+export function createNotDuplicateTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [
+    {
+      url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate' as const
+    }
+  ])
 }
 
 export function createDuplicateTask(
@@ -956,13 +943,12 @@ export function createDuplicateTask(
 
 export function createUpdatedTask(
   previousTask: SavedTask,
-  updatedDetails: ChangedValuesInput,
-  practitioner: Practitioner
+  updatedDetails: ChangedValuesInput
 ): SavedTask {
   const updatedTask = createNewTaskResource(
     previousTask,
     [],
-    practitioner.id,
+    undefined,
     'DECLARATION_UPDATED'
   )
   return {
@@ -1009,18 +995,12 @@ export function createUnassignedTask(
   return unassignedTask
 }
 
-export function createCertifiedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): SavedTask {
-  return createNewTaskResource(previousTask, [], practitioner.id, 'CERTIFIED')
+export function createCertifiedTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [], undefined, 'CERTIFIED')
 }
 
-export function createIssuedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): SavedTask {
-  return createNewTaskResource(previousTask, [], practitioner.id, 'ISSUED')
+export function createIssuedTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [], undefined, 'ISSUED')
 }
 
 export function createVerifyRecordTask(

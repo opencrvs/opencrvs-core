@@ -106,7 +106,6 @@ import {
   mergeChangedResourcesIntoRecord
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 
 export async function toCorrected(
@@ -248,13 +247,11 @@ export async function toUpdated(
   token: string,
   updatedDetails: ChangedValuesInput
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
 
   const updatedTaskWithoutPractitionerExtensions = createUpdatedTask(
     previousTask,
-    updatedDetails,
-    practitioner
+    updatedDetails
   )
 
   const [updatedTask, practitionerResourcesBundle] =
@@ -370,11 +367,9 @@ export async function toRejected(
   comment: fhir3.CodeableConcept,
   reason?: string
 ): Promise<RejectedRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPracitionerExtensions = createRejectTask(
     previousTask,
-    practitioner,
     comment,
     reason
   )
@@ -404,11 +399,9 @@ export async function toWaitingForExternalValidationState(
   comments?: string,
   timeLoggedMS?: number
 ): Promise<WaitingForValidationRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitonerExtensions = createWaitingForValidationTask(
     previousTask,
-    practitioner,
     comments,
     timeLoggedMS
   )
@@ -451,16 +444,13 @@ export async function initiateRegistration(
 export async function toRegistered(
   request: Hapi.Request,
   record: WaitingForValidationRecord,
-  practitioner: Practitioner,
   registrationNumber: IEventRegistrationCallbackPayload['registrationNumber'],
   token: string,
   childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const registeredTaskWithoutPractitionerExtensions = createRegisterTask(
-    previousTask,
-    practitioner
-  )
+  const registeredTaskWithoutPractitionerExtensions =
+    createRegisterTask(previousTask)
 
   const [registeredTask, practitionerResourcesBundle] =
     await withPractitionerDetails(
@@ -662,10 +652,7 @@ export async function toDuplicated(
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
-): Promise<{
-  duplicatedRecord: ReadyForReviewRecord | ValidatedRecord
-  duplicatedRecordWithTaskOnly: Bundle<SavedTask>
-}> {
+) {
   const previousTask = getTaskFromSavedBundle(record)
   const duplicatedTaskWithoutPractitionerExtensions = createDuplicateTask(
     previousTask,
@@ -692,7 +679,7 @@ export async function toDuplicated(
     practitionerResourcesBundle
   )) as ReadyForReviewRecord
 
-  return { duplicatedRecord, duplicatedRecordWithTaskOnly }
+  return duplicatedRecord
 }
 
 export async function toNotDuplicated(
@@ -700,11 +687,7 @@ export async function toNotDuplicated(
   token: string
 ): Promise<ValidRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const practitioner = await getLoggedInPractitionerResource(token)
-  const taskWithoutPractitionerExtensions = createNotDuplicateTask(
-    previousTask,
-    practitioner.id
-  )
+  const taskWithoutPractitionerExtensions = createNotDuplicateTask(previousTask)
 
   const [notDuplicateTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -734,11 +717,9 @@ export async function toValidated(
   comments?: string,
   timeLoggedMS?: number
 ): Promise<ValidatedRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitionerExtensions = createValidateTask(
     previousTask,
-    practitioner,
     comments,
     timeLoggedMS
   )
@@ -966,13 +947,8 @@ export async function toCertified(
   eventType: EVENT_TYPE,
   certificateDetails: CertifyInput
 ): Promise<CertifiedRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-
-  const taskWithoutPractitionerExtensions = createCertifiedTask(
-    previousTask,
-    practitioner
-  )
+  const taskWithoutPractitionerExtensions = createCertifiedTask(previousTask)
 
   const [certifiedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -1051,13 +1027,8 @@ export async function toIssued(
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
 ): Promise<IssuedRecord> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   const previousTask = getTaskFromSavedBundle(record)
-
-  const taskWithoutPractitionerExtensions = createIssuedTask(
-    previousTask,
-    practitioner
-  )
+  const taskWithoutPractitionerExtensions = createIssuedTask(previousTask)
 
   const [issuedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
