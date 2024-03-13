@@ -57,7 +57,6 @@ interface Window {
       PRINT_DECLARATION: boolean
     }
     LANGUAGES: string
-    AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
     MINIO_BUCKET: string

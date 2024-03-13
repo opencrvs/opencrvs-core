@@ -26,7 +26,7 @@ import { LogoContainer } from '@client/views/UserSetup/UserSetupPage'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as nidCallbackMessages } from '@client/i18n/messages/views/nidVerificationCallback'
 import { useQuery } from '@apollo/client'
-import { getDraftsState } from '@client/declarations/selectors'
+import { useDeclaration } from '@client/declarations/selectors'
 import { GET_OIDP_USER_INFO } from '@client/views/OIDPVerificationCallback/queries'
 import { useHistory } from 'react-router'
 import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
@@ -68,7 +68,7 @@ export const OIDPVerificationCallback = () => {
     ?.settings?.openIdProviderClientId
   const intl = useIntl()
   const logo = useSelector(selectCountryLogo)
-  const declarations = useSelector(getDraftsState)
+  const declaration = useDeclaration(declarationId)
   const dispatch = useDispatch()
   const history = useHistory()
   const oidpUserInfoQueryVariables = {
@@ -80,13 +80,6 @@ export const OIDPVerificationCallback = () => {
     variables: oidpUserInfoQueryVariables,
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      const declaration = declarations.declarations.find(
-        (d) => d.id === declarationId
-      )
-
-      if (!declaration || !section) {
-        return
-      }
       addNidUserInfoToDeclaration(declaration, section, data.getOIDPUserInfo)
       dispatch(modifyDeclaration(declaration))
       dispatch(writeDeclaration(declaration))

@@ -1,4 +1,4 @@
 data
 plugins
 .env
-metabase.jar
+*metabase.jar

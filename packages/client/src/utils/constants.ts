@@ -84,5 +84,5 @@ export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
-export const APPLICATION_VERSION = 'v1.4.0'
+export const APPLICATION_VERSION = 'v1.4.1'
 export const IS_PROD_ENVIRONMENT = import.meta.env.PROD
