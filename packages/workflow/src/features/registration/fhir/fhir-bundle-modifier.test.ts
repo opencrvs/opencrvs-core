@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { server as mswServer } from '@test/setupServer'
+import { rest } from 'msw'
 import {
-  setTrackingId,
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
@@ -23,93 +24,23 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import {
   testFhirBundle,
-  testMarriageFhirBundle,
   fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
   mosipSuccessMock,
   mosipConfigMock,
   mosipDeceasedPatientMock,
   mosipBirthPatientBundleMock,
   mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
-import { Composition, Practitioner, Task } from '@opencrvs/commons/types'
+import { Practitioner, Task } from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
 
 const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
-  describe('setTrackingId', () => {
-    it('Successfully modified the provided fhirBundle with birth trackingid', async () => {
-      const fhirBundle = await setTrackingId(testFhirBundle, '')
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[1] &&
-        fhirBundle.entry[1].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as Composition
-        const task = fhirBundle.entry[1].resource as Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^B/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[1]) {
-            expect(task.identifier[1]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Successfully modified the provided fhirBundle with marriage trackingid', async () => {
-      const fhirBundle = await setTrackingId(testMarriageFhirBundle, '')
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[1].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as Composition
-        const task = fhirBundle.entry[1].resource as Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^M/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[0]) {
-            expect(task.identifier[1]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/marriage-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Throws error if invalid fhir bundle is provided', () => {
-      const invalidData = { ...testFhirBundle, entry: [] }
-      expect(() => setTrackingId(invalidData, '')).rejects.toThrowError(
-        'Invalid FHIR bundle found'
-      )
-    })
-  })
   describe('SetupRegistrationType', () => {
     it('Will push the proper event type on fhirDoc', () => {
       const taskResource = setupRegistrationType(
@@ -369,20 +300,7 @@ describe('Verify fhir bundle modifier functions', () => {
     }
   })
   describe('setupLastRegLocation', () => {
-    beforeEach(() => {
-      fetch.mockResponses(
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }]
-      )
-    })
+    beforeEach(() => {})
     it('set regLastLocation properly', async () => {
       const taskResource = await setupLastRegLocation(
         testFhirBundle.entry[1].resource as Task,
@@ -392,7 +310,7 @@ describe('Verify fhir bundle modifier functions', () => {
         expect(taskResource.extension[3]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
-            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
+            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
           }
         })
       }
@@ -406,7 +324,7 @@ describe('Verify fhir bundle modifier functions', () => {
         expect(taskResource.extension[2]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastOffice',
           valueReference: {
-            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
+            reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
           }
         })
       }
@@ -440,12 +358,31 @@ describe('validateDeceasedDetails functions', () => {
     }
   })
   it('Validates deceased details and modifies bundle', async () => {
-    fetch.mockResponses(
-      [mosipConfigMock, { status: 200 }],
-      [mosipSuccessMock, { status: 200 }],
-      [mosipBirthPatientBundleMock, { status: 200 }],
-      [JSON.stringify({}), { status: 200 }]
+    mswServer.use(
+      rest.get('http://localhost:2021/integrationConfig', (_, res, ctx) => {
+        return res(ctx.json(mosipConfigMock))
+      })
     )
+
+    mswServer.use(
+      rest.post(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, (_, res, ctx) =>
+        res(ctx.json(mosipSuccessMock))
+      )
+    )
+
+    mswServer.use(
+      rest.get('http://localhost:3447/fhir/Patient', (_, res, ctx) =>
+        res(ctx.json(mosipBirthPatientBundleMock))
+      )
+    )
+
+    mswServer.use(
+      rest.put(
+        'http://localhost:3447/fhir/Patient/1c9add9b-9215-49d7-bfaa-226c82ac47d2',
+        (_, res, ctx) => res(ctx.json({}))
+      )
+    )
+
     const validateResponse = await validateDeceasedDetails(
       mosipDeceasedPatientMock,
       authHeader

@@ -10,23 +10,14 @@
  */
 
 import {
-  BIRTH_CORRECTION_ENCOUNTER_CODE,
   BIRTH_ENCOUNTER_CODE,
-  CERTIFICATE_CONTEXT_KEY,
-  CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
-  CORRECTION_CERTIFICATE_DOCS_TITLE,
-  DEATH_CORRECTION_ENCOUNTER_CODE,
   DEATH_ENCOUNTER_CODE,
-  INFORMANT_TITLE,
-  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   createDocRefTemplate,
   createEncounter,
   createEncounterSection,
   createLocationResource,
   createObservationEntryTemplate,
-  createPaymentReconciliationTemplate,
   createPersonEntryTemplate,
   createPersonSection,
   createPractitionerEntryTemplate,
@@ -40,27 +31,27 @@ import { getUUID } from '../../uuid'
 import {
   Bundle,
   BundleEntry,
-  CERTIFICATE_DOCS_CODE,
-  CORRECTION_CERTIFICATE_DOCS_CODE,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
   CodeableConcept,
   CompositionSection,
   CompositionSectionCode,
   CompositionSectionEncounterReference,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
   DocumentReference,
   Encounter,
   EncounterParticipant,
   INFORMANT_CODE,
+  INFORMANT_TITLE,
   Location,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   OPENCRVS_SPECIFICATION_URL,
   Observation,
   Patient,
-  PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
   Reference,
   RelatedPerson,
   Resource,
-  Saved,
   Task,
   URNReference,
   WITNESS_ONE_CODE,
@@ -68,10 +59,14 @@ import {
   findCompositionSection,
   findExtension,
   getComposition,
-  isObservation
+  isObservation,
+  isURLReference,
+  urlReferenceToResourceIdentifier,
+  BundleEntryWithFullUrl,
+  findEntryFromBundle
 } from '..'
 
-import { PartialBy } from '../../types'
+import { CompositionSectionTitleByCode, PartialBy } from '../../types'
 import {
   DOWNLOADED_EXTENSION_URL,
   EVENT_TYPE,
@@ -80,20 +75,20 @@ import {
 } from './constants'
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ): CompositionSection | undefined
 
 export function findCompositionSectionInBundle<T extends Bundle>(
-  code: string,
+  code: CompositionSectionCode,
   fhirBundle: T
 ) {
   return findCompositionSection(code, getComposition(fhirBundle))
 }
 
-export function selectOrCreatePersonResource(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function selectOrCreatePersonResource<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   fhirBundle: Bundle
 ): Patient {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -113,9 +108,7 @@ export function selectOrCreatePersonResource(
       throw new Error('Expected person section to have an entry')
     }
     const personSectionEntry = section.entry[0]
-    personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
+    personEntry = findEntryFromBundle(fhirBundle, personSectionEntry.reference)
   }
 
   if (!personEntry) {
@@ -166,9 +159,9 @@ export function selectOrCreateEncounterResource(
     throw new Error('Expected encounter section to have an entry')
   }
   const encounterSectionEntry = section.entry[0]
-  const encounterEntry = fhirBundle.entry.find(
-    (entry): entry is BundleEntry<Encounter> =>
-      entry.fullUrl === encounterSectionEntry.reference
+  const encounterEntry = findEntryFromBundle<Encounter>(
+    fhirBundle,
+    encounterSectionEntry.reference
   )
 
   if (!encounterEntry) {
@@ -181,7 +174,7 @@ export function selectOrCreateEncounterResource(
 }
 
 export function selectOrCreateObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   categoryCode: string,
   categoryDescription: string,
   observationCode: string,
@@ -302,7 +295,7 @@ export async function removeObservationResource(
 }
 
 export function createObservationResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): Observation {
@@ -315,8 +308,9 @@ export function createObservationResource(
     throw new Error('Expected encounter section to exist and have an entry')
   }
   const encounterSectionEntry = section.entry[0]
-  const encounterEntry = fhirBundle.entry.find(
-    (entry) => entry.fullUrl === encounterSectionEntry.reference
+  const encounterEntry = findEntryFromBundle<Encounter>(
+    fhirBundle,
+    encounterSectionEntry.reference
   )
   if (encounterEntry && encounter) {
     observationEntry.resource.context = {
@@ -360,10 +354,10 @@ export function selectOrCreateLocationRefResource(
   }
 
   const locationElement = encounter.location[0]
-  const locationEntry = fhirBundle.entry.find(
-    (entry): entry is BundleEntry<Location> =>
-      entry.fullUrl === locationElement.location.reference
-  )!
+  const locationEntry = findEntryFromBundle<Location>(
+    fhirBundle,
+    locationElement.location.reference
+  )
 
   if (!locationEntry) {
     throw new Error(
@@ -404,8 +398,9 @@ export function selectOrCreateEncounterPartitioner(
     practitioner = createPractitionerEntryTemplate(ref)
     fhirBundle.entry.push(practitioner)
   } else {
-    practitioner = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === encounterParticipant.individual?.reference
+    practitioner = findEntryFromBundle<Practitioner>(
+      fhirBundle,
+      encounterParticipant.individual.reference
     )
     if (!practitioner) {
       throw new Error(
@@ -439,9 +434,9 @@ export function selectOrCreateEncounterLocationRef(
   return encounter.location[0].location
 }
 
-export function selectOrCreateDocRefResource(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function selectOrCreateDocRefResource<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   fhirBundle: Bundle,
   context: any,
   indexKey: string
@@ -476,8 +471,9 @@ export function selectOrCreateDocRefResource(
       docRef = createDocRefTemplate(ref)
       fhirBundle.entry.push(docRef)
     } else {
-      docRef = fhirBundle.entry.find(
-        (entry) => entry.fullUrl === docSectionEntry.reference
+      docRef = findEntryFromBundle<DocumentReference>(
+        fhirBundle,
+        docSectionEntry.reference
       )
       if (!docRef) {
         const ref = getUUID()
@@ -493,50 +489,14 @@ export function selectOrCreateDocRefResource(
   return docRef.resource as DocumentReference
 }
 
-export function selectOrCreateCertificateDocRefResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string,
-  isCorrection?: boolean
-) {
-  const certificate = isCorrection
-    ? ({
-        code: CORRECTION_CERTIFICATE_DOCS_CODE,
-        title: CORRECTION_CERTIFICATE_DOCS_TITLE,
-        indexKey: CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
-      } as const)
-    : ({
-        code: CERTIFICATE_DOCS_CODE,
-        title: CERTIFICATE_DOCS_TITLE,
-        indexKey: CERTIFICATE_CONTEXT_KEY
-      } as const)
-
-  const docRef = selectOrCreateDocRefResource(
-    certificate.code,
-    certificate.title,
-    fhirBundle,
-    context,
-    certificate.indexKey
-  )
-  if (!docRef.type?.coding) {
-    docRef.type = {
-      coding: [
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}certificate-type`,
-          code: eventType
-        }
-      ]
-    }
-  }
-  return docRef
-}
+type InformantCode =
+  | typeof INFORMANT_CODE
+  | typeof WITNESS_ONE_CODE
+  | typeof WITNESS_TWO_CODE
 
 export function selectOrCreateInformantSection(
-  sectionCode:
-    | typeof INFORMANT_CODE
-    | typeof WITNESS_ONE_CODE
-    | typeof WITNESS_TWO_CODE,
-  sectionTitle: string,
+  sectionCode: InformantCode,
+  sectionTitle: CompositionSectionTitleByCode<InformantCode>,
   fhirBundle: Bundle
 ): RelatedPerson | PartialBy<RelatedPerson, 'patient'> {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -555,9 +515,9 @@ export function selectOrCreateInformantSection(
     throw new Error('Expected person section ot have an entry')
   }
   const personSectionEntry = section.entry[0]
-  const informantEntry = fhirBundle.entry.find(
-    (entry): entry is BundleEntry<RelatedPerson> =>
-      entry.fullUrl === personSectionEntry.reference
+  const informantEntry = findEntryFromBundle<RelatedPerson>(
+    fhirBundle,
+    personSectionEntry.reference
   )
   if (!informantEntry) {
     throw new Error(
@@ -585,9 +545,7 @@ export function selectOrCreateInformantResource(fhirBundle: Bundle): Patient {
     }
     return personEntry.resource
   } else {
-    const personEntry = fhirBundle.entry.find(
-      (entry): entry is BundleEntry<Patient> => entry.fullUrl === patientRef
-    )
+    const personEntry = findEntryFromBundle<Patient>(fhirBundle, patientRef)
     if (!personEntry) {
       throw new Error(
         'No related informant person entry not found on fhir bundle'
@@ -600,7 +558,9 @@ export function selectOrCreateInformantResource(fhirBundle: Bundle): Patient {
 export function selectOrCreateWitnessResource(
   fhirBundle: Bundle,
   code: typeof WITNESS_ONE_CODE | typeof WITNESS_TWO_CODE,
-  title: string
+  title: CompositionSectionTitleByCode<
+    typeof WITNESS_ONE_CODE | typeof WITNESS_TWO_CODE
+  >
 ): Patient {
   const relatedPersonResource = selectOrCreateInformantSection(
     code,
@@ -617,169 +577,18 @@ export function selectOrCreateWitnessResource(
     }
     return personEntry.resource as Patient
   } else {
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === patientRef
-    )
+    const personEntry = findEntryFromBundle<Patient>(fhirBundle, patientRef)
     if (!personEntry) {
       throw new Error(
         'No related informant person entry not found on fhir bundle'
       )
     }
-    return personEntry.resource as Patient
-  }
-}
-
-export function selectOrCreateRelatedPersonResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string
-): RelatedPerson | PartialBy<RelatedPerson, 'patient'> {
-  const docRef = selectOrCreateCertificateDocRefResource(
-    fhirBundle,
-    context,
-    eventType
-  )
-  if (!docRef.extension) {
-    docRef.extension = []
-  }
-  const relatedPersonExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-    docRef.extension
-  )
-  if (!relatedPersonExt) {
-    const relatedPersonEntry = createRelatedPersonTemplate(getUUID())
-    fhirBundle.entry.push(relatedPersonEntry)
-    docRef.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-      valueReference: {
-        reference: relatedPersonEntry.fullUrl
-      }
-    })
-    return relatedPersonEntry.resource
-  } else {
-    const relatedPersonEntry = fhirBundle.entry.find(
-      (entry): entry is BundleEntry<RelatedPerson> => {
-        if (!relatedPersonExt.valueReference) {
-          return false
-        }
-        return entry.fullUrl === relatedPersonExt.valueReference.reference
-      }
-    )
-    if (!relatedPersonEntry) {
-      throw new Error('No related person entry found on bundle')
-    }
-    return relatedPersonEntry.resource
-  }
-}
-
-export function selectOrCreateCollectorPersonResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string
-): Patient {
-  const relatedPersonResource = selectOrCreateRelatedPersonResource(
-    fhirBundle,
-    context,
-    eventType
-  )
-  const patientRef =
-    relatedPersonResource.patient && relatedPersonResource.patient.reference
-  if (!patientRef) {
-    const personEntry = createPersonEntryTemplate(getUUID())
-    fhirBundle.entry.push(personEntry)
-    relatedPersonResource.patient = {
-      reference: personEntry.fullUrl
-    }
-    return personEntry.resource as Patient
-  } else {
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === patientRef
-    )
-    if (!personEntry) {
-      throw new Error(
-        'No related collector person entry not found on fhir bundle'
-      )
-    }
-    return personEntry.resource as Patient
-  }
-}
-
-export async function setCertificateCollectorReference(
-  sectionCode: string,
-  relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
-  fhirBundle: Bundle,
-  context: any
-) {
-  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry): entry is Saved<BundleEntry<Patient>> =>
-        entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      throw new Error('Expected person entry not found on the bundle')
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = getComposition(fhirBundle)
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
-  }
-}
-
-export function selectOrCreatePaymentReconciliationResource(
-  fhirBundle: Bundle,
-  context: any,
-  eventType: string,
-  isCorrection?: boolean
-): PaymentReconciliation {
-  const docRef = selectOrCreateCertificateDocRefResource(
-    fhirBundle,
-    context,
-    eventType,
-    isCorrection
-  )
-  if (!docRef.extension) {
-    docRef.extension = []
-  }
-  const paymentExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
-    docRef.extension
-  )
-  if (!paymentExt) {
-    const paymentEntry = createPaymentReconciliationTemplate(getUUID())
-    fhirBundle.entry.push(paymentEntry)
-    docRef.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
-      valueReference: {
-        reference: paymentEntry.fullUrl
-      }
-    })
-    return paymentEntry.resource
-  } else {
-    const paymentEntry = fhirBundle.entry.find((entry) => {
-      if (!paymentExt.valueReference) {
-        return false
-      }
-      return entry.fullUrl === paymentExt.valueReference.reference
-    })
-    if (!paymentEntry) {
-      throw new Error('No related payment entry found on bundle')
-    }
-    return paymentEntry.resource as PaymentReconciliation
+    return personEntry.resource
   }
 }
 
 export function selectOrCreateQuestionnaireResource(
-  sectionCode: string,
+  sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
 ): QuestionnaireResponse {
@@ -808,8 +617,9 @@ export function selectOrCreateQuestionnaireResource(
     throw new Error('Expected encounter section to exist and have an entry')
   }
   const encounterSectionEntry = section.entry[0]
-  const encounterEntry = fhirBundle.entry.find(
-    (entry) => entry.fullUrl === encounterSectionEntry.reference
+  const encounterEntry = findEntryFromBundle<Encounter>(
+    fhirBundle,
+    encounterSectionEntry.reference
   )
   if (encounterEntry && encounter) {
     questionnaireResponseEntry.resource.subject = {
@@ -974,9 +784,9 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function setInformantReference(
-  sectionCode: CompositionSectionCode,
-  sectionTitle: string,
+export function setInformantReference<T extends CompositionSectionCode>(
+  sectionCode: T,
+  sectionTitle: CompositionSectionTitleByCode<T>,
   relatedPerson: RelatedPerson | PartialBy<RelatedPerson, 'patient'>,
   fhirBundle: Bundle,
   context: any
@@ -988,14 +798,16 @@ export function setInformantReference(
   }
   const personSectionEntry = section.entry[0]
   const personEntry = fhirBundle.entry.find(
-    (entry): entry is Saved<BundleEntry<Patient>> =>
+    (entry): entry is BundleEntryWithFullUrl<Patient> =>
       entry.fullUrl === personSectionEntry.reference
   )
   if (!personEntry) {
     return
   }
   relatedPerson.patient = {
-    reference: personEntry.fullUrl
+    reference: isURLReference(personEntry.fullUrl)
+      ? urlReferenceToResourceIdentifier(personEntry.fullUrl)
+      : personEntry.fullUrl
   }
 }
 

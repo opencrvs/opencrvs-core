@@ -74,7 +74,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@notification/(.*)": "<rootDir>/src/$1"
+      "@notification/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [

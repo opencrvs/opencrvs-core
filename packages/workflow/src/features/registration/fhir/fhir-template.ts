@@ -33,24 +33,6 @@ export function getTaskResourceFromFhirBundle(fhirBundle: Bundle): Task {
   return task
 }
 
-export async function findPersonEntry(
-  sectionCode: string,
-  fhirBundle: Bundle
-): Promise<Patient | undefined> {
-  const resource =
-    fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
-  if (!resource) {
-    throw new Error('No resource found')
-  }
-  switch (resource.resourceType) {
-    case 'Composition':
-      return findPersonEntryByComposition(sectionCode, fhirBundle)
-    case 'Task':
-      return findPersonEntryByTask(sectionCode, fhirBundle)
-    default:
-      return undefined
-  }
-}
 export async function findRelatedPersonEntry(
   sectionCode: string,
   fhirBundle: Bundle
