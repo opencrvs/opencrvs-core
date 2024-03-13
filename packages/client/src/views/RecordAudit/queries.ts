@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 
@@ -31,6 +30,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           firstName
           lastName
           officeName
+          avatarURL
         }
       }
       ... on BirthRegistration {
@@ -39,6 +39,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -49,6 +50,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -59,6 +61,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -67,6 +70,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }

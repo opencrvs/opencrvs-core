@@ -6,53 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IValidationMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  bengaliOnlyNameFormat: MessageDescriptor
-  blockAlphaNumericDot: MessageDescriptor
-  dateFormat: MessageDescriptor
-  dobEarlierThanDom: MessageDescriptor
-  domLaterThanDob: MessageDescriptor
-  emailAddressFormat: MessageDescriptor
-  englishOnlyNameFormat: MessageDescriptor
-  facilityMustBeSelected: MessageDescriptor
-  officeMustBeSelected: MessageDescriptor
-  greaterThanZero: MessageDescriptor
-  isValidBirthDate: MessageDescriptor
-  isValidDateOfDeath: MessageDescriptor
-  isDateNotAfterDeath: MessageDescriptor
-  isDateNotBeforeBirth: MessageDescriptor
-  isInformantOfLegalAge: MessageDescriptor
-  illegalMarriageAge: MessageDescriptor
-  isMoVisitBeforeBirth: MessageDescriptor
-  isMoVisitAfterDeath: MessageDescriptor
-  maxLength: MessageDescriptor
-  minLength: MessageDescriptor
-  notGreaterThan: MessageDescriptor
-  numberRequired: MessageDescriptor
-  phoneNumberFormat: MessageDescriptor
-  range: MessageDescriptor
-  required: MessageDescriptor
-  requiredForNewUser: MessageDescriptor
-  requiredSymbol: MessageDescriptor
-  requiredBasic: MessageDescriptor
-  validBirthRegistrationNumber: MessageDescriptor
-  validDeathRegistrationNumber: MessageDescriptor
-  validNationalId: MessageDescriptor
-  validNationalIDLengths: MessageDescriptor
-  duplicateNationalID: MessageDescriptor
-  validPassportNumber: MessageDescriptor
-  phoneNumberNotValid: MessageDescriptor
-  validDrivingLicenseNumber: MessageDescriptor
-  nonDecimalPointNumber: MessageDescriptor
-}
-
-const messagesToDefine: IValidationMessages = {
+const messagesToDefine = {
   phoneNumberNotValid: {
     id: 'register.SelectContactPoint.phoneNoError',
     defaultMessage: 'Not a valid mobile number',
@@ -284,5 +242,4 @@ const messagesToDefine: IValidationMessages = {
   }
 }
 
-export const validationMessages: IValidationMessages =
-  defineMessages(messagesToDefine)
+export const validationMessages = defineMessages(messagesToDefine)

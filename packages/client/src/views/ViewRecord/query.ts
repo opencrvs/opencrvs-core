@@ -6,12 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -25,6 +25,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         duplicates {
           compositionId
           trackingId
@@ -109,29 +110,28 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              middleName
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -143,6 +143,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -152,32 +153,31 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            occupation
-            nationality
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            middleName
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         mother {
@@ -185,6 +185,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           multipleBirth
@@ -222,6 +223,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -280,6 +282,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
           birthDate
@@ -288,6 +291,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           exactDateOfBirthUnknown
           gender
           maritalStatus
+          occupation
           nationality
           identifier {
             id
@@ -312,36 +316,35 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            nationality
-            occupation
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            telecom {
-              system
-              value
-            }
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            middleName
+            familyName
+          }
+          nationality
+          occupation
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          telecom {
+            system
+            value
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         father {
@@ -349,7 +352,37 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
+          }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
           }
         }
         mother {
@@ -357,7 +390,37 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
+          }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
           }
         }
         spouse {
@@ -365,7 +428,37 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
+          }
+          birthDate
+          maritalStatus
+          occupation
+          detailsExist
+          reasonNotApplying
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          educationalAttainment
+          nationality
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
           }
         }
         medicalPractitioner {
@@ -401,11 +494,44 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
       ... on MarriageRegistration {
         _fhirIDMap
         id
+        informant {
+          id
+          relationship
+          otherRelationship
+          _fhirIDPatient
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          name {
+            use
+            firstNames
+            middleName
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
         bride {
           id
           name {
             use
             firstNames
+            middleName
             familyName
             marriedLastName
           }
@@ -439,6 +565,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleName
             familyName
             marriedLastName
           }
@@ -471,36 +598,34 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            middleName
+            familyName
           }
         }
         witnessTwo {
           id
           relationship
           otherRelationship
-          individual {
+          _fhirIDPatient
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            middleName
+            familyName
           }
         }
         typeOfMarriage
@@ -527,7 +652,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
 async function fetchDuplicateDeclarations(id: string) {
   return (
     client &&
-    client.query({
+    client.query<FetchViewRecordByCompositionQuery>({
       query: FETCH_VIEW_RECORD_BY_COMPOSITION,
       variables: { id },
       fetchPolicy: 'network-only'

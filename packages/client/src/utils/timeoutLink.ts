@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloLink, Observable, Operation, NextLink } from '@apollo/client'
 import { DefinitionNode, OperationDefinitionNode } from 'graphql'
@@ -17,11 +16,11 @@ const REQUEST_TIMEOUT_ERROR_CODE = 408
 /**
  * Aborts the request if the timeout expires before the response is received.
  */
-export type TimeoutError = Error & {
+type TimeoutError = Error & {
   statusCode: number
 }
 
-export const throwTimeoutError = (message: string) => {
+const throwTimeoutError = (message: string) => {
   const error = new Error(message) as TimeoutError
 
   error.name = 'RequestTimeoutError'

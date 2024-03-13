@@ -6,25 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-export interface IGetCertificatePayload {
-  status?: string
-  event?: string
-}
-
-export interface ICertificateSVGPayload {
-  id: string
-  svgCode: string
-  svgFilename: string
-  svgDateUpdated: number
-  svgDateCreated: number
-  user: string
-  event: string
-  status: string
-}
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export interface ICertificateSVG {
   _id: string
@@ -41,6 +26,16 @@ export const certificateTypeResolvers: GQLResolver = {
   CertificateSVG: {
     id(certificate: ICertificateSVG) {
       return certificate._id
+    },
+    svgCode: (
+      certificate: ICertificateSVG,
+      _,
+      { headers: authHeader, presignDocumentUrls }
+    ) => {
+      if (!presignDocumentUrls) {
+        return certificate.svgCode
+      }
+      return getPresignedUrlFromUri(certificate.svgCode, authHeader)
     }
   }
 }

@@ -1,4 +1,4 @@
-FROM metabase/metabase:v0.45.2.1
+FROM metabase/metabase:v0.46.6.1
 ADD run.sh /
 ADD initialize-database.sh /
 ADD update-database.sh /
@@ -11,9 +11,6 @@ ENV MB_DB_FILE=/data/metabase/metabase.mv.db
 ENV OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=/environment-configuration.sql
 
 # Install envsubst
-RUN apk update && apk add gettext
+RUN apk update && apk upgrade && apk add --no-cache gettext
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]
-
-
-

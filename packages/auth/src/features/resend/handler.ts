@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -17,17 +16,20 @@ import {
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
 import { getRetrievalStepInformation } from '@auth/features/retrievalSteps/verifyUser/service'
+import { NotificationEvent } from '@auth/features/verifyCode/service'
 
-interface IRefreshPayload {
+interface IResendNotificationPayload {
   nonce: string
+  notificationEvent: NotificationEvent
   retrievalFlow?: boolean
 }
 
-export default async function refreshHandler(
+export default async function resendNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { nonce, retrievalFlow } = request.payload as IRefreshPayload
+  const { nonce, retrievalFlow, notificationEvent } =
+    request.payload as IResendNotificationPayload
 
   let userInformation
   try {
@@ -38,15 +40,23 @@ export default async function refreshHandler(
     return unauthorized()
   }
 
-  const { mobile, scope } = userInformation
+  const { scope, userFullName, mobile, email } = userInformation
 
-  await generateAndSendVerificationCode(nonce, mobile, scope)
+  await generateAndSendVerificationCode(
+    nonce,
+    scope,
+    notificationEvent,
+    userFullName,
+    mobile,
+    email
+  )
 
   return { nonce }
 }
 
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
+  notificationEvent: Joi.string().required(),
   retrievalFlow: Joi.boolean().optional()
 })
 export const responseSchma = Joi.object({

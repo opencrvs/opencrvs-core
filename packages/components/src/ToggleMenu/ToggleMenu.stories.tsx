@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
@@ -52,7 +51,7 @@ ToggleMenuView.args = {
   ),
   menuItems: [
     {
-      icon: <Icon name="Share" color="primary" size="large" weight="bold" />,
+      icon: <Icon name="Export" color="primary" size="large" weight="bold" />,
       label: 'Share',
       handler: () => alert('Settings')
     },

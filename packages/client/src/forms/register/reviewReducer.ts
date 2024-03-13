@@ -6,15 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm, ReviewSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
-import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
+import { deserializeForm } from '@client/forms/deserializer/deserializer'
+import { validators } from '@client/forms/validators'
 
 export type IReviewFormState =
   | {
@@ -47,12 +46,12 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.APPLICATION_CONFIG_LOADED:
-      const { formConfig } = action.payload
+    case offlineActions.FORMS_LOADED:
+      const { forms } = action.payload
 
-      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
-      const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
-      const marriage = getConfiguredOrDefaultForm(formConfig, Event.Marriage)
+      const birth = deserializeForm(forms.birth, validators)
+      const death = deserializeForm(forms.death, validators)
+      const marriage = deserializeForm(forms.marriage, validators)
 
       const review = {
         id: ReviewSection.Review,

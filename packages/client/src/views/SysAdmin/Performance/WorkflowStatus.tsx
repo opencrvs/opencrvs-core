@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -40,11 +39,11 @@ import {
   IColumn,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
-import {
+import type {
   GQLEventProgressSet,
   GQLHumanName,
   GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
@@ -65,7 +64,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import register from '@client/registerServiceWorker'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 
@@ -391,7 +389,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ] as IColumn[]
     return keys.filter((item) => {
       return !(
-        !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+        !window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
         item.key === 'timeLoggedWaitingValidation'
       )
     })

@@ -6,23 +6,40 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet,
   GQLRegStatus
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
+
+export const isBirthEvent = (
+  req: GQLEventSearchSet
+): req is GQLBirthEventSearchSet => {
+  return req.type === 'Birth'
+}
+
+export const isDeathEvent = (
+  req: GQLEventSearchSet
+): req is GQLDeathEventSearchSet => {
+  return req.type === 'Death'
+}
+
+export const isMarriageEvent = (
+  reg: GQLEventSearchSet
+): reg is GQLMarriageEventSearchSet => {
+  return reg.type === 'Marriage'
+}
 
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
@@ -42,37 +59,40 @@ export const transformData = (
       let names
       let groomNames
       let brideNames
-      let mergedMarriageName
       let dateOfEvent
-      const assignedReg = reg as GQLEventSearchSet
-      if (assignedReg.registration && assignedReg.type === 'Birth') {
-        birthReg = reg as GQLBirthEventSearchSet
-        names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
-        dateOfEvent = birthReg && birthReg.dateOfBirth
-      } else if (assignedReg.registration && assignedReg.type === 'Death') {
-        deathReg = reg as GQLDeathEventSearchSet
-        names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
-        dateOfEvent = deathReg && deathReg.dateOfDeath
-      } else {
-        marriageReg = reg as GQLMarriageEventSearchSet
-        groomNames =
-          (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
-        brideNames =
-          (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
+      let mergedMarriageName
+      const assignedReg = reg
 
-        const groomName =
-          (createNamesMap(groomNames as HumanName[])[locale] as string) ||
-          (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
-        const brideName =
-          (createNamesMap(brideNames as HumanName[])[locale] as string) ||
-          (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          birthReg = reg
+          names = (birthReg.childName as GQLHumanName[]) || []
+          dateOfEvent = birthReg.dateOfBirth
+        } else if (isDeathEvent(reg)) {
+          deathReg = reg
+          names = (deathReg.deceasedName as GQLHumanName[]) || []
+          dateOfEvent = deathReg && deathReg.dateOfDeath
+        } else if (isMarriageEvent(reg)) {
+          marriageReg = reg
+          groomNames =
+            (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
+          brideNames =
+            (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
 
-        mergedMarriageName =
-          brideName && groomName
-            ? `${groomName} & ${brideName}`
-            : brideName || groomName || EMPTY_STRING
+          const groomName =
+            (createNamesMap(groomNames as HumanName[])[locale] as string) ||
+            (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
+          const brideName =
+            (createNamesMap(brideNames as HumanName[])[locale] as string) ||
+            (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
 
-        dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+          mergedMarriageName =
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
+
+          dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+        }
       }
       const status =
         assignedReg.registration &&
@@ -108,6 +128,9 @@ export const transformData = (
           (assignedReg.registration &&
             assignedReg.registration.contactNumber) ||
           '',
+        contactEmail:
+          (assignedReg.registration && assignedReg.registration.contactEmail) ||
+          '',
         duplicates:
           (assignedReg.registration && assignedReg.registration.duplicates) ||
           [],
@@ -122,10 +145,7 @@ export const transformData = (
             assignedReg.registration.comment) ||
           '',
         createdAt: assignedReg?.registration?.createdAt,
-        assignment: assignedReg?.registration?.assignment as Record<
-          string,
-          unknown
-        >,
+        assignment: assignedReg?.registration?.assignment,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

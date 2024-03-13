@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -42,7 +41,7 @@ describe('Route authorization', () => {
   })
 
   it('accepts requests with a valid token', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -58,7 +57,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with a token with invalid signature', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert-invalid.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert-invalid.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -74,7 +73,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with expired token', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user',
@@ -95,9 +94,9 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('blocks requests signed with wrong algorithm (HS512)', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'HS512',
+  it('blocks requests signed with wrong algorithm (RS384)', async () => {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
+      algorithm: 'RS384',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     })
@@ -113,7 +112,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong audience', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:NOT_VALID'
@@ -130,7 +129,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong issuer', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+    const token = jwt.sign({}, readFileSync('./test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:NOT_VALID',
       audience: 'opencrvs:gateway-user'
@@ -145,62 +144,19 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it('Tests the health check with a valid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=search'
-    })
-    expect(res.result).toEqual({
-      success: true
-    })
-  })
-  it('Fails the health check with a missing parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
+  it('Tests the health check for all the service', async () => {
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-    expect(res.statusCode).toBe(400)
-  })
-  it('Rejects the health check with an invalid parameter', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: true
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=nonsense'
+    expect(res.result).toEqual({
+      auth: false,
+      search: false,
+      'user-mgnt': false,
+      metrics: false,
+      notification: false,
+      countryconfig: false,
+      workflow: false
     })
-    expect(res.result.message).toEqual('Invalid request query input')
-  })
-  it('Fails the health check for a failed health check on a running service', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        success: false
-      })
-    )
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
-  })
-  it('Fails the health check for a failed and not running service', async () => {
-    fetch.mockReject(new Error('An internal server error occurred'))
-    const res = await server.app.inject({
-      method: 'GET',
-      url: '/ping?service=auth'
-    })
-    expect(res.result.message).toEqual('An internal server error occurred')
   })
 })

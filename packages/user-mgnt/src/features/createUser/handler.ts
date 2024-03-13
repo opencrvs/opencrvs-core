@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createFhirPractitioner,
@@ -24,12 +23,8 @@ import {
   generateSaltedHash,
   generateRandomPassword
 } from '@user-mgnt/utils/hash'
-import {
-  statuses,
-  roleScopeMapping,
-  hasDemoScope,
-  getUserId
-} from '@user-mgnt/utils/userUtils'
+import { statuses, hasDemoScope, getUserId } from '@user-mgnt/utils/userUtils'
+import { userRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -39,13 +34,13 @@ export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser & { password: string }
+  const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
 
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
-  let autoGenPassword = null
+  let password = null
 
   try {
     const practitioner = createFhirPractitioner(user, false)
@@ -68,34 +63,24 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = roleScopeMapping[user.systemRole]
+    const userScopes: string[] = userRoleScopes[user.systemRole]
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
     ) {
       userScopes.push('demo')
     }
-    user.status = statuses.PENDING
+    user.status = user.status ?? statuses.PENDING
     user.scope = userScopes
 
-    if (
-      user.systemRole === 'NOTIFICATION_API_USER' ||
-      user.systemRole === 'VALIDATOR_API_USER' ||
-      user.systemRole === 'AGE_VERIFICATION_API_USER'
-    ) {
-      // Immediately active API users
-      user.status = statuses.ACTIVE
-    }
+    password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
-    autoGenPassword = generateRandomPassword(hasDemoScope(request))
-
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
-
-    user.username = await generateUsername(user.name)
+    user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
@@ -111,15 +96,25 @@ export default async function createUser(
     logger.error(err)
     await rollbackCreateUser(token, practitionerId, roleId)
     if (err.code === 11000) {
-      return h.response().code(403)
+      // check if phone or email has thrown unique constraint errors
+      const errorThrowingProperty =
+        err.keyPattern && Object.keys(err.keyPattern)[0]
+      return h.response({ errorThrowingProperty }).code(403)
     }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.name,
+    user.username,
+    password,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

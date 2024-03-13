@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   loop,
@@ -24,32 +23,43 @@ import { storage } from '@client/storage'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
-  referenceApi
+  ILocationDataResponse,
+  ICertificateTemplateData,
+  referenceApi,
+  CertificateConfiguration,
+  IFacilitiesDataResponse,
+  IOfficesDataResponse
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig } from '@client/forms'
 import { Event, System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  IQuestionConfig,
-  isDefaultQuestionConfig
-} from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { find, isEmpty, merge } from 'lodash'
+import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
+import { ISerializedForm } from '@client/forms'
+import { getToken } from '@client/utils/authUtils'
+import { initConditionals } from '@client/forms/conditionals'
+import { initValidators } from '@client/forms/validators'
+import {
+  Action as NotificationAction,
+  configurationErrorNotification
+} from '@client/notification/actions'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
+
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export enum LocationType {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  CRVS_OFFICE = 'CRVS_OFFICE',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
-}
+export type LocationType =
+  | 'HEALTH_FACILITY'
+  | 'CRVS_OFFICE'
+  | 'ADMIN_STRUCTURE'
+  | 'PRIVATE_HOME'
+
 export interface ILocation {
   id: string
   name: string
@@ -57,17 +67,48 @@ export interface ILocation {
   alias: string
   physicalType: string
   jurisdictionType?: string
+  statisticalId: string
   type: string
   partOf: string
 }
 
+type JurisdictionType =
+  | 'STATE'
+  | 'DISTRICT'
+  | 'LOCATION_LEVEL_3'
+  | 'LOCATION_LEVEL_4'
+  | 'LOCATION_LEVEL_5'
+
+export interface AdminStructure extends ILocation {
+  type: 'ADMIN_STRUCTURE'
+  jurisdictionType: JurisdictionType
+  physicalType: 'Jurisdiction'
+}
+
+export interface Facility extends ILocation {
+  type: 'HEALTH_FACILITY'
+  physicalType: 'Building'
+}
+
+export interface CRVSOffice extends ILocation {
+  type: 'CRVS_OFFICE'
+  physicalType: 'Building'
+}
+
 export interface IOfflineData {
-  locations: { [key: string]: ILocation }
-  facilities: { [key: string]: ILocation }
-  offices: { [key: string]: ILocation }
+  locations: ILocationDataResponse
+  forms: {
+    version: string
+    birth: ISerializedForm
+    death: ISerializedForm
+    marriage: ISerializedForm
+  }
+  facilities: IFacilitiesDataResponse
+  offices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
+    fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
     certificates?: {
@@ -82,7 +123,6 @@ export interface IOfflineData {
   systems: System[]
   config: IApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
-  formConfig: IFormConfig
 }
 
 export type IOfflineDataState = {
@@ -92,7 +132,9 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
-export const initialState: IOfflineDataState = {
+type Action = actions.Action | NotificationAction
+
+const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
   loadingError: false
@@ -102,83 +144,52 @@ async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
-function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
-  languages.forEach((language) => {
-    language.messages = {
-      ...language.messages,
-      ...extractMessages(formConfig.questionConfig, language.lang)
+export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
+
+async function loadCertificate(
+  savedCertificate: ISVGTemplate | undefined,
+  certificate: ICertificateTemplateData
+) {
+  const { svgCode: url, event } = certificate
+  const res = await fetch(url, {
+    headers: {
+      Authorization: getToken(),
+      'If-None-Match': savedCertificate?.hash ?? ''
     }
   })
-  return languages
+  if (res.status === 304) {
+    return {
+      ...certificate,
+      svgCode: savedCertificate!.definition,
+      hash: savedCertificate!.hash!
+    }
+  }
+  if (!res.ok) {
+    return Promise.reject(
+      new Error(`Fetching certificate for "${event}" failed`)
+    )
+  }
+  return res.text().then((svgCode) => ({
+    ...certificate,
+    svgCode,
+    hash: res.headers.get('etag')!
+  }))
 }
 
-function extractMessages(questions: IQuestionConfig[], language: string) {
-  const messages: { [key: string]: string } = {}
-  questions.forEach((question) => {
-    if (isDefaultQuestionConfig(question)) {
-      return
-    }
-    const labelMessage = find(question.label, {
-      lang: language
-    })
-    const placeholderMessage = find(question.placeholder, {
-      lang: language
-    })
-    const descriptionMessage = find(question.description, {
-      lang: language
-    })
-    const tooltipMessage = find(question.tooltip, {
-      lang: language
-    })
-    const errorMessage = find(question.errorMessage, {
-      lang: language
-    })
-    const optionMessages = question?.options?.map((option) => {
-      return find(option.label, {
-        lang: language
-      })
-    })
-    if (labelMessage?.descriptor?.id) {
-      const labelID: string = labelMessage.descriptor.id as string
-      messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
-    }
-
-    if (placeholderMessage?.descriptor?.id) {
-      const placeholderID: string = placeholderMessage.descriptor.id as string
-      messages[placeholderID] = placeholderMessage.descriptor
-        .defaultMessage as string
-    }
-
-    if (descriptionMessage?.descriptor?.id) {
-      const descID = descriptionMessage.descriptor.id as string
-      messages[descID] = descriptionMessage.descriptor.defaultMessage as string
-    }
-
-    if (tooltipMessage?.descriptor?.id) {
-      const tooltipID = tooltipMessage.descriptor.id as string
-      messages[tooltipID] = tooltipMessage.descriptor.defaultMessage as string
-    }
-
-    if (errorMessage?.descriptor?.id) {
-      const errID = errorMessage.descriptor.id as string
-      messages[errID] = errorMessage.descriptor.defaultMessage as string
-    }
-
-    if (!isEmpty(optionMessages)) {
-      optionMessages?.forEach((option) => {
-        if (option?.descriptor?.id) {
-          const errID = option.descriptor.id as string
-          messages[errID] = option.descriptor.defaultMessage as string
-        }
-      })
-    }
-  })
-  return messages
+async function loadCertificates(
+  savedCertificates: IOfflineData['templates']['certificates'],
+  fetchedCertificates: ICertificateTemplateData[]
+) {
+  return await Promise.all(
+    fetchedCertificates.map((cert) =>
+      loadCertificate(savedCertificates?.[cert.event], cert)
+    )
+  )
 }
 
 function checkIfDone(
   oldState: IOfflineDataState,
-  loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
+  loopOrState: IOfflineDataState | Loop<IOfflineDataState, Action>
 ) {
   const loopWithState = liftState(loopOrState)
   const newState = getModel(loopWithState)
@@ -228,14 +239,42 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
+const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
+  successActionCreator: actions.formsLoaded,
+  failActionCreator: actions.formsFailed
+})
+
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
 })
 
+const CERTIFICATE_CONFIG_CMD = Cmd.run(
+  () => referenceApi.loadCertificateConfiguration(),
+  {
+    successActionCreator: actions.certificateConfigurationLoaded,
+    failActionCreator: actions.certificateConfigurationLoadFailed
+  }
+)
+
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
+})
+
+const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
+  successActionCreator: actions.conditionalsLoaded,
+  failActionCreator: actions.conditionalsFailed
+})
+
+const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
+  successActionCreator: actions.validatorsLoaded,
+  failActionCreator: actions.validatorsFailed
+})
+
+const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
+  successActionCreator: actions.handlebarsLoaded,
+  failActionCreator: actions.handlebarsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -252,6 +291,11 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
+    CERTIFICATE_CONFIG_CMD,
+    CONDITIONALS_CMD,
+    VALIDATORS_CMD,
+    HANDLEBARS_CMD,
+    FORMS_CMD,
     CONTENT_CMD
   ])
 }
@@ -284,7 +328,7 @@ function errorIfDataNotLoaded(state: IOfflineDataState) {
 function reducer(
   state: IOfflineDataState,
   action: actions.Action | profileActions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   switch (action.type) {
     // ENTRYPOINT - called from profile reducer
     case profileActions.USER_DETAILS_AVAILABLE: {
@@ -339,26 +383,43 @@ function reducer(
     case actions.UPDATE_OFFLINE_CERTIFICATE: {
       const { templates } = state.offlineData
       const { certificate } = action.payload
-      if (!templates || !templates.certificates) return state
-      else
-        return {
-          ...state,
-          offlineData: {
-            ...state.offlineData,
-            templates: {
-              ...templates,
-              certificates: {
-                ...templates.certificates,
-                [certificate.event]: {
-                  ...templates.certificates[certificate.event],
-                  definition: certificate.svgCode,
-                  fileName: certificate.svgFilename,
-                  lastModifiedDate: certificate.svgDateUpdated
-                }
+      if (!templates || !templates.certificates) {
+        return state
+      }
+      return loop(
+        state,
+        Cmd.run(loadCertificate, {
+          successActionCreator: actions.certificateLoaded,
+          failActionCreator: actions.certificateLoadFailed,
+          args: [templates.certificates[certificate.event], certificate]
+        })
+      )
+    }
+    case actions.CERTIFICATE_LOADED: {
+      const { templates } = state.offlineData
+      const certificate = action.payload
+      if (!templates || !templates.certificates) {
+        return state
+      }
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...templates,
+            certificates: {
+              ...templates.certificates,
+              [certificate.event]: {
+                ...templates.certificates[certificate.event],
+                definition: certificate.svgCode,
+                fileName: certificate.svgFilename,
+                lastModifiedDate: certificate.svgDateUpdated,
+                hash: certificate.hash
               }
             }
           }
         }
+      }
     }
     case actions.UPDATE_OFFLINE_CONFIG: {
       merge(window.config, action.payload.config)
@@ -389,39 +450,12 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_FORM_CONFIG: {
-      const { formConfig } = state.offlineData
 
-      if (!formConfig) return state
-
-      const {
-        formDrafts,
-        questionConfig = formConfig.questionConfig,
-        formDataset
-      } = action.payload
-
-      const newFormConfig = {
-        formDrafts,
-        questionConfig,
-        formDataset
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: {
-            ...state.offlineData,
-            formConfig: newFormConfig
-          }
-        },
-        Cmd.action(actions.offlineFormConfigUpdated(newFormConfig))
-      )
-    }
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig, systems } = action.payload
+      const { certificates, config, systems } = action.payload
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
@@ -441,40 +475,24 @@ function reducer(
         deathCertificateTemplate &&
         marriageCertificateTemplate
       ) {
-        const certificatesTemplates = {
-          birth: {
-            id: birthCertificateTemplate.id,
-            definition: birthCertificateTemplate.svgCode,
-            fileName: birthCertificateTemplate.svgFilename,
-            lastModifiedDate: birthCertificateTemplate.svgDateUpdated
+        return loop(
+          {
+            ...state,
+            offlineData: {
+              ...state.offlineData,
+              config,
+              systems
+            }
           },
-          death: {
-            id: deathCertificateTemplate.id,
-            definition: deathCertificateTemplate.svgCode,
-            fileName: deathCertificateTemplate.svgFilename,
-            lastModifiedDate: deathCertificateTemplate.svgDateUpdated
-          },
-          marriage: {
-            id: marriageCertificateTemplate.id,
-            definition: marriageCertificateTemplate.svgCode,
-            fileName: marriageCertificateTemplate.svgFilename,
-            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated
-          }
-        }
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          formConfig,
-          systems,
-          templates: {
-            certificates: certificatesTemplates
-          }
-        }
+          Cmd.run(loadCertificates, {
+            successActionCreator: actions.certificatesLoaded,
+            args: [state.offlineData.templates?.certificates, certificates]
+          })
+        )
       } else {
         newOfflineData = {
           ...state.offlineData,
           config,
-          formConfig,
           systems,
 
           // Field agents do not get certificate templates from the config service.
@@ -493,7 +511,81 @@ function reducer(
       }
     }
 
+    case actions.CERTIFICATES_LOADED: {
+      const certificates = action.payload
+      const birthCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Birth
+      )
+
+      const deathCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Death
+      )
+
+      const marriageCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Marriage
+      )
+
+      if (
+        birthCertificateTemplate &&
+        deathCertificateTemplate &&
+        marriageCertificateTemplate
+      ) {
+        const certificatesTemplates = {
+          birth: {
+            id: birthCertificateTemplate.id,
+            definition: birthCertificateTemplate.svgCode,
+            fileName: birthCertificateTemplate.svgFilename,
+            lastModifiedDate: birthCertificateTemplate.svgDateUpdated,
+            hash: birthCertificateTemplate.hash
+          },
+          death: {
+            id: deathCertificateTemplate.id,
+            definition: deathCertificateTemplate.svgCode,
+            fileName: deathCertificateTemplate.svgFilename,
+            lastModifiedDate: deathCertificateTemplate.svgDateUpdated,
+            hash: birthCertificateTemplate.hash
+          },
+          marriage: {
+            id: marriageCertificateTemplate.id,
+            definition: marriageCertificateTemplate.svgCode,
+            fileName: marriageCertificateTemplate.svgFilename,
+            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated,
+            hash: birthCertificateTemplate.hash
+          }
+        }
+        const newOfflineData = {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            certificates: certificatesTemplates
+          }
+        }
+
+        return {
+          ...state,
+          offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+          offlineData: newOfflineData
+        }
+      }
+      return state
+    }
+
+    case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(
+            configurationErrorNotification(
+              payload.message + ' to load application configuration properly'
+            )
+          )
+        )
+      }
       return loop(
         {
           ...state,
@@ -512,12 +604,7 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          languages: state.offlineData.formConfig
-            ? getAvailableContent(
-                state.offlineData.formConfig as IFormConfig,
-                action.payload.languages
-              )
-            : action.payload.languages
+          languages: action.payload.languages
         }
       }
     }
@@ -529,6 +616,23 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            fonts: action.payload.fonts
+          }
+        }
+      }
+    }
+
+    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
+      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*
@@ -555,18 +659,48 @@ function reducer(
     }
 
     /*
+     * Forms
+     */
+
+    case actions.FORMS_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          forms: action.payload.forms
+        }
+      }
+    }
+    case actions.FORMS_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(configurationErrorNotification(payload.message))
+        )
+      }
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(FORMS_CMD, RETRY_TIMEOUT)
+      )
+    }
+
+    /*
      * Facilities && Offices
      */
 
     case actions.FACILITIES_LOADED: {
-      const facilities = filterLocations(
-        action.payload,
-        LocationType.HEALTH_FACILITY
-      )
+      const facilities = filterLocations(action.payload, 'HEALTH_FACILITY')
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE
+        'CRVS_OFFICE'
         /*
 
         // This is used to filter office locations available offline
@@ -618,7 +752,7 @@ function reducer(
 export function offlineDataReducer(
   state: IOfflineDataState | undefined = initialState,
   action: actions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   const newState = reducer(state, action)
   if (action.type !== actions.READY) {
     return checkIfDone(state, newState)

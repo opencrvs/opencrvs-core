@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import {
@@ -27,6 +26,7 @@ import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
 import {
+  NotificationEvent,
   generateVerificationCode,
   sendVerificationCode,
   storeVerificationCode
@@ -44,12 +44,18 @@ const sign = promisify(jwt.sign) as (
   secretOrPrivateKey: jwt.Secret,
   options?: jwt.SignOptions
 ) => Promise<string>
-
+export interface IUserName {
+  use: string
+  family: string
+  given: string[]
+}
 export interface IAuthentication {
-  mobile: string
+  name: IUserName[]
+  mobile?: string
   userId: string
   status: string
   scope: string[]
+  email?: string
 }
 
 export interface ISystemAuthentication {
@@ -79,14 +85,14 @@ export async function authenticate(
   if (res.status !== 200) {
     throw Error(res.statusText)
   }
-
   const body = await res.json()
-
   return {
+    name: body.name,
     userId: body.id,
     scope: body.scope,
     status: body.status,
-    mobile: body.mobile
+    mobile: body.mobile,
+    email: body.email
   }
 }
 
@@ -137,13 +143,15 @@ export async function createToken(
 
 export async function storeUserInformation(
   nonce: string,
+  userFullName: IUserName[],
   userId: string,
   scope: string[],
-  mobile: string
+  mobile?: string,
+  email?: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, scope, mobile })
+    JSON.stringify({ userId, scope, userFullName, mobile, email })
   )
 }
 
@@ -152,15 +160,19 @@ export async function getStoredUserInformation(nonce: string) {
   if (record === null) {
     throw new UserInfoNotFoundError('user not found')
   }
-  return JSON.parse(record)
+  const parsedUserData = JSON.parse(record)
+  return parsedUserData
 }
 
 export async function generateAndSendVerificationCode(
   nonce: string,
-  mobile: string,
-  scope: string[]
+  scope: string[],
+  notificationEvent: NotificationEvent,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1
+  const isDemoUser = scope.indexOf('demo') > -1 || QA_ENV
   logger.info(
     `isDemoUser,
       ${JSON.stringify({
@@ -172,21 +184,28 @@ export async function generateAndSendVerificationCode(
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
-    verificationCode = await generateVerificationCode(nonce, mobile)
+    verificationCode = await generateVerificationCode(nonce)
   }
   if (!PRODUCTION || QA_ENV) {
     logger.info(
-      `Sending a verification SMS,
-        ${JSON.stringify({
-          mobile: mobile,
-          verificationCode
-        })}`
+      `Sending a verification to,
+          ${JSON.stringify({
+            mobile: mobile,
+            email: email,
+            verificationCode
+          })}`
     )
   } else {
     if (isDemoUser) {
       throw unauthorized()
     } else {
-      await sendVerificationCode(mobile, verificationCode)
+      await sendVerificationCode(
+        verificationCode,
+        notificationEvent,
+        userFullName,
+        mobile,
+        email
+      )
     }
   }
 }

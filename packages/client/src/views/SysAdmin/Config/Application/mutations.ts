@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
@@ -21,12 +20,10 @@ const applicationConfigMutation = gql`
       APPLICATION_NAME
       NID_NUMBER_PATTERN
       PHONE_NUMBER_PATTERN
-      HIDE_EVENT_REGISTER_INFORMATION
       DATE_OF_BIRTH_UNKNOWN
-      INFORMANT_SIGNATURE
       INFORMANT_SIGNATURE_REQUIRED
-      ADDRESSES
-      ADMIN_LEVELS
+      USER_NOTIFICATION_DELIVERY_METHOD
+      INFORMANT_NOTIFICATION_DELIVERY_METHOD
       LOGIN_BACKGROUND {
         backgroundColor
         backgroundImage

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React, { useState } from 'react'
@@ -17,7 +16,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { useSelector } from 'react-redux'
 import { getLanguages } from '@client/i18n/selectors'
@@ -94,7 +93,9 @@ export function UserRoleManagementModal(props: IProps) {
             ...choices,
             {
               value: lang,
-              label: languages[lang].displayName
+              label: intl.formatMessage(messages.language, {
+                language: languages[lang].lang
+              })
             }
           ]
         : choices,
@@ -190,7 +191,10 @@ export function UserRoleManagementModal(props: IProps) {
         />
         {userRoles.map((item, index) => {
           return (
-            <Stack justifyContent="flex-start">
+            <Stack
+              key={item._id ?? `new-role-${index}`}
+              justifyContent="flex-start"
+            >
               <StyledTextInput
                 id="roleNameInput"
                 value={
@@ -218,7 +222,7 @@ export function UserRoleManagementModal(props: IProps) {
                   setActives(new Array(userRoles.length).fill(true))
                 }
               />
-              {actives[index] && (
+              {actives[index] && !item._id && (
                 <Button
                   id="editButton"
                   type="icon"

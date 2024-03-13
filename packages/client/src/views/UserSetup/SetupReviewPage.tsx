@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -70,6 +69,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   )
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
+  const email = (userDetails && (userDetails.email as string)) || ''
   const language = useSelector(getLanguage)
   const role = userDetails && getUserRole(language, userDetails.role)
   const primaryOffice =
@@ -107,6 +107,15 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       id: 'UserPhone',
       label: intl.formatMessage(constantsMessages.labelPhone),
       value: mobile,
+      action: {
+        label: intl.formatMessage(buttonMessages.change),
+        disabled: true
+      }
+    },
+    {
+      id: 'Email',
+      label: intl.formatMessage(constantsMessages.labelEmail),
+      value: email,
       action: {
         label: intl.formatMessage(buttonMessages.change),
         disabled: true
@@ -164,6 +173,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 title={intl.formatMessage(messages.userSetupReviewHeader)}
                 bottomActionButtons={[
                   <ConfirmButton
+                    key="confirm"
                     id="Confirm"
                     onClick={() => submitActivateUser()}
                   >

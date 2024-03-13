@@ -6,11 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import {
+  UserRole as CommonUserRole,
+  userScopes
+} from '@opencrvs/commons/authentication'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -125,10 +128,12 @@ export interface IUser {
   username: string
   identifiers: IIdentifier[]
   email: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   passwordHash: string
+  oldPasswordHash?: string
   salt: string
-  systemRole: string
+  systemRole: CommonUserRole
   role: Types.ObjectId
   practitionerId: string
   primaryOfficeId: string
@@ -272,7 +277,7 @@ const AdvanceSearchParameters = new Schema(
 
 const SearchesSchema = new Schema(
   {
-    searchId: { type: String, required: true, unique: true },
+    searchId: { type: String, required: true },
     name: { type: String, required: true },
     parameters: { type: AdvanceSearchParameters, required: true }
   },
@@ -296,15 +301,17 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
   email: { type: String },
-  mobile: { type: String, unique: true },
+  emailForNotification: { type: String, unique: true, sparse: true },
+  mobile: { type: String, unique: true, sparse: true },
   passwordHash: { type: String, required: true },
+  oldPasswordHash: { type: String },
   salt: { type: String, required: true },
   systemRole: { type: String, required: true },
   role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
-  scope: { type: [String], required: true },
+  scope: { type: [String], enum: Object.values(userScopes), required: true },
   status: {
     type: String,
     enum: [

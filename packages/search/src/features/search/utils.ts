@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CERTIFIED_STATUS,
@@ -221,6 +220,123 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.groomFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.groomFirstNames,
+        fields: 'groomFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.groomFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.groomFamilyName,
+        fields: 'groomFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.brideFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.brideFirstNames,
+        fields: 'brideFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.brideFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.brideFamilyName,
+        fields: 'brideFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.brideIdentifier) {
+    must.push({
+      match: {
+        brideIdentifier: params.brideIdentifier
+      }
+    })
+  }
+
+  if (params.groomIdentifier) {
+    must.push({
+      match: {
+        groomIdentifier: params.groomIdentifier
+      }
+    })
+  }
+
+  if (params.dateOfMarriage) {
+    must.push({
+      multi_match: {
+        query: params.dateOfMarriage,
+        fields: 'marriageDate'
+      }
+    })
+  }
+
+  if (!params.brideDoBStart && !params.brideDoBEnd && params.brideDoB) {
+    must.push({
+      match: {
+        brideDoB: params.brideDoB
+      }
+    })
+  }
+
+  if (params.brideDoBStart || params.brideDoBEnd) {
+    if (!params.brideDoBStart) {
+      throw new Error('brideDoBStart must be provided along with brideDoBEnd')
+    }
+    if (!params.brideDoBEnd) {
+      throw new Error('brideDoBEnd must be provided along with brideDoBStart')
+    }
+
+    must.push({
+      range: {
+        brideDoB: {
+          gte: params.brideDoBStart,
+          lte: params.brideDoBEnd
+        }
+      }
+    })
+  }
+
+  if (!params.groomDoBStart && !params.groomDoBEnd && params.groomDoB) {
+    must.push({
+      match: {
+        groomDoB: params.groomDoB
+      }
+    })
+  }
+
+  if (params.groomDoBStart || params.groomDoBEnd) {
+    if (!params.groomDoBStart) {
+      throw new Error('groomDoBStart must be provided along with groomDoBEnd')
+    }
+    if (!params.groomDoBEnd) {
+      throw new Error('groomDoBEnd must be provided along with groomDoBStart')
+    }
+
+    must.push({
+      range: {
+        groomDoB: {
+          gte: params.groomDoBStart,
+          lte: params.groomDoBEnd
+        }
+      }
+    })
+  }
+
   if (!params.childDoBStart && !params.childDoBEnd && params.childDoB) {
     must.push({
       match: {
@@ -371,6 +487,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.childIdentifier) {
+    must.push({
+      match: {
+        childIdentifier: params.childIdentifier
+      }
+    })
+  }
+
   if (params.motherIdentifier) {
     must.push({
       match: {
@@ -503,6 +627,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.contactEmail) {
+    must.push({
+      terms: {
+        'contactEmail.keyword': [params.contactEmail]
+      }
+    })
+  }
+
   if (params.registrationNumber) {
     must.push({
       match: {
@@ -519,10 +651,23 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.recordId) {
+    must.push({
+      match: {
+        _id: params.recordId
+      }
+    })
+  }
+
   if (params.nationalId) {
     must.push({
       bool: {
         should: [
+          {
+            match: {
+              childIdentifier: params.nationalId
+            }
+          },
           {
             match: {
               motherIdentifier: params.nationalId
@@ -586,4 +731,31 @@ export function advancedQueryBuilder(
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+export function getSubmittedIdentifier(identifiers: fhir.Identifier[]) {
+  const supportedIdentifiers = [
+    'PASSPORT',
+    'NATIONAL_ID',
+    'MOSIP_PSUT_TOKEN_ID',
+    'DECEASED_PATIENT_ENTRY',
+    'BIRTH_PATIENT_ENTRY',
+    'DRIVING_LICENSE',
+    'BIRTH_REGISTRATION_NUMBER',
+    'DEATH_REGISTRATION_NUMBER',
+    'REFUGEE_NUMBER',
+    'ALIEN_NUMBER',
+    'OTHER',
+    'SOCIAL_SECURITY_NO'
+  ]
+  let value = ''
+  identifiers.find((item) => {
+    const coding = item.type?.coding || []
+    coding.some((codeObj) => {
+      codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
+        ? (value = `${item.value}`)
+        : (value = '')
+    })
+  })
+  return value
 }

@@ -6,38 +6,37 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IDeclaration, IDuplicates } from '@client/declarations'
 import {
   IForm,
   IFormData,
-  TransformedData,
   IFormField,
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
-  IFormSectionData,
-  IFormSection
+  IFormSection,
+  TransformedData
 } from '@client/forms'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import {
   getConditionalActionsForField,
+  getSelectedRadioOptionWithNestedFields,
   getVisibleSectionGroupsBasedOnConditions,
-  stringifyFieldValue,
   isRadioGroupWithNestedField,
-  getSelectedRadioOptionWithNestedFields
+  serializeFieldValue
 } from '@client/forms/utils'
-import { IDeclaration, IDuplicates } from '@client/declarations'
-import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
-import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
+  CorrectionValueInput,
+  DuplicatesInfo,
   EventRegistration,
-  EventSearchSet,
-  DuplicatesInfo
+  EventSearchSet
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
+import { get } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -62,40 +61,28 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const toCorrectionValue = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
   originalDraftData: IFormData,
-  transformedData: TransformedData,
   nestedFieldDef: IFormField | null = null
-): void => {
-  if (!transformedData.registration) {
-    transformedData.registration = {}
-  }
-  if (!transformedData.registration.correction) {
-    transformedData.registration.correction = draftData.registration.correction
-      ? { ...(draftData.registration.correction as IFormSectionData) }
-      : {}
-  }
-  if (!transformedData.registration.correction.values) {
-    transformedData.registration.correction.values = []
-  }
-
+) => {
+  const changedValues: CorrectionValueInput[] = []
   if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
     const newFieldValue = get(draftData[section.id], valuePath)
     const oldFieldValue = get(originalDraftData[section.id], valuePath)
     if (newFieldValue !== oldFieldValue) {
-      transformedData.registration.correction.values.push({
+      changedValues.push({
         section: section.id,
         fieldName: valuePath,
-        newValue: stringifyFieldValue(
+        newValue: serializeFieldValue(
           fieldDef,
           newFieldValue,
           draftData[section.id]
         ),
-        oldValue: stringifyFieldValue(
+        oldValue: serializeFieldValue(
           fieldDef,
           oldFieldValue,
           originalDraftData[section.id]
@@ -113,11 +100,11 @@ export const transformRegistrationCorrection = (
     )
 
     if (selectedRadioOption !== selectedRadioOptionOld) {
-      transformedData.registration.correction.values.push({
+      changedValues.push({
         section: section.id,
         fieldName: fieldDef.name,
-        newValue: selectedRadioOption,
-        oldValue: selectedRadioOptionOld
+        newValue: selectedRadioOption ?? '',
+        oldValue: selectedRadioOptionOld ?? ''
       })
     }
 
@@ -126,42 +113,106 @@ export const transformRegistrationCorrection = (
       Array.isArray(fieldDef.nestedFields[selectedRadioOption])
     ) {
       for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
-        transformRegistrationCorrection(
+        const nestedChangedValues = toCorrectionValue(
           section,
           fieldDef,
           draftData,
           originalDraftData,
-          transformedData,
           nestedFieldDef
         )
+        changedValues.push(...nestedChangedValues)
       }
     }
   } else {
-    transformedData.registration.correction.values.push({
+    changedValues.push({
       section: section.id,
       fieldName: fieldDef.name,
-      newValue: stringifyFieldValue(
+      newValue: serializeFieldValue(
         fieldDef,
         draftData[section.id][fieldDef.name],
         draftData[section.id]
       ),
-      oldValue: stringifyFieldValue(
-        fieldDef,
-        originalDraftData[section.id][fieldDef.name],
-        originalDraftData[section.id]
-      )
+      oldValue:
+        serializeFieldValue(
+          fieldDef,
+          originalDraftData[section.id][fieldDef.name],
+          originalDraftData[section.id]
+        ) ?? ''
     })
   }
+  return changedValues
 }
+
+export function getChangedValues(
+  formDefinition: IForm,
+  declaration: IDeclaration,
+  offlineCountryConfig?: IOfflineData
+) {
+  const draftData = declaration.data
+  const originalDraftData = declaration.originalData || {}
+  const changedValues: CorrectionValueInput[] = []
+
+  if (!formDefinition.sections) {
+    throw new Error('Sections are missing in form definition')
+  }
+
+  formDefinition.sections.forEach((section) => {
+    if (!draftData[section.id]) {
+      return
+    }
+
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      draftData[section.id],
+      draftData
+    ).forEach((groupDef) => {
+      groupDef.fields.forEach((fieldDef) => {
+        const conditionalActions: string[] = getConditionalActionsForField(
+          fieldDef,
+          draftData[section.id],
+          offlineCountryConfig,
+          draftData
+        )
+
+        originalDraftData[section.id] ??= {}
+
+        if (
+          !conditionalActions.includes('hide') &&
+          !conditionalActions.includes('disable') &&
+          !(section.id === 'documents') &&
+          hasFieldChanged(
+            fieldDef,
+            draftData[section.id],
+            originalDraftData[section.id]
+          )
+        ) {
+          changedValues.push(
+            ...toCorrectionValue(
+              section,
+              fieldDef,
+              draftData,
+              originalDraftData
+            )
+          )
+        }
+      })
+    })
+  })
+
+  return changedValues
+}
+
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {}
+  userDetails?: UserDetails | null,
+  offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
+
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
@@ -174,13 +225,14 @@ export const draftToGqlTransformer = (
     getVisibleSectionGroupsBasedOnConditions(
       section,
       draftData[section.id],
-      draftData
+      draftData,
+      userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
           draftData[section.id],
-          undefined,
+          offlineCountryConfig,
           draftData
         )
         if (
@@ -193,32 +245,13 @@ export const draftToGqlTransformer = (
           /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
-              `on section ${section.id}`
+              ` on section ${section.id}`
           )
           /* eslint-enable no-console */
           inCompleteFieldList.push(
             `${section.id}/${groupDef.id}/${fieldDef.name}`
           )
           return
-        }
-        if (Object.keys(originalDraftData).length) {
-          if (
-            !conditionalActions.includes('hide') &&
-            !conditionalActions.includes('disable') &&
-            hasFieldChanged(
-              fieldDef,
-              draftData[section.id],
-              originalDraftData[section.id]
-            )
-          ) {
-            transformRegistrationCorrection(
-              section,
-              fieldDef,
-              draftData,
-              originalDraftData,
-              transformedData
-            )
-          }
         }
 
         if (
@@ -313,15 +346,14 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData,
+      userDetails
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {

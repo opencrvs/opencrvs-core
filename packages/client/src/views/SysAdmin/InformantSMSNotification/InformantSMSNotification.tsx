@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
@@ -20,14 +19,9 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { GET_INFORMANT_SMS_NOTIFICATIONS } from './queries'
-import {
-  Label,
-  Value
-} from '@client/views/SysAdmin/Config/Application/Components'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { Label } from '@client/views/SysAdmin/Config/Application/Components'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
@@ -50,6 +44,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;
@@ -73,7 +68,7 @@ const NotificationNames = [
   'deathRejectionSMS'
 ] as const
 
-type INotificationName = typeof NotificationNames[number]
+type INotificationName = (typeof NotificationNames)[number]
 
 type IState = Record<INotificationName, boolean>
 
@@ -203,6 +198,7 @@ const InformantNotification = () => {
           {items.map((item: SmsNotification) => {
             return (
               <ListViewItemSimplified
+                key={`${item.name}_label`}
                 label={
                   <Label id={`${item.name}_label`}>
                     {intl.formatMessage(
@@ -210,7 +206,6 @@ const InformantNotification = () => {
                     )}
                   </Label>
                 }
-                value={<Value id={`${item.name}_value`}>{item.message}</Value>}
                 actions={
                   <ToggleWrapper>
                     <Toggle
@@ -242,6 +237,7 @@ const InformantNotification = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.informantNotifications)}
           />
         }
         navigation={<Navigation />}
@@ -252,7 +248,15 @@ const InformantNotification = () => {
         <Content
           title={intl.formatMessage(messages.informantNotifications)}
           titleColor={'copy'}
-          subtitle={intl.formatMessage(messages.informantNotificationSubtitle)}
+          subtitle={intl.formatMessage(messages.informantNotificationSubtitle, {
+            communicationType: (
+              <strong>
+                {window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                  ? 'SMS'
+                  : 'Emails'}
+              </strong>
+            )
+          })}
           tabBarContent={
             <FormTabs
               sections={tabSections}

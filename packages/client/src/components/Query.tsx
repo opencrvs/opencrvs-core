@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 /*
@@ -23,16 +22,7 @@ import {
   Query as ApolloQuery,
   QueryComponentOptions
 } from '@apollo/client/react/components'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 
 export function Query<T = any>(props: QueryComponentOptions<T>) {
-  return (
-    <ApolloQuery<T>
-      onError={(error: Error) => {
-        Sentry.captureException(error)
-      }}
-      {...props}
-    />
-  )
+  return <ApolloQuery<T> {...props} />
 }

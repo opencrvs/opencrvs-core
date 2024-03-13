@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import styled from 'styled-components'
@@ -133,7 +132,6 @@ const MobileActionsContainer = styled.div`
 `
 
 export interface IListViewItemSimplifiedProps {
-  key?: number | string
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
@@ -146,7 +144,6 @@ export interface IListViewItemSimplifiedProps {
  * Use the list view to summarise information, for example a user’s responce at the declaration form or for showing performance data
  */
 export function ListViewItemSimplified({
-  key,
   image,
   label,
   value,
@@ -155,7 +152,7 @@ export function ListViewItemSimplified({
   compactLabel
 }: IListViewItemSimplifiedProps) {
   return (
-    <React.Fragment key={key}>
+    <React.Fragment>
       {image && (
         <ImageContainer className={className} data-test-id="list-view-image">
           {image}

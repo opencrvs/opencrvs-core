@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
@@ -19,7 +18,8 @@ import {
   ICompositionBody,
   EVENT,
   IBirthCompositionBody,
-  IDeathCompositionBody
+  IDeathCompositionBody,
+  findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
@@ -42,6 +42,7 @@ export async function searchAssignment(
   const payload = request.payload as IAssignmentPayload
   try {
     const results = await searchByCompositionId(payload.compositionId, client)
+
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined
@@ -213,7 +214,8 @@ export async function searchForBirthDeDuplication(
       request.payload as IBirthCompositionBody,
       client
     )
-    return h.response(result).code(200)
+    const duplicateIds = findDuplicateIds(result)
+    return h.response(duplicateIds).code(200)
   } catch (error) {
     logger.error(`Search/searchForDuplicates: error: ${error}`)
     return internal(error)
@@ -229,7 +231,8 @@ export async function searchForDeathDeDuplication(
       request.payload as IDeathCompositionBody,
       client
     )
-    return h.response(result).code(200)
+    const duplicateIds = findDuplicateIds(result)
+    return h.response(duplicateIds).code(200)
   } catch (err) {
     logger.error(`Search for death duplications : error : ${err}`)
     return internal(err)

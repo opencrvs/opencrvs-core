@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import {
@@ -20,7 +19,8 @@ import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   Workqueue,
   COLUMNS,
@@ -28,12 +28,11 @@ import {
   ColumnContentAlignment,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
-import { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -224,6 +223,10 @@ class SentForReviewComponent extends React.Component<
         sentForApproval =
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
             RegStatus.Declared
           ) ||
           getPreviousOperationDateByOperationType(
@@ -236,7 +239,12 @@ class SentForReviewComponent extends React.Component<
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
             RegStatus.Validated
-          ) || ''
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.CorrectionRequested
+          ) ||
+          ''
       }
 
       const dateOfEvent =

@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL } from '@gateway/constants'
+
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { fetchFHIR } from '@gateway/features/fhir/service'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -30,7 +29,7 @@ export const resolvers: GQLResolver = {
       return childLocation
     },
     async locationById(_, { locationId }, { headers: authHeader }) {
-      return fetchFHIR(`${FHIR_URL}/Location/${locationId}`, authHeader)
+      return fetchFHIR(`/Location/${locationId}`, authHeader)
     }
   }
 }

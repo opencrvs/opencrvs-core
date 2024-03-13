@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -16,13 +15,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  BirthSection,
-  DeathSection
-} from '@client/forms'
+import { IForm, IFormSection, IFormField } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -35,7 +28,6 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { isEmpty, find, flatten, values } from 'lodash'
 import {
   getFieldValue,
-  getFormattedDate,
   getStatusLabel,
   isSystemInitiated,
   isVerifiedAction
@@ -46,12 +38,13 @@ import {
   CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -145,13 +138,23 @@ function prepareComments(
   )
 }
 
-const requesterLabelMapper = (requester: string, intl: IntlShape) => {
+const requesterLabelMapper = (
+  requester: string,
+  intl: IntlShape,
+  declaration: IDeclaration
+) => {
   const requesterIndividual = CorrectorRelationLabelArray.find(
     (labelItem) => labelItem.value === requester
   )
+  const informant =
+    ((declaration.data?.informant?.otherInformantType ||
+      declaration.data?.informant?.informantType) as string) ?? ''
 
+  // informant info added for corrector being informant
   return requesterIndividual?.label
-    ? intl.formatMessage(requesterIndividual.label)
+    ? intl.formatMessage(requesterIndividual.label, {
+        informant: labelFormatterForInformant(informant)
+      })
     : ''
 }
 
@@ -180,7 +183,7 @@ const getReasonForRequest = (
   }
 }
 
-export const ActionDetailsModalListTable = ({
+const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
   registerForm,
@@ -232,7 +235,11 @@ export const ActionDetailsModalListTable = ({
       label: intl.formatMessage(messages.correctionSummaryOriginal),
       width: 33.33
     },
-    { key: 'edit', label: 'Edit', width: 33.33 }
+    {
+      key: 'edit',
+      label: intl.formatMessage(messages.correctionSummaryCorrection),
+      width: 33.33
+    }
   ]
   const certificateCollectorVerified = [
     {
@@ -295,13 +302,9 @@ export const ActionDetailsModalListTable = ({
         (section) => section.id === item?.valueCode
       ) as IFormSection
 
-      if (
-        section.id === BirthSection.Documents ||
-        section.id === DeathSection.DeathDocuments
-      ) {
-        editedValue.valueString = intl.formatMessage(
-          dynamicConstantsMessages.updated
-        )
+      if (section.id === 'documents') {
+        item.value = EMPTY_STRING
+        editedValue.value = intl.formatMessage(dynamicConstantsMessages.updated)
       }
 
       const indexes = item?.valueId?.split('.')
@@ -322,18 +325,8 @@ export const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       } else {
         const [parentField] = indexes
@@ -346,18 +339,8 @@ export const ActionDetailsModalListTable = ({
 
         result.push({
           item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
+          original: getFieldValue(item.value, fieldObj, offlineData, intl),
+          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
         })
       }
     })
@@ -378,9 +361,9 @@ export const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.individual?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.name,
           window.config.LANGUAGES
         )
       : {}
@@ -394,14 +377,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
-          : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
     }
@@ -435,7 +411,8 @@ export const ActionDetailsModalListTable = ({
   const content = prepareComments(actionDetailsData, draft)
   const requesterLabel = requesterLabelMapper(
     actionDetailsData.requester as string,
-    intl
+    intl,
+    draft as IDeclaration
   )
   return (
     <>
@@ -463,6 +440,15 @@ export const ActionDetailsModalListTable = ({
             noResultText=" "
             columns={requesterColumn}
             content={[{ requester: requesterLabel }]}
+          />
+        )}
+      {/* Correction rejected */}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RejectedCorrection && (
+          <Table
+            noResultText=" "
+            columns={reasonColumn}
+            content={[{ text: actionDetailsData.reason }]}
           />
         )}
 
@@ -632,7 +618,7 @@ export const ActionDetailsModal = ({
   } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null
@@ -658,7 +644,15 @@ export const ActionDetailsModal = ({
       <>
         <div>
           <>{userName}</>
-          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+          <span>
+            {' '}
+            —{' '}
+            {formatLongDate(
+              actionDetailsData.date.toLocaleString(),
+              intl.locale,
+              'MMMM dd, yyyy · hh.mm a'
+            )}
+          </span>
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}

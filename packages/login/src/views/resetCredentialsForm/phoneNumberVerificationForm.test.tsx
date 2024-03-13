@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
@@ -47,8 +46,7 @@ const server = setupServer(
             fileName: 'dummy-file-name',
             file: 'dummy-logo'
           },
-          SENTRY: '',
-          LOGROCKET: ''
+          SENTRY: ''
         }
       })
     )
@@ -64,7 +62,9 @@ const server = setupServer(
 )
 
 // Enable API mocking before tests.
-beforeAll(() => server.listen())
+beforeAll(() => {
+  server.listen()
+})
 
 // Reset any runtime request handlers we may add during the tests.
 afterEach(() => server.resetHandlers())
@@ -75,7 +75,7 @@ afterAll(() => server.close())
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
   let history: History
-
+  window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
   beforeEach(async () => {
     const testApp = await createTestApp()
     app = testApp.app
@@ -123,7 +123,9 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '123' } })
-      expect(app.find('#phone-number_error').hostNodes()).toHaveLength(1)
+      expect(
+        app.find('#phone-or-email-for-notification_error').hostNodes()
+      ).toHaveLength(1)
     })
 
     it("continue button doesn't forward to next form when invalid phone number is given", () => {

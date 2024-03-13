@@ -1,6 +1,3 @@
-import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,12 +6,15 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
+import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
 export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
+
+export const CONFIGURATION_ERROR = 'FORM_VALIDATION_ERROR'
 
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
@@ -25,8 +25,12 @@ export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
 export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
 export const SHOW_CREATE_USER_ERROR_TOAST = 'SHOW_CREATE_USER_ERROR_TOAST'
+export const SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST =
+  'SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
 export const HIDE_CREATE_USER_ERROR_TOAST = 'HIDE_CREATE_USER_ERROR_TOAST'
+export const HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST =
+  'HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST'
 
 export const HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST =
   'HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST'
@@ -44,31 +48,39 @@ export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
 
 export const SHOW_UNASSIGNED = 'SHOW_UNASSIGNED'
 export const HIDE_UNASSIGNED = 'HIDE_UNASSIGNED'
+export const SHOW_UNASSIGNED_DECLARATIONS = 'SHOW_UNASSIGNED_DECLARATIONS'
+export const HIDE_UNASSIGNED_DECLARATIONS_TOAST =
+  'HIDE_UNASSIGNED_DECLARATIONS_TOAST'
 
-export type ShowConfigurationErrorAction = {
+type ConfigurationErrorAction = {
+  type: typeof CONFIGURATION_ERROR
+  payload: string
+}
+
+type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
 }
 
-export type HideConfigurationErrorAction = {
+type HideConfigurationErrorAction = {
   type: typeof HIDE_CONFIG_ERROR
 }
 
-export type toggleDraftSavedNotificationAction = {
+type toggleDraftSavedNotificationAction = {
   type: typeof TOGGLE_DRAFT_SAVED_NOTIFICATION
 }
 
-export type ShowSubmitFormSuccessToast = {
+type ShowSubmitFormSuccessToast = {
   type: typeof SHOW_SUBMIT_FORM_SUCCESS_TOAST
   payload: {
     data: string
   }
 }
 
-export type HideSubmitFormSuccessToast = {
+type HideSubmitFormSuccessToast = {
   type: typeof HIDE_SUBMIT_FORM_SUCCESS_TOAST
 }
 
-export type ShowSubmitFormErrorToast = {
+type ShowSubmitFormErrorToast = {
   type: typeof SHOW_SUBMIT_FORM_ERROR_TOAST
   payload: {
     data: string
@@ -82,7 +94,15 @@ export type ShowCreateUserErrorToast = {
   }
 }
 
-export type HideDownloadDeclarationFailedToast = {
+export type ShowCreateUserDuplicateEmailErrorToast = {
+  type: typeof SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
+  payload: {
+    data: string
+    email: string
+  }
+}
+
+type HideDownloadDeclarationFailedToast = {
   type: typeof HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
 
@@ -90,12 +110,20 @@ export type ShowDownloadDeclarationFailedToast = {
   type: typeof SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
 
-export type HideSubmitFormErrorToast = {
+type HideSubmitFormErrorToast = {
   type: typeof HIDE_SUBMIT_FORM_ERROR_TOAST
 }
 
-export type HideCreateUserErrorToast = {
+type HideCreateUserErrorToast = {
   type: typeof HIDE_CREATE_USER_ERROR_TOAST
+}
+
+type HideCreateUserDuplicateEmailErrorToast = {
+  type: typeof HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
+}
+
+type HideUnassignedDeclarationsToast = {
+  type: typeof HIDE_UNASSIGNED_DECLARATIONS_TOAST
 }
 
 export type ShowUserAuditSuccessToast = {
@@ -106,9 +134,16 @@ export type ShowUserAuditSuccessToast = {
   }
 }
 
-export type HideUserAuditSuccessToast = {
+type HideUserAuditSuccessToast = {
   type: typeof HIDE_USER_AUDIT_SUCCESS_TOAST
 }
+
+export const configurationErrorNotification = (
+  msg: string
+): ConfigurationErrorAction => ({
+  type: CONFIGURATION_ERROR,
+  payload: msg
+})
 
 export const showConfigurationErrorNotification =
   (): ShowConfigurationErrorAction => ({
@@ -125,15 +160,15 @@ export const toggleDraftSavedNotification =
     type: TOGGLE_DRAFT_SAVED_NOTIFICATION
   })
 
-export type ShowUserReconnectedToastAction = {
+type ShowUserReconnectedToastAction = {
   type: typeof SHOW_USER_RECONNECTED_TOAST
 }
 
-export type HideUserReconnectedToastAction = {
+type HideUserReconnectedToastAction = {
   type: typeof HIDE_USER_RECONNECTED_TOAST
 }
 
-export type SessionExpiredAction = {
+type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
 
@@ -141,12 +176,17 @@ export interface ShowUnassignedPayload extends Record<string, string> {
   trackingId: string
 }
 
-export type ShowUnassigned = {
+export type ShowUnassignedDeclarations = {
+  type: typeof SHOW_UNASSIGNED_DECLARATIONS
+  payload: string[]
+}
+
+type ShowUnassigned = {
   type: typeof SHOW_UNASSIGNED
   payload: ShowUnassignedPayload
 }
 
-export type HideUnassigned = {
+type HideUnassigned = {
   type: typeof HIDE_UNASSIGNED
 }
 
@@ -188,6 +228,14 @@ export const showCreateUserErrorToast = (
   payload: { data, mobile }
 })
 
+export const showCreateUserDuplicateEmailErrorToast = (
+  data: string,
+  email: string
+): ShowCreateUserDuplicateEmailErrorToast => ({
+  type: SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST,
+  payload: { data, email }
+})
+
 export const showDownloadDeclarationFailedToast =
   (): ShowDownloadDeclarationFailedToast => ({
     type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
@@ -206,6 +254,11 @@ export const hideCreateUserErrorToast = (): HideCreateUserErrorToast => ({
   type: HIDE_CREATE_USER_ERROR_TOAST
 })
 
+export const hideCreateUserFormDuplicateEmailErrorToast =
+  (): HideCreateUserDuplicateEmailErrorToast => ({
+    type: HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
+  })
+
 export const showUserAuditSuccessToast = (
   userFullName: string,
   action: AUDIT_ACTION
@@ -221,7 +274,7 @@ export const hideUserAuditSuccessToast = (): HideUserAuditSuccessToast => ({
   type: HIDE_USER_AUDIT_SUCCESS_TOAST
 })
 
-export type ShowDuplicateRecordsToast = {
+type ShowDuplicateRecordsToast = {
   type: typeof SHOW_DUPLICATE_RECORDS_TOAST
   payload: { trackingId: string; compositionId: string }
 }
@@ -234,7 +287,7 @@ export const showDuplicateRecordsToast = ({
   payload: { trackingId, compositionId }
 })
 
-export type HideDuplicateRecordsToast = {
+type HideDuplicateRecordsToast = {
   type: typeof HIDE_DUPLICATE_RECORDS_TOAST
 }
 
@@ -242,11 +295,11 @@ export const hideDuplicateRecordsToast = () => ({
   type: HIDE_DUPLICATE_RECORDS_TOAST
 })
 
-export type ShowPINUpdateSuccessAction = {
+type ShowPINUpdateSuccessAction = {
   type: typeof SHOW_PIN_UPDATE_SUCCESS
 }
 
-export type HidePINUpdateSuccessAction = {
+type HidePINUpdateSuccessAction = {
   type: typeof HIDE_PIN_UPDATE_SUCCESS
 }
 export const showPINUpdateSuccessToast = (): ShowPINUpdateSuccessAction => ({
@@ -264,12 +317,25 @@ export const showUnassigned = (
   payload: data
 })
 
+export const showUnassignedDeclarations = (
+  unassignedDeclarationTrackingIds: string[]
+): ShowUnassignedDeclarations => ({
+  type: SHOW_UNASSIGNED_DECLARATIONS,
+  payload: unassignedDeclarationTrackingIds
+})
+
 export const hideUnassignedModal = (): HideUnassigned => ({
   type: HIDE_UNASSIGNED
 })
 
+export const hideUnassignedDeclarationsToast =
+  (): HideUnassignedDeclarationsToast => ({
+    type: HIDE_UNASSIGNED_DECLARATIONS_TOAST
+  })
+
 export type Action =
   | SessionExpiredAction
+  | ConfigurationErrorAction
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction
   | toggleDraftSavedNotificationAction
@@ -287,7 +353,11 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
+  | ShowCreateUserDuplicateEmailErrorToast
+  | HideCreateUserDuplicateEmailErrorToast
   | ShowDuplicateRecordsToast
   | HideDuplicateRecordsToast
   | ShowUserReconnectedToastAction
   | HideUserReconnectedToastAction
+  | ShowUnassignedDeclarations
+  | HideUnassignedDeclarationsToast

@@ -6,33 +6,26 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   IDeclaration,
   SUBMISSION_STATUS,
   IPrintableDeclaration
 } from '@client/declarations'
-import {
-  BirthSection,
-  DeathSection,
-  IForm,
-  IFormSectionData,
-  MarriageSection
-} from '@client/forms'
+import { IFormSectionData } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 
-const getInformantEngName = (
+const getEngName = (
   sectionData: IFormSectionData,
   lastNameFirst: boolean
 ): string => {
@@ -41,68 +34,57 @@ const getInformantEngName = (
       sectionData.firstNamesEng ?? ''
     }`
   }
-  return `${sectionData.firstNamesEng ?? ''} ${sectionData.familyNameEng ?? ''}`
+  return [
+    sectionData.firstNamesEng,
+    sectionData.middleNameEng,
+    sectionData.familyNameEng
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
 }
 
-const getInformantOthreName = (sectionData: IFormSectionData): string => {
-  if (sectionData.firstNames) {
-    return `${sectionData.firstNames as string} ${
-      sectionData.familyName as string
-    }`
-  } else {
-    return sectionData.familyName as string
-  }
+const getOtherName = (sectionData: IFormSectionData): string => {
+  return [
+    sectionData.firstNames,
+    sectionData.middleName,
+    sectionData.familyName
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
 }
 
-const getInformantFullName = (
+const getFullName = (
   sectionData: IFormSectionData,
   language = 'en',
   lastNameFirst = false
 ): string => {
-  let fullName: string
   if (!sectionData) {
     return EMPTY_STRING
   }
   if (language === 'en') {
-    fullName = getInformantEngName(sectionData, lastNameFirst).trim()
-  } else {
-    if (sectionData.firstNames && sectionData.familyName) {
-      fullName = `${sectionData.firstNames as string} ${
-        sectionData.familyName as string
-      }`
-    } else {
-      fullName =
-        getInformantOthreName(sectionData) ||
-        getInformantEngName(sectionData, lastNameFirst).trim()
-    }
+    return getEngName(sectionData, lastNameFirst)
   }
-  return fullName
+  return getOtherName(sectionData) || getEngName(sectionData, lastNameFirst)
 }
 
 /*
  * lastNameFirst needs to be removed in #4464
  */
-export const getDraftInformantFullName = (
+export const getDeclarationFullName = (
   draft: IDeclaration,
   language?: string,
   lastNameFirst?: boolean
 ) => {
   switch (draft.event) {
     case Event.Birth:
-      return getInformantFullName(draft.data.child, language, lastNameFirst)
+      return getFullName(draft.data.child, language, lastNameFirst)
     case Event.Death:
-      return getInformantFullName(draft.data.deceased, language, lastNameFirst)
+      return getFullName(draft.data.deceased, language, lastNameFirst)
     case Event.Marriage:
-      const brideName = getInformantFullName(
-        draft.data.bride,
-        language,
-        lastNameFirst
-      )
-      const groomName = getInformantFullName(
-        draft.data.groom,
-        language,
-        lastNameFirst
-      )
+      const brideName = getFullName(draft.data.bride, language, lastNameFirst)
+      const groomName = getFullName(draft.data.groom, language, lastNameFirst)
       if (brideName && groomName) {
         return `${groomName} & ${brideName}`
       } else {
@@ -122,6 +104,8 @@ const transformBirthSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleNameEng:
+      data.childName?.find((name) => name?.use === 'en')?.middleName ?? '',
     familyNameEng:
       (data.childName &&
         data.childName
@@ -134,6 +118,8 @@ const transformBirthSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleName:
+      data.childName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     familyName:
       (data.childName &&
         data.childName
@@ -155,6 +141,8 @@ const transformDeathSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleNameEng:
+      data.deceasedName?.find((name) => name?.use === 'en')?.middleName ?? '',
     familyNameEng:
       (data.deceasedName &&
         data.deceasedName
@@ -167,6 +155,8 @@ const transformDeathSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    middleName:
+      data.deceasedName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     familyName:
       (data.deceasedName &&
         data.deceasedName
@@ -188,6 +178,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    brideMiddleNameEng:
+      data.brideName?.find((name) => name?.use === 'en')?.middleName ?? '',
     brideFamilyNameEng:
       (data.brideName &&
         data.brideName
@@ -200,6 +192,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    brideMiddleName:
+      data.brideName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     brideFamilyName:
       (data.brideName &&
         data.brideName
@@ -216,6 +210,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use === 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    groomMiddleNameEng:
+      data.groomName?.find((name) => name?.use === 'en')?.middleName ?? '',
     groomFamilyNameEng:
       (data.groomName &&
         data.groomName
@@ -228,6 +224,8 @@ const transformMarriageSearchQueryDataToDraft = (
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.firstNames)[0]) ||
       '',
+    groomMiddleName:
+      data.groomName?.find((name) => name?.use !== 'en')?.middleName ?? '',
     groomFamilyName:
       (data.groomName &&
         data.groomName
@@ -277,18 +275,6 @@ export const transformSearchQueryDataToDraft = (
   }
 
   return declaration
-}
-
-export const getAttachmentSectionKey = (declarationEvent: Event): string => {
-  switch (declarationEvent) {
-    case Event.Death:
-      return DeathSection.DeathDocuments
-    case Event.Birth:
-      return BirthSection.Documents
-    case Event.Marriage:
-    default:
-  }
-  return MarriageSection.Documents
 }
 
 export function isDeclarationInReadyToReviewStatus(

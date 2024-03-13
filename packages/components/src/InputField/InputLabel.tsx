@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -50,21 +49,23 @@ const Required = styled.span<
   flex-grow: 0;
 `
 
-export class InputLabel extends React.Component<IInputLabel> {
-  render() {
-    const { inputDescriptor, required, hideAsterisk, children, tooltip } =
-      this.props
-    return (
-      <StyledInputLabel data-tip={tooltip} {...this.props}>
-        {tooltip && <ReactTooltip />}
-        {children}
-        {required && !hideAsterisk && (
-          <Required disabled={this.props.disabled}>&nbsp;*</Required>
-        )}
-        {inputDescriptor && (
-          <InputDescriptor>{inputDescriptor}</InputDescriptor>
-        )}
-      </StyledInputLabel>
-    )
-  }
+export const InputLabel = (props: IInputLabel) => {
+  const {
+    inputDescriptor,
+    required,
+    hideAsterisk,
+    children,
+    tooltip,
+    disabled
+  } = props
+  return (
+    <StyledInputLabel data-tip={tooltip} {...props}>
+      {tooltip && <ReactTooltip />}
+      {children}
+      {required && !hideAsterisk && (
+        <Required disabled={disabled}>&nbsp;*</Required>
+      )}
+      {inputDescriptor && <InputDescriptor>{inputDescriptor}</InputDescriptor>}
+    </StyledInputLabel>
+  )
 }

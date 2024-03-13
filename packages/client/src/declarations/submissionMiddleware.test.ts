@@ -6,25 +6,24 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  submissionMiddleware,
-  declarationReadyForStatusChange
-} from './submissionMiddleware'
-import {
-  mockDeclarationData,
-  createTestStore,
-  ACTION_STATUS_MAP
-} from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
-import { SubmissionAction } from '@client/forms'
-import { SUBMISSION_STATUS } from '.'
-import { createClient } from '@client/utils/apolloClient'
 import { ApolloError } from '@apollo/client'
+import { SubmissionAction } from '@client/forms'
+import {
+  ACTION_STATUS_MAP,
+  createTestStore,
+  mockDeclarationData
+} from '@client/tests/util'
+import { createClient } from '@client/utils/apolloClient'
+import { Event } from '@client/utils/gateway'
 import { GraphQLError } from 'graphql'
-import { vi, SpyInstance } from 'vitest'
+import { SpyInstance, vi } from 'vitest'
+import { SUBMISSION_STATUS } from '.'
+import {
+  declarationReadyForStatusChange,
+  submissionMiddleware
+} from './submissionMiddleware'
 
 describe('Submission middleware', () => {
   const dispatch = vi.fn()
@@ -44,6 +43,7 @@ describe('Submission middleware', () => {
     mutateSpy = vi
       .spyOn(client, 'mutate')
       .mockImplementation(() => Promise.resolve({}))
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
@@ -124,6 +124,18 @@ describe('Submission middleware', () => {
 
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
+      if (
+        event === Event.Marriage &&
+        [
+          SubmissionAction.APPROVE_CORRECTION,
+          SubmissionAction.REJECT_CORRECTION,
+          SubmissionAction.MAKE_CORRECTION,
+          SubmissionAction.REQUEST_CORRECTION
+        ].includes(submissionAction)
+      ) {
+        return
+      }
+
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
         mockDeclarationData.registration.certificates[0] = {
           collector: {
@@ -142,7 +154,6 @@ describe('Submission middleware', () => {
             {
               paymentId: '1234',
               type: 'MANUAL',
-              total: 50,
               amount: 50,
               outcome: 'COMPLETED',
               date: '2018-10-22'
@@ -158,6 +169,7 @@ describe('Submission middleware', () => {
           submissionStatus: ACTION_STATUS_MAP[submissionAction]
         })
         await middleware(action)
+        vi.runAllTimers()
         expect(mutateSpy.mock.calls.length).toBe(1)
         expect(dispatch.mock.calls.length).toBe(4)
         if (

@@ -1,24 +1,27 @@
-FROM node:fermium-alpine
-WORKDIR /usr/src/app
+FROM node:hydrogen-alpine
 
-# Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
+WORKDIR /app
 
-# Install npm dependencies first (so they may be cached if dependencies don't change)
-COPY package.json package.json
-COPY packages/config/tsconfig.json packages/config/tsconfig.json
-COPY packages/config/package.json packages/config/package.json
-COPY packages/commons packages/commons
-COPY yarn.lock yarn.lock
-RUN yarn install --production
+RUN apk update && apk upgrade
 
-# Copy package build
-COPY --from=opencrvs-build /packages/config packages/config
+COPY . .
 
-# Copy dependant package(s) source
-COPY --from=opencrvs-build packages/commons packages/commons
+RUN rm -rf /app/packages/*
 
-EXPOSE 2021
-WORKDIR /usr/src/app/packages/config
+COPY packages/config /app/packages/config
+COPY packages/commons /app/packages/commons
+
+RUN yarn install
+
+WORKDIR /app/packages/commons
+RUN yarn build
+
+WORKDIR /app/packages/config
+RUN yarn build
+
+# FIXME: to be replaced later with whole build running as node
+RUN chown -R node:node /app
+
+USER node
 
 CMD yarn start:prod

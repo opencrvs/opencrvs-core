@@ -6,27 +6,25 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { RouterAction } from 'connected-react-router'
 import { ApolloQueryResult } from '@apollo/client'
 import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { NotificationEvent } from './serviceApi'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
   'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
-export const FETCH_USER_DETAILS = 'PROFILE/FETCH_USER_DETAILS' as const
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS' as const
 export const MODIFY_USER_DETAILS = 'PROFILE/MODIFY_USER_DETAILS' as const
 export const SET_INITIAL_USER_DETAILS =
   'PROFILE/SET_INITIAL_USER_DETAILS' as const
 export const GET_USER_DETAILS_SUCCESS =
   'PROFILE/GET_USER_DETAILS_SUCCESS' as const
-export const GET_USER_DETAILS_FAILED =
-  'PROFILE/GET_USER_DETAILS_FAILED' as const
+const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED' as const
 export const USER_DETAILS_AVAILABLE = 'PROFILE/USER_DETAILS_AVAILABLE' as const
 export const SEND_VERIFY_CODE = 'PROFILE/SEND_VERIFY_CODE' as const
 export const SEND_VERIFY_CODE_COMPLETED =
@@ -55,7 +53,14 @@ type ModifyUserDetailsAction = {
 type SendVerifyCode = {
   type: typeof SEND_VERIFY_CODE
   payload: {
-    phoneNumber: string
+    userFullName: {
+      use: string
+      family: string
+      given: string[]
+    }[]
+    notificationEvent: NotificationEvent
+    phoneNumber?: string
+    email?: string
   }
 }
 
@@ -64,8 +69,9 @@ type SendVerifyCodeSuccessAction = {
   payload: {
     userId: string
     nonce: string
-    mobile: string
     status: string
+    mobile?: string
+    email?: string
   }
 }
 
@@ -78,7 +84,7 @@ export type IGetStorageUserDetailsFailedAction = {
   type: typeof GET_USER_DETAILS_FAILED
 }
 
-export type ISetInitialUserDetails = {
+type ISetInitialUserDetails = {
   type: typeof SET_INITIAL_USER_DETAILS
 }
 
@@ -134,11 +140,23 @@ export const redirectToAuthentication = (
   }
 })
 
-export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {
+export const sendVerifyCode = (
+  userFullName: {
+    use: string
+    family: string
+    given: string[]
+  }[],
+  notificationEvent: NotificationEvent,
+  phoneNumber?: string,
+  email?: string
+): SendVerifyCode => {
   return {
     type: SEND_VERIFY_CODE,
     payload: {
-      phoneNumber
+      userFullName,
+      notificationEvent,
+      phoneNumber,
+      email
     }
   }
 }
@@ -146,8 +164,9 @@ export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {
 export const SendVerifyCodeSuccess = (payload: {
   userId: string
   nonce: string
-  mobile: string
   status: string
+  mobile?: string
+  email?: string
 }): SendVerifyCodeSuccessAction => {
   return {
     type: SEND_VERIFY_CODE_COMPLETED,

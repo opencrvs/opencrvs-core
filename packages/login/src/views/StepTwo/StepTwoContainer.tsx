@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -25,7 +24,7 @@ import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box } from '@login/../../components/lib/Box'
 import {
-  getResentSMS,
+  getResentAuthenticationCode,
   getStepOneDetails,
   getSubmissionError,
   getsubmitting,
@@ -36,6 +35,8 @@ import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
+import { NotificationEvent } from '@login/utils/authApi'
+import { maskEmail, maskString } from '@login/utils/authUtils'
 
 const FORM_NAME = 'STEP_TWO'
 
@@ -46,7 +47,7 @@ export function StepTwoContainer() {
   const submitting = useSelector(getsubmitting)
 
   const submissionError = useSelector(getSubmissionError)
-  const resentSMS = useSelector(getResentSMS)
+  const resentAuthenticationCode = useSelector(getResentAuthenticationCode)
 
   const stepOneDetails = useSelector(getStepOneDetails)
   const intl = useIntl()
@@ -57,27 +58,21 @@ export function StepTwoContainer() {
     if (appName) document.title = appName
   }, [appName])
 
-  const maskPercentage = 0.6
-  const numberLength = stepOneDetails.mobile.length
-  const unmaskedNumberLength =
-    numberLength - ceil(maskPercentage * numberLength)
-  const startForm = ceil(unmaskedNumberLength / 2)
-  const endBefore = unmaskedNumberLength - startForm
-  const mobileNumber = stepOneDetails.mobile.replace(
-    stepOneDetails.mobile.slice(
-      startForm,
-      stepOneDetails.mobile.length - endBefore
-    ),
-    '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
-  )
+  const mobileNumber =
+    stepOneDetails.mobile && maskString(stepOneDetails.mobile)
+  const emailAddress = stepOneDetails.email && maskEmail(stepOneDetails.email)
+
   const field = stepTwoFields.code
+  const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
+  const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
+
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
         <LogoContainer>
           <CountryLogo size="small" src={logo} />
         </LogoContainer>
-        {resentSMS ? (
+        {resentAuthenticationCode ? (
           <React.Fragment>
             <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
@@ -88,9 +83,14 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {intl.formatMessage(messages.resentSMS, {
-                number: mobileNumber
-              })}
+              {notificationMethod === 'sms' &&
+                intl.formatMessage(messages.resentSMS, {
+                  number: mobileNumber
+                })}
+              {notificationMethod === 'email' &&
+                intl.formatMessage(messages.resentEMAIL, {
+                  email: emailAddress
+                })}
             </Text>
           </React.Fragment>
         ) : (
@@ -105,9 +105,14 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {intl.formatMessage(messages.stepTwoInstruction, {
-                number: mobileNumber
-              })}
+              {notificationMethod === 'sms' &&
+                intl.formatMessage(messages.stepTwoInstructionSMS, {
+                  number: mobileNumber
+                })}
+              {notificationMethod === 'email' &&
+                intl.formatMessage(messages.stepTwoInstructionEMAIL, {
+                  email: emailAddress
+                })}
             </Text>
           </React.Fragment>
         )}
@@ -155,11 +160,13 @@ export function StepTwoContainer() {
                   type="tertiary"
                   onClick={(e) => {
                     e.preventDefault()
-                    dispatch(actions.resendSMS())
+                    dispatch(
+                      actions.resendAuthenticationCode(notificationEvent)
+                    )
                   }}
                   id="login-mobile-resend"
                 >
-                  {intl.formatMessage(messages.resend)}
+                  {intl.formatMessage(messages.resend, { notificationMethod })}
                 </Button>
               </Stack>
             </FormWrapper>

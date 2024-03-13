@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React, { useState } from 'react'
@@ -19,7 +18,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { Content, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -34,7 +33,6 @@ import { pick } from 'lodash'
 import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
-import { LocationType } from '@client/utils/gateway'
 import {
   getAccordionActiveStateMap,
   IBaseAdvancedSearchState,
@@ -45,7 +43,7 @@ import {
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
-export enum TabId {
+enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
@@ -111,7 +109,7 @@ const BirthSection = () => {
     )
   })
 
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -185,7 +183,7 @@ const BirthSection = () => {
           id={birthSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === 'HEALTH_FACILITY'
                 ? {
                     ...values,
                     eventCountry: '',
@@ -314,7 +312,7 @@ const DeathSection = () => {
       'death'
     )
   })
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -371,8 +369,7 @@ const DeathSection = () => {
             'deceasedDoB',
             'deceasedFirstNames',
             'deceasedFamilyName',
-            'deceasedGender',
-            'placeOfDeath'
+            'deceasedGender'
           ])}
         />
       </Accordion>
@@ -388,7 +385,7 @@ const DeathSection = () => {
           id={deathSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
-              values.eventLocationType === LocationType.HealthFacility
+              values.eventLocationType === 'HEALTH_FACILITY'
                 ? {
                     ...values,
                     eventCountry: '',

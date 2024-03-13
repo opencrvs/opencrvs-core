@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -29,7 +28,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
     outline: 0;
   }
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {
@@ -43,8 +42,4 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   }
 `
 
-export class TextArea extends React.Component<ITextAreaProps> {
-  render() {
-    return <StyledTextArea {...this.props} />
-  }
-}
+export const TextArea = (props: ITextAreaProps) => <StyledTextArea {...props} />

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -29,16 +28,14 @@ export default async function changePasswordHandler(
   h: Hapi.ResponseToolkit
 ) {
   const userUpdateData = request.payload as IChangePasswordPayload
-
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
+
   if (!user) {
     logger.error(
       `No user details found by given userid: ${userUpdateData.userId}`
     )
-    // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
   if (userUpdateData.existingPassword) {
     if (user.status !== statuses.ACTIVE) {
       logger.error(
@@ -58,6 +55,7 @@ export default async function changePasswordHandler(
       throw unauthorized()
     }
   }
+
   user.passwordHash = generateHash(userUpdateData.password, user.salt)
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
@@ -65,7 +63,7 @@ export default async function changePasswordHandler(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
-    await User.update({ _id: user._id }, user)
+    await User.updateOne({ _id: user._id }, user)
   } catch (err) {
     logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo

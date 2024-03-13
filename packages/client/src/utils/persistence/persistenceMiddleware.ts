@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
 import { IStoreState } from '@client/store'
@@ -25,10 +24,9 @@ import {
   NATL_ADMIN_ROLES
 } from '@client/utils/constants'
 import { client } from '@client/utils/apolloClient'
-import { READY } from '@client/offline/actions'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { QueryOptions } from '@apollo/client'
+import { QueryOptions } from '@apollo/client/core'
 
 const isUserOfNationalScope = (userDetails: UserDetails) =>
   [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
@@ -92,7 +90,7 @@ function getQueriesToPrefetch(
 export const persistenceMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
-  async (action: Action) => {
+  (action: Action) => {
     next(action)
     if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
@@ -107,22 +105,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
           officeSelected
         )
         for (const query of queriesToPrefetch) {
-          await client.query(query)
-        }
-      }
-    } else if (action.type === READY) {
-      const { locations } = getState().offline.offlineData
-      const userDetails = getState().profile.userDetails
-      if (!isFieldAgent(userDetails!)) {
-        const stateIds = Object.values(locations!)
-          .filter((location) => location.partOf === 'Location/0')
-          .map((location) => location.id)
-
-        for (const stateId of stateIds) {
-          const queriesToPrefetch = getQueriesToPrefetch(stateId, false)
-          for (const query of queriesToPrefetch) {
-            await client.query(query)
-          }
+          client.query(query)
         }
       }
     }

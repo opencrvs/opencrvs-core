@@ -7,8 +7,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import React from 'react'
@@ -18,10 +17,11 @@ import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
 import { goBack, goToPerformanceHome } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
 import { useLocation } from 'react-router'
+import { constantsMessages } from '@client/i18n/messages'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -82,7 +82,9 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
             mobileTitle={title}
           />
         }
-        skipToContentText="Skip to main content"
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         {window.config && url ? (
           <StyledIFrame

@@ -6,11 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import {
   SuccessButton,
@@ -23,11 +22,11 @@ import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { identityNameMapper } from '@client/forms/identity'
 import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { identityNameMapper } from '@client/forms/certificate/fieldDefinitions/messages'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -47,6 +46,7 @@ export interface ICollectorInfo {
   familyName: string
   birthDate?: string
   nationality: string
+  age?: string
 }
 
 const Container = styled.div`
@@ -117,18 +117,31 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        <LabelValuePair
-          label={intl.formatMessage(certificateMessages.familyName)}
-          value={String(collectorInformation.familyName)}
-        />
+        {collectorInformation.familyName && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.familyName)}
+            value={String(collectorInformation.familyName)}
+          />
+        )}
 
-        {collectorInformation.birthDate && (
+        {
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(
-              collectorInformation.birthDate as string,
-              intl.locale
-            )}
+            value={
+              collectorInformation.birthDate
+                ? formatLongDate(
+                    collectorInformation.birthDate as string,
+                    intl.locale
+                  )
+                : '-'
+            }
+          />
+        }
+
+        {collectorInformation.age && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.age)}
+            value={String(collectorInformation.age as string)}
           />
         )}
 
@@ -155,7 +168,7 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <div id={id}>
-        <Content title={this.props.title}>
+        <Content title={this.props.title} showTitleOnMobile>
           <Container>{this.renderLabelValue()}</Container>
           <ActionContainer>
             <SuccessButton

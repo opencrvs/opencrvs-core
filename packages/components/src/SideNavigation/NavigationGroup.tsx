@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -17,11 +16,8 @@ export interface INavigationGroup
   extends React.HTMLAttributes<HTMLDivElement> {}
 
 const NavigationGroupContainer = styled.div`
-  padding: 8px 0px;
-  box-shadow: 0px 16px 1px -16px ${({ theme }) => theme.colors.grey400};
-  &:last-child {
-    box-shadow: none;
-  }
+  padding: 6px;
+  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
 `
 
 interface IProps {

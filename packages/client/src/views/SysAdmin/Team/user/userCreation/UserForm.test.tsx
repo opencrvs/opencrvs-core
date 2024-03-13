@@ -6,10 +6,9 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
@@ -22,6 +21,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
+import * as builtInValidators from '@client/utils/validate'
 
 const { store, history } = createStore()
 
@@ -33,11 +33,16 @@ describe('Create new user page tests', () => {
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(
-          mockOfflineData.forms.userForm.sections[0]
+          mockOfflineData.userForms.sections[0],
+          // Needs to be casted as any as there are non-validator functions in the import
+          builtInValidators as Record<string, any>
         )}
         activeGroup={
-          deserializeFormSection(mockOfflineData.forms.userForm.sections[0])
-            .groups[0]
+          deserializeFormSection(
+            mockOfflineData.userForms.sections[0],
+            // Needs to be casted as any as there are non-validator functions in the import
+            builtInValidators as Record<string, any>
+          ).groups[0]
         }
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"

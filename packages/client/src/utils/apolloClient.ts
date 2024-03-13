@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   ApolloClient,
@@ -19,7 +18,6 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { resolve } from 'url'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
@@ -30,7 +28,11 @@ import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import localforage from 'localforage'
-import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
+import {
+  createPersistLink,
+  persistenceMapper,
+  clearOldCacheEntries
+} from '@client/utils/persistence'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -39,7 +41,7 @@ export const createClient = (
   restoredCache?: InMemoryCache
 ) => {
   const httpLink = createHttpLink({
-    uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
+    uri: new URL('graphql', window.config.API_GATEWAY_URL).toString()
   })
 
   const authLink = setContext((_, { headers }) => {
@@ -64,8 +66,6 @@ export const createClient = (
         error.graphQLErrors[0].extensions.code === 'UNAUTHENTICATED')
     ) {
       store.dispatch(showSessionExpireConfirmation())
-    } else if (error.graphQLErrors?.[0]?.extensions?.code === 'UNASSIGNED') {
-      return error.forward(error.operation)
     } else {
       Sentry.captureException(error)
     }
@@ -114,6 +114,7 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
       const { client, persistor } = await createPersistentClient(store)
       setPersistor(persistor)
       setClient(client)
+      clearOldCacheEntries(client.cache)
     }
 
     // skipping the persistent client in tests for now

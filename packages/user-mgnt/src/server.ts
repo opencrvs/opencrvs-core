@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -21,6 +20,8 @@ import getPlugins from '@user-mgnt/config/plugins'
 import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
 import { getRoutes } from '@user-mgnt/config/routes'
+import { logger } from '@user-mgnt/logger'
+import { badRequest, Boom } from '@hapi/boom'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -30,6 +31,19 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
+      validate: {
+        failAction: async (_, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`ValidationError: ${err.message}`)
+            throw badRequest(`Invalid request payload input`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(err.message)
+            throw err
+          }
+        }
+      },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })

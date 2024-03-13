@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { model, Schema, Document } from 'mongoose'
-import { statuses, types } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
+import { integratingSystemTypes, types } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
@@ -28,7 +28,7 @@ export interface ISystem {
     webhook: WebHook[]
   }
   creationDate?: number
-  type: string
+  type: keyof typeof types
 }
 
 export enum EventType {
@@ -79,6 +79,10 @@ const systemSchema = new Schema({
   type: {
     type: String,
     enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH, types.WEBHOOK]
+  },
+  integratingSystemType: {
+    type: String,
+    enum: [integratingSystemTypes.MOSIP, integratingSystemTypes.OTHER]
   }
 })
 

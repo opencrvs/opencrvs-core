@@ -1,25 +1,27 @@
-FROM node:fermium-alpine
+FROM node:hydrogen-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
+RUN apk update && apk upgrade
 
-# Install npm dependencies first (so they may be cached if dependencies don't change)
-COPY package.json package.json
-COPY packages/notification/tsconfig.json packages/notification/tsconfig.json
-COPY packages/notification/package.json packages/notification/package.json
-COPY packages/commons packages/commons
-COPY yarn.lock yarn.lock
-RUN yarn install --production
+COPY . .
 
-# Copy package build
-COPY --from=opencrvs-build packages/notification/build packages/notification/build
+RUN rm -rf /app/packages/*
 
-# Copy dependant package(s) source
-COPY --from=opencrvs-build packages/commons packages/commons
+COPY packages/notification /app/packages/notification
+COPY packages/commons /app/packages/commons
 
-EXPOSE 2020
-WORKDIR /usr/src/app/packages/notification
+RUN yarn install
+
+WORKDIR /app/packages/commons
+RUN yarn build
+
+WORKDIR /app/packages/notification
+RUN yarn build
+
+# FIXME: to be replaced later with whole build running as node
+RUN chown -R node:node /app
+
+USER node
 
 CMD yarn start:prod

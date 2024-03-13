@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   mockOfflineData,
@@ -19,7 +18,6 @@ import {
   getJurisidictionType,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-import { LocationType } from '@client/offline/reducer'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
 
@@ -33,6 +31,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -42,6 +41,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
@@ -51,12 +51,13 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
           }
         },
-        LocationType.ADMIN_STRUCTURE,
+        'ADMIN_STRUCTURE',
         {
           locationLevel: 'partOf',
           locationId: 'Location/123'
@@ -76,6 +77,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -85,6 +87,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/321'
@@ -94,12 +97,13 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
           }
         },
-        LocationType.CRVS_OFFICE,
+        'CRVS_OFFICE',
         {
           locationLevel: 'partOf'
         }
@@ -116,7 +120,7 @@ describe('locationUtil tests', () => {
       const locations = mockOfflineData.locations
       const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
 
-      expect(getJurisidictionType(locations, locationId)).toEqual('DIVISION')
+      expect(getJurisidictionType(locations, locationId)).toEqual('STATE')
     })
   })
 
@@ -163,8 +167,8 @@ describe('locationUtil tests', () => {
 
       const map = getLocationNameMapOfFacility(facilityLocation, locations)
       expect(map).toEqual({
-        DISTRICT: 'Abwe',
-        STATE: 'Central',
+        district: 'Abwe',
+        state: 'Central',
         country: {
           defaultMessage: 'Bangladesh',
           description: 'ISO Country: BGD',

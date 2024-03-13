@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Content } from '@opencrvs/components/lib'
 import {
@@ -15,136 +14,39 @@ import {
   IPrintableDeclaration,
   modifyDeclaration
 } from '@client/declarations'
-import {
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  IFormField,
-  SELECT_WITH_OPTIONS,
-  TEXT
-} from '@client/forms'
-import {
-  identityHelperTextMapper,
-  identityNameMapper,
-  identityOptions,
-  identityTypeMapper
-} from '@client/forms/identity'
-import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
-import { conditionals } from '@client/forms/utils'
-import { formMessages } from '@client/i18n/messages/form'
-import { validIDNumber } from '@client/utils/validate'
+import { IFormField } from '@client/forms'
 import React from 'react'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import { FormFieldGenerator } from '@client/components/form'
 import { useDispatch } from 'react-redux'
-import {
-  goToIssueCertificatePayment,
-  goToVerifyCollector,
-  goToVerifyIssueCollector
-} from '@client/navigation'
+import { formatUrl, goToIssueCertificatePayment } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import {
+  collectBirthCertificateFormSection,
+  collectDeathCertificateFormSection,
+  collectMarriageCertificateFormSection
+} from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { Event } from '@client/utils/gateway'
+import { Redirect } from 'react-router'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
-const fields: IFormField[] = [
-  {
-    name: 'iDType',
-    type: SELECT_WITH_OPTIONS,
-    label: formMessages.typeOfId,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ],
-    placeholder: formMessages.select,
-    options: identityOptions
-  },
-  {
-    name: 'iDTypeOther',
-    type: TEXT,
-    label: formMessages.iDTypeOtherLabel,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ],
-    conditionals: [conditionals.iDType]
-  },
-  {
-    name: 'iD',
-    type: FIELD_WITH_DYNAMIC_DEFINITIONS,
-    dynamicDefinitions: {
-      label: {
-        dependency: 'iDType',
-        labelMapper: identityNameMapper
-      },
-      helperText: {
-        dependency: 'iDType',
-        helperTextMapper: identityHelperTextMapper
-      },
-      type: {
-        kind: 'dynamic',
-        dependency: 'iDType',
-        typeMapper: identityTypeMapper
-      },
-      validate: [
-        {
-          validator: validIDNumber,
-          dependencies: ['iDType']
-        }
-      ]
-    },
-    label: formMessages.iD,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ],
-    conditionals: [conditionals.iDAvailable]
-  },
-  {
-    name: 'firstName',
-    type: TEXT,
-    label: formMessages.firstName,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ]
-  },
-  {
-    name: 'lastName',
-    type: TEXT,
-    label: formMessages.lastName,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ]
-  },
-  {
-    name: 'relationship',
-    type: TEXT,
-    label: formMessages.informantsRelationWithChild,
-    required: true,
-    initialValue: '',
-    validate: [
-      fieldValidationDescriptorToValidationFunction({
-        operation: 'requiredBasic'
-      })
-    ]
-  }
-]
+function collectorFormFieldsForOthers(event: Event) {
+  const collectCertFormSection =
+    event === Event.Birth
+      ? collectBirthCertificateFormSection
+      : event === Event.Death
+      ? collectDeathCertificateFormSection
+      : collectMarriageCertificateFormSection
+
+  return collectCertFormSection.groups.find(
+    (group) => group.id === 'otherCertCollector'
+  )!.fields
+}
 
 export const IssueCollectorFormForOthers = ({
   declaration
@@ -154,6 +56,7 @@ export const IssueCollectorFormForOthers = ({
   const intl = useIntl()
   const dispatch = useDispatch()
 
+  const fields: IFormField[] = collectorFormFieldsForOthers(declaration.event)
   const handleChange = (
     sectionData: ICertificate['collector'],
     declaration: IPrintableDeclaration
@@ -181,6 +84,17 @@ export const IssueCollectorFormForOthers = ({
     )
   }
 
+  if (!declaration) {
+    return (
+      <Redirect
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToIssue,
+          selectorId: ''
+        })}
+      />
+    )
+  }
+
   function continueButtonHandler() {
     const event = declaration.event
     dispatch(goToIssueCertificatePayment(declaration.id, event))
@@ -191,6 +105,7 @@ export const IssueCollectorFormForOthers = ({
       title={intl.formatMessage(issueMessages.collectorDetails)}
       bottomActionButtons={[
         <PrimaryButton
+          key="continue-button"
           id="continue-button"
           onClick={continueButtonHandler}
           disabled={groupHasError(
@@ -201,9 +116,11 @@ export const IssueCollectorFormForOthers = ({
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
+      showTitleOnMobile
     >
       <FormFieldGenerator
         id="otherCollector"
+        key="otherCollector"
         onChange={(values) => {
           handleChange(values, declaration)
         }}

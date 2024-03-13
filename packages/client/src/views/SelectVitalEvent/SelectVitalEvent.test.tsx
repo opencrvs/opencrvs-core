@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
@@ -37,11 +36,13 @@ describe('when user is selecting the vital event', () => {
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app.find('#select_birth_event').hostNodes().simulate('change')
-
         app.find('#continue').hostNodes().simulate('click')
+        app.update()
       })
-      it('takes user to the event info view', () => {
-        expect(app.find('#birth-info-container').hostNodes()).toHaveLength(1)
+      it('takes user to the event info view', async () => {
+        expect(app.find('#content-name').hostNodes().first().text()).toBe(
+          'Introduce the birth registration process to the informant'
+        )
       })
     })
 
@@ -66,7 +67,7 @@ describe('when user is selecting the vital event', () => {
 
     describe('when clicked on cross button', () => {
       beforeEach(async () => {
-        app.find('#crcl-btn').hostNodes().simulate('click')
+        app.find('#goBack').hostNodes().simulate('click')
         await flushPromises()
         app.update()
       })

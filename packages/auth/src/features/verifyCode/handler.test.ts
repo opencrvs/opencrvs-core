@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServerWithEnvironment } from '@auth/tests/util'
 
@@ -27,10 +26,18 @@ describe('authenticate handler receives a request', () => {
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
+        name: [
+          {
+            use: 'en',
+            family: 'Anik',
+            given: ['Sadman']
+          }
+        ],
         userId: '1',
         scope: ['admin'],
         status: 'active',
-        mobile: '+345345343'
+        mobile: '+345345343',
+        email: 'test@test.org'
       })
 
       const authRes = await server.server.inject({
@@ -41,13 +48,13 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
-      const smsCode = codeSpy.mock.calls[0][1]
+      const authCode = codeSpy.mock.calls[0][0]
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: smsCode
+          code: authCode
         }
       })
       expect(res.result.token.split('.')).toHaveLength(3)

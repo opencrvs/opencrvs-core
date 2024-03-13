@@ -6,13 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 9090
 export const ES_HOST = process.env.ES_HOST || 'localhost:9200'
-export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
@@ -25,3 +24,6 @@ export const DEFAULT_TIMEOUT = 600000
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 
 export const FLAGGED_AS_POTENTIAL_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/flaggedAsPotentialDuplicate`
+
+export const HEARTH_MONGO_URL =
+  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'

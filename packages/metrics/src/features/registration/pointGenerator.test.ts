@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   generateBirthRegPoint,
@@ -314,7 +313,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.NEW_DEC
+      Events.READY_FOR_REVIEW
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -342,7 +341,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.REQUEST_FOR_REGISTRAR_VALIDATION
+      Events.VALIDATED
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -370,7 +369,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      Events.WAITING_EXTERNAL_VALIDATION
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -395,7 +394,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.IN_PROGRESS_DEC
+      Events.INCOMPLETE
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -427,7 +426,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(payload),
       AUTH_HEADER,
-      Events.IN_PROGRESS_DEC
+      Events.INCOMPLETE
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -446,7 +445,7 @@ describe('Verify point generation', () => {
   })
   it('returns rejected point', async () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const payload = require('./test-data/rejected.json')
+    const payload = require('./test-data/sent-for-updates-request.json')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
 

@@ -6,17 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { IStoreState } from '@opencrvs/client/src/store'
-import {
-  Section,
-  IFormSection,
-  DeathSection,
-  BirthSection
-} from '@client/forms'
+import { Section, IFormSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 
 const getPartialState = (state: IStoreState): IRegisterFormState =>
@@ -51,7 +45,7 @@ export const getEventRegisterForm = (state: IStoreState, event: Event) => {
 
 export const getRegisterFormSection = (
   state: IStoreState,
-  key: Section,
+  key: Section | string,
   event: Event
 ): IFormSection => {
   const eventRegisterForm = getEventRegisterForm(state, event)
@@ -69,10 +63,16 @@ export const getRegisterFormSection = (
   return section
 }
 
-export const getBirthSection = (state: IStoreState, section: BirthSection) => {
+export const getBirthSection = (
+  state: IStoreState,
+  section: Section | string
+) => {
   return getRegisterFormSection(state, section, Event.Birth)
 }
 
-export const getDeathSection = (state: IStoreState, section: DeathSection) => {
+export const getDeathSection = (
+  state: IStoreState,
+  section: Section | string
+) => {
   return getRegisterFormSection(state, section, Event.Death)
 }

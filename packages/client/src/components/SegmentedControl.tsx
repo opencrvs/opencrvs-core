@@ -6,10 +6,9 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ISelect2Props } from '@opencrvs/components/lib/Select/Select2'
 import React from 'react'
 import { IPerformanceSelectOption } from '@client/views/SysAdmin/Performance/PerformanceSelect'

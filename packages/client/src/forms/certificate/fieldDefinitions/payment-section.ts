@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   ViewType,
@@ -33,7 +32,7 @@ export const paymentFormSection: IFormSection = {
           label: messages.paymentMethod,
           initialValue: 'MANUAL',
           required: true,
-          validate: [],
+          validator: [],
           options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]
         },
         {
@@ -41,14 +40,14 @@ export const paymentFormSection: IFormSection = {
           type: PARAGRAPH,
           label: messages.collectPayment,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'service',
           type: PARAGRAPH,
           label: messages.service,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'paymentAmount',
@@ -57,7 +56,7 @@ export const paymentFormSection: IFormSection = {
           initialValue: '',
           fontVariant: 'h1',
           required: false,
-          validate: []
+          validator: []
         }
       ]
     }

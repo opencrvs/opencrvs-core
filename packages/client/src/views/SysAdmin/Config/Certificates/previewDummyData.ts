@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gqlToDraftTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
@@ -398,7 +397,7 @@ const dummyBirthRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:19:25.860+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -408,6 +407,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -443,6 +446,9 @@ const dummyBirthRegistrationResponse = {
       comments: [],
       input: [],
       output: [],
+      signature: {
+        data: signatureImage
+      },
       certificates: null,
       __typename: 'History'
     },
@@ -1112,6 +1118,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1135,8 +1145,8 @@ const dummyBirthRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1357,7 +1367,7 @@ const dummyDeathRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:30:51.727+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -1367,6 +1377,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1402,6 +1416,9 @@ const dummyDeathRegistrationResponse = {
       comments: [],
       input: [],
       output: [],
+      signature: {
+        data: signatureImage
+      },
       certificates: null,
       __typename: 'History'
     },
@@ -1471,6 +1488,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1494,8 +1515,8 @@ const dummyDeathRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1892,6 +1913,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
@@ -1903,6 +1925,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Abwe',
       alias: 'Abwe',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -1913,6 +1936,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Ibombo',
       alias: 'Ibombo',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -1923,6 +1947,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Central',
       alias: 'Central',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',

@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   injectIntl,
   WrappedComponentProps as IntlShapeProps,
@@ -21,6 +20,7 @@ import {
   IToggleMenuItem,
   ToggleMenu
 } from '@opencrvs/components/lib/ToggleMenu'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
@@ -35,13 +35,13 @@ import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4};
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 `
 
 const UserRole = styled.div`
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg12};
-  margin-bottom: 4px;
+  ${({ theme }) => theme.fonts.reg14};
+  margin-bottom: 6px;
 `
 
 interface IProps {
@@ -61,12 +61,12 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
-      icon: <SettingsBlack />,
+      icon: <Icon name="Gear" size="small" />,
       label: intl.formatMessage(buttonMessages.settings),
       handler: this.props.goToSettings
     })
     items.push({
-      icon: <LogoutBlack />,
+      icon: <Icon name="SignOut" size="small" />,
       label: intl.formatMessage(buttonMessages.logout),
       handler: () => this.props.redirectToAuthentication()
     })

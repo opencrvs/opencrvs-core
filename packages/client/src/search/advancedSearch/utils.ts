@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
@@ -25,10 +24,9 @@ import {
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { IntlShape } from 'react-intl'
-import { LocationType, RegStatus } from '@client/utils/gateway'
+import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import format from '@client/utils/date-formatting'
 import { ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
 
@@ -181,7 +179,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     }
   }
 
-  if (localState.eventLocationType === LocationType.HealthFacility) {
+  if (localState.eventLocationType === 'HEALTH_FACILITY') {
     eventLocationId = localState.eventLocationId
     eventCountry = ''
     eventLocationLevel1 = ''
@@ -329,12 +327,12 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   localState.eventCountry = ''
   localState.eventLocationType = ''
   if (reduxState.eventLocationId) {
-    localState.eventLocationType = LocationType.HealthFacility
+    localState.eventLocationType = 'HEALTH_FACILITY'
     localState.eventLocationId = reduxState.eventLocationId
   }
 
   if (reduxState.eventCountry) {
-    localState.eventLocationType = LocationType.PrivateHome
+    localState.eventLocationType = 'PRIVATE_HOME'
     localState.eventCountry = reduxState.eventCountry
     localState.eventLocationLevel1 = reduxState.eventLocationLevel1 || ''
     localState.eventLocationLevel2 = reduxState.eventLocationLevel2 || ''
@@ -456,7 +454,7 @@ export const getAccordionActiveStateMap = (
   }
 }
 
-export const determineDateFromDateRangePickerVal = (
+const determineDateFromDateRangePickerVal = (
   dateRangePickerValue?: IDateRangePickerValue
 ): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
   if (!dateRangePickerValue) {
@@ -478,7 +476,7 @@ export const determineDateFromDateRangePickerVal = (
   return value
 }
 
-export const convertDateValuesToDateRangePicker = (
+const convertDateValuesToDateRangePicker = (
   exact?: string,
   rangeStart?: string,
   rangeEnd?: string
@@ -576,7 +574,7 @@ const getLabelForRegistrationStatus = (
     WAITING_VALIDATION: [RegStatus.WaitingValidation]
   }
 
-  const statusType = Object.keys(statusLabelMapping).find((key, i) => {
+  const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
@@ -615,7 +613,7 @@ const getLabelForRegistrationStatus = (
   ]
 
   const formattedLabel =
-    forMattedStatusList.find((e, i) => statusType === e.value)?.label ||
+    forMattedStatusList.find((e) => statusType === e.value)?.label ||
     statusList[0]
 
   return formattedLabel
@@ -630,8 +628,8 @@ const formatDateRangeLabel = (
     return
   }
   const dateStartLocale =
-    rangeStart && format(new Date(rangeStart), 'MMMM yyyy')
-  const dateEndLocale = rangeEnd && format(new Date(rangeEnd), 'MMMM yyyy')
+    rangeStart && formatDate(new Date(rangeStart), 'MMMM yyyy')
+  const dateEndLocale = rangeEnd && formatDate(new Date(rangeEnd), 'MMMM yyyy')
 
   return intl.formatMessage(formMessages.dateRangePickerCheckboxLabel, {
     rangeStart: dateStartLocale,

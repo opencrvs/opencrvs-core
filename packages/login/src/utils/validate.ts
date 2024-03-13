@@ -6,12 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
 import { PrimitiveType } from 'intl-messageformat'
 import { messages } from '@login/i18n/messages/validations'
+import { validate as validateEmail } from 'email-validator'
 export interface IValidationResult {
   message: MessageDescriptor
   props?: { [key: string]: PrimitiveType }
@@ -22,6 +22,9 @@ export type Validation = (value: string) => IValidationResult | undefined
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
+}
+export const isAValidEmailAddressFormat = (value: string): boolean => {
+  return validateEmail(value)
 }
 
 export const requiredSymbol: Validation = (value: string) =>
@@ -52,5 +55,18 @@ export const phoneNumberFormat: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.phoneNumberFormat
+      }
+}
+
+export const emailAddressFormat: Validation = (value: string) => {
+  const cast = value as string
+  if (!cast) {
+    return
+  }
+
+  return cast && isAValidEmailAddressFormat(cast)
+    ? undefined
+    : {
+        message: messages.emailAddressFormat
       }
 }

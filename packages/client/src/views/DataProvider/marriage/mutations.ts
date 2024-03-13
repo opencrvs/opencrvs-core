@@ -6,14 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
-import { REQUEST_MARRIAGE_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 
-export const SUBMIT_MARRIAGE_DECLARATION = gql`
+const SUBMIT_MARRIAGE_DECLARATION = gql`
   mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
     createMarriageRegistration(details: $details) {
       trackingId
@@ -21,7 +20,7 @@ export const SUBMIT_MARRIAGE_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_MARRIAGE_DECLARATION = gql`
+const APPROVE_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsValidated(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -29,50 +28,15 @@ export const APPROVE_MARRIAGE_DECLARATION = gql`
     markMarriageAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_MARRIAGE_DECLARATION = gql`
+const REGISTER_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsRegistered(
     $id: ID!
     $details: MarriageRegistrationInput!
   ) {
-    markMarriageAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markMarriageAsRegistered(id: $id, details: $details)
   }
 `
-export const REJECT_MARRIAGE_DECLARATION = gql`
+const REJECT_MARRIAGE_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -82,7 +46,7 @@ export const REJECT_MARRIAGE_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_MARRIAGE_DECLARATION = gql`
+const ARCHIVE_MARRIAGE_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -98,7 +62,7 @@ export const ARCHIVE_MARRIAGE_DECLARATION = gql`
   }
 `
 
-export const COLLECT_MARRIAGE_CERTIFICATE = gql`
+const COLLECT_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsCertified(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -107,13 +71,7 @@ export const COLLECT_MARRIAGE_CERTIFICATE = gql`
   }
 `
 
-export const MARK_EVENT_UNASSIGNED = gql`
-  mutation submitMutation($id: String!) {
-    markEventAsUnassigned(id: $id)
-  }
-`
-
-export const ISSUE_MARRIAGE_CERTIFICATE = gql`
+const ISSUE_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsIssued(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -139,7 +97,7 @@ export function getMarriageMutation(action: SubmissionAction) {
       return COLLECT_MARRIAGE_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_MARRIAGE_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_MARRIAGE_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return REQUEST_REG_CORRECTION
   }
 }

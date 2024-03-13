@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Area } from 'react-easy-crop/types'
 import {
@@ -116,4 +115,22 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
     type: 'image/jpeg',
     data: canvas.toDataURL('image/jpeg')
   }
+}
+
+export async function fetchImageAsBase64(url: string): Promise<string> {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  const mimeType =
+    response.headers.get('Content-Type') || 'application/octet-stream'
+
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = reader.result as string
+      const dataUrl = `data:${mimeType};base64,${base64}`
+      resolve(dataUrl)
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
 }

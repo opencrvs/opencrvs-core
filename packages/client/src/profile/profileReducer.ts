@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@client/profile/profileActions'
@@ -220,8 +219,8 @@ export const profileReducer: LoopReducer<
         )
       }
     case actions.SEND_VERIFY_CODE:
-      const sendVerifyCodeDetails = action.payload
-      if (state.tokenPayload && sendVerifyCodeDetails) {
+      const { notificationEvent, phoneNumber, email } = action.payload
+      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
         return loop(
           {
             ...state

@@ -6,13 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import {
+  IntlShape,
+  MessageDescriptor,
+  createIntl,
+  createIntlCache
+} from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
+import {
+  AdminStructure,
+  ILocation,
+  IOfflineData
+} from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -21,12 +29,20 @@ import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
+import { IStoreState } from '@client/store'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import isValid from 'date-fns/isValid'
+import format from 'date-fns/format'
+import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 
+type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
   obj: Record<string, unknown>
 ): obj is MessageDescriptor & Record<string, string> {
   return (
+    obj !== null &&
     obj.hasOwnProperty('id') &&
     obj.hasOwnProperty('defaultMessage') &&
     typeof (obj as MessageDescriptor).id === 'string' &&
@@ -35,15 +51,17 @@ function isMessageDescriptor(
 }
 
 export function formatAllNonStringValues(
-  templateData: Record<string, string | MessageDescriptor | Array<string>>
+  templateData: Record<string, TemplateDataType>,
+  intl: IntlShape
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
     if (
       typeof templateData[key] === 'object' &&
       isMessageDescriptor(templateData[key] as Record<string, unknown>)
     ) {
-      templateData[key] = (templateData[key] as MessageDescriptor)
-        .defaultMessage as string
+      templateData[key] = intl.formatMessage(
+        templateData[key] as MessageDescriptor
+      )
     } else if (Array.isArray(templateData[key])) {
       // For address field, country label is a MessageDescriptor
       // but state, province is string
@@ -53,20 +71,138 @@ export function formatAllNonStringValues(
         .filter(Boolean)
         .map((item) =>
           isMessageDescriptor(item as Record<string, unknown>)
-            ? (item as MessageDescriptor).defaultMessage
+            ? intl.formatMessage(item as MessageDescriptor)
             : item
         )
         .join(', ')
+    } else if (
+      typeof templateData[key] === 'object' &&
+      templateData[key] !== null
+    ) {
+      templateData[key] = formatAllNonStringValues(
+        templateData[key] as Record<string, TemplateDataType>,
+        intl
+      )
     }
   }
   return templateData as Record<string, string>
 }
+
+const cache = createIntlCache()
+
 export function executeHandlebarsTemplate(
   templateString: string,
-  data: Record<string, any> = {}
+  data: Record<string, any> = {},
+  state: IStoreState
 ): string {
+  const intl = createIntl(
+    {
+      locale: state.i18n.language,
+      messages: state.i18n.messages
+    },
+    cache
+  )
+
+  const customHelpers = getHandlebarHelpers()
+
+  for (const helperName of Object.keys(customHelpers)) {
+    /*
+     * Note for anyone adding new context variables to handlebar helpers:
+     * Everything you expose to country config's here will become API surface area,
+     * This means that countries will become dependant on it and it will be hard to remove or rename later on.
+     * If you need to expose the full record, please consider only exposing the specific values you know are needed.
+     * Otherwise what happens is that we lose the ability to refactor and remove things later on.
+     */
+    const helper = customHelpers[helperName]({ intl })
+    Handlebars.registerHelper(helperName, helper)
+  }
+
+  Handlebars.registerHelper(
+    'intl',
+    function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
+      // If even one of the parts is undefined, then return empty string
+      const idParts = args.slice(0, -1)
+      if (idParts.some((part) => part === undefined)) {
+        return ''
+      }
+
+      const id = idParts.join('.')
+
+      return intl.formatMessage({
+        id,
+        defaultMessage: 'Missing translation for ' + id
+      })
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  Handlebars.registerHelper(
+    'ifCond',
+    function (
+      this: any,
+      v1: string,
+      operator: string,
+      v2: string,
+      options: Handlebars.HelperOptions
+    ) {
+      switch (operator) {
+        case '===':
+          return v1 === v2 ? options.fn(this) : options.inverse(this)
+        case '!==':
+          return v1 !== v2 ? options.fn(this) : options.inverse(this)
+        case '<':
+          return v1 < v2 ? options.fn(this) : options.inverse(this)
+        case '<=':
+          return v1 <= v2 ? options.fn(this) : options.inverse(this)
+        case '>':
+          return v1 > v2 ? options.fn(this) : options.inverse(this)
+        case '>=':
+          return v1 >= v2 ? options.fn(this) : options.inverse(this)
+        case '&&':
+          return v1 && v2 ? options.fn(this) : options.inverse(this)
+        case '||':
+          return v1 || v2 ? options.fn(this) : options.inverse(this)
+        default:
+          return options.inverse(this)
+      }
+    }
+  )
+
+  Handlebars.registerHelper(
+    'formatDate',
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'location',
+    function (this: any, locationId: string | undefined, key: keyof ILocation) {
+      const offlineData = getOfflineData(state)
+
+      if (!locationId) {
+        return ''
+      }
+
+      if (!['name', 'alias'].includes(key)) {
+        return `Unknown property ${key}`
+      }
+
+      const location: AdminStructure | undefined =
+        offlineData.locations[locationId] ??
+        offlineData.facilities[locationId] ??
+        offlineData.offices[locationId]
+
+      const fallback = import.meta.env.DEV
+        ? `Missing location for id: ${locationId}`
+        : locationId
+
+      return location?.[key] ?? fallback
+    }
+  )
+
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data)
+  const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
   return output
 }
@@ -77,6 +213,7 @@ export async function previewCertificate(
   userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
+  state: IStoreState,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'
 ) {
@@ -84,8 +221,8 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+  createPDF(
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -96,11 +233,12 @@ export async function previewCertificate(
   })
 }
 
-export function printCertificate(
+export async function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
   userDetails: UserDetails | null,
   offlineResource: IOfflineData,
+  state: IStoreState,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'
 ) {
@@ -108,7 +246,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -117,19 +255,46 @@ export function printCertificate(
   )
 }
 
-function getPDFTemplateWithSVG(
+async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize
-): IPDFTemplate {
+  pageSize: PageSize,
+  state: IStoreState
+): Promise<IPDFTemplate> {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
+
+  const resolvedSignatures = await Promise.all(
+    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
+      signatureKey: k,
+      url: declaration.data.template[k]
+    }))
+      .filter(({ url }) => Boolean(url))
+      .map(({ signatureKey, url }) =>
+        fetchImageAsBase64(url as string).then((value) => ({
+          [signatureKey]: value
+        }))
+      )
+  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
+
+  const declarationTemplate = {
+    ...declaration.data.template,
+    ...resolvedSignatures
+  }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
-    declaration.data.template
+    declarationTemplate,
+    state
   )
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
+  }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import styled from 'styled-components'
@@ -77,31 +76,34 @@ const TopRight = styled.span`
   right: 15px;
 `
 
-export class Modal extends React.Component<IProps> {
-  render() {
-    const { title, actions, show, handleClose, className } = this.props
-
-    if (!show) {
-      return null
-    }
-
-    return (
-      <Backdrop className={className}>
-        <ModalContent>
-          {title && <Heading>{title}</Heading>}
-          {handleClose && (
-            <TopRight onClick={handleClose}>
-              <Cross />
-            </TopRight>
-          )}
-          {this.props.children}
-          <Actions>
-            {actions.map((action, i) => (
-              <ActionItems key={i}>{action}</ActionItems>
-            ))}
-          </Actions>
-        </ModalContent>
-      </Backdrop>
-    )
+export const Modal = ({
+  title,
+  actions,
+  show,
+  handleClose,
+  className,
+  children
+}: IProps) => {
+  if (!show) {
+    return null
   }
+
+  return (
+    <Backdrop className={className}>
+      <ModalContent>
+        {title && <Heading>{title}</Heading>}
+        {handleClose && (
+          <TopRight onClick={handleClose}>
+            <Cross />
+          </TopRight>
+        )}
+        {children}
+        <Actions>
+          {actions.map((action, i) => (
+            <ActionItems key={i}>{action}</ActionItems>
+          ))}
+        </Actions>
+      </ModalContent>
+    </Backdrop>
+  )
 }

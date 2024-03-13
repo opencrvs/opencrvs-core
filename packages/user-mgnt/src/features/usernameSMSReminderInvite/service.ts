@@ -6,22 +6,29 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import { IUserName } from '@user-mgnt/model/user'
 
 export async function sendUserName(
-  mobile: string,
   username: string,
-  authHeader: { Authorization: string }
+  userFullName: IUserName[],
+  authHeader: { Authorization: string },
+  mobile?: string,
+  email?: string
 ) {
-  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')
+  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserName')
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ msisdn: mobile, username }),
+    body: JSON.stringify({
+      msisdn: mobile,
+      email,
+      username,
+      userFullName
+    }),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader

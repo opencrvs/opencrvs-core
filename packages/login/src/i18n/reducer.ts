@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
@@ -25,7 +24,6 @@ export interface IntlMessages {
 
 export interface ILanguage {
   lang: string
-  displayName: string
   messages: IntlMessages
 }
 
@@ -33,39 +31,11 @@ export interface ILanguageState {
   [key: string]: ILanguage
 }
 
-interface ISupportedLanguages {
-  code: string
-  language: string
-}
-
-function extractLanguageSelectConfig(
-  languageSelectConfig: string
-): ISupportedLanguages[] {
-  const languageSelectConfigs = languageSelectConfig.split(',')
-  const supportedLanguages: ISupportedLanguages[] = []
-  languageSelectConfigs.forEach((languageSelectConfig) => {
-    const languageSelectValueAndLabel = languageSelectConfig.split(':')
-    supportedLanguages.push({
-      code: languageSelectValueAndLabel[0],
-      language: languageSelectValueAndLabel[1]
-    })
-  })
-  return supportedLanguages
-}
-
-const supportedLanguages: ISupportedLanguages[] = extractLanguageSelectConfig(
-  window.config.AVAILABLE_LANGUAGES_SELECT
-)
-
 export const initLanguages = () => {
   const initLanguages: ILanguageState = {}
   getAvailableLanguages().forEach((lang) => {
-    const languageDescription = supportedLanguages.find(
-      (obj) => obj.code === lang
-    ) as ISupportedLanguages
     initLanguages[lang] = {
       lang,
-      displayName: languageDescription.language,
       messages: {}
     }
   })
@@ -90,6 +60,9 @@ const getNextMessages = (
   language: string,
   languages: ILanguageState
 ): IntlMessages => {
+  if (!languages[language]) {
+    return languages[getDefaultLanguage()].messages
+  }
   return languages[language].messages
 }
 
@@ -122,14 +95,19 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       }
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)
+      let language = action.payload.language
+
+      if (!state.languages[language]) {
+        language = getDefaultLanguage()
+      }
 
       return loop(
         {
           ...state,
-          language: action.payload.language,
+          language,
           messages
         },
-        Cmd.run(() => storeLanguage(action.payload.language))
+        Cmd.run(() => storeLanguage(language))
       )
     default:
       return state

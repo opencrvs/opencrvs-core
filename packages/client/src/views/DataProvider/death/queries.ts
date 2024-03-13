@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
@@ -22,6 +21,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -30,6 +30,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         exactDateOfBirthUnknown
         gender
         maritalStatus
+        occupation
         nationality
         identifier {
           id
@@ -54,36 +55,35 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          telecom {
-            system
-            value
-          }
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          middleName
+          familyName
+        }
+        nationality
+        occupation
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        telecom {
+          system
+          value
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       father {
@@ -91,7 +91,37 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
+        }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
         }
       }
       mother {
@@ -99,7 +129,37 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
+        }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
         }
       }
       spouse {
@@ -107,7 +167,37 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleName
           familyName
+        }
+        birthDate
+        maritalStatus
+        occupation
+        detailsExist
+        reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
         }
       }
       medicalPractitioner {
@@ -122,13 +212,16 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        contactEmail
         duplicates {
           compositionId
           trackingId
         }
         informantsSignature
+        informantsSignatureURI
         attachments {
           data
+          uri
           type
           contentType
           subject
@@ -178,9 +271,24 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus
@@ -197,6 +305,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          alias
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -241,29 +354,27 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -284,6 +395,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
         birthDate
@@ -292,6 +404,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         exactDateOfBirthUnknown
         gender
         maritalStatus
+        occupation
         nationality
         identifier {
           id
@@ -316,34 +429,33 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          telecom {
-            system
-            value
-          }
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          middleName
+          familyName
+        }
+        nationality
+        occupation
+        birthDate
+        telecom {
+          system
+          value
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       father {
@@ -351,6 +463,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -359,6 +472,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -367,6 +481,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         name {
           use
           firstNames
+          middleName
           familyName
         }
       }
@@ -381,8 +496,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         informantType
         otherInformantType
         contactRelationship
+        contactEmail
         contactPhoneNumber
         informantsSignature
+        informantsSignatureURI
         duplicates {
           compositionId
           trackingId
@@ -404,6 +521,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -452,6 +570,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         office {
           id
           name
+          alias
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -496,29 +619,27 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }

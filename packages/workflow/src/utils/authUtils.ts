@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
+import { hasScope } from '@opencrvs/commons/authentication'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',
@@ -48,25 +48,23 @@ export const getToken = (request: Hapi.Request): string => {
   }
 }
 
-export const hasScope = (request: Hapi.Request, scope: string): boolean => {
-  if (
-    !request.auth ||
-    !request.auth.credentials ||
-    !request.auth.credentials.scope
-  ) {
-    return false
-  }
-  return request.auth.credentials.scope.includes(scope)
-}
-
 export function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.REGISTER)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.REGISTER
+  )
 }
 
 export function hasValidateScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.VALIDATE)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.VALIDATE
+  )
 }
 
 export function hasDeclareScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.DECLARE)
+  return hasScope(
+    { Authorization: request.headers.authorization },
+    USER_SCOPE.DECLARE
+  )
 }

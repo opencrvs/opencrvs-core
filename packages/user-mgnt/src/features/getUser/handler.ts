@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -17,15 +16,18 @@ import User, { IUserRole } from '@user-mgnt/model/user'
 interface IVerifyPayload {
   userId: string
   practitionerId: string
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 export default async function getUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { userId, practitionerId, mobile } = request.payload as IVerifyPayload
+  const { userId, practitionerId, mobile, email } =
+    request.payload as IVerifyPayload
   let criteria = {}
+
   if (userId) {
     criteria = { ...criteria, _id: userId }
   }
@@ -35,9 +37,13 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
+  if (email) {
+    criteria = { ...criteria, emailForNotification: email }
+  }
   const user = await User.findOne(criteria).populate<{
     role: IUserRole
   }>('role')
+
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
@@ -47,6 +53,7 @@ export default async function getUser(
 
 export const getUserRequestSchema = Joi.object({
   userId: Joi.string().optional(),
+  email: Joi.string().email().optional(),
   practitionerId: Joi.string().optional(),
   mobile: Joi.string().optional()
 })

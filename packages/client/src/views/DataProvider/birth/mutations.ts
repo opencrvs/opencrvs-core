@@ -6,14 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import {
+  REQUEST_REG_CORRECTION,
+  CREATE_BIRTH_REG_CORRECTION,
+  APPROVE_BIRTH_REG_CORRECTION,
+  REJECT_REG_CORRECTION
+} from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
-export const SUBMIT_BIRTH_DECLARATION = gql`
+const SUBMIT_BIRTH_DECLARATION = gql`
   mutation createBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details) {
       trackingId
@@ -22,52 +26,17 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_BIRTH_DECLARATION = gql`
+const APPROVE_BIRTH_DECLARATION = gql`
   mutation markBirthAsValidated($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_BIRTH_DECLARATION = gql`
+const REGISTER_BIRTH_DECLARATION = gql`
   mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput!) {
-    markBirthAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markBirthAsRegistered(id: $id, details: $details)
   }
 `
-export const REJECT_BIRTH_DECLARATION = gql`
+const REJECT_BIRTH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -77,7 +46,7 @@ export const REJECT_BIRTH_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_BIRTH_DECLARATION = gql`
+const ARCHIVE_BIRTH_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -93,13 +62,13 @@ export const ARCHIVE_BIRTH_DECLARATION = gql`
   }
 `
 
-export const COLLECT_BIRTH_CERTIFICATE = gql`
+const COLLECT_BIRTH_CERTIFICATE = gql`
   mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsCertified(id: $id, details: $details)
   }
 `
 
-export const ISSUE_BIRTH_CERTIFICATE = gql`
+const ISSUE_BIRTH_CERTIFICATE = gql`
   mutation markBirthAsIssued($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsIssued(id: $id, details: $details)
   }
@@ -144,7 +113,14 @@ export function getBirthMutation(action: SubmissionAction) {
       return COLLECT_BIRTH_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_BIRTH_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_BIRTH_REG_CORRECTION
+    case SubmissionAction.APPROVE_CORRECTION:
+      return APPROVE_BIRTH_REG_CORRECTION
+    case SubmissionAction.REJECT_CORRECTION:
+      return REJECT_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return CREATE_BIRTH_REG_CORRECTION
+    case SubmissionAction.REQUEST_CORRECTION: {
+      return REQUEST_REG_CORRECTION
+    }
   }
 }

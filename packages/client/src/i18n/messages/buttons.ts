@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -51,6 +50,7 @@ interface IButtonsMessages
   refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
+  printDeclaration: MessageDescriptor
   closeDeclaration: MessageDescriptor
   reactivate: MessageDescriptor
   search: MessageDescriptor
@@ -236,7 +236,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.reject'
   },
   rejectDeclaration: {
-    defaultMessage: 'Reject Declaration',
+    defaultMessage: 'Reject declaration',
     description: 'Reject declaration button text',
     id: 'buttons.rejectDeclaration'
   },
@@ -272,17 +272,22 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.saving'
   },
   saveExitButton: {
-    defaultMessage: 'Save & Exit',
-    description: 'Save & Exit Button Text',
+    defaultMessage: 'Save & exit',
+    description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
   },
   deleteDeclaration: {
-    defaultMessage: 'Delete Declaration',
+    defaultMessage: 'Delete declaration',
     description: 'Delete declaration button text',
     id: 'buttons.deleteDeclaration'
   },
+  printDeclaration: {
+    id: 'buttons.printDeclaration',
+    defaultMessage: 'Print declaration',
+    description: 'Print declaration button text'
+  },
   closeDeclaration: {
-    defaultMessage: 'Close Declaration',
+    defaultMessage: 'Close declaration',
     description: 'Close declaration button text',
     id: 'buttons.closeDeclaration'
   },
@@ -307,7 +312,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.send'
   },
   sendForReview: {
-    defaultMessage: 'Send For Review',
+    defaultMessage: 'Send For review',
     description: 'Submit Button Text',
     id: 'buttons.sendForReview'
   },
@@ -317,7 +322,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendIncomplete'
   },
   sendForApproval: {
-    defaultMessage: 'Send For Approval',
+    defaultMessage: 'Send For approval',
     description: 'Title for complete submit button',
     id: 'buttons.sendForApproval'
   },

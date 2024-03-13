@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -41,16 +40,14 @@ const LoadingTextContainer = styled.div`
   text-align: center;
 `
 
-export class Loader extends React.Component<ILoader> {
-  render() {
-    const { id, loadingText, marginPercent, spinnerDiameter } = this.props
-    return (
-      <LoadingContainer id={id} marginPercent={marginPercent}>
-        <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
-        {loadingText && (
-          <LoadingTextContainer>{loadingText}</LoadingTextContainer>
-        )}
-      </LoadingContainer>
-    )
-  }
-}
+export const Loader = ({
+  id,
+  loadingText,
+  marginPercent,
+  spinnerDiameter
+}: ILoader) => (
+  <LoadingContainer id={id} marginPercent={marginPercent}>
+    <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
+    {loadingText && <LoadingTextContainer>{loadingText}</LoadingTextContainer>}
+  </LoadingContainer>
+)

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { action } from '@storybook/addon-actions'
@@ -34,7 +33,7 @@ const options = [
   { value: 'death', label: 'Death' },
   { value: 'marriage', label: 'Marriage' },
   { value: 'adoption', label: 'Adoption' },
-  { value: 'divorce', label: 'Divorce' }
+  { value: 'divorce', label: 'Divorce', disabled: true }
 ]
 
 export const Default = () => {

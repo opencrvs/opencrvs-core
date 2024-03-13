@@ -6,17 +6,16 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 
-import styled from '@client/styledComponents'
-import {
+import styled from 'styled-components'
+import type {
   GQLLocation,
   GQLIdentifier,
   GQLPaymentMetric
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
@@ -177,7 +176,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 
   const jurisdictionTypeIdentifier =
     location.identifier &&
-    (location.identifier as GQLIdentifier[]).find(
+    location.identifier.find(
       ({ system }: GQLIdentifier) =>
         system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
     )
@@ -293,6 +292,18 @@ export const StatusMapping: IStatusMapping = {
     labelDescriptor: statusMessages.requestedCorrection,
     color: colors.blue
   },
+  CORRECTED: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  APPROVED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  REJECTED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
@@ -321,7 +332,6 @@ export const mockPerformanceMetricsRequest = {
           maleEstimation: 0,
           femaleEstimation: 0,
           locationId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
-          estimationYear: 2022,
           locationLevel: '',
           __typename: 'Estimation'
         },

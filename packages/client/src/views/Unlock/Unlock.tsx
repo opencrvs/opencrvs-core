@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import styled from 'styled-components'
@@ -31,7 +30,7 @@ import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
+import { Box, Stack, Text, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { BackgroundWrapper } from '@client/views/common/Common'
@@ -70,7 +69,7 @@ const Content = styled(Stack)`
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
-export const EnterPinLabel = () => {
+const EnterPinLabel = () => {
   const intl = useIntl()
   return (
     <Text element="h1" variant="h2" align="center">

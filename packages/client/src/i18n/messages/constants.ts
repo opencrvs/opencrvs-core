@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -74,6 +73,7 @@ interface IConstantsMessages
   labelLanguage: MessageDescriptor
   labelPassword: MessageDescriptor
   labelPhone: MessageDescriptor
+  labelEmail: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   labelSystemRole: MessageDescriptor
@@ -135,7 +135,6 @@ interface IConstantsMessages
   maleOver18: MessageDescriptor
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
-  registrationTitle: MessageDescriptor
   withinTargetDays: MessageDescriptor
   withinTargetDaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
@@ -280,6 +279,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Integrations',
     description: 'Integration title',
     id: 'constants.integrations'
+  },
+  vsExportTitle: {
+    defaultMessage: 'Vital statistics',
+    description: 'Vital statistics title',
+    id: 'config.application.vsexport'
   },
   declarationUpdatedOn: {
     defaultMessage: 'Updated on',
@@ -500,6 +504,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Phone label',
     id: 'constants.phoneNumber'
   },
+  labelEmail: {
+    defaultMessage: 'Email Address',
+    description: 'Email label',
+    id: 'constants.emailAddress'
+  },
+
   labelPin: {
     defaultMessage: 'PIN',
     description: 'PIN label',
@@ -833,11 +843,6 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for location',
     id: 'constants.location'
   },
-  registrationTitle: {
-    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
-    description: 'Label for registrationTitle',
-    id: 'constants.registrationTitle'
-  },
   withinTargetDays: {
     defaultMessage: `Within {registrationTargetDays} days`,
     description: `Label for registrations within {registrationTargetDays} days`,
@@ -977,6 +982,11 @@ const dynamicMessagesToDefine: Record<
   string | number | symbol,
   MessageDescriptor
 > = {
+  draft: {
+    id: 'constants.draft',
+    defaultMessage: 'Draft',
+    description: 'A label for draft'
+  },
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',

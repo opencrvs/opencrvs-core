@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -38,18 +37,18 @@ export interface ISubSectionProps {
   disabled?: boolean
 }
 
-export class SubSectionDivider extends React.Component<ISubSectionProps> {
-  render() {
-    const { label, required, optionalLabel } = this.props
-    return (
-      <SubSectionWrapper>
-        <Title>{label}</Title>
-        {required === false && (
-          <Optional disabled={this.props.disabled}>
-            &nbsp;&nbsp;•&nbsp;{optionalLabel}
-          </Optional>
-        )}
-      </SubSectionWrapper>
-    )
-  }
-}
+export const SubSectionDivider = ({
+  label,
+  required,
+  optionalLabel,
+  disabled
+}: ISubSectionProps) => (
+  <SubSectionWrapper>
+    <Title>{label}</Title>
+    {required === false && (
+      <Optional disabled={disabled}>
+        &nbsp;&nbsp;•&nbsp;{optionalLabel}
+      </Optional>
+    )}
+  </SubSectionWrapper>
+)

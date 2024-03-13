@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ISearchLocation, Stack } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
@@ -50,7 +49,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLMixedTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
@@ -60,6 +59,8 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
+import { useAuthorization } from '@client/hooks/useAuthorization'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -121,7 +122,7 @@ type IProps = RouteComponentProps &
   IConnectProps &
   IDispatchProps
 
-export enum EVENT_OPTIONS {
+enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
@@ -171,6 +172,7 @@ function RegistrationListComponent(props: IProps) {
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
+  const { isPerformanceManager } = useAuthorization()
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -409,30 +411,49 @@ function RegistrationListComponent(props: IProps) {
                     ? getName(result.registrarPractitioner.name, 'en')
                     : ''
                 }
+                avatar={result.registrarPractitioner.avatar}
               />
-              <Link
-                font="bold14"
-                onClick={() => {
-                  props.goToUserProfile(String(result.registrarPractitioner.id))
-                }}
-              >
-                {result.registrarPractitioner.name
-                  ? getName(result.registrarPractitioner.name, 'en')
-                  : ''}
-              </Link>
+              <>
+                {!isPerformanceManager ? (
+                  <Link
+                    font="bold14"
+                    onClick={() => {
+                      props.goToUserProfile(
+                        String(result.registrarPractitioner.id)
+                      )
+                    }}
+                  >
+                    {result.registrarPractitioner.name
+                      ? getName(result.registrarPractitioner.name, 'en')
+                      : ''}
+                  </Link>
+                ) : (
+                  String(
+                    result.registrarPractitioner.name
+                      ? getName(result.registrarPractitioner.name, 'en')
+                      : ''
+                  )
+                )}
+              </>
             </Stack>
           ),
           location: (
-            <Link
-              font="bold14"
-              onClick={() => {
-                props.goToTeamUserList(
-                  result.registrarPractitioner.primaryOffice?.id as string
-                )
-              }}
-            >
-              {result.registrarPractitioner.primaryOffice.name}
-            </Link>
+            <>
+              {!isPerformanceManager ? (
+                <Link
+                  font="bold14"
+                  onClick={() => {
+                    props.goToTeamUserList(
+                      result.registrarPractitioner.primaryOffice?.id as string
+                    )
+                  }}
+                >
+                  {result.registrarPractitioner.primaryOffice.name}
+                </Link>
+              ) : (
+                String(result.registrarPractitioner.primaryOffice.name)
+              )}
+            </>
           ),
           systemRole: getFieldAgentTypeLabel(
             result.registrarPractitioner.systemRole
@@ -479,6 +500,11 @@ function RegistrationListComponent(props: IProps) {
       finalContent = content.results.map(
         (result: IDynamicValues, index: number) => ({
           ...result,
+          month: formatLongDate(
+            new Date(result.month).toISOString(),
+            intl.locale,
+            'MMMM yyyy'
+          ),
           total: String(result.total),
           delayed: showWithTooltip(
             result.total,

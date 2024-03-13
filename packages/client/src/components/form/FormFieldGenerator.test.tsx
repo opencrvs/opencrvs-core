@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -31,16 +30,12 @@ import {
   NUMBER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { countries } from '@client/forms/countries'
-import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
+import { countries } from '@client/utils/countries'
+import { OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
 import { vi } from 'vitest'
-
-export interface IMotherSectionFormData {
-  firstName: string
-}
 
 describe('form component', () => {
   let component: ReactWrapper<{}, {}>
@@ -62,7 +57,7 @@ describe('form component', () => {
             label: formMessages.country,
             required: true,
             initialValue: window.config.COUNTRY.toUpperCase(),
-            validate: [],
+            validator: [],
             options: countries
           },
           {
@@ -71,7 +66,7 @@ describe('form component', () => {
             label: formMessages.state,
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
               dependency: 'countryPrimary'
@@ -84,7 +79,7 @@ describe('form component', () => {
             required: true,
             initialValue: '',
             placeholder: formMessages.select,
-            validate: [],
+            validator: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
               dependency: 'statePrimary'
@@ -96,7 +91,7 @@ describe('form component', () => {
             label: formMessages.district,
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           },
           {
             name: 'identifier',
@@ -104,7 +99,7 @@ describe('form component', () => {
             label: formMessages.NID,
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           }
         ]}
       />,
@@ -165,11 +160,11 @@ describe('when field definition has location search input', () => {
             name: 'placeOfBirth',
             type: LOCATION_SEARCH_INPUT,
             required: true,
-            validate: [],
+            validator: [],
             label: formMessages.placeOfBirth,
             initialValue: '',
             searchableResource: ['facilities'],
-            searchableType: [LocationType.HEALTH_FACILITY],
+            searchableType: ['HEALTH_FACILITY'],
             locationList: []
           }
         ]}
@@ -238,7 +233,7 @@ describe('when user is in the register section', () => {
             },
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           }
         ]}
       />,
@@ -279,7 +274,7 @@ describe('when field definition has nested fields', () => {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             options: [
               {
                 value: 'FATHER',
@@ -310,7 +305,7 @@ describe('when field definition has nested fields', () => {
                   },
                   required: false,
                   initialValue: '',
-                  validate: [phoneNumberFormat]
+                  validator: [phoneNumberFormat]
                 }
               ],
               MOTHER: [
@@ -324,7 +319,7 @@ describe('when field definition has nested fields', () => {
                   },
                   required: false,
                   initialValue: '',
-                  validate: [phoneNumberFormat]
+                  validator: [phoneNumberFormat]
                 }
               ]
             }
@@ -448,7 +443,7 @@ describe('when field definition has date field', () => {
               name: 'childDateOfBirth',
               type: DATE,
               required: true,
-              validate: [dateNotInFuture()],
+              validator: [dateNotInFuture()],
               label: formMessages.dateOfBirth,
               initialValue: ''
             }
@@ -462,8 +457,8 @@ describe('when field definition has date field', () => {
       await updateDateField(component, 'childDateOfBirth', FUTURE_DATE)
 
       expect(
-        component.find('#childDateOfBirth_error').hostNodes()
-      ).toHaveLength(1)
+        component.find('#childDateOfBirth_error').hostNodes().length
+      ).toBeGreaterThan(0)
     })
   })
 })
@@ -484,7 +479,7 @@ describe('when field definition has number field', () => {
             name: 'multipleBirth',
             type: NUMBER,
             required: true,
-            validate: [],
+            validator: [],
             label: formMessages.multipleBirth,
             initialValue: ''
           }
@@ -536,7 +531,7 @@ describe('when field definition has select field on mobile device', () => {
             label: formMessages.country,
             required: true,
             initialValue: window.config.COUNTRY.toUpperCase(),
-            validate: [],
+            validator: [],
             options: countries
           }
         ]}

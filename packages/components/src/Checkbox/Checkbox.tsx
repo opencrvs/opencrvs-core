@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -118,37 +117,34 @@ export interface CheckboxProps extends React.OptionHTMLAttributes<{}> {
   value: string
   selected: boolean
   size?: Size
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export class Checkbox extends React.Component<CheckboxProps> {
-  render() {
-    const {
-      name,
-      id,
-      selected,
-      label,
-      value,
-      onChange,
-      size = 'small'
-    } = this.props
-    return (
-      <Wrapper>
-        <Input
-          id={id}
-          role="checkbox"
-          checked={selected}
-          type="checkbox"
-          name={name}
-          value={value}
-          onChange={onChange}
-          size={size === 'large' ? 40 : 16}
-        />
-        <Check size={size}>
-          {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
-        </Check>
-        <Label htmlFor={id}>{label}</Label>
-      </Wrapper>
-    )
-  }
+export const Checkbox = ({
+  name,
+  id,
+  selected,
+  label,
+  value,
+  onChange,
+  size = 'small'
+}: CheckboxProps) => {
+  return (
+    <Wrapper>
+      <Input
+        id={id}
+        role="checkbox"
+        checked={selected}
+        type="checkbox"
+        name={name}
+        value={value}
+        onChange={onChange}
+        size={size === 'large' ? 40 : 16}
+      />
+      <Check size={size}>
+        {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
+      </Check>
+      <Label htmlFor={id}>{label}</Label>
+    </Wrapper>
+  )
 }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createServer } from '@auth/server'
@@ -35,6 +34,13 @@ describe('security question answer checking', () => {
       'TEST_NONCE',
       RetrievalSteps.NUMBER_VERIFIED,
       {
+        userFullName: [
+          {
+            use: 'en',
+            family: 'Anik',
+            given: ['Sadman']
+          }
+        ],
         userId: '123',
         username: 'fake_user_name',
         mobile: '123123123',
@@ -73,6 +79,13 @@ describe('security question answer checking', () => {
           'TEST_NONCE',
           RetrievalSteps.WAITING_FOR_VERIFICATION,
           {
+            userFullName: [
+              {
+                use: 'en',
+                family: 'Anik',
+                given: ['Sadman']
+              }
+            ],
             userId: '123',
             username: 'fake_user_name',
             mobile: '123123123',

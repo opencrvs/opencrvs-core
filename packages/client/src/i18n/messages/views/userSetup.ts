@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -60,10 +59,14 @@ interface IUserSetupMessages
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
   correctedAuditAction: MessageDescriptor
+  requestedCorrectionAuditAction: MessageDescriptor
+  approvedCorrectionAuditAction: MessageDescriptor
+  rejectedCorrectedAuditAction: MessageDescriptor
   archivedAuditAction: MessageDescriptor
   loggedInAuditAction: MessageDescriptor
   loggedOutAuditAction: MessageDescriptor
   phoneNumberChangedAuditAction: MessageDescriptor
+  emailAddressChangedAuditAction: MessageDescriptor
   passwordChangedAuditAction: MessageDescriptor
   reactivateAuditAction: MessageDescriptor
   deactivateAuditAction: MessageDescriptor
@@ -90,7 +93,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'password.label.confirm'
   },
   hasCases: {
-    defaultMessage: 'Contain upper and lower cases',
+    defaultMessage: 'At least one upper and lower case character',
     description: 'Password validation',
     id: 'password.cases'
   },
@@ -105,8 +108,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'misc.newPass.header'
   },
   instruction: {
-    defaultMessage:
-      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    defaultMessage: `Create a unique password - one that you don't use for other websites or applications. A secure and easy to remember passphrase could include three random words, while avoiding the use of personal info.`,
     description: 'New Password instruction',
     id: 'misc.newPass.instruction'
   },
@@ -120,7 +122,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'settings.user.label.nameBN'
   },
   labelEnglishName: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
   },
   match: {
@@ -322,6 +324,21 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for declaration corrected',
     id: 'user.profile.auditList.corrected'
   },
+  requestedCorrectionAuditAction: {
+    defaultMessage: 'Requested correction',
+    description: 'Description for record correction being requested',
+    id: 'user.profile.auditList.requestedCorrectionAuditAction'
+  },
+  approvedCorrectionAuditAction: {
+    defaultMessage: 'Approved correction request',
+    description: 'Description for record correction being approved',
+    id: 'user.profile.auditList.approvedCorrectionAuditAction'
+  },
+  rejectedCorrectedAuditAction: {
+    defaultMessage: 'Rejected correction request',
+    description: 'Description for record correction being rejected',
+    id: 'user.profile.auditList.rejectedCorrectedAuditAction'
+  },
   archivedAuditAction: {
     defaultMessage: 'Archived',
     description: 'Description for declaration archived',
@@ -341,6 +358,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Phone number changed',
     description: 'Description for user change phoneNumber',
     id: 'user.profile.auditList.phoneNumberChanged'
+  },
+  emailAddressChangedAuditAction: {
+    defaultMessage: 'Email Address changed',
+    description: 'Description for user change email',
+    id: 'user.profile.auditList.emailAddressChanged'
   },
   passwordChangedAuditAction: {
     defaultMessage: 'Changed Password',

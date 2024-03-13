@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -104,6 +103,7 @@ export const DuplicateForm = (props: IProps) => {
   const notADuplicateButton = (
     <Button
       id="not-a-duplicate"
+      key="btn-not-a-duplicate"
       onClick={() => {
         toggleNotDuplicateModal()
       }}
@@ -117,6 +117,7 @@ export const DuplicateForm = (props: IProps) => {
   const markAsDuplicateButton = (
     <Button
       id="mark-as-duplicate"
+      key="btn-mark-as-duplicate"
       onClick={() => {
         toggleModal()
       }}
@@ -128,20 +129,21 @@ export const DuplicateForm = (props: IProps) => {
   )
   return (
     <>
-      <SubPageContent
-        title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
-          name: getName(),
-          trackingId: String(data.registration.trackingId)
-        })}
-        subtitle={intl.formatMessage(
-          duplicateMessages.duplicateContentSubtitle,
-
-          {
-            trackingIds
-          }
-        )}
-        bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
-      ></SubPageContent>
+      <div>
+        <SubPageContent
+          title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
+            name: getName(),
+            trackingId: String(data.registration.trackingId)
+          })}
+          subtitle={intl.formatMessage(
+            duplicateMessages.duplicateContentSubtitle,
+            {
+              trackingIds
+            }
+          )}
+          bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+        ></SubPageContent>
+      </div>
 
       <ResponsiveModal
         id="mark-as-duplicate-modal"
@@ -160,6 +162,7 @@ export const DuplicateForm = (props: IProps) => {
             {intl.formatMessage(buttonMessages.cancel)}
           </CancelButton>,
           <Button
+            key="mark-as-duplicate-button"
             id="mark-as-duplicate-button"
             type="negative"
             onClick={() => {

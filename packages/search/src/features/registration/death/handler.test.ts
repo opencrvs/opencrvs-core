@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   indexComposition,
@@ -18,9 +17,7 @@ import { createServer } from '@search/server'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
-  mockDeathRejectionTaskBundle,
   mockLocationResponse,
-  mockMinimalDeathFhirBundle,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockUserModelResponse,
@@ -48,7 +45,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 if invalid payload received', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -67,7 +64,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -107,7 +104,7 @@ describe('Verify handlers', () => {
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -117,47 +114,6 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/death/new-declaration',
         payload: mockDeathFhirBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('should return status code 200 if the some sections is missing too', async () => {
-      fetch.resetMocks()
-      const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId =
-        searchByCompositionId as jest.Mocked<any>
-      mockedIndexComposition.mockResolvedValue({})
-      mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
-
-      fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/0' } }),
-          { status: 200 }
-        ],
-        [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }]
-      )
-
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/new-declaration',
-        payload: mockMinimalDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -191,7 +147,7 @@ describe('Verify handlers', () => {
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -210,18 +166,34 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the event data is updated with task', async () => {
+      fetch.resetMocks()
       ;(updateComposition as jest.Mock).mockReturnValue({})
 
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
       })
 
+      fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/death/mark-voided',
-        payload: mockDeathRejectionTaskBundle,
+        url: '/record',
+        payload: mockDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

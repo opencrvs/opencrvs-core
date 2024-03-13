@@ -6,12 +6,21 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Button to hide section',
+    id: 'form.field.hideLabel'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Button to show section',
+    id: 'form.field.showLabel'
+  },
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
@@ -28,7 +37,7 @@ const messagesToDefine = {
   validateDeclarationActionModalDescription: {
     id: 'validate.declaration.action.modal.description',
     defaultMessage:
-      'This declaration will be sent to the registrar for them to register'
+      'This declaration will be sent for approval prior to registration.'
   },
   informantsSignature: {
     defaultMessage: 'Signature of informant',
@@ -111,14 +120,14 @@ const messagesToDefine = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage} } declaration for {name}',
+      '{name} {eventType, select, birth {Birth} death {Death} other {Marriage} } declaration',
     description:
       'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'
   },
   headerSubjectWithoutName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage}} Declaration',
+      '{eventType, select, birth {Birth} death {Death} other {Marriage}} declaration',
     description: 'Header subject that shows which declaration type to review',
     id: 'review.header.subject.subjectWithoutName'
   },
@@ -148,7 +157,7 @@ const messagesToDefine = {
     id: 'review.actions.desc.regConfInComp'
   },
   registerActionTitle: {
-    defaultMessage: 'Ready to register?',
+    defaultMessage: 'Register event',
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
@@ -169,24 +178,30 @@ const messagesToDefine = {
     id: 'misc.description.inComplete'
   },
   approvalActionTitle: {
-    defaultMessage:
-      'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
+    defaultMessage: 'Send for approval?',
     description: 'Title for review action component',
     id: 'misc.title.declarationStatus'
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
+      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an {deliveryMethod} with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
       'Description for review action component when complete declaration',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an SMS with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
+      'The informant will receive an {deliveryMethod} with a tracking ID that they can use to provide the additional mandatory information required for registration.',
     description:
       'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'
+  },
+  reviewActionDescriptionForErrors: {
+    defaultMessage:
+      'Please ensure all fields are either empty or have a valid value in them.',
+    description:
+      'Description for review action component when declaration has errors on fields',
+    id: 'review.actions.description.hasError'
   },
   reviewActionTitle: {
     defaultMessage:
@@ -216,9 +231,14 @@ const messagesToDefine = {
     description: 'Submit title text on modal',
     id: 'review.modal.title.submitConfirmation'
   },
+  supportingDocuments: {
+    defaultMessage: 'Supporting documents',
+    description: 'Section heading title for supporting documents',
+    id: 'review.inputs.supportingDocuments'
+  },
   validateConfirmationDesc: {
     defaultMessage:
-      'This declaration will be sent to the registrar for them to approve.',
+      'This declaration will be sent for approval prior to registration.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },
@@ -252,6 +272,11 @@ const messagesToDefine = {
     defaultMessage: 'Clear',
     description: 'Label for button that clear signature input',
     id: 'review.signature.clear'
+  },
+  documentViewerTitle: {
+    id: 'review.documentViewer.title',
+    defaultMessage: 'Supporting documents',
+    description: 'Label for Supporting documents section'
   }
 }
 

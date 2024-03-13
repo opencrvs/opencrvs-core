@@ -6,40 +6,28 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import {
-  ICertificateSVGPayload,
-  IGetCertificatePayload
-} from '@gateway/features/certificate/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
+import { uploadSvg } from '@gateway/utils/documents'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getCertificateSVG(
-      _,
-      { status = null, event = null },
-      { headers: authHeader }
-    ) {
-      let payload: IGetCertificatePayload = {}
-      if (status) {
-        payload = { ...payload, status }
-      }
-      if (event) {
-        payload = { ...payload, event }
-      }
+    async getCertificateSVG(_, filters, { headers: authHeader }) {
       const res = await fetch(`${APPLICATION_CONFIG_URL}getCertificate`, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(filters),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
         }
       })
+      if (!res.ok) {
+        return null
+      }
       return await res.json()
     },
     async getActiveCertificatesSVG(_, {}, { headers: authHeader }) {
@@ -60,7 +48,7 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async createOrUpdateCertificateSVG(
       _,
-      { certificateSVG = {} },
+      { certificateSVG },
       { headers: authHeader }
     ) {
       // Only natlsysadmin should be able to create certificate
@@ -72,21 +60,15 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const certificateSVGPayload: ICertificateSVGPayload = {
-        id: certificateSVG.id as string,
-        svgCode: certificateSVG.svgCode as string,
-        svgFilename: certificateSVG.svgFilename as string,
-        svgDateUpdated: certificateSVG.svgDateUpdated as number,
-        svgDateCreated: certificateSVG.svgDateCreated as number,
-        user: certificateSVG.user as string,
-        status: certificateSVG.status as string,
-        event: certificateSVG.event as string
-      }
+      certificateSVG.svgCode = await uploadSvg(
+        certificateSVG.svgCode,
+        authHeader
+      )
 
-      const action = certificateSVGPayload.id ? 'update' : 'create'
+      const action = certificateSVG.id ? 'update' : 'create'
       const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {
         method: 'POST',
-        body: JSON.stringify(certificateSVGPayload),
+        body: JSON.stringify(certificateSVG),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

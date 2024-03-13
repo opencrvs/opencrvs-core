@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
@@ -16,6 +15,7 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   Event,
+  IntegratingSystemType,
   System,
   SystemStatus,
   SystemType,
@@ -142,7 +142,9 @@ export function SystemList() {
     refreshTokenLoading,
     refreshTokenError,
     resetData,
-    shouldWarnAboutNationalId
+    shouldWarnAboutNationalId,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType
   } = useSystems()
 
   function changeActiveStatusIntl(status: SystemStatus) {
@@ -186,10 +188,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.settings!, Event.Birth)
+            populatePermissions(system.settings!.webhook!, Event.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.settings!, Event.Death)
+            populatePermissions(system.settings!.webhook!, Event.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
@@ -213,11 +215,30 @@ export function SystemList() {
     return menuItems
   }
 
-  const sysType = {
+  const systemTypeLabels = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+  }
+
+  const nationalIdLabels = {
+    [IntegratingSystemType.Mosip]: intl.formatMessage(
+      integrationMessages.integratingSystemTypeMosip
+    ),
+    [IntegratingSystemType.Other]: intl.formatMessage(
+      integrationMessages.nationalID
+    )
+  }
+
+  const systemToLabel = (system: System) => {
+    if (system.type === SystemType.NationalId) {
+      return nationalIdLabels[
+        system.integratingSystemType ?? IntegratingSystemType.Mosip
+      ]
+    } else {
+      return systemTypeLabels[system.type]
+    }
   }
 
   return (
@@ -241,6 +262,7 @@ export function SystemList() {
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
           <Button
+            key="create-client-button"
             type="secondary"
             id="createClientButton"
             onClick={() => setShowModal(true)}
@@ -284,7 +306,7 @@ export function SystemList() {
                 </>
               }
               label={system.name}
-              value={sysType[system.type]}
+              value={systemToLabel(system)}
             />
           ))}
 
@@ -347,6 +369,7 @@ export function SystemList() {
         <ResponsiveModal
           actions={[
             <Link
+              key="cancel-link"
               onClick={() => {
                 toggleRevealKeyModal()
                 resetData()
@@ -439,6 +462,7 @@ export function SystemList() {
             ? []
             : [
                 <Link
+                  key="cancel"
                   onClick={() => {
                     toggleModal()
                     clearNewSystemDraft()
@@ -448,6 +472,7 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
+                  key="submit-client-form"
                   id="submitClientForm"
                   disabled={
                     !newSystemType ||
@@ -547,6 +572,44 @@ export function SystemList() {
               </InputField>
             </Field>
 
+            {newSystemType === SystemType.NationalId && (
+              <Field>
+                <InputField
+                  id="integrating-system-type"
+                  touched={false}
+                  label={intl.formatMessage(
+                    integrationMessages.integratingSystemType
+                  )}
+                >
+                  <Select
+                    ignoreMediaQuery
+                    onChange={(val) => {
+                      setNewIntegratingSystemType(val as IntegratingSystemType)
+                    }}
+                    value={
+                      newIntegratingSystemType ?? IntegratingSystemType.Mosip
+                    }
+                    options={[
+                      {
+                        label: intl.formatMessage(
+                          integrationMessages.integratingSystemTypeMosip
+                        ),
+                        value: IntegratingSystemType.Mosip
+                      },
+                      {
+                        label: intl.formatMessage(
+                          integrationMessages.integratingSystemTypeOther
+                        ),
+                        value: IntegratingSystemType.Other,
+                        disabled: true
+                      }
+                    ]}
+                    id={'integrating-system-select'}
+                  />
+                </InputField>
+              </Field>
+            )}
+
             {shouldWarnAboutNationalId && (
               <PaddedAlert type="error">
                 {intl.formatMessage(integrationMessages.onlyOneNationalIdError)}
@@ -571,9 +634,14 @@ export function SystemList() {
 
             {newSystemType === SystemType.NationalId && (
               <PaddedAlert type="info">
-                {intl.formatMessage(
-                  integrationMessages.nationalidAlertDescription
-                )}
+                {newIntegratingSystemType === IntegratingSystemType.Mosip &&
+                  intl.formatMessage(
+                    integrationMessages.integratingSystemTypeAlertMosip
+                  )}
+                {newIntegratingSystemType === IntegratingSystemType.Other &&
+                  intl.formatMessage(
+                    integrationMessages.integratingSystemTypeAlertOther
+                  )}
                 <Link
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')

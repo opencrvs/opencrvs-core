@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -16,7 +15,8 @@ import {
   GQLDeathInput,
   GQLLoginBackgroundInput,
   GQLCountryLogoInput,
-  GQLMarriageInput
+  GQLMarriageInput,
+  GQLFeaturesInput
 } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {
@@ -26,15 +26,13 @@ export interface IApplicationConfigPayload {
   CURRENCY: GQLCurrencyInput
   DEATH: GQLDeathInput
   MARRIAGE: GQLMarriageInput
+  FEATURES: GQLFeaturesInput
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
-  EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
-  ADDRESSES: number
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   DATE_OF_BIRTH_UNKNOWN: boolean
-  INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: GQLLoginBackgroundInput
 }

@@ -6,16 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
-  findTaskExtension,
-  getFromFhir
+  findTaskExtension
 } from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
@@ -24,6 +22,12 @@ import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import {
+  getFromBundleById,
+  SavedBundle,
+  SavedLocation,
+  SavedTask
+} from '@opencrvs/commons/types'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -40,16 +44,60 @@ const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 export const REGISTERED_STATUS = 'REGISTERED'
 const REINSTATED_STATUS = 'REINSTATED'
 export const CERTIFIED_STATUS = 'CERTIFIED'
+export const ISSUED_STATUS = 'ISSUED'
 const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
+const validStatusMapping = {
+  [ARCHIVED_STATUS]: [
+    DECLARED_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [IN_PROGRESS_STATUS]: [null] as const,
+  [DECLARED_STATUS]: [ARCHIVED_STATUS, null] as const,
+  [REJECTED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    WAITING_VALIDATION_STATUS,
+    VALIDATED_STATUS,
+    ARCHIVED_STATUS
+  ] as const,
+  [VALIDATED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    ARCHIVED_STATUS,
+    null
+  ] as const,
+  [WAITING_VALIDATION_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [REGISTERED_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS,
+    WAITING_VALIDATION_STATUS
+  ] as const,
+  [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS] as const,
+  [ISSUED_STATUS]: [CERTIFIED_STATUS] as const,
+  [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS] as const,
+  [REINSTATED_STATUS]: [ARCHIVED_STATUS] as const
+}
+
 export interface ICorrection {
   section: string
   fieldName: string
   oldValue: string
-  newValue: string
+  newValue: string | number | boolean
 }
 
 export interface IAssignment {
@@ -60,7 +108,7 @@ export interface IAssignment {
 }
 
 export interface IOperationHistory {
-  operationType: string
+  operationType: keyof typeof validStatusMapping
   operatedOn: string
   operatorRole: string
   operatorFirstNames: string
@@ -81,8 +129,9 @@ export interface ICompositionBody {
   compositionType?: string
   event?: EVENT
   type?: string
-  contactRelationship?: string
+  informantType?: string
   contactNumber?: string
+  contactEmail?: string
   dateOfDeclaration?: string
   trackingId?: string
   registrationNumber?: string
@@ -102,6 +151,7 @@ export interface ICompositionBody {
   motherDoB?: string
   motherIdentifier?: string
   childDoB?: string
+  childIdentifier?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -112,26 +162,35 @@ export interface ICompositionBody {
 
 export interface IBirthCompositionBody extends ICompositionBody {
   childFirstNames?: string
+  childMiddleName?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  childMiddleNameLocal?: string
   childFamilyNameLocal?: string
   childDoB?: string
+  childIdentifier?: string
   gender?: string
   motherFirstNames?: string
+  motherMiddleName?: string
   motherFamilyName?: string
   motherFirstNamesLocal?: string
+  motherMiddleNameLocal?: string
   motherFamilyNameLocal?: string
   motherDoB?: string
   motherIdentifier?: string
   fatherFirstNames?: string
+  fatherMiddleName?: string
   fatherFamilyName?: string
   fatherFirstNamesLocal?: string
+  fatherMiddleNameLocal?: string
   fatherFamilyNameLocal?: string
   fatherDoB?: string
   fatherIdentifier?: string
   informantFirstNames?: string
+  informantMiddleName?: string
   informantFamilyName?: string
   informantFirstNamesLocal?: string
+  informantMiddleNameLocal?: string
   informantFamilyNameLocal?: string
   informantDoB?: string
   informantIdentifier?: string
@@ -139,28 +198,38 @@ export interface IBirthCompositionBody extends ICompositionBody {
 
 export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNames?: string
+  deceasedMiddleName?: string
   deceasedFamilyName?: string
   deceasedFirstNamesLocal?: string
+  deceasedMiddleNameLocal?: string
   deceasedFamilyNameLocal?: string
   deceasedDoB?: string
   gender?: string
   deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string
+  motherMiddleName?: string
   motherFamilyName?: string
   motherFirstNamesLocal?: string
+  motherMiddleNameLocal?: string
   motherFamilyNameLocal?: string
   fatherFirstNames?: string
+  fatherMiddleName?: string
   fatherFamilyName?: string
   fatherFirstNamesLocal?: string
+  fatherMiddleNameLocal?: string
   fatherFamilyNameLocal?: string
   spouseFirstNames?: string
+  spouseMiddleName?: string
   spouseFamilyName?: string
   spouseFirstNamesLocal?: string
+  spouseMiddleNameLocal?: string
   spouseFamilyNameLocal?: string
   informantFirstNames?: string
+  informantMiddleName?: string
   informantFamilyName?: string
   informantFirstNamesLocal?: string
+  informantMiddleNameLocal?: string
   informantFamilyNameLocal?: string
   informantDoB?: string
   informantIdentifier?: string
@@ -168,25 +237,33 @@ export interface IDeathCompositionBody extends ICompositionBody {
 
 export interface IMarriageCompositionBody extends ICompositionBody {
   brideFirstNames?: string
-  groomFirstNames?: string
+  brideMiddleName?: string
   brideFamilyName?: string
-  groomFamilyName?: string
   brideFirstNamesLocal?: string
-  groomFirstNamesLocal?: string
+  brideMiddleNameLocal?: string
   brideFamilyNameLocal?: string
-  groomFamilyNameLocal?: string
   brideDoB?: string
-  groomDoB?: string
-  marriageDate?: string
   brideIdentifier?: string
+  groomFirstNames?: string
+  groomMiddleName?: string
+  groomFamilyName?: string
+  groomFirstNamesLocal?: string
+  groomMiddleNameLocal?: string
+  groomFamilyNameLocal?: string
+  groomDoB?: string
   groomIdentifier?: string
+  marriageDate?: string
   witnessOneFirstNames?: string
+  witnessOneMiddleName?: string
   witnessOneFamilyName?: string
   witnessOneFirstNamesLocal?: string
+  witnessOneMiddleNameLocal?: string
   witnessOneFamilyNameLocal?: string
   witnessTwoFirstNames?: string
+  witnessTwoMiddleName?: string
   witnessTwoFamilyName?: string
   witnessTwoFirstNamesLocal?: string
+  witnessTwoMiddleNameLocal?: string
   witnessTwoFamilyNameLocal?: string
 }
 
@@ -210,7 +287,7 @@ export async function detectBirthDuplicates(
   body: IBirthCompositionBody
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
-  const duplicates = findBirthDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -219,7 +296,7 @@ export async function detectDeathDuplicates(
   body: IDeathCompositionBody
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
-  const duplicates = findDeathDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -237,8 +314,9 @@ export const getStatus = async (compositionId: string) => {
 
 export const createStatusHistory = async (
   body: ICompositionBody,
-  task: fhir.Task | undefined,
-  authHeader: string
+  task: SavedTask,
+  authHeader: string,
+  bundle: SavedBundle
 ) => {
   if (!isValidOperationHistory(body)) {
     return
@@ -258,9 +336,13 @@ export const createStatusHistory = async (
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
-  const office: fhir.Location = await getFromFhir(
-    `/${regLasOfficeExtension?.valueReference?.reference}`
-  )
+  let office: SavedLocation | undefined
+  if (regLasOfficeExtension) {
+    office = getFromBundleById<SavedLocation>(
+      bundle,
+      regLasOfficeExtension.valueReference.reference.split('/')[1]
+    )?.resource
+  }
 
   const operationHistory = {
     operationType: body.type,
@@ -283,9 +365,10 @@ export const createStatusHistory = async (
     isNotification(body) &&
     body.eventLocationId
   ) {
-    const facility: fhir.Location = await getFromFhir(
-      `/Location/${body.eventLocationId}`
-    )
+    const facility = getFromBundleById<SavedLocation>(
+      bundle,
+      body.eventLocationId
+    ).resource
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
@@ -312,30 +395,13 @@ function isNotification(body: ICompositionBody): boolean {
   )
 }
 
-function findBirthDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
+export function findDuplicateIds(
+  results: ISearchResponse<
+    IBirthCompositionBody | IDeathCompositionBody
+  >['hits']['hits']
 ) {
   return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
-    .map((hit) => ({
-      id: hit._id,
-      trackingId: hit._source.trackingId
-    }))
-}
-
-function findDeathDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IDeathCompositionBody>['hits']['hits']
-) {
-  return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
+    .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
       id: hit._id,
       trackingId: hit._source.trackingId
@@ -366,51 +432,13 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 }
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
-  const validStatusMapping = {
-    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
-    [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
-    [REJECTED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      VALIDATED_STATUS,
-      ARCHIVED_STATUS
-    ],
-    [VALIDATED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      ARCHIVED_STATUS,
-      null
-    ],
-    [WAITING_VALIDATION_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS
-    ],
-    [REGISTERED_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      WAITING_VALIDATION_STATUS
-    ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REINSTATED_STATUS]: [ARCHIVED_STATUS],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
-  }
-
   const previousStatus = getPreviousStatus(body)
-  const currentStatus = body.type
+  const currentStatus = body.type as keyof typeof validStatusMapping
 
   if (
     currentStatus &&
     validStatusMapping[currentStatus] &&
-    !validStatusMapping[currentStatus].includes(previousStatus)
+    !validStatusMapping[currentStatus].includes(previousStatus as never)
   ) {
     return false
   }
@@ -420,7 +448,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
 function updateOperationHistoryWithCorrection(
   operationHistory: IOperationHistory,
-  task?: fhir.Task
+  task: SavedTask
 ) {
   if (
     task?.input?.length &&
@@ -434,15 +462,23 @@ function updateOperationHistoryWithCorrection(
     for (let i = 0; i < task.input.length; i += 1) {
       const section = task.input[i].valueCode || ''
       const fieldName = task.input[i].valueId || ''
-      const oldValue = task.input[i].valueString || ''
-      const newValue = task.output[i].valueString || ''
+      const oldValue =
+        task.input[i].valueString ||
+        task.output[i].valueInteger?.toString() ||
+        ''
+      const newValueString = task.output[i].valueString
+      const newValueNumber = task.output[i].valueInteger
 
-      operationHistory.correction?.push({
+      const payload: ICorrection = {
         section,
         fieldName,
         oldValue,
-        newValue
-      })
+        newValue: (newValueNumber !== undefined
+          ? newValueNumber
+          : newValueString)! // On of these the values always exist
+      }
+
+      operationHistory.correction?.push(payload)
     }
   }
 }

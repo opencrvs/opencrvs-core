@@ -6,11 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
@@ -31,7 +30,7 @@ import {
   useApolloClient
 } from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
@@ -43,7 +42,7 @@ import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
 
 const { useState, useCallback, useMemo } = React
@@ -242,7 +241,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     if (assignment) {
       unassignDeclaration(compositionId, client)
     } else {
-      deleteDeclaration(compositionId)
+      deleteDeclaration(compositionId, client)
     }
   }, [
     compositionId,
@@ -345,7 +344,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         ) : assignment && assignment.userId !== userId ? (
           <AvatarSmall
             avatar={{
-              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              data: assignment.avatarURL,
               type: 'image/jpeg'
             }}
           />
@@ -388,7 +387,8 @@ const mapDispatchToProps = (
     action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
-  deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
+  deleteDeclaration: (id: string, client: ApolloClient<any>) =>
+    dispatch(deleteDeclarationAction(id, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
       unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)

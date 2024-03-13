@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -91,26 +90,23 @@ interface IRadio {
   onChange: (value: Value) => void
 }
 
-export class Radio extends React.Component<IRadio> {
-  onChange = () => {
-    this.props.onChange(this.props.value)
+export const Radio = (props: IRadio) => {
+  const { id, name, selected, label, value, onChange } = props
+  const handleChange = () => {
+    onChange(value)
   }
-  render() {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, name, selected, label, value, onChange } = this.props
-    return (
-      <Wrapper>
-        <Input
-          {...this.props}
-          checked={value === selected}
-          type="radio"
-          name={name}
-          value={value.toString()}
-          onChange={this.onChange}
-        />
-        <Check />
-        <Label htmlFor={id}>{label}</Label>
-      </Wrapper>
-    )
-  }
+  return (
+    <Wrapper>
+      <Input
+        {...props}
+        checked={value === selected}
+        type="radio"
+        name={name}
+        value={value.toString()}
+        onChange={handleChange}
+      />
+      <Check />
+      <Label htmlFor={id}>{label}</Label>
+    </Wrapper>
+  )
 }

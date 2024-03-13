@@ -6,24 +6,23 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { client } from '@client/utils/apolloClient'
 import { InternalRefetchQueriesInclude, gql } from '@apollo/client'
 
 const RESEND_SMS_INVITE = gql`
-  mutation resendSMSInvite($userId: String!) {
-    resendSMSInvite(userId: $userId)
+  mutation resendInvite($userId: String!) {
+    resendInvite(userId: $userId)
   }
 `
-const USERNAME_SMS_REMINDER = gql`
-  mutation usernameSMSReminder($userId: String!) {
-    usernameSMSReminder(userId: $userId)
+const USERNAME_REMINDER = gql`
+  mutation usernameReminder($userId: String!) {
+    usernameReminder(userId: $userId)
   }
 `
 
-async function resendSMSInvite(
+async function resendInvite(
   userId: string,
   refetchQueries: InternalRefetchQueriesInclude
 ) {
@@ -36,34 +35,33 @@ async function resendSMSInvite(
     })
   )
 }
-const RESET_PASSWORD_SMS = gql`
-  mutation resetPasswordSMS($userId: String!, $applicationName: String!) {
-    resetPasswordSMS(userId: $userId, applicationName: $applicationName)
+const RESET_PASSWORD_INVITE = gql`
+  mutation resetPasswordInvite($userId: String!) {
+    resetPasswordInvite(userId: $userId)
   }
 `
-async function sendResetPasswordSMS(
+async function sendResetPasswordInvite(
   userId: string,
-  applicationName: string | undefined,
   refetchQueries: InternalRefetchQueriesInclude
 ) {
   return (
     client &&
     client.mutate({
-      mutation: RESET_PASSWORD_SMS,
-      variables: { userId, applicationName },
+      mutation: RESET_PASSWORD_INVITE,
+      variables: { userId },
       refetchQueries
     })
   )
 }
 
-async function usernameSMSReminderSend(
+async function usernameReminderSend(
   userId: string,
   refetchQueries: InternalRefetchQueriesInclude
 ) {
   return (
     client &&
     client.mutate({
-      mutation: USERNAME_SMS_REMINDER,
+      mutation: USERNAME_REMINDER,
       variables: { userId },
       refetchQueries
     })
@@ -71,7 +69,7 @@ async function usernameSMSReminderSend(
 }
 
 export const userMutations = {
-  resendSMSInvite,
-  usernameSMSReminderSend,
-  sendResetPasswordSMS
+  resendInvite,
+  usernameReminderSend,
+  sendResetPasswordInvite
 }

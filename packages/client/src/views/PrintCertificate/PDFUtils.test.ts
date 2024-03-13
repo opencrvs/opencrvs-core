@@ -6,14 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   previewCertificate,
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
-import { mockDeathDeclarationData, mockOfflineData } from '@client/tests/util'
+import {
+  createTestStore,
+  mockDeathDeclarationData,
+  mockOfflineData
+} from '@client/tests/util'
 import { createIntl } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { omit } from 'lodash'
@@ -25,8 +28,9 @@ const intl = createIntl({
 })
 
 describe('PDFUtils related tests', () => {
-  it('Throws exception if invalid userDetails found for previewCertificate', () => {
+  it('Throws exception if invalid userDetails found for previewCertificate', async () => {
     const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
+    const { store } = await createTestStore()
     expect(
       previewCertificate(
         intl,
@@ -37,7 +41,8 @@ describe('PDFUtils related tests', () => {
         },
         null,
         mockOfflineData,
-        (pdf: string) => {}
+        (pdf: string) => {},
+        store.getState()
       )
     ).rejects.toThrowError('No user details found')
   })

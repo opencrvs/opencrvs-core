@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -43,7 +42,10 @@ export const removeDuplicate = async (
     throw new Error('No Composition ID found')
   }
   const composition = await searchByCompositionId(compositionId, client)
-  const body = get(composition, 'body.hits.hits[0]._source') as ICompositionBody
+  const body = get(
+    composition,
+    'body.hits.hits[0]._source'
+  ) as unknown as ICompositionBody
   body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body, client)
 }
@@ -65,6 +67,14 @@ export const searchForBirthDuplicates = async (
   // Names of length of >7 characters = 2 edits allowed
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
+  if (
+    (!body.childFirstNames && !body.childFamilyName) ||
+    (!body.motherFirstNames && !body.motherFamilyName) ||
+    !body.motherDoB ||
+    !body.childDoB
+  ) {
+    return []
+  }
   const mothersDetailsMatch = {
     bool: {
       must: [
@@ -230,6 +240,13 @@ export const searchForDeathDuplicates = async (
   client: elasticsearch.Client
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+  if (
+    (!body.deceasedFirstNames && !body.deceasedFamilyName) ||
+    !body.deceasedDoB ||
+    !body.deathDate
+  ) {
+    return []
+  }
 
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({

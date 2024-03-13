@@ -1,3 +1,12 @@
+import {
+  BundleEntry,
+  Encounter,
+  Location,
+  Observation,
+  ResourceIdentifier,
+  URLReference
+} from '@opencrvs/commons/types'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,9 +15,30 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { GQLResolver } from '@gateway/graphql/schema'
+
+type IsResolver<T> = T extends (...args: any[]) => any ? true : false
+
+type MakeAllButFirstParamUndefined<F> = F extends (
+  arg1: infer A,
+  ...args: Array<any>
+) => infer R
+  ? ((arg1: A) => R) & ((arg1: A, ...args: any[]) => R)
+  : F
+
+type DeepRequired<T> = Required<{
+  [P in keyof T]: IsResolver<NonNullable<T[P]>> extends true
+    ? MakeAllButFirstParamUndefined<NonNullable<T[P]>>
+    : NonNullable<T[P]> extends Record<any, any>
+    ? DeepRequired<T[P]>
+    : never
+}>
+
+export type TestResolvers = DeepRequired<GQLResolver>
+
 export const mockPatient = {
   resourceType: 'Patient',
   active: true,
@@ -183,10 +213,8 @@ export const mockUser = {
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
-      {
-        lang: 'en',
-        label: 'CHAIRMAN'
-      }
+      { label: 'Field Agent', lang: 'en' },
+      { label: 'Agent de terrain', lang: 'fr' }
     ]
   },
   name: [
@@ -200,7 +228,7 @@ export const mockUser = {
 
 export const mockTask = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   intent: '',
   identifier: [
     {
@@ -274,7 +302,7 @@ export const mockTask = {
 
 export const mockTaskDownloaded = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   intent: '',
   identifier: [
     {
@@ -309,7 +337,7 @@ export const mockTaskDownloaded = {
     reference: 'Composition/123' // the composition encompassing this registration
   },
   authoredOn: '2016-10-31T08:25:05+10:00',
-  lastModified: '2016-10-31T09:45:05+10:00',
+  lastModified: '2023-01-31T09:45:05+10:00',
   statusReason: {
     text: 'Rejected reason'
   },
@@ -356,7 +384,7 @@ export const mockTaskDownloaded = {
 
 export const mockTaskForDeath = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/death-tracking-id',
@@ -449,7 +477,7 @@ export const mockComposition = {
   subject: {
     reference: 'Patient/xyz' // A reference to the person being registered, by fullUrl
   },
-  date: '{{logicalCompositionDate}}', // declaration date
+  date: '2018-10-05', // declaration date
   author: [
     {
       reference: 'Practitioner/xyz' // CHW that declared the event
@@ -643,7 +671,7 @@ export const mockDeathComposition = {
   subject: {
     reference: 'Patient/xyz' // A reference to the person being registered, by fullUrl
   },
-  date: '{{logicalCompositionDate}}', // declaration date
+  date: '2018-10-05', // declaration date
   author: [
     {
       reference: 'Practitioner/xyz' // CHW that declared the event
@@ -758,7 +786,7 @@ export const mockDeathComposition = {
       text: '',
       entry: [
         {
-          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below
+          reference: 'Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e' // reference to Encounter resource contained below
         }
       ]
     },
@@ -790,6 +818,162 @@ export const mockDeathComposition = {
   id: '123'
 }
 
+export const mockDeathEncounter: BundleEntry<Encounter> = {
+  fullUrl:
+    '/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' as URLReference,
+  resource: {
+    resourceType: 'Encounter',
+    status: 'finished',
+    id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+    location: [
+      {
+        location: {
+          reference:
+            'Location/11539b31-0123-4b3e-88a7-db5919b34bd4' as ResourceIdentifier
+        }
+      }
+    ],
+    meta: {
+      lastUpdated: '2023-09-22T11:49:24.305+00:00',
+      versionId: '0a0ef65c-badf-4930-adc8-fe598de05951'
+    }
+  }
+}
+
+export const mockDeathEncounterLocation: BundleEntry<Location> = {
+  fullUrl:
+    '/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/_history/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference,
+  resource: {
+    resourceType: 'Location',
+    identifier: [
+      {
+        system: 'http://opencrvs.org/specs/id/internal-id',
+        value: 'HEALTH_FACILITY_Nw5x6uTYgJF'
+      }
+    ],
+    name: 'Muntemba Rural Health Centre',
+    alias: ['Muntemba Rural Health Centre'],
+    status: 'active',
+    mode: 'instance',
+    partOf: {
+      reference:
+        'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as ResourceIdentifier
+    },
+    type: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/location-type',
+          code: 'HEALTH_FACILITY'
+        }
+      ]
+    },
+    physicalType: {
+      coding: [
+        {
+          code: 'bu',
+          display: 'Building'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:36:07.630+00:00',
+      versionId: 'ae83b6d8-a772-41dd-9554-94b1749c0473'
+    },
+
+    id: '11539b31-0123-4b3e-88a7-db5919b34bd4'
+  }
+}
+
+export const causeOfDeathObservation: BundleEntry<Observation> = {
+  fullUrl:
+    '/fhir/Observation/5f08d904-4b70-4f0a-b43c-b0911b5bd6c5/_history/434a745a-be8c-470d-8bfa-c759c600b26f' as URLReference,
+  resource: {
+    resourceType: 'Observation',
+    status: 'final',
+    context: {
+      reference: `Encounter/${mockDeathEncounter.resource.id}`
+    },
+    category: [
+      {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs'
+          }
+        ]
+      }
+    ],
+    code: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: 'cause-of-death-method',
+          display: 'Cause of death method'
+        }
+      ]
+    },
+    id: '5f08d904-4b70-4f0a-b43c-b0911b5bd6c5',
+    valueCodeableConcept: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/cause-of-death-method',
+          code: 'PHYSICIAN'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:40:11.613+00:00',
+      versionId: '434a745a-be8c-470d-8bfa-c759c600b26f'
+    }
+  }
+}
+
+export const mannerOfDeathObservation: BundleEntry<Observation> = {
+  fullUrl:
+    '/fhir/Observation/9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb/_history/ccf928d7-8653-4922-87d2-32907f02f402' as URLReference,
+  resource: {
+    resourceType: 'Observation',
+    status: 'final',
+    context: {
+      reference: `Encounter/${mockDeathEncounter.resource.id}`
+    },
+    category: [
+      {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs'
+          }
+        ]
+      }
+    ],
+    code: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: 'uncertified-manner-of-death',
+          display: 'Uncertified manner of death'
+        }
+      ]
+    },
+    id: '9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb',
+    valueCodeableConcept: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/manner-of-death',
+          code: 'NATURAL_CAUSES'
+        }
+      ]
+    },
+    meta: {
+      lastUpdated: '2023-09-13T12:39:01.517+00:00',
+      versionId: 'ccf928d7-8653-4922-87d2-32907f02f402'
+    }
+  }
+}
+
 export const mockTaskBundle = {
   resourceType: 'Bundle',
   id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
@@ -808,7 +992,7 @@ export const mockTaskBundle = {
         'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
       resource: {
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -964,7 +1148,7 @@ export const mockFhirBundle = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -1205,31 +1389,6 @@ export const mockObservations = {
     ]
   },
   birthRegistration: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'birth-reg-type',
-                display: 'Birth registration type'
-              }
-            ]
-          },
-          effectiveDateTime: '2016-03-28', // same as birthdate
-          valueString: 'BOTH_PARENTS'
-        }
-      }
-    ]
-  },
-  birthRegistrationType: {
     entry: [
       {
         fullUrl: 'urn:uuid:<uuid>',
@@ -1574,7 +1733,7 @@ export const mockErrorComposition = {
 
 export const mockTaskForError = {
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
   identifier: [
     {
@@ -1735,7 +1894,7 @@ export const mockFhirLocation = {
     },
     {
       url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-      valueString: '[{"2020":6.8375},{"2021":6.9875}]'
+      valueString: '[{"2020":13.675},{"2021":13.975}]'
     }
   ],
   meta: {

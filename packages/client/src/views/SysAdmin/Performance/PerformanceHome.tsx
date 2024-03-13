@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -43,10 +42,10 @@ import { ApolloError } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
-import {
+import type {
   GQLCorrectionMetric,
   GQLTotalMetricsResult
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
@@ -437,7 +436,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         return <GenericErrorToast />
                       }
 
-                      if (loading) {
+                      if (loading && !data) {
                         return (
                           <Spinner id="performance-home-loading" size={24} />
                         )
@@ -485,6 +484,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
+                            event={event}
                           />
                         </>
                       )
@@ -600,7 +600,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     actions={[]}
                   >
                     <ResponsiveModalContent>
-                      {loading ? (
+                      {loading && !data ? (
                         <Spinner id="modal-data-loading" size={24} />
                       ) : (
                         <>
@@ -639,7 +639,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <LayoutRight>
                     {!officeSelected && (
                       <LocationStats>
-                        {!isOnline ? null : loading ? (
+                        {!isOnline ? null : loading && !data ? (
                           <Spinner id="location-stats-loading" size={24} />
                         ) : (
                           <LocationStatsView
@@ -661,7 +661,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     <RegistrationStatus>
                       {!isOnline ? (
                         <></>
-                      ) : loading ? (
+                      ) : loading && !data ? (
                         <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView

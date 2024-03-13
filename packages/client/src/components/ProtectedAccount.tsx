@@ -6,16 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { CreatePassword } from '@client/views/UserSetup/CreatePassword'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
 import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
-export const SCREEN_LOCK = 'screenLock'
 
 export enum ProtectedAccoutStep {
   LANDING,
@@ -34,48 +32,32 @@ export interface IProtectedAccountSetupData {
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
 }
 
-interface IProtectAccountState {
-  currentStep: ProtectedAccoutStep
-  setupData: IProtectedAccountSetupData
-}
+export const ProtectedAccount = () => {
+  const [currentStep, setCurrentStep] = useState<ProtectedAccoutStep>(
+    ProtectedAccoutStep.LANDING
+  )
+  const [setupData, setSetupData] = useState<IProtectedAccountSetupData>({})
 
-export class ProtectedAccount extends React.Component<
-  {},
-  IProtectAccountState
-> {
-  constructor(props: {}) {
-    super(props)
-    this.state = {
-      currentStep: ProtectedAccoutStep.LANDING,
-      setupData: {}
-    }
-    this.goToStep = this.goToStep.bind(this)
+  const goToStep = (
+    step: ProtectedAccoutStep,
+    data: IProtectedAccountSetupData
+  ) => {
+    setCurrentStep(step)
+    setSetupData(data)
   }
 
-  goToStep(step: ProtectedAccoutStep, data: IProtectedAccountSetupData) {
-    this.setState(() => ({
-      currentStep: step,
-      setupData: data
-    }))
-  }
-
-  render() {
-    const { currentStep, setupData } = this.state
-    switch (currentStep) {
-      case ProtectedAccoutStep.LANDING:
-        return <UserSetupPage goToStep={this.goToStep} setupData={setupData} />
-      case ProtectedAccoutStep.PASSWORD:
-        return <CreatePassword goToStep={this.goToStep} setupData={setupData} />
-      case ProtectedAccoutStep.SECURITY_QUESTION:
-        return (
-          <SecurityQuestion goToStep={this.goToStep} setupData={setupData} />
-        )
-      case ProtectedAccoutStep.REVIEW:
-        return (
-          <UserSetupReview goToStep={this.goToStep} setupData={setupData} />
-        )
-      case ProtectedAccoutStep.CONFIRMATION:
-        return <SetupConfirmationPage />
-    }
+  switch (currentStep) {
+    case ProtectedAccoutStep.LANDING:
+      return <UserSetupPage goToStep={goToStep} setupData={setupData} />
+    case ProtectedAccoutStep.PASSWORD:
+      return <CreatePassword goToStep={goToStep} setupData={setupData} />
+    case ProtectedAccoutStep.SECURITY_QUESTION:
+      return <SecurityQuestion goToStep={goToStep} setupData={setupData} />
+    case ProtectedAccoutStep.REVIEW:
+      return <UserSetupReview goToStep={goToStep} setupData={setupData} />
+    case ProtectedAccoutStep.CONFIRMATION:
+      return <SetupConfirmationPage />
+    default:
+      return null
   }
 }

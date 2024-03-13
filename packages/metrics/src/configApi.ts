@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
+import { Document } from 'mongoose'
 interface IBirth {
   REGISTRATION_TARGET: number
   LATE_REGISTRATION_TARGET: number
@@ -62,12 +62,9 @@ export interface IApplicationConfig {
   HEALTH_FACILITY_FILTER: string
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
-  ADDRESSES: number
   LOGIN_BACKGROUND: ILoginBackground
-  ADMIN_LEVELS: number
 }
 
 export async function getApplicationConfig(
@@ -90,6 +87,27 @@ export async function getApplicationConfig(
     .catch((error) => {
       return Promise.reject(
         new Error(`Application config request failed: ${error.message}`)
+      )
+    })
+}
+
+export async function getDashboardQueries(
+  authorization: string
+): Promise<Array<{ collection: string; aggregate: Document[] }>> {
+  const token = authorization.replace('Bearer ', '')
+  return fetch(`${CONFIG_API_URL}/dashboardQueries`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Dashboard queries request failed: ${error.message}`)
       )
     })
 }

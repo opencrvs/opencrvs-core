@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
@@ -88,14 +87,12 @@ export interface IEstimation {
   femaleEstimation: number
   locationId: string
   locationLevel: string
-  estimationYear: number
 }
 
 export interface IRegistrationInTargetDayEstimation {
   locationId: string
   registrationInTargetDay: number
   estimatedRegistration: number
-  estimationYear: number
   estimationLocationLevel: string
   estimationPercentage: number
 }
@@ -743,7 +740,6 @@ export async function fetchEstimatedTargetDayMetrics(
       locationId: point[locationLevel],
       registrationInTargetDay: point.withInTargetDay,
       estimatedRegistration: estimationOfTargetDay.totalEstimation,
-      estimationYear: estimationOfTargetDay.estimationYear,
       estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage:
         point.withInTargetDay === 0 ||
@@ -773,7 +769,6 @@ export async function fetchEstimatedTargetDayMetrics(
       locationId: id,
       registrationInTargetDay: 0,
       estimatedRegistration: estimationOfTargetDay.totalEstimation,
-      estimationYear: estimationOfTargetDay.estimationYear,
       estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage: 0
     })

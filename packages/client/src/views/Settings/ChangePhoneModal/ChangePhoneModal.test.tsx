@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -82,12 +81,10 @@ describe('Change phone modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetails = vi.fn(() =>
+    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready
@@ -106,12 +103,10 @@ describe('Change phone modal tests', () => {
   })
 
   it('should trigger onSuccess callback after change phone number', async () => {
-    queriesForUser.fetchUserDetails = vi.fn(() =>
+    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready

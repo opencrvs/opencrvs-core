@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IDuplicateDeclarationMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  duplicateDeclarationDetails: MessageDescriptor
   duplicateReviewHeader: MessageDescriptor
   duplicateContentTitle: MessageDescriptor
   duplicateContentSubtitle: MessageDescriptor
@@ -23,6 +23,11 @@ interface IDuplicateDeclarationMessages
 }
 
 const messagesToDefine: IDuplicateDeclarationMessages = {
+  duplicateDeclarationDetails: {
+    id: 'duplicates.content.header',
+    defaultMessage: 'Declaration Details',
+    description: 'Declaration details header of two duplicate ones'
+  },
   duplicateReviewHeader: {
     id: 'duplicates.review.header',
     defaultMessage: 'Potential {event} duplicate review',

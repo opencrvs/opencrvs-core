@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as React from 'react'
@@ -35,7 +34,7 @@ import {
 import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
-import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
@@ -18,16 +17,18 @@ import {
   getUserData,
   IDeclaration,
   SUBMISSION_STATUS,
-  updateWorkqueueData
+  updateWorkqueueData,
+  DOWNLOAD_STATUS,
+  RemoveUnassignedDeclarationsActionCreator
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+import type {
+  GQLEventSearchResultSet,
+  GQLEventSearchSet
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -60,7 +61,8 @@ export const EVENT_STATUS = {
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION'
+  WAITING_VALIDATION: 'WAITING_VALIDATION',
+  CORRECTION_REQUESTED: 'CORRECTION_REQUESTED'
 }
 
 export interface IWorkqueue {
@@ -132,7 +134,81 @@ export function updateRegistrarWorkqueue(
   }
 }
 
-export async function getWorkqueueOfCurrentUser(): Promise<string> {
+async function getFilteredDeclarations(
+  workqueue: IWorkqueue,
+  getState: () => IStoreState
+): Promise<{
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}> {
+  const state = getState()
+  const scope = getScope(state)
+  const savedDeclarations = state.declarationsState.declarations
+
+  const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
+    (queryData) => {
+      return queryData[1].results
+    }
+  ) as Array<GQLEventSearchSet | null>
+
+  // for field agent, no declarations should be unassigned
+  // for registration agent, sent for approval declarations should not be unassigned
+
+  // for other agents, check if the status of workqueue declaration
+  // has changed and if that declaration is saved in the store
+  // also declaration should not show as unassigned when it is being submitted
+  if (scope?.includes('declare'))
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations: []
+    }
+
+  const unassignedDeclarations = workqueueDeclarations
+    .filter(
+      (dec) =>
+        dec &&
+        hasStatusChanged(dec, savedDeclarations) &&
+        isNotSubmittingOrDownloading(dec, savedDeclarations)
+    )
+    .map((dec) => savedDeclarations.find((d) => d.id === dec?.id))
+    .filter((maybeDeclaration): maybeDeclaration is IDeclaration =>
+      Boolean(maybeDeclaration)
+    )
+
+  const unassignedDeclarationIds = unassignedDeclarations.map(
+    (unassigned) => unassigned.id
+  )
+  const currentlyDownloadedDeclarations = savedDeclarations.filter(
+    (dec) => !unassignedDeclarationIds.includes(dec.id)
+  )
+
+  // don't need to update indexDb if there are no unassigned declarations
+  if (unassignedDeclarations.length === 0)
+    return {
+      currentlyDownloadedDeclarations: savedDeclarations,
+      unassignedDeclarations
+    }
+
+  const uID = await getCurrentUserID()
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+  if (currentUserData) {
+    currentUserData.declarations = currentlyDownloadedDeclarations
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: currentlyDownloadedDeclarations,
+      workqueue
+    }
+    allUserData.push(currentUserData)
+  }
+
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  return { currentlyDownloadedDeclarations, unassignedDeclarations }
+}
+
+async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
 
@@ -160,6 +236,54 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   return JSON.stringify(currentUserWorkqueue)
 }
 
+function isNotSubmittingOrDownloading(
+  workqueueDeclaration: GQLEventSearchSet,
+  savedDeclarations: IDeclaration[]
+) {
+  const declarationInStore = savedDeclarations.find(
+    (dec) => dec.id === workqueueDeclaration.id
+  )
+
+  if (
+    declarationInStore &&
+    declarationInStore.downloadStatus &&
+    [DOWNLOAD_STATUS.DOWNLOADING, DOWNLOAD_STATUS.READY_TO_DOWNLOAD].includes(
+      declarationInStore.downloadStatus
+    )
+  ) {
+    return false
+  }
+
+  if (declarationInStore?.submissionStatus)
+    return !Boolean(
+      [
+        SUBMISSION_STATUS.SUBMITTING,
+        SUBMISSION_STATUS.APPROVING,
+        SUBMISSION_STATUS.REGISTERING,
+        SUBMISSION_STATUS.REJECTING,
+        SUBMISSION_STATUS.ARCHIVING,
+        SUBMISSION_STATUS.CERTIFYING,
+        SUBMISSION_STATUS.ISSUING,
+        SUBMISSION_STATUS.REQUESTING_CORRECTION
+      ].includes(declarationInStore.submissionStatus as SUBMISSION_STATUS)
+    )
+  return true
+}
+
+function hasStatusChanged(
+  currentDeclaration: GQLEventSearchSet,
+  savedDeclarations: IDeclaration[]
+) {
+  const currentDeclarationStatus = currentDeclaration?.registration?.status
+  const declarationStatusInStore = savedDeclarations.find(
+    (dec) => dec.id === currentDeclaration?.id
+  )?.registrationStatus
+
+  if (!declarationStatusInStore) return false
+
+  return currentDeclarationStatus !== declarationStatusInStore
+}
+
 function mergeWorkQueueData(
   state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
@@ -178,9 +302,7 @@ function mergeWorkQueueData(
     ) {
       return
     }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
+    destinationWorkQueue.data[workQueueId].results?.forEach((declaration) => {
       if (declaration == null) {
         return
       }
@@ -192,7 +314,11 @@ function mergeWorkQueueData(
           currentApplications[declarationIndex].submissionStatus ===
             SUBMISSION_STATUS.FAILED_NETWORK ||
           currentApplications[declarationIndex].submissionStatus ===
-            SUBMISSION_STATUS.FAILED
+            SUBMISSION_STATUS.FAILED ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED
 
         if (!isDownloadFailed) {
           updateWorkqueueData(
@@ -219,7 +345,11 @@ async function getWorkqueueData(
   const scope = getScope(state)
   const reviewStatuses =
     scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      ? [
+          EVENT_STATUS.DECLARED,
+          EVENT_STATUS.VALIDATED,
+          EVENT_STATUS.CORRECTION_REQUESTED
+        ]
       : [EVENT_STATUS.DECLARED]
 
   const {
@@ -291,7 +421,7 @@ async function getWorkqueueData(
   )
 }
 
-export async function writeRegistrarWorkqueueByUser(
+async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {
@@ -400,11 +530,16 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
-
-        return {
-          ...state,
-          workqueue
-        }
+        return loop(
+          {
+            ...state,
+            workqueue
+          },
+          Cmd.run(getFilteredDeclarations, {
+            successActionCreator: RemoveUnassignedDeclarationsActionCreator,
+            args: [workqueue, Cmd.getState]
+          })
+        )
       }
       return state
 

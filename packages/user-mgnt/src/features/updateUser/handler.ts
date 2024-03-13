@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   generateUsername,
@@ -21,11 +20,12 @@ import {
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
-import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
+import { getUserId } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { userRoleScopes } from '@opencrvs/commons/authentication'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -65,6 +65,7 @@ export default async function updateUser(
   existingUser.identifiers = user.identifiers
   existingUser.email = user.email
   existingUser.mobile = user.mobile
+  existingUser.emailForNotification = user.emailForNotification
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
@@ -72,9 +73,9 @@ export default async function updateUser(
   if (existingUser.systemRole !== user.systemRole) {
     changingRole = true
     existingUser.systemRole = user.systemRole
-    // Updating user sope
+    // Updating user scope
     const userScopes: string[] =
-      roleScopeMapping[existingUser.systemRole || 'FIELD_AGENT']
+      userRoleScopes[existingUser.systemRole || 'FIELD_AGENT']
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -141,16 +142,25 @@ export default async function updateUser(
       existingPractitionerRole
     )
     if (err.code === 11000) {
-      return h.response().code(403)
+      // check if phone or email has thrown unique constraint errors
+      const errorThrowingProperty =
+        err.keyPattern && Object.keys(err.keyPattern)[0]
+      return h.response({ errorThrowingProperty }).code(403)
     }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }
 
   if (userNameChanged) {
-    sendUpdateUsernameNotification(user.mobile, existingUser.username, {
-      Authorization: request.headers.authorization
-    })
+    sendUpdateUsernameNotification(
+      user.name,
+      existingUser.username,
+      {
+        Authorization: request.headers.authorization
+      },
+      user.mobile,
+      user.emailForNotification
+    )
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
 
@@ -31,6 +30,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         firstName
         lastName
         officeName
+        avatarURL
       }
     }
     operationHistories {
@@ -53,6 +53,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfBirth
       childName {
         firstNames
+        middleName
         familyName
         use
       }
@@ -61,6 +62,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfDeath
       deceasedName {
         firstNames
+        middleName
         familyName
         use
       }
@@ -69,11 +71,13 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfMarriage
       brideName {
         firstNames
+        middleName
         familyName
         use
       }
       groomName {
         firstNames
+        middleName
         familyName
         use
       }
@@ -163,7 +167,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     approvalTab: searchEvents(
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
-        registrationStatuses: ["VALIDATED"]
+        registrationStatuses: ["VALIDATED", "CORRECTION_REQUESTED"]
       }
       count: $pageSize
       skip: $approvalSkip

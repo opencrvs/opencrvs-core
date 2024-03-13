@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
@@ -117,6 +116,7 @@ const UserRoles = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.userRoles)}
           />
         }
         navigation={<Navigation />}
@@ -172,7 +172,9 @@ const UserRoles = () => {
                       <Value id={`${systemRole.value}_value`}>
                         <Stack direction="column" alignItems="stretch" gap={2}>
                           {systemRole.roles.map((role) => (
-                            <span>{getUserRole(language, role)}</span>
+                            <span key={role._id}>
+                              {getUserRole(language, role)}
+                            </span>
                           ))}
                         </Stack>
                       </Value>
@@ -180,7 +182,7 @@ const UserRoles = () => {
                     actions={
                       <Link
                         id="changeButton"
-                        key={systemRole.id}
+                        key={'change-button-' + systemRole.id}
                         font="reg16"
                         onClick={() => {
                           roleChangeHandler(systemRole)

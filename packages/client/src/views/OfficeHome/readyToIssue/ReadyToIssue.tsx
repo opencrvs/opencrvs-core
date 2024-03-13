@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
@@ -22,9 +21,9 @@ import {
   COLUMNS,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
-import { useIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   buttonMessages,
@@ -47,11 +46,12 @@ import {
 import {
   IconWithName,
   NoNameContainer,
-  NameContainer
+  NameContainer,
+  IconWithNameEvent
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useEffect, useState } from 'react'
-import { useTheme } from '@client/styledComponents'
+import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IBasePrintTabProps {
@@ -154,7 +154,7 @@ export const ReadyToIssue = ({
         {
           label: intl.formatMessage(constantsMessages.record),
           width: 70,
-          key: COLUMNS.ICON_WITH_NAME
+          key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
           width: 30,
@@ -239,6 +239,13 @@ export const ReadyToIssue = ({
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
           <IconWithName status={reg.declarationStatus} name={NameComponent} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={NameComponent}
+            event={reg.event}
+          />
         ),
         dateOfEvent,
         trackingId: reg.trackingId,

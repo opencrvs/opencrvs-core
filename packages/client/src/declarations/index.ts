@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   Action as DeclarationAction,
@@ -20,7 +19,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query, SystemRoleType } from '@client/utils/gateway'
+import {
+  Attachment,
+  Event,
+  History,
+  Query,
+  SystemRoleType
+} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -40,7 +45,7 @@ import {
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
+import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -48,7 +53,7 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   ApolloClient,
   ApolloError,
@@ -61,7 +66,9 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast
+  ShowDownloadDeclarationFailedToast,
+  ShowUnassignedDeclarations,
+  showUnassignedDeclarations
 } from '@client/notification/actions'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
@@ -72,9 +79,14 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import {
+  EMPTY_STRING,
+  FIELD_AGENT_ROLES,
+  SIGNATURE_KEYS
+} from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
+import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -95,6 +107,8 @@ const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
+const REMOVE_UNASSIGNED_DECLARATIONS =
+  'DECLARATION/REMOVE_UNASSIGNED_DECLARATIONS'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -126,10 +140,11 @@ export enum SUBMISSION_STATUS {
   ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK',
-  IN_PROGRESS = 'IN_PROGRESS'
+  IN_PROGRESS = 'IN_PROGRESS',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
+  REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
 export enum DOWNLOAD_STATUS {
@@ -157,8 +172,10 @@ export const processingStates = [
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.CORRECTION_REQUESTED,
   SUBMISSION_STATUS.READY_TO_ISSUE,
-  SUBMISSION_STATUS.ISSUING
+  SUBMISSION_STATUS.ISSUING,
+  SUBMISSION_STATUS.REJECT_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -170,7 +187,7 @@ const ACTION_LIST: IActionList = {
   [DownloadAction.LOAD_REVIEW_DECLARATION]:
     DownloadAction.LOAD_REVIEW_DECLARATION,
   [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
-    DownloadAction.LOAD_CERTIFICATE_DECLARATION,
+    DownloadAction.LOAD_REVIEW_DECLARATION,
   [DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
     DownloadAction.LOAD_REVIEW_DECLARATION
 }
@@ -207,6 +224,7 @@ export interface IDeclaration {
   data: IFormData
   duplicates?: IDuplicates[]
   originalData?: IFormData
+  localData?: IFormData
   savedOn?: number
   createdAt?: string
   modifiedOn?: number
@@ -252,8 +270,8 @@ type RelationForCertificateCorrection =
   | 'CHILD'
 
 export type ICertificate = {
-  collector?: Partial<{ type: Relation }>
-  corrector?: Partial<{ type: RelationForCertificateCorrection }>
+  collector?: Partial<{ type: Relation | string }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -275,7 +293,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
     }
     registration: {
       _fhirID: string
-      informantType: Relation
+      informantType: Relation | string
       whoseContactDetails: string
       registrationPhone: string
       trackingId: string
@@ -293,10 +311,9 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 export type Payment = {
   paymentId?: string
   type: PaymentType
-  total: number
   amount: number
   outcome: PaymentOutcomeType
-  date: number
+  date: string
 }
 
 interface IArchiveDeclarationAction {
@@ -317,7 +334,7 @@ interface IStoreDeclarationAction {
 interface IModifyDeclarationAction {
   type: typeof MODIFY_DECLARATION
   payload: {
-    declaration: IDeclaration | IPrintableDeclaration
+    declaration: IPrintableDeclaration | Partial<IDeclaration>
   }
 }
 
@@ -354,6 +371,7 @@ interface IDeleteDeclarationAction {
   type: typeof DELETE_DECLARATION
   payload: {
     declarationId: string
+    client: ApolloClient<{}>
   }
 }
 
@@ -368,7 +386,7 @@ interface IGetStorageDeclarationsFailedAction {
 
 interface IDeleteDeclarationSuccessAction {
   type: typeof DELETE_DECLARATION_SUCCESS
-  payload: string
+  payload: { declarationId: string; client: ApolloClient<{}> }
 }
 
 interface IDeleteDeclarationFailedAction {
@@ -380,6 +398,14 @@ interface IDownloadDeclaration {
   payload: {
     declaration: IDeclaration
     client: ApolloClient<{}>
+  }
+}
+
+interface IRemoveUnassignedDeclarationAction {
+  type: typeof REMOVE_UNASSIGNED_DECLARATIONS
+  payload: {
+    currentlyDownloadedDeclarations: IDeclaration[]
+    unassignedDeclarations: IDeclaration[]
   }
 }
 
@@ -455,6 +481,8 @@ export type Action =
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
+  | IRemoveUnassignedDeclarationAction
+  | ShowUnassignedDeclarations
 
 export interface IUserData {
   userID: string
@@ -511,7 +539,8 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: formData,
+    originalData: status !== 'IN_PROGRESS' ? formData : {},
+    localData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -536,9 +565,8 @@ export function storeDeclaration(
 }
 
 export function modifyDeclaration(
-  declaration: IDeclaration | IPrintableDeclaration
+  declaration: IPrintableDeclaration | Partial<IDeclaration>
 ): IModifyDeclarationAction {
-  declaration.modifiedOn = Date.now()
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
@@ -579,16 +607,29 @@ export function archiveDeclaration(
   }
 }
 
+export const RemoveUnassignedDeclarationsActionCreator = (payload: {
+  currentlyDownloadedDeclarations: IDeclaration[]
+  unassignedDeclarations: IDeclaration[]
+}): IRemoveUnassignedDeclarationAction => ({
+  type: REMOVE_UNASSIGNED_DECLARATIONS,
+  payload: payload
+})
+
 export function deleteDeclaration(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declarationId } }
+  return { type: DELETE_DECLARATION, payload: { declarationId, client } }
 }
 
 function deleteDeclarationSuccess(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationSuccessAction {
-  return { type: DELETE_DECLARATION_SUCCESS, payload: declarationId }
+  return {
+    type: DELETE_DECLARATION_SUCCESS,
+    payload: { declarationId, client }
+  }
 }
 
 function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
@@ -599,6 +640,7 @@ export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
+  declaration.modifiedOn = Date.now()
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
@@ -688,7 +730,12 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        const history = d.originalData?.history as unknown as IDynamicValues
+        // original data stays empty for in progress declaration
+        const history = (
+          d.originalData && Object.keys(d.originalData).length === 0
+            ? d.localData
+            : d.originalData
+        )?.history as IDynamicValues
 
         const downloadedTime = (
           history.filter((h: IDynamicValues) => {
@@ -1014,7 +1061,7 @@ function createRequestForDeclaration(
 }
 
 function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<any>>,
+  mainRequest: Promise<ApolloQueryResult<Query>>,
   getState: () => IStoreState,
   client: ApolloClient<{}>
 ) {
@@ -1026,9 +1073,32 @@ function requestWithStateWrapper(
       if (
         !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
       ) {
-        await fetchAllDuplicateDeclarations(data.data as Query)
+        await fetchAllDuplicateDeclarations(data.data)
       }
-      await fetchAllMinioUrlsInAttachment(data.data as Query)
+      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
+        data.data
+      )
+
+      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
+        .map(
+          (declaration) =>
+            declaration.data.fetchRegistrationForViewing?.registration
+        )
+        .flatMap((registration) => registration?.attachments)
+        .map((attachment) => attachment?.data)
+        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+      const allfetchableURLs = [
+        ...getAttachmentUrls(data.data),
+        ...getSignatureUrls(data.data),
+        ...getProfileIconUrls(data.data),
+        ...allduplicateDeclarationsAttachments
+      ]
+
+      await Promise.all(
+        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
+      )
+
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
@@ -1036,21 +1106,41 @@ function requestWithStateWrapper(
   })
 }
 
-async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+function getProfileIconUrls(queryResultData: Query) {
+  const history =
+    queryResultData.fetchBirthRegistration?.history ||
+    queryResultData.fetchDeathRegistration?.history ||
+    queryResultData.fetchMarriageRegistration?.history
+
+  const userAvatars = (history ?? [])
+    .filter((h): h is History => Boolean(h))
+    .map((h) => h.user?.avatar?.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+  return [...new Set(userAvatars).values()]
+}
+
+function getAttachmentUrls(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  const attachments = registration?.attachments
-  if (!attachments) {
-    return
-  }
-  const urlsWithMinioPath = attachments
-    .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
+  return (registration?.attachments ?? [])
+    .filter((a): a is Attachment => Boolean(a))
+    .map((a) => a.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+}
 
-  return Promise.all(urlsWithMinioPath)
+function getSignatureUrls(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
+
+  return SIGNATURE_KEYS.map(
+    (propertyKey) => registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1174,7 +1264,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ({ id }) => id === action.payload.declarationId
       )
 
-      if (!declaration || declaration.data[action.payload.pageId]) {
+      if (
+        !declaration ||
+        declaration.data[action.payload.pageId] ||
+        action.payload.pageId === 'preview' ||
+        action.payload.pageId === 'review'
+      ) {
         return state
       }
       const modifiedDeclaration = {
@@ -1192,7 +1287,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         declarations: state.declarations.concat(action.payload.declaration)
       }
     case DELETE_DECLARATION: {
-      const { declarationId } = action.payload
+      const { declarationId, client: clientFromDeleteDeclaration } =
+        action.payload
       return loop(
         {
           ...state,
@@ -1203,7 +1299,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           )
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: deleteDeclarationSuccess,
+          successActionCreator: (id: string) =>
+            deleteDeclarationSuccess(id, clientFromDeleteDeclaration),
           failActionCreator: deleteDeclarationFailed,
           args: [state.userID, action.payload.declarationId, state]
         })
@@ -1211,17 +1308,25 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
     }
     case DELETE_DECLARATION_SUCCESS:
       const declarationToDelete = state.declarations.find(
-        (declaration) => declaration.id === action.payload
+        (declaration) => declaration.id === action.payload.declarationId
       )
       const declarationMinioUrls =
         getMinioUrlsFromDeclaration(declarationToDelete)
 
       postMinioUrlsToServiceWorker(declarationMinioUrls)
+
+      const declarationsWithoutDeleted = state.declarations.filter(
+        ({ id }) => id !== action.payload.declarationId
+      )
+
+      clearUnusedViewRecordCacheEntries(
+        action.payload.client.cache,
+        declarationsWithoutDeleted
+      )
+
       return {
         ...state,
-        declarations: state.declarations.filter(
-          ({ id }) => id !== action.payload
-        )
+        declarations: declarationsWithoutDeleted
       }
     case MODIFY_DECLARATION:
       const newDeclarations = [...state.declarations]
@@ -1236,7 +1341,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )?.value
       }
 
-      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
+      newDeclarations[currentDeclarationIndex] = {
+        ...newDeclarations[currentDeclarationIndex],
+        ...modifiedDeclaration
+      }
 
       return {
         ...state,
@@ -1764,7 +1872,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           | IUnassignDeclaration
         >(
           [
-            Cmd.action(deleteDeclaration(action.payload.id)),
+            Cmd.action(
+              deleteDeclaration(action.payload.id, action.payload.client)
+            ),
             Cmd.action(updateRegistrarWorkqueue()),
             declarationNextToUnassign
               ? Cmd.action(
@@ -1777,6 +1887,19 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ],
           { sequence: true }
         )
+      )
+    case REMOVE_UNASSIGNED_DECLARATIONS:
+      const unassignedDeclarationTrackingIds =
+        action.payload.unassignedDeclarations.map(
+          (dec) => dec.data.registration.trackingId
+        ) as string[]
+
+      return loop(
+        {
+          ...state,
+          declarations: action.payload.currentlyDownloadedDeclarations
+        },
+        Cmd.action(showUnassignedDeclarations(unassignedDeclarationTrackingIds))
       )
     default:
       return state
@@ -1810,14 +1933,36 @@ export function filterProcessingDeclarations(
 export function getMinioUrlsFromDeclaration(
   declaration: IDeclaration | undefined
 ) {
-  const minioUrls: string[] = []
   if (!declaration) {
-    return minioUrls
+    return []
   }
+  const minioUrls: string[] = SIGNATURE_KEYS.map(
+    (propertyKey) => declaration.originalData?.registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
   const documentsData = declaration.originalData?.documents as Record<
     string,
     IAttachmentValue[]
   >
+
+  const userAvatars: string[] = Object.values(
+    declaration.originalData?.history || []
+  )
+    .map((history) => {
+      if (
+        typeof history === 'object' &&
+        history !== null &&
+        'user' in history
+      ) {
+        const user = history.user as { avatar?: { data?: string } }
+        return user?.avatar?.data
+      }
+      return null
+    })
+    .filter((avatarData): avatarData is string => Boolean(avatarData))
+
+  minioUrls.push(...userAvatars)
+
   if (!documentsData) {
     return minioUrls
   }
@@ -1834,11 +1979,8 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
-  )
   navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioFullUrls
+    minioUrls: minioUrls
   })
 }
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {

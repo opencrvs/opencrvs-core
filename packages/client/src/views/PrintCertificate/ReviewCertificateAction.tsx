@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   PrimaryButton,
@@ -29,7 +28,6 @@ import {
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
@@ -39,7 +37,7 @@ import {
   formatUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -56,11 +54,10 @@ import {
   getEventDate,
   isFreeOfCost,
   calculatePrice,
-  getRegisteredDate,
-  getRegistrarSignatureHandlebarName
+  getRegisteredDate
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
@@ -130,6 +127,7 @@ class ReviewCertificateActionComponent extends React.Component<
             certificatePdf: svg
           })
         },
+        this.props.state,
         this.props.countries
       )
     }
@@ -163,10 +161,9 @@ class ReviewCertificateActionComponent extends React.Component<
       ) {
         certificate.payments = {
           type: 'MANUAL' as const,
-          total: 0,
           amount: 0,
           outcome: 'COMPLETED' as const,
-          date: Date.now()
+          date: new Date().toISOString()
         }
       } else {
         const paymentAmount = calculatePrice(
@@ -177,10 +174,9 @@ class ReviewCertificateActionComponent extends React.Component<
         )
         certificate.payments = {
           type: 'MANUAL' as const,
-          total: Number(paymentAmount),
           amount: Number(paymentAmount),
           outcome: 'COMPLETED' as const,
-          date: Date.now()
+          date: new Date().toISOString()
         }
       }
     }
@@ -200,6 +196,7 @@ class ReviewCertificateActionComponent extends React.Component<
       draft,
       this.props.userDetails,
       this.props.offlineCountryConfig,
+      this.props.state,
       this.props.countries
     )
     this.props.modifyDeclaration(draft)
@@ -288,10 +285,15 @@ class ReviewCertificateActionComponent extends React.Component<
               : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
           }
           actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+            <CustomTertiaryButton
+              key="close-modal"
+              onClick={this.toggleModal}
+              id="close-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton
+              key="print-certificate"
               onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >
@@ -346,10 +348,6 @@ function mapStatetoProps(
   const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
   const offlineCountryConfig = getOfflineData(state)
-  const signatureKey = getRegistrarSignatureHandlebarName(
-    offlineCountryConfig,
-    event
-  )
 
   return {
     event,
@@ -360,11 +358,7 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
-          [signatureKey]:
-            !draft.data.template?.[signatureKey] ||
-            isCertificateForPrintInAdvance(draft)
-              ? ''
-              : draft.data.template[signatureKey]
+          ...(isCertificateForPrintInAdvance(draft) && { printInAdvance: true })
         }
       }
     },
@@ -372,7 +366,8 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
     offlineCountryConfig,
-    registerForm: getEventRegisterForm(state, event)
+    registerForm: getEventRegisterForm(state, event),
+    state
   }
 }
 

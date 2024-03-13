@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { RegRatesLineChart } from '@client/components/charts/RegRatesLineChart'
 import { DateRangePicker } from '@client/components/DateRangePicker'
@@ -25,10 +24,10 @@ import {
   NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {

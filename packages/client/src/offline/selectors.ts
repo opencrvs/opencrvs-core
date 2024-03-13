@@ -6,17 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
-import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
-import { UserDetails } from '@client/utils/userUtils'
 
-export const getOfflineState = (store: IStoreState): IOfflineDataState =>
-  store.offline
+const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
 function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
   return getOfflineState(store)[key]
@@ -29,29 +25,13 @@ export function isOfflineDataLoaded(
     state.facilities &&
     state.locations &&
     state.config &&
-    state.formConfig &&
+    state.forms &&
     state.templates &&
     state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
-}
-
-export function isSystemAdmin(userDetails: UserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.systemRole &&
-    SYS_ADMIN_ROLES.includes(userDetails.systemRole)
-  )
-}
-
-export function isNationalSystemAdmin(userDetails: UserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.systemRole &&
-    NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-  )
 }
 
 export const getOfflineDataLoaded = (

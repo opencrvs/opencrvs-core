@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { query } from '@metrics/influxdb/client'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
@@ -122,16 +121,16 @@ export async function getNumberOfAppStartedByPractitioners(
                   OR locationLevel3 = $locationId
                   OR locationLevel4 = $locationId
                   OR locationLevel5 = $locationId ) 
-              $eventClause
-              $statusClause    
+              ${eventClause}
+              ${statusClause}    
               GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause,
-        statusClause
+        event,
+        status
       }
     }
   )
@@ -164,14 +163,13 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
                     OR locationLevel3 = $locationId
                     OR locationLevel4 = $locationId
                     OR locationLevel5 = $locationId ) 
-                $eventClause
+                ${eventClause}
                 GROUP BY startedBy`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause,
         event
       }
     }
@@ -210,14 +208,15 @@ export async function getAvgTimeSpentOnAppByPractitioners(
                         OR locationLevel3 = $locationId
                         OR locationLevel4 = $locationId
                         OR locationLevel5 = $locationId ) 
-                    $eventClause
+                    ${eventClause}
                     GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause
+        event,
+        status
       }
     }
   )

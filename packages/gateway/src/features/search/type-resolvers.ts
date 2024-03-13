@@ -6,20 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { NATIVE_LANGUAGE } from '@gateway/constants'
+import { AVATAR_API, NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  GQLAdvancedSearchParametersInput,
+  IEventDurationResponse,
+  getEventDurationsFromMetrics
+} from '@gateway/features/metrics/service'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
-import {
-  getEventDurationsFromMetrics,
-  IEventDurationResponse
-} from '@gateway/features/fhir/utils'
-import { getUser } from '@gateway/features/user/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -29,13 +27,12 @@ interface ISearchEventDataTemplate {
 interface ISearchDataTemplate {
   [key: string]: any
 }
-export interface ISearchCriteria {
-  parameters: GQLAdvancedSearchParametersInput
-  sort?: string
-  sortColumn?: string
-  size?: number
-  from?: number
-  createdBy?: string
+
+interface IAssignment {
+  officeName: string
+  firstName: string
+  lastName: string
+  userId: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -59,7 +56,12 @@ const getChildName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.childFirstNames && [source.childFirstNames]) || null,
+      given:
+        ((source.childFirstNames || source.childMiddleName) && [
+          source.childFirstNames,
+          source.childMiddleName
+        ]) ||
+        null,
       family: (source.childFamilyName && [source.childFamilyName]) || null
     }
   ]
@@ -68,7 +70,11 @@ const getChildName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.childFirstNamesLocal && [source.childFirstNamesLocal]) || null,
+        ((source.childFirstNamesLocal || source.childMiddleNameLocal) && [
+          source.childFirstNamesLocal,
+          source.childMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.childFamilyNameLocal && [source.childFamilyNameLocal]) || null
     })
@@ -85,7 +91,12 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.deceasedFirstNames && [source.deceasedFirstNames]) || null,
+      given:
+        ((source.deceasedFirstNames || source.deceasedMiddleName) && [
+          source.deceasedFirstNames,
+          source.deceasedMiddleName
+        ]) ||
+        null,
       family: (source.deceasedFamilyName && [source.deceasedFamilyName]) || null
     }
   ]
@@ -94,7 +105,10 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.deceasedFirstNamesLocal && [source.deceasedFirstNamesLocal]) ||
+        ((source.deceasedFirstNamesLocal || source.deceasedMiddleNameLocal) && [
+          source.deceasedFirstNamesLocal,
+          source.deceasedMiddleNameLocal
+        ]) ||
         null,
       family:
         (source.deceasedFamilyNameLocal && [source.deceasedFamilyNameLocal]) ||
@@ -112,7 +126,12 @@ const getBrideName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.brideFirstNames && [source.brideFirstNames]) || null,
+      given:
+        ((source.brideFirstNames || source.brideMiddleName) && [
+          source.brideFirstNames,
+          source.brideMiddleName
+        ]) ||
+        null,
       family: (source.brideFamilyName && [source.brideFamilyName]) || null
     }
   ]
@@ -121,7 +140,11 @@ const getBrideName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.brideFirstNamesLocal && [source.brideFirstNamesLocal]) || null,
+        ((source.brideFirstNamesLocal || source.brideMiddleNameLocal) && [
+          source.brideFirstNamesLocal,
+          source.brideMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.brideFamilyNameLocal && [source.brideFamilyNameLocal]) || null
     })
@@ -137,7 +160,12 @@ const getGroomName = (source: ISearchDataTemplate) => {
   const names = [
     {
       use: 'en',
-      given: (source.groomFirstNames && [source.groomFirstNames]) || null,
+      given:
+        ((source.groomFirstNames || source.groomMiddleName) && [
+          source.groomFirstNames,
+          source.groomMiddleName
+        ]) ||
+        null,
       family: (source.groomFamilyName && [source.groomFamilyName]) || null
     }
   ]
@@ -146,7 +174,11 @@ const getGroomName = (source: ISearchDataTemplate) => {
     names.push({
       use: NATIVE_LANGUAGE,
       given:
-        (source.groomFirstNamesLocal && [source.groomFirstNamesLocal]) || null,
+        ((source.groomFirstNamesLocal || source.groomMiddleNameLocal) && [
+          source.groomFirstNamesLocal,
+          source.groomMiddleNameLocal
+        ]) ||
+        null,
       family:
         (source.groomFamilyNameLocal && [source.groomFamilyNameLocal]) || null
     })
@@ -188,6 +220,46 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
+    },
+    placeOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (
+        (resultSet._source && resultSet._source.eventLocationId) ||
+        (resultSet._source &&
+          resultSet._source.eventJurisdictionIds[
+            resultSet._source.eventJurisdictionIds.length - 1
+          ]) ||
+        null
+      )
+    },
+    childGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
+    },
+    childIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.childIdentifier) || null
+    },
+    mothersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFirstNames) || null
+    },
+    mothersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFamilyName) || null
+    },
+    fathersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFirstNames) || null
+    },
+    fathersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFamilyName) || null
+    },
+    motherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherDoB) || null
+    },
+    fatherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherDoB) || null
+    },
+    motherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherIdentifier) || null
+    },
+    fatherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherIdentifier) || null
     }
   },
   DeathEventSearchSet: {
@@ -202,6 +274,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     operationHistories(resultSet: ISearchEventDataTemplate) {
       return resultSet._source.operationHistories
+    },
+    deceasedGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
@@ -226,8 +301,14 @@ export const searchTypeResolvers: GQLResolver = {
     brideName(resultSet: ISearchEventDataTemplate) {
       return getBrideName(resultSet._source)
     },
+    brideIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.brideIdentifier) || null
+    },
     groomName(resultSet: ISearchEventDataTemplate) {
       return getGroomName(resultSet._source)
+    },
+    groomIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.groomIdentifier) || null
     },
     dateOfMarriage(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.marriageDate) || null
@@ -323,11 +404,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedBy: async (
       searchData: ISearchEventDataTemplate,
       _,
-      { headers: authHeader }
+      { dataSources }
     ) => {
-      const res = await getUser(
-        { practitionerId: searchData._source && searchData._source.createdBy },
-        authHeader
+      const res = await dataSources.usersAPI.getUserByPractitionerId(
+        searchData._source && searchData._source.createdBy
       )
       // declarations created by health facilities don't have user
       // associated with it, so it returns an error
@@ -373,6 +453,26 @@ export const searchTypeResolvers: GQLResolver = {
     },
     timeInReadyToPrint(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'REGISTERED')
+    }
+  },
+  AssignmentData: {
+    async avatarURL(
+      assignmentData: IAssignment,
+      _,
+      { dataSources, headers: authHeader, presignDocumentUrls }
+    ) {
+      const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
+        assignmentData.userId
+      )
+
+      if (avatarURI) {
+        if (!presignDocumentUrls) {
+          return avatarURI
+        }
+        const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
+        return avatarURL
+      }
+      return `${AVATAR_API}${userName}`
     }
   }
 }

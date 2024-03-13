@@ -6,12 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
 import { Box } from '@opencrvs/components/lib/Box'
@@ -27,6 +26,7 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  getOfflineData,
   selectApplicationName,
   selectCountryLogo
 } from '@client/offline/selectors'
@@ -45,6 +45,7 @@ import {
 } from '@client/utils/gateway'
 import { useTimeout } from '@client/hooks/useTimeout'
 import { goToHome } from '@client/navigation'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -81,7 +82,7 @@ const SpaceDiv = styled.div`
   height: 16px;
 `
 
-export enum ContentSize {
+enum ContentSize {
   LARGE = 'large',
   NORMAL = 'normal'
 }
@@ -122,13 +123,15 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           gender
         }
         eventLocation {
+          id
           name
           description
           type
           address {
+            district
+            state
             city
-            districtName
-            stateName
+            country
           }
         }
         registration {
@@ -165,13 +168,15 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           }
         }
         eventLocation {
+          id
           name
           description
           type
           address {
+            district
+            state
             city
-            districtName
-            stateName
+            country
           }
         }
         registration {
@@ -256,6 +261,7 @@ export function VerifyCertificatePage() {
 
   const logo = useSelector(selectCountryLogo)
   const appName = useSelector(selectApplicationName)
+  const offlineData = useSelector(getOfflineData)
 
   const [closeWindow, setCloseWindow] = React.useState(false)
   const [timeOut, setTimeOut] = React.useState(false)
@@ -345,16 +351,42 @@ export function VerifyCertificatePage() {
       return data.deceased.gender
   }
 
-  const getLocation = (data: any) => {
+  // This function currently supports upto two location levels
+  const getLocation = (data: BirthRegistration | DeathRegistration) => {
     const location = data.eventLocation
-    if (location?.type === 'HEALTH_FACILITY') return location?.name
-    const city = location?.address?.city && location?.address?.city + ', '
-    return (
-      city +
-      location?.address?.districtName +
-      ', ' +
-      location?.address?.stateName
-    )
+
+    if (location?.type === 'HEALTH_FACILITY') {
+      return location?.name ?? EMPTY_STRING
+    }
+
+    const country =
+      location?.address?.country &&
+      intl.formatMessage(countryMessages[location?.address?.country])
+
+    const city = location?.address?.city ?? EMPTY_STRING
+
+    if (location?.address?.country === window.config.COUNTRY) {
+      const district =
+        location.address.district &&
+        offlineData.locations[location.address.district].name
+      const state =
+        location.address.state &&
+        offlineData.locations[location.address.state].name
+      return [city, district, state, country]
+        .filter((label) => Boolean(label))
+        .join(', ')
+    }
+
+    //international address
+
+    return [
+      city,
+      location?.address?.district,
+      location?.address?.state,
+      country
+    ]
+      .filter((label) => Boolean(label))
+      .join(', ')
   }
 
   const getRegistarData = (data: any) => {

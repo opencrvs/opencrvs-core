@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -20,7 +19,7 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Event } from '@client/utils/gateway'
 import {
   IRejectRegistrationForm,
@@ -145,6 +144,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
             <Button
+              key="submit_archive"
               id="submit_archive"
               size="medium"
               type="secondary_negative"
@@ -161,6 +161,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.archive)}
             </Button>,
             <Button
+              key="submit_reject_form"
               size="medium"
               type="negative"
               id="submit_reject_form"

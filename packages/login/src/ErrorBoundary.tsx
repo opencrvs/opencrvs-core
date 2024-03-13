@@ -6,10 +6,9 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 import * as Sentry from '@sentry/react'
 
@@ -20,17 +19,11 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-export class ErrorBoundary extends React.Component<{
-  children?: React.ReactNode
-}> {
-  render() {
-    return (
-      <Sentry.ErrorBoundary
-        showDialog={!development}
-        fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
-      >
-        {this.props.children}
-      </Sentry.ErrorBoundary>
-    )
-  }
-}
+export const ErrorBoundary = ({ children }: { children: ReactNode }) => (
+  <Sentry.ErrorBoundary
+    showDialog={!development}
+    fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
+  >
+    {children}
+  </Sentry.ErrorBoundary>
+)

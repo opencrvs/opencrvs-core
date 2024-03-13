@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   CorrectionSection,
@@ -16,7 +15,7 @@ import {
   RADIO_GROUP
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 
 export const supportingDocumentsSectionGroup: IFormSectionGroup = {
   id: 'correctionDocumentsViewGroup',
@@ -31,7 +30,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       mapping: {
         mutation: fieldValueSectionExchangeTransformer('correction', 'data')
       },
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'Affidavit',
@@ -55,7 +54,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       hideAsterisk: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: messages.selectPlaceholder,
       options: [
         {

@@ -6,12 +6,12 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { systemRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
@@ -25,11 +25,10 @@ import System, {
 } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
+import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
-import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
-import { pick } from 'lodash'
-import { Types } from 'mongoose'
 import * as uuid from 'uuid/v4'
 
 export enum EventType {
@@ -49,26 +48,15 @@ interface IRegisterSystemPayload {
     webhook: WebHookPayload[]
   }
   type: string
+  integratingSystemType: string
 }
-
-/** Returns a curated System with only the params we want to expose */
-const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
-  ...pick(system, ['name', 'status', 'type']),
-  // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
-  _id: system._id.toString(),
-  shaSecret: system.sha_secret,
-  clientId: system.client_id,
-  settings: system.settings.webhook.map((ite) => ({
-    event: ite.event,
-    permissions: ite.permissions
-  }))
-})
 
 export async function registerSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { name, type } = request.payload as IRegisterSystemPayload
+  const { name, type, integratingSystemType } =
+    request.payload as IRegisterSystemPayload
   let { settings } = request.payload as IRegisterSystemPayload
   try {
     if (type === types.WEBHOOK && !settings) {
@@ -100,11 +88,11 @@ export async function registerSystem(
     if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
       throw new Error('System with NATIONAL_ID already exists !')
     }
-    if (!systemScopeMapping[type]) {
+    if (!systemRoleScopes[type]) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = systemScopeMapping[type]
+    const systemScopes: string[] = systemRoleScopes[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -178,7 +166,8 @@ export async function registerSystem(
       secretHash: hash,
       salt,
       sha_secret,
-      type
+      type,
+      integratingSystemType
     }
     const newSystem = await System.create(systemDetails)
 
@@ -319,7 +308,6 @@ export async function verifySystemHandler(
     status: system.status,
     id: system.id
   }
-
   return response
 }
 
@@ -373,11 +361,6 @@ export async function getSystemHandler(
   }
 }
 
-export async function getAllSystemsHandler() {
-  const systems = await System.find()
-  return systems.map((system) => pickSystem(system))
-}
-
 export const getSystemRequestSchema = Joi.object({
   systemId: Joi.string(),
   clientId: Joi.string()
@@ -387,8 +370,16 @@ const webHookSchema = Joi.array().items(
   Joi.object({
     event: Joi.string().required(),
     permissions: Joi.array().items(Joi.string())
-  })
+  }).unknown(true)
 )
+
+const settingsSchema = Joi.object({
+  dailyQuota: Joi.number(),
+  openIdProviderBaseUrl: Joi.string(),
+  openIdProviderClientId: Joi.string(),
+  openIdProviderClaims: Joi.string(),
+  webhook: webHookSchema
+})
 
 export const getSystemResponseSchema = Joi.object({
   name: Joi.string(),
@@ -400,10 +391,7 @@ export const getSystemResponseSchema = Joi.object({
   sha_secret: Joi.string(),
   practitionerId: Joi.string(),
   type: Joi.string(),
-  settings: Joi.object({
-    dailyQuota: Joi.number(),
-    webhook: Joi.any().optional()
-  })
+  settings: settingsSchema
 })
 
 export const clientIdSchema = Joi.object({
@@ -415,9 +403,10 @@ export const SystemSchema = Joi.object({
   name: Joi.string(),
   status: Joi.string(),
   type: Joi.string(),
+  integratingSystemType: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
-  settings: webHookSchema.optional()
+  settings: settingsSchema
 })
 
 export const resSystemSchema = Joi.object({
@@ -469,6 +458,7 @@ export const reqUpdateSystemSchema = Joi.object({
 export const reqRegisterSystemSchema = Joi.object({
   type: Joi.string().required(),
   name: Joi.string().required(),
+  integratingSystemType: Joi.string(),
   settings: Joi.object({
     dailyQuota: Joi.number(),
     webhook: webHookSchema

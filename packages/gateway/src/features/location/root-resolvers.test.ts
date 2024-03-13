@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
@@ -19,7 +18,7 @@ describe('Location root resolvers', () => {
     it('returns an array of location results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
       // @ts-ignore
-      const compositions = await resolvers.Query.locationsByParent(
+      const compositions = await resolvers.Query!.locationsByParent(
         {},
         { parentId: '1' },
         { headers: undefined }
@@ -34,7 +33,7 @@ describe('Location root resolvers', () => {
     it('returns a location object', async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Location' }))
       // @ts-ignore
-      const composition = await resolvers.Query.locationById(
+      const composition = await resolvers.Query!.locationById(
         {},
         { locationId: '1' },
         { headers: undefined }
@@ -55,7 +54,7 @@ describe('Location root resolvers', () => {
         })
       )
       // @ts-ignore
-      const composition = await resolvers.Query.hasChildLocation(
+      const composition = await resolvers.Query!.hasChildLocation(
         {},
         { parentId: '1' },
         { headers: undefined }

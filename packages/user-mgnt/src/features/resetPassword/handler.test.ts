@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
@@ -18,7 +17,7 @@ import { Types } from 'mongoose'
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -76,7 +75,7 @@ const mockUser: IUser & { _id: string } = {
   ]
 }
 
-describe('resetPasswordSMS handler', () => {
+describe('resetPasswordInvite handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -88,10 +87,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -106,10 +104,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -123,10 +120,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`

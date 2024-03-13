@@ -6,15 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
@@ -23,7 +25,7 @@ import {
   SORT_ORDER,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -41,7 +43,7 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -158,7 +160,9 @@ class ReadyForReviewComponent extends React.Component<
             ) => {
               e && e.stopPropagation()
               this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.declarationStatus === 'CORRECTION_REQUESTED'
+                  ? REVIEW_CORRECTION
+                  : REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -206,6 +210,10 @@ class ReadyForReviewComponent extends React.Component<
         getPreviousOperationDateByOperationType(
           reg.operationHistories,
           RegStatus.Validated
+        ) ||
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.CorrectionRequested
         ) ||
         ''
       const NameComponent = reg.name ? (

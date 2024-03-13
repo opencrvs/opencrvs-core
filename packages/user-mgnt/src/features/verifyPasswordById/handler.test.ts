@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
@@ -35,8 +34,9 @@ test("verifyPassHandlerById should throw with 401 when user doesn't exist", asyn
 test("verifyPassHandler should throw with 401 when password hash doesn't match", async () => {
   const entry = {
     mobile: '27555555555',
-    passwordHash: 'xyz',
-    salt: '12345',
+    passwordHash:
+      '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+    salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe',
     scope: ['test']
   }
 
@@ -45,7 +45,7 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPasswordById',
-    payload: { id: '27555555555', password: 'test' }
+    payload: { id: '27555555555', password: 'test1' }
   })
 
   expect(res.result.statusCode).toBe(401)
@@ -55,8 +55,8 @@ test('verifyPassHandler should return 200 and the user scope when the user exist
   const entry = {
     mobile: '27555555555',
     passwordHash:
-      'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-    salt: '12345',
+      '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+    salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe',
     scope: ['test']
   }
   mockingoose(User).toReturn(entry, 'findOne')

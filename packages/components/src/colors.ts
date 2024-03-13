@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import darken from 'polished/lib/color/darken'
@@ -35,7 +34,7 @@ const config = {
   // Monochrome
   white: '#FFFFFF',
   grey100: '#F5F5F5', // background
-  grey200: '#E8E8E8', // dividers, hover
+  grey200: '#EEEEEE', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
   grey400: '#959595', // placeholder copy
   grey500: '#5B5B5B', // supporting copy
@@ -51,7 +50,10 @@ const config = {
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
-  backgroundPrimary: '#36304E'
+  backgroundPrimary: '#36304E',
+  subheaderCopyBirth: '#007A5E',
+  subheaderCopyDeath: '#4B5EAA',
+  subheaderCopyMarriage: '#E4BC0C'
 }
 
 export const gradients = {
@@ -72,12 +74,12 @@ export const colors = {
   primaryDarker: darken(0.2)(config.primary),
   primaryDark: darken(0.1)(config.primary),
   primaryLight: lighten(0.2)(config.primary),
-  primaryLighter: lighten(0.4)(config.primary),
+  primaryLighter: lighten(0.45)(config.primary),
 
   purpleDarker: darken(0.2)(config.purple),
   purpleDark: darken(0.1)(config.purple),
   purpleLight: lighten(0.2)(config.purple),
-  purpleLighter: lighten(0.4)(config.purple),
+  purpleLighter: lighten(0.44)(config.purple),
 
   orangeDarker: darken(0.2)(config.orange),
   orangeDark: darken(0.1)(config.orange),
@@ -87,17 +89,17 @@ export const colors = {
   redDarker: darken(0.2)(config.red),
   redDark: darken(0.1)(config.red),
   redLight: lighten(0.2)(config.red),
-  redLighter: lighten(0.4)(config.red),
+  redLighter: lighten(0.42)(config.red),
 
   greenDarker: darken(0.2)(config.green),
   greenDark: darken(0.1)(config.green),
   greenLight: lighten(0.2)(config.green),
-  greenLighter: lighten(0.4)(config.green),
+  greenLighter: lighten(0.45)(config.green),
 
   blueDarker: darken(0.2)(config.blue),
   blueDark: darken(0.1)(config.blue),
   blueLight: lighten(0.2)(config.blue),
-  blueLighter: lighten(0.35)(config.blue),
+  blueLighter: lighten(0.4)(config.blue),
 
   tealDarker: darken(0.2)(config.teal),
   tealDark: darken(0.1)(config.teal),

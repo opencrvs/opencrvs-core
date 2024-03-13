@@ -6,33 +6,37 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { GQLComment } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLComment } from '@client/utils/gateway-deprecated-do-not-use'
 import { HumanName } from './gateway'
 
 interface INamesMap {
   [key: string]: string
 }
 
-export const createNamesMap = (names: HumanName[]): INamesMap =>
-  names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
-    if (!name.use) {
-      prevNamesMap['default'] = `${name.firstNames || ''} ${
-        name.familyName || ''
-      }`.trim()
-      return prevNamesMap
-    }
+function generateName(name: HumanName) {
+  return [name.firstNames, name.middleName, name.familyName]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+}
 
-    prevNamesMap[name.use] = `${name.firstNames || ''} ${
-      name.familyName || ''
-    }`.trim()
-    prevNamesMap[name.use] =
-      prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
-    return prevNamesMap
-  }, {})
+export const createNamesMap = (names: (HumanName | null)[]): INamesMap =>
+  names
+    .filter((name): name is HumanName => Boolean(name))
+    .reduce((prevNamesMap: INamesMap, name) => {
+      if (!name.use) {
+        prevNamesMap['default'] = generateName(name)
+        return prevNamesMap
+      }
+
+      prevNamesMap[name.use] = generateName(name)
+      prevNamesMap[name.use] =
+        prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
+      return prevNamesMap
+    }, {})
 
 export const extractCommentFragmentValue = (
   comments: GQLComment[],

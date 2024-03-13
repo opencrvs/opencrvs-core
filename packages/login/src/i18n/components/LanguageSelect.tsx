@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -20,6 +19,7 @@ import styled from 'styled-components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
+import { defineMessages, useIntl } from 'react-intl'
 
 const SelectContainer = styled.div`
   ${({ theme }) => theme.colors.primary};
@@ -29,15 +29,26 @@ const SelectContainer = styled.div`
   padding: 24px 24px 8px;
 `
 
+const messages = defineMessages({
+  language: {
+    id: 'login.language',
+    defaultMessage: '{language}'
+  }
+})
+
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLanguages = window.config.LANGUAGES.split(',')
   const history = useHistory()
   const location = useLocation()
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
+  const intl = useIntl()
 
   const languageOptions: ISelect2Option[] = Object.values(languages)
-    .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
+    .map(({ lang }) => ({
+      value: lang,
+      label: intl.formatMessage(messages.language, { language: lang })
+    }))
     .filter(({ value }) => applicationLanguages.includes(value))
 
   const onChange = ({ value }: ISelect2Option) => {

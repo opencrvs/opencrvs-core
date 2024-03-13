@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const CRUD_BIRTH_RATE_SEC = 'id/statistics-crude-birth-rates'
@@ -32,8 +31,8 @@ export const WITHIN_1_YEAR = 'DAYS_0_TO_365'
 export const EVENT = 'event'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export enum Events {
-  IN_PROGRESS_DEC = 'in-progress-declaration', // Field agent or DHIS2 in progress
-  NEW_DEC = 'new-declaration', // Field agent complete
-  REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
-  REQUEST_FOR_REGISTRAR_VALIDATION = 'request-for-registrar-validation' // Registration agent new event
+  INCOMPLETE = 'in-progress-declaration', // Field agent or DHIS2 in progress
+  READY_FOR_REVIEW = 'new-declaration', // Field agent complete
+  WAITING_EXTERNAL_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
+  VALIDATED = 'request-for-registrar-validation' // Registration agent new event
 }

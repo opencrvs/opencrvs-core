@@ -6,14 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/search/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/search/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
 beforeEach(() => {
@@ -29,7 +29,7 @@ describe('Search root resolvers', () => {
       fetch.resetMocks()
       const validUserTokenRegister = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -42,7 +42,7 @@ describe('Search root resolvers', () => {
       }
       const validUserTokenDeclare = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -65,7 +65,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -90,7 +90,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -115,7 +115,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -140,7 +140,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -167,7 +167,7 @@ describe('Search root resolvers', () => {
       )
 
       await expect(
-        resolvers.Query.searchEvents(
+        resolvers.Query!.searchEvents(
           {},
           {
             advancedSearchParameters: {}
@@ -187,7 +187,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -212,7 +212,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -238,7 +238,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -260,7 +260,7 @@ describe('Search root resolvers', () => {
           body: { hits: null }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -286,7 +286,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.searchEvents(
+      const result = await resolvers.Query!.searchEvents(
         {},
         {
           advancedSearchParameters: {
@@ -310,7 +310,7 @@ describe('Search root resolvers', () => {
       fetch.resetMocks()
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -323,7 +323,7 @@ describe('Search root resolvers', () => {
       }
       const sysadminUserToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -346,7 +346,7 @@ describe('Search root resolvers', () => {
           }
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         {
           declarationJurisdictionId: 'dummy_loc_id_parent',
@@ -364,7 +364,7 @@ describe('Search root resolvers', () => {
     })
     it('throws an error for unauthorized user', async () => {
       await expect(
-        resolvers.Query.getEventsWithProgress(
+        resolvers.Query!.getEventsWithProgress(
           {},
           {},
           { headers: unauthorizedUser }
@@ -379,7 +379,7 @@ describe('Search root resolvers', () => {
           entry: []
         })
       )
-      const result = await resolvers.Query.getEventsWithProgress(
+      const result = await resolvers.Query!.getEventsWithProgress(
         {},
         { declarationJurisdictionId: null },
         { headers: authorizedUser }

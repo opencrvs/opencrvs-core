@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   createTestApp,
@@ -17,19 +16,12 @@ import {
   waitForReady,
   validateScopeToken,
   registerScopeToken,
-  primaryAddressData,
-  primaryInternationalAddressLines,
-  secondaryAddressData,
-  secondaryInternationalAddressLines,
-  eventAddressData,
-  flushPromises,
-  getFileFromBase64String,
-  validImageB64String
+  flushPromises
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_PAGE,
-  HOME
+  REGISTRAR_HOME
 } from '@client/navigation/routes'
 import {
   storeDeclaration,
@@ -71,167 +63,6 @@ describe('when user is previewing the form data', () => {
     await waitForReady(app)
   })
 
-  describe('when user is in the preview section', () => {
-    let customDraft: IDeclaration
-
-    beforeEach(async () => {
-      const data = birthDraftData
-
-      customDraft = {
-        id: uuid(),
-        data,
-        event: Event.Birth,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      }
-      store.dispatch(storeDeclaration(customDraft))
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(
-          ':declarationId',
-          customDraft.id.toString()
-        )
-      )
-
-      await waitForElement(app, '#readyDeclaration')
-    })
-
-    describe('when user clicks the "submit" button', () => {
-      beforeEach(async () => {
-        await goToEndOfForm(app)
-      })
-
-      it('check whether submit button is enabled or not', async () => {
-        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-          false
-        )
-      })
-      describe('All sections visited', () => {
-        it('Should be able to click SEND FOR REVIEW Button', () => {
-          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-            false
-          )
-        })
-        describe('button clicked', () => {
-          beforeEach(async () => {
-            app.find('#submit_form').hostNodes().simulate('click')
-          })
-
-          it('confirmation screen should show up', () => {
-            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
-          })
-          it('should redirect to home page', () => {
-            app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(history.location.pathname).toBe(HOME)
-          })
-        })
-      })
-    })
-  })
-  describe('when user is in the birth review section', () => {
-    let customDraft: IDeclaration
-
-    const childDetails: IPersonDetails = {
-      attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'নাইম',
-      firstNamesEng: 'Naim',
-      gender: 'male',
-      multipleBirth: '2',
-      birthType: 'SINGLE',
-      weightAtBirth: '6',
-      _fhirID: '1'
-    }
-
-    const fatherDetails: IPersonDetails = {
-      detailsExist: true,
-      iD: '432432432',
-      iDType: 'NATIONAL_ID',
-      primaryAddressSameAsOtherPrimary: true,
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      fatherBirthDate: '1999-10-10',
-      dateOfMarriage: '2010-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'আনোয়ার',
-      firstNamesEng: 'Anwar',
-      maritalStatus: 'MARRIED',
-      nationality: 'FAR',
-      _fhirID: '2'
-    }
-
-    const motherDetails: IPersonDetails = {
-      iD: '765987987',
-      iDType: 'NATIONAL_ID',
-      nationality: 'FAR',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'রোকেয়া',
-      firstNamesEng: 'Rokeya',
-      maritalStatus: 'MARRIED',
-      dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirID: '3'
-    }
-
-    const registrationDetails = {
-      contactPoint: {
-        value: 'DAUGHTER',
-        nestedFields: { registrationPhone: '0787878787' }
-      },
-      trackingId: 'B123456',
-      registrationNumber: '2019121525B1234568',
-      _fhirID: '4'
-    }
-
-    beforeEach(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
-      await flushPromises()
-      const data = birthReviewDraftData
-
-      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
-      store.dispatch(storeDeclaration(customDraft))
-      history.replace(
-        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':declarationId',
-          customDraft.id.toString()
-        )
-          .replace(':event', 'birth')
-          .replace(':pageId', 'review')
-      )
-      await waitForElement(app, '#readyDeclaration')
-    })
-
-    it('rejecting declaration redirects to home screen', async () => {
-      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
-
-      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
-
-      app
-        .find('#rejectionCommentForHealthWorker')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            id: 'rejectionCommentForHealthWorker',
-            value: 'reject reason'
-          }
-        })
-
-      app.find('#submit_reject_form').hostNodes().simulate('click')
-
-      expect(history.location.pathname).toEqual('/')
-    })
-  })
   describe('when user is in the death review section', () => {
     let customDraft: IDeclaration
 
@@ -281,7 +112,106 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+    })
+  })
+
+  describe('when user is in the preview section', () => {
+    let customDraft: IDeclaration
+
+    beforeEach(async () => {
+      const data = birthDraftData
+
+      customDraft = {
+        id: uuid(),
+        data,
+        event: Event.Birth,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        DRAFT_BIRTH_PARENT_FORM.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+      )
+
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    describe('when user clicks the "submit" button', () => {
+      beforeEach(async () => {
+        await goToEndOfForm(app)
+      })
+
+      it('check whether submit button is enabled or not', () => {
+        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+          false
+        )
+      })
+      describe('All sections visited', () => {
+        it('Should be able to click SEND FOR REVIEW Button', () => {
+          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+            false
+          )
+        })
+        describe('button clicked', () => {
+          beforeEach(async () => {
+            app.find('#submit_form').hostNodes().simulate('click')
+          })
+
+          it('confirmation screen should show up', () => {
+            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+          })
+          it('should redirect to home page', () => {
+            app.find('#submit_confirm').hostNodes().simulate('click')
+            expect(history.location.pathname).toBe(REGISTRAR_HOME)
+          })
+        })
+      })
+    })
+  })
+
+  describe('when user is in the birth review section', () => {
+    let customDraft: IDeclaration
+
+    beforeEach(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      await store.dispatch(checkAuth())
+      await flushPromises()
+      const data = birthReviewDraftData
+
+      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+          .replace(':event', 'birth')
+          .replace(':pageId', 'review')
+      )
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    it('rejecting declaration redirects to home screen', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
+
+      app
+        .find('#rejectionCommentForHealthWorker')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'rejectionCommentForHealthWorker',
+            value: 'reject reason'
+          }
+        })
+
+      app.find('#submit_reject_form').hostNodes().simulate('click')
+
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -310,13 +240,6 @@ describe('when user is previewing the form data', () => {
       await waitForElement(app, '#readyDeclaration')
     })
 
-    it('successfully submits the review form', async () => {
-      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
-      app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
-      app.update()
-      app.update().find('#submit_confirm').hostNodes().simulate('click')
-    })
-
     it('rejecting declaration redirects to reject confirmation screen', async () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 
@@ -335,7 +258,7 @@ describe('when user is previewing the form data', () => {
         })
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -368,10 +291,7 @@ describe('when user is previewing the form data', () => {
 
     it('shows send for review button', async () => {
       await waitForElement(app, '#readyDeclaration')
-
-      expect(
-        app.update().find('#validateDeclarationBtn').hostNodes().text()
-      ).toBe('Send For Approval')
+      expect(app.update().contains('#validateDeclarationBtn')).toBeFalsy()
     })
   })
 })

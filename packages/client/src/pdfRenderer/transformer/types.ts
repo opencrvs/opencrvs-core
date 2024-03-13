@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IDeclaration } from '@client/declarations'
 import { IntlShape, MessageDescriptor } from 'react-intl'
@@ -20,13 +19,14 @@ export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
-  fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  fonts: Record<string, TFontFamilyTypes>
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
 }
 export interface ISVGTemplate {
   id: string
   definition: string
+  hash?: string
   fonts?: { [language: string]: { [name: string]: TFontFamilyTypes } }
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
@@ -50,7 +50,7 @@ export type TransformerPayload =
 
 export type Condition = IInformantNameCondition | IOfflineAddressCondition
 
-export interface IFieldTransformer {
+interface IFieldTransformer {
   field: string
   operation: string
   parameters?: TransformerPayload
@@ -82,7 +82,7 @@ export enum ConditionOperation {
   VALUE_EXISTS = 'VALUE_EXISTS',
   VALUE_DOES_NOT_EXISTS = 'VALUE_DOES_NOT_EXISTS'
 }
-export interface ICondition {
+interface ICondition {
   key: string
   operation?: ConditionOperation
   values: string[]
@@ -171,7 +171,7 @@ export interface IEventWiseKey {
   [event: string]: string // {birth: child.dob}
 }
 // Based on the need, add more here
-export type ConditionType = 'COMPARE_DATE_IN_DAYS'
+type ConditionType = 'COMPARE_DATE_IN_DAYS'
 
 export interface IConditionExecutorPayload {
   fromKey: IEventWiseKey | ExecutorKey
@@ -184,7 +184,7 @@ export interface IConditionExecutorPayload {
   }[]
 }
 
-export type ArithmeticOperationType =
+type ArithmeticOperationType =
   | 'ADDITION'
   | 'SUBTRACTION'
   | 'DIVISION'

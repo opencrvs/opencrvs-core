@@ -6,17 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/metrics/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/metrics/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 
 const fetch = fetchAny as any
 beforeEach(() => {
   fetch.resetMocks()
 })
-
 describe('get total metrics', () => {
   it('returns estimated data for event', async () => {
     fetch.mockResponseOnce(
@@ -26,7 +26,6 @@ describe('get total metrics', () => {
           maleEstimation: 127633,
           femaleEstimation: 136838,
           locationId: 'Location/0',
-          estimationYear: 2022,
           locationLevel: 'COUNTRY'
         },
         results: [
@@ -41,7 +40,7 @@ describe('get total metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.getTotalMetrics(
+    const data = await resolvers.Query!.getTotalMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -66,7 +65,7 @@ describe('get declarations started metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.getDeclarationsStartedMetrics(
+    const data = await resolvers.Query!.getDeclarationsStartedMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -105,7 +104,7 @@ describe('get month wise event estimation metrics', () => {
       ])
     )
 
-    const data = await resolvers.Query.fetchMonthWiseEventMetrics(
+    const data = await resolvers.Query!.fetchMonthWiseEventMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -146,7 +145,7 @@ describe('get location wise event estimation metrics', () => {
       ])
     )
 
-    const data = await resolvers.Query.fetchLocationWiseEventMetrics(
+    const data = await resolvers.Query!.fetchLocationWiseEventMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',

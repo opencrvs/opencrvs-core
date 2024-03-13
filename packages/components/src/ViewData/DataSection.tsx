@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -52,27 +51,26 @@ interface IProps {
   isConfigPage?: boolean
 }
 
-export class DataSection extends React.Component<IProps> {
-  render() {
-    const { action, id, title, items, responsiveContents } = this.props
-
-    return (
-      <Container id={id}>
-        <Title>
-          {title}
-          {action && <Link onClick={action.handler}>{action.label}</Link>}
-        </Title>
-        {responsiveContents && (
-          <ResponsiveContainer
-            isConfigPage={this.props.isConfigPage && this.props.isConfigPage}
-          >
-            {responsiveContents}
-          </ResponsiveContainer>
-        )}
-        {items.map((item: IDataProps, index: number) => (
-          <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
-        ))}
-      </Container>
-    )
-  }
-}
+export const DataSection = ({
+  action,
+  id,
+  title,
+  items,
+  responsiveContents,
+  isConfigPage
+}: IProps) => (
+  <Container id={id}>
+    <Title>
+      {title}
+      {action && <Link onClick={action.handler}>{action.label}</Link>}
+    </Title>
+    {responsiveContents && (
+      <ResponsiveContainer isConfigPage={isConfigPage && isConfigPage}>
+        {responsiveContents}
+      </ResponsiveContainer>
+    )}
+    {items.map((item: IDataProps, index: number) => (
+      <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
+    ))}
+  </Container>
+)

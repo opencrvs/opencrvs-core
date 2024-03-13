@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
@@ -22,17 +21,6 @@ interface ILocationMessages
 }
 
 const messagesToDefine: ILocationMessages = {
-  /* UNION & DIVISION is needed for unit tests. Can be removed after the tests are refactored */
-  UNION: {
-    id: 'form.field.label.UNION',
-    defaultMessage: 'Union',
-    description: 'Label for Union'
-  },
-  DIVISION: {
-    id: 'form.field.label.DIVISION',
-    defaultMessage: 'Division',
-    description: 'Label for Division'
-  },
   DISTRICT: {
     id: 'form.field.label.district',
     defaultMessage: 'District',

@@ -6,21 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from '@client/App'
-import registerServiceWorker from '@client/registerServiceWorker'
 import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
@@ -55,38 +52,6 @@ if (
       dsn: window.config.SENTRY
     })
   }
-
-  // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET, {
-      release: import.meta.env.VITE_APP_VERSION
-    })
-  }
-
-  // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
-    Sentry.configureScope((scope) => {
-      scope.addEventProcessor(async (event) => {
-        if (!event.extra) {
-          event.extra = {}
-        }
-        const sessionUrl = await new Promise((resolve) => {
-          LogRocket.getSessionURL((url) => {
-            resolve(url)
-          })
-        })
-        event.extra.sessionURL = sessionUrl
-        return event
-      })
-    })
-  }
-}
-
-function onNewContentAvailable(waitingSW: ServiceWorker | null) {
-  if (waitingSW) {
-    waitingSW.postMessage('skipWaiting')
-    window.location.reload()
-  }
 }
 
 function userReconnectedToast() {
@@ -100,5 +65,4 @@ const container = document.getElementById('root')
 const root = createRoot(container!)
 root.render(<App store={store} history={history} />)
 
-registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()

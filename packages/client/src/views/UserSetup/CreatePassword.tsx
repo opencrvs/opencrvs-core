@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -76,7 +75,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   const [continuePressed, setContinuePressed] = React.useState(false)
 
   const validateLength = (value: string) => {
-    setValidLength(value.length >= 8)
+    setValidLength(value.length >= 12)
   }
   const validateNumber = (value: string) => {
     setHasNumber(/\d/.test(value))
@@ -139,6 +138,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
       >
         <Content
           title={intl.formatMessage(messages.header)}
+          showTitleOnMobile
           subtitle={intl.formatMessage(messages.instruction)}
           bottomActionButtons={[continueActionButton]}
         >
@@ -177,7 +177,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
                 {validLength && <TickOn />}
                 {!validLength && <TickOff />}
                 <span>
-                  {intl.formatMessage(messages.minLength, { min: 8 })}
+                  {intl.formatMessage(messages.minLength, { min: 12 })}
                 </span>
               </div>
               <div>

@@ -6,12 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import User, { IUser } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import User, { IUser, UserRole } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -22,7 +20,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -100,9 +98,24 @@ describe('createUser handler', () => {
       ['', { status: 200 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'save')
+    mockingoose(UserRole).toReturn(
+      {
+        _id: '6348acd2e1a47ca32e79f46f',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de terrain'
+          }
+        ],
+        createdAt: '1685959052687',
+        updatedAt: '1685959052687'
+      },
+      'findOne'
+    )
 
     const res = await server.server.inject({
       method: 'POST',
@@ -120,7 +133,7 @@ describe('createUser handler', () => {
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
-        role: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -157,7 +170,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'Field Agent'
+              code: '[{"lang":"en","label":"Field Agent"},{"lang":"fr","label":"Agent de terrain"}]'
             }
           ]
         }
@@ -169,8 +182,6 @@ describe('createUser handler', () => {
         { reference: 'Location/44' }
       ]
     }
-
-    console.log('fetch.mock', fetch.mock.calls[5][1].body)
 
     expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
@@ -249,7 +260,7 @@ describe('createUser handler', () => {
 
     expect(fetch.mock.calls.length).toBe(3)
     expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
+      'http://localhost:3447/fhir/Practitioner/123'
     )
     expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)
@@ -258,18 +269,12 @@ describe('createUser handler', () => {
   it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 202 }],
+      ['', { status: 202 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(
-      { username: 'jw.doe', count: 1 },
-      'findOne'
-    )
-    mockingoose(UsernameRecord).toReturn(
-      new Error('Failed to update'),
-      'update'
-    )
-
+    mockingoose(User).toReturn(new Error(), 'findOne')
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',

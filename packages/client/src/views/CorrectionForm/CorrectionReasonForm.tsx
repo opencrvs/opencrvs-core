@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import {
@@ -25,8 +24,7 @@ import {
 import {
   CorrectionSection,
   IFormSection,
-  IFormSectionData,
-  IForm
+  IFormSectionData
 } from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -116,7 +114,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
     <>
       <ActionPageLight
         id="corrector_form"
-        title={intl.formatMessage(section.title)}
+        title={section.title && intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
         goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
@@ -129,6 +127,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         >
           <FormFieldGenerator
             id={group.id}
+            key={group.id}
             onChange={(values) => {
               modifyDeclaration(values, section, declaration)
             }}

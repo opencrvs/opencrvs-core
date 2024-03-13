@@ -6,12 +6,25 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
+import {
+  CompositionSectionCode,
+  Extension,
+  findCompositionSection,
+  getFromBundleById,
+  KnownExtensionType,
+  OpenCRVSPatientName,
+  Resource,
+  resourceIdentifierToUUID,
+  SavedBundle,
+  SavedComposition,
+  SavedTask
+} from '@opencrvs/commons/types'
+import { FLAGGED_AS_POTENTIAL_DUPLICATE, FHIR_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
+  ICompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
@@ -21,59 +34,42 @@ export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
 }
 
-export function findCompositionSection(
-  code: string,
-  composition: ITemplatedComposition
+export function findTask(bundleEntries?: fhir.BundleEntry[]) {
+  const taskEntry = bundleEntries?.find(
+    (entry) => entry?.resource?.resourceType === 'Task'
+  )
+  if (!taskEntry?.resource) throw new Error('No task resource found')
+  return taskEntry.resource as fhir.Task
+}
+
+export function findPatient(bundle: fhir.Bundle) {
+  return bundle.entry?.find(
+    (entry) => entry?.resource?.resourceType === 'Patient'
+  )?.resource as fhir.Patient | undefined
+}
+
+export function findTaskExtension<T extends keyof KnownExtensionType>(
+  task: SavedTask,
+  extensionUrl: T
 ) {
-  return (
-    composition.section &&
-    composition.section.find((section: fhir.CompositionSection) => {
-      if (!section.code || !section.code.coding || !section.code.coding.some) {
-        return false
-      }
-      return section.code.coding.some((coding) => coding.code === code)
-    })
+  return task.extension.find(
+    (ext): ext is KnownExtensionType[T] => ext.url === extensionUrl
   )
 }
 
-export function findTask(
-  bundleEntries?: fhir.BundleEntry[]
-): fhir.Task | undefined {
-  const taskEntry: fhir.BundleEntry | undefined =
-    bundleEntries &&
-    bundleEntries.find((entry) => {
-      if (entry && entry.resource) {
-        return entry.resource.resourceType === 'Task'
-      } else {
-        return false
-      }
-    })
-  return taskEntry && (taskEntry.resource as fhir.Task)
-}
-
-export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
-  return (
-    task &&
-    task.extension &&
-    task.extension.find(
-      (extension) => extension && extension.url === extensionUrl
-    )
-  )
-}
-
-export function findExtension(
-  url: string,
-  extensions: fhir.Extension[]
-): fhir.Extension | undefined {
+export function findExtension<T extends keyof KnownExtensionType>(
+  url: T,
+  extensions: Extension[] | undefined
+) {
   const extension =
     extensions &&
-    extensions.find((obj: fhir.Extension) => {
+    extensions.find((obj): obj is KnownExtensionType[T] => {
       return obj.url === url
     })
   return extension
 }
 
-export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
+export function findTaskIdentifier(task?: SavedTask, identiferSystem?: string) {
   return (
     task &&
     task.identifier &&
@@ -81,23 +77,23 @@ export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
   )
 }
 
-export function findEntry(
-  code: string,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
-): fhir.Resource | undefined {
+export function findEntry<T extends Resource = Resource>(
+  code: CompositionSectionCode,
+  composition: SavedComposition,
+  bundle: SavedBundle
+) {
   const patientSection = findCompositionSection(code, composition)
   if (!patientSection || !patientSection.entry) {
     return undefined
   }
   const reference = patientSection.entry[0].reference
-  return findEntryResourceByUrl(reference, bundleEntries)
+  return getFromBundleById<T>(bundle, reference!.split('/')[1]).resource
 }
 
 export async function addEventLocation(
   body: IBirthCompositionBody | IDeathCompositionBody,
-  code: string,
-  composition: fhir.Composition
+  code: CompositionSectionCode,
+  composition: SavedComposition
 ) {
   let data
   let location: fhir.Location | undefined
@@ -107,6 +103,7 @@ export async function addEventLocation(
     data = await getFromFhir(
       `/Encounter/${encounterSection.entry[0].reference}`
     )
+
     if (data && data.location && data.location[0].location) {
       location = await getFromFhir(`/${data.location[0].location.reference}`)
     }
@@ -149,22 +146,40 @@ export async function addEventLocation(
   }
 }
 
-export function findEntryResourceByUrl(
+export function findEntryResourceByUrl<T extends fhir.Resource = fhir.Resource>(
   url?: string,
   bundleEntries?: fhir.BundleEntry[]
-) {
+): T | undefined {
   const bundleEntry =
     bundleEntries &&
     bundleEntries.find((obj: fhir.BundleEntry) => obj.fullUrl === url)
-  return bundleEntry && bundleEntry.resource
+  return bundleEntry && (bundleEntry.resource as T)
+}
+export function findName(
+  code: string,
+  names: fhir.HumanName[] | undefined
+): fhir.HumanName | undefined
+export function findName(
+  code: string,
+  names: OpenCRVSPatientName[] | undefined
+): OpenCRVSPatientName | undefined
+export function findName(
+  code: string,
+  names: (OpenCRVSPatientName | fhir.HumanName)[] | undefined
+) {
+  return names && names.find((name) => name.use === code)
 }
 
-export function findName(code: string, names: fhir.HumanName[] | undefined) {
-  return names && names.find((name: fhir.HumanName) => name.use === code)
-}
-
-export function findNameLocale(names: fhir.HumanName[] | undefined) {
-  return names && names.find((name: fhir.HumanName) => name.use !== 'en')
+export function findNameLocale(
+  names: fhir.HumanName[] | undefined
+): fhir.HumanName | undefined
+export function findNameLocale(
+  names: OpenCRVSPatientName[] | undefined
+): OpenCRVSPatientName | undefined
+export function findNameLocale(
+  names: (OpenCRVSPatientName | fhir.HumanName)[] | undefined
+) {
+  return names && names.find((name) => name.use !== 'en')
 }
 
 export async function getCompositionById(id: string) {
@@ -238,7 +253,7 @@ function existsAsDuplicate(
 }
 
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }
@@ -252,7 +267,7 @@ export const getFromFhir = (suffix: string) => {
 }
 
 export async function updateInHearth(suffix: string, payload: any) {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
     headers: {
@@ -302,16 +317,16 @@ export async function getdeclarationJurisdictionIds(
   if (!declarationLocationId) {
     return []
   }
-  const locationHirarchyIds = [declarationLocationId]
+  const locationHierarchyIds = [declarationLocationId]
   let locationId = `Location/${declarationLocationId}`
   while (locationId) {
     locationId = await fetchParentLocationByLocationID(locationId)
     if (locationId === 'Location/0') {
       break
     }
-    locationHirarchyIds.push(locationId.split('/')[1])
+    locationHierarchyIds.push(locationId.split('/')[1])
   }
-  return locationHirarchyIds
+  return locationHierarchyIds
 }
 
 export async function fetchTaskByCompositionIdFromHearth(id: string) {
@@ -343,7 +358,7 @@ export const fetchHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: method,
     body,
     headers: {
@@ -357,4 +372,21 @@ export const fetchHearth = async <T = any>(
     )
   }
   return res.json()
+}
+
+export function updateCompositionBodyWithDuplicateIds(
+  composition: SavedComposition,
+  body: ICompositionBody
+) {
+  const duplicates =
+    composition.relatesTo?.filter((rel) => rel.code === 'duplicate') || []
+  if (!duplicates.length) {
+    return
+  }
+  logger.info(
+    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
+  )
+  body.relatesTo = duplicates.map((rel) =>
+    resourceIdentifierToUUID(rel.targetReference.reference)
+  )
 }

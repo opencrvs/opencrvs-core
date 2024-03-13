@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AppStore } from '@client/store'
 import {
@@ -98,7 +97,7 @@ const mockAuditedUserGqlResponse = {
 }
 
 describe('User audit list tests for field agent', () => {
-  userMutations.resendSMSInvite = vi.fn()
+  userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
@@ -147,7 +146,7 @@ describe('User audit list tests for field agent', () => {
 })
 
 describe('User audit list tests for sys admin', () => {
-  userMutations.resendSMSInvite = vi.fn()
+  userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>

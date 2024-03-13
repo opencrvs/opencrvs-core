@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { RegAction, RegStatus } from '@client/utils/gateway'
 import { defineMessages, MessageDescriptor } from 'react-intl'
@@ -28,9 +27,7 @@ interface IRecordAuditMessages
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
   placeOfMarriage: MessageDescriptor
-  informant: MessageDescriptor
-  brn: MessageDescriptor
-  drn: MessageDescriptor
+  rn: MessageDescriptor
   noName: MessageDescriptor
   noStatus: MessageDescriptor
   noType: MessageDescriptor
@@ -39,7 +36,6 @@ interface IRecordAuditMessages
   noDateOfDeath: MessageDescriptor
   noPlaceOfBirth: MessageDescriptor
   noPlaceOfDeath: MessageDescriptor
-  noInformant: MessageDescriptor
   reinstateDeclarationDialogTitle: MessageDescriptor
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
@@ -48,6 +44,16 @@ interface IRecordAuditMessages
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  contact: {
+    id: 'recordAudit.contact',
+    defaultMessage: 'Contact',
+    description: 'Contact for record audit'
+  },
+  noContact: {
+    id: 'recordAudit.noContact',
+    defaultMessage: 'No contact details provided',
+    description: 'No contact for record audit'
+  },
   archived: {
     id: 'recordAudit.archive.status',
     defaultMessage: 'Archived',
@@ -119,20 +125,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Place of marriage',
     description: 'Label for place of marriage'
   },
-  informant: {
-    id: 'recordAudit.informant',
-    defaultMessage: 'Informant',
-    description: 'Label for informant'
-  },
-  brn: {
-    id: 'recordAudit.brn',
-    defaultMessage: 'BRN',
+  rn: {
+    id: 'recordAudit.rn',
+    defaultMessage: 'Registration no.',
     description: 'Label for Birth Registration Number'
-  },
-  drn: {
-    id: 'recordAudit.drn',
-    defaultMessage: 'DRN',
-    description: 'Label for Death Registration Number'
   },
   registrationNo: {
     id: 'recordAudit.registrationNo',
@@ -169,6 +165,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No date of death',
     description: 'Label for date of death not available'
   },
+  noDateOfMarriage: {
+    id: 'recordAudit.noDateOfMarriage',
+    defaultMessage: 'No date of marriage',
+    description: 'Label for date of marriage not available'
+  },
   noPlaceOfBirth: {
     id: 'recordAudit.noPlaceOfBirth',
     defaultMessage: 'No place of birth',
@@ -179,10 +180,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No place of death',
     description: 'Label for place of death not availale'
   },
-  noInformant: {
-    id: 'recordAudit.noInformant',
-    defaultMessage: 'No Informant',
-    description: 'Label for informant not available'
+  noPlaceOfMarriage: {
+    id: 'recordAudit.noPlaceOfMarriage',
+    defaultMessage: 'No place of marriage',
+    description: 'Label for place of marriage not availale'
   },
   reinstateDeclarationDialogTitle: {
     id: 'recordAudit.declaration.reinstateDialogTitle',
@@ -236,13 +237,28 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   [RegAction.Reinstated]: {
     id: 'recordAudit.regAction.reinstated',
     defaultMessage:
-      'Reinstated to {regStatus, select, validated{ready for review} in_progress{in progress} declared{ready for review} rejected{requires updates} other{}}',
+      'Reinstated to {regStatus, select, registered{registered} validated{ready for review} in_progress{in progress} declared{ready for review} rejected{requires updates} other{}}',
     description: 'Reinstated action'
   },
   [RegAction.RequestedCorrection]: {
     id: 'recordAudit.regAction.requestedCorrection',
-    defaultMessage: 'Requested Correction',
+    defaultMessage: 'Correction requested',
     description: 'Requested Correction action'
+  },
+  [RegAction.ApprovedCorrection]: {
+    id: 'recordAudit.regAction.approvedCorrection',
+    defaultMessage: 'Correction approved',
+    description: 'Approved Correction action'
+  },
+  [RegAction.Corrected]: {
+    id: 'recordAudit.regAction.corrected',
+    defaultMessage: 'Record corrected',
+    description: 'Corrected action'
+  },
+  [RegAction.RejectedCorrection]: {
+    id: 'recordAudit.regAction.rejectedCorrection',
+    defaultMessage: 'Correction rejected',
+    description: 'Rejected Correction action'
   },
   [RegAction.Viewed]: {
     id: 'recordAudit.regAction.viewed',
@@ -317,6 +333,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Updated',
     description: 'Declaration has been updated',
     id: 'recordAudit.regStatus.updatedDeclaration'
+  },
+  [RegStatus.CorrectionRequested]: {
+    defaultMessage: 'Correction requested',
+    description: 'Label for when someone requested correction',
+    id: 'recordAudit.regStatus.correctionRequested'
   }
 }
 

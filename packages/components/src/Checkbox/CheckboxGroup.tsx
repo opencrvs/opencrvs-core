@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { Checkbox } from './Checkbox'
@@ -37,38 +36,36 @@ export interface ICheckboxGroup {
   onChange: (value: string[]) => void
 }
 
-export class CheckboxGroup extends React.Component<ICheckboxGroup> {
-  change = (event: React.ChangeEvent<HTMLInputElement>) => {
+export const CheckboxGroup = (props: ICheckboxGroup) => {
+  const { options, value, name, ...restProps } = props
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
-    this.props.onChange(
-      this.props.value.indexOf(value) > -1
-        ? this.props.value.filter((val) => val !== value)
-        : this.props.value.concat(value)
+    props.onChange(
+      props.value.indexOf(value) > -1
+        ? props.value.filter((val) => val !== value)
+        : props.value.concat(value)
     )
   }
 
-  render() {
-    const { options, value, name, ...props } = this.props
-
-    return (
-      <Wrapper>
-        <List>
-          {options.map((option) => {
-            return (
-              <Checkbox
-                {...props}
-                id={props.id + option.value}
-                key={option.label}
-                name={option.label}
-                label={option.label}
-                value={option.value}
-                selected={value.includes(option.value)}
-                onChange={this.change}
-              />
-            )
-          })}
-        </List>
-      </Wrapper>
-    )
-  }
+  return (
+    <Wrapper>
+      <List>
+        {options.map((option) => {
+          return (
+            <Checkbox
+              {...restProps}
+              id={props.id + option.value}
+              key={option.label}
+              name={option.label}
+              label={option.label}
+              value={option.value}
+              selected={value.includes(option.value)}
+              onChange={handleChange}
+            />
+          )
+        })}
+      </List>
+    </Wrapper>
+  )
 }

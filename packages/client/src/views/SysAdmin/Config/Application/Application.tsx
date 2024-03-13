@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -57,7 +56,7 @@ const ListGroupTitle = styled.div`
   align-items: center;
 `
 
-export enum TabId {
+enum TabId {
   GENERAL = 'general',
   BIRTH = 'birth',
   DEATH = 'death',
@@ -94,10 +93,6 @@ export enum MarriageActionId {
   MARRIAGE_REGISTRATION_DELAYED_TARGET = 'MARRIAGE_REGISTRATION_DELAYED_TARGET',
   MARRIAGE_ON_TIME_FEE = 'MARRIAGE_ON_TIME_FEE',
   MARRIAGE_DELAYED_FEE = 'MARRIAGE_DELAYED_FEE'
-}
-
-interface ISection {
-  title: React.ReactNode
 }
 
 function GeneralTabContent() {

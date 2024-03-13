@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -22,7 +21,7 @@ import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { HOME } from '@client/navigation/routes'
 

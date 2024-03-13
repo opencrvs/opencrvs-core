@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -59,59 +58,57 @@ interface IProgressBarProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
-export class ProgressBar extends React.Component<IProgressBarProps, {}> {
-  defaultClickHadler() {
+export const ProgressBar = ({
+  title = '',
+  color,
+  width = 2,
+  shape = 'square',
+  totalPoints = 0,
+  currentPoints = 0,
+  loading = false,
+  disabled = false,
+  onClick,
+  id
+}: IProgressBarProps) => {
+  const defaultClickHadler = () => {
     // do nothing
   }
-
-  render() {
-    const {
-      title = '',
-      color,
-      width = 2,
-      shape = 'square',
-      totalPoints = 0,
-      currentPoints = 0,
-      loading = false,
-      disabled = false
-    } = this.props
-    const percentage =
-      totalPoints === 0 || currentPoints === 0
-        ? 0
-        : Number(((currentPoints / totalPoints) * 100).toFixed(2))
-    return (
-      <>
-        {(!loading && (
-          <HeaderWrapper>
-            {!disabled ? (
-              <TitleLink
-                id={`${this.props.id}-title-link`}
-                onClick={this.props.onClick || this.defaultClickHadler}
-              >
-                {title}
-              </TitleLink>
-            ) : (
-              <TitleLink disabled={disabled}>{title}</TitleLink>
-            )}
-            <ValueHolder>
-              <Value>{currentPoints}</Value>{' '}
-              <Percentage>({percentage}%)</Percentage>
-            </ValueHolder>
-          </HeaderWrapper>
-        )) || (
-          <HeaderWrapper>
-            <LoaderBox width={35} />
-            <LoaderBox width={15} />
-          </HeaderWrapper>
-        )}
-        <Line
-          percent={percentage}
-          strokeWidth={width}
-          trailWidth={width}
-          strokeLinecap={shape}
-          strokeColor={percentage > 0 ? color : ''}
-        />
-      </>
-    )
-  }
+  const percentage =
+    totalPoints === 0 || currentPoints === 0
+      ? 0
+      : Number(((currentPoints / totalPoints) * 100).toFixed(2))
+  return (
+    <>
+      {(!loading && (
+        <HeaderWrapper>
+          {!disabled ? (
+            <TitleLink
+              id={`${id}-title-link`}
+              onClick={onClick || defaultClickHadler}
+            >
+              {title}
+            </TitleLink>
+          ) : (
+            <TitleLink disabled={disabled}>{title}</TitleLink>
+          )}
+          <ValueHolder>
+            <Value>{currentPoints}</Value>{' '}
+            <Percentage>({percentage}%)</Percentage>
+          </ValueHolder>
+        </HeaderWrapper>
+      )) || (
+        <HeaderWrapper>
+          <LoaderBox width={35} />
+          <LoaderBox width={15} />
+        </HeaderWrapper>
+      )}
+      <Line
+        percent={percentage}
+        strokeWidth={width}
+        trailWidth={width}
+        strokeLinecap={shape}
+        strokeColor={percentage > 0 ? color : ''}
+      />
+    </>
+  )
 }

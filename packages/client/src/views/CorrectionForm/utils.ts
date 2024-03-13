@@ -6,14 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
+  BULLET_LIST,
+  CHECKBOX,
   CHECKBOX_GROUP,
   DATE,
+  DIVIDER,
   FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  HIDDEN,
+  IAttachmentValue,
+  ICheckboxFormField,
   ICheckboxGroupFormField,
   IDynamicOptions,
   IFileValue,
@@ -26,41 +32,41 @@ import {
   IFormSectionGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
+  SUBSECTION_HEADER,
   TEXTAREA,
-  WARNING,
-  LOCATION_SEARCH_INPUT,
-  IAttachmentValue,
-  CHECKBOX,
-  ICheckboxFormField
+  WARNING
 } from '@client/forms'
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import {
+  getConditionalActionsForField,
+  getListOfLocations,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@client/forms/utils'
 import { getValidationErrorsForForm } from '@client/forms/validation'
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
+import { getDefaultLanguage } from '@client/i18n/utils'
 import {
   ILocation,
   IOfflineData,
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { generateLocations } from '@client/utils/locationUtils'
 import {
-  getConditionalActionsForField,
-  getListOfLocations,
-  getVisibleSectionGroupsBasedOnConditions
-} from '@client/forms/utils'
-import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
+  CorrectionInput,
+  PaymentOutcomeType,
+  PaymentType
+} from '@client/utils/gateway'
+import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { camelCase, clone, flattenDeep, get, isArray, isEqual } from 'lodash'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -128,16 +134,51 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
 }
 
 export function updateDeclarationRegistrationWithCorrection(
-  declaration: IDeclaration,
+  correctionData: {
+    corrector?: {
+      relationship:
+        | string
+        | { value: string; nestedFields: { otherRelationship: string } }
+      hasShowedVerifiedDocument?: boolean
+    }
+    reason?: {
+      type: string | { value: string }
+      additionalComment?: string
+      nestedFields?: IFormSectionData
+    }
+    supportingDocuments?: {
+      supportDocumentRequiredForCorrection?: boolean
+      uploadDocForLegalProof?: IAttachmentValue
+    }
+    currectionFeesPayment?: {
+      correctionFees?: IFormSectionData
+    }
+  },
   meta?: { userPrimaryOffice?: UserDetails['primaryOffice'] }
-): void {
-  let correctionValues: Record<string, any> = {}
-  const { data } = declaration
+) {
+  let correctionValues: CorrectionInput = {
+    requester: '',
+    requesterOther: '',
+    hasShowedVerifiedDocument: false,
+    noSupportingDocumentationRequired: false,
+    reason: '',
+    otherReason: '',
+    location: {},
+    note: '',
+    attachments: [],
+    values: []
+  }
+
+  const data = correctionData
 
   if (data.corrector && data.corrector.relationship) {
-    correctionValues.requester = ((
-      data.corrector.relationship as IFormSectionData
-    ).value || data.corrector.relationship) as string
+    if (typeof data.corrector.relationship === 'string') {
+      correctionValues.requester = data.corrector.relationship
+    } else {
+      correctionValues.requester = data.corrector.relationship.value
+      correctionValues.requesterOther =
+        data.corrector.relationship.nestedFields.otherRelationship
+    }
   }
 
   correctionValues.hasShowedVerifiedDocument = Boolean(
@@ -175,49 +216,37 @@ export function updateDeclarationRegistrationWithCorrection(
       }
     }
 
-    if (data.supportingDocuments.uploadDocForLegalProof) {
-      correctionValues.data = (
-        data.supportingDocuments.uploadDocForLegalProof as IAttachmentValue
-      ).data
+    if (Array.isArray(data.supportingDocuments.uploadDocForLegalProof)) {
+      data.supportingDocuments.uploadDocForLegalProof.forEach((file) => {
+        correctionValues.attachments.push({
+          data: file.data,
+          type: file.optionValues[1]
+        })
+      })
     }
   }
 
   if (data.currectionFeesPayment) {
-    if (
-      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
-      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
-        'REQUIRED'
-    ) {
+    const correctionFees = (
+      data.currectionFeesPayment.correctionFees as IFormSectionData
+    )?.value
+
+    if (correctionFees === 'REQUIRED') {
       const { nestedFields }: { nestedFields?: IFormSectionData } = data
         .currectionFeesPayment.correctionFees as IFormSectionData
-      correctionValues.payments = [
-        {
-          type: 'MANUAL',
-          total: Number(nestedFields?.totalFees),
-          amount: Number(nestedFields?.totalFees),
-          outcome: 'COMPLETED' as const
-        }
-      ]
+
+      correctionValues.payment = {
+        type: PaymentType.Manual,
+        amount: Number(nestedFields?.totalFees),
+        outcome: PaymentOutcomeType.Completed,
+        date: new Date().toISOString()
+      }
+
       if (nestedFields?.proofOfPayment) {
-        correctionValues.payments[0].data = (
+        correctionValues.payment.attachmentData = (
           nestedFields?.proofOfPayment as IFileValue
         ).data
       }
-    } else if (
-      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
-      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
-        'NOT_REQUIRED'
-    ) {
-      correctionValues.payments = [
-        {
-          type: 'MANUAL',
-          total: 0,
-          amount: 0,
-          outcome: 'COMPLETED' as const,
-          data: EMPTY_STRING,
-          date: Date.now()
-        }
-      ]
     }
   }
 
@@ -229,12 +258,7 @@ export function updateDeclarationRegistrationWithCorrection(
     }
   }
 
-  data.registration.correction = data.registration.correction
-    ? {
-        ...(data.registration.correction as IFormSectionData),
-        ...correctionValues
-      }
-    : correctionValues
+  return correctionValues
 }
 
 export function sectionHasError(
@@ -272,16 +296,16 @@ export function sectionHasError(
   return false
 }
 
-export function renderSelectOrRadioLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
@@ -304,8 +328,12 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId] || {
+          name: locationId,
+          alias: locationId
+        }
       } else {
         selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
       }
@@ -338,7 +366,7 @@ const getCheckboxFieldValue = (
   )
 }
 
-export const getCheckBoxGroupFieldValue = (
+const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
   intl: IntlShape
@@ -352,7 +380,7 @@ export const getCheckBoxGroupFieldValue = (
   return ''
 }
 
-export const getFormFieldValue = (
+const getFormFieldValue = (
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -372,6 +400,21 @@ export const getFormFieldValue = (
   return ''
 }
 
+export const addressFieldNames = [
+  'statePrimary',
+  'districtPrimary',
+  'cityUrbanOptionPrimary',
+  'internationalStatePrimary',
+  'internationalDistrictPrimary',
+  'internationalCityPrimary',
+  'stateSecondary',
+  'districtSecondary',
+  'cityUrbanOptionSecondary',
+  'internationalStateSecondary',
+  'internationalCitySecondary',
+  'internationalDistrictSecondary'
+]
+
 export const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -381,42 +424,52 @@ export const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+  const hasAddressField = addressFieldNames.some((fieldName) =>
+    field.name.includes(fieldName)
+  )
 
-  if (
-    [
-      'statePrimary',
-      'districtPrimary',
-      'internationalStatePrimary',
-      'internationalDistrictPrimary',
-      'stateSecondary',
-      'districtSecondary',
-      'internationalStateSecondary',
-      'internationalDistrictSecondary'
-    ].includes(field.name)
-  ) {
+  if (hasAddressField) {
     const sectionData = draftData[sectionId]
 
-    if (sectionData.countryPrimary === window.config.COUNTRY) {
+    if (
+      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
       const dynamicOption: IDynamicOptions = {
         resource: 'locations',
         initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countryPrimary ${sectionId}`)
+        : camelCase(`statePrimary ${sectionId}`)
 
-      if (field.name.includes('Secondary')) {
-        dynamicOption.dependency = [
-          'internationalStateSecondary',
-          'stateSecondary'
-        ].includes(field.name)
-          ? 'countrySecondary'
-          : 'stateSecondary'
-      } else {
-        dynamicOption.dependency = [
-          'internationalStatePrimary',
-          'statePrimary'
-        ].includes(field.name)
-          ? 'countryPrimary'
-          : 'statePrimary'
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineResources,
+        language
+      )
+    }
+
+    if (
+      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      window.config.COUNTRY
+    ) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStateSecondary',
+        'stateSecondary'
+      ].some((f) => field.name.includes(f))
+        ? camelCase(`countrySecondary ${sectionId}`)
+        : camelCase(`stateSecondary ${sectionId}`)
 
       return renderSelectDynamicLabel(
         value,
@@ -534,7 +587,7 @@ export function hasFieldChanged(
   return data[field.name] !== originalData[field.name]
 }
 
-export function hasNestedDataChanged(
+function hasNestedDataChanged(
   nestedFieldData: IFormData,
   previousNestedFieldData: IFormData
 ) {
@@ -582,6 +635,9 @@ export function isVisibleField(
   draft: IDeclaration,
   offlineResources: IOfflineData
 ) {
+  if (field.type === HIDDEN) {
+    return false
+  }
   const conditionalActions = getConditionalActionsForField(
     field,
     draft.data[section.id] || {},
@@ -634,9 +690,15 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
-    (type) => type === field.type
-  )
+  return [
+    BULLET_LIST,
+    PARAGRAPH,
+    WARNING,
+    TEXTAREA,
+    SUBSECTION_HEADER,
+    FETCH_BUTTON,
+    DIVIDER
+  ].find((type) => type === field.type)
 }
 
 export const getNestedFieldValue = (
@@ -681,4 +743,10 @@ const getVisibleSections = (
         draft.data
       ).length > 0
   )
+}
+
+export function labelFormatterForInformant(inputString: string) {
+  return (
+    inputString.charAt(0) + inputString.slice(1).toLowerCase()
+  ).replaceAll('_', ' ')
 }

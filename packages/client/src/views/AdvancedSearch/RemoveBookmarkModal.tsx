@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -30,7 +29,7 @@ import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/adva
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 interface IRemoveBookmarkModalProps {
   showRemoveBookmarkModal: boolean
@@ -112,6 +111,7 @@ export function RemoveBookmarkAdvancedSearchModal({
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button
+            key="remove-advanced-search-bookmark"
             type="primary"
             id="remove_advanced_search_bookmark"
             onClick={async () => {

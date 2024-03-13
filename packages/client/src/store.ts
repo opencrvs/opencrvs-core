@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   connectRouter,
@@ -24,12 +23,7 @@ import {
   StoreEnhancer
 } from 'redux'
 import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
-
 import { declarationsReducer, IDeclarationsState } from '@client/declarations'
-import {
-  IPrintFormState,
-  printReducer
-} from '@client/forms/certificate/printReducer'
 import {
   IRegisterFormState,
   registerFormReducer
@@ -55,10 +49,6 @@ import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
-import {
-  formConfigReducer,
-  IFormConfigState
-} from './forms/configuration/formConfig/reducer'
 import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
@@ -71,11 +61,9 @@ export interface IStoreState {
   navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
-  printCertificateForm: IPrintFormState
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
-  formConfig: IFormConfigState
   advancedSearch: IAdvancedSearchParamState
 }
 
@@ -98,11 +86,9 @@ export const createStore = <T>(
     navigation: navigationReducer,
     notification: notificationReducer,
     reviewForm: reviewReducer,
-    printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
-    formConfig: formConfigReducer,
     advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore

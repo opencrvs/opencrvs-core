@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -84,39 +83,41 @@ const EndComponentContainer = styled.div`
     padding: 0;
   }
 `
-class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
-  render() {
-    const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
-    return (
-      <HeaderContainer id={id} className={this.props.className}>
-        {mobileLeft &&
-          mobileLeft.map(({ icon }, index) => (
-            <EndComponentContainer key={`mobile-left-${index}`}>
+export const MobileHeader = ({
+  id,
+  className,
+  mobileLeft,
+  mobileRight,
+  title,
+  mobileBody
+}: IMobileHeaderProps & IDomProps) => {
+  return (
+    <HeaderContainer id={id} className={className}>
+      {mobileLeft &&
+        mobileLeft.map(({ icon }, index) => (
+          <EndComponentContainer key={`mobile-left-${index}`}>
+            {icon()}
+          </EndComponentContainer>
+        ))}
+
+      {mobileBody ? (
+        <SearchBody>{mobileBody}</SearchBody>
+      ) : (
+        <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
+      )}
+
+      {mobileRight &&
+        mobileRight.map(({ handler, icon }, index) => (
+          <EndComponentContainer key={`mobile-right-${index}`}>
+            <CircleButton
+              id="mobile_header_right"
+              onClick={handler}
+              color="#4972BB"
+            >
               {icon()}
-            </EndComponentContainer>
-          ))}
-
-        {mobileBody ? (
-          <SearchBody>{mobileBody}</SearchBody>
-        ) : (
-          <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
-        )}
-
-        {mobileRight &&
-          mobileRight.map(({ handler, icon }, index) => (
-            <EndComponentContainer key={`mobile-right-${index}`}>
-              <CircleButton
-                id="mobile_header_right"
-                onClick={handler}
-                color="#4972BB"
-              >
-                {icon()}
-              </CircleButton>
-            </EndComponentContainer>
-          ))}
-      </HeaderContainer>
-    )
-  }
+            </CircleButton>
+          </EndComponentContainer>
+        ))}
+    </HeaderContainer>
+  )
 }
-
-export { MobileHeader }

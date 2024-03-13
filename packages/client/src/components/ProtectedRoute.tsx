@@ -6,18 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Route } from 'react-router'
+import { Redirect, Route } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { hasAccessToRoute } from '@client/utils/authUtils'
 import { SystemRoleType } from '@client/utils/gateway'
+import { HOME } from '@client/navigation/routes'
 
-export interface IProps {
+interface IProps {
   roles?: SystemRoleType[]
 }
 
@@ -32,7 +32,7 @@ class ProtectedRouteWrapper extends Route<
     }
     if (roles && userDetails) {
       if (!hasAccessToRoute(roles, userDetails)) {
-        throw new Error('Unauthorised!')
+        return <Redirect to={HOME} />
       }
     }
     return <Route {...rest} />

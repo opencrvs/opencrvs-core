@@ -6,17 +6,10 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import {
-  getMetrics,
-  postAdvancedSearch,
-  postMetrics
-} from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
-import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
+import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
 import {
   getSystem,
   getTokenPayload,
@@ -25,6 +18,16 @@ import {
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
+import { ISearchCriteria, postAdvancedSearch } from './utils'
+import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
+import { ApolloError } from 'apollo-server-hapi'
+
+export class RateLimitError extends ApolloError {
+  constructor(message: string) {
+    super(message, 'DAILY_QUOTA_EXCEEDED')
+    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
+  }
+}
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -76,7 +79,8 @@ export const resolvers: GQLResolver = {
         count,
         skip,
         sortColumn,
-        sort = 'desc'
+        sort = 'desc',
+        sortBy
       },
       { headers: authHeader }
     ) {
@@ -101,6 +105,24 @@ export const resolvers: GQLResolver = {
         )
       }
 
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
+      }
+      if (userId) {
+        searchCriteria.createdBy = userId
+      }
+      if (sortColumn) {
+        searchCriteria.sortColumn = sortColumn
+      }
+      if (sortBy) {
+        searchCriteria.sortBy = sortBy.map((sort) => ({
+          [sort.column]: sort.order
+        }))
+      }
+
       const isExternalAPI = hasScope(authHeader, 'recordsearch')
       if (isExternalAPI) {
         const payload = getTokenPayload(authHeader.Authorization)
@@ -112,23 +134,19 @@ export const resolvers: GQLResolver = {
           authHeader
         )
         if (getTotalRequest.total >= system.settings.dailyQuota) {
-          return await Promise.reject(new Error('Daily search quota exceeded'))
+          throw new RateLimitError('Daily search quota exceeded')
         }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
 
-        if (
-          searchResult &&
-          searchResult.statusCode &&
-          searchResult.statusCode >= 400
-        ) {
+        if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
           return await Promise.reject(new Error(errMsg.message))
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
+          await fetchRegistrationForDownloading(hit._id, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {
@@ -156,26 +174,13 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('There is no param to search '))
         }
 
-        if (count) {
-          searchCriteria.size = count
-        }
-        if (skip) {
-          searchCriteria.from = skip
-        }
-        if (userId) {
-          searchCriteria.createdBy = userId
-        }
-        if (sortColumn) {
-          searchCriteria.sortColumn = sortColumn
-        }
-
         searchCriteria.parameters = { ...advancedSearchParameters }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
         return {
-          totalItems: searchResult?.body?.hits?.total?.value || 0,
-          results: searchResult?.body?.hits?.hits || []
+          totalItems: searchResult?.body?.hits?.total?.value ?? 0,
+          results: searchResult?.body?.hits?.hits ?? []
         }
       }
     },

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
@@ -80,7 +79,9 @@ export function Language() {
             ...choices,
             {
               value: lang,
-              label: languages[lang].displayName
+              label: intl.formatMessage(userMessages.language, {
+                language: languages[lang].lang
+              })
             }
           ]
         : choices,
@@ -96,7 +97,11 @@ export function Language() {
           </LabelContainer>
         }
         value={
-          <ValueContainer>{languages[language].displayName}</ValueContainer>
+          <ValueContainer>
+            {intl.formatMessage(userMessages.language, {
+              language: languages[language].lang
+            })}
+          </ValueContainer>
         }
         actions={
           <DynamicHeightLinkButton
@@ -143,12 +148,7 @@ export function Language() {
       </ResponsiveModal>
       {showSuccessNotification && (
         <Toast type="success" onClose={toggleSuccessNotification}>
-          <FormattedMessage
-            {...userMessages.changeLanguageSuccessMessage}
-            values={{
-              language: languages[selectedLanguage].displayName
-            }}
-          />
+          <FormattedMessage {...userMessages.changeLanguageSuccessMessage} />
         </Toast>
       )}
     </>

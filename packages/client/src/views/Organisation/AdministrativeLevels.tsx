@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { Fragment } from 'react'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -29,7 +28,7 @@ import {
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { useParams } from 'react-router'
 import {
   goToOrganizationList,
@@ -40,6 +39,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -103,7 +103,7 @@ export function AdministrativeLevels() {
 
           if (currentOffice) {
             LocationBreadCrumb.push({
-              label: currentOffice.name,
+              label: getLocalizedLocationName(intl, currentOffice),
               paramId: currentOffice.id
             })
             currentLocationId = currentOffice.partOf.split('/')[1]
@@ -178,15 +178,15 @@ export function AdministrativeLevels() {
                       <Link
                         element="a"
                         onClick={(e) => {
-                          if (level.type === LocationType.ADMIN_STRUCTURE) {
+                          if (level.type === 'ADMIN_STRUCTURE') {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }
-                          if (level.type === LocationType.CRVS_OFFICE)
+                          if (level.type === 'CRVS_OFFICE')
                             dispatch(goToTeamUserList(level.id))
                         }}
                       >
-                        {level?.name}
+                        {getLocalizedLocationName(intl, level)}
                       </Link>
                     }
                     actions={

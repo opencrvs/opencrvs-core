@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   calculateInterval,
@@ -16,7 +15,9 @@ import {
   getDistrictLocation,
   fillEmptyDataArrayByKey,
   EVENT_TYPE,
-  getMonthRangeFilterListFromTimeRage
+  getMonthRangeFilterListFromTimeRage,
+  getDaysPerYear,
+  createEstimatesArray
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 import { cloneDeep } from 'lodash'
@@ -164,12 +165,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48324.82564712329,
+        femaleEstimation: 24211.83823178082,
+        maleEstimation: 24113.028044109593,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns 0 as estimations for an office', async () => {
@@ -187,8 +187,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 0,
         maleEstimation: 0,
         locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-        locationLevel: '',
-        estimationYear: 2017
+        locationLevel: ''
       })
     })
     it('Returns estimate properly for death', async () => {
@@ -197,13 +196,13 @@ describe('verify metrics util', () => {
       clonedLocation.extension[1] = {
         url: 'http://opencrvs.org/specs/id/statistics-male-populations',
         valueString:
-          '[{"2007":"1292568"},{"2008":"1250993"},{"2009":"1246376"},{"2010":"1279752"},{"2011":"1293470"},{"2012":"1291684"},{"2013":"1756173"},{"2014":"1788473"},{"2015":"1167891"},{"2016":"1225971"},{"2017":""}]'
+          '[{"2007":"1292568"},{"2008":"1250993"},{"2009":"1246376"},{"2010":"1279752"},{"2011":"1293470"},{"2012":"1291684"},{"2013":"1756173"},{"2014":"1788473"},{"2015":"1167891"},{"2016":"1225971"},{"2017":"1228886"}]'
       }
       // Emptying female population data for latest year
       clonedLocation.extension[2] = {
         url: 'http://opencrvs.org/specs/id/statistics-female-populations',
         valueString:
-          '[{"2007":"1261767"},{"2008":"1221096"},{"2009":"1214677"},{"2010":"1240638"},{"2011":"1257481"},{"2012":"1241730"},{"2013":"1724403"},{"2014":"1758485"},{"2015":"1151860"},{"2016":"1228886"},{"2017":""}]'
+          '[{"2007":"1261767"},{"2008":"1221096"},{"2009":"1214677"},{"2010":"1240638"},{"2011":"1257481"},{"2012":"1241730"},{"2013":"1724403"},{"2014":"1758485"},{"2015":"1151860"},{"2016":"1228886"},{"2017":"1228886"}]'
       }
       const result = await fetchEstimateByLocation(
         clonedLocation,
@@ -215,12 +214,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 11873,
-        femaleEstimation: 5937,
-        maleEstimation: 5937,
+        totalEstimation: 12385.749504657533,
+        femaleEstimation: 6284.48933589041,
+        maleEstimation: 6273.451468767123,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns the estimatedFigures for right location', async () => {
@@ -234,12 +232,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48324.82564712329,
+        femaleEstimation: 24211.83823178082,
+        maleEstimation: 24113.028044109593,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
 
@@ -326,12 +323,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48324.82564712329,
+        femaleEstimation: 24211.83823178082,
+        maleEstimation: 24113.028044109593,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
   })
@@ -416,5 +412,74 @@ describe('verify metrics util', () => {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
       ])
     })
+  })
+
+  describe('check for the list of days in year for a range', () => {
+    it('Returns set of days from a range when start date is 29th of the month', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-04-29T10:00:00.000Z'),
+        new Date('2023-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([247, 95])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in same year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([67])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in different year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2018-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T11:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([337, 365, 366, 365, 95])
+    })
+  })
+
+  describe('verify createEstimatesArray', () => {
+    it('creates a valid estimates array from submitted years', () => {
+      const crudArray: number[] = []
+
+      const yearsArray = [2022, 2023]
+
+      const estimatesExtension = {
+        url: '',
+        valueString: JSON.stringify([
+          { '2015': 17.2 },
+          { '2022': 16 },
+          { '2017': 17.2 }
+        ])
+      }
+
+      const expectedOutput = [16, 16]
+
+      crudArray.push(...createEstimatesArray(yearsArray, estimatesExtension))
+
+      expect(crudArray).toEqual(expectedOutput)
+    })
+  })
+  it('creates a valid estimates array from submitted years', () => {
+    const crudArray: number[] = []
+
+    const yearsArray = [2015, 2018]
+
+    const estimatesExtension = {
+      url: '',
+      valueString: JSON.stringify([
+        { '2015': 17.2 },
+        { '2022': 16 },
+        { '2017': 17.5 }
+      ])
+    }
+
+    const expectedOutput = [17.2, 17.5]
+
+    crudArray.push(...createEstimatesArray(yearsArray, estimatesExtension))
+
+    expect(crudArray).toEqual(expectedOutput)
   })
 })

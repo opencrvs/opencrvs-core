@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -19,14 +18,10 @@ import {
 import { createServer } from '@search/server'
 import {
   mockBirthFhirBundle,
-  mockCompositionEntry,
-  mockCompositionResponse,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockEncounterResponse,
-  mockLocationResponse,
-  mockUserModelResponse,
-  mockTaskBundleWithExtensions
+  mockUserModelResponse
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -72,15 +67,17 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
-        [JSON.stringify(mockCompositionResponse), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify({}), { status: 200 }]
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -88,7 +85,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/new-declaration',
+        url: '/record',
         payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
@@ -124,14 +121,26 @@ describe('Verify handlers', () => {
           { status: 200 }
         ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
-        [JSON.stringify(mockCompositionResponse), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify({}), { status: 200 }]
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -139,7 +148,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/new-declaration',
+        url: '/record',
         payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`

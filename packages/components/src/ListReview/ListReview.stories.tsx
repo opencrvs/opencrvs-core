@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
 import { ListReview } from './index'
@@ -20,7 +19,7 @@ export default {
     docs: {
       description: {
         component: `
-\`<ListReview>\` provides a three column simple list. Useful for displaying content that requires a label, value and action button(s). 
+\`<ListReview>\` provides a three column simple list. Useful for displaying content that requires a label, value and action button(s).
 `
       }
     }

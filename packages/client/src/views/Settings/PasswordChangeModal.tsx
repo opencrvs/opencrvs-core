@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
@@ -18,7 +17,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { gql } from '@apollo/client'
 import { get } from 'lodash'
@@ -104,7 +103,7 @@ const BoxedError = styled.div`
   margin-bottom: 10px;
   display: flex;
 `
-export const changePasswordMutation = gql`
+const changePasswordMutation = gql`
   mutation changePassword(
     $userId: String!
     $existingPassword: String!
@@ -154,7 +153,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
   }
   validateLength = (value: string) => {
     this.setState(() => ({
-      validLength: value.length >= 8
+      validLength: value.length >= 12
     }))
   }
   validateNumber = (value: string) => {
@@ -235,6 +234,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         contentHeight={420}
         actions={[
           <Mutation
+            key="change-password-mutation"
             mutation={changePasswordMutation}
             variables={{
               userId: get(this.props, 'userDetails.userMgntUserID'),
@@ -335,9 +335,9 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                         messages.passwordLengthCharacteristicsForPasswordUpdateForm,
                         {
                           min: intl.formatMessage({
-                            defaultMessage: '8',
+                            defaultMessage: '12',
                             description: 'Minimum length password',
-                            id: 'number.eight'
+                            id: 'number.twelve'
                           })
                         }
                       )}
@@ -404,9 +404,9 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     messages.passwordLengthCharacteristicsForPasswordUpdateForm,
                     {
                       min: intl.formatMessage({
-                        defaultMessage: '8',
+                        defaultMessage: '12',
                         description: 'Minimum length password',
-                        id: 'number.eight'
+                        id: 'number.twelve'
                       })
                     }
                   )}

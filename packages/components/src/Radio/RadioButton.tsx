@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -116,50 +115,48 @@ interface IRadioButton {
   onChange?: (value: Value) => void
 }
 
-export class RadioButton extends React.Component<IRadioButton> {
-  onChange = () => {
-    if (this.props.onChange) {
-      this.props.onChange(this.props.value)
+export const RadioButton = ({
+  id,
+  name,
+  selected,
+  label,
+  value,
+  size,
+  disabled,
+  onChange,
+  hasFlexDirection
+}: IRadioButton) => {
+  const handleChange = () => {
+    if (onChange) {
+      onChange(value)
     }
   }
-  render() {
-    const {
-      id,
-      name,
-      selected,
-      label,
-      value,
-      size,
-      disabled,
-      hasFlexDirection
-    } = this.props
-    return (
-      <Wrapper>
-        <CheckOuter>
-          <Input
-            id={id}
-            buttonSize={size}
-            disabled={disabled}
-            role="radio"
-            checked={value === selected}
-            type="radio"
-            name={name}
-            value={value.toString()}
-            onChange={disabled ? () => null : this.onChange}
-          />
-          <Check disabled={disabled} size={size}>
-            {disabled ? '' : <span />}
-          </Check>
-        </CheckOuter>
-        <Label
+  return (
+    <Wrapper>
+      <CheckOuter>
+        <Input
+          id={id}
+          buttonSize={size}
           disabled={disabled}
-          size={size}
-          htmlFor={id}
-          hasFlexDirection={hasFlexDirection}
-        >
-          {label}
-        </Label>
-      </Wrapper>
-    )
-  }
+          role="radio"
+          checked={value === selected}
+          type="radio"
+          name={name}
+          value={value.toString()}
+          onChange={disabled ? () => null : handleChange}
+        />
+        <Check disabled={disabled} size={size}>
+          {disabled ? '' : <span />}
+        </Check>
+      </CheckOuter>
+      <Label
+        disabled={disabled}
+        size={size}
+        htmlFor={id}
+        hasFlexDirection={hasFlexDirection}
+      >
+        {label}
+      </Label>
+    </Wrapper>
+  )
 }

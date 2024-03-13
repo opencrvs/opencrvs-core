@@ -6,15 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
 import { Types } from 'mongoose'
 import { logger } from '@user-mgnt/logger'
 import { UserRole } from '@user-mgnt/model/user'
-import SystemRole, { ISystemRoleModel } from '@user-mgnt/model/systemRole'
+import SystemRole, {
+  ISystemRoleModel,
+  SYSTEM_ROLE_TYPES
+} from '@user-mgnt/model/systemRole'
 import * as Joi from 'joi'
 
 const roleLabelSchema = Joi.object({
@@ -29,13 +31,15 @@ const roleRequestSchema = Joi.object({
 
 export const systemRolesRequestSchema = Joi.object({
   id: Joi.string().required(),
-  value: Joi.string().optional(),
+  value: Joi.string()
+    .allow(...SYSTEM_ROLE_TYPES)
+    .optional(),
   roles: Joi.array().items(roleRequestSchema).optional(),
   active: Joi.boolean().optional()
 })
 
 export const systemRoleResponseSchema = Joi.object({
-  msg: Joi.string().required()
+  roleIdMap: Joi.object().required()
 })
 
 export interface IRoleLabel {
@@ -50,7 +54,7 @@ export interface IRoleRequest {
 
 export interface ISystemRolesRequest {
   id: string
-  value?: string
+  value?: (typeof SYSTEM_ROLE_TYPES)[number]
   roles?: IRoleRequest[]
   active?: boolean
 }
@@ -61,6 +65,7 @@ export default async function updateRole(
 ) {
   const systemRolesRequest = request.payload as ISystemRolesRequest
   let updatedRoleIds: Types.ObjectId[] = []
+  let roleIdMap: { [role: string]: Types.ObjectId } = {}
 
   const systemRole: ISystemRoleModel | null = await SystemRole.findOne({
     _id: systemRolesRequest.id
@@ -72,7 +77,9 @@ export default async function updateRole(
 
   if (systemRolesRequest.roles) {
     try {
-      updatedRoleIds = await updateParticularRoles(systemRolesRequest.roles)
+      ;({ updatedRoleIds, roleIdMap } = await updateParticularRoles(
+        systemRolesRequest.roles
+      ))
       systemRole.roles = updatedRoleIds
     } catch (err) {
       logger.error(err)
@@ -93,16 +100,24 @@ export default async function updateRole(
       .code(401)
   }
 
-  logger.info(systemRole)
-  return h.response({ msg: 'System role updated' }).code(200)
+  return h
+    .response({
+      roleIdMap
+    })
+    .code(200)
 }
 
 async function updateParticularRoles(roles: IRoleRequest[]) {
-  return Promise.all(
+  const roleIdMap: { [role: string]: Types.ObjectId } = {}
+  const updatedRoleIds = await Promise.all(
     roles.map(async (role) => {
       const id = new Types.ObjectId(role._id)
       await UserRole.updateOne({ _id: id.toString() }, role, { upsert: true })
+      for (const labelObj of role.labels) {
+        roleIdMap[labelObj.label] = id
+      }
       return id
     })
   )
+  return { updatedRoleIds, roleIdMap }
 }

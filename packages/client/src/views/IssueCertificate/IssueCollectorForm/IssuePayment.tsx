@@ -6,32 +6,20 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import {
-  IDeclaration,
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import {
-  formatUrl,
-  goBack,
-  goToHomeTab,
-  goToReviewCertificate
-} from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  useIntl
-} from 'react-intl'
+import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
+import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Redirect, RouteComponentProps, useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
@@ -46,19 +34,15 @@ import {
   Summary,
   Currency,
   ResponsiveModal
-} from '@client/../../components/lib'
-import {
-  SuccessButton,
-  TertiaryButton
-} from '@client/../../components/lib/buttons'
+} from '@opencrvs/components/lib'
+import { SuccessButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Event } from '@client/utils/gateway'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Button } from '@client/../../components/src/Button'
+import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
@@ -107,10 +91,9 @@ export const IssuePayment = () => {
     )
     certificate.payments = {
       type: 'MANUAL' as const,
-      total: Number(paymentAmount),
       amount: Number(paymentAmount),
       outcome: 'COMPLETED' as const,
-      date: Date.now()
+      date: new Date().toISOString()
     }
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(declaration))
@@ -164,7 +147,7 @@ export const IssuePayment = () => {
         hideBackground
         goHome={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
       >
-        <Content title={titleMessage}>
+        <Content title={titleMessage} showTitleOnMobile>
           <Summary id="summary">
             <Summary.Row
               id="service"
@@ -199,10 +182,15 @@ export const IssuePayment = () => {
           show={showConfirmationModal}
           handleClose={toggleModal}
           actions={[
-            <TertiaryButton onClick={toggleModal} id="close-issue-modal">
+            <TertiaryButton
+              key="close-issue-modal"
+              onClick={toggleModal}
+              id="close-issue-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </TertiaryButton>,
             <Button
+              key="issue-certificate-confirmation"
               onClick={() => readyToIssue()}
               id="issue-certificate-confirmation"
               type={'primary'}

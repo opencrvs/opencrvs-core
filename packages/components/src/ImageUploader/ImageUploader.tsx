@@ -6,32 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
-import { SecondaryButton } from '../buttons'
-
-const ImageBase = styled(SecondaryButton)`
-  width: auto;
-  ${({ theme }) => theme.fonts.bold16};
-  align-items: center;
-  display: inline-flex;
-  border: 0;
-  justify-content: space-between;
-  cursor: pointer;
-`
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 const HiddenInput = styled.input`
   display: none;
 `
-const Icon = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-left: 2em;
-`
-interface IImagePickerProps {
+
+type IImagePickerProps = {
   id: string
   title: string
   icon?: () => React.ReactNode
@@ -40,40 +26,41 @@ interface IImagePickerProps {
   disabled?: boolean
 }
 
-export class ImageUploader extends React.Component<IImagePickerProps, {}> {
-  fileUploader: React.RefObject<HTMLInputElement> = React.createRef()
-  handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+export const ImageUploader = (props: IImagePickerProps) => {
+  const fileUploader = useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
     if (files) {
-      this.props.handleFileChange(files[0])
+      props.handleFileChange(files[0])
     }
     // Required to select the same file again
     event.target.value = ''
   }
 
-  render() {
-    const { icon, title, disabled = false, ...otherProps } = this.props
-    return (
-      <ImageBase
-        {...otherProps}
-        onClick={(event) => {
-          if (this.props.onClick) {
-            this.props.onClick(event)
-          }
-          this.fileUploader.current!.click()
-        }}
-        disabled={disabled}
-      >
-        {title}
-        {icon && <Icon>{icon()}</Icon>}
-        <HiddenInput
-          ref={this.fileUploader}
-          id="image_file_uploader_field"
-          type="file"
-          accept="image/*"
-          onChange={this.handleFileChange}
-        />
-      </ImageBase>
-    )
-  }
+  const { icon, title, disabled = false, ...otherProps } = props
+  return (
+    <Button
+      type="secondary"
+      size="medium"
+      {...otherProps}
+      onClick={(event) => {
+        if (props.onClick) {
+          props.onClick(event)
+        }
+        fileUploader.current!.click()
+      }}
+      disabled={disabled}
+    >
+      <Icon name="UploadSimple" />
+      {title}
+      <HiddenInput
+        ref={fileUploader}
+        id="image_file_uploader_field"
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+    </Button>
+  )
 }

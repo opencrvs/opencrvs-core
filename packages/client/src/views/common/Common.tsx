@@ -6,17 +6,15 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
-import { isEqual } from 'lodash-es'
 import { selectCountryBackground } from '@client/offline/selectors'
 
-export interface IProps {
+interface IProps {
   children: React.ReactNode
   id?: string
 }
@@ -62,7 +60,7 @@ const StyledPage = styled.div<{
     box-sizing: border-box;
   }
 `
-export const Container = styled.div`
+const Container = styled.div`
   margin: auto;
   height: auto;
   width: min(380px, 90%);

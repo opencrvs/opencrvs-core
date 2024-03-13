@@ -6,25 +6,24 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Event } from '@client/utils/gateway'
 import {
-  getDraftInformantFullName,
+  getDeclarationFullName,
   transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 
 describe('draftUtils tests', () => {
   describe('getDraftInformantFullName()', () => {
     describe('Birth event', () => {
       it('Returns child english name properly', () => {
         expect(
-          getDraftInformantFullName({
+          getDeclarationFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               child: {
@@ -42,7 +41,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftInformantFullName(
+          getDeclarationFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {
@@ -64,7 +63,7 @@ describe('draftUtils tests', () => {
     describe('Death event', () => {
       it('Returns deceased english name properly', () => {
         expect(
-          getDraftInformantFullName({
+          getDeclarationFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               deceased: {
@@ -81,7 +80,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftInformantFullName(
+          getDeclarationFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {
@@ -117,12 +116,14 @@ describe('draftUtils tests', () => {
           childName: [
             {
               firstNames: 'Muhammad',
-              familyName: 'Ashraful',
+              middleName: 'Ashraful',
+              familyName: 'Alam',
               use: 'en'
             },
             {
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল',
+              middleName: 'আশরাফুল',
+              familyName: 'আলম',
               use: 'bn'
             }
           ]
@@ -142,9 +143,11 @@ describe('draftUtils tests', () => {
             },
             child: {
               firstNamesEng: 'Muhammad',
-              familyNameEng: 'Ashraful',
+              middleNameEng: 'Ashraful',
+              familyNameEng: 'Alam',
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল'
+              middleName: 'আশরাফুল',
+              familyName: 'আলম'
             }
           },
           event: 'birth',
@@ -166,12 +169,14 @@ describe('draftUtils tests', () => {
           deceasedName: [
             {
               firstNames: 'Muhammad',
-              familyName: 'Ashraful',
+              middleName: 'Ashraful',
+              familyName: 'Alam',
               use: 'en'
             },
             {
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল',
+              middleName: 'আশরাফুল',
+              familyName: 'আলম',
               use: 'bn'
             }
           ]
@@ -191,9 +196,11 @@ describe('draftUtils tests', () => {
             },
             deceased: {
               firstNamesEng: 'Muhammad',
-              familyNameEng: 'Ashraful',
+              middleNameEng: 'Ashraful',
+              familyNameEng: 'Alam',
               firstNames: 'মুহাম্মাদ',
-              familyName: 'আশরাফুল'
+              middleName: 'আশরাফুল',
+              familyName: 'আলম'
             }
           },
           event: 'death',

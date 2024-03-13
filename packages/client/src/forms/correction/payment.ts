@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
@@ -29,7 +28,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
       hideAsterisk: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'REQUIRED',
@@ -52,7 +51,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           },
           {
@@ -62,7 +61,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             description: messages.correctionSummaryProofOfPayment,
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]

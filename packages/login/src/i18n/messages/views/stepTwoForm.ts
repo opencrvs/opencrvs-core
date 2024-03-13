@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor, defineMessages } from 'react-intl'
 
@@ -16,10 +15,12 @@ interface IStepTwoFormMessages
   stepTwoTitle: MessageDescriptor
   stepTwoResendTitle: MessageDescriptor
   resend: MessageDescriptor
-  stepTwoInstruction: MessageDescriptor
+  stepTwoInstructionSMS: MessageDescriptor
+  stepTwoInstructionEMAIL: MessageDescriptor
   submit: MessageDescriptor
   codeSubmissionError: MessageDescriptor
   resentSMS: MessageDescriptor
+  resentEMAIL: MessageDescriptor
   optionalLabel: MessageDescriptor
   verficationCodeLabel: MessageDescriptor
 }
@@ -37,15 +38,23 @@ const messagesToDefine: IStepTwoFormMessages = {
       'The title that appears in step two of the form after resend button click'
   },
   resend: {
-    id: 'login.resendMobile',
+    id: 'login.resend',
     defaultMessage: 'Resend SMS',
-    description: 'Text for button that resends SMS verification code'
+    description: 'Text for button that resends SMS or email verification code'
   },
-  stepTwoInstruction: {
-    id: 'login.stepTwoInstruction',
+  stepTwoInstructionSMS: {
+    id: 'login.stepTwoInstruction.sms',
     defaultMessage:
-      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 5 minutes.',
-    description: 'The instruction that appears in step two of the form'
+      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 10 minutes.',
+    description:
+      'The instruction that appears in step two of the form that lets users know that code has been sent to phone'
+  },
+  stepTwoInstructionEMAIL: {
+    id: 'login.stepTwoInstruction.email',
+    defaultMessage:
+      'A verification code has been sent to your email. ending in {email}. This code will be valid for 10 minutes.',
+    description:
+      'The instruction that appears in step two of the form that lets users know that code has been sent to email'
   },
   submit: {
     id: 'login.submit',
@@ -66,7 +75,14 @@ const messagesToDefine: IStepTwoFormMessages = {
   resentSMS: {
     id: 'login.resentSMS',
     defaultMessage: 'We just resent you another code to {number}',
-    description: 'The message that appears when the resend button is clicked.'
+    description:
+      'The message that appears when the resend button is clicked and tells user than code is resent to email'
+  },
+  resentEMAIL: {
+    id: 'login.resentEMAIL',
+    defaultMessage: 'We just resent you another code to {email}',
+    description:
+      'The message that appears when the resend button is clicked and tells user than code is resent to email'
   },
   optionalLabel: {
     id: 'login.optionalLabel',

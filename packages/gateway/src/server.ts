@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
 import * as Hapi from '@hapi/hapi'
@@ -19,8 +18,10 @@ import {
   AUTH_URL,
   PORT,
   HOST,
+  DEFAULT_TIMEOUT,
   HOSTNAME,
-  DEFAULT_TIMEOUT
+  CLIENT_APP_URL,
+  LOGIN_URL
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
@@ -30,15 +31,17 @@ import {
 } from 'apollo-server-hapi'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/features/user/database'
+import * as database from '@gateway/utils/redis'
 import { logger } from '@gateway/logger'
+import { badRequest, Boom } from '@hapi/boom'
+import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
   if (HOSTNAME[0] !== '*') {
-    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
+    whitelist = [LOGIN_URL, CLIENT_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const app = new Hapi.Server({
@@ -46,6 +49,19 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: whitelist },
+      validate: {
+        failAction: async (_, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`ValidationError: ${err.message}`)
+            throw badRequest(`Invalid request payload input`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(err.message)
+            throw err
+          }
+        }
+      },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
@@ -75,6 +91,28 @@ export async function createServer() {
 
   const routes = getRoutes()
   app.route(routes)
+
+  app.ext('onRequest', (req, h) => {
+    if (req.url.pathname.startsWith('/v1')) {
+      req.url.pathname = req.url.pathname.replace('/v1', '')
+      req.setUrl(req.url)
+    }
+    return h.continue
+  })
+
+  app.ext('onPreResponse', (request, reply) => {
+    if (request.response instanceof RateLimitError) {
+      return reply
+        .response({
+          statusCode: 402,
+          error: 'Rate limit exceeded',
+          message: request.response.message
+        })
+        .code(402)
+    }
+
+    return reply.continue
+  })
 
   /*
    * For debugging sent declarations on pre-prod environments.

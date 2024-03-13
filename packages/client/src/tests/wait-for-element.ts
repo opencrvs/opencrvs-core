@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable import/export */
 import * as React from 'react'
@@ -15,21 +14,6 @@ import { ReactWrapper } from 'enzyme'
 
 const MAX_TIME = process.env.CI ? 10000 : 2000
 const INTERVAL = 10
-const SECONDS_INTERVAL = 1000
-
-export async function waitForSeconds(time: number) {
-  return new Promise<void>((resolve, reject) => {
-    let remainingTime = time * 1000
-
-    const intervalId = setInterval(() => {
-      if (remainingTime < 0) {
-        clearInterval(intervalId)
-        return resolve()
-      }
-      remainingTime = remainingTime - SECONDS_INTERVAL
-    }, INTERVAL)
-  })
-}
 
 export async function waitFor(condition: () => boolean) {
   return new Promise<void>((resolve, reject) => {

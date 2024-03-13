@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   sendBirthDeclarationConfirmation,
@@ -19,6 +18,12 @@ import {
   rejectionNotificationSchema,
   sendBirthInProgressConfirmation
 } from '@notification/features/sms/birth-handler'
+import {
+  sendCorrectionApprovedNotification,
+  sendCorrectionApprovedNotificationInput,
+  sendCorrectionRejectedNotification,
+  sendCorrectionRejectedNotificationInput
+} from '@notification/features/sms/correction'
 import {
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation,
@@ -33,9 +38,23 @@ import {
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema,
   authCodeNotificationSchema,
-  sendResetPasswordSMS,
+  sendResetPasswordInvite,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
+import { ServerRoute, ReqRefDefaults, RouteOptionsValidate } from '@hapi/hapi'
+import * as Joi from 'joi'
+import {
+  birthInProgressNotification,
+  deathInProgressNotification
+} from '@notification/features/inProgress/handler'
+import {
+  birthReadyForReviewNotification,
+  deathReadyForReviewNotification
+} from '@notification/features/readyForReview/handler'
+import {
+  birthRegisterNotification,
+  deathRegisterNotification
+} from '@notification/features/register/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -45,19 +64,23 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin'
 }
 
-export default function getRoutes() {
+const recordValidation: RouteOptionsValidate = {
+  payload: Joi.object()
+}
+
+export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
   return [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: (request, h) => {
         // Perform any health checks and return true or false for success prop
         return {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -67,7 +90,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/authenticationCode',
       handler: sendUserAuthenticationCode,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with auth code',
         validate: {
@@ -77,9 +100,75 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
+      path: '/birth/sent-notification',
+      handler: birthInProgressNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth in-progress declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-notification',
+      handler: deathInProgressNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for death in-progress declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-notification-for-review',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-notification-for-review',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for death ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/registered',
+      handler: birthRegisterNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for birth register declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/registered',
+      handler: deathRegisterNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for death register declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
       path: '/birthInProgressSMS',
       handler: sendBirthInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for birth in-progress entry',
         auth: {
@@ -99,9 +188,10 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthDeclarationSMS',
       handler: sendBirthDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth declaration entry',
+        description:
+          'Sends an sms or email to a user for birth declaration entry',
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -119,9 +209,10 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRegistrationSMS',
       handler: sendBirthRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth registration entry',
+        description:
+          'Sends an sms or email to a user for birth registration entry',
         auth: {
           scope: [RouteScope.REGISTER]
         },
@@ -134,10 +225,10 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRejectionSMS',
       handler: sendBirthRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
-          'Sends an sms to a user for birth declaration rejection entry',
+          'Sends an sms or email to a user for birth declaration rejection entry',
         auth: {
           scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
         },
@@ -150,9 +241,10 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathInProgressSMS',
       handler: sendDeathInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
-        description: 'Sends an sms to a user for death in-progress entry',
+        description:
+          'Sends an sms or email to a user for death in-progress entry',
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -170,9 +262,10 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathDeclarationSMS',
       handler: sendDeathDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
-        description: 'Sends an sms to a user for death declaration entry',
+        description:
+          'Sends an sms or email to a user for death declaration entry',
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -190,7 +283,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRegistrationSMS',
       handler: sendDeathRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
@@ -205,7 +298,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRejectionSMS',
       handler: sendDeathRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms to a user for death declaration rejection entry',
@@ -219,9 +312,9 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/userCredentialsSMS',
+      path: '/userCredentialsInvite',
       handler: sendUserCredentials,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
@@ -234,9 +327,39 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/resetPasswordSMS',
-      handler: sendResetPasswordSMS,
-      config: {
+      path: '/rejectCorrectionRequest',
+      handler: sendCorrectionRejectedNotification,
+      options: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionRejectedNotificationInput
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/approveCorrectionRequest',
+      handler: sendCorrectionApprovedNotification,
+      options: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionApprovedNotificationInput
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resetPasswordInvite',
+      handler: sendResetPasswordInvite,
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
@@ -249,9 +372,9 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/retrieveUserNameSMS',
+      path: '/retrieveUserName',
       handler: retrieveUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with username',
         validate: {
@@ -263,7 +386,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/updateUserNameSMS',
       handler: updateUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new username',
         validate: {

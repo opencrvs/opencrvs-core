@@ -6,36 +6,17 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
-import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
 import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-
-export const Message = styled.div`
-  margin-bottom: 16px;
-`
-export const Field = styled.div`
-  width: 100%;
-  margin-bottom: 30px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-bottom: 0px;
-  }
-`
-export interface IBookmarkAdvancedSearch {
-  name: string
-  parameters: IAdvancedSearchParamState
-  userId: string
-}
 
 export function BookmarkAdvancedSearchResult() {
   const advancedSearchState = useSelector(getAdvancedSearchParamsState)

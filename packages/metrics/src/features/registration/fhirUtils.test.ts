@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
   getSectionBySectionCode,
@@ -17,7 +16,7 @@ import {
   getObservationValueByCode,
   getTimeLoggedFromTask,
   isNotification,
-  getStartedByFieldAgent,
+  getRecordInitiator,
   FHIR_RESOURCE_TYPE,
   CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
@@ -85,7 +84,7 @@ describe('fhirUtils', () => {
           fullUrl: 'urn:uuid:13f293bd-4265-4885-b810-9b8e1e22dc6a',
           resource: {
             resourceType: 'Task',
-            status: 'requested',
+            status: 'ready',
             code: {
               coding: [
                 {
@@ -823,7 +822,7 @@ describe('fhirUtils', () => {
   it('returns time taken to complete task', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -897,7 +896,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no extension', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -927,7 +926,7 @@ describe('fhirUtils', () => {
   it('Throws error if task has no time logged', () => {
     const task = {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'ready',
       intent: '',
       code: {
         coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
@@ -1224,7 +1223,7 @@ describe('fhirUtils', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
 
-    expect(getStartedByFieldAgent(taskHistory)).toEqual(
+    expect(getRecordInitiator(taskHistory)).toEqual(
       'fe16875f-3e5f-47bc-85d6-16482a63e7df'
     )
   })
@@ -1233,7 +1232,7 @@ describe('fhirUtils', () => {
     const taskHistory = require('./test-data/task-history.json')
     taskHistory.entry[1].resource.businessStatus.coding[0].code = ''
 
-    expect(() => getStartedByFieldAgent(taskHistory)).toThrowError(
+    expect(() => getRecordInitiator(taskHistory)).toThrowError(
       'Task not found!'
     )
   })

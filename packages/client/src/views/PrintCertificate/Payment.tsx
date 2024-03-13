@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -25,7 +24,7 @@ import {
 } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -83,10 +82,9 @@ class PaymentComponent extends React.Component<IFullProps> {
               ...certificate,
               payments: {
                 type: 'MANUAL' as const,
-                total: Number(paymentAmount),
                 amount: Number(paymentAmount),
                 outcome: 'COMPLETED' as const,
-                date: Date.now()
+                date: new Date().toISOString()
               }
             }
           ]
@@ -141,7 +139,10 @@ class PaymentComponent extends React.Component<IFullProps> {
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
-          <Content title={intl.formatMessage(messages.payment)}>
+          <Content
+            title={intl.formatMessage(messages.payment)}
+            showTitleOnMobile
+          >
             <Summary id="summary">
               <Summary.Row
                 id="service"

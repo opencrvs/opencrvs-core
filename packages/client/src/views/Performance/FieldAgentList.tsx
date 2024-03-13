@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -27,7 +26,7 @@ import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
@@ -39,7 +38,7 @@ import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Avatar } from '@client/utils/gateway'
+import { Avatar, Event } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
@@ -74,6 +73,7 @@ interface ISearchParams {
   locationId: string
   timeStart: string
   timeEnd: string
+  event: string
 }
 
 interface IConnectProps {
@@ -160,11 +160,13 @@ function FieldAgentListComponent(props: IProps) {
     location: { search },
     offlineOffices
   } = props
-  const { locationId, timeStart, timeEnd } = parse(
-    search
-  ) as unknown as ISearchParams
+  const {
+    event = Event.Birth,
+    locationId,
+    timeStart,
+    timeEnd
+  } = parse(search) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
-  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] =
@@ -183,7 +185,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
         status: status.toString(),
-        event: event || undefined,
+        event: event.toUpperCase(),
         count: recordCount,
         sort: 'asc',
         skip: 0
@@ -193,7 +195,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: event || undefined,
+        event: event.toUpperCase(),
         count: recordCount,
         sort: 'asc',
         skip: 0
@@ -411,10 +413,11 @@ function FieldAgentListComponent(props: IProps) {
             />
             <PerformanceSelect
               onChange={(option) => {
-                setEvent(
-                  Object.values(EVENT_OPTIONS).find(
-                    (val) => val === option.value
-                  ) || EVENT_OPTIONS.BIRTH
+                props.goToFieldAgentList(
+                  timeStart,
+                  timeEnd,
+                  locationId,
+                  option.value
                 )
               }}
               id="event-select"
@@ -424,11 +427,11 @@ function FieldAgentListComponent(props: IProps) {
               options={[
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
-                  value: EVENT_OPTIONS.BIRTH
+                  value: Event.Birth
                 },
                 {
                   label: intl.formatMessage(messages.eventOptionForDeaths),
-                  value: EVENT_OPTIONS.DEATH
+                  value: Event.Death
                 }
               ]}
             />

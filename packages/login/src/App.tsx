@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { PageContainer } from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
@@ -33,7 +32,6 @@ import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 
 export const { store, history } = createStore()
-
 interface IAppProps {
   store: AppStore
   history: History
@@ -48,64 +46,60 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
-export class App extends React.Component<IAppProps> {
-  public render() {
-    return (
-      <ErrorBoundary>
-        <GlobalStyle />
-        <Provider store={this.props.store}>
-          <IntlContainer>
-            <ThemeProvider theme={getTheme()}>
-              <ConnectedRouter history={this.props.history}>
-                <Page>
-                  <Switch>
-                    <Route exact path={routes.STEP_ONE}>
-                      <LoginBackgroundWrapper>
-                        <StepOneContainer />
-                      </LoginBackgroundWrapper>
-                    </Route>
-                    <Route exact path={routes.STEP_TWO}>
-                      <LoginBackgroundWrapper>
-                        <StepTwoContainer />
-                      </LoginBackgroundWrapper>
-                    </Route>
-                    <Route exact path={routes.FORGOTTEN_ITEM}>
-                      <PageContainer>
-                        <ForgottenItem />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
-                      <PageContainer>
-                        <PhoneNumberVerification />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.RECOVERY_CODE_ENTRY}>
-                      <PageContainer>
-                        <RecoveryCodeEntry />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.SECURITY_QUESTION}>
-                      <PageContainer>
-                        <SecurityQuestion />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.UPDATE_PASSWORD}>
-                      <PageContainer>
-                        <UpdatePassword />
-                      </PageContainer>
-                    </Route>
-                    <Route
-                      exact
-                      path={routes.SUCCESS}
-                      component={ResetCredentialsSuccessPage}
-                    ></Route>
-                  </Switch>
-                </Page>
-              </ConnectedRouter>
-            </ThemeProvider>
-          </IntlContainer>
-        </Provider>
-      </ErrorBoundary>
-    )
-  }
-}
+export const App = ({ store, history }: IAppProps) => (
+  <ErrorBoundary>
+    <GlobalStyle />
+    <Provider store={store}>
+      <IntlContainer>
+        <ThemeProvider theme={getTheme()}>
+          <ConnectedRouter history={history}>
+            <Page>
+              <Switch>
+                <Route exact path={routes.STEP_ONE}>
+                  <LoginBackgroundWrapper>
+                    <StepOneContainer />
+                  </LoginBackgroundWrapper>
+                </Route>
+                <Route exact path={routes.STEP_TWO}>
+                  <LoginBackgroundWrapper>
+                    <StepTwoContainer />
+                  </LoginBackgroundWrapper>
+                </Route>
+                <Route exact path={routes.FORGOTTEN_ITEM}>
+                  <PageContainer>
+                    <ForgottenItem />
+                  </PageContainer>
+                </Route>
+                <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
+                  <PageContainer>
+                    <PhoneNumberVerification />
+                  </PageContainer>
+                </Route>
+                <Route exact path={routes.RECOVERY_CODE_ENTRY}>
+                  <PageContainer>
+                    <RecoveryCodeEntry />
+                  </PageContainer>
+                </Route>
+                <Route exact path={routes.SECURITY_QUESTION}>
+                  <PageContainer>
+                    <SecurityQuestion />
+                  </PageContainer>
+                </Route>
+                <Route exact path={routes.UPDATE_PASSWORD}>
+                  <PageContainer>
+                    <UpdatePassword />
+                  </PageContainer>
+                </Route>
+                <Route
+                  exact
+                  path={routes.SUCCESS}
+                  component={ResetCredentialsSuccessPage}
+                ></Route>
+              </Switch>
+            </Page>
+          </ConnectedRouter>
+        </ThemeProvider>
+      </IntlContainer>
+    </Provider>
+  </ErrorBoundary>
+)

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -20,7 +19,7 @@ const DateWrapper = styled.div`
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
 `
-interface IProps {
+type IProps = {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
@@ -39,7 +38,7 @@ interface IState {
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
-  width: 54px !important;
+  width: 58px !important;
   margin: 0 4px;
 
   &:first-of-type {

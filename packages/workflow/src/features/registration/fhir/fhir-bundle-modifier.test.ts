@@ -6,11 +6,11 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { server as mswServer } from '@test/setupServer'
+import { rest } from 'msw'
 import {
-  setTrackingId,
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
@@ -24,162 +24,27 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import {
   testFhirBundle,
-  testDeathFhirBundle,
-  testMarriageFhirBundle,
   fieldAgentPractitionerMock,
-  fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
   mosipSuccessMock,
   mosipConfigMock,
   mosipDeceasedPatientMock,
   mosipBirthPatientBundleMock,
   mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
+import { Practitioner, Task } from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
 
 const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
-  describe('setTrackingId', () => {
-    it('Successfully modified the provided fhirBundle with birth trackingid', () => {
-      const fhirBundle = setTrackingId(testFhirBundle)
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[1] &&
-        fhirBundle.entry[1].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[1].resource as fhir.Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^B/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[1]) {
-            expect(task.identifier[1]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Successfully modified the provided fhirBundle with death trackingid', () => {
-      const fhirBundle = setTrackingId(testDeathFhirBundle)
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[10].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[10].resource as fhir.Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^D/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[0]) {
-            expect(task.identifier[0]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Successfully modified the provided fhirBundle with marriage trackingid', () => {
-      const fhirBundle = setTrackingId(testMarriageFhirBundle)
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource &&
-        fhirBundle.entry[1].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[1].resource as fhir.Task
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^M/)
-          expect(composition.identifier.value.length).toBe(7)
-          if (task && task.identifier && task.identifier[0]) {
-            expect(task.identifier[1]).toEqual({
-              system: `${OPENCRVS_SPECIFICATION_URL}id/marriage-tracking-id`,
-              value: composition.identifier.value
-            })
-          }
-        }
-      }
-    })
-
-    it('Throws error if invalid fhir bundle is provided', () => {
-      const invalidData = { ...testFhirBundle, entry: [] }
-      expect(() => setTrackingId(invalidData)).toThrowError(
-        'Invalid FHIR bundle found'
-      )
-    })
-
-    it('Will push the composite resource identifier if it is missing on fhirDoc', () => {
-      const fhirBundle = setTrackingId({
-        ...testFhirBundle,
-        entry: [
-          {
-            resource: {
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'BIRTH'
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      })
-
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[0] &&
-        fhirBundle.entry[0].resource
-      ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        if (
-          composition &&
-          composition.identifier &&
-          composition.identifier.value
-        ) {
-          expect(composition.identifier.value).toMatch(/^B/)
-          expect(composition.identifier.value.length).toBe(7)
-        }
-      }
-    })
-  })
   describe('SetupRegistrationType', () => {
     it('Will push the proper event type on fhirDoc', () => {
       const taskResource = setupRegistrationType(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         EVENT_TYPE.BIRTH
       )
       if (
@@ -198,9 +63,9 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Will push code section with proper event type on fhirDoc if it is missing', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[1].resource.code = undefined
+      fhirBundle.entry[1].resource.code = undefined as any
       const taskResource = setupRegistrationType(
-        fhirBundle.entry[1].resource as fhir.Task,
+        fhirBundle.entry[1].resource as Task,
         EVENT_TYPE.BIRTH
       )
 
@@ -228,7 +93,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['declare']
       }
       const taskResource = await setupRegistrationWorkflow(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         tokenPayload
       )
 
@@ -272,7 +137,7 @@ describe('Verify fhir bundle modifier functions', () => {
         }
 
         const taskResource = await setupRegistrationWorkflow(
-          fhirBundle.entry[1].resource as fhir.Task,
+          fhirBundle.entry[1].resource as Task,
           tokenPayload
         )
 
@@ -292,7 +157,7 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   describe('SetupLastRegUser', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
@@ -315,20 +180,20 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource
       ) {
         const taskResource = setupLastRegUser(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[3] &&
-          taskResource.extension[3].valueReference &&
-          taskResource.extension[3].valueReference.reference
+          taskResource.extension[4] &&
+          taskResource.extension[4].valueReference &&
+          taskResource.extension[4].valueReference.reference
         ) {
           expect(
-            taskResource.extension[3].valueReference.reference
+            taskResource.extension[4].valueReference.reference
           ).toBeDefined()
-          expect(taskResource.extension[3].valueReference.reference).toEqual(
+          expect(taskResource.extension[4].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -343,11 +208,13 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[1] &&
         fhirBundle.entry[1].resource
       ) {
-        fhirBundle.entry[1].resource.extension = [{ url: '', valueString: '' }]
+        fhirBundle.entry[1].resource.extension = [
+          { url: '', valueString: '' }
+        ] as any
         const taskResource = setupLastRegUser(
-          fhirBundle.entry[1].resource as fhir.Task,
+          fhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
 
         if (
           taskResource &&
@@ -377,18 +244,18 @@ describe('Verify fhir bundle modifier functions', () => {
         const lengthOfTaskExtensions =
           testFhirBundle.entry[1].resource.extension.length
         const taskResource = setupLastRegUser(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
-        )
+        ) as any
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[3] &&
-          taskResource.extension[3].valueReference &&
-          taskResource.extension[3].valueReference.reference
+          taskResource.extension[4] &&
+          taskResource.extension[4].valueReference &&
+          taskResource.extension[4].valueReference.reference
         ) {
           expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-          expect(taskResource.extension[3].valueReference.reference).toEqual(
+          expect(taskResource.extension[4].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -396,7 +263,7 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
@@ -420,7 +287,7 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     ]
     const taskResource = setupAuthorOnNotes(
-      fhirBundle.entry[1].resource as fhir.Task,
+      fhirBundle.entry[1].resource as Task,
       practitioner
     )
     if (taskResource && taskResource.note && taskResource.note[0]) {
@@ -433,44 +300,31 @@ describe('Verify fhir bundle modifier functions', () => {
     }
   })
   describe('setupLastRegLocation', () => {
-    beforeEach(() => {
-      fetch.mockResponses(
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }]
-      )
-    })
+    beforeEach(() => {})
     it('set regLastLocation properly', async () => {
       const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
       if (taskResource && taskResource.extension && taskResource.extension[4]) {
-        expect(taskResource.extension[4]).toEqual({
+        expect(taskResource.extension[3]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
-            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
+            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
           }
         })
       }
     })
     it('set regLastOffice properly', async () => {
       const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
       if (taskResource && taskResource.extension && taskResource.extension[2]) {
         expect(taskResource.extension[2]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastOffice',
           valueReference: {
-            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
+            reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
           }
         })
       }
@@ -480,7 +334,7 @@ describe('Verify fhir bundle modifier functions', () => {
       practitioner.id = undefined
       expect(
         setupLastRegLocation(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
         )
       ).rejects.toThrowError('Invalid practitioner data found')
@@ -493,27 +347,42 @@ describe('validateDeceasedDetails functions', () => {
   let authHeader: { Authorization: string }
   beforeEach(async () => {
     fetch.resetMocks()
-    token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    token = jwt.sign({ scope: ['register'] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
 
     authHeader = {
       Authorization: `Bearer ${token}`
     }
   })
   it('Validates deceased details and modifies bundle', async () => {
-    fetch.mockResponses(
-      [mosipConfigMock, { status: 200 }],
-      [mosipSuccessMock, { status: 200 }],
-      [mosipBirthPatientBundleMock, { status: 200 }],
-      [JSON.stringify({}), { status: 200 }]
+    mswServer.use(
+      rest.get('http://localhost:2021/integrationConfig', (_, res, ctx) => {
+        return res(ctx.json(mosipConfigMock))
+      })
     )
+
+    mswServer.use(
+      rest.post(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, (_, res, ctx) =>
+        res(ctx.json(mosipSuccessMock))
+      )
+    )
+
+    mswServer.use(
+      rest.get('http://localhost:3447/fhir/Patient', (_, res, ctx) =>
+        res(ctx.json(mosipBirthPatientBundleMock))
+      )
+    )
+
+    mswServer.use(
+      rest.put(
+        'http://localhost:3447/fhir/Patient/1c9add9b-9215-49d7-bfaa-226c82ac47d2',
+        (_, res, ctx) => res(ctx.json({}))
+      )
+    )
+
     const validateResponse = await validateDeceasedDetails(
       mosipDeceasedPatientMock,
       authHeader

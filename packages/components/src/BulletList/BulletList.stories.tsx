@@ -6,30 +6,23 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { ComponentStory } from '@storybook/react'
 import { BulletList } from './BulletList'
 
-interface IProps {
-  id?: string
-  items: string[]
+export default {
+  title: 'Typography/Bullet List',
+  component: BulletList
 }
 
-export default {
-  title: 'Typography/Bullet list',
-  component: BulletList
-} as Meta
+const Template: ComponentStory<typeof BulletList> = (args) => (
+  <BulletList {...args} />
+)
 
-const Template: Story<IProps> = (args) => <BulletList {...args} />
-
-export const BulletListView = Template.bind({})
-BulletListView.args = {
-  items: [
-    'Why not walk on keyboard trip on catnip, or my water bowl is clean',
-    'You there, with the hands fooled again thinking the dog likes me, so annoy owner',
-    "Nap all day sleep on my human's head instead of drinking water from the cat bowl, make sure to steal water from the toilet"
-  ]
+export const Default = Template.bind({})
+Default.args = {
+  items: ['Birth', 'Death', 'Marriage', 'Adoption', 'Divorce'],
+  font: 'reg18'
 }

@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
 
@@ -15,20 +14,33 @@ import { COUNTRY_CONFIG_URL } from '@notification/constants'
 import { logger } from '@notification/logger'
 
 export async function notifyCountryConfig(
-  msisdn: string,
-  message: string,
+  templateName: {
+    email?: string
+    sms?: string
+  },
+  recipient: {
+    email?: string | null
+    sms?: string | null
+  },
+  type: 'user' | 'informant',
+  variables: Record<string, unknown>,
   token: string,
+  locale: string,
   convertUnicode?: boolean
 ) {
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
-    logger.info(`Sending the following message: "${message}" to ${msisdn}`)
-    logger.info('Notifying the country config with above payload')
+    logger.info(
+      `Sending the following message template "${templateName}" from notifyCountryConfig`
+    )
     return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        msisdn,
-        message,
+        templateName,
+        recipient,
+        type,
+        locale,
+        variables,
         convertUnicode
       }),
       headers: {

@@ -6,14 +6,18 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import {
+  APPROVE_DEATH_REG_CORRECTION,
+  CREATE_DEATH_REG_CORRECTION,
+  REJECT_REG_CORRECTION,
+  REQUEST_REG_CORRECTION
+} from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
-export const SUBMIT_DEATH_DECLARATION = gql`
+const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
@@ -22,52 +26,17 @@ export const SUBMIT_DEATH_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_DEATH_DECLARATION = gql`
+const APPROVE_DEATH_DECLARATION = gql`
   mutation markDeathAsValidated($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_DEATH_DECLARATION = gql`
+const REGISTER_DEATH_DECLARATION = gql`
   mutation markDeathAsRegistered($id: ID!, $details: DeathRegistrationInput!) {
-    markDeathAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markDeathAsRegistered(id: $id, details: $details)
   }
 `
-export const REJECT_DEATH_DECLARATION = gql`
+const REJECT_DEATH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -77,7 +46,7 @@ export const REJECT_DEATH_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_DEATH_DECLARATION = gql`
+const ARCHIVE_DEATH_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -93,13 +62,13 @@ export const ARCHIVE_DEATH_DECLARATION = gql`
   }
 `
 
-export const COLLECT_DEATH_CERTIFICATE = gql`
+const COLLECT_DEATH_CERTIFICATE = gql`
   mutation markDeathAsCertified($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
   }
 `
 
-export const ISSUE_DEATH_CERTIFICATE = gql`
+const ISSUE_DEATH_CERTIFICATE = gql`
   mutation markDeathAsIssued($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsIssued(id: $id, details: $details)
   }
@@ -122,7 +91,13 @@ export function getDeathMutation(action: SubmissionAction) {
       return COLLECT_DEATH_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_DEATH_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_DEATH_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return CREATE_DEATH_REG_CORRECTION
+    case SubmissionAction.REQUEST_CORRECTION:
+      return REQUEST_REG_CORRECTION
+    case SubmissionAction.APPROVE_CORRECTION:
+      return APPROVE_DEATH_REG_CORRECTION
+    case SubmissionAction.REJECT_CORRECTION:
+      return REJECT_REG_CORRECTION
   }
 }

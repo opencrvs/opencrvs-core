@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AppStore } from '@client/store'
 import {
@@ -192,10 +191,10 @@ describe('Registrations List test', () => {
       component,
       '#month-label'
     )
-    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('November-2022')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('November 2022')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('February-2022')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('February 2022')
   })
 })

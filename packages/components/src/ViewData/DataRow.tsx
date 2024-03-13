@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import styled from 'styled-components'
@@ -81,40 +80,39 @@ export interface IDataProps {
   actionsMenu?: React.ReactNode
 }
 
-export class DataRow extends React.Component<IDataProps> {
-  render() {
-    const { id, label, value, placeHolder, action, actionsMenu } = this.props
-
-    return (
-      <Container id={id}>
-        {label && (
-          <>
-            <DataContainer>
-              <Label id={`${id}_label`}>{label}</Label>
-              {value && <Value id={`${id}_value`}>{value}</Value>}
-              {placeHolder && (
-                <PlaceHolder id={`${id}_placeholder`}>
-                  {placeHolder}
-                </PlaceHolder>
-              )}
-            </DataContainer>
-            {action && (
-              <Action>
-                <Link
-                  font="reg14"
-                  id={action.id}
-                  disabled={action.disabled}
-                  onClick={action.handler}
-                >
-                  {action.label}
-                </Link>
-              </Action>
-            )}
-            {actionsMenu && <div>{actionsMenu}</div>}
-          </>
+export const DataRow = ({
+  id,
+  label,
+  value,
+  placeHolder,
+  action,
+  actionsMenu
+}: IDataProps) => (
+  <Container id={id}>
+    {label && (
+      <>
+        <DataContainer>
+          <Label id={`${id}_label`}>{label}</Label>
+          {value && <Value id={`${id}_value`}>{value}</Value>}
+          {placeHolder && (
+            <PlaceHolder id={`${id}_placeholder`}>{placeHolder}</PlaceHolder>
+          )}
+        </DataContainer>
+        {action && (
+          <Action>
+            <Link
+              font="reg14"
+              id={action.id}
+              disabled={action.disabled}
+              onClick={action.handler}
+            >
+              {action.label}
+            </Link>
+          </Action>
         )}
-        {!label && <ValueContainer>{value}</ValueContainer>}
-      </Container>
-    )
-  }
-}
+        {actionsMenu && <div>{actionsMenu}</div>}
+      </>
+    )}
+    {!label && <ValueContainer>{value}</ValueContainer>}
+  </Container>
+)

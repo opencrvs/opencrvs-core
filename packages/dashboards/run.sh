@@ -5,8 +5,7 @@
 # OpenCRVS is also distributed under the terms of the Civil Registration
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
-# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-# graphic logo are (registered/a) trademark(s) of Plan International.
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
 #!/bin/bash
 
@@ -52,6 +51,26 @@ fi
 
 if [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
   echo "Error: OPENCRVS_METABASE_DB_AUTH_DB environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_NAME}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_NAME environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_URL}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_URL environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_REGION_KEY}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_REGION_KEY environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_REGION_NAME}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_REGION_NAME environment variable is not defined"
   exit 1
 fi
 

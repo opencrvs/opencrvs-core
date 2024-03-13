@@ -6,11 +6,14 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 module.exports = {
-  extends: ['../../.eslintrc.js', 'eslint-config-react-app'],
+  extends: [
+    '../../.eslintrc.js',
+    'eslint-config-react-app',
+    'plugin:react/recommended'
+  ],
   plugins: ['react', 'formatjs'],
   env: {
     es6: true,
@@ -51,7 +54,8 @@ Query component now sends errors automatically to Sentry.`
     ],
     'react/boolean-prop-naming': 'off',
     'react/sort-comp': 'off',
-    'react/sort-prop-types': 'off'
+    'react/sort-prop-types': 'off',
+    'react/prop-types': 'off'
   },
   settings: {
     react: {

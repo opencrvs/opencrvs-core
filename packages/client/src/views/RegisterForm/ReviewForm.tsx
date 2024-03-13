@@ -6,13 +6,13 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   RegisterForm,
   FullProps
@@ -50,10 +50,6 @@ type IProps = IReviewProps &
   IntlShapeProps &
   RouteComponentProps<{}>
 
-export interface IReviewSectionDetails {
-  [key: string]: any
-}
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg16};
@@ -61,7 +57,7 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-export class ReviewFormView extends React.Component<IProps> {
+class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -118,7 +114,7 @@ function mapStatetoProps(
     event: string
   }>
 ) {
-  const { match, history } = props
+  const { match } = props
   if (!match.params.event) {
     throw new Error('Event is not provided as path param')
   }

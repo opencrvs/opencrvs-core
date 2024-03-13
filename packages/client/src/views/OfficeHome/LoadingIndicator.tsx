@@ -6,8 +6,7 @@
  * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -15,7 +14,7 @@ import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'
-import { isNavigatorOnline } from '@client/utils'
+import { isNavigatorOnline, useOnlineStatus } from '@client/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -75,7 +74,7 @@ type IBaseLoadingProps = {
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-export class LoadingIndicatorComp extends React.Component<IProps> {
+class LoadingIndicatorComp extends React.Component<IProps> {
   render() {
     const { loading, noDeclaration, hasError, intl } = this.props
 
@@ -113,20 +112,6 @@ export function withOnlineStatus<T>(
     const isOnline = useOnlineStatus()
     return <WrappedComponent isOnline={isOnline} {...props} />
   }
-}
-
-export function useOnlineStatus() {
-  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
-  const ONLINE_CHECK_INTERVAL = 500
-  React.useEffect(() => {
-    const intervalID = setInterval(
-      () => setOnline(isNavigatorOnline()),
-      ONLINE_CHECK_INTERVAL
-    )
-
-    return () => clearInterval(intervalID)
-  }, [])
-  return isOnline
 }
 
 export type IOnlineStatusProps = {
