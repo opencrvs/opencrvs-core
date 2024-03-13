@@ -49,7 +49,8 @@ import {
   resourceToSavedBundleEntry,
   ResourceIdentifier,
   isTask,
-  urlReferenceToResourceIdentifier
+  urlReferenceToResourceIdentifier,
+  RegistrationStatus
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -876,6 +877,22 @@ export function createRegisterTask(previousTask: SavedTask): Task {
     ...registeredTask,
     ...(comments ? { note: [{ text: comments }] } : {})
   }
+}
+
+export function createReinstateTask(
+  previousTask: SavedTask,
+  prevBusinessStatuses: RegistrationStatus
+) {
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/regReinstated'
+      }
+    ],
+    undefined,
+    prevBusinessStatuses
+  )
 }
 
 export function createArchiveTask(

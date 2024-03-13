@@ -103,7 +103,8 @@ import {
   createIssuedTask,
   createCertifiedTask,
   withPractitionerDetails,
-  mergeChangedResourcesIntoRecord
+  mergeChangedResourcesIntoRecord,
+  createReinstateTask
 } from '@workflow/records/fhir'
 import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
@@ -574,66 +575,33 @@ export async function toArchived(
 export async function toReinstated(
   record: ArchivedRecord,
   prevRegStatus: RegistrationStatus,
-  practitioner: Practitioner
+  token: string
 ): Promise<ValidatedRecord | ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const reinstatedTask: SavedTask = {
-    ...previousTask,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
-      {
-        url: 'http://opencrvs.org/specs/extension/regReinstated'
-      }
-    ],
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: prevRegStatus
-        }
-      ]
-    }
+  const taskWithoutPractitionerExtensions = createReinstateTask(
+    previousTask,
+    prevRegStatus
+  )
+
+  const [reinstatedTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
+
+  const reinstatedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: reinstatedTask }]
   }
 
-  const reinstatedTaskWithPractitionerExtensions = setupLastRegUser(
-    reinstatedTask,
-    practitioner
-  )
-
-  const reinstatedTaskWithLocationExtensions = await setupLastRegLocation(
-    reinstatedTaskWithPractitionerExtensions,
-    practitioner
-  )
-
-  const newEntries = [
-    ...record.entry.map((entry) => {
-      if (entry.resource.id !== previousTask.id) {
-        return entry
-      }
-      return {
-        ...entry,
-        resource: reinstatedTaskWithLocationExtensions
-      }
-    })
-  ]
-
-  return changeState(
-    {
-      ...record,
-      entry: newEntries
-    },
+  const reinstatedRecord = changeState(
+    await mergeChangedResourcesIntoRecord(
+      record,
+      reinstatedRecordWithTaskOnly,
+      practitionerResourcesBundle
+    ),
     ['READY_FOR_REVIEW', 'VALIDATED']
   )
+
+  return reinstatedRecord
 }
 
 export async function toDuplicated(
