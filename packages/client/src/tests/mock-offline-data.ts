@@ -433,7 +433,6 @@ export const mockOfflineData = {
       },
       PRINT_IN_ADVANCE: true
     },
-    AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
     DEATH: {
       REGISTRATION_TARGET: 45,
       FEE: {

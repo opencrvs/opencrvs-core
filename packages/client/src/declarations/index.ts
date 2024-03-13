@@ -731,7 +731,12 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        const history = d.originalData?.history as unknown as IDynamicValues
+        // original data stays empty for in progress declaration
+        const history = (
+          d.originalData && Object.keys(d.originalData).length === 0
+            ? d.localData
+            : d.originalData
+        )?.history as IDynamicValues
 
         const downloadedTime = (
           history.filter((h: IDynamicValues) => {

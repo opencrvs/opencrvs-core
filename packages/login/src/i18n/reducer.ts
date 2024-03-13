@@ -24,7 +24,6 @@ export interface IntlMessages {
 
 export interface ILanguage {
   lang: string
-  displayName: string
   messages: IntlMessages
 }
 
@@ -32,39 +31,11 @@ export interface ILanguageState {
   [key: string]: ILanguage
 }
 
-interface ISupportedLanguages {
-  code: string
-  language: string
-}
-
-function extractLanguageSelectConfig(
-  languageSelectConfig: string
-): ISupportedLanguages[] {
-  const languageSelectConfigs = languageSelectConfig.split(',')
-  const supportedLanguages: ISupportedLanguages[] = []
-  languageSelectConfigs.forEach((languageSelectConfig) => {
-    const languageSelectValueAndLabel = languageSelectConfig.split(':')
-    supportedLanguages.push({
-      code: languageSelectValueAndLabel[0],
-      language: languageSelectValueAndLabel[1]
-    })
-  })
-  return supportedLanguages
-}
-
-const supportedLanguages: ISupportedLanguages[] = extractLanguageSelectConfig(
-  window.config.AVAILABLE_LANGUAGES_SELECT
-)
-
 export const initLanguages = () => {
   const initLanguages: ILanguageState = {}
   getAvailableLanguages().forEach((lang) => {
-    const languageDescription = supportedLanguages.find(
-      (obj) => obj.code === lang
-    ) as ISupportedLanguages
     initLanguages[lang] = {
       lang,
-      displayName: languageDescription.language,
       messages: {}
     }
   })

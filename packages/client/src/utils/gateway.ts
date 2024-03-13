@@ -916,7 +916,6 @@ export type IntegratedSystem = {
 
 export enum IntegratingSystemType {
   Mosip = 'MOSIP',
-  Osia = 'OSIA',
   Other = 'OTHER'
 }
 
