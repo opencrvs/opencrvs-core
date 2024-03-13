@@ -1878,6 +1878,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             <ListReview id={'Section_' + sec.id}>
                               {sec.items.map((item) => (
                                 <ListReview.Row
+                                  id={item.label.split(' ')[0]}
                                   key={sec.id + '_' + item.label}
                                   label={item.label}
                                   value={item.value}
