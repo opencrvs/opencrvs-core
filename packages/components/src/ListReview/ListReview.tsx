@@ -65,7 +65,6 @@ export const ReviewRow = styled.table`
   }
 
   td {
-    margin: 0;
     padding: 14px 0;
     vertical-align: top;
   }
