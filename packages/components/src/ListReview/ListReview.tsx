@@ -134,11 +134,11 @@ export function ListReview({
         </ReviewHeader>
       )}
       {rows.map((row, index) => (
-        <ReviewRow key={index}>
+        <ReviewRow key={row.id ?? index}>
           <tbody>
             <tr>
               {row.label && <td>{row.label}</td>}
-              <td>{row.value}</td>
+              {row.value && <td>{row.value}</td>}
               {row.actions ? (
                 <td>
                   <ActionsContainer>{row.actions}</ActionsContainer>
