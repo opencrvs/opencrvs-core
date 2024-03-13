@@ -19,7 +19,7 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
+import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { ApolloError } from 'apollo-server-hapi'
 
 export class RateLimitError extends ApolloError {
@@ -146,7 +146,7 @@ export const resolvers: GQLResolver = {
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedBySystem(hit._id, system, authHeader)
+          await fetchRegistrationForDownloading(hit._id, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {

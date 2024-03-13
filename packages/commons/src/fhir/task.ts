@@ -14,7 +14,6 @@ import {
   ASSIGNED_EXTENSION_URL,
   Bundle,
   BundleEntry,
-  BusinessStatus,
   Coding,
   DOWNLOADED_EXTENSION_URL,
   DUPLICATE_TRACKING_ID,
@@ -32,9 +31,11 @@ import {
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   findExtension,
-  isSaved
+  isSaved,
+  SavedBundle
 } from '.'
 import { UUID } from '..'
+import { RegistrationStatus } from '../record'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -102,7 +103,14 @@ export type Task = Omit<
   lastModified: string
   status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
   extension: Array<Extension>
-  businessStatus: BusinessStatus
+  businessStatus: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code' | 'system'> & {
+        system: 'http://opencrvs.org/specs/reg-status'
+        code: TaskStatus
+      }
+    >
+  }
   intent?: fhir3.Task['intent']
   identifier: Array<TaskIdentifier>
   code: Omit<fhir3.CodeableConcept, 'coding'> & {
@@ -177,8 +185,7 @@ export function isTaskOrTaskHistory<T extends Resource>(
 ): resource is (T & TaskHistory) | (T & Task) {
   return ['TaskHistory', 'Task'].includes(resource.resourceType)
 }
-
-export function getTaskFromBundle<T extends Bundle>(bundle: T) {
+export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
   if (!task || !isSaved(task)) {
@@ -211,26 +218,30 @@ export const enum TaskAction {
   FLAGGED_AS_POTENTIAL_DUPLICATE = 'FLAGGED_AS_POTENTIAL_DUPLICATE'
 }
 
-export const enum TaskStatus {
-  IN_PROGRESS = 'IN_PROGRESS',
-  ARCHIVED = 'ARCHIVED',
-  DECLARED = 'DECLARED',
-  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
-  WAITING_VALIDATION = 'WAITING_VALIDATION',
-  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
-  VALIDATED = 'VALIDATED',
-  REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED',
-  ISSUED = 'ISSUED'
-}
+export type TaskStatus =
+  | 'IN_PROGRESS'
+  | 'ARCHIVED'
+  | 'DECLARED'
+  | 'DECLARATION_UPDATED'
+  | 'WAITING_VALIDATION'
+  | 'CORRECTION_REQUESTED'
+  | 'VALIDATED'
+  | 'REGISTERED'
+  | 'CERTIFIED'
+  | 'REJECTED'
+  | 'ISSUED'
 
 export function getStatusFromTask(task: Task) {
-  const statusType = task.businessStatus?.coding?.find(
+  const statusType = task.businessStatus.coding.find(
     (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return statusType && (statusType.code as TaskStatus)
+  if (!statusType) {
+    throw new Error(
+      "Task didn't have any business status. This should never happen"
+    )
+  }
+  return statusType.code
 }
 
 export function getActionFromTask(task: Task) {
@@ -280,7 +291,7 @@ export function getActionFromTask(task: Task) {
  */
 export function updateFHIRTaskBundle(
   taskEntry: BundleEntry<Task>,
-  status: string,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -367,7 +378,7 @@ export function taskBundleWithExtension(
  */
 function updateTaskTemplate(
   task: Task,
-  status: string,
+  status: RegistrationStatus,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string

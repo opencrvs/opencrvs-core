@@ -16,6 +16,7 @@ import {
   DeathRegistration,
   MarriageRegistration
 } from '@opencrvs/commons/types'
+import { CertifyInput, IssueInput } from './records/validations'
 
 const fetchDocuments = async <T = any>(
   suffix: string,
@@ -47,6 +48,26 @@ export async function uploadBase64ToMinio(
   )
 
   return docUploadResponse.refUrl
+}
+
+export async function uploadCertificateAttachmentsToDocumentsStore<
+  T extends CertifyInput | IssueInput
+>(certificateDetails: T, authHeader: IAuthHeader): Promise<T> {
+  if (
+    'affidavit' in certificateDetails.collector &&
+    certificateDetails.collector.affidavit
+  ) {
+    for (const affidavit of certificateDetails.collector.affidavit) {
+      affidavit.data = await uploadBase64ToMinio(affidavit.data, authHeader)
+    }
+  }
+  if ('data' in certificateDetails) {
+    certificateDetails.data = await uploadBase64ToMinio(
+      certificateDetails.data,
+      authHeader
+    )
+  }
+  return certificateDetails
 }
 
 export async function uploadBase64AttachmentsToDocumentsStore(

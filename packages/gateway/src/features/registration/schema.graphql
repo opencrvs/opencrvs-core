@@ -55,7 +55,6 @@ enum PaymentOutcomeType {
 input PaymentInput {
   paymentId: ID
   type: PaymentType
-  total: Float
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
@@ -383,6 +382,7 @@ input RegistrationInput {
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
+  changedValues: [CorrectionValueInput!]
 }
 
 type Registration { # -> Task
@@ -611,13 +611,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
-  markBirthAsRegistered(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsVoided(id: String!, reason: String!, comment: String!): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
   markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
   markEventAsArchived(
@@ -635,20 +632,14 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
-  markDeathAsRegistered(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
   #MARRIAGE
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
-  markMarriageAsRegistered(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   markEventAsDuplicate(

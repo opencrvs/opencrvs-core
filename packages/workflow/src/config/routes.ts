@@ -9,8 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { routes as correctionRoutes } from '@workflow/features/correction/routes'
-import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
+import { certifyRoute } from '@workflow/records/handler/certify'
+import { archiveRoute } from '@workflow/records/handler/archive'
+import createRecordHandler from '@workflow/records/handler/create'
+import { unassignRecordHandler } from '@workflow/records/handler/unassign'
+import { downloadRecordHandler } from '@workflow/records/handler/download'
+import { issueRoute } from '@workflow/records/handler/issue'
+import { duplicateRecordHandler } from '@workflow/records/handler/duplicate'
+import { registerRoute } from '@workflow/records/handler/register'
+import { rejectRoute } from '@workflow/records/handler/reject'
+import { reinstateRoute } from '@workflow/records/handler/reinstate'
+import { updateRoute } from '@workflow/records/handler/update'
+import { validateRoute } from '@workflow/records/handler/validate'
+import { viewRecordHandler } from '@workflow/records/handler/view'
+import { verifyRecordHandler } from '@workflow/records/handler/verify'
+import { markAsNotDuplicateHandler } from '@workflow/records/handler/not-duplicate'
 
 export const getRoutes = () => {
   const routes = [
@@ -53,13 +67,74 @@ export const getRoutes = () => {
     },
     ...correctionRoutes,
     {
-      method: '*',
-      path: '/fhir/{path*}',
-      handler: fhirWorkflowEventHandler,
+      method: 'POST',
+      path: '/create-record',
+      handler: createRecordHandler,
       config: {
         tags: ['api'],
-        description:
-          'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
+        description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/download-record',
+      handler: downloadRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/unassign-record',
+      handler: unassignRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Unassign record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/view',
+      handler: viewRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'View record endpoint'
+      }
+    },
+    ...validateRoute,
+    ...updateRoute,
+    ...registerRoute,
+    certifyRoute,
+    issueRoute,
+    ...archiveRoute,
+    rejectRoute,
+    reinstateRoute,
+    {
+      method: 'POST',
+      path: '/records/{id}/duplicate',
+      handler: duplicateRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Unassign record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/verify',
+      handler: verifyRecordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Verify record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/not-duplicate',
+      handler: markAsNotDuplicateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Mark as not-duplicate record endpoint'
       }
     }
   ]

@@ -10,30 +10,14 @@
  */
 import {
   COUNTRY_CONFIG_URL,
-  HEARTH_URL,
-  MOSIP_TOKEN_SEEDER_URL,
-  NOTIFICATION_SERVICE_URL
+  FHIR_URL,
+  MOSIP_TOKEN_SEEDER_URL
 } from '@workflow/constants'
-import { Events } from '@workflow/features/events/utils'
-import {
-  CHILD_SECTION_CODE,
-  DECEASED_SECTION_CODE,
-  EVENT_TYPE,
-  INFORMANT_SECTION_CODE
-} from '@workflow/features/registration/fhir/constants'
-import {
-  concatenateName,
-  getCRVSOfficeName,
-  getInformantName,
-  getRegistrationLocation,
-  getRegistrationNumber,
-  getSubjectName,
-  getTrackingId
-} from '@workflow/features/registration/fhir/fhir-utils'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
 import { logger } from '@workflow/logger'
 import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
-
 import {
   Bundle,
   BundleEntry,
@@ -47,24 +31,6 @@ import {
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { getTaskResourceFromFhirBundle } from './fhir/fhir-template'
-import {
-  getInformantSMSNotification,
-  InformantNotificationName,
-  isInformantSMSNotificationEnabled
-} from './smsNotificationUtils'
-
-interface INotificationPayload {
-  recipient: {
-    sms?: string | null
-    email?: string | null
-  }
-  name?: string
-  trackingId?: string
-  crvsOffice?: string
-  registrationLocation?: string
-  registrationNumber?: string
-}
 
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
@@ -118,317 +84,6 @@ export function convertStringToASCII(str: string): string {
   return [...str]
     .map((char) => char.charCodeAt(0).toString())
     .reduce((acc, v) => acc.concat(v))
-}
-
-// TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getSubjectName() )
-export async function sendEventNotification(
-  fhirBundle: Bundle,
-  event: Events,
-  recipient: {
-    sms?: string | null
-    email?: string | null
-  },
-  authHeader: { Authorization: string }
-) {
-  const informantSMSNotifications = await getInformantSMSNotification(
-    authHeader.Authorization
-  )
-
-  const eventType = getEventType(fhirBundle)
-  switch (event) {
-    case Events.BIRTH_IN_PROGRESS_DEC:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.birthInProgressSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.birthInProgressSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-      break
-    case Events.BIRTH_NEW_DEC:
-    case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.birthDeclarationSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.birthDeclarationSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-      break
-    case Events.BIRTH_MARK_REG:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.birthRegistrationSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.birthRegistrationSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            ),
-            registrationNumber: getRegistrationNumber(
-              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
-              EVENT_TYPE[eventType]
-            )
-          }
-        )
-      }
-      break
-    case Events.BIRTH_MARK_VOID:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.birthRejectionSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.birthRejectionSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-      break
-    case Events.DEATH_IN_PROGRESS_DEC:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.deathInProgressSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.deathInProgressSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-      break
-    case Events.DEATH_NEW_DEC:
-    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.deathDeclarationSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.deathDeclarationSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            ),
-            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE)
-          }
-        )
-      }
-      break
-    case Events.DEATH_MARK_REG:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.deathRegistrationSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.deathRegistrationSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
-            registrationNumber: getRegistrationNumber(
-              getTaskResourceFromFhirBundle(fhirBundle as Bundle),
-              EVENT_TYPE[eventType]
-            ),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-      break
-    case Events.DEATH_MARK_VOID:
-      if (
-        isInformantSMSNotificationEnabled(
-          informantSMSNotifications,
-          InformantNotificationName.deathRejectionSMS
-        )
-      ) {
-        logger.info(`sendEventNotification method for event: ${event}`)
-        await sendNotification(
-          InformantNotificationName.deathRejectionSMS,
-          recipient,
-          authHeader,
-          {
-            trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle),
-            registrationLocation: await getRegistrationLocation(fhirBundle),
-            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
-            informantName: await getInformantName(
-              fhirBundle,
-              INFORMANT_SECTION_CODE
-            )
-          }
-        )
-      }
-  }
-}
-
-export async function sendRegisteredNotification(
-  recipient: {
-    sms?: string | null
-    email?: string | null
-  },
-  informantName: string,
-  name: string,
-  trackingId: string,
-  registrationNumber: string,
-  crvsOffice: string,
-  registrationLocation: string,
-  eventType: EVENT_TYPE,
-  authHeader: { Authorization: string }
-) {
-  const informantSMSNotifications = await getInformantSMSNotification(
-    authHeader.Authorization
-  )
-  if (
-    eventType === EVENT_TYPE.BIRTH &&
-    isInformantSMSNotificationEnabled(
-      informantSMSNotifications,
-      InformantNotificationName.birthRegistrationSMS
-    )
-  ) {
-    await sendNotification('birthRegistrationSMS', recipient, authHeader, {
-      informantName,
-      name,
-      trackingId,
-      registrationNumber,
-      crvsOffice,
-      registrationLocation
-    })
-  } else if (
-    eventType === EVENT_TYPE.DEATH &&
-    isInformantSMSNotificationEnabled(
-      informantSMSNotifications,
-      InformantNotificationName.deathRegistrationSMS
-    )
-  ) {
-    await sendNotification('deathRegistrationSMS', recipient, authHeader, {
-      informantName,
-      name,
-      trackingId,
-      registrationNumber,
-      crvsOffice,
-      registrationLocation
-    })
-  }
-}
-
-async function sendNotification(
-  smsType: string,
-  recipient: {
-    sms?: string | null
-    email?: string | null
-  },
-  authHeader: { Authorization: string },
-  notificationPayload: {
-    name?: string
-    informantName?: string
-    trackingId?: string
-    crvsOffice?: string
-    registrationLocation?: string
-    registrationNumber?: string
-  }
-) {
-  const payload: INotificationPayload = {
-    recipient,
-    ...notificationPayload
-  }
-  logger.info(`Notifying to ${NOTIFICATION_SERVICE_URL}${smsType}`)
-  try {
-    await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
-  }
 }
 
 const DETECT_EVENT: Record<string, EVENT_TYPE> = {
@@ -506,7 +161,7 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
   )
 }
 
-export function isEventNotification(fhirBundle: Bundle) {
+export function isHospitalNotification(fhirBundle: Bundle) {
   const compositionEntry =
     fhirBundle &&
     fhirBundle.entry &&
@@ -529,18 +184,6 @@ export function isEventNotification(fhirBundle: Bundle) {
   )
 }
 
-export function isEventNonNotifiable(event: Events) {
-  return (
-    [
-      Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-    ].indexOf(event) >= 0
-  )
-}
 interface IMosipAuthData {
   vid?: string
   name?: string
@@ -679,7 +322,7 @@ export const fetchHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+  const res = await fetch(`${FHIR_URL}${suffix}`, {
     method: method,
     body,
     headers: {
@@ -698,17 +341,4 @@ export const fetchHearth = async <T = any>(
 export async function fetchTaskByCompositionIdFromHearth(id: string) {
   const taskBundle: Bundle = await fetchHearth(`/Task?focus=Composition/${id}`)
   return taskBundle.entry?.[0]?.resource as Task
-}
-
-export function getVoidEvent(event: EVENT_TYPE): Events {
-  switch (event) {
-    case EVENT_TYPE.MARRIAGE:
-      return Events.MARRIAGE_MARK_VOID
-    case EVENT_TYPE.BIRTH:
-      return Events.BIRTH_MARK_VOID
-    case EVENT_TYPE.DEATH:
-      return Events.DEATH_MARK_VOID
-    default:
-      return Events.BIRTH_MARK_VOID
-  }
 }
