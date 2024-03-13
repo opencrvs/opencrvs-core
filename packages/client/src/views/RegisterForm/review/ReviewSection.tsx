@@ -14,21 +14,18 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Link } from '@opencrvs/components/lib/Link'
 import {
   InputField,
   ISelectOption as SelectComponentOptions,
   Text,
-  TextArea
-} from '@opencrvs/components/lib/'
-
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { Accordion } from '@opencrvs/components/lib/Accordion'
-import {
+  TextArea,
+  Link,
+  Alert,
+  Accordion,
   DocumentViewer,
-  IDocumentViewerOptions
-} from '@opencrvs/components/lib/DocumentViewer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+  IDocumentViewerOptions,
+  ResponsiveModal
+} from '@opencrvs/components'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -1857,7 +1854,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     .filter((sec) => sec.items.length > 0)
                     .map((sec, index) => {
                       return (
-                        <DeclarationDataContainer key={index}>
+                        <DeclarationDataContainer key={'Section_' + sec.id}>
                           <Accordion
                             name={sec.id}
                             label={sec.title}
@@ -1878,27 +1875,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             )}
                             expand={true}
                           >
-                            <ListReview
-                              id={'Section_' + sec.id}
-                              key={index}
-                              rows={sec.items.map((item) => ({
-                                id: item.id,
-                                label: [item.label],
-                                value: [item.value],
-                                actions: [
-                                  <Link
-                                    key={item.action.id}
-                                    id={item.action.id}
-                                    disabled={item.action.disabled}
-                                    onClick={item.action.handler}
-                                    element="button"
-                                    font="reg16"
-                                  >
-                                    {item.action.label}
-                                  </Link>
-                                ]
-                              }))}
-                            />
+                            <ListReview id={'Section_' + sec.id}>
+                              {sec.items.map((item) => (
+                                <ListReview.Row
+                                  key={sec.id + '_' + item.label}
+                                  label={item.label}
+                                  value={item.value}
+                                  actions={
+                                    !item?.action?.disabled &&
+                                    declaration.registrationStatus !==
+                                      SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                      <Link
+                                        key={item.action.id}
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                        element="button"
+                                        font="reg16"
+                                      >
+                                        {item.action.label}
+                                      </Link>
+                                    )
+                                  }
+                                />
+                              ))}
+                            </ListReview>
                           </Accordion>
                         </DeclarationDataContainer>
                       )

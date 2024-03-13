@@ -12,6 +12,9 @@ import React from 'react'
 import { ListReview } from './index'
 import { Link } from '../Link'
 import { Toggle } from '../Toggle'
+import { Stack } from '../Stack'
+import { Text } from '../Text'
+import { Meta } from '@storybook/react'
 
 export default {
   title: 'Data/List Review',
@@ -25,7 +28,7 @@ export default {
     }
   },
   component: ListReview
-}
+} as Meta
 
 const LinkExample = (
   <Link font="reg16" key="linkButton">
@@ -34,29 +37,31 @@ const LinkExample = (
 )
 
 export const Default = () => (
-  <div>
-    <ListReview
-      labelHeader="FIELD"
-      valueHeader="INPUT"
-      rows={[
-        {
-          label: 'Firstname(s)',
-          value: ['Peter Jonathan'],
-          actions: [LinkExample]
-        },
-        {
-          label: 'Lastname',
-          value: ['Jones'],
-          actions: [LinkExample]
-        },
-        {
-          label: 'Usual place of residence',
-          value: ['New Hampton', 'Larjde', 'Farajaland'],
-          actions: [LinkExample]
-        }
-      ]}
+  <ListReview labelHeader="FIELD" valueHeader="INPUT">
+    <ListReview.Row
+      label="Firstname(s)"
+      value="Peter Jonathan"
+      actions={LinkExample}
     />
-  </div>
+    <ListReview.Row label="Lastname" value="Jones" actions={LinkExample} />
+    <ListReview.Row
+      label="Usual place of residence"
+      value={
+        <Stack direction="column" alignItems="flex-start">
+          <Text variant="reg16" element="span">
+            New Hampton
+          </Text>
+          <Text variant="reg16" element="span">
+            Larjde
+          </Text>
+          <Text variant="reg16" element="span">
+            Farajaland
+          </Text>
+        </Stack>
+      }
+      actions={LinkExample}
+    />
+  </ListReview>
 )
 
 export const WithToggle = () => {
@@ -84,34 +89,22 @@ export const WithToggle = () => {
   )
 
   return (
-    <div>
-      <ListReview
-        labelHeader="TYPE"
-        valueHeader="CONTENT"
-        rows={[
-          {
-            label: 'In review ',
-            value: [
-              'Your declaration is in review. Your tracking ID is {TRACKING ID}. Use this for any follow up queries'
-            ],
-            actions: [Toggle1]
-          },
-          {
-            label: 'Registered',
-            value: [
-              'The birth of {CHILDS NAME} has been registered. Their registration no. is {REG NO.}. Please visit your local registration office to collect their certificate'
-            ],
-            actions: [Toggle2]
-          },
-          {
-            label: 'Certified',
-            value: [
-              'This is to confirm that a certificate has been printed and issued for {CHILDS NAME}'
-            ],
-            actions: [Toggle3]
-          }
-        ]}
+    <ListReview labelHeader="TYPE" valueHeader="CONTENT">
+      <ListReview.Row
+        label="In review"
+        value="Your declaration is in review. Your tracking ID is {TRACKING ID}. Use this for any follow up queries"
+        actions={Toggle1}
       />
-    </div>
+      <ListReview.Row
+        label="Registered"
+        value="The birth of {CHILDS NAME} has been registered. Their registration no. is {REG NO.}. Please visit your local registration office to collect their certificate"
+        actions={Toggle2}
+      />
+      <ListReview.Row
+        label="Certified"
+        value="This is to confirm that a certificate has been printed and issued for {CHILDS NAME}"
+        actions={Toggle3}
+      />
+    </ListReview>
   )
 }

@@ -10,22 +10,16 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+import { Row } from './components/Row'
 
 export interface ListReviewProps {
   id?: string
   labelHeader?: React.ReactNode
   valueHeader?: React.ReactNode
-  rows: Array<{
-    id?: string
-    label: React.ReactNode
-    value?: React.ReactNode
-    actions: JSX.Element[]
-  }>
+  children: React.ReactElement<typeof Row>[]
 }
 
-export const ReviewHeader = styled.table`
-  border-collapse: collapse;
-  width: 100%;
+const ReviewHeader = styled.tr`
   th {
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.grey400};
@@ -33,10 +27,12 @@ export const ReviewHeader = styled.table`
     padding: 12px 0;
     text-align: left;
   }
+
   th:first-child {
     min-width: 300px;
     padding-right: 48px;
   }
+
   th:nth-child(2) {
     width: 100%;
     padding-right: 48px;
@@ -47,6 +43,12 @@ export const ReviewHeader = styled.table`
     padding: 8px 8px;
     text-align: right;
   }
+`
+
+const ListReviewTable = styled.table`
+  border-collapse: collapse;
+  width: 100%;
+
   /* Media query for mobile */
   @media screen and (max-width: 768px) {
     thead {
@@ -55,101 +57,26 @@ export const ReviewHeader = styled.table`
   }
 `
 
-export const ReviewRow = styled.table`
-  border-collapse: collapse;
-  width: 100%;
-
-  tr {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  }
-
-  td {
-    padding: 14px 0;
-    vertical-align: top;
-  }
-
-  td:first-child {
-    margin: 0;
-    ${({ theme }) => theme.fonts.bold16}
-    min-width: 300px;
-    padding-right: 48px;
-  }
-  td:nth-child(2) {
-    margin: 0;
-    ${({ theme }) => theme.fonts.reg16}
-    width: 100%;
-    padding-right: 48px;
-  }
-
-  td:last-child {
-    min-width: 80px;
-    text-align: right;
-  }
-
-  /* Media query for mobile */
-  @media screen and (max-width: 768px) {
-    td:first-child {
-      display: block;
-      min-width: 200px;
-      width: 100%;
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-    td:nth-child(2) {
-      display: block;
-      width: 100%;
-      padding-top: 8px;
-    }
-    td:last-child {
-      vertical-align: top;
-      min-width: 100px;
-    }
-  }
-`
-
-const ActionsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-`
-
 export function ListReview({
-  rows,
   labelHeader,
-  valueHeader
+  valueHeader,
+  children
 }: ListReviewProps): JSX.Element {
   const hideHeader = labelHeader !== undefined || valueHeader !== undefined
   return (
-    <React.Fragment>
+    <ListReviewTable>
       {hideHeader && (
-        <ReviewHeader>
-          <thead>
-            <tr>
-              <th>{labelHeader}</th>
-              <th>{valueHeader}</th>
-              <th></th>
-            </tr>
-          </thead>
-        </ReviewHeader>
+        <thead>
+          <ReviewHeader>
+            <th>{labelHeader}</th>
+            <th>{valueHeader}</th>
+            <th></th>
+          </ReviewHeader>
+        </thead>
       )}
-      {rows.map((row, index) => (
-        <ReviewRow key={row.id ?? index}>
-          <tbody>
-            <tr>
-              {row.label && <td>{row.label}</td>}
-              {row.value && <td>{row.value}</td>}
-              {row.actions ? (
-                <td>
-                  <ActionsContainer>{row.actions}</ActionsContainer>
-                </td>
-              ) : (
-                row.actions && <td></td>
-              )}
-            </tr>
-          </tbody>
-        </ReviewRow>
-      ))}
-    </React.Fragment>
+      <tbody>{children}</tbody>
+    </ListReviewTable>
   )
 }
+
+ListReview.Row = Row
