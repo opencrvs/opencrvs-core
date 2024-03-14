@@ -37,7 +37,8 @@ const LinkExample = (
 )
 
 export const Default = () => (
-  <ListReview labelHeader="FIELD" valueHeader="INPUT">
+  <ListReview>
+    <ListReview.Header label="FIELD" value="INPUT" />
     <ListReview.Row
       label="Firstname(s)"
       value="Peter Jonathan"
@@ -89,7 +90,8 @@ export const WithToggle = () => {
   )
 
   return (
-    <ListReview labelHeader="TYPE" valueHeader="CONTENT">
+    <ListReview>
+      <ListReview.Header label="FIELD" value="INPUT" />
       <ListReview.Row
         label="In review"
         value="Your declaration is in review. Your tracking ID is {TRACKING ID}. Use this for any follow up queries"

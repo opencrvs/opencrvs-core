@@ -11,39 +11,13 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Row } from './components/Row'
+import { Header } from './components/Header'
 
 export interface ListReviewProps {
   id?: string
-  labelHeader?: React.ReactNode
-  valueHeader?: React.ReactNode
+  header?: React.ReactElement<typeof Header>[]
   children: React.ReactElement<typeof Row>[]
 }
-
-const ReviewHeader = styled.tr`
-  th {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.grey400};
-    ${({ theme }) => theme.fonts.bold12};
-    padding: 12px 0;
-    text-align: left;
-  }
-
-  th:first-child {
-    min-width: 300px;
-    padding-right: 48px;
-  }
-
-  th:nth-child(2) {
-    width: 100%;
-    padding-right: 48px;
-  }
-
-  th:last-child {
-    min-width: 80px;
-    padding: 8px 8px;
-    text-align: right;
-  }
-`
 
 const ListReviewTable = styled.table`
   border-collapse: collapse;
@@ -57,26 +31,15 @@ const ListReviewTable = styled.table`
   }
 `
 
-export function ListReview({
-  labelHeader,
-  valueHeader,
-  children
-}: ListReviewProps): JSX.Element {
-  const hideHeader = labelHeader !== undefined || valueHeader !== undefined
+export function ListReview({ header, children }: ListReviewProps): JSX.Element {
+  const hideHeader = header !== undefined
   return (
     <ListReviewTable>
-      {hideHeader && (
-        <thead>
-          <ReviewHeader>
-            <th>{labelHeader}</th>
-            <th>{valueHeader}</th>
-            <th></th>
-          </ReviewHeader>
-        </thead>
-      )}
+      {hideHeader && <thead>{header}</thead>}
       <tbody>{children}</tbody>
     </ListReviewTable>
   )
 }
 
+ListReview.Header = Header
 ListReview.Row = Row

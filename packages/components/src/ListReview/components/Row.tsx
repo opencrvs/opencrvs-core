@@ -25,6 +25,7 @@ export const RowContainer = styled.tr`
     min-width: 300px;
     padding-right: 48px;
   }
+
   td:nth-child(2) {
     margin: 0;
     ${({ theme }) => theme.fonts.reg16}
