@@ -41,11 +41,13 @@ import {
   DeathRegistration,
   History,
   RegistrationType,
-  RegStatus
+  RegStatus,
+  Query
 } from '@client/utils/gateway'
 import { useTimeout } from '@client/hooks/useTimeout'
 import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { compact } from 'lodash'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -254,6 +256,18 @@ const TimeOutState = () => {
   )
 }
 
+const isBirthRegistration = (
+  data: BirthRegistration | DeathRegistration
+): data is BirthRegistration => {
+  return data.registration?.type === RegistrationType.Birth
+}
+
+const isDeathRegistration = (
+  data: BirthRegistration | DeathRegistration
+): data is DeathRegistration => {
+  return data.registration?.type === RegistrationType.Death
+}
+
 export function VerifyCertificatePage() {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -266,24 +280,25 @@ export function VerifyCertificatePage() {
   const [closeWindow, setCloseWindow] = React.useState(false)
   const [timeOut, setTimeOut] = React.useState(false)
 
-  const { loading, error, data } = useQuery(
+  const {
+    loading,
+    error,
+    data: queryData
+  } = useQuery<Pick<Query, 'fetchRecordDetailsForVerification'>>(
     FETCH_RECORD_DETAILS_FOR_VERIFICATION,
     {
       variables: { id: declarationId },
       fetchPolicy: 'network-only'
     }
   )
-
-  const [currentData, setCurrentData] = React.useState<
-    BirthRegistration | DeathRegistration
-  >()
+  const data = queryData?.fetchRecordDetailsForVerification
 
   useTimeout(
     () => {
       setCloseWindow(true)
     },
     60000,
-    data
+    Boolean(data)
   )
 
   useTimeout(
@@ -292,19 +307,12 @@ export function VerifyCertificatePage() {
       setTimeOut(true)
     },
     600000,
-    data
+    Boolean(data)
   )
-
-  React.useEffect(() => {
-    if (data) {
-      setCurrentData(data.fetchRecordDetailsForVerification)
-    }
-  }, [data])
 
   const closeWindowAction = () => {
     const blank = window.open('about:blank', '_self')
-    // @ts-ignore
-    blank.close()
+    blank?.close()
   }
 
   const getRegisterNumber = (data: BirthRegistration | DeathRegistration) => {
@@ -317,38 +325,40 @@ export function VerifyCertificatePage() {
     return formatDate(new Date(data.createdAt), 'dd MMMM yyyy')
   }
 
-  const getFullName = (data: any) => {
-    if (data.registration?.type === RegistrationType.Birth) {
+  const getFullName = (data: BirthRegistration | DeathRegistration) => {
+    if (isBirthRegistration(data)) {
       return (
-        data?.child?.name[0]?.firstNames + ' ' + data.child.name[0].familyName
+        data.child?.name?.[0]?.firstNames +
+        ' ' +
+        data.child?.name?.[0]?.familyName
       )
     }
+
     if (data.registration?.type === RegistrationType.Death) {
       return (
-        data?.deceased?.name[0]?.firstNames +
+        data.deceased?.name?.[0]?.firstNames +
         ' ' +
-        data?.deceased?.name[0]?.familyName
+        data.deceased?.name?.[0]?.familyName
       )
     }
   }
 
-  const getDateOfBirthOrOfDeceased = (data: any) => {
-    if (data.registration?.type === RegistrationType.Birth)
-      return formatDate(new Date(data?.child.birthDate), 'dd MMMM yyyy')
-
-    if (data.registration?.type === RegistrationType.Death) {
+  const getDateOfBirthOrOfDeceased = (
+    data: BirthRegistration | DeathRegistration
+  ) => {
+    if (isBirthRegistration(data) && data.child?.birthDate)
+      return formatDate(new Date(data.child.birthDate), 'dd MMMM yyyy')
+    if (isDeathRegistration(data) && data.deceased?.deceased?.deathDate)
       return formatDate(
         new Date(data.deceased.deceased.deathDate),
         'dd MMMM yyyy'
       )
-    }
+    return undefined
   }
 
-  const getGender = (data: any) => {
-    if (data.registration?.type === RegistrationType.Birth)
-      return data.child.gender
-    if (data.registration?.type === RegistrationType.Death)
-      return data.deceased.gender
+  const getGender = (data: BirthRegistration | DeathRegistration) => {
+    if (isBirthRegistration(data)) return data.child?.gender
+    if (isDeathRegistration(data)) return data.deceased?.gender
   }
 
   // This function currently supports upto two location levels
@@ -389,8 +399,8 @@ export function VerifyCertificatePage() {
       .join(', ')
   }
 
-  const getRegistarData = (data: any) => {
-    const history = data.history.find(
+  const getRegistarData = (data: BirthRegistration | DeathRegistration) => {
+    const history = compact(data.history).find(
       ({ action, regStatus }: History) =>
         !action && regStatus === RegStatus.Registered
     )
@@ -405,19 +415,8 @@ export function VerifyCertificatePage() {
         history &&
         history?.user?.catchmentArea?.length &&
         history?.user?.catchmentArea
-          ?.map((_: { name: string }) => _?.name)
+          ?.map((_: { name?: string | null }) => _?.name)
           .join(', ')
-    }
-  }
-
-  const getChildOrDeceasedData = (
-    data: BirthRegistration | DeathRegistration
-  ) => {
-    return {
-      fullName: getFullName(data),
-      date: getDateOfBirthOrOfDeceased(data),
-      gender: getGender(data),
-      location: getLocation(data)
     }
   }
 
@@ -451,7 +450,7 @@ export function VerifyCertificatePage() {
         constantsMessages.skipToMainContent
       )}
     >
-      <Container size={ContentSize.NORMAL} checking={!!currentData || timeOut}>
+      <Container size={ContentSize.NORMAL} checking={Boolean(data) || timeOut}>
         <LogoDiv>
           <CountryLogo src={logo} />
         </LogoDiv>
@@ -459,7 +458,7 @@ export function VerifyCertificatePage() {
           <>
             {loading && <LoadingState />}
             {error && <ErrorState />}
-            {currentData && !timeOut && (
+            {data && !timeOut && (
               <>
                 <Alert type="success">
                   <Text variant={'bold16'} element={'span'} color={'greenDark'}>
@@ -486,17 +485,17 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type ===
+                          {data?.registration?.type ===
                             RegistrationType.Birth &&
                             intl.formatMessage(messageToDefine.brn)}
-                          {currentData?.registration?.type ===
+                          {data?.registration?.type ===
                             RegistrationType.Death &&
                             intl.formatMessage(messageToDefine.drn)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getRegisterNumber(currentData)}
+                          {getRegisterNumber(data)}
                         </Text>
                       }
                     />
@@ -508,24 +507,24 @@ export function VerifyCertificatePage() {
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getChildOrDeceasedData(currentData).fullName}
+                          {getFullName(data)}
                         </Text>
                       }
                     />
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type ===
+                          {data?.registration?.type ===
                             RegistrationType.Birth &&
                             intl.formatMessage(messageToDefine.dateOfBirth)}
-                          {currentData?.registration?.type ===
+                          {data?.registration?.type ===
                             RegistrationType.Death &&
                             intl.formatMessage(messageToDefine.dateOfDeath)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getChildOrDeceasedData(currentData).date}
+                          {getDateOfBirthOrOfDeceased(data)}
                         </Text>
                       }
                     />
@@ -538,9 +537,7 @@ export function VerifyCertificatePage() {
                       value={
                         <Text variant={'reg16'} element={'span'}>
                           {intl.formatMessage(
-                            messageToDefine[
-                              getChildOrDeceasedData(currentData).gender
-                            ]
+                            messageToDefine[getGender(data) ?? 'unknown']
                           )}
                         </Text>
                       }
@@ -548,17 +545,15 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type ===
-                            RegistrationType.Birth &&
+                          {isBirthRegistration(data) &&
                             intl.formatMessage(messageToDefine.placeOfBirth)}
-                          {currentData?.registration?.type ===
-                            RegistrationType.Death &&
+                          {isDeathRegistration(data) &&
                             intl.formatMessage(messageToDefine.placeOfDeath)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getChildOrDeceasedData(currentData).location}
+                          {getLocation(data)}
                         </Text>
                       }
                     />
@@ -572,7 +567,7 @@ export function VerifyCertificatePage() {
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getRegistarData(currentData).center}
+                          {getRegistarData(data).center}
                         </Text>
                       }
                     />
@@ -584,7 +579,7 @@ export function VerifyCertificatePage() {
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getRegistarData(currentData).registar}
+                          {getRegistarData(data).registar}
                         </Text>
                       }
                     />
@@ -597,7 +592,7 @@ export function VerifyCertificatePage() {
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getDateOfCertificate(currentData)}
+                          {getDateOfCertificate(data)}
                         </Text>
                       }
                     />
@@ -605,7 +600,7 @@ export function VerifyCertificatePage() {
                 </Box>
               </>
             )}
-            {currentData && timeOut && <TimeOutState />}
+            {data && timeOut && <TimeOutState />}
           </>
         ) : (
           <ErrorState />
