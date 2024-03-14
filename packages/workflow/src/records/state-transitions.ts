@@ -49,8 +49,7 @@ import {
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord,
-  Location
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { getUUID } from '@opencrvs/commons'
 import {
@@ -106,7 +105,6 @@ import {
   mergeChangedResourcesIntoRecord,
   createReinstateTask
 } from '@workflow/records/fhir'
-import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 
 export async function toCorrected(
@@ -288,11 +286,10 @@ export async function toUpdated(
 
 export async function toViewed<T extends ValidRecord>(
   record: T,
-  user: IUserModelData,
-  office: Location
+  token: string
 ): Promise<T> {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
-  const viewedTask = await createViewTask(previousTask, user, office)
+  const viewedTask = await createViewTask(previousTask, token)
 
   const taskHistoryEntry = resourceToBundleEntry(
     toHistoryResource(previousTask)
@@ -322,7 +319,7 @@ export async function toViewed<T extends ValidRecord>(
 
 export async function toDownloaded(
   record: ValidRecord,
-  user: IUserModelData | ISystemModelData,
+  token: string,
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
@@ -331,7 +328,7 @@ export async function toDownloaded(
 
   const downloadedTask = await createDownloadTask(
     previousTask,
-    user,
+    token,
     extensionUrl
   )
 
@@ -768,27 +765,14 @@ export async function toCorrectionRequested(
   )
 }
 
-export async function toUnassigned(
-  record: ValidRecord,
-  practitioner: Practitioner
-) {
+export async function toUnassigned(record: ValidRecord, token: string) {
   const previousTask = getTaskFromSavedBundle(record)
-  const unassignedTask = createUnassignedTask(previousTask, practitioner)
-
-  const unassignedTaskWithPractitionerExtensions = setupLastRegUser(
-    unassignedTask,
-    practitioner
-  )
-
-  const unassignedTaskWithLocationExtensions = await setupLastRegLocation(
-    unassignedTaskWithPractitionerExtensions,
-    practitioner
-  )
+  const unassignedTask = await createUnassignedTask(previousTask, token)
 
   const unassignedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [{ resource: unassignedTaskWithLocationExtensions }]
+    entry: [{ resource: unassignedTask }]
   }
 
   return unassignedRecordWithTaskOnly
@@ -799,7 +783,7 @@ export async function toVerified(
   ipInfo: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
+  const verifyRecordTask = await createVerifyRecordTask(previousTask, ipInfo)
 
   return {
     ...record,
