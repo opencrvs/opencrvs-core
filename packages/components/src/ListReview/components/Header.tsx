@@ -16,18 +16,19 @@ export const HeaderContainer = styled.tr`
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
     padding: 12px 0;
     text-align: left;
+    color: ${({ theme }) => theme.colors.grey400};
+    ${({ theme }) => theme.fonts.bold12};
+
+    @media screen and (max-width: 768px) {
+       display: none;
   }
 
   th:first-child {
-    ${({ theme }) => theme.fonts.bold12};
-    color: ${({ theme }) => theme.colors.grey400};
     min-width: 300px;
     padding-right: 48px;
   }
 
   th:nth-child(2) {
-    ${({ theme }) => theme.fonts.bold12};
-    color: ${({ theme }) => theme.colors.grey400};
     width: 100%;
     padding-right: 48px;
   }
@@ -47,8 +48,8 @@ type HeaderProps = {
 
 export const Header = ({ id, value, label }: HeaderProps) => (
   <HeaderContainer id={id}>
-    <td>{label}</td>
-    <td>{value}</td>
-    <td></td>
+    <th>{label}</th>
+    <th>{value}</th>
+    <th></th>
   </HeaderContainer>
 )
