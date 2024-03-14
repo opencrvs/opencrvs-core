@@ -88,7 +88,12 @@ export async function sendEmailToAllUsers(
         .filter((user) => user.systemRole !== 'NATIONAL_SYSTEM_ADMIN')
         .map((user) => user.emailForNotification)
         .filter((email): email is string => email != undefined)
-      requestNotificationServiceToSendEmails(subject, body, emails, authHeader)
+      await requestNotificationServiceToSendEmails(
+        subject,
+        body,
+        emails,
+        authHeader
+      )
     }
     currentPage += 1
   } while (total && currentPage < Math.ceil(total / DEFAULT_PAGE_SIZE))
