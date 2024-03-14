@@ -9,48 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-import {
-  fetchFHIR,
-  getCompositionIdFromResponse,
-  getDeclarationIds,
-  getDeclarationIdsFromResponse,
-  getIDFromResponse
-} from '@gateway/features/fhir/service'
-import { getUserId, hasScope, inScope } from '@gateway/features/user/utils'
+import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
-import { IAuthHeader, UUID } from '@opencrvs/commons'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
   EVENT_TYPE,
-  Extension,
-  Location,
-  OPENCRVS_SPECIFICATION_URL,
   Patient,
   Saved,
-  SavedBundleEntry,
   Task,
-  TaskActionExtension,
-  TaskHistory,
-  TaskStatus,
-  addExtensionsToTask,
   buildFHIRBundle,
-  clearActionExtension,
-  getComposition,
-  getStatusFromTask,
-  getTaskFromBundle,
-  isComposition,
-  resourceIdentifierToUUID,
-  resourceToBundleEntry,
-  taskBundleWithExtension,
-  toHistoryResource,
-  updateFHIRTaskBundle
+  getComposition
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput,
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -60,23 +36,26 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
+import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
-  hasBirthDuplicates,
-  hasDeathDuplicates
-} from '@gateway/features/search/service'
-import {
-  ISystemModelData,
-  IUserModelData,
-  isSystem
-} from '@gateway/features/user/type-resolvers'
-import {
-  removeDuplicatesFromComposition,
-  setCertificateCollector,
-  uploadBase64AttachmentsToDocumentsStore
-} from './utils'
+  archiveRegistration,
+  certifyRegistration,
+  createRegistration,
+  issueRegistration,
+  registerDeclaration,
+  unassignRegistration,
+  rejectDeclaration,
+  updateRegistration,
+  validateRegistration,
+  fetchRegistrationForDownloading,
+  reinstateRegistration,
+  duplicateRegistration,
+  viewDeclaration,
+  verifyRegistration,
+  markNotADuplicate
+} from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
 async function getAnonymousToken() {
@@ -154,18 +133,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -181,18 +150,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -212,18 +171,8 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        const user = await context.dataSources.usersAPI.getUserById(
-          getUserId(context.headers)
-        )
-
-        const office = await context.dataSources.locationsAPI.getLocation(
-          user.primaryOfficeId
-        )
-
-        context.record = await markRecordAsDownloadedOrAssigned(
+        context.record = await fetchRegistrationForDownloading(
           id,
-          user,
-          office,
           context.headers
         )
         return context.record
@@ -272,36 +221,7 @@ export const resolvers: GQLResolver = {
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      const user = await context.dataSources.usersAPI.getUserById(
-        getUserId(context.headers)
-      )
-
-      context.record = await getRecordById(id, context.headers.Authorization)
-
-      const office = await context.dataSources.locationsAPI.getLocation(
-        user.primaryOfficeId
-      )
-      context.record = insertActionToBundle(
-        context.record,
-        'http://opencrvs.org/specs/extension/regViewed',
-        user,
-        office
-      )
-
-      fetchFHIR(
-        '/Task',
-        context.headers,
-        'PUT',
-        JSON.stringify({
-          resourceType: 'Bundle',
-          type: 'document',
-          entry: [
-            context.record.entry.find(
-              ({ resource }) => resource.resourceType === 'Task'
-            )
-          ]
-        })
-      )
+      context.record = await viewDeclaration(id, context.headers)
 
       return context.record
     },
@@ -415,29 +335,12 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
-      try {
-        const token = await getAnonymousToken()
-        headers.Authorization = `Bearer ${token}`
-        const authHeader = {
-          Authorization: headers.Authorization
-        }
-        const taskEntry = await getTaskEntry(id, authHeader)
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      const token = await getAnonymousToken()
+      context.headers.Authorization = `Bearer ${token}`
+      context.record = await verifyRegistration(id, context.headers)
 
-        const taskBundle = taskBundleWithExtension(taskEntry, {
-          url: 'http://opencrvs.org/specs/extension/regVerified',
-          valueString: headers['x-real-ip']!
-        })
-        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
-
-        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
-        if (!record) {
-          await Promise.reject(new Error('Invalid QrCode'))
-        }
-        return record
-      } catch (e) {
-        await Promise.reject(new Error(e))
-      }
+      return context.record
     }
   },
 
@@ -449,7 +352,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
+      return await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -458,7 +361,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
+      return createRegistration(details, EVENT_TYPE.DEATH, authHeader)
     },
     async createMarriageRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -467,14 +370,14 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createEventRegistration(details, authHeader, EVENT_TYPE.MARRIAGE)
+      return createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
     },
     async updateBirthRegistration(_, { details }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
+        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -557,12 +460,7 @@ export const resolvers: GQLResolver = {
         throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.DEATH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.DEATH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
@@ -605,15 +503,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.REJECTED,
-        reason,
-        comment
-      )
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const taskEntry = await rejectDeclaration(id, authHeader, reason, comment)
+      if (!taskEntry) {
+        return await Promise.reject(new Error('Task not found'))
+      }
 
       // return the taskId
       return taskEntry.resource.id
@@ -632,15 +525,13 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
-        taskEntry,
-        GQLRegStatus.ARCHIVED,
+      const taskEntry = await archiveRegistration(
+        id,
+        authHeader,
         reason,
         comment,
         duplicateTrackingId
       )
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },
@@ -654,24 +545,11 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
 
-      const taskId = taskEntry.resource.id
-
-      const prevRegStatus =
-        taskId && (await getPreviousRegStatus(taskId, authHeader))
-      if (!prevRegStatus) {
-        return await Promise.reject(new Error('Task has no reg-status code'))
-      }
-
-      taskEntry.resource.extension = [
-        ...(taskEntry.resource.extension ?? []),
-        { url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated` }
-      ]
-
-      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      const { taskId, prevRegStatus } = await reinstateRegistration(
+        id,
+        authHeader
+      )
 
       return {
         taskEntryResourceID: taskId,
@@ -679,88 +557,52 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
-      }
-    },
-    async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
-      }
-    },
-    async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsCertified(
-          details,
-          authHeader,
-          EVENT_TYPE.MARRIAGE
-        )
-      } else {
+      if (!hasScope(authHeader, 'certify')) {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
+    },
+    async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
+    },
+    async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a certify scope')
-        )
+      if (!hasScope(authHeader, 'certify')) {
+        return Promise.reject(new Error('User does not have a certify scope'))
       }
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
+      const isAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!isAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition: Composition = await fetchFHIR(
-          `/Composition/${id}`,
-          authHeader,
-          'GET'
-        )
-        await removeDuplicatesFromComposition(composition, id)
-        const compositionEntry = {
-          resource: composition
-        }
+        const composition = await markNotADuplicate(id, authHeader)
 
-        const taskEntry = await getTaskEntry(id, authHeader)
-
-        const extension = {
-          url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate` as const
-        }
-        const taskBundle = taskBundleWithExtension(taskEntry, extension)
-        const payloadBundle: Bundle = {
-          ...taskBundle,
-          entry: [compositionEntry, ...taskBundle.entry]
-        }
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(payloadBundle)
-        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -774,15 +616,10 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const taskBundle = taskBundleWithExtension(taskEntry, {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned` as const
-      })
-
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      const task = (await unassignRegistration(id, authHeader)).entry[0]
 
       // return the taskId
-      return taskEntry.resource.id
+      return task.resource.id
     },
     async markEventAsDuplicate(
       _,
@@ -799,170 +636,42 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const taskEntry = await getTaskEntry(id, authHeader)
-      const extension = {
-        url: `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate` as const,
-        valueString: duplicateTrackingId
-      }
+      const taskEntry = await duplicateRegistration(
+        id,
+        authHeader,
+        reason,
+        comment,
+        duplicateTrackingId
+      )
 
-      if (comment || reason) {
-        if (!taskEntry.resource.reason) {
-          taskEntry.resource.reason = {
-            text: ''
-          }
-        }
-
-        taskEntry.resource.reason.text = reason || ''
-        const statusReason = {
-          text: comment
-        }
-        taskEntry.resource.statusReason = statusReason
-      }
-
-      const taskBundle = taskBundleWithExtension(taskEntry, extension)
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return taskEntry.resource.id
     }
   }
-}
-
-async function registrationToFHIR(
-  event: EVENT_TYPE,
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader
-) {
-  const recordWithAttachmentsUploaded =
-    await uploadBase64AttachmentsToDocumentsStore(details, authHeader)
-
-  return buildFHIRBundle(recordWithAttachmentsUploaded, event)
-}
-
-async function createEventRegistration(
-  details:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput,
-  authHeader: IAuthHeader,
-  event: EVENT_TYPE
-) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  let isADuplicate = false
-  if (event === EVENT_TYPE.BIRTH) {
-    isADuplicate = await hasBirthDuplicates(
-      authHeader,
-      details as GQLBirthRegistrationInput
-    )
-  } else if (event === EVENT_TYPE.DEATH) {
-    isADuplicate = await hasDeathDuplicates(
-      authHeader,
-      details as GQLDeathRegistrationInput
-    )
-  }
-
-  const composition = getComposition(doc)
-  const hasBeenFlaggedAsDuplicate = composition.extension?.find(
-    (x) => x.url === `${OPENCRVS_SPECIFICATION_URL}duplicate`
-  )
-  if (isADuplicate && !hasBeenFlaggedAsDuplicate) {
-    composition.extension = composition.extension || []
-    composition.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
-      valueBoolean: true
-    })
-  }
-
-  const draftId =
-    details && details.registration && details.registration.draftId
-
-  const existingComposition =
-    draftId && (await lookForComposition(draftId, authHeader))
-
-  if (existingComposition) {
-    if (hasScope(authHeader, 'register')) {
-      return { compositionId: existingComposition }
-    } else {
-      // return tracking-id
-      return await getDeclarationIds(existingComposition, authHeader)
-    }
-  }
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-
-  /*
-   * Some custom logic added here. If you are a registar and
-   * we flagged the declaration as a duplicate, we push the declaration into
-   * "Ready for review" queue and not ready to print.
-   */
-  const hasDuplicates = Boolean(
-    doc.entry
-      .map((entry) => entry.resource)
-      .find(isComposition)
-      ?.extension?.find(
-        (ext) =>
-          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
-          ext.valueBoolean
-      )
-  )
-
-  if (hasScope(authHeader, 'register') && !hasDuplicates) {
-    // return the registrationNumber
-    return await getCompositionIdFromResponse(res, event, authHeader)
-  } else {
-    // return tracking-id and potential duplicates
-    const ids = await getDeclarationIdsFromResponse(res, authHeader)
-    return {
-      ...ids,
-      isPotentiallyDuplicate: hasDuplicates
-    }
-  }
-}
-
-export async function lookForComposition(
-  identifier: string,
-  authHeader: IAuthHeader
-) {
-  const taskBundle = await fetchFHIR<Bundle>(
-    `/Task?identifier=${identifier}`,
-    authHeader
-  )
-
-  const task =
-    taskBundle &&
-    taskBundle.entry &&
-    taskBundle.entry[0] &&
-    (taskBundle.entry[0].resource as Task)
-
-  return (
-    task &&
-    task.focus &&
-    task.focus.reference &&
-    task.focus.reference.split('/')[1]
-  )
 }
 
 async function markEventAsValidated(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details?:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskEntry = await getTaskEntry(id, authHeader)
-
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskEntry
-    }
-  } else {
-    doc = await registrationToFHIR(event, details, authHeader)
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
   }
 
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  const comment =
+    details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+  const timeLoggedMS =
+    details?.registration?.status?.[0]?.timeLoggedMS ?? undefined
+
+  await validateRegistration(id, authHeader, comment, timeLoggedMS)
+  return id
 }
 
 async function markEventAsRegistered(
@@ -974,270 +683,67 @@ async function markEventAsRegistered(
     | GQLDeathRegistrationInput
     | GQLMarriageRegistrationInput
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  if (
+    details?.registration?.changedValues &&
+    details.registration.changedValues.length > 0
+  ) {
+    await updateRegistration(id, authHeader, details, event)
+  }
 
-  // return the full composition
-  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
+  const comments =
+    details?.registration?.status?.[0]?.comments?.[0]?.comment ?? undefined
+  const timeLoggedMS =
+    details?.registration?.status?.[0]?.timeLoggedMS ?? undefined
 
-  return composition
+  await registerDeclaration(id, authHeader, comments, timeLoggedMS)
+  return id
 }
 
 async function markEventAsCertified(
-  details: any,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  await setCertificateCollector(details, authHeader)
-  const doc = await registrationToFHIR(event, details, authHeader)
-
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return composition-id
-  return getIDFromResponse(res)
+  await setCollectorForPrintInAdvance(details, authHeader)
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const certifiedRecord = await certifyRegistration(
+    id,
+    certificateDetails,
+    event,
+    authHeader
+  )
+  return getComposition(certifiedRecord).id
 }
 
 async function markEventAsIssued(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  id: string,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await registrationToFHIR(event, details, authHeader)
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  return getIDFromResponse(res)
-}
-
-const ACTION_EXTENSIONS: Extension['url'][] = [
-  'http://opencrvs.org/specs/extension/regAssigned',
-  'http://opencrvs.org/specs/extension/regVerified',
-  'http://opencrvs.org/specs/extension/regUnassigned',
-  'http://opencrvs.org/specs/extension/regDownloaded',
-  'http://opencrvs.org/specs/extension/regReinstated',
-  'http://opencrvs.org/specs/extension/makeCorrection',
-  'http://opencrvs.org/specs/extension/regViewed',
-  'http://opencrvs.org/specs/extension/markedAsNotDuplicate',
-  'http://opencrvs.org/specs/extension/markedAsDuplicate',
-  'http://opencrvs.org/specs/extension/duplicateTrackingId',
-  'http://opencrvs.org/specs/extension/flaggedAsPotentialDuplicate'
-]
-
-type ACTION_EXTENSION_TYPE = typeof ACTION_EXTENSIONS
-
-async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
-  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
-  const taskBundle = await fetchFHIR<Saved<Bundle<Task>>>(
-    `/Task?focus=Composition/${compositionId}`,
+  const certificateDetails = details.registration?.certificates?.[0]
+  if (!certificateDetails) {
+    return Promise.reject(new Error('Certificate details required'))
+  }
+  const { payments, ...withoutPayments } = certificateDetails
+  if (!payments?.[0]) {
+    return Promise.reject(new Error('Payment details required'))
+  }
+  const issuedRecord = await issueRegistration(
+    id,
+    { ...withoutPayments, payment: payments[0] },
+    event,
     authHeader
   )
-  const taskEntry = taskBundle.entry[0]
-  if (!taskEntry) {
-    throw new Error('Task does not exist')
-  }
-  taskEntry.resource.extension = taskEntry.resource.extension?.filter(
-    ({ url }) =>
-      !ACTION_EXTENSIONS.includes(
-        url as unknown as ACTION_EXTENSION_TYPE[number]
-      )
-  )
-  taskEntry.resource.identifier = taskEntry.resource.identifier?.filter(
-    ({ system }) => system != systemIdentifierUrl
-  )
-  return taskEntry
-}
-
-async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
-  const taskHistoryBundle: Bundle = await fetchFHIR(
-    `/Task/${taskId}/_history`,
-    authHeader
-  )
-
-  const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
-    return taskEntry.resource as Task
-  })
-
-  if (!taskHistory) {
-    throw new Error('Task has no history')
-  }
-
-  const filteredTaskHistory = taskHistory.filter((task) => {
-    return (
-      task.businessStatus?.coding &&
-      task.businessStatus?.coding[0].code !== 'ARCHIVED'
-    )
-  })
-  return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
-}
-
-type Action = typeof TaskActionExtension
-
-export function insertActionToBundle(
-  record: Saved<Bundle>,
-  action: Action[number],
-  user: IUserModelData | ISystemModelData,
-  office?: Saved<Location>
-) {
-  const task = getTaskFromBundle(record)
-  const bundleEntry = record.entry.find(
-    (entry) => entry.resource.id === task.id
-  )!
-
-  const taskHistoryEntry = resourceToBundleEntry(
-    toHistoryResource(task)
-  ) as SavedBundleEntry<TaskHistory>
-
-  const extensions = isSystem(user)
-    ? []
-    : ([
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastUser',
-          valueReference: {
-            reference: `Practitioner/${user.practitionerId as UUID}`
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastLocation',
-          valueReference: {
-            reference: `Location/${resourceIdentifierToUUID(
-              office!.partOf!.reference
-            )}`
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastOffice',
-          valueReference: {
-            reference: `Location/${user.primaryOfficeId}`
-          }
-        }
-      ] as const)
-
-  const newTask = {
-    ...addExtensionsToTask(clearActionExtension(task), [
-      {
-        url: action
-      } as Extension,
-      ...extensions
-    ]),
-    lastModified: new Date().toISOString(),
-    identifier: task.identifier.filter(
-      ({ system }) =>
-        // Clear old system identifier task if it happens that the last task was made
-        // by an intergration but this one is by a real user
-        system !== 'http://opencrvs.org/specs/id/system_identifier'
-    ),
-    meta: {
-      ...task.meta,
-      lastUpdated: new Date().toISOString()
-    }
-  }
-  if (isSystem(user)) {
-    newTask.identifier.push({
-      system: 'http://opencrvs.org/specs/id/system_identifier',
-      value: JSON.stringify({
-        name: user.name,
-        username: user.username,
-        type: user.type
-      })
-    })
-  }
-
-  const updatedBundleEntry = {
-    ...bundleEntry,
-    resource: newTask
-  }
-
-  const updatedEntries = record.entry
-    .map((entry) => {
-      if (entry.resource.id === task.id) {
-        return updatedBundleEntry
-      }
-      return entry
-    })
-    .concat(taskHistoryEntry)
-
-  return {
-    ...record,
-    entry: updatedEntries
-  } as Saved<Bundle>
-}
-
-function getDownloadedOrAssignedExtension(
-  authHeader: IAuthHeader,
-  status: TaskStatus
-): Action[number] {
-  if (
-    inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === TaskStatus.VALIDATED)
-  ) {
-    return `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-  }
-  return `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-}
-
-export async function markRecordAsDownloadedBySystem(
-  id: string,
-  system: ISystemModelData,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, system)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
-}
-export async function markRecordAsDownloadedOrAssigned(
-  id: string,
-  user: IUserModelData,
-  office: Saved<Location>,
-  authHeader: IAuthHeader
-) {
-  const record = await getRecordById(id, authHeader.Authorization)
-  const task = getTaskFromBundle(record)
-  const businessStatus = getStatusFromTask(task)
-
-  if (!businessStatus) {
-    throw new Error("Task didn't have any status. This should never happen")
-  }
-
-  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
-
-  const updatedRecord = insertActionToBundle(record, extension, user, office)
-
-  fetchFHIR(
-    '/Task',
-    authHeader,
-    'PUT',
-    JSON.stringify({
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [
-        updatedRecord.entry.find(
-          ({ resource }) => resource.resourceType === 'Task'
-        )
-      ]
-    })
-  )
-
-  return updatedRecord
+  return getComposition(issuedRecord).id
 }

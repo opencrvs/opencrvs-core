@@ -1247,7 +1247,6 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 type Payment = {
   paymentId?: string
   type: PaymentType
-  total: string
   amount: string
   outcome: PaymentOutcomeType
   date: number

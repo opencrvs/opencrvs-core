@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/metrics",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS metrics service",
   "license": "MPL-2.0",
   "private": true,
@@ -94,7 +94,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@metrics/(.*)": "<rootDir>/src/$1"
+      "@metrics/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "coverageReporters": [
       "json",

@@ -12,8 +12,6 @@ import { upsertEvent as upsertBirthEvent } from '@search/features/registration/b
 import { upsertEvent as upsertDeathEvent } from '@search/features/registration/death/service'
 import { upsertEvent as upsertMarriageEvent } from '@search/features/registration/marriage/service'
 
-import { logger } from '@search/logger'
-import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 
 function getEventType(bundle: fhir.Bundle) {
@@ -35,23 +33,18 @@ export async function recordHandler(
 ) {
   const bundle = request.payload as fhir.Bundle
 
-  try {
-    switch (getEventType(bundle)) {
-      case 'BIRTH':
-        await upsertBirthEvent(request)
-        break
-      case 'DEATH':
-        await upsertDeathEvent(request)
-        break
-      case 'MARRIAGE':
-        await upsertMarriageEvent(request)
-        break
-      default:
-        throw new Error('Unsupported event type')
-    }
-  } catch (error) {
-    logger.error(`Search/recordHandler: error: ${error}`)
-    return internal(error)
+  switch (getEventType(bundle)) {
+    case 'BIRTH':
+      await upsertBirthEvent(request)
+      break
+    case 'DEATH':
+      await upsertDeathEvent(request)
+      break
+    case 'MARRIAGE':
+      await upsertMarriageEvent(request)
+      break
+    default:
+      throw new Error('Unsupported event type')
   }
 
   return h.response().code(200)

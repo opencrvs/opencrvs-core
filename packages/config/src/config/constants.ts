@@ -20,7 +20,6 @@ export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070/'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const MONGO_URL =

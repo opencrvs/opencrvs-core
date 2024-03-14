@@ -91,10 +91,9 @@ export const IssuePayment = () => {
     )
     certificate.payments = {
       type: 'MANUAL' as const,
-      total: Number(paymentAmount),
       amount: Number(paymentAmount),
       outcome: 'COMPLETED' as const,
-      date: Date.now()
+      date: new Date().toISOString()
     }
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(declaration))

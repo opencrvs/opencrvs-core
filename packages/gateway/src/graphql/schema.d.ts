@@ -73,7 +73,7 @@ export interface GQLMutation {
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
-  markBirthAsRegistered: GQLBirthRegistration
+  markBirthAsRegistered: string
   markBirthAsCertified: string
   markBirthAsIssued: string
   markEventAsVoided: string
@@ -84,13 +84,13 @@ export interface GQLMutation {
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsValidated?: string
-  markDeathAsRegistered: GQLDeathRegistration
+  markDeathAsRegistered: string
   markDeathAsCertified: string
   markDeathAsIssued: string
   markEventAsUnassigned: string
   createMarriageRegistration: GQLCreatedIds
   markMarriageAsValidated?: string
-  markMarriageAsRegistered: GQLMarriageRegistration
+  markMarriageAsRegistered: string
   markMarriageAsCertified: string
   markMarriageAsIssued: string
   markEventAsDuplicate: string
@@ -1109,7 +1109,6 @@ export const enum GQLSystemType {
 
 export const enum GQLIntegratingSystemType {
   MOSIP = 'MOSIP',
-  OSIA = 'OSIA',
   OTHER = 'OTHER'
 }
 
@@ -1246,6 +1245,7 @@ export interface GQLRegistrationInput {
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
+  changedValues?: Array<GQLCorrectionValueInput>
 }
 
 export interface GQLRelatedPersonInput {
@@ -1912,7 +1912,6 @@ export interface GQLCommentInput {
 export interface GQLPaymentInput {
   paymentId?: string
   type?: GQLPaymentType
-  total?: number
   amount?: number
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
@@ -3117,7 +3116,7 @@ export interface MutationToMarkBirthAsIssuedResolver<
 export interface MutationToMarkEventAsVoidedArgs {
   id: string
   reason: string
-  comment?: string
+  comment: string
 }
 export interface MutationToMarkEventAsVoidedResolver<
   TParent = any,

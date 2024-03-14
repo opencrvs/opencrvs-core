@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS notification service",
   "license": "MPL-2.0",
   "private": true,
@@ -74,7 +74,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@notification/(.*)": "<rootDir>/src/$1"
+      "@notification/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [

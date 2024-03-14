@@ -260,7 +260,7 @@ describe('createUser handler', () => {
 
     expect(fetch.mock.calls.length).toBe(3)
     expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
+      'http://localhost:3447/fhir/Practitioner/123'
     )
     expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)

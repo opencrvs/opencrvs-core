@@ -26,9 +26,9 @@ import {
 } from '@client/notification/actions'
 import { IStoreState } from '@client/store'
 import {
-  addCorrectionDetails,
   appendGqlMetadataFromDraft,
-  draftToGqlTransformer
+  draftToGqlTransformer,
+  getChangedValues
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
@@ -117,6 +117,14 @@ function isCorrectionAction(action: SubmissionAction) {
   ].includes(action)
 }
 
+function isValidationAction(action: SubmissionAction) {
+  return [SubmissionAction.APPROVE_DECLARATION].includes(action)
+}
+
+function isRegisterAction(action: SubmissionAction) {
+  return [SubmissionAction.REGISTER_DECLARATION].includes(action)
+}
+
 async function removeDuplicatesFromCompositionAndElastic(
   declaration: IDeclaration,
   submissionAction: SubmissionAction
@@ -166,7 +174,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const form = getRegisterForm(getState())[event]
     const offlineData = getOfflineData(getState())
-    let graphqlPayload = getGqlDetails(
+    const graphqlPayload = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
       getOfflineData(getState()),
@@ -174,12 +182,20 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     )
 
     if (isCorrectionAction(submissionAction)) {
-      graphqlPayload = addCorrectionDetails(
-        form,
-        declaration,
-        graphqlPayload,
-        offlineData
-      )
+      const changedValues = getChangedValues(form, declaration, offlineData)
+      graphqlPayload.registration ??= {}
+      graphqlPayload.registration.correction =
+        declaration.data.registration.correction ?? {}
+      graphqlPayload.registration.correction.values = changedValues
+    }
+
+    if (
+      isValidationAction(submissionAction) ||
+      isRegisterAction(submissionAction)
+    ) {
+      const changedValues = getChangedValues(form, declaration, offlineData)
+      graphqlPayload.registration ??= {}
+      graphqlPayload.registration.changedValues = changedValues
     }
 
     //then add payment while issue declaration
@@ -253,7 +269,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             }
           })
         }
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {
@@ -283,7 +302,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
         return
       } else {
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {

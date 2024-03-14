@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@workflow/*": ["./*"]
+      "@test/*": ["../test/*"],
+      "@workflow/*": ["./*"],
     },
     "target": "es6",
     "module": "commonjs",
@@ -20,6 +21,6 @@
     "types": ["fhir", "jest"],
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "typings"],
+  "include": ["src/**/*.ts", "typings", "test/**/*.ts"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }
