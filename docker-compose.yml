@@ -46,8 +46,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
-      - FHIR_URL=http://openhim-core:5001/fhir
-      - HEARTH_URL=http://hearth:3447/fhir
+      - FHIR_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
@@ -75,8 +74,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - HEARTH_URL=http://hearth:3447/fhir
-      - OPENHIM_URL=http://openhim-core:5001
+      - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
@@ -90,7 +88,7 @@ services:
       - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
-      - HEARTH_URL=http://hearth:3447/fhir
+      - FHIR_URL=http://hearth:3447/fhir
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION}
     build:
@@ -103,13 +101,13 @@ services:
       - INFLUX_DB=ocrvs
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
-      - FHIR_URL=http://openhim-core:5001/fhir
       - MONGO_URL=mongodb://mongo1/metrics
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
+      - FHIR_URL=http://hearth:3447/fhir
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION}
@@ -142,9 +140,9 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-      - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
+      - FHIR_URL=http://hearth:3447/fhir
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     build:
@@ -156,9 +154,9 @@ services:
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
+      - FHIR_URL=http://hearth:3447/fhir
   notification:
     image: opencrvs/ocrvs-notification:${VERSION}
     build:
@@ -181,7 +179,6 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
-      - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/

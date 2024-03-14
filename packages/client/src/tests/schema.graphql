@@ -1014,7 +1014,6 @@ union MixedTotalMetricsResult =
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
-
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
@@ -1057,7 +1056,7 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsVoided(id: String!, reason: String!, comment: String!): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
@@ -1247,7 +1246,6 @@ type Payment {
 input PaymentInput {
   paymentId: ID
   type: PaymentType
-  total: Float
   amount: Float
   outcome: PaymentOutcomeType
   date: Date

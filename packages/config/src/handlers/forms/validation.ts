@@ -336,6 +336,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'informantNidVerification',
     'primaryAddressSameAsOtherPrimary',
     'informantBirthDate',
+    'occupation',
     'nationality',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
@@ -435,7 +436,7 @@ const form = z.object({
     .refine(
       (sections) =>
         sections.filter(({ id }) =>
-          REQUIRED_SECTIONS.includes(id as typeof REQUIRED_SECTIONS[number])
+          REQUIRED_SECTIONS.includes(id as (typeof REQUIRED_SECTIONS)[number])
         ).length >= 2,
       {
         message: `${REQUIRED_SECTIONS.map((sec) => `"${sec}"`).join(

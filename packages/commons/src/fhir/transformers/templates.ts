@@ -19,17 +19,22 @@ import {
   Location,
   Observation,
   Patient,
-  PaymentReconciliation,
   Practitioner,
   QuestionnaireResponse,
   RelatedPerson,
   Section,
   Task
 } from '..'
-import { EVENT_TYPE, PartialBy } from '../../types'
+import {
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  CompositionSectionTitle,
+  CompositionSectionTitleByCode,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  EVENT_TYPE,
+  PartialBy
+} from '../../types'
 import { UUID } from '../../uuid'
 
-export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
 export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
@@ -49,18 +54,6 @@ export const OBSERVATION_CATEGORY_PROCEDURE_CODE = 'procedure'
 export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
 export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
 export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
-export const MOTHER_TITLE = "Mother's details"
-export const FATHER_TITLE = "Father's details"
-export const SPOUSE_TITLE = "Spouse's details"
-export const CHILD_TITLE = 'Child details'
-export const DECEASED_TITLE = 'Deceased details'
-export const INFORMANT_TITLE = "Informant's details"
-export const WITNESS_ONE_TITLE = "Witness One's details"
-export const WITNESS_TWO_TITLE = "Witness Two's details"
-export const BRIDE_TITLE = "Bride's details"
-export const GROOM_TITLE = "Groom's details"
-export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
-export const CERTIFICATE_DOCS_TITLE = 'Certificates'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
 export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 export const DEATH_ENCOUNTER_CODE = 'death-encounter'
@@ -71,15 +64,11 @@ export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 export const DEATH_DESCRIPTION_CODE =
   'lay-reported-or-verbal-autopsy-description'
 export const PARENT_DETAILS = 'parent-details'
-export const BIRTH_CORRECTION_ENCOUNTER_CODE = 'birth-correction-encounters'
-export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
-export const MARRIAGE_CORRECTION_ENCOUNTER_CODE =
-  'marriage-correction-encounters'
 
 export function createPersonSection<T extends CompositionSectionCode>(
   refUuid: UUID,
   sectionCode: T,
-  sectionTitle: string
+  sectionTitle: CompositionSectionTitleByCode<T>
 ): Section<T> {
   return {
     title: sectionTitle,
@@ -113,7 +102,7 @@ export function createLocationResource(refUuid: UUID): BundleEntry<Location> {
 export function createEncounterSection<
   T extends CompositionSectionEncounterReference
 >(refUuid: UUID, sectionCode: T): Section<T> {
-  let sectionTitle
+  let sectionTitle: CompositionSectionTitle
   if (sectionCode === BIRTH_ENCOUNTER_CODE) {
     sectionTitle = 'Birth encounter'
   } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
@@ -164,16 +153,6 @@ export function createRelatedPersonTemplate(refUuid: UUID) {
       resourceType: 'RelatedPerson' as const
     }
   } satisfies BundleEntry<PartialBy<RelatedPerson, 'patient'>>
-}
-
-export function createPaymentReconciliationTemplate(refUuid: UUID) {
-  return {
-    fullUrl: `urn:uuid:${refUuid}` as const,
-    resource: {
-      resourceType: 'PaymentReconciliation',
-      status: 'active'
-    }
-  } satisfies BundleEntry<PaymentReconciliation>
 }
 
 export function createCompositionTemplate(
@@ -258,7 +237,7 @@ export function createPractitionerEntryTemplate(
 
 export function createSupportingDocumentsSection<
   T extends CompositionSectionCode
->(sectionCode: T, sectionTitle: string): Section<T> {
+>(sectionCode: T, sectionTitle: CompositionSectionTitleByCode<T>): Section<T> {
   return {
     title: sectionTitle,
     code: {
@@ -343,31 +322,5 @@ export function createQuestionnaireResponseTemplate(
       extension: [],
       status: 'completed'
     }
-  }
-}
-
-export async function removeDuplicatesFromComposition(
-  composition: Composition,
-  compositionId: string,
-  duplicateId?: string
-) {
-  if (duplicateId) {
-    const removeAllDuplicates = compositionId === duplicateId
-    const updatedRelatesTo =
-      composition.relatesTo &&
-      composition.relatesTo.filter((relatesTo) => {
-        return (
-          relatesTo.code !== 'duplicate' ||
-          (!removeAllDuplicates &&
-            relatesTo.targetReference &&
-            relatesTo.targetReference.reference !==
-              `Composition/${duplicateId}`)
-        )
-      })
-    composition.relatesTo = updatedRelatesTo
-    return composition
-  } else {
-    composition.relatesTo = []
-    return composition
   }
 }

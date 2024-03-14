@@ -15,7 +15,6 @@ import {
   GQLAddressType,
   GQLAddressUse,
   GQLGender,
-  GQLPaymentType,
   GQLTelecomSystem,
   GQLTelecomUse
 } from '@gateway/graphql/schema'
@@ -155,26 +154,6 @@ test('should build a minimal FHIR registration document without error', async ()
             createdAt: '2018-10-22',
             subject: 'MOTHER'
           }
-        ],
-        certificates: [
-          {
-            collector: {
-              relationship: 'OTHER',
-              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-              identifier: [{ id: '123456', type: 'PASSPORT' }]
-            },
-            hasShowedVerifiedDocument: true,
-            payments: [
-              {
-                paymentId: '1234',
-                type: GQLPaymentType.MANUAL,
-                total: 50.0,
-                amount: 50.0,
-                date: '2018-10-22'
-              }
-            ],
-            data: 'DUMMY-DATA'
-          }
         ]
       },
       eventLocation: {
@@ -209,7 +188,7 @@ test('should build a minimal FHIR registration document without error', async ()
     'DEATH' as EVENT_TYPE
   ) as any
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(8)
+  expect(fhir.entry[0].resource.section.length).toBe(7)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[0].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd'

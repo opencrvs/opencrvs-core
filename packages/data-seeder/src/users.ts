@@ -11,10 +11,13 @@
 import fetch from 'node-fetch'
 import { ACTIVATE_USERS, COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import { z } from 'zod'
-import { parseGQLResponse, raise } from './utils'
+import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
+
+const MAX_RETRY = 5
+const RETRY_DELAY_IN_MILLISECONDS = 5000
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -124,68 +127,85 @@ async function getOfficeIdFromIdentifier(identifier: string) {
   return locationBundle.entry?.[0]?.resource?.id
 }
 
+async function callCreateUserMutation(token: string, userPayload: unknown) {
+  return fetch(`${GATEWAY_HOST}/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: createUserMutation,
+      variables: {
+        user: userPayload
+      }
+    })
+  })
+}
+
 export async function seedUsers(
   token: string,
   roleIdMap: Record<string, string | undefined>
 ) {
   const rawUsers = await getUseres()
-  await Promise.all(
-    rawUsers.map(async (userMetadata) => {
-      const {
-        givenNames,
-        familyName,
-        role,
-        primaryOfficeId: officeIdentifier,
-        username,
-        ...user
-      } = userMetadata
-      if (await userAlreadyExists(token, username)) {
-        console.log(
-          `User with the username "${username}" already exists. Skipping user "${username}"`
-        )
-        return
+  for (const userMetadata of rawUsers) {
+    const {
+      givenNames,
+      familyName,
+      role,
+      primaryOfficeId: officeIdentifier,
+      username,
+      ...user
+    } = userMetadata
+    if (await userAlreadyExists(token, username)) {
+      console.log(
+        `User with the username "${username}" already exists. Skipping user "${username}"`
+      )
+      continue
+    }
+    const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
+    if (!primaryOffice) {
+      console.log(
+        `No office found with id ${officeIdentifier}. Skipping user "${username}"`
+      )
+      continue
+    }
+    if (!roleIdMap[role]) {
+      console.log(
+        `Role "${role}" is not recognized by system. Skipping user "${username}"`
+      )
+      continue
+    }
+    const userPayload = {
+      ...user,
+      role: roleIdMap[role],
+      name: [
+        {
+          use: 'en',
+          familyName,
+          firstNames: givenNames
+        }
+      ],
+      ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
+      primaryOffice,
+      username
+    }
+    let tryNumber = 0
+    let jsonRes
+    let res
+    do {
+      ++tryNumber
+      if (tryNumber > 1) {
+        await delay(RETRY_DELAY_IN_MILLISECONDS)
+        console.log('Trying again for time: ', tryNumber)
       }
-      const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
-      if (!primaryOffice) {
-        console.log(
-          `No office found with id ${officeIdentifier}. Skipping user "${username}"`
-        )
-        return
-      }
-      if (!roleIdMap[role]) {
-        console.log(
-          `Role "${role}" is not recognized by system. Skipping user "${username}"`
-        )
-        return
-      }
-      const userPayload = {
-        ...user,
-        role: roleIdMap[role],
-        name: [
-          {
-            use: 'en',
-            familyName,
-            firstNames: givenNames
-          }
-        ],
-        ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
-        primaryOffice,
-        username
-      }
-      const res = await fetch(`${GATEWAY_HOST}/graphql`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          query: createUserMutation,
-          variables: {
-            user: userPayload
-          }
-        })
-      })
-      parseGQLResponse(await res.json())
-    })
-  )
+      res = await callCreateUserMutation(token, userPayload)
+      jsonRes = await res.json()
+    } while (
+      tryNumber < MAX_RETRY &&
+      'errors' in jsonRes &&
+      jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
+    )
+    parseGQLResponse(jsonRes)
+  }
 }

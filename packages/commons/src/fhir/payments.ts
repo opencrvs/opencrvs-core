@@ -10,10 +10,39 @@
  */
 import { BundleEntry, Resource } from '.'
 
-export type PaymentReconciliationDetail = fhir3.PaymentReconciliationDetail
+export type Money = Omit<fhir3.Money, 'value'> & {
+  value: NonNullable<fhir3.Money['value']>
+}
 
-export type PaymentReconciliation = fhir3.PaymentReconciliation
-export type Money = fhir3.Money
+export type PaymentReconciliationDetail = Omit<
+  fhir3.PaymentReconciliationDetail,
+  'date' | 'amount' | 'type'
+> & {
+  amount: Money
+  date: string
+  type: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code'> & {
+        code: 'MANUAL'
+      }
+    >
+  }
+}
+
+export type PaymentReconciliation = Omit<
+  fhir3.PaymentReconciliation,
+  'total' | 'detail' | 'outcome'
+> & {
+  total: Money
+  detail: PaymentReconciliationDetail[]
+  outcome: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code'> & {
+        code: 'COMPLETED' | 'ERROR' | 'PARTIAL'
+      }
+    >
+  }
+}
 
 export function isPaymentReconciliation(
   resource: Resource

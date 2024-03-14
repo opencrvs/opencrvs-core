@@ -202,7 +202,7 @@ export const testFhirBundle: StrictBundle<
         businessStatus: {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/status',
+              system: 'http://opencrvs.org/specs/reg-status',
               code: 'DECLARED'
             }
           ]
@@ -1098,6 +1098,284 @@ export const officeMock = JSON.stringify({
   }
 })
 
+export const stateMock = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/statistical-code',
+      value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+      value: 'STATE'
+    }
+  ],
+  name: 'Central',
+  alias: ['Central'],
+  description: 'AWn3s2RqgAN',
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/0'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'ADMIN_STRUCTURE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'jdn',
+        display: 'Jurisdiction'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+      valueAttachment: {
+        contentType: 'application/geo+json',
+        data: '<base64>'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString:
+        '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString:
+        '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString:
+        '[{"2007":40000},{"2008":40000},{"2009":40000},{"2010":40000},{"2011":40000},{"2012":40000},{"2013":40000},{"2014":40000},{"2015":40000},{"2016":40000},{"2017":40000},{"2018":40000},{"2019":40000},{"2020":40000},{"2021":40000},{"2022":60000},{"2023":80000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString:
+        '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.122+00:00',
+    versionId: '39745e77-c524-4f12-b393-4ae1e03d756e'
+  },
+  id: 'f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+})
+
+export const districtMockOfState = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/statistical-code',
+      value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+      value: 'DISTRICT'
+    }
+  ],
+  name: 'Ibombo',
+  alias: ['Ibombo'],
+  description: 'oEBf29y8JP8',
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'ADMIN_STRUCTURE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'jdn',
+        display: 'Jurisdiction'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+      valueAttachment: {
+        contentType: 'application/geo+json',
+        data: '<base64>'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString:
+        '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString:
+        '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString:
+        '[{"2007":10000},{"2008":10000},{"2009":10000},{"2010":10000},{"2011":10000},{"2012":10000},{"2013":10000},{"2014":10000},{"2015":10000},{"2016":10000},{"2017":10000},{"2018":10000},{"2019":10000},{"2020":10000},{"2021":10000},{"2022":15000},{"2023":20000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString:
+        '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.118+00:00',
+    versionId: 'b16c3805-ea38-468c-8031-23d6323583d8'
+  },
+  id: '59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+})
+
+export const officeMockOfDistrict = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/internal-id',
+      value: 'CRVS_OFFICE_JWMRGwDBXK'
+    }
+  ],
+  name: 'Ibombo District Office',
+  alias: ['Ibombo District Office'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'CRVS_OFFICE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.119+00:00',
+    versionId: 'baf90709-d589-47f1-bb9e-7631e76a4ab8'
+  },
+  id: 'd4ea52d2-0da7-4f40-8073-cf29fd0685c0'
+})
+
+export const practitionerRoleMock = JSON.stringify({
+  resourceType: 'Bundle',
+  id: '1d4c5877-abab-4e7b-9eca-49bbd6d50c0f',
+  meta: {
+    lastUpdated: '2023-11-23T11:09:02.340+00:00'
+  },
+  type: 'searchset',
+  total: 1,
+  link: [
+    {
+      relation: 'self',
+      url: 'http://localhost:3447/fhir/PractitionerRole?practitioner=5e530833-956a-4f98-af57-6edb315fe6bb'
+    }
+  ],
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/PractitionerRole/3aec06d1-90e8-4a8f-aaef-8de22875a0ee/_history/8d386f4f-6dce-4365-9f53-f817f27c97ed',
+      resource: {
+        resourceType: 'PractitionerRole',
+        practitioner: {
+          reference: 'Practitioner/5e530833-956a-4f98-af57-6edb315fe6bb'
+        },
+        code: [
+          {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/roles',
+                code: 'LOCAL_REGISTRAR'
+              }
+            ]
+          },
+          {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/types',
+                code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
+              }
+            ]
+          }
+        ],
+        location: [
+          {
+            reference: 'Location/d4ea52d2-0da7-4f40-8073-cf29fd0685c0'
+          },
+          {
+            reference: 'Location/59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+          },
+          {
+            reference: 'Location/f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+          }
+        ],
+        meta: {
+          lastUpdated: '2023-11-22T12:15:05.121+00:00',
+          versionId: '8d386f4f-6dce-4365-9f53-f817f27c97ed'
+        },
+        id: '3aec06d1-90e8-4a8f-aaef-8de22875a0ee'
+      },
+      request: {
+        method: 'PUT',
+        url: 'PractitionerRole/3aec06d1-90e8-4a8f-aaef-8de22875a0ee'
+      }
+    }
+  ]
+})
+
+export const registrarMock = JSON.stringify({
+  resourceType: 'Practitioner',
+  identifier: [],
+  telecom: [
+    {
+      system: 'phone',
+      value: '0933333333'
+    },
+    {
+      system: 'email',
+      value: ''
+    }
+  ],
+  name: [
+    {
+      use: 'en',
+      family: 'Mweene',
+      given: ['Kennedy']
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.116+00:00',
+    versionId: 'fc468c8c-85c5-4833-95d9-75223f6c756a'
+  },
+  _request: {
+    method: 'PUT'
+  },
+  id: '5e530833-956a-4f98-af57-6edb315fe6bb'
+})
+
 export const informantSMSNotificationMock = [
   {
     _id: '63a30240ee4b270dc91f53d0',
@@ -1892,7 +2170,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
         title: 'Marriage Declaration',
         section: [
           {
-            title: 'Groom details',
+            title: "Groom's details",
             code: {
               coding: [
                 {
@@ -1900,7 +2178,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'groom-details'
                 }
               ],
-              text: 'Groom details'
+              text: "Groom's details"
             },
             entry: [
               {
@@ -1910,7 +2188,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
             ]
           },
           {
-            title: 'Bride details',
+            title: "Bride's details",
             code: {
               coding: [
                 {
@@ -1918,7 +2196,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
                   code: 'bride-details'
                 }
               ],
-              text: 'Bride details'
+              text: "Bride's details"
             },
             entry: [
               {
@@ -1947,7 +2225,7 @@ export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
         businessStatus: {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/status',
+              system: 'http://opencrvs.org/specs/reg-status',
               code: 'IN_PROGRESS'
             }
           ]
@@ -2275,6 +2553,8 @@ export const mockFormDraft = [
     __v: 0
   }
 ]
+type PatientIdentifier = NonNullable<Patient['identifier']>[number]
+
 const drnIdentifier = {
   type: {
     coding: [
@@ -2285,7 +2565,7 @@ const drnIdentifier = {
     ]
   },
   value: '2022DSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const nidIdentifier = {
   value: '654654666',
@@ -2297,7 +2577,7 @@ const nidIdentifier = {
       }
     ]
   }
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const brnIdentifier = {
   type: {
@@ -2309,7 +2589,7 @@ const brnIdentifier = {
     ]
   },
   value: '2022BSNEYUG'
-} as fhir3.CodeableConcept
+} satisfies PatientIdentifier
 
 const mosipPsutTokenIdentifier = {
   type: {
@@ -2335,13 +2615,13 @@ const birthPatientIdentifier = {
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
 } as fhir3.CodeableConcept
 
-export const mosipDeceasedPatientMock: Patient = {
+export const mosipDeceasedPatientMock: Saved<Patient> = {
   resourceType: 'Patient',
   active: true,
-  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1' as UUID,
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
       family: ['Hasan']
     }
@@ -2358,7 +2638,7 @@ export const mosipUpdatedDeceasedPatientMock = {
   id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
       family: ['Hasan']
     }
@@ -2386,7 +2666,7 @@ export const mosipBirthPatientMock = {
   identifier: [brnIdentifier, mosipPsutTokenIdentifier]
 }
 
-export const mosipBirthPatientBundleMock = JSON.stringify({
+export const mosipBirthPatientBundleMock = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -2395,7 +2675,7 @@ export const mosipBirthPatientBundleMock = JSON.stringify({
       resource: mosipBirthPatientMock
     }
   ]
-})
+}
 
 export const mosipErrorMock = JSON.stringify({
   transactionID: '6810356436',
@@ -2414,7 +2694,7 @@ export const mosipErrorMock = JSON.stringify({
     authToken: '278978890917620599774520674456334033'
   }
 })
-export const mosipSuccessMock = JSON.stringify({
+export const mosipSuccessMock = {
   transactionID: '5763906453',
   version: '1.0',
   id: 'mosip.identity.auth',
@@ -2424,7 +2704,7 @@ export const mosipSuccessMock = JSON.stringify({
     authStatus: true,
     authToken: '257803821990055124230310596669133515'
   }
-})
-export const mosipConfigMock = JSON.stringify([
+}
+export const mosipConfigMock = [
   { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
-])
+]

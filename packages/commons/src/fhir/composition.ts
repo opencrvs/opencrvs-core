@@ -8,7 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Reference, ResourceIdentifier, SavedReference, URNReference } from '.'
+import { Reference, SavedReference, SavedComposition, Composition } from '.'
+
+export const MOTHER_TITLE = "Mother's details"
+export const FATHER_TITLE = "Father's details"
+export const SPOUSE_TITLE = "Spouse's details"
+export const CHILD_TITLE = 'Child details'
+export const DECEASED_TITLE = 'Deceased details'
+export const INFORMANT_TITLE = "Informant's details"
+export const WITNESS_ONE_TITLE = "Witness One's details"
+export const WITNESS_TWO_TITLE = "Witness Two's details"
+export const BRIDE_TITLE = "Bride's details"
+export const GROOM_TITLE = "Groom's details"
+
+export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
+
+export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
+export const CERTIFICATE_DOCS_TITLE = 'Certificates'
+
+export const BIRTH_ENCOUNTER_TITLE = 'Birth encounter'
+export const MARRIAGE_ENCOUNTER_TITLE = 'Marriage encounter'
+export const DEATH_ENCOUNTER_TITLE = 'Death encounter'
+export const BIRTH_CORRECTION_ENCOUNTER_TITLE = 'Birth correction encounters'
+export const DEATH_CORRECTION_ENCOUNTER_TITLE = 'Death correction encounters'
+export const MARRIAGE_CORRECTION_ENCOUNTER_TITLE =
+  'Marriage correction encounters'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -45,58 +69,98 @@ export type CompositionSectionEncounterReference =
 type ReferenceType =
   | {
       code: typeof ATTACHMENT_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof ATTACHMENT_DOCS_TITLE
     }
   | {
       code: typeof CORRECTION_CERTIFICATE_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof CORRECTION_CERTIFICATE_DOCS_TITLE
     }
   | {
       code: typeof CERTIFICATE_DOCS_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof CERTIFICATE_DOCS_TITLE
     }
   | {
       code: typeof BIRTH_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof BIRTH_ENCOUNTER_TITLE
     }
   | {
       code: typeof MARRIAGE_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof MARRIAGE_ENCOUNTER_TITLE
     }
   | {
       code: typeof DEATH_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof DEATH_ENCOUNTER_TITLE
     }
   | {
       code: typeof BIRTH_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof BIRTH_CORRECTION_ENCOUNTER_TITLE
     }
   | {
       code: typeof DEATH_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof DEATH_CORRECTION_ENCOUNTER_TITLE
     }
   | {
       code: typeof MARRIAGE_CORRECTION_ENCOUNTER_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof MARRIAGE_CORRECTION_ENCOUNTER_TITLE
     }
-  | { code: typeof MOTHER_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof FATHER_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof CHILD_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof DECEASED_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof SPOUSE_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof BRIDE_CODE; reference: ResourceIdentifier | URNReference }
-  | { code: typeof GROOM_CODE; reference: ResourceIdentifier | URNReference }
+  | {
+      code: typeof MOTHER_CODE
+      reference: Reference['reference']
+      title: typeof MOTHER_TITLE
+    }
+  | {
+      code: typeof FATHER_CODE
+      reference: Reference['reference']
+      title: typeof FATHER_TITLE
+    }
+  | {
+      code: typeof CHILD_CODE
+      reference: Reference['reference']
+      title: typeof CHILD_TITLE
+    }
+  | {
+      code: typeof DECEASED_CODE
+      reference: Reference['reference']
+      title: typeof DECEASED_TITLE
+    }
+  | {
+      code: typeof SPOUSE_CODE
+      reference: Reference['reference']
+      title: typeof SPOUSE_TITLE
+    }
+  | {
+      code: typeof BRIDE_CODE
+      reference: Reference['reference']
+      title: typeof BRIDE_TITLE
+    }
+  | {
+      code: typeof GROOM_CODE
+      reference: Reference['reference']
+      title: typeof GROOM_TITLE
+    }
   | {
       code: typeof INFORMANT_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof INFORMANT_TITLE
     }
   | {
       code: typeof WITNESS_ONE_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof WITNESS_ONE_TITLE
     }
   | {
       code: typeof WITNESS_TWO_CODE
-      reference: ResourceIdentifier | URNReference
+      reference: Reference['reference']
+      title: typeof WITNESS_TWO_TITLE
     }
 
 export type CompositionSectionCode = ReferenceType['code']
@@ -106,8 +170,12 @@ type ReferenceTypeByCode<U extends CompositionSectionCode> = Extract<
   { code: U }
 >
 
+export type CompositionSectionTitleByCode<T extends CompositionSectionCode> =
+  ReferenceTypeByCode<T>['title']
+export type CompositionSectionTitle = ReferenceType['title']
+
 export type Section<Code extends CompositionSectionCode> = {
-  title: string
+  title: ReferenceType['title'] // ReferenceTypeByCode<Code>['title'] requires ts ^5.1.2
   code: {
     coding: Array<{
       system:
@@ -115,7 +183,7 @@ export type Section<Code extends CompositionSectionCode> = {
         | 'http://opencrvs.org/specs/sections'
       code: Code
     }>
-    text: string
+    text: ReferenceType['title'] // ReferenceTypeByCode<Code>['title'] requires ts ^5.1.2
   }
   entry: Array<
     Omit<Reference, 'reference'> & {
@@ -131,4 +199,23 @@ export type CompositionSection = Section<ReferenceType['code']>
 
 export type SavedCompositionSection = Omit<CompositionSection, 'entry'> & {
   entry: Array<SavedReference>
+}
+
+export function addRelatesToToComposition(
+  composition: Composition | SavedComposition,
+  relatesTo: NonNullable<Composition['relatesTo']>
+) {
+  return {
+    ...composition,
+    relatesTo: (composition.relatesTo ?? [])
+      .filter(
+        (rlt) =>
+          !relatesTo.some((r) => {
+            return (
+              r.targetReference?.reference === rlt.targetReference?.reference
+            )
+          })
+      )
+      .concat(relatesTo)
+  }
 }
