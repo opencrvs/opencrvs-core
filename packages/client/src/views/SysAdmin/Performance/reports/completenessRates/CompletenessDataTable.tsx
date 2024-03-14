@@ -16,7 +16,6 @@ import {
   COMPLETENESS_RATE_REPORT_BASE
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
