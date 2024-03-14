@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { model, Schema } from 'mongoose'
+import { InferSchemaType, model, Schema, Types } from 'mongoose'
 
 const errorSchema = {
   statusCode: { type: Number },
@@ -27,4 +27,7 @@ const notificationQueueSchema = new Schema({
   error: { type: errorSchema }
 })
 
+export type NotificationQueueRecord = { _id: Types.ObjectId } & InferSchemaType<
+  typeof notificationQueueSchema
+>
 export default model('NotificationQueue', notificationQueueSchema)

@@ -9,8 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { COUNTRY_CONFIG_URL } from '@notification/constants'
-import NotificationQueue from '@notification/model/notificationQueue'
+import NotificationQueue, {
+  NotificationQueueRecord
+} from '@notification/model/notificationQueue'
 import { AllUsersEmailPayloadSchema } from '@notification/features/email/all-user-handler'
+import { logger } from '@notification/logger'
+
+let isLoopInprogress = false
 
 async function notifyCountryConfig(payload: AllUsersEmailPayloadSchema) {
   const res = await fetch(`${COUNTRY_CONFIG_URL}/allUsersEmail`, {
@@ -29,39 +34,59 @@ async function notifyCountryConfig(payload: AllUsersEmailPayloadSchema) {
 
 export async function sendAllUserEmails(payload: AllUsersEmailPayloadSchema) {
   await NotificationQueue.create(payload)
-  await loopThroughQueue()
+  if (!isLoopInprogress) {
+    loopNotificationQueue()
+  }
   return {
     success: true
   }
 }
 
-async function loopThroughQueue() {
-  let record = await NotificationQueue.findOne({
+async function findOldestNotificationQueueRecord() {
+  return await NotificationQueue.findOne({
     status: { $ne: 'failed' }
   }).sort({ createdAt: -1 })
+}
 
+async function dispatch(record: NotificationQueueRecord) {
+  await notifyCountryConfig({
+    subject: record.subject,
+    body: record.body,
+    bcc: record.bcc
+  })
+  await NotificationQueue.deleteOne({ _id: record._id })
+}
+
+async function markQueueRecordFailedWithErrorDetails(
+  record: NotificationQueueRecord,
+  e: Error & { statusCode: number; error: string }
+) {
+  await NotificationQueue.updateOne(
+    { _id: record._id },
+    {
+      status: 'failed',
+      error: {
+        statusCode: e.statusCode,
+        message: e.message,
+        error: e.error
+      }
+    }
+  )
+}
+
+export async function loopNotificationQueue() {
+  isLoopInprogress = true
+  let record = await findOldestNotificationQueueRecord()
   while (record) {
     try {
-      await notifyCountryConfig({
-        subject: record.subject,
-        body: record.body,
-        bcc: record.bcc
-      })
-    } catch (e) {
-      await NotificationQueue.updateOne(
-        { _id: record._id },
-        {
-          status: 'failed',
-          error: {
-            statusCode: e.statusCode,
-            message: e.message,
-            error: e.error
-          }
-        }
+      logger.info(
+        `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
       )
+      await dispatch(record)
+    } catch (e) {
+      await markQueueRecordFailedWithErrorDetails(record, e)
     }
-    record = await NotificationQueue.findOne({
-      status: { $ne: 'failed' }
-    }).sort({ createdAt: -1 })
+    record = await findOldestNotificationQueueRecord()
   }
+  isLoopInprogress = false
 }
