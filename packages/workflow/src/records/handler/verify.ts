@@ -10,7 +10,7 @@
  */
 import * as z from 'zod'
 import * as Hapi from '@hapi/hapi'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { getRecordById } from '@workflow/records/index'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { toVerified } from '@workflow/records/state-transitions'

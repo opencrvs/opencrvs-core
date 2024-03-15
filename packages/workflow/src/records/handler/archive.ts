@@ -10,7 +10,7 @@
  */
 import * as z from 'zod'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'

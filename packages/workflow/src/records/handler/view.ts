@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { getToken, getTokenPayload } from '@workflow/utils/authUtils'
+import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { getValidRecordById } from '@workflow/records/index'
 import { getPractitionerOffice, getUser } from '@workflow/features/user/utils'
 import { Bundle, Location } from '@opencrvs/commons/types'

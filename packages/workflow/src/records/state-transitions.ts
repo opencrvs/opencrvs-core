@@ -64,7 +64,7 @@ import {
   updatePatientIdentifierWithRN,
   validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { IEventRegistrationCallbackPayload } from '@workflow/features/registration/handler'
+import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   getTaskEventType,
@@ -452,9 +452,9 @@ export async function toRegistered(
   request: Hapi.Request,
   record: WaitingForValidationRecord,
   practitioner: Practitioner,
-  registrationNumber: IEventRegistrationCallbackPayload['registrationNumber'],
+  registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
+  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions = createRegisterTask(

@@ -15,9 +15,9 @@ import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import {
   getInformantSMSNotification,
   InformantNotificationName
-} from '@workflow/features/registration/smsNotificationUtils'
+} from '@workflow/features/registration/sms-notification-utils'
 import { internal } from '@hapi/boom'
-import { RecordEvent } from './recordEvents'
+import { RecordEvent } from './record-events'
 
 type NotificationEvent = Extract<
   RecordEvent,
