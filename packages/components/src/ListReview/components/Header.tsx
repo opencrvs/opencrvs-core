@@ -20,7 +20,8 @@ export const HeaderContainer = styled.tr`
     ${({ theme }) => theme.fonts.bold12};
 
     @media screen and (max-width: 768px) {
-       display: none;
+      display: none;
+    }
   }
 
   th:first-child {
