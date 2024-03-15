@@ -7990,12 +7990,6 @@
             "deprecationReason": null
           },
           {
-            "name": "OSIA",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "OTHER",
             "description": null,
             "isDeprecated": false,

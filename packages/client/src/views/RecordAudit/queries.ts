@@ -39,6 +39,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -49,6 +50,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -59,6 +61,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
@@ -67,6 +70,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleName
             familyName
           }
         }
