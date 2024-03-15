@@ -1013,9 +1013,20 @@ export function createUnassignedTask(
 
 export function createCertifiedTask(
   previousTask: SavedTask,
-  practitioner: Practitioner
+  practitioner: Practitioner,
+  collectorRelationship: string
 ): SavedTask {
-  return createNewTaskResource(previousTask, [], practitioner.id, 'CERTIFIED')
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+        valueString: collectorRelationship
+      }
+    ],
+    practitioner.id,
+    'CERTIFIED'
+  )
 }
 
 export function createIssuedTask(

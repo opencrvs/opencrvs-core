@@ -978,7 +978,8 @@ export async function toCertified(
 
   const taskWithoutPractitionerExtensions = createCertifiedTask(
     previousTask,
-    practitioner
+    practitioner,
+    certificateDetails.collector.relationship
   )
 
   const [certifiedTask, practitionerResourcesBundle] =
