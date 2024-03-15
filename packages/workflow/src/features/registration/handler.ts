@@ -8,21 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
-import { getEventType } from '@workflow/features/registration/utils'
-import { EVENT_TYPE } from '@opencrvs/commons/types'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { indexBundle } from '@workflow/records/search'
-import {
-  isNotificationEnabled,
-  sendNotification
-} from '@workflow/records/notification'
-import { auditEvent } from '@workflow/records/audit'
+import { handleSideEffects } from './side-effects'
 
-export interface IEventRegistrationCallbackPayload {
+export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
   error: string
@@ -39,7 +32,7 @@ export async function markEventAsRegisteredCallbackHandler(
 ) {
   const token = getToken(request)
   const { registrationNumber, error, childIdentifiers, compositionId } =
-    request.payload as IEventRegistrationCallbackPayload
+    request.payload as EventRegistrationPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -55,9 +48,7 @@ export async function markEventAsRegisteredCallbackHandler(
   }
   const practitioner = await getLoggedInPractitionerResource(getToken(request))
 
-  const event = getEventType(savedRecord)
-
-  const registeredBundle = await toRegistered(
+  const bundle = await toRegistered(
     request,
     savedRecord,
     practitioner,
@@ -65,16 +56,8 @@ export async function markEventAsRegisteredCallbackHandler(
     token,
     childIdentifiers
   )
-  await indexBundle(registeredBundle, getToken(request))
-  await auditEvent('registered', registeredBundle, token)
 
-  // Notification not implemented for marriage yet
-  if (
-    event !== EVENT_TYPE.MARRIAGE &&
-    (await isNotificationEnabled('registered', event, token))
-  ) {
-    await sendNotification('registered', registeredBundle, token)
-  }
+  await handleSideEffects({ bundle, token })
 
-  return h.response(registeredBundle).code(200)
+  return h.response(bundle).code(200)
 }
