@@ -19,7 +19,7 @@ const WEBHOOK_URLS = {
     '/events/marriage/mark-registered',
     WEBHOOKS_URL
   )
-}
+} satisfies Record<EVENT_TYPE, URL>
 
 export const dispatchWebhook = async ({
   bundle,
