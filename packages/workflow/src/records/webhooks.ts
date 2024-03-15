@@ -21,7 +21,7 @@ const WEBHOOK_URLS = {
   )
 } satisfies Record<EVENT_TYPE, URL>
 
-export const dispatchWebhook = async ({
+export const invokeWebhooks = async ({
   bundle,
   token,
   event

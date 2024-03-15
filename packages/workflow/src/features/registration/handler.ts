@@ -13,7 +13,14 @@ import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { handleSideEffects } from './side-effects'
+import { getEventType } from './utils'
+import { indexBundle } from '@workflow/records/search'
+import { auditEvent } from '@workflow/records/audit'
+import {
+  isNotificationEnabled,
+  sendNotification
+} from '@workflow/records/notification'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 
 export interface EventRegistrationPayload {
   trackingId: string
@@ -56,8 +63,16 @@ export async function markEventAsRegisteredCallbackHandler(
     token,
     childIdentifiers
   )
+  const event = getEventType(bundle)
 
-  await handleSideEffects({ bundle, token })
+  await indexBundle(bundle, token)
+  await auditEvent('registered', bundle, token)
+
+  if (await isNotificationEnabled('registered', event, token)) {
+    await sendNotification('registered', bundle, token)
+  }
+
+  await invokeWebhooks({ bundle, token, event })
 
   return h.response(bundle).code(200)
 }
