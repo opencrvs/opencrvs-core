@@ -667,50 +667,37 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
+const NAME_TO_IDENTIFIER = {
+  district: 'DISTRICT',
+  state: 'STATE',
+  locationLevel3: 'LOCATION_LEVEL_3',
+  locationLevel4: 'LOCATION_LEVEL_4',
+  locationLevel5: 'LOCATION_LEVEL_5'
+} as const
+
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
   userDetails: UserDetails | null
 ) {
-  let fieldInitialValue = field.initialValue as IFormFieldValue
-  const catchmentAreas = userDetails?.catchmentArea
-  let district = ''
-  let state = ''
-  let locationLevel3 = ''
-
-  if (catchmentAreas) {
-    catchmentAreas.forEach((catchmentArea) => {
-      if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
-        )
-      ) {
-        locationLevel3 = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'DISTRICT'
-        )
-      ) {
-        district = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'STATE'
-        )
-      ) {
-        state = catchmentArea.id
-      }
-    })
-  }
-
-  if (field.name.includes('district') && !field.initialValue && district) {
-    fieldInitialValue = district as IFormFieldValue
-  }
-  if (field.name.includes('state') && !field.initialValue && state) {
-    fieldInitialValue = state as IFormFieldValue
-  }
-  if (!field.initialValue && locationLevel3) {
-    fieldInitialValue = locationLevel3 as IFormFieldValue
-  }
-  return fieldInitialValue
+  return (
+    Object.keys(NAME_TO_IDENTIFIER)
+      .filter((fieldNameIdentifier) => field.name.includes(fieldNameIdentifier))
+      .map(
+        (fieldNameIdentifier) =>
+          userDetails?.catchmentArea?.find((catchmentArea) =>
+            catchmentArea.identifier?.some(
+              (identifier) =>
+                identifier.value ===
+                NAME_TO_IDENTIFIER[
+                  fieldNameIdentifier as keyof typeof NAME_TO_IDENTIFIER
+                ]
+            )
+          )?.id ?? ''
+      )
+      .at(0) ??
+    field.initialValue ??
+    ''
+  )
 }
 
 const mapFieldsToValues = (
