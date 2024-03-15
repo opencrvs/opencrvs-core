@@ -2018,7 +2018,129 @@ const builders: IFieldBuilders = {
       const person = selectOrCreateInformantResource(fhirBundle)
       person.multipleBirthInteger = fieldValue as number
     },
-    address: createAddressBuilder(INFORMANT_CODE, INFORMANT_TITLE),
+    address: {
+      use: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'use',
+          context
+        )
+      },
+      type: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'type',
+          context
+        )
+      },
+      text: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'text',
+          context
+        )
+      },
+      line: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        if (!person.address) {
+          person.address = []
+        }
+        if (!person.address[context._index.address]) {
+          person.address[context._index.address] = {}
+        }
+        if (!person.address[context._index.address].line) {
+          person.address[context._index.address].line = []
+        }
+        if (
+          person.address[context._index.address].line![context._index.line] !==
+          undefined
+        ) {
+          person.address[context._index.address].line![context._index.line] =
+            fieldValue
+        } else {
+          ;(person.address[context._index.address].line as string[]).push(
+            fieldValue
+          )
+        }
+      },
+      city: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'city',
+          context
+        )
+      },
+      district: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'district',
+          context
+        )
+      },
+      state: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'state',
+          context
+        )
+      },
+      postalCode: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'postalCode',
+          context
+        )
+      },
+      partOf: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          [
+            {
+              url: 'http://opencrvs.org/specs/extension/part-of',
+              valueReference: {
+                reference: `Location/${fieldValue}`
+              }
+            }
+          ],
+          'extension',
+          context
+        )
+      },
+      country: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'address',
+          fieldValue,
+          'country',
+          context
+        )
+      }
+    },
     photo: {
       contentType: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
