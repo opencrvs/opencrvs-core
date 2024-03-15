@@ -26,7 +26,7 @@ async function notifyCountryConfig(payload: AllUsersEmailPayloadSchema) {
     }
   })
   if (res.status === 200) {
-    return await res.json()
+    return res
   } else {
     throw await res.json()
   }
