@@ -138,7 +138,7 @@ export const PasswordInput = ({
   showIcon,
   hideIcon,
   ...props
-}: ICustomProps) => {
+}: IPasswordInputProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
