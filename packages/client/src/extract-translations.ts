@@ -11,47 +11,120 @@
 /* eslint-disable */
 import * as fs from 'fs'
 import glob from 'glob'
-import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ILanguage } from '@client/i18n/reducer'
+import csv2json from 'csv2json'
+import { stringify, Options } from 'csv-stringify'
+import { promisify } from 'util'
+import { sortBy } from 'lodash'
+import ts from 'typescript'
+import { MessageDescriptor } from 'react-intl'
+const csvStringify = promisify<Array<Record<string, any>>, Options>(stringify)
 
-interface IReactIntlDescriptions {
-  [key: string]: string
+export async function writeJSONToCSV(
+  filename: string,
+  data: Array<Record<string, any>>
+) {
+  const csv = await csvStringify(data, {
+    header: true
+  })
+  return fs.promises.writeFile(filename, csv, 'utf8')
 }
+
+export async function readCSVToJSON<T>(filename: string) {
+  return new Promise<T>((resolve, reject) => {
+    const chunks: string[] = []
+    fs.createReadStream(filename)
+      .on('error', reject)
+      .pipe(
+        csv2json({
+          separator: ','
+        })
+      )
+      .on('data', (chunk: string) => chunks.push(chunk))
+      .on('error', reject)
+      .on('end', () => {
+        resolve(JSON.parse(chunks.join('')))
+      })
+  })
+}
+
+type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const COUNTRY_CONFIG_PATH = process.argv[2]
-type LocalisationFile = {
-  data: Array<{
-    lang: string
-    displayName: string
-    messages: Record<string, string>
-  }>
-}
+
+type LocalisationFile = CSVRow[]
 
 function writeTranslations(data: LocalisationFile) {
-  fs.writeFileSync(
-    `${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`,
-    JSON.stringify(data, null, 2)
+  return writeJSONToCSV(
+    `${COUNTRY_CONFIG_PATH}/src/translations/client.csv`,
+    data
   )
 }
 
 function readTranslations() {
-  return JSON.parse(
-    fs
-      .readFileSync(`${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`)
-      .toString()
+  return readCSVToJSON<CSVRow[]>(
+    `${COUNTRY_CONFIG_PATH}/src/translations/client.csv`
   )
 }
 
-function isEnglish(obj: ILanguage) {
-  return obj.lang === 'en-US' || obj.lang === 'en'
+function findObjectLiteralsWithIdAndDefaultMessage(
+  filePath: string,
+  sourceCode: string
+): MessageDescriptor[] {
+  const sourceFile = ts.createSourceFile(
+    'temp.ts',
+    sourceCode,
+    ts.ScriptTarget.Latest,
+    true
+  )
+  const matches: MessageDescriptor[] = []
+
+  function visit(node: ts.Node) {
+    if (!ts.isObjectLiteralExpression(node)) {
+      ts.forEachChild(node, visit)
+      return
+    }
+    const idProperty = node.properties.find(
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'id'
+    )
+    const defaultMessageProperty = node.properties.find(
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
+    )
+
+    if (!(idProperty && defaultMessageProperty)) {
+      ts.forEachChild(node, visit)
+      return
+    }
+
+    const objectText = node.getText(sourceFile) // The source code representation of the object
+
+    try {
+      const func = new Function(`return (${objectText});`)
+      const objectValue = func()
+      matches.push(objectValue)
+    } catch (error) {
+      console.error(
+        `Error: Found a dynamic message identifier in file ${filePath}.`,
+        'Message identifiers should never be dynamic and should always be hardcoded instead.',
+        'This enables us to confidently verify that a country configuration has all required keys.',
+        '\n',
+        objectText
+      )
+    }
+
+    ts.forEachChild(node, visit)
+  }
+
+  visit(sourceFile)
+
+  return matches
 }
 
 async function extractMessages() {
   let translations: LocalisationFile
   try {
-    translations = readTranslations()
+    translations = await readTranslations()
   } catch (error: unknown) {
     const err = error as Error & { code: string }
     if (err.code === 'ENOENT') {
@@ -60,88 +133,105 @@ async function extractMessages() {
         `Your environment variables may not be set.
         Please add valid COUNTRY_CONFIG_PATH, as an environment variable.
         If they are set correctly, then something is wrong with
-        this file: ${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`
+        this file: ${COUNTRY_CONFIG_PATH}/src/translations/client.csv`
       )
     } else {
       console.error(err)
     }
     process.exit(1)
   }
-  let results: Message[] = []
-  const pattern = 'src/**/*.@(tsx|ts)'
-  try {
+
+  const knownLanguages =
+    translations.length > 0
+      ? Object.keys(translations[0]).filter(
+          (key) => !['id', 'description'].includes(key)
+        )
+      : ['en']
+
+  console.log('Checking translations in application...')
+  console.log()
+
+  const files = await promisify(glob)('src/**/*.@(tsx|ts)', {
+    ignore: ['**/*.test.@(tsx|ts)', 'src/tests/**/*.*']
+  })
+
+  const messagesParsedFromApp: MessageDescriptor[] = files
+    .map((f) => {
+      const contents = fs.readFileSync(f).toString()
+      return findObjectLiteralsWithIdAndDefaultMessage(f, contents)
+    })
+    .flat()
+
+  const reactIntlDescriptions = Object.fromEntries(
+    messagesParsedFromApp.map(({ id, description }) => [id, description || ''])
+  )
+
+  const missingKeys = Object.keys(reactIntlDescriptions).filter(
+    (key) => !translations.find(({ id }) => id === key)
+  )
+
+  if (missingKeys.length > 0) {
     // eslint-disable-line no-console
-    console.log('Checking translations in application...')
-    console.log()
-
-    glob(pattern, (err: any, files) => {
-      if (err) {
-        throw new Error(err)
-      }
-
-      files.forEach((f) => {
-        const contents = fs.readFileSync(f).toString()
-        results = results.concat(main(contents))
-      })
-
-      const reactIntlDescriptions: IReactIntlDescriptions = {}
-      results.forEach((r) => {
-        reactIntlDescriptions[r.id] = r.description!
-      })
-      const englishTranslations = translations.data.find(isEnglish)?.messages
-      const missingKeys = Object.keys(reactIntlDescriptions).filter(
-        (key) => !englishTranslations?.hasOwnProperty(key)
-      )
-
-      if (missingKeys.length > 0) {
-        // eslint-disable-line no-console
-        console.log(chalk.red.bold('Missing translations'))
-        console.log(`You are missing the following content keys from your country configuration package:\n
+    console.log(chalk.red.bold('Missing translations'))
+    console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n
 Translate the keys and add them to this file:
-${chalk.white(`${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`)}`)
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
 
-        if (write) {
-          console.log(
-            `${chalk.yellow('Warning ⚠️:')} ${chalk.white(
-              'The --write command is experimental and only adds new translations for English.'
-            )}`
-          )
-
-          const defaultsToBeAdded = missingKeys.map((key) => [
-            key,
-            results.find(({ id }) => id === key)?.defaultMessage
-          ])
-          const newEnglishTranslations: Record<string, string> = {
-            ...englishTranslations,
-            ...Object.fromEntries(defaultsToBeAdded)
-          }
-
-          const english = translations.data.find(isEnglish)!
-          english.messages = newEnglishTranslations
-          writeTranslations(translations)
-        } else {
-          console.log(`
-${chalk.green('Tip 🪄')}: ${chalk.white(
-            `If you want this command do add the missing English keys for you, run it with the ${chalk.bold(
-              '--write'
-            )} flag. Note that you still need to add non-English translations to the file.`
-          )}`)
-        }
-
-        process.exit(1)
-      }
-
-      fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/api/content/client/descriptions.json`,
-        JSON.stringify({ data: reactIntlDescriptions }, null, 2)
+    if (write) {
+      console.log(
+        `${chalk.yellow('Warning ⚠️:')} ${chalk.white(
+          'The --write command is experimental and only adds new translations for English.'
+        )}`
       )
-    })
-  } catch (err) {
-    // eslint-disable-line no-console
-    console.log(err)
+
+      // This is just to ensure that all languages stay in the CVS file
+      const emptyLanguages = Object.fromEntries(
+        knownLanguages.map((lang) => [lang, ''])
+      )
+
+      const defaultsToBeAdded = missingKeys.map(
+        (key): CSVRow => ({
+          id: key,
+          description: reactIntlDescriptions[key],
+          ...emptyLanguages,
+          en:
+            messagesParsedFromApp
+              .find(({ id }) => id === key)
+              ?.defaultMessage?.toString() || ''
+        })
+      )
+
+      const allIds = Array.from(
+        new Set(
+          defaultsToBeAdded
+            .map(({ id }) => id)
+            .concat(translations.map(({ id }) => id))
+        )
+      )
+
+      const allTranslations = allIds.map((id) => {
+        const existingTranslation = translations.find(
+          (translation) => translation.id === id
+        )
+
+        return (
+          existingTranslation ||
+          defaultsToBeAdded.find((translation) => translation.id === id)!
+        )
+      })
+
+      await writeTranslations(sortBy(allTranslations, (row) => row.id))
+    } else {
+      console.log(`
+${chalk.green('Tip 🪄')}: ${chalk.white(
+        `If you want this command to add the missing English keys for you, run it with the ${chalk.bold(
+          '--write'
+        )} flag. Note that you still need to add non-English translations to the file.`
+      )}`)
+    }
+
     process.exit(1)
-    return
   }
 }
 

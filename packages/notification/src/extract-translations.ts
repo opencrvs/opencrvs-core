@@ -9,39 +9,55 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable */
-import * as fs from 'fs'
-import * as chalk from 'chalk'
 import { messageKeys } from '@notification/i18n/messages'
-import { ILanguage } from '@notification/features/sms/utils'
+import * as chalk from 'chalk'
+import { Options, stringify } from 'csv-stringify'
+import csv2json from 'csv2json'
+import * as fs from 'fs'
+import { promisify } from 'util'
+const csvStringify = promisify<Array<Record<string, any>>, Options>(stringify)
 
-interface IMessageKey {
-  [key: string]: string
+export async function writeJSONToCSV(
+  filename: string,
+  data: Array<Record<string, any>>
+) {
+  const csv = await csvStringify(data, {
+    header: true
+  })
+  return fs.promises.writeFile(filename, csv, 'utf8')
 }
 
-interface IMessageDescriptions {
-  data: IMessageKey
+export async function readCSVToJSON<T>(filename: string) {
+  return new Promise<T>((resolve, reject) => {
+    const chunks: string[] = []
+    fs.createReadStream(filename)
+      .on('error', reject)
+      .pipe(
+        csv2json({
+          separator: ','
+        })
+      )
+      .on('data', (chunk: string) => chunks.push(chunk))
+      .on('error', reject)
+      .on('end', () => {
+        resolve(JSON.parse(chunks.join('')))
+      })
+  })
+}
+
+type CSVRow = { id: string; description: string } & Record<string, string>
+
+const COUNTRY_CONFIG_PATH = process.argv[2]
+
+function readTranslations() {
+  return readCSVToJSON<CSVRow[]>(
+    `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+  )
 }
 
 async function extractMessages() {
-  const COUNTRY_CONFIG_PATH = process.argv[2]
-  const notification = JSON.parse(
-    fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/api/content/notification/notification.json`
-      )
-      .toString()
-  )
-  const descriptions: IMessageDescriptions = JSON.parse(
-    fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/api/content/notification/descriptions.json`
-      )
-      .toString()
-  )
+  const translations = await readTranslations()
 
-  const englishTranslations = notification.data.find(
-    (obj: ILanguage) => obj.lang === 'en'
-  ).messages
   try {
     console.log(
       `${chalk.yellow('Checking translations in notification service ...')}`
@@ -49,27 +65,14 @@ async function extractMessages() {
     Object.keys(messageKeys).forEach((messageKey) => {
       let missingKeys = false
 
-      if (!englishTranslations.hasOwnProperty(messageKey)) {
+      if (!translations.find(({ id }) => id === messageKey)) {
         missingKeys = true
         console.log(
           `${chalk.red(
-            `No English translation key exists for messageKey.  Remeber to translate and add for all locales!!!: ${chalk.white(
+            `No translation key exists for ${messageKey}.  Remember to translate and add for all locales!!!: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/api/content/notification/notification.json`
-            )}`
-          )}`
-        )
-      }
-
-      if (!descriptions.data.hasOwnProperty(messageKey)) {
-        missingKeys = true
-        console.log(
-          `${chalk.red(
-            `No description exists for messageKey: ${chalk.white(
-              messageKey
-            )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/api/content/notification/descriptions.json`
+              `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
             )}`
           )}`
         )
