@@ -51,6 +51,8 @@ export async function readCSVToJSON<T>(filename: string) {
 type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
+const outdated = process.argv.includes('--outdated')
+
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
 type LocalisationFile = CSVRow[]
@@ -104,12 +106,14 @@ function findObjectLiteralsWithIdAndDefaultMessage(
       const objectValue = func()
       matches.push(objectValue)
     } catch (error) {
+      console.log(chalk.yellow.bold('Warning'))
       console.error(
-        `Error: Found a dynamic message identifier in file ${filePath}.`,
+        `Found a dynamic message identifier in file ${filePath}.`,
         'Message identifiers should never be dynamic and should always be hardcoded instead.',
         'This enables us to confidently verify that a country configuration has all required keys.',
         '\n',
-        objectText
+        objectText,
+        '\n'
       )
     }
 
@@ -162,13 +166,26 @@ async function extractMessages() {
     })
     .flat()
 
-  const reactIntlDescriptions = Object.fromEntries(
+  const reactIntlDescriptions: Record<string, string> = Object.fromEntries(
     messagesParsedFromApp.map(({ id, description }) => [id, description || ''])
   )
 
   const missingKeys = Object.keys(reactIntlDescriptions).filter(
     (key) => !translations.find(({ id }) => id === key)
   )
+
+  if (outdated) {
+    const extraKeys = translations
+      .map(({ id }) => id)
+      .filter((key) => !reactIntlDescriptions[key])
+
+    console.log(chalk.yellow.bold('Potentially outdated translations'))
+    console.log(
+      'The following keys were not found in the code, but are part of the copy file:',
+      '\n'
+    )
+    console.log(extraKeys.join('\n'))
+  }
 
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console

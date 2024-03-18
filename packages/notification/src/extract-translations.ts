@@ -12,10 +12,12 @@
 import { messageKeys } from '@notification/i18n/messages'
 import * as chalk from 'chalk'
 import { Options, stringify } from 'csv-stringify'
-import csv2json from 'csv2json'
+import * as csv2json from 'csv2json'
 import * as fs from 'fs'
 import { promisify } from 'util'
-const csvStringify = promisify<Array<Record<string, any>>, Options>(stringify)
+const csvStringify = promisify<Array<Record<string, any>>, Options, string>(
+  stringify
+)
 
 export async function writeJSONToCSV(
   filename: string,
