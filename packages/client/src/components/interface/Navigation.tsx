@@ -1008,6 +1008,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
       ? WORKQUEUE_TABS.informantNotification
+      : window.location.href.endsWith(WORKQUEUE_TABS.emailAllUsers)
+      ? WORKQUEUE_TABS.emailAllUsers
       : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
       ? WORKQUEUE_TABS.userRoles
       : ''

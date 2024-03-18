@@ -31,7 +31,8 @@ import {
   hideCreateUserFormDuplicateEmailErrorToast,
   hideUserReconnectedToast,
   hideDuplicateRecordsToast,
-  hideUnassignedDeclarationsToast
+  hideUnassignedDeclarationsToast,
+  toggleEmailAllUsersFeedbackToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
@@ -56,6 +57,7 @@ type DispatchProps = {
   hideUnassignedDeclarationsToast: typeof hideUnassignedDeclarationsToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  toggleEmailAllUsersFeedbackToast: typeof toggleEmailAllUsersFeedbackToast
 }
 
 class Component extends React.Component<
@@ -98,6 +100,9 @@ class Component extends React.Component<
   hideUserReconnectedToast = () => {
     this.props.hideUserReconnectedToast()
   }
+  hideEmailAllUsersFeedbackToast = () => {
+    this.props.toggleEmailAllUsersFeedbackToast({ visible: false })
+  }
 
   render() {
     const {
@@ -120,7 +125,8 @@ class Component extends React.Component<
       userReconnectedToast,
       goToDeclarationRecordAudit,
       isOnline,
-      unassignedDeclarations
+      unassignedDeclarations,
+      emailAllUsers
     } = this.props
 
     const userFormSubmitErrorMessage = isOnline
@@ -288,6 +294,17 @@ class Component extends React.Component<
             })}
           </Toast>
         )}
+        {emailAllUsers.visible && (
+          <Toast
+            id="emailAllUsersFeedback"
+            type={emailAllUsers.type}
+            onClose={this.hideEmailAllUsersFeedbackToast}
+          >
+            {emailAllUsers.type === 'success'
+              ? 'Email sent to all users'
+              : 'Only one email can be sent per day'}
+          </Toast>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -317,7 +334,8 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.userCreateDuplicateMobileFailedToast,
     userCreateDuplicateEmailFailedToast:
       store.notification.userCreateDuplicateEmailFailedToast,
-    userReconnectedToast: store.notification.userReconnectedToast
+    userReconnectedToast: store.notification.userReconnectedToast,
+    emailAllUsers: store.notification.emailAllUsers
   }
 }
 
@@ -336,6 +354,7 @@ export const NotificationComponent = withRouter(
     hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
     goToDeclarationRecordAudit,
-    hideUnassignedDeclarationsToast
+    hideUnassignedDeclarationsToast,
+    toggleEmailAllUsersFeedbackToast
   })(injectIntl(withOnlineStatus(Component)))
 )

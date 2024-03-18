@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import styled from 'styled-components'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -19,9 +18,69 @@ import { constantsMessages } from '@client/i18n/messages'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import {
+  InputField,
+  TextArea,
+  TextInput,
+  Button,
+  Icon,
+  ResponsiveModal
+} from '@opencrvs/components'
+import styled from 'styled-components'
+import { useLazyQuery } from '@apollo/client'
+import { EMAIL_ALL_USERS } from '@client/views/SysAdmin/Communications/AllUserEmail/queries'
+import { useDispatch } from 'react-redux'
+import { toggleEmailAllUsersFeedbackToast } from '@client/notification/actions'
 
+const Form = styled.form`
+  & > :not(:last-child) {
+    margin-bottom: 24px;
+  }
+`
+const FullWidthInputField = styled(InputField)`
+  input {
+    width: 100%;
+  }
+`
 const AllUserEmail = () => {
   const intl = useIntl()
+  const [subject, setSubject] = useState('')
+  const [body, setBody] = useState('')
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false)
+  const [sendEmail, { data, error }] = useLazyQuery(EMAIL_ALL_USERS)
+  const dispatch = useDispatch()
+  const hideModal = () => setConfirmationModalOpen(false)
+  const resetForm = () => {
+    setSubject('')
+    setBody('')
+  }
+  const handleConfirmSubmit = () => {
+    sendEmail({
+      variables: {
+        subject,
+        body
+      }
+    })
+    hideModal()
+    resetForm()
+  }
+
+  useEffect(() => {
+    if (data) {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
+      )
+    }
+  }, [data, dispatch])
+
+  useEffect(() => {
+    if (error) {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
+      )
+    }
+  }, [error, dispatch])
+
   return (
     <>
       <Frame
@@ -40,10 +99,66 @@ const AllUserEmail = () => {
       >
         <Content
           title={intl.formatMessage(messages.emailAllUsersTitle)}
-          titleColor={'copy'}
+          titleColor="copy"
           subtitle={intl.formatMessage(messages.emailAllUsersSubtitle)}
-        ></Content>
+        >
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault()
+              setConfirmationModalOpen(true)
+            }}
+          >
+            <FullWidthInputField
+              id="subject"
+              label={'Subject'}
+              touched={false}
+              required={true}
+              hideAsterisk
+            >
+              <TextInput
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              />
+            </FullWidthInputField>
+            <FullWidthInputField
+              id="body"
+              label={'Message'}
+              touched={false}
+              required={true}
+              hideAsterisk
+            >
+              <TextArea
+                ignoreMediaQuery
+                {...{
+                  value: body,
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                    setBody(e.target.value)
+                }}
+              />
+            </FullWidthInputField>
+            <Button type="primary" disabled={!subject || !body}>
+              <Icon name="PaperPlaneTilt" size="medium" />
+              Send
+            </Button>
+          </Form>
+        </Content>
       </Frame>
+      <ResponsiveModal
+        title={'Send email to all users?'}
+        show={isConfirmationModalOpen}
+        handleClose={hideModal}
+        autoHeight
+        actions={[
+          <Button key="cancel" type="tertiary" onClick={hideModal}>
+            Cancel
+          </Button>,
+          <Button key="confirm" type="primary" onClick={handleConfirmSubmit}>
+            Confirm
+          </Button>
+        ]}
+      >
+        User will receive emails over the next 24 hours
+      </ResponsiveModal>
     </>
   )
 }

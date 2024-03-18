@@ -68,7 +68,7 @@ export const SYSTEM_LIST = '/config/integration'
 export const USER_ROLES_CONFIG = '/config/userroles'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'
-export const ALL_USER_EMAIL = '/communications/allUserEmail'
+export const ALL_USER_EMAIL = '/communications/emailAllUsers'
 
 export const DECLARATION_RECORD_AUDIT = '/record-audit/:tab/:declarationId'
 
