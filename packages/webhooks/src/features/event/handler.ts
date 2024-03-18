@@ -67,7 +67,7 @@ export async function birthRegisteredHandler(
           authHeader,
           EventType.Birth
         )
-        const transformedBundle = await transformBirthBundle(
+        const transformedBundle = transformBirthBundle(
           bundle,
           webhookToNotify.createdBy.type,
           permissions
@@ -162,7 +162,7 @@ export async function deathRegisteredHandler(
           authHeader,
           EventType.Death
         )
-        const transformedBundle = await transformDeathBundle(
+        const transformedBundle = transformDeathBundle(
           bundle,
           webhookToNotify.createdBy.type,
           permissions

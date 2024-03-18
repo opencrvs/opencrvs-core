@@ -89,6 +89,24 @@ const registeredRecord = {
             ]
           },
           {
+            title: 'Supporting Documents',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'supporting-documents'
+                }
+              ],
+              text: 'Supporting Documents'
+            },
+            entry: [
+              {
+                reference:
+                  'DocumentReference/b5662f6e-3e08-428f-8fdf-a9912c64c106'
+              }
+            ]
+          },
+          {
             title: 'Child details',
             code: {
               coding: [
@@ -354,6 +372,43 @@ const registeredRecord = {
             value: ''
           }
         ]
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/DocumentReference/b5662f6e-3e08-428f-8fdf-a9912c64c106/_history/74f850d9-15cc-48ff-8c6a-0e25b5819c7b' as URLReference,
+      resource: {
+        resourceType: 'DocumentReference',
+        masterIdentifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'f18488e8-2bb4-43d1-b8d7-9ecbc2674294'
+        },
+        extension: [],
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/supporting-doc-type',
+              code: 'NOTIFICATION_OF_BIRTH'
+            }
+          ]
+        },
+        content: [
+          {
+            attachment: {
+              contentType: 'image/png',
+              data: '/ocrvs/2f108f21-f929-4971-8179-70216a148c53.png'
+            }
+          }
+        ],
+        status: 'current',
+        subject: {
+          display: 'CHILD'
+        },
+        meta: {
+          lastUpdated: '2024-03-18T17:30:45.818+00:00',
+          versionId: '74f850d9-15cc-48ff-8c6a-0e25b5819c7b'
+        },
+        id: 'b5662f6e-3e08-428f-8fdf-a9912c64c106' as UUID
       }
     },
     {
@@ -1083,6 +1138,43 @@ const nationalIdBundle = {
     },
     {
       fullUrl:
+        '/fhir/DocumentReference/b5662f6e-3e08-428f-8fdf-a9912c64c106/_history/74f850d9-15cc-48ff-8c6a-0e25b5819c7b' as URLReference,
+      resource: {
+        resourceType: 'DocumentReference',
+        masterIdentifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'f18488e8-2bb4-43d1-b8d7-9ecbc2674294'
+        },
+        extension: [],
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/supporting-doc-type',
+              code: 'NOTIFICATION_OF_BIRTH'
+            }
+          ]
+        },
+        content: [
+          {
+            attachment: {
+              contentType: 'image/png',
+              data: '/ocrvs/2f108f21-f929-4971-8179-70216a148c53.png'
+            }
+          }
+        ],
+        status: 'current',
+        subject: {
+          display: 'CHILD'
+        },
+        meta: {
+          lastUpdated: '2024-03-18T17:30:45.818+00:00',
+          versionId: '74f850d9-15cc-48ff-8c6a-0e25b5819c7b'
+        },
+        id: 'b5662f6e-3e08-428f-8fdf-a9912c64c106' as UUID
+      }
+    },
+    {
+      fullUrl:
         '/fhir/Patient/dfe07740-7803-49c1-9d36-7d54cbf209ef/_history/1221f4a5-b9de-4d7b-a805-5356240ecd38',
       resource: {
         resourceType: 'Patient',
@@ -1532,23 +1624,65 @@ const permissionsBundle = {
   ]
 }
 
-describe('Webhooks bundle transformation while respecting permissions', () => {
-  it('transforms national id integration bundle correctly', () => {
+describe('Webhooks on a birth or death event', () => {
+  it('transforms national id integration bundle', () => {
     const bundle = transformBirthBundle(registeredRecord, 'nationalId')
 
     expect(bundle).toEqual(nationalIdBundle)
   })
-})
 
-describe('webhook transformBirthBundle for webhook permissions integrations ', () => {
-  it('should return webhook permissions bundle', () => {
+  it('transforms webhooks bundle', () => {
     const bundle = getPermissionsBundle(registeredRecord, [
       'child-details',
       'mother-details',
-      'informant-details',
-      'supporting-documents'
+      'informant-details'
     ])
 
     expect(bundle).toEqual(permissionsBundle)
+  })
+
+  it('only includes mother and childs details in the bundle', () => {
+    const bundle = getPermissionsBundle(registeredRecord, [
+      'child-details',
+      'mother-details'
+    ])
+    const MOTHER_UUID = 'dfe07740-7803-49c1-9d36-7d54cbf209ef'
+    const CHILD_UUID = '7fc04a24-cf8e-41b3-a63b-fdae03269026'
+
+    expect(bundle.entry).toHaveLength(3) // child details, mother details and the task
+    expect(
+      bundle.entry.some((entry) => entry.resource.id === MOTHER_UUID)
+    ).toBeTruthy()
+    expect(
+      bundle.entry.some((entry) => entry.resource.id === CHILD_UUID)
+    ).toBeTruthy()
+    expect(
+      bundle.entry.find(
+        (entry) => ![MOTHER_UUID, CHILD_UUID].includes(entry.resource.id)
+      )
+    ).toMatchObject({ resource: { resourceType: 'Task' } })
+  })
+
+  it('only includes informants details and supporting documents in the bundle', () => {
+    const bundle = getPermissionsBundle(registeredRecord, [
+      'informant-details',
+      'supporting-documents'
+    ])
+    const INFORMANT_UUID = 'cc412b7a-c0c3-4264-b0e5-16fe103fae98'
+    const SUPPORTING_DOCS_UUID = 'b5662f6e-3e08-428f-8fdf-a9912c64c106'
+
+    expect(bundle.entry).toHaveLength(3) // informants details, supporting documents and the task
+    expect(
+      bundle.entry.some((entry) => entry.resource.id === INFORMANT_UUID)
+    ).toBeTruthy()
+    expect(
+      bundle.entry.some((entry) => entry.resource.id === SUPPORTING_DOCS_UUID)
+    ).toBeTruthy()
+    expect(
+      bundle.entry.find(
+        (entry) =>
+          ![INFORMANT_UUID, SUPPORTING_DOCS_UUID].includes(entry.resource.id)
+      )
+    ).toMatchObject({ resource: { resourceType: 'Task' } })
   })
 })
