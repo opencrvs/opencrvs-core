@@ -14,7 +14,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
-import { constantsMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
@@ -138,26 +138,26 @@ const AllUserEmail = () => {
             </FullWidthInputField>
             <Button type="primary" disabled={!subject || !body}>
               <Icon name="PaperPlaneTilt" size="medium" />
-              Send
+              {intl.formatMessage(buttonMessages.send)}
             </Button>
           </Form>
         </Content>
       </Frame>
       <ResponsiveModal
-        title={'Send email to all users?'}
+        title={intl.formatMessage(messages.emailAllUsersModalTitle)}
         show={isConfirmationModalOpen}
         handleClose={hideModal}
         autoHeight
         actions={[
           <Button key="cancel" type="tertiary" onClick={hideModal}>
-            Cancel
+            {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button key="confirm" type="primary" onClick={handleConfirmSubmit}>
-            Confirm
+            {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
       >
-        User will receive emails over the next 24 hours
+        {intl.formatMessage(messages.emailAllUsersModalSupportingCopy)}
       </ResponsiveModal>
     </>
   )

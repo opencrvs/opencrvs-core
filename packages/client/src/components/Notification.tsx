@@ -301,8 +301,8 @@ class Component extends React.Component<
             onClose={this.hideEmailAllUsersFeedbackToast}
           >
             {emailAllUsers.type === 'success'
-              ? 'Email sent to all users'
-              : 'Only one email can be sent per day'}
+              ? intl.formatMessage(messages.emailAllUsersSuccess)
+              : intl.formatMessage(messages.emailAllUsersError)}
           </Toast>
         )}
         {/* More notification types can be added here */}

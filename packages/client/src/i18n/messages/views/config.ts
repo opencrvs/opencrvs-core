@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
-import { messageToDefine } from './verifyCertificate'
+import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
   applicationSettings: {
@@ -628,6 +627,16 @@ const messagesToDefine = {
     defaultMessage:
       'This email will be sent to all users you are active. Emails will be sent over the next 24 hours. Only one email can be sent per day',
     description: 'Subtitle for email all users'
+  },
+  emailAllUsersModalTitle: {
+    id: 'config.emailAllUsers.modal.title',
+    defaultMessage: 'Send email to all users?',
+    description: 'Label for send email all users confirmation title'
+  },
+  emailAllUsersModalSupportingCopy: {
+    id: 'config.emailAllUsers.modal.supportingCopy',
+    defaultMessage: 'User will receive emails over the next 24 hours',
+    description: 'Label for send email all users confirmation supporting copy'
   }
 }
 
