@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import fetch from 'node-fetch'
 import { EVENT_TYPE, RegisteredRecord } from '@opencrvs/commons/types'
 import { WEBHOOKS_URL } from '@workflow/constants'
 
