@@ -15,6 +15,7 @@
 ## Bug fixes
 
 - Handle back button click after issuing a declaration [#6424](https://github.com/opencrvs/opencrvs-core/issues/6424)
+- Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
 
 ## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
 
