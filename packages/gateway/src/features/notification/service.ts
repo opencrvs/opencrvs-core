@@ -48,6 +48,7 @@ async function requestNotificationServiceToSendEmails(
   subject: string,
   body: string,
   bcc: string[],
+  locale: string,
   authHeader: IAuthHeader
 ) {
   const res = await fetch(`${NOTIFICATION_URL}allUsersEmail`, {
@@ -55,6 +56,7 @@ async function requestNotificationServiceToSendEmails(
     body: JSON.stringify({
       subject,
       body,
+      locale,
       bcc
     }),
     headers: {
@@ -72,6 +74,7 @@ async function requestNotificationServiceToSendEmails(
 export async function sendEmailToAllUsers(
   subject: string,
   body: string,
+  locale: string,
   authHeader: IAuthHeader
 ) {
   let total: number | undefined
@@ -92,6 +95,7 @@ export async function sendEmailToAllUsers(
         subject,
         body,
         emails,
+        locale,
         authHeader
       )
     }

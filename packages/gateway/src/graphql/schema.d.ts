@@ -2138,6 +2138,7 @@ export interface QueryToListNotificationsResolver<
 export interface QueryToSendNotificationToAllUsersArgs {
   subject: string
   body: string
+  locale: string
   type?: GQLNotificationType
 }
 export interface QueryToSendNotificationToAllUsersResolver<

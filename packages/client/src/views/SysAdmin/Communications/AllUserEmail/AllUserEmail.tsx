@@ -58,7 +58,8 @@ const AllUserEmail = () => {
     sendEmail({
       variables: {
         subject,
-        body
+        body,
+        locale: intl.locale
       }
     })
     hideModal()

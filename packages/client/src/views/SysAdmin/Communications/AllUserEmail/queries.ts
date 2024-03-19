@@ -12,8 +12,12 @@
 import gql from 'graphql-tag'
 
 export const EMAIL_ALL_USERS = gql`
-  query emailAllUsers($subject: String!, $body: String!) {
-    sendNotificationToAllUsers(subject: $subject, body: $body) {
+  query emailAllUsers($subject: String!, $body: String!, $locale: String!) {
+    sendNotificationToAllUsers(
+      subject: $subject
+      body: $body
+      locale: $locale
+    ) {
       success
     }
   }

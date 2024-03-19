@@ -21,7 +21,7 @@ export const resolvers: GQLResolver = {
     },
     async sendNotificationToAllUsers(
       _: any,
-      { subject, body, type },
+      { subject, body, type, locale },
       { headers: authHeader }
     ) {
       if (!inScope(authHeader, ['natlsysadmin'])) {
@@ -30,7 +30,7 @@ export const resolvers: GQLResolver = {
         )
       }
       if (type === GQLNotificationType.EMAIL) {
-        return sendEmailToAllUsers(subject, body, authHeader)
+        return sendEmailToAllUsers(subject, body, locale, authHeader)
       } else {
         throw new Error('Unsupported notification type')
       }

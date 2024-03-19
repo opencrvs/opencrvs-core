@@ -47,6 +47,7 @@ type Query {
   sendNotificationToAllUsers(
     subject: String!
     body: String!
+    locale: String!
     type: NotificationType = EMAIL
   ): NotificationResult
 }
