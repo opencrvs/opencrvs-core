@@ -403,7 +403,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       method: 'POST',
       path: '/allUsersEmail',
       handler: allUsersEmailHandler,
-      config: {
+      options: {
         tags: ['api'],
         auth: {
           scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]

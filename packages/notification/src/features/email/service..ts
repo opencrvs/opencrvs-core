@@ -8,34 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { COUNTRY_CONFIG_URL } from '@notification/constants'
+
 import NotificationQueue, {
   NotificationQueueRecord
 } from '@notification/model/notificationQueue'
 import { AllUsersEmailPayloadSchema } from '@notification/features/email/all-user-handler'
 import { logger } from '@notification/logger'
+import { notifyCountryConfig } from '@notification/features/sms/service'
 
 let isLoopInprogress = false
 
-async function notifyCountryConfig(payload: AllUsersEmailPayloadSchema) {
-  const res = await fetch(`${COUNTRY_CONFIG_URL}/allUsersEmail`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-type': 'application/json'
-    }
-  })
-  if (res.status === 200) {
-    return res
-  } else {
-    throw await res.json()
-  }
-}
-
-export async function sendAllUserEmails(payload: AllUsersEmailPayloadSchema) {
+export async function sendAllUserEmails(
+  payload: AllUsersEmailPayloadSchema,
+  token: string
+) {
   await NotificationQueue.create(payload)
   if (!isLoopInprogress) {
-    loopNotificationQueue()
+    loopNotificationQueue(token)
   }
   return {
     success: true
@@ -48,12 +37,20 @@ async function findOldestNotificationQueueRecord() {
   }).sort({ createdAt: -1 })
 }
 
-async function dispatch(record: NotificationQueueRecord) {
-  await notifyCountryConfig({
-    subject: record.subject,
-    body: record.body,
-    bcc: record.bcc
-  })
+async function dispatch(record: NotificationQueueRecord, token: string) {
+  await notifyCountryConfig(
+    {
+      email: 'allUserNotification'
+    },
+    { email: record.bcc[0], bcc: record.bcc.slice(1) },
+    'user',
+    {
+      subject: record.subject,
+      body: record.body
+    },
+    token,
+    'en'
+  )
   await NotificationQueue.deleteOne({ _id: record._id })
 }
 
@@ -74,7 +71,7 @@ async function markQueueRecordFailedWithErrorDetails(
   )
 }
 
-export async function loopNotificationQueue() {
+export async function loopNotificationQueue(token: string) {
   isLoopInprogress = true
   let record = await findOldestNotificationQueueRecord()
   while (record) {
@@ -82,7 +79,7 @@ export async function loopNotificationQueue() {
       logger.info(
         `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
       )
-      await dispatch(record)
+      await dispatch(record, token)
     } catch (e) {
       await markQueueRecordFailedWithErrorDetails(record, e)
     }

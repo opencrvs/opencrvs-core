@@ -24,11 +24,15 @@ export async function allUsersEmailHandler(
   h: Hapi.ResponseToolkit
 ) {
   logger.info(`Notifying from allUsersEmailHandler`)
-  return sendAllUserEmails(request.payload as AllUsersEmailPayloadSchema)
+  return sendAllUserEmails(
+    request.payload as AllUsersEmailPayloadSchema,
+    request.headers.authorization
+  )
 }
 
 export const allUsersEmailPayloadSchema = Joi.object({
   subject: Joi.string().required(),
   body: Joi.string().required(),
-  bcc: Joi.array().items(Joi.string().required()).required()
+  bcc: Joi.array().items(Joi.string().required()).required(),
+  locale: Joi.string().required()
 })
