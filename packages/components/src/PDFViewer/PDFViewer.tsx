@@ -32,8 +32,8 @@ const SpinnerWrapper = styled.div`
   align-items: center;
   justify-content: center;
   background: ${({ theme }) => theme.colors.white};
-  width: 595px;
-  height: 841px;
+  height: 595px;
+  width: 841px;
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
