@@ -1088,31 +1088,6 @@ test.only('creates task with contact other relationship', async () => {
             createdAt: '2018-10-22',
             subject: 'MOTHER'
           }
-        ],
-        certificates: [
-          {
-            collector: {
-              relationship: 'OTHER',
-              affidavit: {
-                contentType: 'image/jpg',
-                data: 'ExampleData'
-              },
-              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-              identifier: [{ id: '123456', type: 'PASSPORT' }]
-            },
-            hasShowedVerifiedDocument: true,
-            payments: [
-              {
-                paymentId: '1234',
-                type: 'MANUAL',
-                total: 50,
-                amount: 50,
-                outcome: 'COMPLETED',
-                date: '2018-10-22'
-              }
-            ],
-            data: 'DUMMY-DATA'
-          }
         ]
       }
     } as any,

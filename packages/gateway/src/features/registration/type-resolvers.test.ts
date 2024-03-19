@@ -15,14 +15,16 @@ jest.useFakeTimers('modern').setSystemTime(new Date('2023-10-11T07:24:55.108Z'))
 
 import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { getApolloConfig } from '@gateway/graphql/config'
-import { Context } from '@gateway/graphql/context'
 import { generateQueryForType } from '@gateway/graphql/query-generator'
-import { getAuthHeader } from '@opencrvs/commons/http'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { BIRTH_BUNDLE } from './fixtures/birth-bundle'
-import { DEATH_BUNDLE } from './fixtures/death-bundle'
-import { MARRIAGE_BUNDLE } from './fixtures/marriage-bundle'
+import {
+  BIRTH_BUNDLE,
+  DEATH_BUNDLE,
+  MARRIAGE_BUNDLE
+} from '@opencrvs/commons/fixtures'
+import { Context } from '@gateway/graphql/context'
+import { getAuthHeader } from '@opencrvs/commons/http'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -222,32 +224,11 @@ jest.mock('@gateway/features/registration/utils', () => {
   }
 })
 
-jest.mock('@gateway/features/fhir/service', () => {
-  const originalModule = jest.requireActual('@gateway/features/fhir/service')
-  return {
-    ...originalModule,
-    fetchFHIR: (url: string, headers: Headers, method: 'PUT' | 'GET') => {
-      if (method === 'GET') {
-        throw new Error(
-          'FHIR resources should not be fetched from Hearth when GraphQL is being resolved'
-        )
-      }
-      return Promise.resolve()
-    }
-  }
-})
 jest.mock('@gateway/features/user/utils', () => {
   const originalModule = jest.requireActual('@gateway/features/user/utils')
   return {
     ...originalModule,
     getUser: () => Promise.resolve(MOCK_USER)
-  }
-})
-jest.mock('@gateway/records', () => {
-  const originalModule = jest.requireActual('@gateway/records')
-  return {
-    ...originalModule,
-    getRecordById: jest.fn(() => Promise.resolve(BIRTH_BUNDLE))
   }
 })
 
@@ -269,6 +250,16 @@ jest.mock('apollo-datasource-rest', () => {
   }
   return {
     RESTDataSource: MockRESTDataSource
+  }
+})
+
+jest.mock('@gateway/workflow/index', () => {
+  const originalModule = jest.requireActual('@gateway/workflow/index')
+  return {
+    ...originalModule,
+    fetchRegistrationForDownloading: jest.fn(() =>
+      Promise.resolve(BIRTH_BUNDLE)
+    )
   }
 })
 
@@ -304,12 +295,12 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a B
   expect(response.data).toMatchSnapshot()
 })
 
-test('running a full aggregated birth FHIR bundle through resolvers produces a DeathRegistration object', async () => {
+test('running a full aggregated death FHIR bundle through resolvers produces a DeathRegistration object', async () => {
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/records').getRecordById.mockImplementation(() =>
-    Promise.resolve(DEATH_BUNDLE)
+  require('@gateway/workflow/index').fetchRegistrationForDownloading.mockImplementation(
+    () => Promise.resolve(DEATH_BUNDLE)
   )
   const testServer = new ApolloServer({
     ...getApolloConfig(),
@@ -350,12 +341,12 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a D
   )
   expect(response.data).toMatchSnapshot()
 })
-test('running a full aggregated birth FHIR bundle through resolvers produces a MarriageRegistration object', async () => {
+test('running a full aggregated marriage FHIR bundle through resolvers produces a MarriageRegistration object', async () => {
   const apolloConfig = getApolloConfig()
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('@gateway/records').getRecordById.mockImplementation(() =>
-    Promise.resolve(MARRIAGE_BUNDLE)
+  require('@gateway/workflow/index').fetchRegistrationForDownloading.mockImplementation(
+    () => Promise.resolve(MARRIAGE_BUNDLE)
   )
   const testServer = new ApolloServer({
     ...getApolloConfig(),

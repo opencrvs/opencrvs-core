@@ -10,13 +10,10 @@
  */
 import {
   Bundle,
-  BundleEntry,
   FhirResourceType,
   StateIdenfitiers,
   getFromBundleById,
-  isComposition,
-  isEncounter,
-  isRelatedPerson
+  isComposition
 } from '@opencrvs/commons/types'
 import { HEARTH_MONGO_URL } from '@search/constants'
 import { MongoClient } from 'mongodb'
@@ -52,6 +49,7 @@ function checkForUnresolvedReferences(bundle: Bundle) {
   const EXCLUDED_PATHS = [
     'Location.partOf.reference',
     'Patient.address.extension',
+    'RelatedPerson.address.extension.valueReference',
     'Composition.relatesTo.targetReference.reference',
     'CompositionHistory.relatesTo.targetReference.reference'
   ]
@@ -78,8 +76,7 @@ function checkForUnresolvedReferences(bundle: Bundle) {
             developmentTimeError(
               'Unresolved reference found: ' + value,
               'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned',
-              'Resource:',
-              // JSON.stringify(rootResource),
+              `Resource path: ${path}`,
               'Bundle',
               dumpFile
             )
@@ -956,11 +953,11 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
               // Add fullUrl to all entries
               fullUrl: {
                 $concat: [
-                  'http://localhost:3447/fhir/',
+                  '/fhir/',
                   '$$resource.resourceType',
                   '/',
                   '$$resource.id',
-                  '/',
+                  '/_history/',
                   '$$resource.meta.versionId'
                 ]
               },
@@ -1008,15 +1005,10 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     return 1
   })
 
-  const bundleWithFullURLReferences = resolveReferenceFullUrls(
-    bundle,
-    entriesInBackwardsCompatibleOrder
-  )
-
   const record = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: bundleWithFullURLReferences.map((entry) => {
+    entry: entriesInBackwardsCompatibleOrder.map((entry) => {
       const { _id, ...resourceWithoutMongoId } = entry.resource
       return {
         ...entry,
@@ -1026,37 +1018,4 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   }
 
   return record as StateIdenfitiers[T[number]]
-}
-
-function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
-  return entries.map((entry) => {
-    const resource = entry.resource!
-    if (isComposition(resource)) {
-      resource.section?.forEach((section) => {
-        section.entry?.forEach((entry) => {
-          entry.reference = getFromBundleById(
-            bundle,
-            entry.reference!.split('/')[1]
-          )?.fullUrl
-        })
-      })
-    }
-    if (isEncounter(resource)) {
-      resource.location?.forEach(({ location }) => {
-        location.reference = getFromBundleById(
-          bundle,
-          location.reference.split('/')[1]
-        )?.fullUrl
-      })
-    }
-
-    if (isRelatedPerson(resource) && resource.patient?.reference) {
-      resource.patient.reference = getFromBundleById(
-        bundle,
-        resource.patient.reference.split('/')[1]
-      ).fullUrl
-    }
-
-    return entry
-  })
 }

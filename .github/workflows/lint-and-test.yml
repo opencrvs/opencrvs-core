@@ -40,9 +40,6 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v2
 
-      - name: Verify every file has a license header
-        run: npx license-check-and-add check -f license-config.json
-
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -87,6 +84,10 @@ jobs:
               fi
             fi
           done
+
+      - name: Verify every file has a license header
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: npx license-check-and-add check -f license-config.json
 
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'

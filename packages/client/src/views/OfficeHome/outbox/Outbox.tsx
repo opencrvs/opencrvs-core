@@ -49,23 +49,8 @@ import {
   IRetryStatus
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/utils'
-import { getScope } from '@client/profile/profileSelectors'
 import { Spinner } from '@opencrvs/components/lib'
-import { EMPTY_STRING } from '@client/utils/constants'
-
-function getFullName(firstName?: string, lastName?: string) {
-  let fullName = ''
-  if (firstName) {
-    fullName += firstName
-  }
-  if (lastName) {
-    if (fullName) {
-      fullName += ' '
-    }
-    fullName += lastName
-  }
-  return fullName
-}
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 
 const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
@@ -152,7 +137,6 @@ export function Outbox() {
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
   const isOnline = useOnlineStatus()
   const theme = getTheme()
-  const scope = useSelector(getScope)
   const declarations = useSelector((state: IStoreState) =>
     state.declarationsState?.declarations.filter(isOutboxDeclaration)
   )
@@ -177,57 +161,16 @@ export function Outbox() {
 
   function transformDeclarationsReadyToSend() {
     const items = declarations.map((declaration, index) => {
-      let name
+      const name = getDeclarationFullName(declaration)
       let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
-        name =
-          getFullName(
-            declaration.data?.child?.firstNamesEng as string,
-            declaration.data?.child?.familyNameEng as string
-          ) ||
-          getFullName(
-            declaration.data?.child?.firstNames as string,
-            declaration.data?.child?.familyName as string
-          )
         dateOfEvent = declaration.data?.child?.childBirthDate as string
       } else if (
         declaration.event &&
         declaration.event.toString() === 'death'
       ) {
-        name =
-          getFullName(
-            declaration.data?.deceased?.firstNamesEng as string,
-            declaration.data?.deceased?.familyNameEng as string
-          ) ||
-          getFullName(
-            declaration.data?.deceased?.firstNames as string,
-            declaration.data?.deceased?.familyName as string
-          )
         dateOfEvent = declaration.data?.deathEvent?.deathDate as string
       } else if (declaration?.event?.toString() === 'marriage') {
-        const brideName =
-          getFullName(
-            declaration.data?.bride?.firstNamesEng as string,
-            declaration.data?.bride?.familyNameEng as string
-          ) ||
-          getFullName(
-            declaration.data?.bride?.firstNames as string,
-            declaration.data?.bride?.familyName as string
-          )
-        const groomName =
-          getFullName(
-            declaration.data?.groom?.firstNamesEng as string,
-            declaration.data?.groom?.familyNameEng as string
-          ) ||
-          getFullName(
-            declaration.data?.groom?.firstNames as string,
-            declaration.data?.groom?.familyName as string
-          )
-        name =
-          brideName && groomName
-            ? `${groomName} & ${brideName}`
-            : brideName || groomName || EMPTY_STRING
-
         dateOfEvent = declaration.data?.marriageEvent?.marriageDate?.toString()
       }
 

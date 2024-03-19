@@ -41,3 +41,11 @@ vulnerabilities:
     statement: Dashboards vulns (java libs)
   - id: CVE-2022-1471
     statement: Dashboards vulns (java libs)
+  - id: CVE-2024-25710
+    statement: Metabase v0.46 vulnerability (remove when v0.49 is released)
+  - id: CVE-2024-26308
+    statement: Metabase v0.46 vulnerability (remove when v0.49 is released)
+  - id: CVE-2024-22201
+    statement: Metabase v0.46 vulnerability (remove when v0.49 is released)
+  - id: CVE-2023-36478
+    statement: Metabase v0.46 vulnerability (remove when v0.49 is released)

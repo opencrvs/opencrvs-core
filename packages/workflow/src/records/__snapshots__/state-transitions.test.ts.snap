@@ -144,12 +144,15 @@ Array [
     "outcome": Object {
       "coding": Array [
         Object {
-          "code": "SUCCESS",
+          "code": "COMPLETED",
         },
       ],
     },
     "resourceType": "PaymentReconciliation",
     "status": "active",
+    "total": Object {
+      "value": 100,
+    },
   },
   Object {
     "resourceType": "Encounter",

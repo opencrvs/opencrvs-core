@@ -19,7 +19,15 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { markRecordAsDownloadedBySystem } from '@gateway/features/registration/root-resolvers'
+import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
+import { ApolloError } from 'apollo-server-hapi'
+
+export class RateLimitError extends ApolloError {
+  constructor(message: string) {
+    super(message, 'DAILY_QUOTA_EXCEEDED')
+    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
+  }
+}
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -97,6 +105,24 @@ export const resolvers: GQLResolver = {
         )
       }
 
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
+      }
+      if (userId) {
+        searchCriteria.createdBy = userId
+      }
+      if (sortColumn) {
+        searchCriteria.sortColumn = sortColumn
+      }
+      if (sortBy) {
+        searchCriteria.sortBy = sortBy.map((sort) => ({
+          [sort.column]: sort.order
+        }))
+      }
+
       const isExternalAPI = hasScope(authHeader, 'recordsearch')
       if (isExternalAPI) {
         const payload = getTokenPayload(authHeader.Authorization)
@@ -108,7 +134,7 @@ export const resolvers: GQLResolver = {
           authHeader
         )
         if (getTotalRequest.total >= system.settings.dailyQuota) {
-          return await Promise.reject(new Error('Daily search quota exceeded'))
+          throw new RateLimitError('Daily search quota exceeded')
         }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
@@ -120,7 +146,7 @@ export const resolvers: GQLResolver = {
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await markRecordAsDownloadedBySystem(hit._id, system, authHeader)
+          await fetchRegistrationForDownloading(hit._id, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {
@@ -146,24 +172,6 @@ export const resolvers: GQLResolver = {
 
         if (!hasAtLeastOneParam) {
           return await Promise.reject(new Error('There is no param to search '))
-        }
-
-        if (count) {
-          searchCriteria.size = count
-        }
-        if (skip) {
-          searchCriteria.from = skip
-        }
-        if (userId) {
-          searchCriteria.createdBy = userId
-        }
-        if (sortColumn) {
-          searchCriteria.sortColumn = sortColumn
-        }
-        if (sortBy) {
-          searchCriteria.sortBy = sortBy.map((sort) => ({
-            [sort.column]: sort.order
-          }))
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }

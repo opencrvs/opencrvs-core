@@ -16,9 +16,7 @@ import {
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
-  IFormFieldValue,
   IFormSection,
-  IFormSectionData,
   TransformedData
 } from '@client/forms'
 import { sectionTransformer } from '@client/forms/register/mappings/query'
@@ -39,13 +37,6 @@ import {
 import { UserDetails } from '@client/utils/userUtils'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-
-interface ICorrection {
-  section: string
-  fieldName: string
-  oldValue: IFormFieldValue
-  newValue: IFormFieldValue
-}
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -70,40 +61,27 @@ const nestedFieldsMapping = (
   }
 }
 
-const transformRegistrationCorrection = (
+const toCorrectionValue = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
   originalDraftData: IFormData,
-  transformedData: TransformedData,
   nestedFieldDef: IFormField | null = null
-): void => {
-  const values: CorrectionValueInput[] =
-    transformedData.registration.correction?.values ?? []
-
-  if (!transformedData.registration) {
-    transformedData.registration = {}
-  }
-
-  if (!transformedData.registration.correction) {
-    transformedData.registration.correction = draftData.registration.correction
-      ? { ...(draftData.registration.correction as IFormSectionData) }
-      : {}
-  }
-
+) => {
+  const changedValues: CorrectionValueInput[] = []
   if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
     const newFieldValue = get(draftData[section.id], valuePath)
     const oldFieldValue = get(originalDraftData[section.id], valuePath)
     if (newFieldValue !== oldFieldValue) {
-      values.push({
+      changedValues.push({
+        section: section.id,
+        fieldName: valuePath,
         newValue: serializeFieldValue(
           fieldDef,
           newFieldValue,
           draftData[section.id]
         ),
-        section: section.id,
-        fieldName: valuePath,
         oldValue: serializeFieldValue(
           fieldDef,
           oldFieldValue,
@@ -122,11 +100,11 @@ const transformRegistrationCorrection = (
     )
 
     if (selectedRadioOption !== selectedRadioOptionOld) {
-      values.push({
+      changedValues.push({
         section: section.id,
         fieldName: fieldDef.name,
-        newValue: selectedRadioOption,
-        oldValue: selectedRadioOptionOld
+        newValue: selectedRadioOption ?? '',
+        oldValue: selectedRadioOptionOld ?? ''
       })
     }
 
@@ -135,43 +113,44 @@ const transformRegistrationCorrection = (
       Array.isArray(fieldDef.nestedFields[selectedRadioOption])
     ) {
       for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
-        transformRegistrationCorrection(
+        const nestedChangedValues = toCorrectionValue(
           section,
           fieldDef,
           draftData,
           originalDraftData,
-          transformedData,
           nestedFieldDef
         )
+        changedValues.push(...nestedChangedValues)
       }
     }
   } else {
-    const value = draftData[section.id][fieldDef.name]
-    const payload: ICorrection = {
+    changedValues.push({
       section: section.id,
       fieldName: fieldDef.name,
-      newValue: serializeFieldValue(fieldDef, value, draftData[section.id]),
-      oldValue: serializeFieldValue(
+      newValue: serializeFieldValue(
         fieldDef,
-        originalDraftData[section.id][fieldDef.name],
-        originalDraftData[section.id]
-      )
-    }
-
-    values.push(payload)
+        draftData[section.id][fieldDef.name],
+        draftData[section.id]
+      ),
+      oldValue:
+        serializeFieldValue(
+          fieldDef,
+          originalDraftData[section.id][fieldDef.name],
+          originalDraftData[section.id]
+        ) ?? ''
+    })
   }
-
-  transformedData.registration.correction.values = values
+  return changedValues
 }
 
-export function addCorrectionDetails(
+export function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
-  transformedData: TransformedData,
   offlineCountryConfig?: IOfflineData
 ) {
   const draftData = declaration.data
   const originalDraftData = declaration.originalData || {}
+  const changedValues: CorrectionValueInput[] = []
 
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -195,30 +174,32 @@ export function addCorrectionDetails(
           draftData
         )
 
-        if (Object.keys(originalDraftData).length) {
-          if (
-            !conditionalActions.includes('hide') &&
-            !conditionalActions.includes('disable') &&
-            hasFieldChanged(
-              fieldDef,
-              draftData[section.id],
-              originalDraftData[section.id]
-            )
-          ) {
-            transformRegistrationCorrection(
+        originalDraftData[section.id] ??= {}
+
+        if (
+          !conditionalActions.includes('hide') &&
+          !conditionalActions.includes('disable') &&
+          !(section.id === 'documents') &&
+          hasFieldChanged(
+            fieldDef,
+            draftData[section.id],
+            originalDraftData[section.id]
+          )
+        ) {
+          changedValues.push(
+            ...toCorrectionValue(
               section,
               fieldDef,
               draftData,
-              originalDraftData,
-              transformedData
+              originalDraftData
             )
-          }
+          )
         }
       })
     })
   })
 
-  return transformedData
+  return changedValues
 }
 
 export const draftToGqlTransformer = (

@@ -33,42 +33,7 @@ const REGISTER_MARRIAGE_DECLARATION = gql`
     $id: ID!
     $details: MarriageRegistrationInput!
   ) {
-    markMarriageAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markMarriageAsRegistered(id: $id, details: $details)
   }
 `
 const REJECT_MARRIAGE_DECLARATION = gql`

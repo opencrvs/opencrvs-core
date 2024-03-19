@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Bundle, Resource, Saved, getEncounterFromRecord } from '.'
+import { Bundle, Resource, Saved, findEncounterFromRecord } from '.'
 
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
@@ -50,7 +50,11 @@ export function findObservationByCode(
   bundle: Saved<Bundle>,
   code: ObservationCode
 ) {
-  const encounter = getEncounterFromRecord(bundle)
+  const encounter = findEncounterFromRecord(bundle)
+
+  if (!encounter) {
+    return undefined
+  }
 
   return bundle.entry
     .map((x) => x.resource)

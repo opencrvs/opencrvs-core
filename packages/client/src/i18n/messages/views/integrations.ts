@@ -335,11 +335,6 @@ const messagesToDefine = {
     defaultMessage: 'MOSIP',
     description: 'Integrating system type option "MOSIP"'
   },
-  integratingSystemTypeOsia: {
-    id: 'integrations.integratingSystemTypeOsia',
-    defaultMessage: 'OSIA (Coming soon)',
-    description: 'Integrating system type option "OSIA"'
-  },
   integratingSystemTypeOther: {
     id: 'integrations.integratingSystemTypeOther',
     defaultMessage: 'Other',
@@ -354,11 +349,6 @@ const messagesToDefine = {
     id: 'integrations.integratingSystemTypeAlertMosip',
     defaultMessage: 'Mosip copy tbd. TODO: Euan',
     description: 'Label for alert when selecting MOSIP type'
-  },
-  integratingSystemTypeAlertOsia: {
-    id: 'integrations.integratingSystemTypeAlertOsia',
-    defaultMessage: 'Osia copy tbd. TODO: Euan',
-    description: 'Label for alert when selecting OSIA type'
   },
   integratingSystemTypeAlertOther: {
     id: 'integrations.integratingSystemTypeAlertOther',

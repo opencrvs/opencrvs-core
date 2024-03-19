@@ -23,7 +23,7 @@ export async function notifyCountryConfig(
     sms?: string | null
   },
   type: 'user' | 'informant',
-  variables: Record<string, string>,
+  variables: Record<string, unknown>,
   token: string,
   locale: string,
   convertUnicode?: boolean

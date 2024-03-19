@@ -617,6 +617,10 @@ const messagesToDefine = {
       'Add the roles to be assigned the system role of {systemRole}',
     description: 'Instruction for adding/updating role in role management modal'
   },
+  language: {
+    id: 'config.userRoles.language',
+    defaultMessage: '{language}'
+  },
   emailAllUsersTitle: {
     id: 'config.emailAllUsers.title',
     defaultMessage: 'Email all users',

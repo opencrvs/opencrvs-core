@@ -18,14 +18,10 @@ import {
 import { createServer } from '@search/server'
 import {
   mockBirthFhirBundle,
-  mockCompositionEntry,
-  mockCompositionResponse,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockEncounterResponse,
-  mockLocationResponse,
-  mockUserModelResponse,
-  mockTaskBundleWithExtensions
+  mockUserModelResponse
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -71,13 +67,15 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
-        [JSON.stringify(mockCompositionResponse), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify({}), { status: 200 }]
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
@@ -87,7 +85,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/new-declaration',
+        url: '/record',
         payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
@@ -123,12 +121,24 @@ describe('Verify handlers', () => {
           { status: 200 }
         ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
-        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
-        [JSON.stringify(mockCompositionResponse), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify(mockCompositionEntry), { status: 200 }],
-        [JSON.stringify({}), { status: 200 }]
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ]
       )
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
@@ -138,7 +148,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/new-declaration',
+        url: '/record',
         payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
