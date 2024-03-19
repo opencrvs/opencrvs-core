@@ -39,7 +39,7 @@ import {
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { CorrectionReason } from '@client/forms/correction/reason'
-import { Table } from '@client/../../components/lib'
+import { Table } from '@opencrvs/components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -371,6 +371,8 @@ const ActionDetailsModalListTable = ({
       const relation = CollectorRelationLabelArray.find(
         (labelItem) => labelItem.value === certificate.collector?.relationship
       )
+      console.log('certificate=>', certificate)
+
       const collectorName = `${name?.firstNames || ''} ${
         name?.familyName || ''
       }`
