@@ -537,28 +537,30 @@ const ActionDetailsModalListTable = ({
         )}
 
       {/* For Certificate */}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollector}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollectorVerified}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollector}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollectorVerified}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&

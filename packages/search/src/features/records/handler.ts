@@ -18,8 +18,8 @@ export async function getRecordByIdHandler(
 ) {
   const recordId = request.params.recordId
   const allowedStates = request.query.states?.split(',') || []
-  const includeHistoryResources = true
-  // request.query.includeHistoryResources !== undefined
+  const includeHistoryResources =
+    request.query.includeHistoryResources !== undefined
   try {
     const bundle = await getRecordById(
       recordId,
