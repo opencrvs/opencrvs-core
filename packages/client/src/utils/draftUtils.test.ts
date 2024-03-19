@@ -10,7 +10,7 @@
  */
 import { Event } from '@client/utils/gateway'
 import {
-  getDraftInformantFullName,
+  getDeclarationFullName,
   transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
 import type {
@@ -23,7 +23,7 @@ describe('draftUtils tests', () => {
     describe('Birth event', () => {
       it('Returns child english name properly', () => {
         expect(
-          getDraftInformantFullName({
+          getDeclarationFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               child: {
@@ -41,7 +41,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftInformantFullName(
+          getDeclarationFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {
@@ -63,7 +63,7 @@ describe('draftUtils tests', () => {
     describe('Death event', () => {
       it('Returns deceased english name properly', () => {
         expect(
-          getDraftInformantFullName({
+          getDeclarationFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               deceased: {
@@ -80,7 +80,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftInformantFullName(
+          getDeclarationFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {

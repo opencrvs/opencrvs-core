@@ -49,6 +49,7 @@ function checkForUnresolvedReferences(bundle: Bundle) {
   const EXCLUDED_PATHS = [
     'Location.partOf.reference',
     'Patient.address.extension',
+    'RelatedPerson.address.extension.valueReference',
     'Composition.relatesTo.targetReference.reference',
     'CompositionHistory.relatesTo.targetReference.reference'
   ]
@@ -75,8 +76,7 @@ function checkForUnresolvedReferences(bundle: Bundle) {
             developmentTimeError(
               'Unresolved reference found: ' + value,
               'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned',
-              'Resource:',
-              // JSON.stringify(rootResource),
+              `Resource path: ${path}`,
               'Bundle',
               dumpFile
             )

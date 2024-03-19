@@ -66,7 +66,6 @@ const config = {
     PRINT_DECLARATION: true
   },
   LANGUAGES: 'en,bn,fr',
-  AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',

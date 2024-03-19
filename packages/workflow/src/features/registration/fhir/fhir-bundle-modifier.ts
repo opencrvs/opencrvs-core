@@ -507,7 +507,7 @@ export function updatePatientIdentifierWithRN(
 interface Integration {
   name: string
   status: string
-  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
+  integratingSystemType: 'MOSIP' | 'OTHER'
 }
 
 const statuses = {

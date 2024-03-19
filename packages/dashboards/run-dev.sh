@@ -21,11 +21,12 @@
 
 echo 'OpenCRVS Metabase development environment'
 
-metabase_jar='./metabase.jar'
+METABASE_VERSION="v0.46.6.1"
+METABASE_JAR="./$METABASE_VERSION-metabase.jar"
 
-if [ ! -f "$metabase_jar" ]; then
+if [ ! -f "$METABASE_JAR" ]; then
   echo "You don't seem to have Metabase installed. Downloading Metabase..."
-  curl https://downloads.metabase.com/v0.48.6/metabase.jar --output $metabase_jar
+  curl https://downloads.metabase.com/$METABASE_VERSION/metabase.jar --output $METABASE_JAR
 fi
 
 if [ -f .env ]
@@ -60,7 +61,6 @@ metabase_db_path_for_metabase=${metabase_db_path%.mv.db}
 # Create database from supplied SQL file
 #
 #########
-
 . ./initialize-database.sh
 . ./update-database.sh
 
@@ -72,8 +72,7 @@ metabase_db_path_for_metabase=${metabase_db_path%.mv.db}
 
 MB_DB_FILE=${metabase_db_path_for_metabase} \
 MB_DB_TYPE=h2 \
-java -jar metabase.jar
-
+java -jar $METABASE_JAR
 ##########
 #
 # Store database back to SQL File to be stored in version control
@@ -84,7 +83,7 @@ save_sql_file=${MB_DB_SAVE_TO_SQL_FILE}
 
 if [ -n "$save_sql_file" ]; then
   echo "Saving database $metabase_db_path to $save_sql_file"
-  java -cp "$metabase_jar" org.h2.tools.Script -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$save_sql_file"
+  java -cp "$METABASE_JAR" org.h2.tools.Script -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$save_sql_file"
   echo "Done"
   exit 0
 fi

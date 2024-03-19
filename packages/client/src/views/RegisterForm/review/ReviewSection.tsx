@@ -112,7 +112,7 @@ import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
   injectIntl,
@@ -1723,7 +1723,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
-    const informantName = getDraftInformantFullName(
+    const informantName = getDeclarationFullName(
       declaration,
       intl.locale,
       this.isLastNameFirst()
