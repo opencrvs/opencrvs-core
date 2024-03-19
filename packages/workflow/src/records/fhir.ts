@@ -304,8 +304,9 @@ function findPatientReferenceFromRelatedPerson(
   record: RegisteredRecord | CertifiedRecord,
   reference: ResourceIdentifier
 ): ResourceIdentifier {
-  return (findEntryFromBundle(record, reference)
-    ?.resource as Saved<RelatedPerson>)!.patient.reference
+  return (
+    findEntryFromBundle(record, reference)?.resource as Saved<RelatedPerson>
+  ).patient.reference
 }
 
 export function createRelatedPersonEntries(

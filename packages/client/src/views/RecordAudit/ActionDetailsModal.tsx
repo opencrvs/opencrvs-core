@@ -371,8 +371,6 @@ const ActionDetailsModalListTable = ({
       const relation = CollectorRelationLabelArray.find(
         (labelItem) => labelItem.value === certificate.collector?.relationship
       )
-      console.log('certificate=>', certificate)
-
       const collectorName = `${name?.firstNames || ''} ${
         name?.familyName || ''
       }`
