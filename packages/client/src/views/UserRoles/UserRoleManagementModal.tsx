@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux'
 import { getLanguages } from '@client/i18n/selectors'
 import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
 import { messages } from '@client/i18n/messages/views/config'
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 import {
   ISystemRole,
   RolesInput
@@ -103,7 +103,7 @@ export function UserRoleManagementModal(props: IProps) {
   )
 
   const isRoleUpdateValid = () => {
-    if (_.isEqual(userRoles, stripTypenameFromRoles(props.systemRole.roles))) {
+    if (isEqual(userRoles, stripTypenameFromRoles(props.systemRole.roles))) {
       return false
     }
     const inCompleteRoleEntries = userRoles.filter((role) => {

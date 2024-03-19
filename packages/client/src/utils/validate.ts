@@ -21,7 +21,7 @@ import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _, { get } from 'lodash'
+import { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
 /**
@@ -653,7 +653,7 @@ export const validIDNumber =
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
-    const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
+    const valueToCheck = get(drafts, fieldToDuplicateCheck)
     if (value && valueToCheck && value === valueToCheck) {
       return {
         message: messages.duplicateNationalID

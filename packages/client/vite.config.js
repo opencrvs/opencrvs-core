@@ -12,6 +12,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
+import { optimizeLodashImports } from '@optimize-lodash/rollup-plugin'
 
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
@@ -88,7 +89,13 @@ export default defineConfig(({ mode }) => {
         crypto: 'crypto-js'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react(),
+      tsconfigPaths(),
+      VitePWAPlugin(),
+      optimizeLodashImports(),
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
