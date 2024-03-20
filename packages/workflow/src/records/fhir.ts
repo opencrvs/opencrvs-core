@@ -50,8 +50,7 @@ import {
   isTask,
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
-  findEntryFromBundle,
-  Saved
+  getResourceFromBundleById
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -299,10 +298,11 @@ export function createDocumentReferenceEntryForCertificate(
 
 function findPatientReferenceFromRelatedPerson(
   record: RegisteredRecord | CertifiedRecord,
-  reference: ResourceIdentifier
+  relatedPesonReference: ResourceIdentifier
 ): ResourceIdentifier {
-  return (
-    findEntryFromBundle(record, reference)?.resource as Saved<RelatedPerson>
+  return getResourceFromBundleById<RelatedPerson>(
+    record,
+    resourceIdentifierToUUID(relatedPesonReference)
   ).patient.reference
 }
 
