@@ -72,7 +72,7 @@ describe('Update record endpoint', () => {
               response: {
                 status: '201',
                 location:
-                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/919495a1-56ed-4fa1-b045-2670b2c6ed63' as URLReference
+                  '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/cf4454c2-5754-4bc9-b173-1622e61eda16' as URLReference
               }
             },
             {
@@ -107,7 +107,14 @@ describe('Update record endpoint', () => {
               response: {
                 status: '201',
                 location:
-                  '/fhir/Encounter/2e5b37ef-c3c2-4071-af56-d20a16e87891/_history/cf4454c2-5754-4bc9-b173-1622e61eda16' as URLReference
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/919495a1-56ed-4fa1-b045-2670b2c6ed63' as URLReference
+              }
+            },
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1/_history/7d23bdbd-d987-4c03-8cad-1d4e4b7b986c' as URLReference
               }
             },
             {
@@ -129,13 +136,6 @@ describe('Update record endpoint', () => {
                 status: '201',
                 location:
                   '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/7d23bdbd-d987-4c03-8cad-1d4e4b7b986c' as URLReference
-              }
-            },
-            {
-              response: {
-                status: '201',
-                location:
-                  '/fhir/Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1/_history/7d23bdbd-d987-4c03-8cad-1d4e4b7b986c' as URLReference
               }
             },
             {
