@@ -787,7 +787,7 @@ export function createRegisterTask(previousTask: SavedTask): Task {
 
 export function createReinstateTask(
   previousTask: SavedTask,
-  prevBusinessStatuses: RegistrationStatus
+  prevBusinessStatus: RegistrationStatus
 ) {
   return createNewTaskResource(
     previousTask,
@@ -796,7 +796,7 @@ export function createReinstateTask(
         url: 'http://opencrvs.org/specs/extension/regReinstated'
       }
     ],
-    prevBusinessStatuses
+    prevBusinessStatus
   )
 }
 

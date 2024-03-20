@@ -49,14 +49,6 @@ export const reinstateRoute = createRoute({
 
     const reinstatedRecord = await toReinstated(record, prevRegStatus, token)
 
-    const reinstatedTask = reinstatedRecord.entry.find(
-      (e) => e.resource.resourceType === 'Task'
-    )
-
-    if (!reinstatedTask) {
-      throw new Error('No task found after reinstating')
-    }
-
     await indexBundle(reinstatedRecord, token)
     await auditEvent('reinstated', reinstatedRecord, token)
 

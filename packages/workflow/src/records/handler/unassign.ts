@@ -44,14 +44,10 @@ export async function unassignRecordHandler(
     ]
   )
 
-  const unassignedRecordWithTaskOnly = await toUnassigned(record, token)
+  const unassignedRecord = await toUnassigned(record, token)
 
-  await sendBundleToHearth(unassignedRecordWithTaskOnly)
-  await indexBundleToRoute(
-    unassignedRecordWithTaskOnly,
-    token,
-    '/events/unassigned'
-  )
+  await sendBundleToHearth(unassignedRecord)
+  await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
 
-  return unassignedRecordWithTaskOnly
+  return unassignedRecord
 }
