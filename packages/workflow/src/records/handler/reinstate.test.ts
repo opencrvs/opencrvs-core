@@ -14,8 +14,13 @@ import { readFileSync } from 'fs'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
-import { ReadyForReviewRecord, RegisteredRecord } from '@opencrvs/commons/types'
+import {
+  ReadyForReviewRecord,
+  RegisteredRecord,
+  URLReference
+} from '@opencrvs/commons/types'
 import { ARCHIVED_BIRTH_RECORD } from '@test/mocks/records/archive'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
   const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')
@@ -54,6 +59,26 @@ describe('reinstate record endpoint', () => {
           return res(ctx.json(ARCHIVED_BIRTH_RECORD))
         }
       )
+    )
+
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'transaction-response',
+          entry: [
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Task/529a2252-597f-4651-9c53-fb0b68403247/_history/919495a1-56ed-4fa1-b045-2670b2c6ed63' as URLReference
+              }
+            }
+          ]
+        }
+
+        return res(ctx.json(responseBundle))
+      })
     )
 
     const res = await server.server.inject({

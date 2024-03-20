@@ -16,9 +16,11 @@ import * as jwt from 'jsonwebtoken'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('archive record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -51,6 +53,26 @@ describe('archive record endpoint', () => {
           return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
+    )
+
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'transaction-response',
+          entry: [
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/919495a1-56ed-4fa1-b045-2670b2c6ed63' as URLReference
+              }
+            }
+          ]
+        }
+
+        return res(ctx.json(responseBundle))
+      })
     )
 
     const res = await server.server.inject({
