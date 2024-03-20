@@ -19,19 +19,19 @@ sequenceDiagram
     participant ElasticSearch
 
     GraphQL gateway->>Search: Search for assignment
-    Search->>ElasticSearch: Search by Composition id
+    Search->>ElasticSearch: Search by composition id
     Note over GraphQL gateway,ElasticSearch: Check if the user has been assigned to this record
 
     GraphQL gateway->>Workflow: POST /records/{recordId}/reject
     Workflow->>Search: Get record by id (by createRoute)
 
-    Workflow->>User management: Fetch user/system info
-    loop PractitionerRole Locations
-      Workflow->>Hearth: Get Location by user's practitionerId
-    end
-    Note over Workflow,Hearth: Adds office to the Task Bundle
+    Workflow->>User management: Fetch user/system information
+    Workflow->>Hearth: Get practitioner resource
 
-    Note over Workflow: Modify task entry
+    loop PractitionerRole Locations
+      Workflow->>Hearth: Get location by user's practitionerId
+    end
+    Note over Workflow,Hearth: Update bundle with practitioner details
 
     Workflow->>Hearth: Save bundle to hearth
     Note over Workflow,Hearth: Get hearth response for all entries
@@ -46,17 +46,14 @@ sequenceDiagram
     %% createIndexBody
       %% createChildIndex
       %% addEventLocation
-    Search->>Hearth: Get Encounter
-    Search->>Hearth: Get Encounter location
+    Search->>Hearth: Get event location for creating child index
 
     %% createDeclarationIndex
-      %% getCreatedBy
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdBy
+    Search->>Hearth: Get declarationJurisdictionIds for declaration index
+    Search->>ElasticSearch: Get createdBy
 
     %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
+    Search->>User management: Get user for status history
     Note over Search,Hearth: Compose new history entry
 
     Search->>ElasticSearch: Index composition
