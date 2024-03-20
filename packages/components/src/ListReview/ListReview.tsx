@@ -23,6 +23,10 @@ const ListReviewTable = styled.table`
   border-collapse: collapse;
   width: 100%;
 
+  tr:last-child {
+    border-bottom: none;
+  }
+
   /* Media query for mobile */
   @media screen and (max-width: 768px) {
     thead {
