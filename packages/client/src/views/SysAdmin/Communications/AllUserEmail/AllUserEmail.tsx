@@ -111,7 +111,7 @@ const AllUserEmail = () => {
           >
             <FullWidthInputField
               id="subject"
-              label={'Subject'}
+              label={intl.formatMessage(constantsMessages.emailSubject)}
               touched={false}
               required={true}
               hideAsterisk
@@ -123,7 +123,7 @@ const AllUserEmail = () => {
             </FullWidthInputField>
             <FullWidthInputField
               id="body"
-              label={'Message'}
+              label={intl.formatMessage(constantsMessages.emailBody)}
               touched={false}
               required={true}
               hideAsterisk

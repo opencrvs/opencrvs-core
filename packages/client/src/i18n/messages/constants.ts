@@ -409,6 +409,16 @@ const messagesToDefine: IConstantsMessages = {
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
   },
+  emailBody: {
+    defaultMessage: 'Message',
+    description: 'Label for email body input',
+    id: 'constants.emailBody'
+  },
+  emailSubject: {
+    defaultMessage: 'Subject',
+    description: 'Label for email subject input',
+    id: 'constants.emailSubject'
+  },
   estimatedNumberOfEvents: {
     defaultMessage:
       'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
