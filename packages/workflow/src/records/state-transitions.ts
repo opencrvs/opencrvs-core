@@ -862,14 +862,20 @@ export async function toUnassigned(
   return unassignedRecordWithTaskOnly
 }
 
-export async function toVerified(
+export function toVerified(
   record: RegisteredRecord | IssuedRecord,
   ipInfo: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
   const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
 
-  return {
+  const verifiedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: verifyRecordTask }]
+  }
+
+  const verifiedRecord = {
     ...record,
     entry: [
       ...record.entry.filter((e) => e.resource.resourceType !== 'Task'),
@@ -880,6 +886,8 @@ export async function toVerified(
       }
     ]
   }
+
+  return { verifiedRecord, verifiedRecordWithTaskOnly }
 }
 
 export async function toCorrectionRejected(
