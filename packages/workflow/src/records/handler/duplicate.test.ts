@@ -18,9 +18,11 @@ import {
   Extension,
   getTaskFromSavedBundle,
   SavedTask,
+  URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { TransactionResponse } from '@workflow/records/fhir'
 
 function hasDuplicateExtension(task: SavedTask) {
   return task.extension.find(
@@ -89,6 +91,26 @@ describe('duplicate record endpoint', () => {
           return res(ctx.json({}))
         }
       )
+    )
+
+    mswServer.use(
+      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+        const responseBundle: TransactionResponse = {
+          resourceType: 'Bundle',
+          type: 'transaction-response',
+          entry: [
+            {
+              response: {
+                status: '201',
+                location:
+                  '/fhir/Task/f00e742a-0900-488b-b7c1-9625d7b7e456/_history/919495a1-56ed-4fa1-b045-2670b2c6ed63' as URLReference
+              }
+            }
+          ]
+        }
+
+        return res(ctx.json(responseBundle))
+      })
     )
 
     const res = await server.server.inject({

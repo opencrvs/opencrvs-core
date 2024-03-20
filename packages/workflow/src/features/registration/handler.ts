@@ -14,7 +14,6 @@ import { getEventType } from '@workflow/features/registration/utils'
 import { EVENT_TYPE } from '@opencrvs/commons/types'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { indexBundle } from '@workflow/records/search'
 import {
   isNotificationEnabled,
@@ -53,14 +52,12 @@ export async function markEventAsRegisteredCallbackHandler(
   if (!savedRecord) {
     throw new Error('Could not find record in elastic search!')
   }
-  const practitioner = await getLoggedInPractitionerResource(getToken(request))
 
   const event = getEventType(savedRecord)
 
   const registeredBundle = await toRegistered(
     request,
     savedRecord,
-    practitioner,
     registrationNumber,
     token,
     childIdentifiers
