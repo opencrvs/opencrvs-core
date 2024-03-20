@@ -27,7 +27,6 @@ import {
   urlReferenceToUUID,
   ValidRecord,
   resourceIdentifierToUUID,
-  Location,
   isEncounter,
   isRelatedPerson,
   Encounter,
@@ -49,7 +48,8 @@ import {
   resourceToSavedBundleEntry,
   ResourceIdentifier,
   isTask,
-  urlReferenceToResourceIdentifier
+  urlReferenceToResourceIdentifier,
+  RegistrationStatus
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -63,14 +63,8 @@ import {
   CertifyInput
 } from '@workflow/records/validations'
 import { badRequest, internal } from '@hapi/boom'
+import { getUserOrSystem, isSystem } from './user'
 import {
-  getUserOrSystem,
-  isSystem,
-  ISystemModelData,
-  IUserModelData
-} from './user'
-import {
-  getPractitionerOffice,
   getLoggedInPractitionerResource,
   getPractitionerLocations
 } from '@workflow/features/user/utils'
@@ -119,7 +113,10 @@ export async function withPractitionerDetails<T extends Task>(
     identifier: task.identifier.filter(
       ({ system }) =>
         system !== 'http://opencrvs.org/specs/id/system_identifier'
-    )
+    ),
+    requester: {
+      agent: { reference: `Practitioner/${userOrSystem.practitionerId}` }
+    }
   }
   if (isSystem(userOrSystem)) {
     const { name, username, type } = userOrSystem
@@ -664,118 +661,35 @@ export function createCorrectedTask(
 
 export async function createViewTask(
   previousTask: SavedTask,
-  user: IUserModelData,
-  office: Location
+  token: string
 ): Promise<SavedTask> {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${user.practitionerId}` }
-    },
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
-      {
-        url: 'http://opencrvs.org/specs/extension/regLastUser',
-        valueReference: {
-          reference: `Practitioner/${user.practitionerId as UUID}`
-        }
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: `Location/${resourceIdentifierToUUID(
-            office!.partOf!.reference
-          )}`
-        }
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/regLastOffice',
-        valueReference: {
-          reference: `Location/${user.primaryOfficeId}`
-        }
-      },
-      { url: 'http://opencrvs.org/specs/extension/regViewed' }
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: previousTask.businessStatus,
-    meta: {
-      ...previousTask.meta,
-      lastUpdated: new Date().toISOString()
-    }
-  }
+  const taskWithoutPracitionerExtensions = createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regViewed' }
+  ])
+
+  const [viewedTask] = await withPractitionerDetails(
+    taskWithoutPracitionerExtensions,
+    token
+  )
+
+  return viewedTask
 }
 
 export async function createDownloadTask(
   previousTask: SavedTask,
-  user: IUserModelData | ISystemModelData,
+  token: string,
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
 ): Promise<SavedTask> {
-  const office = (await getPractitionerOffice(user.practitionerId)) as Location
-  const identifiers = previousTask.identifier.filter(
-    ({ system }) =>
-      // Clear old system identifier task if it happens that the last task was made
-      // by an intergration but this one is by a real user
-      system !== 'http://opencrvs.org/specs/id/system_identifier'
+  const taskWithoutPractitionerExtensions: SavedTask = createNewTaskResource(
+    previousTask,
+    [{ url: extensionUrl }]
   )
 
-  if (isSystem(user)) {
-    identifiers.push({
-      system: 'http://opencrvs.org/specs/id/system_identifier',
-      value: JSON.stringify({
-        name: user.name,
-        username: user.username,
-        type: user.type
-      })
-    })
-  }
-
-  const extensions: Extension[] = isSystem(user)
-    ? []
-    : [
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastUser',
-          valueReference: {
-            reference: `Practitioner/${user.practitionerId as UUID}`
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastLocation',
-          valueReference: {
-            reference: `Location/${resourceIdentifierToUUID(
-              office!.partOf!.reference
-            )}`
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastOffice',
-          valueReference: {
-            reference: `Location/${user.primaryOfficeId}`
-          }
-        }
-      ]
-
-  const downloadedTask: SavedTask = createNewTaskResource(
-    previousTask,
-    [{ url: extensionUrl }, ...extensions],
-    user.practitionerId
+  const [downloadedTask] = await withPractitionerDetails(
+    taskWithoutPractitionerExtensions,
+    token
   )
 
   return downloadedTask
@@ -783,7 +697,6 @@ export async function createDownloadTask(
 
 export function createRejectTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comment: fhir3.CodeableConcept,
   reason?: string
 ): SavedTask {
@@ -795,7 +708,6 @@ export function createRejectTask(
         valueInteger: 0
       }
     ],
-    practitioner.id,
     'REJECTED'
   )
 
@@ -812,7 +724,6 @@ export function createRejectTask(
 
 export function createValidateTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comments?: string,
   timeLoggedMS?: number
 ): SavedTask {
@@ -824,7 +735,6 @@ export function createValidateTask(
         valueInteger: timeLoggedMS ?? 0
       }
     ],
-    practitioner.id,
     'VALIDATED'
   )
 
@@ -836,7 +746,6 @@ export function createValidateTask(
 
 export function createWaitingForValidationTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   comments?: string,
   timeLoggedMS?: number
 ): Task {
@@ -848,7 +757,6 @@ export function createWaitingForValidationTask(
         valueInteger: timeLoggedMS ?? 0
       }
     ],
-    practitioner.id,
     'WAITING_VALIDATION'
   )
 
@@ -858,10 +766,7 @@ export function createWaitingForValidationTask(
   }
 }
 
-export function createRegisterTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): Task {
+export function createRegisterTask(previousTask: SavedTask): Task {
   const timeLoggedMSExtension = previousTask.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
   )!
@@ -869,7 +774,6 @@ export function createRegisterTask(
   const registeredTask = createNewTaskResource(
     previousTask,
     [timeLoggedMSExtension],
-    practitioner.id,
     'REGISTERED'
   )
 
@@ -881,9 +785,23 @@ export function createRegisterTask(
   }
 }
 
+export function createReinstateTask(
+  previousTask: SavedTask,
+  prevBusinessStatus: RegistrationStatus
+) {
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/regReinstated'
+      }
+    ],
+    prevBusinessStatus
+  )
+}
+
 export function createArchiveTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -898,7 +816,6 @@ export function createArchiveTask(
   const archivedTask = createNewTaskResource(
     previousTask,
     newExtensions,
-    practitioner.id,
     'ARCHIVED'
   )
 
@@ -913,24 +830,16 @@ export function createArchiveTask(
   return updatedArchivedTask
 }
 
-export function createNotDuplicateTask(
-  previousTask: SavedTask,
-  practitionerId: string
-): SavedTask {
-  return createNewTaskResource(
-    previousTask,
-    [
-      {
-        url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate' as const
-      }
-    ],
-    practitionerId
-  )
+export function createNotDuplicateTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [
+    {
+      url: 'http://opencrvs.org/specs/extension/markedAsNotDuplicate' as const
+    }
+  ])
 }
 
 export function createDuplicateTask(
   previousTask: SavedTask,
-  practitioner: Practitioner,
   reason?: string,
   comment?: string,
   duplicateTrackingId?: string
@@ -943,11 +852,7 @@ export function createDuplicateTask(
     })
   }
 
-  const duplicateTask = createNewTaskResource(
-    previousTask,
-    newExtensions,
-    practitioner.id
-  )
+  const duplicateTask = createNewTaskResource(previousTask, newExtensions)
 
   return {
     ...duplicateTask,
@@ -958,13 +863,11 @@ export function createDuplicateTask(
 
 export function createUpdatedTask(
   previousTask: SavedTask,
-  updatedDetails: ChangedValuesInput,
-  practitioner: Practitioner
+  updatedDetails: ChangedValuesInput
 ): SavedTask {
   const updatedTask = createNewTaskResource(
     previousTask,
     [],
-    practitioner.id,
     'DECLARATION_UPDATED'
   )
   return {
@@ -998,69 +901,40 @@ export function createUpdatedTask(
   }
 }
 
-export function createUnassignedTask(
+export async function createUnassignedTask(
   previousTask: SavedTask,
-  practitioner: Practitioner
+  token: string
 ) {
-  const unassignedTask: SavedTask = createNewTaskResource(
-    previousTask,
-    [{ url: 'http://opencrvs.org/specs/extension/regUnassigned' }],
-    practitioner.id
+  const taskWithoutPracitionerExtensions = createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regUnassigned' }
+  ])
+
+  const [unassignedTask] = await withPractitionerDetails(
+    taskWithoutPracitionerExtensions,
+    token
   )
 
   return unassignedTask
 }
 
-export function createCertifiedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): SavedTask {
-  return createNewTaskResource(previousTask, [], practitioner.id, 'CERTIFIED')
+export function createCertifiedTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [], 'CERTIFIED')
 }
 
-export function createIssuedTask(
-  previousTask: SavedTask,
-  practitioner: Practitioner
-): SavedTask {
-  return createNewTaskResource(previousTask, [], practitioner.id, 'ISSUED')
+export function createIssuedTask(previousTask: SavedTask): SavedTask {
+  return createNewTaskResource(previousTask, [], 'ISSUED')
 }
 
 export function createVerifyRecordTask(
   previousTask: SavedTask,
   ipInfo: string
 ): SavedTask {
-  return {
-    resourceType: 'Task',
-    status: 'accepted',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/contact-person-phone-number',
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email',
-          'http://opencrvs.org/specs/extension/bride-signature',
-          'http://opencrvs.org/specs/extension/groom-signature',
-          'http://opencrvs.org/specs/extension/witness-one-signature',
-          'http://opencrvs.org/specs/extension/witness-two-signature'
-        ].includes(extension.url)
-      ),
-      {
-        url: 'http://opencrvs.org/specs/extension/regVerified',
-        valueString: ipInfo
-      }
-    ],
-    lastModified: new Date().toISOString(),
-    businessStatus: previousTask.businessStatus,
-    meta: {
-      ...previousTask.meta,
-      lastUpdated: new Date().toISOString()
+  return createNewTaskResource(previousTask, [
+    {
+      url: 'http://opencrvs.org/specs/extension/regVerified',
+      valueString: ipInfo
     }
-  }
+  ])
 }
 
 export function createCorrectionRequestTask(
@@ -1173,7 +1047,6 @@ export function createCorrectionRequestTask(
 function createNewTaskResource(
   previousTask: SavedTask,
   newExtensions: Extension[],
-  practitionerId: Practitioner['id'],
   status?: TaskStatus
 ): SavedTask {
   return {
@@ -1184,9 +1057,7 @@ function createNewTaskResource(
     code: previousTask.code,
     focus: previousTask.focus,
     id: previousTask.id,
-    requester: {
-      agent: { reference: `Practitioner/${practitionerId}` }
-    },
+    requester: previousTask.requester,
     identifier: previousTask.identifier,
     note: previousTask.note,
     extension: previousTask.extension
