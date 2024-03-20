@@ -13,7 +13,6 @@ import { getToken } from '@workflow/utils/authUtils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 import { getRecordById } from '@workflow/records/index'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
@@ -45,17 +44,10 @@ export async function unassignRecordHandler(
     ]
   )
 
-  const unassignedRecordWithTaskOnly = await toUnassigned(
-    record,
-    await getLoggedInPractitionerResource(token)
-  )
+  const unassignedRecord = await toUnassigned(record, token)
 
-  await sendBundleToHearth(unassignedRecordWithTaskOnly)
-  await indexBundleToRoute(
-    unassignedRecordWithTaskOnly,
-    token,
-    '/events/unassigned'
-  )
+  await sendBundleToHearth(unassignedRecord)
+  await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
 
-  return unassignedRecordWithTaskOnly
+  return unassignedRecord
 }

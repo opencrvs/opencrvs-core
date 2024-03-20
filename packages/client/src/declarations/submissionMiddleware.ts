@@ -32,7 +32,7 @@ import {
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   MARK_EVENT_AS_DUPLICATE,
   getBirthMutation
@@ -297,6 +297,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         }
         updateDeclaration(dispatch, {
           ...declaration,
+          registrationStatus: RegStatus.Certified,
           action: SubmissionAction.ISSUE_DECLARATION,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
         })

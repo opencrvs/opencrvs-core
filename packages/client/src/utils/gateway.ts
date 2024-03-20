@@ -1354,7 +1354,7 @@ export type MutationMarkEventAsUnassignedArgs = {
 }
 
 export type MutationMarkEventAsVoidedArgs = {
-  comment?: InputMaybe<Scalars['String']>
+  comment: Scalars['String']
   id: Scalars['String']
   reason: Scalars['String']
 }
@@ -3026,6 +3026,7 @@ export type SearchEventsQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -3076,6 +3077,7 @@ export type SearchEventsQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -3126,12 +3128,14 @@ export type SearchEventsQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -4214,6 +4218,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: string | null
+      occupation?: string | null
       nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
@@ -4638,6 +4643,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: string | null
+      occupation?: string | null
       nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
@@ -5736,6 +5742,7 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
   childName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
+    middleName?: string | null
     familyName?: string | null
     use?: string | null
   } | null> | null
@@ -5788,6 +5795,7 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
   deceasedName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
+    middleName?: string | null
     familyName?: string | null
     use?: string | null
   } | null> | null
@@ -5840,12 +5848,14 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
   brideName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
+    middleName?: string | null
     familyName?: string | null
     use?: string | null
   } | null> | null
   groomName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
+    middleName?: string | null
     familyName?: string | null
     use?: string | null
   } | null> | null
@@ -5925,6 +5935,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -5976,6 +5987,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6027,12 +6039,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6091,6 +6105,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6142,6 +6157,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6193,12 +6209,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6257,6 +6275,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6308,6 +6327,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6359,12 +6379,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6423,6 +6445,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6474,6 +6497,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6525,12 +6549,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6589,6 +6615,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6640,6 +6667,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6691,12 +6719,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6755,6 +6785,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6806,6 +6837,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6857,12 +6889,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6921,6 +6955,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -6972,6 +7007,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7023,12 +7059,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7087,6 +7125,7 @@ export type RegistrationHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7138,6 +7177,7 @@ export type RegistrationHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7189,12 +7229,14 @@ export type RegistrationHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7265,6 +7307,7 @@ export type FieldAgentHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7316,6 +7359,7 @@ export type FieldAgentHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7367,12 +7411,14 @@ export type FieldAgentHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7431,6 +7477,7 @@ export type FieldAgentHomeQuery = {
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7482,6 +7529,7 @@ export type FieldAgentHomeQuery = {
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7533,12 +7581,14 @@ export type FieldAgentHomeQuery = {
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
           groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             use?: string | null
           } | null> | null
@@ -7617,6 +7667,7 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -7654,6 +7705,7 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -7691,6 +7743,7 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -7701,6 +7754,7 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -8585,6 +8639,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -8609,6 +8664,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           address?: Array<{
@@ -8640,6 +8696,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -8681,6 +8738,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -8852,6 +8910,7 @@ export type FetchViewRecordByCompositionQuery = {
                 __typename?: 'HumanName'
                 use?: string | null
                 firstNames?: string | null
+                middleName?: string | null
                 familyName?: string | null
               } | null> | null
               telecom?: Array<{
@@ -8884,11 +8943,13 @@ export type FetchViewRecordByCompositionQuery = {
           exactDateOfBirthUnknown?: boolean | null
           gender?: string | null
           maritalStatus?: string | null
+          occupation?: string | null
           nationality?: Array<string | null> | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -8933,6 +8994,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           telecom?: Array<{
@@ -8968,6 +9030,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -9010,6 +9073,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -9052,6 +9116,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           identifier?: Array<{
@@ -9231,6 +9296,7 @@ export type FetchViewRecordByCompositionQuery = {
                 __typename?: 'HumanName'
                 use?: string | null
                 firstNames?: string | null
+                middleName?: string | null
                 familyName?: string | null
               } | null> | null
               telecom?: Array<{
@@ -9270,6 +9336,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
           address?: Array<{
@@ -9296,6 +9363,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             marriedLastName?: string | null
           } | null> | null
@@ -9334,6 +9402,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
             marriedLastName?: string | null
           } | null> | null
@@ -9375,6 +9444,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -9394,6 +9464,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
+            middleName?: string | null
             familyName?: string | null
           } | null> | null
         } | null
@@ -9543,6 +9614,7 @@ export type FetchViewRecordByCompositionQuery = {
                 __typename?: 'HumanName'
                 use?: string | null
                 firstNames?: string | null
+                middleName?: string | null
                 familyName?: string | null
               } | null> | null
               telecom?: Array<{
