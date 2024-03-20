@@ -36,7 +36,7 @@ sequenceDiagram
     Workflow->>Hearth: Save bundle to hearth
     Note over Workflow,Hearth: Get hearth response for all entries
 
-    Note over Workflow: Merge changed resources into record
+    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
 
     Workflow->>Search: Send full bundle to search
     %% upsertEvent
