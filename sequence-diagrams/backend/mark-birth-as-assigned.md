@@ -20,12 +20,22 @@ sequenceDiagram
 
     % markRecordAsDownloadedOrAssigned
       % getTaskEntry
-    GraphQL Gateway->>Workflow: CompositionId
+    GraphQL Gateway->>Workflow: Post to /download-record with compositionId
     Workflow->>Search: Get Record by id
 
-    Workflow->>User management: Fetch user/system info
-    Workflow->>Hearth: Bundle with modified Task
-    Workflow->>Search: Bundle with modified Task
+    Workflow->>User management: Fetch user/system information
+    Workflow->>Hearth: Get practitioner resource
+
+    loop PractitionerRole Locations
+      Workflow->>Hearth: Get location by user's practitionerId
+    end
+    Note over Workflow,Hearth: Update bundle with practitioner details
+
+    Workflow->>Hearth: Save bundle with modified task
+    Workflow->>Search: Post bundle with modified task to /events/assigned
+
+    Search->>User management: Get user information
+    Search->>ElasticSearch: Update composition
 
     Workflow->>GraphQL Gateway: Return full updated record
 ```
