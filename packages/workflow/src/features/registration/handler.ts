@@ -12,7 +12,6 @@ import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
 import { toRegistered } from '@workflow/records/state-transitions'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getEventType } from './utils'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
@@ -53,12 +52,10 @@ export async function markEventAsRegisteredCallbackHandler(
   if (!savedRecord) {
     throw new Error('Could not find record in elastic search!')
   }
-  const practitioner = await getLoggedInPractitionerResource(getToken(request))
 
   const bundle = await toRegistered(
     request,
     savedRecord,
-    practitioner,
     registrationNumber,
     token,
     childIdentifiers

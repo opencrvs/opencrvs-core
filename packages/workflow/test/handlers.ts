@@ -119,6 +119,7 @@ const hearthHandler = rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
     type: 'batch-response',
     entry: []
   }
+
   return res(ctx.json(responseBundle))
 })
 
