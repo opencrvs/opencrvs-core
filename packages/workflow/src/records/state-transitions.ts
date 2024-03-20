@@ -783,7 +783,7 @@ export function toVerified(
   ipInfo: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const verifyRecordTask = await createVerifyRecordTask(previousTask, ipInfo)
+  const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
 
   const verifiedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
