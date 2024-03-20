@@ -295,7 +295,7 @@ describe('when user has starts a new declaration', () => {
             app,
             '#btn_change_child_familyNameEng'
           )
-          expect(changeNameButton.hostNodes()).toHaveLength(2)
+          expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
         it('should go to input field when user press change button to edit information', async () => {
           const backToReviewButton = await waitForElement(
