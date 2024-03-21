@@ -33,7 +33,7 @@ sequenceDiagram
     end
     Note over Workflow,Hearth: Update bundle with practitioner details
 
-    Workflow->>Hearth: Save bundle to hearth
+    Workflow->>Hearth: Save bundle
     Note over Workflow,Hearth: Get hearth response for all entries
 
     Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
