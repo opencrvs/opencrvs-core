@@ -12,6 +12,8 @@
 
 ## New features
 
+- Add loading spinners before JavaScript bundle has loaded for both login and client
+
 ## Bug fixes
 
 - Handle back button click after issuing a declaration [#6424](https://github.com/opencrvs/opencrvs-core/issues/6424)
