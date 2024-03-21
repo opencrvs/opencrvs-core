@@ -12,19 +12,25 @@
 import NotificationQueue, {
   NotificationQueueRecord
 } from '@notification/model/notificationQueue'
-import { AllUsersEmailPayloadSchema } from '@notification/features/email/all-user-handler'
 import { logger } from '@notification/logger'
 import { notifyCountryConfig } from '@notification/features/sms/service'
+import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+
+interface AllUsersEmailPayloadSchema {
+  subject: string
+  body: string
+  bcc: string[]
+  locale: string
+}
 
 let isLoopInprogress = false
 
-export async function sendAllUserEmails(
-  payload: AllUsersEmailPayloadSchema,
-  token: string
-) {
+export async function sendAllUserEmails(request: Hapi.Request) {
+  const payload = request.payload as AllUsersEmailPayloadSchema
   await NotificationQueue.create(payload)
   if (!isLoopInprogress) {
-    loopNotificationQueue(token)
+    loopNotificationQueue(request)
   }
   return {
     success: true
@@ -38,7 +44,7 @@ async function findOldestNotificationQueueRecord() {
 }
 
 async function dispatch(record: NotificationQueueRecord, token: string) {
-  await notifyCountryConfig(
+  return await notifyCountryConfig(
     {
       email: 'allUserNotification'
     },
@@ -51,14 +57,16 @@ async function dispatch(record: NotificationQueueRecord, token: string) {
     token,
     record.locale
   )
-  await NotificationQueue.deleteOne({ _id: record._id })
 }
 
+async function deleteRecord(record: NotificationQueueRecord) {
+  return await NotificationQueue.deleteOne({ _id: record._id })
+}
 async function markQueueRecordFailedWithErrorDetails(
   record: NotificationQueueRecord,
   e: Error & { statusCode: number; error: string }
 ) {
-  await NotificationQueue.updateOne(
+  return await NotificationQueue.updateOne(
     { _id: record._id },
     {
       status: 'failed',
@@ -71,18 +79,21 @@ async function markQueueRecordFailedWithErrorDetails(
   )
 }
 
-export async function loopNotificationQueue(token: string) {
+export async function loopNotificationQueue(request?: Hapi.Request) {
+  const token = request?.headers?.authorization
   isLoopInprogress = true
   let record = await findOldestNotificationQueueRecord()
   while (record) {
-    try {
-      logger.info(
-        `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
-      )
-      await dispatch(record, token)
-    } catch (e) {
-      await markQueueRecordFailedWithErrorDetails(record, e)
+    logger.info(
+      `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
+    )
+    const res = await dispatch(record, token)
+    if (!res.ok) {
+      const error = await res.json()
+      await markQueueRecordFailedWithErrorDetails(record, error)
+      request?.log(['error', error.error, internal(error.message)])
     }
+    await deleteRecord(record)
     record = await findOldestNotificationQueueRecord()
   }
   isLoopInprogress = false

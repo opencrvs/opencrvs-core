@@ -13,22 +13,12 @@ import { logger } from '@notification/logger'
 import * as Joi from 'joi'
 import { sendAllUserEmails } from './service.'
 
-export interface AllUsersEmailPayloadSchema {
-  subject: string
-  body: string
-  bcc: string[]
-  locale: string
-}
-
 export async function allUsersEmailHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   logger.info(`Notifying from allUsersEmailHandler`)
-  return sendAllUserEmails(
-    request.payload as AllUsersEmailPayloadSchema,
-    request.headers.authorization
-  )
+  return sendAllUserEmails(request)
 }
 
 export const allUsersEmailPayloadSchema = Joi.object({
