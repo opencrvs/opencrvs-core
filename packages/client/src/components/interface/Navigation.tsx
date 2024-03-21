@@ -338,7 +338,10 @@ const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.systems,
     WORKQUEUE_TABS.userRoles
   ]
-  const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
+  const conmmunicationTab: string[] = [
+    WORKQUEUE_TABS.informantNotification,
+    WORKQUEUE_TABS.emailAllUsers
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
