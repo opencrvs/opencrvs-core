@@ -92,8 +92,9 @@ export async function loopNotificationQueue(request?: Hapi.Request) {
       const error = await res.json()
       await markQueueRecordFailedWithErrorDetails(record, error)
       request?.log(['error', error.error, internal(error.message)])
+    } else {
+      await deleteRecord(record)
     }
-    await deleteRecord(record)
     record = await findOldestNotificationQueueRecord()
   }
   isLoopInprogress = false
