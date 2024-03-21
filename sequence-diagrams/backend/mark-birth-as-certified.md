@@ -21,7 +21,7 @@ sequenceDiagram
     GraphQL gateway->>Workflow: POST /records/{recordId}/certify-record
     Workflow->>Search: Get record by id (by createRoute)
 
-    Workflow->>Documents: Post certificate details to /upload
+    Workflow->>Documents: POST certificate details to /upload
     Documents->>Minio: Upload certificate documents
 
     Workflow->>User management: Fetch user/system information
@@ -57,7 +57,7 @@ sequenceDiagram
 
     Search->>ElasticSearch: Index composition
 
-    Workflow--)Metrics: Post bundle
+    Workflow--)Metrics: POST bundle
 
     Metrics->>Influx DB: Write audit point
 
