@@ -8,7 +8,6 @@ title: Create birth registration
 sequenceDiagram
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth
@@ -18,81 +17,84 @@ sequenceDiagram
     participant Influx DB
     participant Search
     participant ElasticSearch
+    participant Documents
+    participant Minio
+    participant Country-Config
 
-    GraphQL gateway->>OpenHIM: Get Task
-    OpenHIM->>Hearth: Get Task
-    Note over GraphQL gateway,Hearth: Check for duplicate draft id
-    GraphQL gateway->>OpenHIM: Post bundle
-    OpenHIM->>Workflow: Post bundle
+    GraphQL gateway->>Workflow: POST /create-record
+    Workflow--)Hearth: Fetch task from identifier(draft-id)
+    Note over Workflow,Hearth: Check existing draft-IDs. If found, return previous declaration info to gateway.
 
-    %% BIRTH_IN_PROGRESS_DEC
-    %% createRegistrationHandler
-    %% modifyRegistrationBundle
-    %% setupRegistrationWorkflow
-    %% checkForDuplicateStatusUpdate
-    %% fetchExistingRegStatusCode
-    Workflow->>Hearth: Get Task
-    Note over Workflow,Hearth: Check and throw if declaration is already in IN_PROGRESS state
-    Workflow->>Hearth: Post Bundle
-    Workflow->>Hearth: Get registration office
-    Workflow->>Notification: Post in progress notification
-    Workflow->>OpenHIM: Trigger birth in progress event
+    Workflow--)Search: Search for duplicates
 
-    OpenHIM--)Search: Trigger birth in progress event
+    Workflow--)Documents: POST certificate details to /upload
+    Documents->>Minio: Upload certificate documents
 
-    %% upsertEvent
-    %% updateEvent
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Get operation history
-    %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
-    Note over Search,Hearth: Compose new history entry
-    %% updateComposition
-    Search->>ElasticSearch: Update composition
+    Workflow--)Country-Config: POST to /tracking-id to get tracking id
 
-    %% indexAndSearchComposition
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdAt
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find operation history
+    Workflow->>User management: Fetch user/system information
+    Workflow->>Hearth: Get practitioner resource
 
-    %% createIndexBody
-      %% createChildIndex
-      %% addEventLocation
-    Search->>Hearth: Get Encounter
-    Search->>Hearth: Get Encounter location
+    loop PractitionerRole Locations
+      Workflow->>Hearth: Get location by user's practitionerId
+    end
+    Note over Workflow,Hearth: Update bundle with practitioner details
 
-      %% createDeclarationIndex
-      %% getCreatedBy
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdBy
+    Workflow->>Hearth: Save bundle to hearth
+    Note over Workflow,Hearth: Get hearth response for all entries
 
-      %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
-    Note over Search,Hearth: Compose new history entry
+    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
 
-    %% indexComposition
-    Search->>ElasticSearch: Index composition
-
-    %% Duplicates don't get detected, as the status is IN_PROGRESS
-
-    OpenHIM--)Metrics: Trigger birth in progress event
+    Workflow--)Metrics: POST bundle to /events/{event}/sent-notification
     Metrics->>InfluxDB: Write user audit point "IN_PROGRESS"
 
     loop location levels 4, 3, 2
-        Metrics->>OpenHIM: Get parent of Location
-        OpenHIM->>Workflow: Get parent of Location
+        Metrics->>Workflow: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate time logged point
 
     loop location levels 4, 3, 2
-        Metrics->>OpenHIM: Get parent of Location
-        OpenHIM->>Workflow: Get parent of Location
+        Metrics->>Workflow: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate declaration started point
     Metrics->>InfluxDB: Write audit points
+
+    Note over Workflow,Search: For duplicate declarations, starts here
+    Workflow--)Search: Index bundle
+
+    %% upsertEvent
+    Search->>ElasticSearch: Search by composition id
+    Note over Search,ElasticSearch: Get operation history and createdAt
+
+    %% createIndexBody
+      %% createChildIndex
+      %% addEventLocation
+    Search->>Hearth: Get event location for creating child index
+
+    %% createDeclarationIndex
+    Search->>Hearth: Get declarationJurisdictionIds for declaration index
+    Search->>ElasticSearch: Get createdBy
+
+    %% createStatusHistory
+    Search->>User management: Get user for status history
+    Note over Search,Hearth: Compose new history entry
+
+    Search->>ElasticSearch: Index composition
+    Workflow->>Hearth: Save bundle to Hearth
+    Note over Workflow,Hearth: For duplicate declarations, ends here
+
+    Workflow--)Config: Check if notification is enabled
+    Workflow--)Search: Index bundle
+
+    Workflow--)Notifications: Send notification if enabled
+    Notifications->>Country-Config: POST /notification
+    Country-Config->>Config: GET Application Config from /publicConfig
+    Config->>Country-Config: Get config from /application-config
+    Note over Workflow,Notifications: Get APPLICATION NAME, Notification Delivery Methods
+
+    Note over Country-Config: Send notifications
+
+    Workflow--)GraphQL gateway: Return compositionId, trackingId and duplicate status
 ```
