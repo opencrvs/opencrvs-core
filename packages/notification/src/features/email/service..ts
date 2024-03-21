@@ -49,7 +49,7 @@ async function dispatch(record: NotificationQueueRecord, token: string) {
       body: record.body
     },
     token,
-    'en'
+    record.locale
   )
   await NotificationQueue.deleteOne({ _id: record._id })
 }

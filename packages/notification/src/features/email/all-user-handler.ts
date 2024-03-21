@@ -17,6 +17,7 @@ export interface AllUsersEmailPayloadSchema {
   subject: string
   body: string
   bcc: string[]
+  locale: string
 }
 
 export async function allUsersEmailHandler(

@@ -23,6 +23,7 @@ const notificationQueueSchema = new Schema({
     type: String,
     enum: ['success', 'failed']
   },
+  locale: { type: String, required: true },
   createdAt: { type: Number, default: Date.now },
   error: { type: errorSchema }
 })
