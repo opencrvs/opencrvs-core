@@ -1,6 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", "monorepo:lerna"],
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "monorepo:lerna"
+  ],
   "lockFileMaintenance": {
     "enabled": true
   },
