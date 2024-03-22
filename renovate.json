@@ -1,8 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", "monorepo:lerna"],
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "monorepo:lerna"
+  ],
   "lockFileMaintenance": {
     "enabled": true
   },
-  "pruneStaleBranches": false
+  "pruneStaleBranches": false,
+  "timezone": "Europe/London",
+  "schedule": [
+    "after 5pm every weekday",
+    "before 3am every weekday",
+    "every weekend"
+  ]
 }
