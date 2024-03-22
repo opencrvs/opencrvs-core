@@ -1,4 +1,4 @@
-FROM metabase/metabase:v0.46.6.1@sha256:5fd48fa55f6492d7366d1fa3ac783216950af7b9659bc23099db5a8723c96361
+FROM metabase/metabase:v0.46.6.4@sha256:95c60db0c87c5da9cb81f6aefd0cd548fe2c14ff8c8dcba2ea58a338865cdbd9
 ADD run.sh /
 ADD initialize-database.sh /
 ADD update-database.sh /
