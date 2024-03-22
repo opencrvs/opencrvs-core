@@ -7616,10 +7616,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/recharts@^1.1.1":
-  version "1.8.26"
-  resolved "https://registry.yarnpkg.com/@types/recharts/-/recharts-1.8.26.tgz#9ae5bb732b7bf5701da1a0522eebc9cbf6e5294d"
-  integrity sha512-aQj6sPwcklOtLl/tpbs1i33YaIQnmIZjxm5yzvV0BnzgDAp039AfuGDZOT5kochG6MyIdyIMzoSu49aBSJAqow==
+"@types/recharts@^1.8.26":
+  version "1.8.29"
+  resolved "https://registry.yarnpkg.com/@types/recharts/-/recharts-1.8.29.tgz#5e117521a65bf015b808350b45b65553ff5011f3"
+  integrity sha512-ulKklaVsnFIIhTQsQw226TnOibrddW1qUQNFVhoQEyY1Z7FRQrNecFCGt7msRuJseudzE9czVawZb17dK/aPXw==
   dependencies:
     "@types/d3-shape" "^1"
     "@types/react" "*"
