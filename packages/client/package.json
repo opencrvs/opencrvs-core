@@ -170,7 +170,7 @@
     "vite-plugin-pwa": "^0.16.4",
     "vitest": "0.25.5",
     "vitest-fetch-mock": "^0.2.1",
-    "whatwg-fetch": "^3.0.0"
+    "whatwg-fetch": "^3.6.19"
   },
   "browserslist": {
     "production": [
