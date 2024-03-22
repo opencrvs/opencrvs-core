@@ -30,7 +30,7 @@ sequenceDiagram
     Workflow--)Documents: POST certificate details to /upload
     Documents->>Minio: Upload certificate documents
 
-    Workflow--)Country-Config: POST to /tracking-id to get tracking id
+    Workflow--)Country-Config: GET trackingId from /tracking-id
 
     Workflow->>User management: Fetch user/system information
     Workflow->>Hearth: Get practitioner resource
@@ -46,7 +46,7 @@ sequenceDiagram
     Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
 
     Workflow--)Metrics: POST bundle to /events/{event}/sent-notification
-    Metrics->>InfluxDB: Write user audit point "IN_PROGRESS"
+    Metrics->>Influx DB: Write user audit point "IN_PROGRESS"
 
     loop location levels 4, 3, 2
         Metrics->>Workflow: Get parent of Location
@@ -59,7 +59,7 @@ sequenceDiagram
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate declaration started point
-    Metrics->>InfluxDB: Write audit points
+    Metrics->>Influx DB: Write audit points
 
     Note over Workflow,Search: For duplicate declarations, starts here
     Workflow--)Search: Index bundle
@@ -83,7 +83,7 @@ sequenceDiagram
 
     Search->>ElasticSearch: Index composition
     Workflow->>Hearth: Save bundle to Hearth
-    Note over Workflow,Hearth: For duplicate declarations, ends here
+    Note over Workflow,Search: For duplicate declarations, ends here
 
     Workflow--)Config: Check if notification is enabled
     Workflow--)Search: Index bundle
