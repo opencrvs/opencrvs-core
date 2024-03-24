@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 import { PrimaryButton } from '../buttons'
@@ -93,13 +93,7 @@ export interface ISearchLocation {
   searchableText: string
   displayLabel: string
 }
-interface IState {
-  dropDownIsVisible: boolean
-  filteredList: ISearchLocation[]
-  selectedText: string | null
-  selectedItem: ISearchLocation | null
-  isFocused?: boolean
-}
+
 interface IProps {
   locationList?: ISearchLocation[]
   selectedLocation?: ISearchLocation | undefined
@@ -114,35 +108,50 @@ interface IProps {
   className?: string
   buttonLabel: string
 }
-export class LocationSearch extends React.Component<IProps, IState> {
-  searchTimeout: NodeJS.Timeout | undefined
-  constructor(props: IProps) {
-    super(props)
-    this.state = {
-      dropDownIsVisible: false,
-      filteredList: [],
-      selectedItem: null,
-      selectedText: null,
-      isFocused: false
-    }
-  }
-  handler = () => {
-    document.removeEventListener('click', this.handler)
-    this.setState({
-      dropDownIsVisible: false
-    })
+export const LocationSearch = ({
+  locationList,
+  selectedLocation,
+  searchHandler,
+  searchButtonHandler,
+  id,
+  onBlur,
+  errorMessage,
+  error,
+  touched,
+  className,
+  buttonLabel
+}: IProps) => {
+  const [dropDownIsVisible, setDropDownIsVisible] = useState(false)
+  const [filteredList, setFilteredList] = useState<ISearchLocation[]>([])
+  const [selectedItem, setSelectedItem] = useState<ISearchLocation | null>(null)
+  const [selectedText, setSelectedText] = useState<string | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
+
+  let searchTimeout: NodeJS.Timeout | undefined = undefined
+
+  const handler = () => {
+    document.removeEventListener('click', handler)
+    setDropDownIsVisible(false)
   }
 
-  searchOnEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
+  useEffect(() => {
+    if (selectedLocation) {
+      setSelectedText(selectedLocation.displayLabel)
+      setSelectedItem(selectedLocation)
     }
-  }
 
-  search = (searchText: string) => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+      document.removeEventListener('click', handler)
+    }
+  }, [selectedLocation])
+
+  const search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
-    if (searchText && this.props.locationList) {
-      for (const location of this.props.locationList) {
+    if (searchText && locationList) {
+      for (const location of locationList) {
         if (searchResult.length === 10) {
           break
         }
@@ -158,86 +167,69 @@ export class LocationSearch extends React.Component<IProps, IState> {
     }
     if (
       searchResult.length === 0 ||
-      (this.state.selectedItem &&
-        this.state.selectedText !== this.state.selectedItem.displayLabel)
+      (selectedItem && selectedText !== selectedItem.displayLabel)
     ) {
-      this.setState({
-        selectedItem: null
-      })
+      setSelectedItem(null)
     }
 
-    this.setState({
-      filteredList: searchResult,
-      dropDownIsVisible: searchResult.length > 0
-    })
+    setFilteredList(searchResult)
+    setDropDownIsVisible(searchResult.length > 0)
   }
 
-  debounce(callback: () => void, duration: number) {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout)
+  const debounce = (callback: () => void, duration: number) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
     }
-    this.searchTimeout = setTimeout(callback, duration)
+    searchTimeout = setTimeout(callback, duration)
   }
 
-  onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value
-    this.setState((_) => ({
-      selectedText: text
-    }))
-    this.debounce(() => this.search(text), SEARCH_DEBOUNCE_DURATION)
+    setSelectedText(text)
+    debounce(() => search(text), SEARCH_DEBOUNCE_DURATION)
   }
 
-  onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    this.setState({
-      isFocused: false
-    })
-    if (this.props.onBlur && this.props.searchHandler) {
-      this.props.searchHandler({
-        id: this.state.selectedText ? '0' : '',
-        searchableText: this.state.selectedText || '',
-        displayLabel: this.state.selectedText || ''
+  const onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false)
+    if (onBlur && searchHandler) {
+      searchHandler({
+        id: selectedText ? '0' : '',
+        searchableText: selectedText || '',
+        displayLabel: selectedText || ''
       })
-      this.props.onBlur(event)
+      onBlur(event)
     }
   }
 
-  onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    this.setState({
-      isFocused: true
-    })
+  const onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true)
     setTimeout(event.target.select.bind(event.target), 20)
-    if (
-      this.state.selectedItem &&
-      this.state.selectedText === this.state.selectedItem.displayLabel
-    ) {
-      this.search(this.state.selectedItem.searchableText)
-    } else {
-      this.search(this.state.selectedText || '')
+    if (selectedItem && selectedText === selectedItem.displayLabel) {
+      return search(selectedItem.searchableText)
     }
+    search(selectedText || '')
   }
 
-  dropDownItemSelect = (item: ISearchLocation) => {
-    if (this.props.searchHandler) {
-      this.props.searchHandler(item)
+  const dropDownItemSelect = (item: ISearchLocation) => {
+    if (searchHandler) {
+      searchHandler(item)
     }
 
-    this.setState((_) => ({
-      dropDownIsVisible: false,
-      selectedItem: item,
-      selectedText: item.displayLabel
-    }))
+    setDropDownIsVisible(false)
+    setSelectedItem(item)
+    setSelectedText(item.displayLabel)
   }
 
-  dropdown() {
+  const dropdown = () => {
     return (
-      this.state.dropDownIsVisible && (
+      dropDownIsVisible && (
         <DropDownWrapper>
-          {this.state.filteredList.map((item) => {
+          {filteredList.map((item) => {
             return (
               <DropDownItem
                 id={`locationOption${item.id}`}
                 key={item.id}
-                onClick={() => this.dropDownItemSelect(item)}
+                onClick={() => dropDownItemSelect(item)}
               >
                 <Label>{item.displayLabel}</Label>
               </DropDownItem>
@@ -248,67 +240,41 @@ export class LocationSearch extends React.Component<IProps, IState> {
     )
   }
 
-  componentDidMount() {
-    if (this.props.selectedLocation) {
-      this.setState({
-        selectedText: this.props.selectedLocation.displayLabel,
-        selectedItem: this.props.selectedLocation
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout)
-    }
-    document.removeEventListener('click', this.handler)
-  }
-
-  render() {
-    return (
-      <>
-        <LocationSearchContainer>
-          <Wrapper className={this.props.className}>
-            <Icon name="MapPin" size="medium" />
-            <SearchTextInput
-              id={this.props.id ? this.props.id : 'locationSearchInput'}
-              type="text"
-              autoComplete="off"
-              onFocus={this.onFocus}
-              onBlur={this.onBlurHandler}
-              onClick={() =>
-                //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
-                setTimeout(
-                  () => document.addEventListener('click', this.handler),
-                  0
-                )
-              }
-              value={this.state.selectedText || ''}
-              onChange={this.onChangeHandler}
-              error={this.props.error}
-              touched={this.props.touched}
-            />
-            {this.dropdown()}
-          </Wrapper>
-          {this.props.searchButtonHandler && (
-            <SearchButton
-              id="location-search-btn"
-              onClick={this.props.searchButtonHandler}
-              disabled={!(this.state.selectedItem && this.state.selectedText)}
-            >
-              {this.props.buttonLabel}
-            </SearchButton>
-          )}
-        </LocationSearchContainer>
-        {!this.state.selectedItem &&
-          this.state.selectedText &&
-          this.props.errorMessage &&
-          !this.state.isFocused && (
-            <InputError id="location-search-error">
-              {this.props.errorMessage}
-            </InputError>
-          )}
-      </>
-    )
-  }
+  return (
+    <>
+      <LocationSearchContainer>
+        <Wrapper className={className}>
+          <Icon name="MapPin" size="medium" />
+          <SearchTextInput
+            id={id ? id : 'locationSearchInput'}
+            type="text"
+            autoComplete="off"
+            onFocus={onFocus}
+            onBlur={onBlurHandler}
+            onClick={() =>
+              //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+              setTimeout(() => document.addEventListener('click', handler), 0)
+            }
+            value={selectedText || ''}
+            onChange={onChangeHandler}
+            error={error}
+            touched={touched}
+          />
+          {dropdown()}
+        </Wrapper>
+        {searchButtonHandler && (
+          <SearchButton
+            id="location-search-btn"
+            onClick={searchButtonHandler}
+            disabled={!(selectedItem && selectedText)}
+          >
+            {buttonLabel}
+          </SearchButton>
+        )}
+      </LocationSearchContainer>
+      {!selectedItem && selectedText && errorMessage && !isFocused && (
+        <InputError id="location-search-error">{errorMessage}</InputError>
+      )}
+    </>
+  )
 }
