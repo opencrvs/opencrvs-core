@@ -8,12 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import { ClearText } from '../icons'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
-import { Text } from '../Text'
+import { set } from 'lodash'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
@@ -134,15 +134,6 @@ const AdvancedSearchWrapper = styled.div`
   padding-bottom: 0;
 `
 
-const IconWrapper = styled.span`
-  display: flex;
-  padding-right: 12px;
-  padding-left: 0;
-`
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.copy};
-`
 const SelectedSearchCriteria = styled.span`
   display: flex;
   margin-right: 16px;
@@ -188,12 +179,7 @@ export interface INavigationType {
   icon?: React.ReactNode
   onClick: () => void
 }
-interface IState {
-  dropDownIsVisible: boolean
-  searchParam: string
-  language: string
-  selectedSearchType: ISearchType
-}
+
 interface IProps {
   searchTypeList: ISearchType[]
   navigationList?: INavigationType[]
@@ -204,75 +190,69 @@ interface IProps {
   onClearText?: () => void
   className?: string
 }
-export class SearchTool extends React.Component<IProps, IState> {
-  static getDerivedStateFromProps: React.GetDerivedStateFromProps<
-    IProps,
-    IState
-  > = (nextProps, previousState) => {
-    if (nextProps.language !== previousState.language) {
-      return {
-        selectedSearchType: nextProps.searchTypeList.find(
-          (item: ISearchType) =>
-            item.value === previousState.selectedSearchType.value
-        ),
-        language: nextProps.language
-      }
+
+export const SearchTool = ({
+  searchTypeList,
+  navigationList,
+  searchText = '',
+  selectedSearchType: initialSelectedSearchType,
+  language,
+  searchHandler,
+  onClearText,
+  className
+}: IProps) => {
+  const [dropDownIsVisible, setDropDownIsVisible] = useState(false)
+  const [searchParam, setSearchParam] = useState(searchText)
+  const [currentLanguage, setCurrentLanguage] = useState(language)
+  const [selectedSearchType, setSelectedSearchType] = useState(() =>
+    getDefaultSearchType()
+  )
+
+  useEffect(() => {
+    if (language !== currentLanguage) {
+      const newSelectedSearchType = searchTypeList.find(
+        (item) => item.value === selectedSearchType.value
+      )
+      setSelectedSearchType(newSelectedSearchType || searchTypeList[0])
+      setCurrentLanguage(language)
     }
-    return null
-  }
+  }, [language, searchTypeList, selectedSearchType.value, currentLanguage])
 
-  constructor(props: IProps) {
-    super(props)
-
-    this.state = {
-      dropDownIsVisible: false,
-      searchParam: this.props.searchText ? this.props.searchText : '',
-      language: this.props.language,
-      selectedSearchType: this.getDefaultSearchType()
-    }
-  }
-
-  getDefaultSearchType(): ISearchType {
-    if (this.props.selectedSearchType) {
+  const getDefaultSearchType = (): ISearchType => {
+    if (initialSelectedSearchType) {
       return (
-        this.props.searchTypeList.find(
-          (item: ISearchType) => item.value === this.props.selectedSearchType
-        ) || this.props.searchTypeList[0]
+        searchTypeList.find(
+          (item: ISearchType) => item.value === initialSelectedSearchType
+        ) || searchTypeList[0]
       )
     }
     return (
-      this.props.searchTypeList.find(
-        (item: ISearchType) => item.isDefault === true
-      ) || this.props.searchTypeList[0]
+      searchTypeList.find((item: ISearchType) => item.isDefault === true) ||
+      searchTypeList[0]
     )
   }
-  search = (e: React.FormEvent) => {
+
+  const search = (e: React.FormEvent) => {
     e.preventDefault()
-    return (
-      this.state.searchParam &&
-      this.props.searchHandler(
-        this.state.searchParam,
-        this.state.selectedSearchType.value
-      )
-    )
+    return searchParam && searchHandler(searchParam, selectedSearchType.value)
   }
-  dropdown() {
+  const dropdown = () => {
     return (
-      this.state.dropDownIsVisible && (
+      dropDownIsVisible && (
         <DropDownWrapper>
-          {this.props.searchTypeList.map((item) => {
+          {searchTypeList.map((item) => {
             return (
               <DropDownItem
                 id={item.value}
                 key={item.value}
-                onClick={() => this.dropDownItemSelect(item)}
+                onClick={() => dropDownItemSelect(item)}
               >
                 {item.icon}
                 {item.label}
               </DropDownItem>
             )
           })}
-          {this.props.navigationList?.map((item) => {
+          {navigationList?.map((item) => {
             return (
               <AdvancedSearchWrapper>
                 <Button
@@ -292,78 +272,67 @@ export class SearchTool extends React.Component<IProps, IState> {
     )
   }
 
-  dropDownItemSelect = (item: ISearchType) => {
-    this.setState((_) => ({
-      selectedSearchType: item,
-      dropDownIsVisible: false
-    }))
+  const dropDownItemSelect = (item: ISearchType) => {
+    setSelectedSearchType(item)
+    setDropDownIsVisible(false)
   }
-  toggleDropdownDisplay = () => {
+
+  const toggleDropdownDisplay = () => {
     const handler = () => {
-      this.setState({ dropDownIsVisible: false })
+      setDropDownIsVisible(false)
       document.removeEventListener('click', handler)
     }
-    if (!this.state.dropDownIsVisible) {
+    if (!dropDownIsVisible) {
       //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
       setTimeout(() => document.addEventListener('click', handler), 0)
     }
-
-    this.setState((prevState) => ({
-      dropDownIsVisible: !prevState.dropDownIsVisible
-    }))
-  }
-  onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchParam: event.target.value, dropDownIsVisible: false })
+    setDropDownIsVisible(!dropDownIsVisible)
   }
 
-  onClearTextHandler = () => {
-    const { onClearText } = this.props
-    this.setState({ searchParam: '' })
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParam(event.target.value)
+    setDropDownIsVisible(false)
+  }
+
+  const onClearTextHandler = () => {
+    setSearchParam('')
 
     if (onClearText) {
       onClearText()
     }
   }
 
-  render() {
-    const { placeHolderText, value } = this.state.selectedSearchType
-    return (
-      <SearchBox className={this.props.className}>
-        <Wrapper onSubmit={this.search}>
-          <Button
-            type="icon"
-            size="medium"
-            aria-label="Search"
-            id="searchIconButton"
-            onClick={this.search}
-          >
-            <Icon color="currentColor" name="MagnifyingGlass" size="large" />
-          </Button>
-          <SearchInput
-            id="searchText"
-            type={value === 'phone' ? 'tel' : 'text'}
-            autoComplete="off"
-            placeholder={placeHolderText}
-            onChange={this.onChangeHandler}
-            value={this.state.searchParam}
-            maxLength={200}
-          />
-          {this.state.searchParam && (
-            <ClearTextIcon onClick={this.onClearTextHandler} />
-          )}
-          <DropDown id="searchType" onClick={this.toggleDropdownDisplay}>
-            <SelectedSearchCriteria>
-              <span className="selected-icon">
-                {this.state.selectedSearchType.icon}
-              </span>
-              <span className="selected-label">
-                {this.state.selectedSearchType.label}
-              </span>
-            </SelectedSearchCriteria>
-          </DropDown>
-          {this.dropdown()}
-        </Wrapper>
-      </SearchBox>
-    )
-  }
+  const { placeHolderText, value } = selectedSearchType
+  return (
+    <SearchBox className={className}>
+      <Wrapper onSubmit={search}>
+        <Button
+          type="icon"
+          size="medium"
+          aria-label="Search"
+          id="searchIconButton"
+          onClick={search}
+        >
+          <Icon color="currentColor" name="MagnifyingGlass" size="large" />
+        </Button>
+        <SearchInput
+          id="searchText"
+          type={value === 'phone' ? 'tel' : 'text'}
+          autoComplete="off"
+          placeholder={placeHolderText}
+          onChange={onChangeHandler}
+          value={searchParam}
+          maxLength={200}
+        />
+        {searchParam && <ClearTextIcon onClick={onClearTextHandler} />}
+        <DropDown id="searchType" onClick={toggleDropdownDisplay}>
+          <SelectedSearchCriteria>
+            <span className="selected-icon">{selectedSearchType.icon}</span>
+            <span className="selected-label">{selectedSearchType.label}</span>
+          </SelectedSearchCriteria>
+        </DropDown>
+        {dropdown()}
+      </Wrapper>
+    </SearchBox>
+  )
 }
