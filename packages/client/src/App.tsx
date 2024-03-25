@@ -72,7 +72,7 @@ import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
-import { ReviewCertificateSvg } from './views/PrintCertificate/ReviewCertificateSvg'
+import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -345,7 +345,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               path={routes.REVIEW_CERTIFICATE}
-                                              component={ReviewCertificateSvg}
+                                              component={ReviewCertificate}
                                             />
                                             <ProtectedRoute
                                               path={

@@ -21,15 +21,15 @@ import {
   AppBar,
   Spinner
 } from '@opencrvs/components'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useParams } from 'react-router'
-import { getPDFTemplateWithSVG } from './PDFUtils'
+import { getPDFTemplateWithSVG, printCertificate } from './PDFUtils'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { hasRegisterScope } from '@client/utils/authUtils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   goToCertificateCorrection,
   goToHomeTab,
@@ -43,7 +43,8 @@ import {
   getRegisteredDate,
   getEventDate,
   isFreeOfCost,
-  calculatePrice
+  calculatePrice,
+  getCountryTranslations
 } from './utils'
 import {
   IPrintableDeclaration,
@@ -55,10 +56,11 @@ import { cloneDeep } from 'lodash'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import styled from 'styled-components'
 import { useDeclaration } from '@client/declarations/selectors'
+import { countries } from '@client/utils/countries'
 
 const CertificateContainer = styled.div``
 
-export const ReviewCertificateSvg = () => {
+export const ReviewCertificate = () => {
   const offlineData = useSelector(getOfflineData)
   const location = useLocation<{ isNavigatedInsideApp: boolean }>()
   const [svg, setSvg] = useState<string>()
@@ -70,11 +72,14 @@ export const ReviewCertificateSvg = () => {
   const intl = useIntl()
   const scope = useSelector((store: IStoreState) => getScope(store))
   const [modal, openModal] = useModal()
-  const svgElementRef = useRef<HTMLDivElement | null>(null)
+  const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
+  const languages = useSelector((store: IStoreState) =>
+    getCountryTranslations(store.i18n.languages, countries)
+  )
 
   useEffect(() => {
     if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, state).then((svg) =>
+      getPDFTemplateWithSVG(offlineData, declaration, 'A4', state).then((svg) =>
         setSvg(svg.svgCode)
       )
   }, [offlineData, declaration, registrationId, state])
@@ -160,43 +165,11 @@ export const ReviewCertificateSvg = () => {
       ]
     }
 
-    const svgElement = svgElementRef.current?.querySelector('svg')
-    const style = document.createElement('style')
-    style.innerHTML = `${Object.entries(offlineData.templates.fonts ?? {})
-      .flatMap(([font, families]) =>
-        Object.entries(families).map(
-          ([family, url]) => `
-@font-face {
-  font-family: "${font}";
-  font-style: "${family}";
-  src: url("${url}") format("truetype");
-}`
-        )
-      )
-      .join('')}
-@media print {
-  @page { margin: 0; }
-  svg {
-    width: 100vw;
-    height: 100vh;
-  }
-}
-    `
+    printCertificate(intl, draft, userDetails, offlineData, state, languages)
 
-    svgElement?.append(style)
-
-    const svgAsText = new XMLSerializer().serializeToString(svgElement!)
-    const blob = new Blob([svgAsText], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const svgWindow = window.open(url)
-    // so the Garbage Collector can collect the blob
-    svgWindow!.onload = () => URL.revokeObjectURL(url)
-    svgWindow?.print()
-
-    //window.print()
-    //dispatch(modifyDeclaration(draft))
-    //dispatch(writeDeclaration(draft))
-    //dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+    dispatch(modifyDeclaration(draft))
+    dispatch(writeDeclaration(draft))
+    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
   }
 
   const confirmAndPrint = async () => {
@@ -272,7 +245,6 @@ export const ReviewCertificateSvg = () => {
           <Stack direction="column">
             <Box>
               <CertificateContainer
-                ref={svgElementRef}
                 id="print"
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
