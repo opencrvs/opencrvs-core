@@ -33,7 +33,7 @@ export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
 
-type FontFamilyTypes = {
+export type FontFamilyTypes = {
   normal: string
   bold: string
   italics: string

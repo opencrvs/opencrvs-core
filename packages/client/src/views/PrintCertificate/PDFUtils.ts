@@ -14,21 +14,15 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import {
   AdminStructure,
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import {
-  OptionalData,
-  IPDFTemplate
-} from '@client/pdfRenderer/transformer/types'
-import { PageSize } from 'pdfmake/interfaces'
+import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
-import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
@@ -207,60 +201,11 @@ export function executeHandlebarsTemplate(
   return output
 }
 
-export async function previewCertificate(
-  intl: IntlShape,
-  declaration: IDeclaration,
-  userDetails: UserDetails | null,
-  offlineResource: IOfflineData,
-  callBack: (pdf: string) => void,
-  state: IStoreState,
-  optionalData?: OptionalData,
-  pageSize: PageSize = 'A4'
-) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-
-  createPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
-    declaration,
-    userDetails,
-    offlineResource,
-    intl,
-    optionalData
-  ).getDataUrl((pdf: string) => {
-    callBack(pdf)
-  })
-}
-
-export async function printCertificate(
-  intl: IntlShape,
-  declaration: IDeclaration,
-  userDetails: UserDetails | null,
-  offlineResource: IOfflineData,
-  state: IStoreState,
-  optionalData?: OptionalData,
-  pageSize: PageSize = 'A4'
-) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-  printPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
-    declaration,
-    userDetails,
-    offlineResource,
-    intl,
-    optionalData
-  )
-}
-
-async function getPDFTemplateWithSVG(
+export async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize,
   state: IStoreState
-): Promise<IPDFTemplate> {
+) {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
@@ -295,9 +240,7 @@ async function getPDFTemplateWithSVG(
       ...offlineResource.templates.fonts
     }
   }
-  pdfTemplate.definition.pageSize = pageSize
-  updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
-  return pdfTemplate
+  return { pdfTemplate, svgCode }
 }
 
 export function downloadFile(
@@ -310,35 +253,4 @@ export function downloadFile(
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
-}
-
-function updatePDFTemplateWithSVGContent(
-  template: IPDFTemplate,
-  svg: string,
-  pageSize: PageSize
-) {
-  template.definition['content'] = {
-    svg,
-    fit: getPageDimensions(pageSize)
-  }
-}
-
-const standardPageSizes: Record<string, [number, number]> = {
-  A2: [1190.55, 1683.78],
-  A3: [841.89, 1190.55],
-  A4: [595.28, 841.89],
-  A5: [419.53, 595.28]
-}
-
-function getPageDimensions(pageSize: PageSize) {
-  if (
-    typeof pageSize === 'string' &&
-    standardPageSizes.hasOwnProperty(pageSize)
-  ) {
-    return standardPageSizes[pageSize]
-  } else {
-    throw new Error(
-      `Pagesize ${pageSize} is not found in standardPageSizes map`
-    )
-  }
 }
