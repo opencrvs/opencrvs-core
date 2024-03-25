@@ -10,10 +10,35 @@
  */
 
 import * as crypto from 'crypto'
-import { FHIR_URL } from '@webhooks/constants'
-import fetch from 'node-fetch'
-import { logger } from '@webhooks/logger'
-import { IAuthHeader } from '@webhooks/features/event/handler'
+import {
+  RegisteredRecord,
+  MOTHER_CODE,
+  FATHER_CODE,
+  CHILD_CODE,
+  ATTACHMENT_DOCS_CODE,
+  INFORMANT_CODE,
+  DECEASED_CODE,
+  DEATH_ENCOUNTER_CODE,
+  getComposition,
+  CompositionSectionCode,
+  resourceIdentifierToUUID,
+  isTask
+} from '@opencrvs/commons/types'
+
+const NATIONAL_ID_BIRTH_PERMISSIONS = [
+  MOTHER_CODE,
+  FATHER_CODE,
+  CHILD_CODE,
+  ATTACHMENT_DOCS_CODE,
+  INFORMANT_CODE
+] as CompositionSectionCode[]
+
+const NATIONAL_ID_DEATH_PERMISSIONS = [
+  DECEASED_CODE,
+  ATTACHMENT_DOCS_CODE,
+  INFORMANT_CODE,
+  DEATH_ENCOUNTER_CODE
+] as CompositionSectionCode[]
 
 export function createRequestSignature(
   requestSigningVersion: string,
@@ -25,162 +50,53 @@ export function createRequestSignature(
   return `${requestSigningVersion}=${hmac.digest('hex')}`
 }
 
-export async function transformBirthBundle(
-  bundle: fhir.Bundle,
+export function transformBirthBundle(
+  bundle: RegisteredRecord,
   scope: string,
-  authHeader: IAuthHeader,
-  permissions: string[] = []
+  permissions: CompositionSectionCode[] = []
 ) {
-  if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
-    throw new Error('Invalid FHIR bundle found')
-  }
-  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
-  if (task && task.focus && task.focus.reference) {
-    const composition = await getComposition(
-      task.focus.reference as string,
-      authHeader
-    )
-    switch (scope) {
-      case 'nationalId':
-        return getPermissionsBundle(
-          bundle,
-          [
-            'child-details',
-            'mother-details',
-            'father-details',
-            'supporting-documents',
-            'informant-details'
-          ],
-          composition,
-          authHeader
-        )
-      case 'webhook':
-        return getPermissionsBundle(
-          bundle,
-          permissions,
-          composition,
-          authHeader
-        )
-      default:
-        return bundle
-    }
-  } else {
-    throw new Error('Task has no composition reference')
+  switch (scope) {
+    case 'nationalId':
+      return getPermissionsBundle(bundle, NATIONAL_ID_BIRTH_PERMISSIONS)
+    case 'webhook':
+      return getPermissionsBundle(bundle, permissions)
+    default:
+      return bundle
   }
 }
 
-export async function transformDeathBundle(
-  bundle: fhir.Bundle,
+export function transformDeathBundle(
+  bundle: RegisteredRecord,
   scope: string,
-  authHeader: IAuthHeader,
-  permissions: string[] = []
+  permissions: CompositionSectionCode[] = []
 ) {
-  if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
-    throw new Error('Invalid FHIR bundle found')
-  }
-  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
-  if (task && task.focus && task.focus.reference) {
-    const composition = await getComposition(
-      task.focus.reference as string,
-      authHeader
-    )
-    switch (scope) {
-      case 'nationalId':
-        return getPermissionsBundle(
-          bundle,
-          [
-            'deceased-details',
-            'supporting-documents',
-            'informant-details',
-            'death-encounter'
-          ],
-          composition,
-          authHeader
-        )
-      case 'webhook':
-        return getPermissionsBundle(
-          bundle,
-          permissions,
-          composition,
-          authHeader
-        )
-      default:
-        return bundle
-    }
-  } else {
-    throw new Error('Task has no composition reference')
+  switch (scope) {
+    case 'nationalId':
+      return getPermissionsBundle(bundle, NATIONAL_ID_DEATH_PERMISSIONS)
+    case 'webhook':
+      return getPermissionsBundle(bundle, permissions)
+    default:
+      return bundle
   }
 }
 
-export const getPermissionsBundle = async (
-  bundle: fhir.Bundle,
-  permissions: string[] = [],
-  composition: fhir.Composition,
-  authHeader: IAuthHeader
+export const getPermissionsBundle = (
+  bundle: RegisteredRecord,
+  permissions: CompositionSectionCode[]
 ) => {
-  const resources = await Promise.all(
-    permissions.map((sectionCode) =>
-      getResourceBySection(composition, sectionCode, authHeader)
-    )
+  const composition = getComposition(bundle)
+  const allowedSections = composition.section.filter((section) =>
+    section.code.coding.some(({ code }) => permissions.includes(code))
   )
-  resources.forEach((resource: fhir.BundleEntry) => {
-    if (resource) {
-      bundle.entry!.push({ resource })
-    }
-  })
+  const allowedReferences = allowedSections.flatMap((section) =>
+    section.entry.map(({ reference }) => resourceIdentifierToUUID(reference))
+  )
 
-  return bundle
-}
-
-const getFromFhir = (suffix: string, authHeader: IAuthHeader) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    headers: {
-      'Content-Type': 'application/json+fhir',
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
-}
-
-async function getComposition(resource: string, authHeader: IAuthHeader) {
-  try {
-    return await getFromFhir(`/${resource}`, authHeader)
-  } catch (error) {
-    logger.error(`getting composition by identifer failed with error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-async function getResourceBySection(
-  composition: any,
-  sectionCode: string,
-  authHeader: IAuthHeader
-) {
-  const resourceSection =
-    composition &&
-    composition.section &&
-    composition.section.find((section: fhir.CompositionSection) => {
-      if (!section.code || !section.code.coding || !section.code.coding.some) {
-        return false
-      }
-      return section.code.coding.some((coding) => coding.code === sectionCode)
-    })
-
-  if (!resourceSection || !resourceSection.entry) {
-    return null
-  }
-  // TODO: For a proper implementation, all the documents should be requested
-  // and searched to find which document is the visual identity MOSIP requires.
-  const resource = resourceSection.entry[0].reference
-  try {
-    return await getFromFhir(`/${resource}`, authHeader)
-  } catch (error) {
-    logger.error(`getting resource by identifer failed with error: ${error}`)
-    throw new Error(error)
-  }
+  return {
+    ...bundle,
+    entry: bundle.entry.filter(
+      ({ resource }) =>
+        allowedReferences.includes(resource.id) || isTask(resource)
+    )
+  } satisfies RegisteredRecord
 }
