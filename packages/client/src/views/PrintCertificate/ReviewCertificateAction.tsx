@@ -24,7 +24,11 @@ import {
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useParams } from 'react-router'
-import { getPDFTemplateWithSVG, printCertificate } from './PDFUtils'
+import {
+  addFontsToSvg,
+  getPDFTemplateWithSVG,
+  printCertificate
+} from './PDFUtils'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -79,8 +83,14 @@ export const ReviewCertificate = () => {
 
   useEffect(() => {
     if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, 'A4', state).then((svg) =>
-        setSvg(svg.svgCode)
+      getPDFTemplateWithSVG(offlineData, declaration, 'A4', state).then(
+        (svg) => {
+          const svgWithFonts = addFontsToSvg(
+            svg.svgCode,
+            offlineData.templates.fonts ?? {}
+          )
+          setSvg(svgWithFonts)
+        }
       )
   }, [offlineData, declaration, registrationId, state])
 
