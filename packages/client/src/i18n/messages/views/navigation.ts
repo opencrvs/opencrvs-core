@@ -111,6 +111,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Completeness rates in navigation',
     id: 'navigation.completenessRates'
   },
+  emailAllUsers: {
+    defaultMessage: 'Email all users',
+    description: 'Email all users label in navigation',
+    id: 'navigation.emailAllUsers'
+  },
   form: {
     defaultMessage: 'Declaration forms',
     description: 'Declaration forms label in navigation',

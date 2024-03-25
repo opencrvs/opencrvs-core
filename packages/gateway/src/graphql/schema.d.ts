@@ -14,6 +14,7 @@ import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
  *******************************/
 export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
+  sendNotificationToAllUsers?: GQLNotificationResult
   fetchBirthRegistration?: GQLBirthRegistration
   searchBirthRegistrations?: Array<GQLBirthRegistration | null>
   searchDeathRegistrations?: Array<GQLDeathRegistration | null>
@@ -134,6 +135,15 @@ export interface GQLNotification {
 }
 
 export type GQLDate = any
+
+export interface GQLNotificationResult {
+  success: boolean
+}
+
+export const enum GQLNotificationType {
+  EMAIL = 'EMAIL',
+  SMS = 'SMS'
+}
 
 export interface GQLBirthRegistration extends GQLEventRegistration {
   id: string
@@ -1934,6 +1944,7 @@ export interface GQLResolver {
   Dummy?: GQLDummyTypeResolver
   Notification?: GQLNotificationTypeResolver
   Date?: GraphQLScalarType
+  NotificationResult?: GQLNotificationResultTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   Person?: GQLPersonTypeResolver
@@ -2060,6 +2071,7 @@ export interface GQLResolver {
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
+  sendNotificationToAllUsers?: QueryToSendNotificationToAllUsersResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   searchBirthRegistrations?: QueryToSearchBirthRegistrationsResolver<TParent>
   searchDeathRegistrations?: QueryToSearchDeathRegistrationsResolver<TParent>
@@ -2118,6 +2130,24 @@ export interface QueryToListNotificationsResolver<
   (
     parent: TParent,
     args: QueryToListNotificationsArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSendNotificationToAllUsersArgs {
+  subject: string
+  body: string
+  locale: string
+  type?: GQLNotificationType
+}
+export interface QueryToSendNotificationToAllUsersResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToSendNotificationToAllUsersArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -3809,6 +3839,22 @@ export interface NotificationToCreatedAtResolver<TParent = any, TResult = any> {
 }
 
 export interface NotificationToUpdatedAtResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLNotificationResultTypeResolver<TParent = any> {
+  success?: NotificationResultToSuccessResolver<TParent>
+}
+
+export interface NotificationResultToSuccessResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

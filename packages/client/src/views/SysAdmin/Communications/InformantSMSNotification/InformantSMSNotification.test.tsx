@@ -15,13 +15,13 @@ import {
   flushPromises,
   userDetails
 } from '@client/tests/util'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import InformantNotification from '@client/views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
 import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { formatUrl } from '@client/navigation'
 import { INFORMANT_NOTIFICATION } from '@client/navigation/routes'
-import { GET_INFORMANT_SMS_NOTIFICATIONS } from '@client/views/SysAdmin/InformantSMSNotification/queries'
-import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from '@client/views/SysAdmin/InformantSMSNotification/mutations'
+import { GET_INFORMANT_SMS_NOTIFICATIONS } from '@client/views/SysAdmin/Communications/InformantSMSNotification/queries'
+import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from '@client/views/SysAdmin/Communications/InformantSMSNotification/mutations'
 import { History } from 'history'
 import { informantSMSNotificationMock } from '@client/tests/mock-graphql-responses'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'

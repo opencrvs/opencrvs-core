@@ -21,6 +21,7 @@ export async function notifyCountryConfig(
   recipient: {
     email?: string | null
     sms?: string | null
+    bcc?: string[]
   },
   type: 'user' | 'informant',
   variables: Record<string, unknown>,
