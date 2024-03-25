@@ -22,7 +22,12 @@ export async function verifyRecordHandler(
 ) {
   const token = getToken(request)
   const recordId = request.params.id
-  const record = await getRecordById(recordId, token, ['REGISTERED', 'ISSUED'])
+  const record = await getRecordById(
+    recordId,
+    token,
+    ['REGISTERED', 'ISSUED'],
+    true
+  )
 
   const payload = validateRequest(
     z.object({
@@ -31,8 +36,11 @@ export async function verifyRecordHandler(
     request.payload
   )
 
-  const verifiedRecord = await toVerified(record, payload['x-real-ip'])
+  const { verifiedRecord, verifiedRecordWithTaskOnly } = toVerified(
+    record,
+    payload['x-real-ip']
+  )
 
-  await sendBundleToHearth(verifiedRecord)
+  await sendBundleToHearth(verifiedRecordWithTaskOnly)
   return verifiedRecord
 }
