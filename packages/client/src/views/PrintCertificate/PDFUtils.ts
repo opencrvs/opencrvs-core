@@ -20,7 +20,10 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  OptionalData
+} from '@client/pdfRenderer/transformer/types'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
@@ -30,6 +33,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
+import { FontFamilyTypes } from '@client/utils/referenceApi'
+import { PageSize } from 'pdfmake/interfaces'
+import { printPDF } from '@client/pdfRenderer'
+import { UserDetails } from '@client/utils/userUtils'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -201,9 +208,58 @@ export function executeHandlebarsTemplate(
   return output
 }
 
+export function addFontsToSvg(
+  svgString: string,
+  fonts: Record<string, FontFamilyTypes>
+) {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgString, 'image/svg+xml')
+  const svg = doc.documentElement
+  const style = document.createElement('style')
+  style.innerHTML = Object.entries(fonts)
+    .flatMap(([font, families]) =>
+      Object.entries(families).map(
+        ([family, url]) => `
+@font-face {
+font-family: "${font}";
+font-style: "${family}";
+src: url("${url}") format("truetype");
+}`
+      )
+    )
+    .join('')
+  svg.appendChild(style)
+  const serializer = new XMLSerializer()
+  return serializer.serializeToString(svg)
+}
+
+export async function printCertificate(
+  intl: IntlShape,
+  declaration: IDeclaration,
+  userDetails: UserDetails | null,
+  offlineResource: IOfflineData,
+  state: IStoreState,
+  optionalData?: OptionalData,
+  pageSize: PageSize = 'A4'
+) {
+  if (!userDetails) {
+    throw new Error('No user details found')
+  }
+  printPDF(
+    (await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state))
+      .pdfTemplate,
+    declaration,
+    userDetails,
+    offlineResource,
+    intl,
+    optionalData
+  )
+}
+
 export async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
+  pageSize: PageSize,
   state: IStoreState
 ) {
   const svgTemplate =
@@ -240,6 +296,8 @@ export async function getPDFTemplateWithSVG(
       ...offlineResource.templates.fonts
     }
   }
+  pdfTemplate.definition.pageSize = pageSize
+  updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return { pdfTemplate, svgCode }
 }
 
@@ -253,4 +311,35 @@ export function downloadFile(
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
+}
+
+function updatePDFTemplateWithSVGContent(
+  template: IPDFTemplate,
+  svg: string,
+  pageSize: PageSize
+) {
+  template.definition['content'] = {
+    svg,
+    fit: getPageDimensions(pageSize)
+  }
+}
+
+const standardPageSizes: Record<string, [number, number]> = {
+  A2: [1190.55, 1683.78],
+  A3: [841.89, 1190.55],
+  A4: [595.28, 841.89],
+  A5: [419.53, 595.28]
+}
+
+function getPageDimensions(pageSize: PageSize) {
+  if (
+    typeof pageSize === 'string' &&
+    standardPageSizes.hasOwnProperty(pageSize)
+  ) {
+    return standardPageSizes[pageSize]
+  } else {
+    throw new Error(
+      `Pagesize ${pageSize} is not found in standardPageSizes map`
+    )
+  }
 }
