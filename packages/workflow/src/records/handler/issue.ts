@@ -11,7 +11,7 @@
 import { IssuedRecord } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { validateRequest } from '@workflow/utils'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { IssueRequestSchema } from '@workflow/records/validations'
 import { toIssued } from '@workflow/records/state-transitions'
 import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/documents'
