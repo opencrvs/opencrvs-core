@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '../Button'
 import { noop } from 'lodash'
 
@@ -94,21 +94,23 @@ export const ToggleMenu = ({
 }: IProps) => {
   const [showSubmenu, setShowSubmenu] = useState(false)
 
-  const closeMenu = () => {
+  const closeMenuRef = useRef(() => {
     setShowSubmenu(false)
-  }
+  })
 
-  const closeMenuOnEscape = (e: KeyboardEvent) => {
+  const closeMenuOnEscapeRef = useRef((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
-      closeMenu()
+      closeMenuRef.current()
     }
-  }
+  })
 
   useEffect(() => {
+    const closeMenu = closeMenuRef.current
+    const closeMenuOnEscape = closeMenuOnEscapeRef.current
     if (showSubmenu) {
-      // To ensure the event listeners are correctly cleaned up, avoid using setTimeout if possible.
-      document.addEventListener('click', closeMenu)
-      document.addEventListener('keyup', closeMenuOnEscape)
+      //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+      setTimeout(() => document.addEventListener('click', closeMenu), 0)
+      setTimeout(() => document.addEventListener('keyup', closeMenuOnEscape), 0)
     }
 
     return () => {
