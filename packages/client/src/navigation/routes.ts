@@ -50,8 +50,6 @@ export const ISSUE_VERIFY_COLLECTOR =
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
-export const REVIEW_CERTIFICATE_SVG = '/review-svg/:registrationId/:eventType'
-export const PRINT_CERTIFICATE = '/review-svg-print/:registrationId'
 
 export const PRINT_CERTIFICATE_PAYMENT =
   '/print/payment/:registrationId/:eventType'
