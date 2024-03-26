@@ -19,9 +19,8 @@ import { useDeclaration } from '@client/declarations/selectors'
 import { CorrectionSection, SubmissionAction } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { userDetails } from '@client/tests/util'
 import { hasRegisterScope } from '@client/utils/authUtils'
 import { countries } from '@client/utils/countries'
 import { cloneDeep } from 'lodash'
@@ -56,9 +55,10 @@ export const usePrintableCertificate = (declarationId: string) => {
   const languages = useSelector((store: IStoreState) =>
     getCountryTranslations(store.i18n.languages, countries)
   )
-  const scope = useSelector((store: IStoreState) => getScope(store))
+  const scope = useSelector(getScope)
   const canUserEditRecord =
     declaration?.event !== Event.Marriage && hasRegisterScope(scope)
+  const userDetails = useSelector(getUserDetails)
 
   useEffect(() => {
     if (declaration)
