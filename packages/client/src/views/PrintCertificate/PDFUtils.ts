@@ -222,13 +222,13 @@ export function addFontsToSvg(
         ([family, url]) => `
 @font-face {
 font-family: "${font}";
-font-style: "${family}";
+font-weight: ${family};
 src: url("${url}") format("truetype");
 }`
       )
     )
     .join('')
-  svg.appendChild(style)
+  svg.prepend(style)
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
