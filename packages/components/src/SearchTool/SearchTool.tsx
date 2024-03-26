@@ -13,7 +13,6 @@ import { ClearText } from '../icons'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
-import { set } from 'lodash'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
@@ -180,7 +179,7 @@ export interface INavigationType {
   onClick: () => void
 }
 
-interface IProps {
+export interface IProps {
   searchTypeList: ISearchType[]
   navigationList?: INavigationType[]
   searchText?: string
