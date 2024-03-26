@@ -179,7 +179,7 @@ export interface INavigationType {
   onClick: () => void
 }
 
-export interface IProps {
+export interface ISearchToolProps {
   searchTypeList: ISearchType[]
   navigationList?: INavigationType[]
   searchText?: string
@@ -199,7 +199,7 @@ export const SearchTool = ({
   searchHandler,
   onClearText,
   className
-}: IProps) => {
+}: ISearchToolProps) => {
   const [dropDownIsVisible, setDropDownIsVisible] = useState(false)
   const [searchParam, setSearchParam] = useState(searchText)
   const [currentLanguage, setCurrentLanguage] = useState(language)
