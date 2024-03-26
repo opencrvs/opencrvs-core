@@ -78,7 +78,7 @@ export function createSVG(
   intl: IntlShape,
   optionalData?: OptionalData
 ): string {
-  pdfMake.vfs = { ...commonVFS, ...template.vfs }
+  pdfMake.vfs = { ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
   if (template.transformers && template.transformers.length > 0) {
     template.transformers.forEach((transformerDef) => {
