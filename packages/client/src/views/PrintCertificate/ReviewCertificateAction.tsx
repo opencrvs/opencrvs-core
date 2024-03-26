@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
 import {
   Box,
   Button,
@@ -21,78 +19,30 @@ import {
   AppBar,
   Spinner
 } from '@opencrvs/components'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
+import { useDispatch } from 'react-redux'
 import { useLocation, useParams } from 'react-router'
-import {
-  addFontsToSvg,
-  getPDFTemplateWithSVG,
-  printCertificate
-} from './PDFUtils'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { hasRegisterScope } from '@client/utils/authUtils'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import {
-  goToCertificateCorrection,
-  goToHomeTab,
-  goBack
-} from '@client/navigation'
-import { Event } from '@client/utils/gateway'
-import { CorrectionSection, SubmissionAction } from '@client/forms'
+import { goToHomeTab, goBack } from '@client/navigation'
 import { useModal } from '@client/hooks/useModal'
-import {
-  isCertificateForPrintInAdvance,
-  getRegisteredDate,
-  getEventDate,
-  isFreeOfCost,
-  calculatePrice,
-  getCountryTranslations
-} from './utils'
-import {
-  IPrintableDeclaration,
-  modifyDeclaration,
-  SUBMISSION_STATUS,
-  writeDeclaration
-} from '@client/declarations'
-import { cloneDeep } from 'lodash'
+
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import styled from 'styled-components'
-import { useDeclaration } from '@client/declarations/selectors'
-import { countries } from '@client/utils/countries'
+import { constantsMessages } from '@client/i18n/messages'
+import { usePrintableCertificate } from './usePrintableCertificate'
 
 const CertificateContainer = styled.div``
 
-export const ReviewCertificate = () => {
-  const offlineData = useSelector(getOfflineData)
-  const location = useLocation<{ isNavigatedInsideApp: boolean }>()
-  const [svg, setSvg] = useState<string>()
-
-  const { registrationId } = useParams<{ registrationId: string }>()
-  const declaration = useDeclaration<IPrintableDeclaration>(registrationId)
-  const dispatch = useDispatch()
-  const state = useSelector((store: IStoreState) => store)
+const ReviewCertificateFrame = ({
+  children
+}: {
+  children: React.ReactNode
+}) => {
   const intl = useIntl()
-  const scope = useSelector((store: IStoreState) => getScope(store))
-  const [modal, openModal] = useModal()
-  const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
-  const languages = useSelector((store: IStoreState) =>
-    getCountryTranslations(store.i18n.languages, countries)
-  )
-
-  useEffect(() => {
-    if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, 'A4', state).then(
-        (svg) => {
-          const svgWithFonts = addFontsToSvg(
-            svg.svgCode,
-            offlineData.templates.fonts ?? {}
-          )
-          setSvg(svgWithFonts)
-        }
-      )
-  }, [offlineData, declaration, registrationId, state])
+  const dispatch = useDispatch()
+  const location = useLocation<{ isNavigatedInsideApp: boolean }>()
 
   const back = () => {
     const historyState = location.state
@@ -104,125 +54,6 @@ export const ReviewCertificate = () => {
       dispatch(goBack())
     } else {
       dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
-    }
-  }
-
-  if (!declaration || !svg) {
-    return (
-      <Frame
-        header={
-          <AppBar
-            desktopLeft={
-              <Button type="icon">
-                <Icon name="CaretLeft" size="large" />
-              </Button>
-            }
-          />
-        }
-        skipToContentText="Skip to main content"
-      >
-        <Frame.LayoutCentered>
-          <Spinner id="review-certificate-loading" />
-        </Frame.LayoutCentered>
-      </Frame>
-    )
-  }
-
-  const isPrintInAdvanced = isCertificateForPrintInAdvance(declaration)
-
-  const readyToCertifyAndIssueOrCertify = () => {
-    const draft = cloneDeep(declaration) as IPrintableDeclaration
-
-    draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = isPrintInAdvanced
-      ? SubmissionAction.CERTIFY_DECLARATION
-      : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
-
-    const registeredDate = getRegisteredDate(draft.data)
-    const certificate = draft.data.registration.certificates[0]
-    const eventDate = getEventDate(draft.data, draft.event)
-    if (!isPrintInAdvanced) {
-      if (isFreeOfCost(draft.event, eventDate, registeredDate, offlineData)) {
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: 0,
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          offlineData
-        )
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: Number(paymentAmount),
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
-      }
-    }
-
-    draft.data.registration = {
-      ...draft.data.registration,
-      certificates: [
-        {
-          ...certificate,
-          data: svg || ''
-        }
-      ]
-    }
-
-    printCertificate(intl, draft, userDetails, offlineData, state, languages)
-
-    dispatch(modifyDeclaration(draft))
-    dispatch(writeDeclaration(draft))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
-  }
-
-  const confirmAndPrint = async () => {
-    const saveAndExitConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        id="confirm-print-modal"
-        title={
-          isPrintInAdvanced
-            ? intl.formatMessage(certificateMessages.printModalTitle)
-            : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
-        }
-        actions={[
-          <Button
-            type="tertiary"
-            key="close-modal"
-            onClick={() => {
-              close(null)
-            }}
-            id="close-modal"
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </Button>,
-          <Button
-            type="primary"
-            key="print-certificate"
-            onClick={readyToCertifyAndIssueOrCertify}
-            id="print-certificate"
-          >
-            {intl.formatMessage(buttonMessages.print)}
-          </Button>
-        ]}
-        show={true}
-        handleClose={() => close(null)}
-        contentHeight={100}
-      >
-        {isPrintInAdvanced
-          ? intl.formatMessage(certificateMessages.printModalBody)
-          : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
-      </ResponsiveModal>
-    ))
-
-    if (saveAndExitConfirm) {
-      readyToCertifyAndIssueOrCertify()
     }
   }
 
@@ -248,8 +79,84 @@ export const ReviewCertificate = () => {
           }
         />
       }
-      skipToContentText="Skip to main content"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToContentText
+      )}
     >
+      {children}
+    </Frame>
+  )
+}
+
+export const ReviewCertificate = () => {
+  const { registrationId } = useParams<{ registrationId: string }>()
+  const {
+    svg,
+    loading,
+    handleCertify,
+    isPrintInAdvanced,
+    canUserEditRecord,
+    handleEdit
+  } = usePrintableCertificate(registrationId)
+  const intl = useIntl()
+  const [modal, openModal] = useModal()
+
+  if (loading) {
+    return (
+      <ReviewCertificateFrame>
+        <Frame.LayoutCentered>
+          <Spinner id="review-certificate-loading" />
+        </Frame.LayoutCentered>
+      </ReviewCertificateFrame>
+    )
+  }
+
+  const confirmAndPrint = async () => {
+    const saveAndExitConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        id="confirm-print-modal"
+        title={
+          isPrintInAdvanced
+            ? intl.formatMessage(certificateMessages.printModalTitle)
+            : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
+        }
+        actions={[
+          <Button
+            type="tertiary"
+            key="close-modal"
+            onClick={() => {
+              close(null)
+            }}
+            id="close-modal"
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            key="print-certificate"
+            onClick={handleCertify}
+            id="print-certificate"
+          >
+            {intl.formatMessage(buttonMessages.print)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+        contentHeight={100}
+      >
+        {isPrintInAdvanced
+          ? intl.formatMessage(certificateMessages.printModalBody)
+          : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
+      </ResponsiveModal>
+    ))
+
+    if (saveAndExitConfirm) {
+      handleCertify()
+    }
+  }
+
+  return (
+    <ReviewCertificateFrame>
       <Frame.LayoutCentered>
         {svg && (
           <Stack direction="column">
@@ -275,19 +182,11 @@ export const ReviewCertificate = () => {
                   {intl.formatMessage(certificateMessages.confirmAndPrint)}
                 </Button>,
 
-                declaration.event !== Event.Marriage &&
-                hasRegisterScope(scope) ? (
+                canUserEditRecord ? (
                   <Button
                     key="edit-record"
                     type="negative"
-                    onClick={() =>
-                      dispatch(
-                        goToCertificateCorrection(
-                          registrationId,
-                          CorrectionSection.Corrector
-                        )
-                      )
-                    }
+                    onClick={handleEdit}
                   >
                     {intl.formatMessage(buttonMessages.editRecord)}
                   </Button>
@@ -300,6 +199,6 @@ export const ReviewCertificate = () => {
         )}
       </Frame.LayoutCentered>
       {modal}
-    </Frame>
+    </ReviewCertificateFrame>
   )
 }
