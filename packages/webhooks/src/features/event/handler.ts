@@ -23,6 +23,7 @@ import { getQueue } from '@webhooks/queue'
 import { Queue } from 'bullmq'
 import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
+import { RegisteredRecord } from '@opencrvs/commons/types'
 
 export interface IAuthHeader {
   Authorization: string
@@ -33,7 +34,7 @@ export async function birthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const bundle = request.payload as fhir.Bundle
+  const bundle = request.payload as RegisteredRecord
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -66,10 +67,9 @@ export async function birthRegisteredHandler(
           authHeader,
           EventType.Birth
         )
-        const transformedBundle = await transformBirthBundle(
+        const transformedBundle = transformBirthBundle(
           bundle,
           webhookToNotify.createdBy.type,
-          authHeader,
           permissions
         )
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_REGISTERED]) {
@@ -129,7 +129,7 @@ export async function deathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const bundle = request.payload as fhir.Bundle
+  const bundle = request.payload as RegisteredRecord
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -162,10 +162,9 @@ export async function deathRegisteredHandler(
           authHeader,
           EventType.Death
         )
-        const transformedBundle = await transformDeathBundle(
+        const transformedBundle = transformDeathBundle(
           bundle,
           webhookToNotify.createdBy.type,
-          authHeader,
           permissions
         )
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.DEATH_REGISTERED]) {

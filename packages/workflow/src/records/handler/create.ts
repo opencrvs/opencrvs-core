@@ -36,7 +36,7 @@ import {
   getToken,
   hasRegisterScope,
   hasValidateScope
-} from '@workflow/utils/authUtils'
+} from '@workflow/utils/auth-utils'
 import {
   findTaskFromIdentifier,
   mergeBundles,
@@ -51,7 +51,7 @@ import {
   findDuplicateIds,
   updateCompositionWithDuplicateIds,
   updateTaskWithDuplicateIds
-} from '@workflow/utils/duplicateChecker'
+} from '@workflow/utils/duplicate-checker'
 import {
   generateTrackingIdForEvents,
   isHospitalNotification,
