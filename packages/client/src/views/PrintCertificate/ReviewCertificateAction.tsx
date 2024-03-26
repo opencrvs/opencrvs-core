@@ -80,7 +80,7 @@ const ReviewCertificateFrame = ({
         />
       }
       skipToContentText={intl.formatMessage(
-        constantsMessages.skipToContentText
+        constantsMessages.skipToMainContent
       )}
     >
       {children}
