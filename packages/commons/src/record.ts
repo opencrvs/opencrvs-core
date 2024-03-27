@@ -31,7 +31,8 @@ import {
   sortTasksDescending,
   SavedBundle,
   TrackingID,
-  getStatusFromTask
+  getStatusFromTask,
+  QuestionnaireResponse
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -93,6 +94,7 @@ export type RegisteredRecord = Nominal<
     | PractitionerRole
     | Location
     | Observation
+    | QuestionnaireResponse
   >,
   'Registered'
 >

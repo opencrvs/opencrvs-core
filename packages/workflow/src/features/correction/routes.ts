@@ -47,7 +47,7 @@ import {
   toCorrectionRequested
 } from '@workflow/records/state-transitions'
 import { createRoute } from '@workflow/states'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { z } from 'zod'
 import { Request } from '@hapi/hapi'
 import { getAuthHeader } from '@opencrvs/commons/http'

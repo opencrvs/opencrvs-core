@@ -533,10 +533,7 @@ describe('when in device of large viewport', () => {
 
       expect(
         reviewSectionComponent
-          .find('#Informant')
-          .hostNodes()
-          .first()
-          .childAt(0)
+          .find('#Informant [data-test-id="row-value-Informant"]')
           .text()
       ).toContain('Mother')
     })

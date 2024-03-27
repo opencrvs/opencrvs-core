@@ -10,7 +10,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { getRecordById } from '@workflow/records/index'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'

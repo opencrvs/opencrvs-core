@@ -12,7 +12,7 @@ import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 import { ValidRecord } from '@opencrvs/commons/types'
 import { METRICS_URL } from '@workflow/constants'
-import { RecordEvent } from './recordEvents'
+import { RecordEvent } from './record-events'
 
 export async function auditEvent(
   action: RecordEvent,

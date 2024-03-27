@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled, { withTheme } from 'styled-components'
 import { grid } from '../grid'
 import { IColumn, IActionObject } from './types'
@@ -138,33 +138,30 @@ interface IWorkqueueProps extends IComponentWithTheme {
   hideLastBorder?: boolean
 }
 
-interface IWorkqueueState {
-  width: number
-  expanded: string[]
-}
+const WorkqueueComp = ({
+  content,
+  columns,
+  noResultText,
+  loading,
+  hideTableHeader,
+  clickable,
+  sortOrder,
+  hideLastBorder,
+  theme
+}: IWorkqueueProps) => {
+  const [width, setWidth] = useState(window.innerWidth)
 
-export class WorkqueueComp extends React.Component<
-  IWorkqueueProps,
-  IWorkqueueState
-> {
-  state = {
-    width: window.innerWidth,
-    expanded: []
-  }
+  const recordWindowWidth = () => setWidth(window.innerWidth)
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
+  useEffect(() => {
+    window.addEventListener('resize', recordWindowWidth)
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  }, [])
 
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  renderActionBlock = (
+  const renderActionBlock = (
     itemId: string,
     actions: IAction[],
     width: number,
@@ -179,18 +176,16 @@ export class WorkqueueComp extends React.Component<
     )
   }
 
-  getRowClickHandler = (itemRowClickHandler: IActionObject[]) => {
+  const getRowClickHandler = (itemRowClickHandler: IActionObject[]) => {
     return itemRowClickHandler[0].handler
   }
 
-  render() {
-    const { columns, content, noResultText, hideTableHeader, sortOrder } =
-      this.props
-    const { width } = this.state
-    const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
-    return (
-      <Wrapper>
-        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
+  const isMobileView = width < theme.grid.breakpoints.lg
+  return (
+    <Wrapper>
+      {content.length > 0 &&
+        width > grid.breakpoints.lg &&
+        !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ColumnContainer
@@ -216,30 +211,29 @@ export class WorkqueueComp extends React.Component<
             ))}
           </TableHeader>
         )}
-        {!isMobileView ? (
-          <WorkqueueRowDesktop
-            columns={this.props.columns}
-            displayItems={content}
-            clickable={this.props.clickable}
-            getRowClickHandler={this.getRowClickHandler}
-            renderActionBlock={this.renderActionBlock}
-            hideLastBorder={this.props.hideLastBorder}
-          />
-        ) : (
-          <WorkqueueRowMobile
-            columns={this.props.columns}
-            displayItems={content}
-            clickable={this.props.clickable}
-            getRowClickHandler={this.getRowClickHandler}
-            renderActionBlock={this.renderActionBlock}
-          />
-        )}
-        {!this.props.loading && noResultText && content.length <= 0 && (
-          <NoResultText id="no-record">{noResultText}</NoResultText>
-        )}
-      </Wrapper>
-    )
-  }
+      {!isMobileView ? (
+        <WorkqueueRowDesktop
+          columns={columns}
+          displayItems={content}
+          clickable={clickable}
+          getRowClickHandler={getRowClickHandler}
+          renderActionBlock={renderActionBlock}
+          hideLastBorder={hideLastBorder}
+        />
+      ) : (
+        <WorkqueueRowMobile
+          columns={columns}
+          displayItems={content}
+          clickable={clickable}
+          getRowClickHandler={getRowClickHandler}
+          renderActionBlock={renderActionBlock}
+        />
+      )}
+      {!loading && noResultText && content.length <= 0 && (
+        <NoResultText id="no-record">{noResultText}</NoResultText>
+      )}
+    </Wrapper>
+  )
 }
 
 export const Workqueue = withTheme(WorkqueueComp)

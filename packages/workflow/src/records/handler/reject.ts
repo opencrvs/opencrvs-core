@@ -11,7 +11,7 @@
 
 import * as z from 'zod'
 import { createRoute } from '@workflow/states'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'

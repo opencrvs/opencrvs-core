@@ -150,7 +150,11 @@ describe('Register record endpoint', () => {
           ]
         }
         return res(ctx.json(responseBundle))
-      })
+      }),
+      rest.post(
+        'http://localhost:2525/events/birth/mark-registered',
+        (_, res, ctx) => res(ctx.status(200))
+      )
     )
 
     const response = await server.server.inject({

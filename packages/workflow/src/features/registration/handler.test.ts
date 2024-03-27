@@ -135,10 +135,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     mswServer.use(
       rest.get('http://localhost:9090/records/123', (_, res, ctx) =>
         res(ctx.json(BIRTH_BUNDLE))
-      )
-    )
-
-    mswServer.use(
+      ),
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
@@ -161,7 +158,11 @@ describe('markEventAsRegisteredCallbackHandler', () => {
           ]
         }
         return res(ctx.json(responseBundle))
-      })
+      }),
+      rest.post(
+        'http://localhost:2525/events/birth/mark-registered',
+        (_, res, ctx) => res(ctx.status(200))
+      )
     )
 
     const res = await server.server.inject({
@@ -182,23 +183,14 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     mswServer.use(
       rest.get('http://localhost:9090/records/123', (_, res, ctx) =>
         res(ctx.json(DEATH_BUNDLE))
-      )
-    )
-
-    mswServer.use(
+      ),
       rest.get('http://localhost:2021/integrationConfig', (_, res, ctx) =>
         res(ctx.json({}))
-      )
-    )
-
-    mswServer.use(
+      ),
       rest.post(
         'http://localhost:1050/events/death/registered',
         (_, res, ctx) => res(ctx.json({}))
-      )
-    )
-
-    mswServer.use(
+      ),
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
@@ -221,7 +213,11 @@ describe('markEventAsRegisteredCallbackHandler', () => {
           ]
         }
         return res(ctx.json(responseBundle))
-      })
+      }),
+      rest.post(
+        'http://localhost:2525/events/death/mark-registered',
+        (_, res, ctx) => res(ctx.status(200))
+      )
     )
 
     const res = await server.server.inject({

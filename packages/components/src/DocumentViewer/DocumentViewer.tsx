@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from '../Select'
 import PanViewer from './components/PanViewer'
 import PanControls from './components/PanControls'
-import { isEqual } from 'lodash'
 
 const ViewerWrapper = styled.div`
   position: relative;
@@ -61,113 +60,80 @@ interface IProps {
   children?: React.ReactNode
 }
 
-interface IState {
-  selectedOption: string
-  selectedDocument: string
-  zoom: number
-  rotation: number
-}
+export const DocumentViewer = ({ id, options, children }: IProps) => {
+  const [selectedOption, setSelectedOption] = useState(
+    options.selectOptions[0]?.value || ''
+  )
+  const [selectedDocument, setSelectedDocument] = useState(
+    options.documentOptions[0]?.value || ''
+  )
+  const [zoom, setZoom] = useState(1)
+  const [rotation, setRotation] = useState(0)
 
-export class DocumentViewer extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props)
+  useEffect(() => {
+    setSelectedOption(options.selectOptions[0]?.value || '')
+    setSelectedDocument(options.documentOptions[0]?.value || '')
+  }, [options])
 
-    this.state = {
-      selectedOption:
-        typeof this.props.options.selectOptions[0] !== 'undefined'
-          ? this.props.options.selectOptions[0].value
-          : '',
-      selectedDocument:
-        typeof this.props.options.documentOptions[0] !== 'undefined'
-          ? this.props.options.documentOptions[0].value
-          : '',
-      zoom: 1,
-      rotation: 0
-    }
+  const zoomIn = () => {
+    setZoom((prev) => prev + 0.2)
   }
 
-  componentDidUpdate(prevProps: IProps) {
-    if (!isEqual(prevProps.options, this.props.options)) {
-      this.setState({
-        selectedOption:
-          typeof this.props.options.selectOptions[0] !== 'undefined'
-            ? this.props.options.selectOptions[0].value
-            : '',
-        selectedDocument:
-          typeof this.props.options.documentOptions[0] !== 'undefined'
-            ? this.props.options.documentOptions[0].value
-            : ''
-      })
-    }
-  }
-
-  zoomIn = () => {
-    this.setState((prevState) => ({ ...prevState, zoom: prevState.zoom + 0.2 }))
-  }
-
-  zoomOut = () => {
-    this.setState((prevState) => {
-      if (prevState.zoom >= 1) {
-        return { ...prevState, zoom: prevState.zoom - 0.2 }
-      } else {
-        return prevState
+  const zoomOut = () => {
+    setZoom((prev) => {
+      if (prev >= 1) {
+        return prev - 0.2
       }
+      return prev
     })
   }
 
-  rotateLeft = () => {
-    this.setState((prevState) => ({
-      rotation: (prevState.rotation - 90) % 360
-    }))
+  const rotateLeft = () => {
+    setRotation((prev) => (prev - 90) % 360)
   }
 
-  render() {
-    const { options, children, id } = this.props
-    const isSupportingDocumentsEmpty =
-      this.state.selectedDocument && this.state.selectedDocument.length > 0
+  const isSupportingDocumentsEmpty =
+    selectedDocument && selectedDocument.length > 0
 
-    return (
-      <ViewerWrapper id={id}>
-        <>
-          <ViewerContainer>
-            <ViewerHeader>
-              <Select
-                id="select_document"
-                options={options.selectOptions}
-                color="inherit"
-                value={this.state.selectedOption as string}
-                onChange={(val: string) => {
-                  const imgArray = options.documentOptions.filter((doc) => {
-                    return doc.label === val
-                  })
-                  if (imgArray[0]) {
-                    this.setState({
-                      selectedOption: val,
-                      selectedDocument: imgArray[0].value
-                    })
-                  }
-                }}
+  return (
+    <ViewerWrapper id={id}>
+      <>
+        <ViewerContainer>
+          <ViewerHeader>
+            <Select
+              id="select_document"
+              options={options.selectOptions}
+              color="inherit"
+              value={selectedOption}
+              onChange={(val: string) => {
+                const imgArray = options.documentOptions.filter((doc) => {
+                  return doc.label === val
+                })
+                if (imgArray[0]) {
+                  setSelectedDocument(imgArray[0].value)
+                  setSelectedOption(val)
+                }
+              }}
+            />
+            <PanControls
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              rotateLeft={rotateLeft}
+            />
+          </ViewerHeader>
+          {isSupportingDocumentsEmpty && (
+            <ViewerImage>
+              <PanViewer
+                id="document_image"
+                image={selectedDocument}
+                zoom={zoom}
+                rotation={rotation}
               />
-              <PanControls
-                zoomIn={this.zoomIn}
-                zoomOut={this.zoomOut}
-                rotateLeft={this.rotateLeft}
-              />
-            </ViewerHeader>
-            {isSupportingDocumentsEmpty && (
-              <ViewerImage>
-                <PanViewer
-                  id="document_image"
-                  image={this.state.selectedDocument}
-                  zoom={this.state.zoom}
-                  rotation={this.state.rotation}
-                />
-              </ViewerImage>
-            )}
-            {children}
-          </ViewerContainer>
-        </>
-      </ViewerWrapper>
-    )
-  }
+            </ViewerImage>
+          )}
+          {children}
+        </ViewerContainer>
+      </>
+    </ViewerWrapper>
+  )
 }

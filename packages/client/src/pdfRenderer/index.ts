@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
-import { commonVFS } from '@client/pdfRenderer/common_vfs'
 import { transformers } from '@client/pdfRenderer/transformer'
 import {
   IPDFTemplate,
@@ -33,7 +32,7 @@ export function createPDF(
   intl: IntlShape,
   optionalData?: OptionalData
 ): TCreatedPdf {
-  pdfMake.vfs = { ...commonVFS, ...template.vfs }
+  pdfMake.vfs = { ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
   if (template.transformers && template.transformers.length > 0) {
     template.transformers.forEach((transformerDef) => {
@@ -79,7 +78,7 @@ export function createSVG(
   intl: IntlShape,
   optionalData?: OptionalData
 ): string {
-  pdfMake.vfs = { ...commonVFS, ...template.vfs }
+  pdfMake.vfs = { ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
   if (template.transformers && template.transformers.length > 0) {
     template.transformers.forEach((transformerDef) => {

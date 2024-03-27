@@ -11,7 +11,7 @@
 
 import * as z from 'zod'
 import * as Hapi from '@hapi/hapi'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { toDuplicated } from '@workflow/records/state-transitions'
 import { auditEvent } from '@workflow/records/audit'

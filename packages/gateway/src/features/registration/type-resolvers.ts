@@ -152,6 +152,18 @@ function findPatient(
 }
 
 export const typeResolvers: GQLResolver = {
+  RecordDetails: {
+    __resolveType(record: Saved<ValidRecord>) {
+      const composition = getComposition(record)
+      if (
+        composition.type.coding?.[0].code === 'birth-declaration' ||
+        composition.type.coding?.[0].code === 'birth-notification'
+      ) {
+        return 'BirthRegistration'
+      }
+      return 'DeathRegistration'
+    }
+  },
   EventRegistration: {
     __resolveType(record: Saved<ValidRecord>) {
       return getEventLabelFromBundle(record)

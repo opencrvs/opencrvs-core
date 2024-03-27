@@ -21,7 +21,7 @@ import {
   findRelatedPersonEntry,
   getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 import {
   getComposition,

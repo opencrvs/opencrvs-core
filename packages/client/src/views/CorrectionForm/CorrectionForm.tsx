@@ -38,22 +38,14 @@ type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
   const { modifyDeclaration } = props
-  const logTime = React.useCallback(
-    (timeMs: number) => {
-      if (declaration) {
-        const declarationUpdated = declaration
-        if (!declarationUpdated.timeLoggedMS) {
-          declarationUpdated.timeLoggedMS = 0
-        }
-        declarationUpdated.timeLoggedMS += timeMs
-        modifyDeclaration(declarationUpdated)
-      }
-    },
-    [modifyDeclaration, declaration]
-  )
-
   if (!declaration) {
     return <Redirect to={HOME} />
+  }
+
+  const logTime = (timeMs: number) => {
+    modifyDeclaration({
+      timeLoggedMS: declaration.timeLoggedMS ?? 0 + timeMs
+    })
   }
 
   if (declaration.writingDraft) {

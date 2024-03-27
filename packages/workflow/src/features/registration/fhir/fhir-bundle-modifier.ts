@@ -55,7 +55,7 @@ import {
   USER_SCOPE,
   getToken,
   getTokenPayload
-} from '@workflow/utils/authUtils'
+} from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
 export async function markBundleAsValidated<T extends Bundle>(

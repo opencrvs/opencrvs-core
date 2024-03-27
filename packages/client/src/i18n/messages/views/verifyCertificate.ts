@@ -140,6 +140,11 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage: 'Male',
     description: 'Option for form field: Sex name',
     id: 'verifyCertificate.sexMale'
+  },
+  unknown: {
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name',
+    id: 'verifyCertificate.sexUnknown'
   }
 }
 
