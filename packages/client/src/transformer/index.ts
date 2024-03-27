@@ -68,20 +68,21 @@ const toCorrectionValue = (
   originalDraftData: IFormData,
   nestedFieldDef: IFormField | null = null
 ) => {
+  const newSerializedFieldValue = serializeFieldValue(
+    fieldDef,
+    draftData[section.id][fieldDef.name],
+    draftData[section.id]
+  )
   const changedValues: CorrectionValueInput[] = []
   if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
     const newFieldValue = get(draftData[section.id], valuePath)
     const oldFieldValue = get(originalDraftData[section.id], valuePath)
-    if (newFieldValue !== oldFieldValue) {
+    if (newFieldValue !== oldFieldValue && newSerializedFieldValue) {
       changedValues.push({
         section: section.id,
         fieldName: valuePath,
-        newValue: serializeFieldValue(
-          fieldDef,
-          newFieldValue,
-          draftData[section.id]
-        ),
+        newValue: newSerializedFieldValue,
         oldValue: serializeFieldValue(
           fieldDef,
           oldFieldValue,
@@ -124,21 +125,18 @@ const toCorrectionValue = (
       }
     }
   } else {
-    changedValues.push({
-      section: section.id,
-      fieldName: fieldDef.name,
-      newValue: serializeFieldValue(
-        fieldDef,
-        draftData[section.id][fieldDef.name],
-        draftData[section.id]
-      ),
-      oldValue:
-        serializeFieldValue(
-          fieldDef,
-          originalDraftData[section.id][fieldDef.name],
-          originalDraftData[section.id]
-        ) ?? ''
-    })
+    if (newSerializedFieldValue)
+      changedValues.push({
+        section: section.id,
+        fieldName: fieldDef.name,
+        newValue: newSerializedFieldValue,
+        oldValue:
+          serializeFieldValue(
+            fieldDef,
+            originalDraftData[section.id][fieldDef.name],
+            originalDraftData[section.id]
+          ) ?? ''
+      })
   }
   return changedValues
 }
