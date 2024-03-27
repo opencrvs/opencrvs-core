@@ -97,7 +97,6 @@ function CorrectorFormComponent(props: IFullProps) {
     const relationShip = (
       declaration.data.corrector.relationship as IFormSectionData
     ).value as string
-    props.writeDeclaration(declaration)
     if (
       relationShip === CorrectorRelationship.REGISTRAR ||
       relationShip === CorrectorRelationship.ANOTHER_AGENT
@@ -122,6 +121,7 @@ function CorrectorFormComponent(props: IFullProps) {
         declaration.event
       )
     } else {
+      props.writeDeclaration(declaration)
       props.goToVerifyCorrector(declaration.id, relationShip)
     }
   }

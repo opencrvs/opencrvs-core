@@ -11,11 +11,9 @@
 
 import * as z from 'zod'
 import * as Hapi from '@hapi/hapi'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { toDuplicated } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
 import { getRecordById } from '@workflow/records/index'
 
@@ -37,15 +35,14 @@ export async function duplicateRecordHandler(
   const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
   const { reason, comment, duplicateTrackingId } = payload
 
-  const { duplicatedRecord, duplicatedRecordWithTaskOnly } = await toDuplicated(
+  const duplicatedRecord = await toDuplicated(
     record,
-    await getLoggedInPractitionerResource(token),
+    token,
     reason,
     comment,
     duplicateTrackingId
   )
 
-  await sendBundleToHearth(duplicatedRecordWithTaskOnly)
   await auditEvent('marked-as-duplicate', duplicatedRecord, token)
 
   return duplicatedRecord

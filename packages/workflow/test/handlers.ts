@@ -14,7 +14,7 @@ import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
 import { TransactionResponse } from '@workflow/records/fhir'
-import { RecordEvent } from '@workflow/records/recordEvents'
+import { RecordEvent } from '@workflow/records/record-events'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -119,6 +119,7 @@ const hearthHandler = rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
     type: 'batch-response',
     entry: []
   }
+
   return res(ctx.json(responseBundle))
 })
 

@@ -112,6 +112,8 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedTask
   : T extends Practitioner
   ? SavedPractitioner
+  : T extends QuestionnaireResponse
+  ? SavedQuestionnaireResponse
   : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
@@ -233,6 +235,14 @@ export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
   partOf?: {
     reference: ResourceIdentifier
   }
+}
+
+export type SavedQuestionnaireResponse = Omit<
+  QuestionnaireResponse,
+  'status' | 'id'
+> & {
+  id: UUID
+  status: 'completed'
 }
 
 export type CompositionHistory = Saved<Composition> & {

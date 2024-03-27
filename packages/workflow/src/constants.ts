@@ -18,7 +18,7 @@ export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
-
+export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050/'
 
 export const MOSIP_TOKEN_SEEDER_URL =
