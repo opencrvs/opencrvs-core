@@ -1,4 +1,4 @@
-FROM node:hydrogen-alpine@sha256:c7620fdecfefb96813da62519897808775230386f4c8482e972e37b8b18cb460
+FROM node:hydrogen-alpine@sha256:c698ffe060d198dcc6647be78ea1683363f12d5d507dc5ec9855f1c55966ffdd
 WORKDIR /app
 
 RUN apk update && apk upgrade
