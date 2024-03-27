@@ -74,26 +74,26 @@ const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   color: ${({ theme, isCurrentPage }) =>
     isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
 `
-export class Pagination extends React.Component<IPaginationProps> {
-  currentPage = () =>
-    this.props.totalPages > 0
-      ? this.props.currentPage && this.props.currentPage > 0
-        ? this.props.currentPage
-        : 1
-      : 0
+export const Pagination = ({
+  totalPages,
+  currentPage,
+  onPageChange
+}: IPaginationProps) => {
+  const handleCurrentPage = () =>
+    totalPages > 0 ? (currentPage && currentPage > 0 ? currentPage : 1) : 0
 
-  pageRange = (start: number, end: number) => {
+  const pageRange = (start: number, end: number) => {
     const length = end - start + 1
     return Array.from({ length }, (_, idx) => idx + start)
   }
 
-  paginationRow = (
+  const paginationRow = (
     currentPage: number,
     totalPages: number,
     siblingCount: number
   ) => {
     if (totalPages <= 6) {
-      return this.pageRange(1, totalPages)
+      return pageRange(1, totalPages)
     }
     const DOTs = '...'
     const leftRangeIndex = Math.max(currentPage - siblingCount, 1)
@@ -103,51 +103,49 @@ export class Pagination extends React.Component<IPaginationProps> {
     const showRightDots = rightRangeIndex < totalPages - 2
 
     if (showLeftDots && showRightDots) {
-      const middleRange = this.pageRange(leftRangeIndex, rightRangeIndex)
+      const middleRange = pageRange(leftRangeIndex, rightRangeIndex)
       return [1, DOTs, ...middleRange, DOTs, totalPages]
     } else if (showLeftDots && !showRightDots) {
       const rightItemsCount = 3 + 2 * siblingCount
-      const rightRange = this.pageRange(
-        totalPages - rightItemsCount + 1,
-        totalPages
-      )
+      const rightRange = pageRange(totalPages - rightItemsCount + 1, totalPages)
       return [1, DOTs, ...rightRange]
     } else if (!showLeftDots && showRightDots) {
       const leftItemsCount = 3 + 2 * siblingCount
-      const leftRange = this.pageRange(1, leftItemsCount)
+      const leftRange = pageRange(1, leftItemsCount)
       return [...leftRange, DOTs, totalPages]
     }
 
-    return this.pageRange(1, totalPages)
+    return pageRange(1, totalPages)
   }
 
-  canGoToPreviousPage = () => this.currentPage() > 1
+  const currentPageValue = handleCurrentPage()
 
-  canGoToNextPage = () => this.currentPage() + 1 <= this.props.totalPages
+  const canGoToPreviousPage = currentPageValue > 1
 
-  changePage = (page: number | string) => {
+  const canGoToNextPage = currentPageValue + 1 <= totalPages
+
+  const changePage = (page: number | string) => {
     if (typeof page === 'number') {
-      this.props.onPageChange(page)
+      onPageChange(page)
     }
   }
 
-  renderPages(size: IPaginationVariant) {
-    const { totalPages } = this.props
-    const currentPage = this.currentPage()
+  const renderPages = (size: IPaginationVariant) => {
+    const currentPage = handleCurrentPage()
 
     if (currentPage > totalPages) {
-      this.changePage(totalPages)
+      changePage(totalPages)
     }
-    const pages = this.paginationRow(currentPage, totalPages, 1)
+    const pages = paginationRow(currentPage, totalPages, 1)
     return (
       <PaginationContainer id="pagination">
         <Button
           type="icon"
           size="small"
           onClick={() => {
-            this.changePage(currentPage - 1)
+            changePage(currentPage - 1)
           }}
-          disabled={!this.canGoToPreviousPage()}
+          disabled={!canGoToPreviousPage}
           aria-label="Previous page"
         >
           <Icon color="grey400" name="CaretLeft" size="small" />
@@ -174,7 +172,7 @@ export class Pagination extends React.Component<IPaginationProps> {
                 type="tertiary"
                 size="small"
                 id={`page-number-${id}`}
-                onClick={() => this.changePage(page)}
+                onClick={() => changePage(page)}
               >
                 <StyledPageNumber
                   size={size}
@@ -192,9 +190,9 @@ export class Pagination extends React.Component<IPaginationProps> {
           type="icon"
           size="small"
           onClick={() => {
-            this.changePage(currentPage + 1)
+            changePage(currentPage + 1)
           }}
-          disabled={!this.canGoToNextPage()}
+          disabled={!canGoToNextPage}
           aria-label="Next page"
         >
           <Icon color="grey400" name="CaretRight" size="small" />
@@ -203,12 +201,10 @@ export class Pagination extends React.Component<IPaginationProps> {
     )
   }
 
-  render() {
-    return (
-      <PaginationWrapper id="pagination_container">
-        <DesktopWrapper>{this.renderPages('small')}</DesktopWrapper>
-        <MobileWrapper>{this.renderPages('large')}</MobileWrapper>
-      </PaginationWrapper>
-    )
-  }
+  return (
+    <PaginationWrapper id="pagination_container">
+      <DesktopWrapper>{renderPages('small')}</DesktopWrapper>
+      <MobileWrapper>{renderPages('large')}</MobileWrapper>
+    </PaginationWrapper>
+  )
 }
