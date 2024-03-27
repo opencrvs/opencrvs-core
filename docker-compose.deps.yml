@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18@sha256:ed43613fe3c372e98e883f36fab2597ea63c86ff8bb22b2a298d1cd4fb436bab
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19@sha256:d7c71fa33140df19a4a4a355f6c1aee1eddeb35519de84bf7e8205c06f40b90a
     restart: unless-stopped
     environment:
       - discovery.type=single-node
