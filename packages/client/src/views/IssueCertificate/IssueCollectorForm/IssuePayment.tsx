@@ -10,6 +10,7 @@
  */
 
 import {
+  IDeclaration,
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
@@ -71,7 +72,7 @@ export const IssuePayment = () => {
   )
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const draft = useDeclaration(registrationId)
+  const draft = useDeclaration<IDeclaration>(registrationId)
 
   const readyToIssue = () => {
     const registeredDate = getRegisteredDate(declaration.data)
