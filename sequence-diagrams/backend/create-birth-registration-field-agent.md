@@ -1,4 +1,4 @@
-# Create birth registration (registrar)
+# Create birth registration (field agent)
 
 ```mermaid
 ---
@@ -6,10 +6,8 @@ title: Create birth registration
 ---
 
 sequenceDiagram
-
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth
@@ -19,8 +17,9 @@ sequenceDiagram
     participant Influx DB
     participant Search
     participant ElasticSearch
-    participant Country configuration
-    participant Webhook
+    participant Documents
+    participant Minio
+    participant Country-Config
 
     GraphQL gateway->>Workflow: POST /create-record
     Workflow--)Hearth: Fetch task from identifier(draft-id)
@@ -46,8 +45,8 @@ sequenceDiagram
 
     Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
 
-    Workflow--)Metrics: POST bundle to /events/{event}/sent-notification-for-review
-    Metrics->>Influx DB: Write user audit point "DECLARED"
+    Workflow--)Metrics: POST bundle to /events/{event}/sent-notification
+    Metrics->>Influx DB: Write user audit point "IN_PROGRESS"
 
     loop location levels 4, 3, 2
         Metrics->>Workflow: Get parent of Location
@@ -62,44 +61,29 @@ sequenceDiagram
     Note over Metrics,Hearth: Generate declaration started point
     Metrics->>Influx DB: Write audit points
 
-    Workflow->>User management: Fetch user/system information
-    Workflow->>Hearth: Get practitioner resource
-
-    loop PractitionerRole Locations
-      Workflow->>Hearth: Get location by user's practitionerId
-    end
-    Note over Workflow,Hearth: Update bundle with practitioner and location details
-
-    Workflow->>Hearth: Save bundle
-    Note over Workflow,Hearth: Get hearth response for all entries
-
-    Note over Workflow,Hearth: To external waiting validation state
-
-    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
-
-    Workflow--)Metrics: POST bundle to /events/{event}/waiting-external-validation
-
-    Workflow--)Country-Config: POST record to /event-registration
-    Country-Config->>Workflow: POST /confirm/registration
-    Workflow->>Search: Get record by id
-
-    Workflow->>User management: Fetch user/system information
-    Workflow->>Hearth: Get practitioner resource
-
-    loop PractitionerRole Locations
-      Workflow->>Hearth: Get location by user's practitionerId
-    end
-    Note over Workflow,Hearth: Update bundle with practitioner details
-
-    Workflow->>Hearth: Save bundle
-    Note over Workflow,Hearth: Get hearth response for all entries
-
-    Note over Workflow,Hearth: To registered state
-
-    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
-
+    Note over Workflow,Search: For duplicate declarations, starts here
     Workflow--)Search: Index bundle
-    Workflow--)Metrics: POST bundle to /events/{event}/registered
+
+    %% upsertEvent
+    Search->>ElasticSearch: Search by composition id
+    Note over Search,ElasticSearch: Get operation history and createdAt
+
+    %% createIndexBody
+      %% createChildIndex
+      %% addEventLocation
+    Search->>Hearth: Get event location for creating child index
+
+    %% createDeclarationIndex
+    Search->>Hearth: Get declarationJurisdictionIds for declaration index
+    Search->>ElasticSearch: Get createdBy
+
+    %% createStatusHistory
+    Search->>User management: Get user for status history
+    Note over Search,Hearth: Compose new history entry
+
+    Search->>ElasticSearch: Index composition
+    Workflow->>Hearth: Save bundle to Hearth
+    Note over Workflow,Search: For duplicate declarations, ends here
 
     Workflow--)Config: Check if notification is enabled
     Workflow--)Search: Index bundle
