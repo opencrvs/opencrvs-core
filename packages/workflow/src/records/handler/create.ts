@@ -206,12 +206,10 @@ function getEventAction(record: CreatedRecord) {
   if (isInProgress(record)) {
     return 'sent-notification'
   }
-  if (isReadyForReview(record)) {
+  if (isReadyForReview(record) || isValidated(record)) {
     return 'sent-notification-for-review'
   }
-  if (isValidated(record)) {
-    return 'sent-for-approval'
-  }
+
   if (isWaitingExternalValidation(record)) {
     return 'waiting-external-validation'
   }
@@ -290,7 +288,6 @@ export default async function createRecordHandler(
   const notificationDisabled =
     isHospitalNotification(record) ||
     event === EVENT_TYPE.MARRIAGE ||
-    eventAction === 'sent-for-approval' ||
     eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 
