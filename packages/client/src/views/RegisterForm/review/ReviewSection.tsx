@@ -236,10 +236,10 @@ const FormData = styled.div`
   }
 `
 
-const ReviewContainter = styled.div<{ paddingT?: boolean }>`
-  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
+const ReviewContainter = styled.div`
+  padding: 0px 32px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0px 24px;
+    padding: 0;
   }
 `
 const StyledAlert = styled(Alert)`
