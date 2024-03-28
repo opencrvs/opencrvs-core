@@ -243,22 +243,6 @@ export const DuplicateFormTabs = (props: IProps) => {
       : value
   }
 
-  const fieldHasErrors = (
-    section: IFormSection,
-    field: IFormField,
-    sectionErrors: IErrorsBySection
-  ) => {
-    if (
-      (
-        get(sectionErrors[section.id][field.name], 'errors') ||
-        getErrorForNestedField(section, field, sectionErrors)
-      ).length > 0
-    ) {
-      return true
-    }
-    return false
-  }
-
   const getRenderableField = (
     fieldLabel: MessageDescriptor,
     value: IFormFieldValue | JSX.Element | undefined
@@ -354,28 +338,6 @@ export const DuplicateFormTabs = (props: IProps) => {
             </>
           ))
       )
-
-      const hasErrors = taggedFields.reduce(
-        (accum, field) =>
-          accum || fieldHasErrors(section, field, errorsOnFields),
-        false
-      )
-
-      const draftOriginalData = draft.originalData
-      if (draftOriginalData && !hasErrors) {
-        const previousValues = taggedFields
-          .map((field, index) =>
-            getValueOrError(
-              section,
-              draftOriginalData,
-              field,
-              errorsOnFields,
-              undefined,
-              !index
-            )
-          )
-          .filter((value) => value)
-      }
 
       return getRenderableField(
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -680,10 +642,10 @@ export const DuplicateFormTabs = (props: IProps) => {
             data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (eventData.history as History[]).find(
+          ((eventData.history as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name as HumanName[]) ?? [],
           language
         )
       }
@@ -703,10 +665,10 @@ export const DuplicateFormTabs = (props: IProps) => {
             data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (props.declaration.data.history as unknown as History[]).find(
+          ((props.declaration.data.history as unknown as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name as HumanName[]) ?? [],
           language
         )
       }

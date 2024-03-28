@@ -22,7 +22,7 @@ export async function viewRecordHandler(
 ) {
   const token = getToken(request)
   const recordId = request.params.id
-  const record = await getValidRecordById(recordId, token)
+  const record = await getValidRecordById(recordId, token, true)
 
   const viewedRecord = await toViewed(record, token)
 
