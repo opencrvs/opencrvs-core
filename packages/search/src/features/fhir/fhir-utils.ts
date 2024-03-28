@@ -100,9 +100,7 @@ export async function addEventLocation(
 
   const encounterSection = findCompositionSection(code, composition)
   if (encounterSection && encounterSection.entry) {
-    data = await getFromFhir(
-      `/Encounter/${encounterSection.entry[0].reference}`
-    )
+    data = await getFromFhir(`/${encounterSection.entry[0].reference}`)
 
     if (data && data.location && data.location[0].location) {
       location = await getFromFhir(`/${data.location[0].location.reference}`)
