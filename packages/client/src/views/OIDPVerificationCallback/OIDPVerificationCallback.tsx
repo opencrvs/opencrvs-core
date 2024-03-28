@@ -80,9 +80,9 @@ export const OIDPVerificationCallback = () => {
     variables: oidpUserInfoQueryVariables,
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      addNidUserInfoToDeclaration(declaration, section, data.getOIDPUserInfo)
-      dispatch(modifyDeclaration(declaration))
-      dispatch(writeDeclaration(declaration))
+      addNidUserInfoToDeclaration(declaration!, section, data.getOIDPUserInfo)
+      dispatch(modifyDeclaration(declaration!))
+      dispatch(writeDeclaration(declaration!))
       goToVerificationOrigin()
     }
   })

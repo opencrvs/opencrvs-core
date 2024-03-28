@@ -17,7 +17,7 @@ import {
   MAIN_CONTENT_ANCHOR_ID
 } from './components/SkipToContent'
 
-export interface IFrameProps {
+export interface FrameProps {
   /** Accepts a header component that will be rendered at the top-most portion of an application frame */
   header: React.ReactNode
   /** Accepts a navigation component that will be rendered in the left sidebar of an application frame */
@@ -57,7 +57,7 @@ export function Frame({
   navigation,
   skipToContentText,
   children
-}: IFrameProps) {
+}: FrameProps) {
   return (
     <FrameGrid>
       <SkipToContent>{skipToContentText}</SkipToContent>

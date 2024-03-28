@@ -10,6 +10,7 @@
  */
 
 import {
+  IDeclaration,
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
@@ -44,9 +45,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Event } from '@client/utils/gateway'
 import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
-import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useState } from 'react'
+import { useDeclaration } from '@client/declarations/selectors'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -71,15 +72,12 @@ export const IssuePayment = () => {
   )
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const declarations = useSelector<IStoreState, IPrintableDeclaration[]>(
-    (state) => state.declarationsState.declarations as IPrintableDeclaration[]
-  )
+  const draft = useDeclaration<IDeclaration>(registrationId)
 
   const readyToIssue = () => {
     const registeredDate = getRegisteredDate(declaration.data)
     const certificate = declaration.data.registration.certificates[0]
     const eventDate = getEventDate(declaration.data, event)
-    const draft = getDraft(declarations, registrationId, eventType)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_ISSUE
     draft.action = SubmissionAction.ISSUE_DECLARATION
 

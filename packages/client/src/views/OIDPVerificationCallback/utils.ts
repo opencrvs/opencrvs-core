@@ -212,7 +212,7 @@ export const useNidAuthentication = () => {
 
   const onClick = () =>
     dispatch(
-      writeDeclaration(declaration, () => {
+      writeDeclaration(declaration!, () => {
         redirectToNidIntegration(
           offlineCountryConfig,
           matchParams.declarationId,
