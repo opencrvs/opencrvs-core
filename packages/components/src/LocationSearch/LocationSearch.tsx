@@ -28,31 +28,27 @@ const LocationSearchContainer = styled.div`
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
-  width: 344px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-  }
+  width: 100%;
   margin-bottom: 1px;
   position: relative;
   & svg {
     position: absolute;
-    left: 8px;
+    left: 12px;
   }
 `
 const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
-  height: 40px;
+  height: 46px;
   border-radius: 4px;
-  ${({ theme }) => theme.fonts.reg18};
-  padding-left: 32px;
-  border: 2px solid
+  ${({ theme }) => theme.fonts.reg19};
+  padding-left: 40px;
+  border: 1px solid
     ${({ theme, error, touched }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
 
   &:focus {
-    outline: none;
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
+    outline: solid 1px ${({ theme }) => theme.colors.copy};
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.yellow};
   }
 `
 const DropDownWrapper = styled.ul`
@@ -63,29 +59,26 @@ const DropDownWrapper = styled.ul`
   width: 100%;
   z-index: 9999;
   list-style: none;
-  padding: 0px;
+  padding: 4px;
   top: 100%;
   left: 0px;
   margin-top: 4px;
   overflow-y: auto;
-  cursor: pointer;
 `
 const DropDownItem = styled.li`
-  display: flex;
-  align-items: center;
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
+  height: 40px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  background-color: ${({ theme }) => theme.colors.white};
   padding: 8px 16px;
   white-space: nowrap;
   cursor: pointer;
-  &:nth-last-child {
-    border-bottom: none;
-  }
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
 `
 export interface ISearchLocation {

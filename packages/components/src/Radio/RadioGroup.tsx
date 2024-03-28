@@ -15,42 +15,33 @@ import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  margin-top: 8px;
-  margin-bottom: 0px;
+  width: 100%;
 `
 
 const List = styled.ul<{ flexDirection?: string }>`
   list-style: none;
   margin: 0;
   padding: 0;
-  & > div {
-    margin-bottom: 16px;
-  }
   ${({ flexDirection }) =>
     flexDirection &&
     `display: flex;
-    & > div {
-      margin-right: 16px;
-    }`}
+    `}
 `
 const LargeList = styled.ul<{ flexDirection?: string }>`
   list-style: none;
   margin: 0;
   padding: 0;
-  & > div {
-    margin-bottom: 16px;
-  }
   ${({ flexDirection }) =>
     flexDirection &&
     `display: flex;
     & > div {
-      margin-right: 16px;
+      width: 100%;
     }`}
 `
 const NestedChildren = styled.div`
-  margin: 15px 0px 0px 18px;
+  margin: 0px 0px 0px 32px;
   padding-left: 33px;
-  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  border-left: 2px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
 `
 

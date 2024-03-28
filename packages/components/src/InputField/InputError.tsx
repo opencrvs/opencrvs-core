@@ -24,10 +24,9 @@ const InputErrorWrapper = styled.div<IInputError>`
   width: 100%;
   padding-top: 4px;
   display: inline-block;
-  ${({ theme }) => theme.fonts.bold14}
+  ${({ theme }) => theme.fonts.bold16}
   color: ${({ theme, color }) => (color ? color : theme.colors.negative)};
   text-align: ${({ centred }) => (centred ? 'center' : 'left')};
-  max-width: 535px;
 `
 
 export const InputError = ({ children, centred, ...rest }: IInputError) => (

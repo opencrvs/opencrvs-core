@@ -131,7 +131,7 @@ export function StepTwoContainer() {
                       {...field}
                       {...otherProps}
                       touched={Boolean(meta.touched)}
-                      label={intl.formatMessage(messages.verficationCodeLabel)}
+                      label=""
                       optionalLabel={intl.formatMessage(messages.optionalLabel)}
                       ignoreMediaQuery
                       hideAsterisk
@@ -139,6 +139,9 @@ export function StepTwoContainer() {
                       <TextInput
                         {...field}
                         {...input}
+                        placeholder={intl.formatMessage(
+                          messages.verficationCodeLabel
+                        )}
                         touched={Boolean(meta.touched)}
                         error={Boolean(meta.error)}
                         ignoreMediaQuery

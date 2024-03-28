@@ -11,7 +11,7 @@
 
 import { css } from 'styled-components'
 
-export const base = css`
+export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
   display: inline-flex;
   justify-content: center;
@@ -27,6 +27,11 @@ export const base = css`
   opacity: 1;
   margin: 0;
   background: transparent;
+
+  ${fullWidth &&
+  css`
+    width: 100%;
+  `}
 
   svg {
     height: 24px;
@@ -205,7 +210,7 @@ export const medium = css`
 
 export const large = css`
   ${({ theme }) => theme.fonts.bold18};
-  height: 48px;
+  height: 54px;
   padding: 0 16px;
 
   svg {

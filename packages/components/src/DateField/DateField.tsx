@@ -15,6 +15,9 @@ import { InputLabel } from '../InputField/InputLabel'
 
 const DateWrapper = styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
 `
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
@@ -37,18 +40,7 @@ interface IState {
 
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
-const DateSegment = styled(TextInput)`
-  width: 58px !important;
-  margin: 0 4px;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
-  &:last-of-type {
-    margin-right: 0;
-    width: 80px !important;
-  }
-`
+const DateSegment = styled(TextInput)``
 
 export class DateField extends React.Component<IDateFieldProps, IState> {
   private dd: React.RefObject<IRef>

@@ -11,12 +11,21 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
+const Wrapper = styled.li`
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  cursor: pointer;
   list-style-type: none;
   display: flex;
   flex-direction: row;
-  width: auto;
-  align-items: flex-start;
+  padding: 8px 12px;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryLighter};
+  }
+  &:active {
+    background-color: ${({ theme }) => theme.colors.primaryLight};
+  }
 `
 
 const Label = styled.label<{
@@ -28,14 +37,15 @@ const Label = styled.label<{
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
+  width: 100%;
   align-self: center;
   ${({ size, theme }) =>
     size === 'large'
       ? `
-    ${theme.fonts.reg18};
+    ${theme.fonts.reg19};
     margin-left: 14px`
       : `
-    ${theme.fonts.reg16};
+    ${theme.fonts.reg18};
     margin-left: 16px;`}
 
   ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
@@ -48,7 +58,7 @@ const CheckOuter = styled.div`
 const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: flex;
   justify-content: center;
-  border: 2px solid
+  border: 1px solid
     ${({ theme, disabled }) =>
       disabled ? theme.colors.disabled : theme.colors.copy};
   ${({ size }) =>
@@ -87,6 +97,7 @@ const Input = styled.input<{ buttonSize?: string; disabled?: boolean }>`
       ? `height: 40px; width: 40px;`
       : `height: 24px; width: 24px;`}
   cursor: pointer;
+
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) =>
         disabled ? theme.colors.white : theme.colors.yellow}

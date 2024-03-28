@@ -18,6 +18,7 @@ import { useIntl } from 'react-intl'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   Content,
+  ContentSize,
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
@@ -155,6 +156,7 @@ export function AdministrativeLevels() {
       navigation={<Navigation />}
     >
       <Content
+        size={ContentSize.NORMAL}
         title={intl.formatMessage(navigationMessages.organisation)}
         showTitleOnMobile={false}
       >

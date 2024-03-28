@@ -30,17 +30,11 @@ interface IState {
 
 const Container = styled.div`
   width: 100%;
+  display: flex;
+  gap: 16px;
 `
 const Segment = styled(TextInput)`
-  width: 58px !important;
-  margin: 0 4px;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
-  &:last-of-type {
-    margin-right: 0;
-  }
+  width: 100%;
 `
 
 export type ITimeFieldProps = IProps &

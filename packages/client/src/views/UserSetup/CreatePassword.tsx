@@ -23,7 +23,7 @@ import {
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const GlobalError = styled.div`
@@ -40,7 +40,6 @@ const PasswordMismatch = styled.div`
 
 const PasswordContents = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  max-width: 416px;
 `
 const ValidationRulesSection = styled.div`
   background: ${({ theme }) => theme.colors.background};
@@ -137,6 +136,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
         }}
       >
         <Content
+          size={ContentSize.SMALL}
           title={intl.formatMessage(messages.header)}
           showTitleOnMobile
           subtitle={intl.formatMessage(messages.instruction)}

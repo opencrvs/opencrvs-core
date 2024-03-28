@@ -16,7 +16,7 @@ import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
@@ -36,11 +36,7 @@ import {
   createDeclaration
 } from '@client/declarations'
 
-const Actions = styled.div`
-  & > div {
-    margin-bottom: 16px;
-  }
-`
+const Actions = styled.div``
 
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
@@ -116,6 +112,7 @@ class SelectVitalEventView extends React.Component<
         )}
       >
         <Content
+          size={ContentSize.SMALL}
           title={intl.formatMessage(messages.registerNewEventHeading)}
           bottomActionButtons={[
             <Button
@@ -123,6 +120,7 @@ class SelectVitalEventView extends React.Component<
               id="continue"
               type="primary"
               size="large"
+              fullWidth
               onClick={this.handleContinue}
             >
               {intl.formatMessage(buttonMessages.continueButton)}

@@ -12,13 +12,23 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
-const Wrapper = styled.li`
-  margin-bottom: 10px;
-  margin-top: 10px;
+const Wrapper = styled.li<{ size?: string }>`
+  width: 100%;
+  border-radius: 4px;
+  padding: 4px 12px;
+  height: ${({ size }) => (size === 'large' ? '64px' : '48px')};
   list-style-type: none;
   display: flex;
   align-items: center;
   position: relative;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryLighter};
+  }
+
+  &:active {
+    background-color: ${({ theme }) => theme.colors.primaryLight};
+  }
 `
 
 const Label = styled.label`
@@ -27,7 +37,7 @@ const Label = styled.label`
   padding-left: 20px;
   margin-left: -5px; /* This is to increase hitbox on the label, to allow clicking the borders of the checkbox */
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 const Check = styled.span<{ size?: string }>`
@@ -81,8 +91,8 @@ const Check = styled.span<{ size?: string }>`
 
 const Input = styled.input`
   position: absolute;
-  width: ${({ size }) => `${size}px`};
-  height: ${({ size }) => `${size}px`};
+  width: 100%;
+  height: 100%;
   opacity: 0;
   z-index: 2;
   cursor: pointer;
@@ -104,9 +114,6 @@ const Input = styled.input`
       width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
     }
-  }
-  &:hover ~ ${Check} {
-    box-shadow: ${({ theme }) => theme.colors.grey300} 0 0 0 8px;
   }
 `
 type Size = 'large' | 'small'

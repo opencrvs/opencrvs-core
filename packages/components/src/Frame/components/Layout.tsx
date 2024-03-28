@@ -58,10 +58,9 @@ export const LayoutCentered = styled.div`
 
 export const LayoutForm = styled.section`
   display: grid;
-  width: 100%;
+  max-width: 640px;
   gap: 24px;
-  grid-template-columns: ${({ children }) =>
-    React.Children.count(children) === 1 ? '1fr' : 'auto 1fr'};
+  grid-template-columns: 1fr auto 1fr;
   margin: 24px auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: 1fr;
@@ -73,13 +72,4 @@ export const LayoutForm = styled.section`
     margin: 0 auto;
     width: 100%;
   }
-  /* On multiple columns, remove margin in <Content> and apply margin to <Layout> */
-  ${({ children }) =>
-    React.Children.count(children) >= 2 &&
-    css`
-      max-width: min(740px, 100% - 24px - 24px);
-      ${Content} {
-        max-width: 100%;
-      }
-    `}
 `

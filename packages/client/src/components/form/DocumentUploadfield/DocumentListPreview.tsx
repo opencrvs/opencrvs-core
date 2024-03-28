@@ -18,13 +18,14 @@ import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
 const Wrapper = styled.div`
-  margin: 8px 0px;
-  max-width: 100%;
+  margin: 4px 0px;
+  width: 100%;
 `
 
 const Container = styled.div`
   display: flex;
   align-items: center;
+  width: 100%;
   justify-content: space-between;
   gap: 4px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};

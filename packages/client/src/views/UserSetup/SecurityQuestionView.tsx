@@ -28,7 +28,7 @@ import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
@@ -59,8 +59,7 @@ type IState = {
 }
 
 const QuestionWrapper = styled.div`
-  margin-bottom: 66px;
-  ${({ theme }) => theme.fonts.reg16};
+  margin-bottom: 40px;
 `
 const Wrapper = styled.div`
   display: flex;
@@ -68,25 +67,14 @@ const Wrapper = styled.div`
   margin-bottom: 20px;
 `
 const Label = styled.label`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.h4};
   margin: 0 0 6px 0;
 `
 
-const FullWidthSelect = styled(Select)`
-  width: 70%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-  }
-`
-const FullWidthInput = styled(TextInput)`
-  width: 70%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-  }
-`
 const Error = styled.span`
+  margin-left: 2px;
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg12};
+  ${({ theme }) => theme.fonts.h4};
 `
 
 class SecurityQuestionView extends React.Component<IProps, IState> {
@@ -250,7 +238,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     })}
                     <Error>*</Error>
                   </Label>
-                  <FullWidthSelect
+                  <Select
                     id={`question-${index}`}
                     onChange={(value: string) =>
                       this.onQuestionSelect(value, index)
@@ -277,7 +265,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     {intl.formatMessage(messages.answer)}
                     <Error>*</Error>
                   </Label>
-                  <FullWidthInput
+                  <TextInput
                     id={`answer-${index}`}
                     onChange={(answer: React.ChangeEvent<HTMLInputElement>) =>
                       this.onAnswerChange(answer, index)
@@ -325,6 +313,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
       >
         <Content
+          size={ContentSize.SMALL}
           title={intl.formatMessage(messages.userFormSecurityQuestionsHeading)}
           subtitle={intl.formatMessage(
             messages.userFormSecurityQuestionsDescription
