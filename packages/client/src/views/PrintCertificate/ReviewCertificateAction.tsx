@@ -19,8 +19,8 @@ import {
   AppBar,
   Spinner
 } from '@opencrvs/components'
-import React from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useParams } from 'react-router'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
@@ -32,6 +32,8 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
+import { IStoreState } from '@client/store'
+import { IPrintableDeclaration } from '@client/declarations'
 
 const CertificateContainer = styled.div``
 
@@ -65,7 +67,7 @@ const ReviewCertificateFrame = ({
             certificateMessages.certificateCollectionTitle
           )}
           desktopLeft={
-            <Button type="icon" onClick={back}>
+            <Button type="icon" onClick={back} id="action_page_back_button">
               <Icon name="ArrowLeft" size="large" />
             </Button>
           }
@@ -90,9 +92,9 @@ const ReviewCertificateFrame = ({
 
 export const ReviewCertificate = () => {
   const { registrationId } = useParams<{ registrationId: string }>()
+
   const {
     svg,
-    loading,
     handleCertify,
     isPrintInAdvanced,
     canUserEditRecord,
@@ -101,7 +103,7 @@ export const ReviewCertificate = () => {
   const intl = useIntl()
   const [modal, openModal] = useModal()
 
-  if (loading) {
+  if (!svg) {
     return (
       <ReviewCertificateFrame>
         <Frame.LayoutCentered>
@@ -112,7 +114,7 @@ export const ReviewCertificate = () => {
   }
 
   const confirmAndPrint = async () => {
-    const saveAndExitConfirm = await openModal<boolean | null>((close) => (
+    const saveAndExitConfirm = await openModal<boolean>((close) => (
       <ResponsiveModal
         id="confirm-print-modal"
         title={
@@ -125,7 +127,7 @@ export const ReviewCertificate = () => {
             type="tertiary"
             key="close-modal"
             onClick={() => {
-              close(null)
+              close(false)
             }}
             id="close-modal"
           >
@@ -134,14 +136,14 @@ export const ReviewCertificate = () => {
           <Button
             type="primary"
             key="print-certificate"
-            onClick={handleCertify}
+            onClick={() => close(true)}
             id="print-certificate"
           >
             {intl.formatMessage(buttonMessages.print)}
           </Button>
         ]}
         show={true}
-        handleClose={() => close(null)}
+        handleClose={() => close(false)}
         contentHeight={100}
       >
         {isPrintInAdvanced

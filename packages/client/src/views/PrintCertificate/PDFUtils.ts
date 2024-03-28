@@ -269,7 +269,7 @@ export async function getPDFTemplateWithSVG(
   const resolvedSignatures = await Promise.all(
     MARRIAGE_SIGNATURE_KEYS.map((k) => ({
       signatureKey: k,
-      url: declaration.data.template[k]
+      url: declaration.data.template?.[k]
     }))
       .filter(({ url }) => Boolean(url))
       .map(({ signatureKey, url }) =>

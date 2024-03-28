@@ -15,7 +15,7 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { useDeclaration } from '@client/declarations/selectors'
+import { getDraftsState, useDeclaration } from '@client/declarations/selectors'
 import { CorrectionSection, SubmissionAction } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
@@ -132,7 +132,6 @@ export const usePrintableCertificate = (declarationId: string) => {
 
   return {
     svg,
-    loading: !declaration || !svg,
     handleCertify,
     isPrintInAdvanced,
     canUserEditRecord,
