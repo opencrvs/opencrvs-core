@@ -680,10 +680,10 @@ export const DuplicateFormTabs = (props: IProps) => {
             data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (eventData.history as History[]).find(
+          ((eventData.history as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name as HumanName[]) ?? [],
           language
         )
       }
@@ -703,10 +703,10 @@ export const DuplicateFormTabs = (props: IProps) => {
             data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (props.declaration.data.history as unknown as History[]).find(
+          ((props.declaration.data.history as unknown as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name as HumanName[]) ?? [],
           language
         )
       }
