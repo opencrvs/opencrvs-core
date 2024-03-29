@@ -206,10 +206,12 @@ function getEventAction(record: CreatedRecord) {
   if (isInProgress(record)) {
     return 'sent-notification'
   }
-  if (isReadyForReview(record) || isValidated(record)) {
+  if (isReadyForReview(record)) {
     return 'sent-notification-for-review'
   }
-
+  if (isValidated(record)) {
+    return 'sent-for-approval'
+  }
   if (isWaitingExternalValidation(record)) {
     return 'waiting-external-validation'
   }
