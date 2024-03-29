@@ -1158,13 +1158,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             ))
         )
 
-        completeValue = (
-          <>
-            {previousCompleteValue}
-            <br />
-            {completeValue}
-          </>
-        )
+        completeValue =
+          draft.registrationStatus !== 'IN_PROGRESS' ? (
+            <>
+              {previousCompleteValue}
+              <br />
+              {completeValue}
+            </>
+          ) : (
+            <>{completeValue}</>
+          )
       }
 
       return this.getRenderableField(
@@ -1250,7 +1253,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean
+    ignoreNestedFieldWrapping?: boolean,
+    status?: string
   ) {
     const {
       draft: { data, originalData }
@@ -1269,22 +1273,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.hasFieldChanged(field, data[section.id], originalData[section.id]) &&
       !this.fieldHasErrors(section, field, sectionErrors)
     ) {
-      value = (
-        <>
-          <Deleted>
-            {this.getValueOrError(
-              section,
-              originalData,
-              field,
-              sectionErrors,
-              ignoreNestedFieldWrapping,
-              true
-            )}
-          </Deleted>
-          <br />
-          {value}
-        </>
-      )
+      value =
+        status !== 'IN_PROGRESS' ? (
+          <>
+            <Deleted>
+              {this.getValueOrError(
+                section,
+                originalData,
+                field,
+                sectionErrors,
+                ignoreNestedFieldWrapping,
+                true
+              )}
+            </Deleted>
+            <br />
+            {value}
+          </>
+        ) : (
+          <>{value}</>
+        )
     }
 
     return this.getRenderableField(
@@ -1583,7 +1590,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   section,
                   group,
                   field,
-                  errorsOnFields
+                  errorsOnFields,
+                  undefined,
+                  draft.registrationStatus
                 )
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
