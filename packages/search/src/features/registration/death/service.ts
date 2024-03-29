@@ -130,7 +130,7 @@ async function createDeceasedIndex(
     return
   }
 
-  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
+  await addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
 
   const deceasedName = findName(NAME_EN, deceased.name)
   const deceasedNameLocal = findNameLocale(deceased.name)

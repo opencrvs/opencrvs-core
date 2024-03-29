@@ -142,7 +142,7 @@ async function createChildIndex(
     return
   }
 
-  await addEventLocation(body, BIRTH_ENCOUNTER_CODE, composition)
+  await addEventLocation(bundle, body, BIRTH_ENCOUNTER_CODE)
 
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
