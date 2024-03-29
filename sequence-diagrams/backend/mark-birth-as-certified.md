@@ -21,8 +21,8 @@ sequenceDiagram
     GraphQL gateway->>Workflow: POST /records/{recordId}/certify-record
     Workflow->>Search: Get record by id (by createRoute)
 
-    Workflow->>Documents: POST certificate details to /upload
-    Documents->>Minio: Upload certificate documents
+    Workflow->>Documents: POST attachment details to /upload
+    Documents->>Minio: Upload attachment documents
 
     Workflow->>User management: Fetch user/system information
     Workflow->>Hearth: Get practitioner resource
@@ -62,13 +62,13 @@ sequenceDiagram
     Metrics->>Influx DB: Write audit point
 
     loop location levels 4, 3, 2
-        Metrics->>Workflow: Get parent of Location
+        Metrics->>Hearth: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate certification point
 
     loop location levels 4, 3, 2
-        Metrics->>Workflow: Get parent of Location
+        Metrics->>Hearth: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate payment point

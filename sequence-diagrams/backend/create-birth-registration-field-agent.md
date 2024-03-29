@@ -27,8 +27,8 @@ sequenceDiagram
 
     Workflow--)Search: Search for duplicates
 
-    Workflow--)Documents: POST certificate details to /upload
-    Documents->>Minio: Upload certificate documents
+    Workflow--)Documents: POST attachment details to /upload
+    Documents->>Minio: Upload attachment documents
 
     Workflow--)Country-Config: GET trackingId from /tracking-id
 
@@ -49,13 +49,13 @@ sequenceDiagram
     Metrics->>Influx DB: Write user audit point "IN_PROGRESS"
 
     loop location levels 4, 3, 2
-        Metrics->>Workflow: Get parent of Location
+        Metrics->>Hearth: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate time logged point
 
     loop location levels 4, 3, 2
-        Metrics->>Workflow: Get parent of Location
+        Metrics->>Hearth: Get parent of Location
         Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate declaration started point
@@ -85,14 +85,14 @@ sequenceDiagram
     Workflow->>Hearth: Save bundle to Hearth
     Note over Workflow,Search: For duplicate declarations, ends here
 
-    Workflow--)Config: Check if notification is enabled
     Workflow--)Search: Index bundle
-
+    Workflow--)Config: Check if notification is enabled
     Workflow--)Notifications: Send notification if enabled
+
     Notifications->>Country-Config: POST /notification
     Country-Config->>Config: GET Application Config from /publicConfig
     Config->>Country-Config: Get config from /application-config
-    Note over Workflow,Notifications: Get APPLICATION NAME, Notification Delivery Methods
+    Note over Config,Notifications: Get APPLICATION NAME, Notification Delivery Methods
 
     Note over Country-Config: Send notifications
 
