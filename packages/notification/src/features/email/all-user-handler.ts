@@ -25,5 +25,6 @@ export const allUsersEmailPayloadSchema = Joi.object({
   subject: Joi.string().required(),
   body: Joi.string().required(),
   bcc: Joi.array().items(Joi.string().required()).required(),
-  locale: Joi.string().required()
+  locale: Joi.string().required(),
+  requestId: Joi.string().required()
 })

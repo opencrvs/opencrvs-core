@@ -14,7 +14,7 @@ import NotificationQueue, {
 } from '@notification/model/notificationQueue'
 import { logger } from '@notification/logger'
 import { notifyCountryConfig } from '@notification/features/sms/service'
-import { internal } from '@hapi/boom'
+import { internal, tooManyRequests } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 
 interface AllUsersEmailPayloadSchema {
@@ -22,12 +22,14 @@ interface AllUsersEmailPayloadSchema {
   body: string
   bcc: string[]
   locale: string
+  requestId: string
 }
 
 let isLoopInprogress = false
 
 export async function sendAllUserEmails(request: Hapi.Request) {
   const payload = request.payload as AllUsersEmailPayloadSchema
+  await preProcessRequest(request)
   await NotificationQueue.create(payload)
   if (!isLoopInprogress) {
     loopNotificationQueue(request)
@@ -37,14 +39,44 @@ export async function sendAllUserEmails(request: Hapi.Request) {
   }
 }
 
-async function findOldestNotificationQueueRecord() {
-  return await NotificationQueue.findOne({
-    status: { $ne: 'failed' }
+async function countQueueRecordsOfCurrentDay(requestId: string) {
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  const end = new Date()
+  end.setHours(23, 59, 59, 999)
+  return NotificationQueue.count({
+    createdAt: { $gte: start, $lt: end },
+    requestId: { $ne: requestId }
+  })
+}
+
+async function deleteAllStaleRecords() {
+  const referenceDate = new Date()
+  referenceDate.setHours(0, 0, 0, 0)
+  return NotificationQueue.deleteMany({ createdAt: { $lt: referenceDate } })
+}
+
+async function preProcessRequest(request: Hapi.Request) {
+  const payload = request.payload as AllUsersEmailPayloadSchema
+  await deleteAllStaleRecords()
+  const currentDayRecords = await countQueueRecordsOfCurrentDay(
+    payload.requestId
+  )
+
+  if (currentDayRecords > 0) {
+    throw tooManyRequests('Already sent mails for today')
+  }
+}
+
+async function findOldestNotificationQueueRecord(requestId: string) {
+  return NotificationQueue.findOne({
+    status: { $exists: false },
+    requestId
   }).sort({ createdAt: -1 })
 }
 
 async function dispatch(record: NotificationQueueRecord, token: string) {
-  return await notifyCountryConfig(
+  return notifyCountryConfig(
     {
       email: 'allUserNotification'
     },
@@ -59,14 +91,11 @@ async function dispatch(record: NotificationQueueRecord, token: string) {
   )
 }
 
-async function deleteRecord(record: NotificationQueueRecord) {
-  return await NotificationQueue.deleteOne({ _id: record._id })
-}
 async function markQueueRecordFailedWithErrorDetails(
   record: NotificationQueueRecord,
   e: Error & { statusCode: number; error: string }
 ) {
-  return await NotificationQueue.updateOne(
+  return NotificationQueue.updateOne(
     { _id: record._id },
     {
       status: 'failed',
@@ -79,10 +108,20 @@ async function markQueueRecordFailedWithErrorDetails(
   )
 }
 
-export async function loopNotificationQueue(request?: Hapi.Request) {
-  const token = request?.headers?.authorization
+async function markQueueRecordSuccess(record: NotificationQueueRecord) {
+  return NotificationQueue.updateOne(
+    { _id: record._id },
+    {
+      status: 'success'
+    }
+  )
+}
+
+export async function loopNotificationQueue(request: Hapi.Request) {
+  const token = request.headers.authorization
+  const payload = request.payload as AllUsersEmailPayloadSchema
   isLoopInprogress = true
-  let record = await findOldestNotificationQueueRecord()
+  let record = await findOldestNotificationQueueRecord(payload.requestId)
   while (record) {
     logger.info(
       `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
@@ -93,9 +132,9 @@ export async function loopNotificationQueue(request?: Hapi.Request) {
       await markQueueRecordFailedWithErrorDetails(record, error)
       request?.log(['error', error.error, internal(error.message)])
     } else {
-      await deleteRecord(record)
+      await markQueueRecordSuccess(record)
     }
-    record = await findOldestNotificationQueueRecord()
+    record = await findOldestNotificationQueueRecord(payload.requestId)
   }
   isLoopInprogress = false
 }

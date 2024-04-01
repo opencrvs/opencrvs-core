@@ -13,19 +13,16 @@ import { USER_MANAGEMENT_URL, NOTIFICATION_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { internal } from '@hapi/boom'
+import { v4 as uuid } from 'uuid'
 
 const DEFAULT_PAGE_SIZE = 500
 
-async function fetchAllUsersInPage(
-  pageSize: number,
-  pageNumber: number,
-  authHeader: IAuthHeader
-) {
+async function fetchAllUsers(authHeader: IAuthHeader) {
   const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
     method: 'POST',
     body: JSON.stringify({
-      count: pageSize,
-      skip: pageNumber * pageSize,
+      count: 0,
+      skip: 0,
       sortOrder: 'desc'
     }),
     headers: {
@@ -40,7 +37,8 @@ async function fetchAllUsersInPage(
       results: IUserModelData[]
     }>
   } else {
-    throw internal('Something went wrong in user-mgnt server')
+    const errorResponse = await res.json()
+    throw internal('Error fetching user-mgnt: ' + errorResponse.message)
   }
 }
 
@@ -49,6 +47,7 @@ async function requestNotificationServiceToSendEmails(
   body: string,
   bcc: string[],
   locale: string,
+  requestId: string,
   authHeader: IAuthHeader
 ) {
   const res = await fetch(`${NOTIFICATION_URL}allUsersEmail`, {
@@ -57,6 +56,7 @@ async function requestNotificationServiceToSendEmails(
       subject,
       body,
       locale,
+      requestId,
       bcc
     }),
     headers: {
@@ -65,9 +65,8 @@ async function requestNotificationServiceToSendEmails(
     }
   })
   if (res.status !== 200) {
-    throw internal(
-      'Something went wrong in notification service while forwarding email request'
-    )
+    const errorResponse = await res.json()
+    throw internal('Error fetching notification: ' + errorResponse.message)
   }
 }
 
@@ -77,30 +76,24 @@ export async function sendEmailToAllUsers(
   locale: string,
   authHeader: IAuthHeader
 ) {
-  let total: number | undefined
-  let res
-  let currentPage = 0
-
+  const users = await fetchAllUsers(authHeader)
+  const requestId = uuid()
+  let i = 0
   do {
-    res = await fetchAllUsersInPage(DEFAULT_PAGE_SIZE, currentPage, authHeader)
-    if (res.results?.length > 0) {
-      if (!total) {
-        total = res.total
-      }
-      const emails = res.results
-        .filter((user) => user.systemRole !== 'NATIONAL_SYSTEM_ADMIN')
-        .map((user) => user.emailForNotification)
-        .filter((email): email is string => email != undefined)
-      await requestNotificationServiceToSendEmails(
-        subject,
-        body,
-        emails,
-        locale,
-        authHeader
-      )
-    }
-    currentPage += 1
-  } while (total && currentPage < Math.ceil(total / DEFAULT_PAGE_SIZE))
+    const emails = users.results
+      .slice(i, i + DEFAULT_PAGE_SIZE)
+      .map((user) => user.emailForNotification)
+      .filter((email): email is string => email != undefined)
+    await requestNotificationServiceToSendEmails(
+      subject,
+      body,
+      emails,
+      locale,
+      requestId,
+      authHeader
+    )
+    i += DEFAULT_PAGE_SIZE
+  } while (users.total && i < users.total)
 
   return {
     success: true
