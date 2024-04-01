@@ -85,6 +85,7 @@ const MAPPING: Record<
   [EVENT_TYPE.MARRIAGE]: {
     'sent-notification': null,
     'sent-notification-for-review': null,
+    'sent-for-approval': null,
     registered: null
   }
 }
