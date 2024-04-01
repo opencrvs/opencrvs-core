@@ -15,9 +15,9 @@ import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import {
   getInformantSMSNotification,
   InformantNotificationName
-} from '@workflow/features/registration/smsNotificationUtils'
+} from '@workflow/features/registration/sms-notification-utils'
 import { internal } from '@hapi/boom'
-import { RecordEvent } from './recordEvents'
+import { RecordEvent } from './record-events'
 
 type NotificationEvent = Extract<
   RecordEvent,
@@ -63,11 +63,10 @@ async function getNotificationFlags(token: string) {
   }
 }
 
-type SupportedVitalEvents = Exclude<EVENT_TYPE, 'MARRIAGE'>
-
+/** If the mapping is null, the notification is not enabled and won't be sent. */
 const MAPPING: Record<
-  SupportedVitalEvents,
-  Record<NotificationEvent, InformantNotificationName>
+  EVENT_TYPE,
+  Record<NotificationEvent, InformantNotificationName | null>
 > = {
   [EVENT_TYPE.BIRTH]: {
     'sent-notification': InformantNotificationName.birthInProgressSMS,
@@ -82,14 +81,21 @@ const MAPPING: Record<
       InformantNotificationName.deathDeclarationSMS,
     'sent-for-approval': InformantNotificationName.deathDeclarationSMS,
     registered: InformantNotificationName.deathRegistrationSMS
+  },
+  [EVENT_TYPE.MARRIAGE]: {
+    'sent-notification': null,
+    'sent-notification-for-review': null,
+    registered: null
   }
 }
 
 export async function isNotificationEnabled(
   action: NotificationEvent,
-  event: SupportedVitalEvents,
+  event: EVENT_TYPE,
   token: string
 ) {
+  if (MAPPING[event][action] === null) return false
+
   const notificationFlags = await getNotificationFlags(token)
   return (
     notificationFlags.find(({ name }) => name === MAPPING[event][action])
