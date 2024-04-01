@@ -200,6 +200,20 @@ export const SearchTool = ({
   onClearText,
   className
 }: ISearchToolProps) => {
+  const getDefaultSearchType = (): ISearchType => {
+    if (initialSelectedSearchType) {
+      return (
+        searchTypeList.find(
+          (item: ISearchType) => item.value === initialSelectedSearchType
+        ) || searchTypeList[0]
+      )
+    }
+    return (
+      searchTypeList.find((item: ISearchType) => item.isDefault === true) ||
+      searchTypeList[0]
+    )
+  }
+
   const [dropDownIsVisible, setDropDownIsVisible] = useState(false)
   const [searchParam, setSearchParam] = useState(searchText)
   const [currentLanguage, setCurrentLanguage] = useState(language)
@@ -216,20 +230,6 @@ export const SearchTool = ({
       setCurrentLanguage(language)
     }
   }, [language, searchTypeList, selectedSearchType.value, currentLanguage])
-
-  const getDefaultSearchType = (): ISearchType => {
-    if (initialSelectedSearchType) {
-      return (
-        searchTypeList.find(
-          (item: ISearchType) => item.value === initialSelectedSearchType
-        ) || searchTypeList[0]
-      )
-    }
-    return (
-      searchTypeList.find((item: ISearchType) => item.isDefault === true) ||
-      searchTypeList[0]
-    )
-  }
 
   const search = (e: React.FormEvent) => {
     e.preventDefault()
