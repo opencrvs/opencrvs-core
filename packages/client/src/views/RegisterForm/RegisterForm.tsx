@@ -300,10 +300,10 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to localData
-      //so that we can revert changes back to data.localData when users exits without saving
+      // saving current changes to localData
+      // for reverting back the changes when users exits without saving
       declaration.localData = declaration.data
-      //save declaration and exit
+      // save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
     }
