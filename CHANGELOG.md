@@ -12,9 +12,17 @@
 
 ## New features
 
+- Add loading spinners before JavaScript bundle has loaded for both login and client
+
 ## Bug fixes
 
 - Handle back button click after issuing a declaration [#6424](https://github.com/opencrvs/opencrvs-core/issues/6424)
+- Fix certificate verification QR code for a death declaration [#6230](https://github.com/opencrvs/opencrvs-core/issues/6230#issuecomment-1996766125)
+- Fix certificate verification QR code crashing when gender is unknown [#6422](https://github.com/opencrvs/opencrvs-core/issues/6422)
+- Fix certificate verification page missing registration center and the name of registrar [#6614](https://github.com/opencrvs/opencrvs-core/issues/6614)
+- Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
+
+- Fix record correction e2e failing due to stale data getting saved on redux
 
 ## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
 
