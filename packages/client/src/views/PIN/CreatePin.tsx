@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import * as bcrypt from 'bcryptjs'
@@ -38,7 +38,6 @@ const CreatePinComponent = ({
   offlineCountryConfiguration,
   onComplete
 }: IProps) => {
-  let pinKeyRef = useRef(null)
   const [pin, setPin] = useState<string | null>(null)
   const [pinMatchError, setPinMatchError] = useState(false)
   const [pinHasSameDigits, setPinHasSameDigits] = useState(false)
@@ -123,11 +122,7 @@ const CreatePinComponent = ({
                   {intl.formatMessage(messages.pinMatchError)}
                 </Toast>
               )}
-              <PINKeypad
-                pin=""
-                ref={(elem: any) => (pinKeyRef = elem)}
-                onComplete={firstPINEntry}
-              />
+              <PINKeypad pin="" onComplete={firstPINEntry} />
             </>
           )}
           {pinHasSeqDigits && (
@@ -182,7 +177,6 @@ const CreatePinComponent = ({
                 {intl.formatMessage(messages.pinSameDigitsError)}
               </Toast>
               <PINKeypad
-                ref={(elem: any) => (pinKeyRef = elem)}
                 onComplete={firstPINEntry}
                 key={refresher.toString()}
               />
@@ -202,10 +196,7 @@ const CreatePinComponent = ({
                 {intl.formatMessage(messages.reEnterDescription)}
               </Text>
 
-              <PINKeypad
-                ref={(elem: any) => (pinKeyRef = elem)}
-                onComplete={secondPINEntry}
-              />
+              <PINKeypad onComplete={secondPINEntry} />
             </>
           )}
         </Content>
