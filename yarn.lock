@@ -23234,10 +23234,10 @@ typedarray@^0.0.6:
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript-react-intl@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/typescript-react-intl/-/typescript-react-intl-0.3.0.tgz"
-  integrity sha512-sQmWJ4DDvH3kqV18OtbW1P4eem0Y9J6pK4eI1FOQF6kyrXhOf0LBGKa+fgIJgOw/OhHPPBsdbdsaysFbbVhXng==
+typescript-react-intl@^0.4.0:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/typescript-react-intl/-/typescript-react-intl-0.4.1.tgz#9b92732ebe7cbe36aaf14f89322452613bba1a63"
+  integrity sha512-ktOVL7L6NDxMyVOhN56eovI6MPlnLYvB+IEn/Gsb8BMFQGpzZuiMv9KvD2RI2CemWiyF3sxz7jwehbmFrh8hfQ==
   dependencies:
     typescript "^2.6.2"
 
