@@ -13,6 +13,7 @@ export const COUNTRY_CONFIG_HOST =
   process.env.COUNTRY_CONFIG_HOST || 'http://localhost:3040'
 export const GATEWAY_HOST = process.env.GATEWAY_HOST || 'http://localhost:7070'
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const OPENHIM_URL = 'http://localhost:5001'
 
 export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
 

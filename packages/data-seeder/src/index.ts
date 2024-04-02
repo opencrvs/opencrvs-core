@@ -14,7 +14,7 @@ import { seedCertificate } from './certificates'
 import { seedLocations } from './locations'
 import { seedRoles } from './roles'
 import { seedUsers } from './users'
-import { parseGQLResponse, raise } from './utils'
+import { parseGQLResponse, raise, verifyOpenHIMConnectivity } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import decode from 'jwt-decode'
@@ -95,6 +95,7 @@ async function main() {
   const roleIdMap = await seedRoles(token)
   console.log('Seeding locations')
   await seedLocations(token)
+  await verifyOpenHIMConnectivity()
   console.log('Seeding users')
   await seedUsers(token, roleIdMap)
   console.log('Seeding certificates')
