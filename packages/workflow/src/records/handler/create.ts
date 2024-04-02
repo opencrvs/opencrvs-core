@@ -289,8 +289,6 @@ export default async function createRecordHandler(
   // don't forward hospital notifications
   const notificationDisabled =
     isHospitalNotification(record) ||
-    event === EVENT_TYPE.MARRIAGE ||
-    eventAction === 'sent-for-approval' ||
     eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 
