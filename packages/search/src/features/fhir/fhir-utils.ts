@@ -13,9 +13,9 @@ import {
   Encounter,
   Extension,
   findCompositionSection,
+  findResourceFromBundleById,
   getComposition,
   getFromBundleById,
-  getResourceFromBundleById,
   KnownExtensionType,
   Location,
   OpenCRVSPatientName,
@@ -108,16 +108,21 @@ export async function addEventLocation(
 
   const encounterSection = findCompositionSection(code, composition)
   if (encounterSection && encounterSection.entry) {
-    const encounter = getResourceFromBundleById<Encounter>(
+    const encounter = findResourceFromBundleById<Encounter>(
       bundle,
       resourceIdentifierToUUID(encounterSection.entry[0].reference)
     )
 
-    if (encounter && encounter.location)
-      location = getResourceFromBundleById<Location>(
+    if (encounter && encounter.location) {
+      const locationResource = findResourceFromBundleById<Location>(
         bundle,
         resourceIdentifierToUUID(encounter.location[0].location.reference)
       )
+
+      if (locationResource !== null) {
+        location = locationResource
+      }
+    }
   }
 
   if (location) {
