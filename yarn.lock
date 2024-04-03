@@ -23338,22 +23338,10 @@ typedarray@^0.0.6:
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript-react-intl@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/typescript-react-intl/-/typescript-react-intl-0.3.0.tgz"
-  integrity sha512-sQmWJ4DDvH3kqV18OtbW1P4eem0Y9J6pK4eI1FOQF6kyrXhOf0LBGKa+fgIJgOw/OhHPPBsdbdsaysFbbVhXng==
-  dependencies:
-    typescript "^2.6.2"
-
 typescript@4.9.5, "typescript@^3 || ^4":
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
-
-typescript@^2.6.2:
-  version "2.9.2"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-2.9.2.tgz"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
 
 typical@^2.6.1:
   version "2.6.1"
