@@ -12,9 +12,14 @@ get_abs_filename() {
 }
 
 write=false
+outdated=false
 
 for i in "$@"; do
   case $i in
+    --outdated)
+      outdated=true
+      shift
+      ;;
     --write)
       write=true
       shift
@@ -38,6 +43,11 @@ elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
   echo "COUNTRY_CONFIG_PATH does not look like a real directory path."
   echo "Country config path you tried using: $(get_abs_filename $COUNTRY_CONFIG_PATH)"
   exit 1
+fi
+
+if $outdated; then
+  $(yarn bin)/ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --outdated
+  exit 0
 fi
 
 if $write; then

@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
-import { Message } from 'typescript-react-intl'
 
 interface IFormMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   name: MessageDescriptor
   title: MessageDescriptor
   whoIsBirthInformant: MessageDescriptor
-  whoIsDeathInformant: Message
+  whoIsDeathInformant: MessageDescriptor
   GRANDFATHER: MessageDescriptor
   GRANDMOTHER: MessageDescriptor
   MOTHER: MessageDescriptor

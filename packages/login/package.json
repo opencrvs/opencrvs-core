@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/login",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "OpenCRVS login client application",
   "license": "MPL-2.0",
   "private": true,
@@ -76,6 +76,7 @@
     ]
   },
   "devDependencies": {
+    "@types/csv2json": "^1.4.5",
     "@types/enzyme": "^3.1.13",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/jwt-decode": "^2.2.1",
@@ -87,6 +88,8 @@
     "@types/webfontloader": "^1.6.34",
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
+    "csv-stringify": "^6.4.6",
+    "csv2json": "^2.0.2",
     "enzyme": "^3.4.4",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
@@ -106,7 +109,6 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "ts-node": "^6.1.1",
     "typescript": "4.9.5",
-    "typescript-react-intl": "^0.3.0",
     "vite": "^3.0.0",
     "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-svgr": "^0.3.0",
