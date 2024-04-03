@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.9@sha256:414e0518bb9228d35e4cd5165567fb91d26c6a214e9c95899e1e056fcd349011
 
 # Install required packages
 RUN apk update && apk upgrade && apk add --update --no-cache bash curl coreutils mongodb mongodb-tools

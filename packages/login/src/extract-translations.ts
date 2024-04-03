@@ -11,89 +11,243 @@
 /* eslint-disable */
 import * as fs from 'fs'
 import glob from 'glob'
-import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ILanguage } from '@login/i18n/reducer'
+import csv2json from 'csv2json'
+import { stringify, Options } from 'csv-stringify'
+import { promisify } from 'util'
+import { sortBy } from 'lodash'
+import ts from 'typescript'
+import { MessageDescriptor } from 'react-intl'
+const csvStringify = promisify<Array<Record<string, any>>, Options>(stringify)
 
-interface IReactIntlDescriptions {
-  [key: string]: string
+export async function writeJSONToCSV(
+  filename: string,
+  data: Array<Record<string, any>>
+) {
+  const csv = await csvStringify(data, {
+    header: true
+  })
+  return fs.promises.writeFile(filename, csv, 'utf8')
 }
 
-function existsInContentful(obj: any, value: string): boolean {
-  if (Object.values(obj).indexOf(value) > -1) {
-    return true
+export async function readCSVToJSON<T>(filename: string) {
+  return new Promise<T>((resolve, reject) => {
+    const chunks: string[] = []
+    fs.createReadStream(filename)
+      .on('error', reject)
+      .pipe(
+        csv2json({
+          separator: ','
+        })
+      )
+      .on('data', (chunk: string) => chunks.push(chunk))
+      .on('error', reject)
+      .on('end', () => {
+        resolve(JSON.parse(chunks.join('')))
+      })
+  })
+}
+
+type CSVRow = { id: string; description: string } & Record<string, string>
+
+const write = process.argv.includes('--write')
+const outdated = process.argv.includes('--outdated')
+
+const COUNTRY_CONFIG_PATH = process.argv[2]
+
+type LocalisationFile = CSVRow[]
+
+function writeTranslations(data: LocalisationFile) {
+  return writeJSONToCSV(
+    `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`,
+    data
+  )
+}
+
+function readTranslations() {
+  return readCSVToJSON<CSVRow[]>(
+    `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+  )
+}
+
+function findObjectLiteralsWithIdAndDefaultMessage(
+  filePath: string,
+  sourceCode: string
+): MessageDescriptor[] {
+  const sourceFile = ts.createSourceFile(
+    'temp.ts',
+    sourceCode,
+    ts.ScriptTarget.Latest,
+    true
+  )
+  const matches: MessageDescriptor[] = []
+
+  function visit(node: ts.Node) {
+    if (!ts.isObjectLiteralExpression(node)) {
+      ts.forEachChild(node, visit)
+      return
+    }
+    const idProperty = node.properties.find(
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'id'
+    )
+    const defaultMessageProperty = node.properties.find(
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
+    )
+
+    if (!(idProperty && defaultMessageProperty)) {
+      ts.forEachChild(node, visit)
+      return
+    }
+
+    const objectText = node.getText(sourceFile) // The source code representation of the object
+
+    try {
+      const func = new Function(`return (${objectText});`)
+      const objectValue = func()
+      matches.push(objectValue)
+    } catch (error) {
+      console.log(chalk.yellow.bold('Warning'))
+      console.error(
+        `Found a dynamic message identifier in file ${filePath}.`,
+        'Message identifiers should never be dynamic and should always be hardcoded instead.',
+        'This enables us to confidently verify that a country configuration has all required keys.',
+        '\n',
+        objectText,
+        '\n'
+      )
+    }
+
+    ts.forEachChild(node, visit)
   }
-  return false
+
+  visit(sourceFile)
+
+  return matches
 }
 
 async function extractMessages() {
-  const COUNTRY_CONFIG_PATH = process.argv[2]
-
-  let login: {
-    data: Array<{
-      lang: string
-      displayName: string
-      messages: Record<string, string>
-    }>
-  }
+  let translations: LocalisationFile
   try {
-    login = JSON.parse(
-      fs
-        .readFileSync(`${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`)
-        .toString()
-    )
-  } catch (err) {
-    console.error(
-      `Please add valid COUNTRY_CONFIG_PATH as an environment variable`
-    )
+    translations = await readTranslations()
+  } catch (error: unknown) {
+    const err = error as Error & { code: string }
+    if (err.code === 'ENOENT') {
+      console.error(err.message)
+      console.error(
+        `Your environment variables may not be set.
+        Please add valid COUNTRY_CONFIG_PATH, as an environment variable.
+        If they are set correctly, then something is wrong with
+        this file: ${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+      )
+    } else {
+      console.error(err)
+    }
     process.exit(1)
   }
-  let results: any[] = []
-  const pattern = 'src/**/*.@(tsx|ts)'
-  try {
+
+  const knownLanguages =
+    translations.length > 0
+      ? Object.keys(translations[0]).filter(
+          (key) => !['id', 'description'].includes(key)
+        )
+      : ['en']
+
+  console.log('Checking translations in application...')
+  console.log()
+
+  const files = await promisify(glob)('src/**/*.@(tsx|ts)', {
+    ignore: ['**/*.test.@(tsx|ts)', 'src/tests/**/*.*']
+  })
+
+  const messagesParsedFromApp: MessageDescriptor[] = files
+    .map((f) => {
+      const contents = fs.readFileSync(f).toString()
+      return findObjectLiteralsWithIdAndDefaultMessage(f, contents)
+    })
+    .flat()
+
+  const reactIntlDescriptions: Record<string, string> = Object.fromEntries(
+    messagesParsedFromApp.map(({ id, description }) => [id, description || ''])
+  )
+
+  const missingKeys = Object.keys(reactIntlDescriptions).filter(
+    (key) => !translations.find(({ id }) => id === key)
+  )
+
+  if (outdated) {
+    const extraKeys = translations
+      .map(({ id }) => id)
+      .filter((key) => !reactIntlDescriptions[key])
+
+    console.log(chalk.yellow.bold('Potentially outdated translations'))
+    console.log(
+      'The following keys were not found in the code, but are part of the copy file:',
+      '\n'
+    )
+    console.log(extraKeys.join('\n'))
+  }
+
+  if (missingKeys.length > 0) {
     // eslint-disable-line no-console
-    console.log(`${chalk.yellow('Checking translations in application ...')}`)
-    glob(pattern, (err: any, files) => {
-      if (err) {
-        throw new Error(err)
-      }
-      let res: Message[]
-      files.forEach((f) => {
-        const contents = fs.readFileSync(f).toString()
-        var res = main(contents)
-        results = results.concat(res)
-      })
-      const reactIntlDescriptions: IReactIntlDescriptions = {}
-      results.forEach((r) => {
-        reactIntlDescriptions[r.id] = r.description
-      })
-      const englishTranslations = login.data.find(
-        (obj: ILanguage) => obj.lang === 'en-US' || obj.lang === 'en'
-      )?.messages
-
-      const missingKeys = Object.keys(reactIntlDescriptions).filter(
-        (key) => !englishTranslations?.hasOwnProperty(key)
-      )
-
-      if (missingKeys.length > 0) {
-        // eslint-disable-line no-console
-        console.log(chalk.red.bold('Missing translations'))
-        console.log(`You are missing the following content keys from your country configuration package:\n
+    console.log(chalk.red.bold('Missing translations'))
+    console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n
 Translate the keys and add them to this file:
-${chalk.white(`${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`)}`)
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
 
-        process.exit(1)
-      }
-
-      fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/api/content/login/descriptions.json`,
-        JSON.stringify({ data: reactIntlDescriptions }, null, 2)
+    if (write) {
+      console.log(
+        `${chalk.yellow('Warning ⚠️:')} ${chalk.white(
+          'The --write command is experimental and only adds new translations for English.'
+        )}`
       )
-    })
-  } catch (err) {
-    // eslint-disable-line no-console
-    console.log(err)
+
+      // This is just to ensure that all languages stay in the CVS file
+      const emptyLanguages = Object.fromEntries(
+        knownLanguages.map((lang) => [lang, ''])
+      )
+
+      const defaultsToBeAdded = missingKeys.map(
+        (key): CSVRow => ({
+          id: key,
+          description: reactIntlDescriptions[key],
+          ...emptyLanguages,
+          en:
+            messagesParsedFromApp
+              .find(({ id }) => id === key)
+              ?.defaultMessage?.toString() || ''
+        })
+      )
+
+      const allIds = Array.from(
+        new Set(
+          defaultsToBeAdded
+            .map(({ id }) => id)
+            .concat(translations.map(({ id }) => id))
+        )
+      )
+
+      const allTranslations = allIds.map((id) => {
+        const existingTranslation = translations.find(
+          (translation) => translation.id === id
+        )
+
+        return (
+          existingTranslation ||
+          defaultsToBeAdded.find((translation) => translation.id === id)!
+        )
+      })
+
+      await writeTranslations(sortBy(allTranslations, (row) => row.id))
+    } else {
+      console.log(`
+${chalk.green('Tip 🪄')}: ${chalk.white(
+        `If you want this command to add the missing English keys for you, run it with the ${chalk.bold(
+          '--write'
+        )} flag. Note that you still need to add non-English translations to the file.`
+      )}`)
+    }
+
     process.exit(1)
   }
 }

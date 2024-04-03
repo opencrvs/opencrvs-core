@@ -30,21 +30,75 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Loading...</title>
+
+    <style>
+      body,
+      html {
+        background-color: #f5f5f5;
+      }
+      #spinner {
+        opacity: 0;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-25px, -25px);
+        animation: a 2s forwards;
+      }
+      #spinner g {
+        transform-origin: center;
+        animation: b 2s linear infinite;
+      }
+      #spinner g circle {
+        stroke-linecap: round;
+        animation: c 1.5s ease-in-out infinite;
+      }
+      @keyframes a {
+        85% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes b {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes c {
+        0% {
+          stroke-dasharray: 0 150;
+          stroke-dashoffset: 0;
+        }
+        47.5% {
+          stroke-dasharray: 42 150;
+          stroke-dashoffset: -16;
+        }
+        95%,
+        100% {
+          stroke-dasharray: 42 150;
+          stroke-dashoffset: -59;
+        }
+      }
+    </style>
   </head>
 
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <svg
+        id="spinner"
+        width="50"
+        height="50"
+        stroke="#4C68C1"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g>
+          <circle cx="12" cy="12" r="9.5" fill="none" stroke-width="2"></circle>
+        </g>
+      </svg>
+    </div>
     <script type="module" src="/src/index.tsx"></script>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

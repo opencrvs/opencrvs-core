@@ -149,6 +149,28 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
     },
     {
       method: 'POST',
+      path: '/birth/sent-for-approval',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated birth declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-for-approval',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated death declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
       path: '/birth/registered',
       handler: birthRegisterNotification,
       options: {
