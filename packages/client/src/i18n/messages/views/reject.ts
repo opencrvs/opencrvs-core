@@ -84,7 +84,7 @@ const messagesToDefine: IRejectMessages = {
       'Comments or instructions for health worker to rectify declaration'
   },
   rejectionReasonLabel: {
-    id: 'review.rejection.form.reasonLabel',
+    id: 'constants.reason',
     defaultMessage: 'Reason'
   }
 }
