@@ -8,7 +8,6 @@ title: Fetch birth registration (mark as downloaded)
 sequenceDiagram
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth

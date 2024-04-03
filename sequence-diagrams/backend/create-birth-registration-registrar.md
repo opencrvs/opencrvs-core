@@ -51,13 +51,11 @@ sequenceDiagram
 
     loop location levels 4, 3, 2
         Metrics->>Hearth: Get parent of Location
-        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate time logged point
 
     loop location levels 4, 3, 2
         Metrics->>Hearth: Get parent of Location
-        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate declaration started point
     Metrics->>Influx DB: Write audit points
