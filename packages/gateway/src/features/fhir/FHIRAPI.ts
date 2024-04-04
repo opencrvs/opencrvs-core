@@ -89,6 +89,11 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       .filter((composition) => composition.id === id)
       .filter(isCompositionOrCompositionHistory)
       .filter(isSaved)
+      .sort((resourceA, resourceB) => {
+        const dateA = new Date(resourceA.meta?.lastUpdated || '')
+        const dateB = new Date(resourceB.meta?.lastUpdated || '')
+        return dateA.getTime() - dateB.getTime()
+      })
   }
   getDocumentReference(id: string) {
     if (!this.context.record) {

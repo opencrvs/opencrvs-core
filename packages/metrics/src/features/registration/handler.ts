@@ -336,7 +336,7 @@ export async function markCertifiedHandler(
   try {
     const points = await generateEventDurationPoint(
       request.payload as fhir.Bundle,
-      ['REGISTERED'],
+      ['REGISTERED', 'ISSUED'],
       {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']

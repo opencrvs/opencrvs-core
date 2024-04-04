@@ -1,14 +1,14 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
   "os": [
     "darwin",
     "linux"
   ],
   "engines": {
-    "node": "18.19.x"
+    "node": "18.x.x"
   },
   "workspaces": [
     "packages/*"
