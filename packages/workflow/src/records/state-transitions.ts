@@ -783,13 +783,28 @@ export async function toUnassigned(record: ValidRecord, token: string) {
   const previousTask = getTaskFromSavedBundle(record)
   const unassignedTask = await createUnassignedTask(previousTask, token)
 
+  const filteredEntriesWithoutTask = record.entry.filter(
+    (entry) => entry.resource.id !== previousTask.id
+  )
+  const newTaskEntry = {
+    fullUrl: record.entry.find(
+      (entry) => entry.resource.id === previousTask.id
+    )!.fullUrl,
+    resource: unassignedTask
+  }
+
+  const unassignedRecord = {
+    ...record,
+    entry: [...filteredEntriesWithoutTask, newTaskEntry]
+  } as ValidRecord
+
   const unassignedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [{ resource: unassignedTask }]
   }
 
-  return unassignedRecordWithTaskOnly
+  return { unassignedRecord, unassignedRecordWithTaskOnly }
 }
 
 export function toVerified(

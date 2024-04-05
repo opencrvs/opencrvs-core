@@ -346,7 +346,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/unassigned',
+      path: '/events/{event}/unassigned',
       handler: declarationUnassignedHandler,
       options: {
         tags: ['api']

@@ -16,6 +16,7 @@ import { getRecordById } from '@workflow/records/index'
 import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
+import { auditEvent } from '@workflow/records/audit'
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
@@ -44,10 +45,18 @@ export async function unassignRecordHandler(
     ]
   )
 
-  const unassignedRecord = await toUnassigned(record, token)
+  const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
+    record,
+    token
+  )
 
-  await sendBundleToHearth(unassignedRecord)
-  await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
+  await sendBundleToHearth(unassignedRecordWithTaskOnly)
+  await indexBundleToRoute(
+    unassignedRecordWithTaskOnly,
+    token,
+    '/events/unassigned'
+  )
+  await auditEvent('unassigned', unassignedRecord, token)
 
   return unassignedRecord
 }

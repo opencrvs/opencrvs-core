@@ -25,3 +25,4 @@ export type RecordEvent =
   | 'not-duplicate'
   | 'downloaded'
   | 'assigned'
+  | 'unassigned'
