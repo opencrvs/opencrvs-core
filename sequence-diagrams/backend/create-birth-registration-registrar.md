@@ -99,8 +99,6 @@ sequenceDiagram
     Workflow--)Search: Index bundle
     Workflow--)Metrics: POST bundle to /events/{event}/registered
 
-    Workflow--)Search: Index bundle
-
     Workflow--)Config: Check if notification is enabled
     Workflow--)Notifications: Send notification if enabled
 
@@ -110,6 +108,9 @@ sequenceDiagram
     Note over Config,Notifications: Get APPLICATION NAME, Notification Delivery Methods
 
     Note over Country-Config: Send notifications
+
+    Workflow--)Webhook: POST to /events/birth/mark-registered
+    Webhook->>User management: Get System Permissions
 
     Workflow--)GraphQL gateway: Return compositionId, trackingId and duplicate status
 ```
