@@ -23,3 +23,5 @@ export type RecordEvent =
   | 'marked-as-duplicate'
   | 'viewed'
   | 'not-duplicate'
+  | 'downloaded'
+  | 'assigned'

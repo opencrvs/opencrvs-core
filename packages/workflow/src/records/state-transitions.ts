@@ -323,7 +323,10 @@ export async function toDownloaded(
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
-) {
+): Promise<{
+  downloadedRecord: ValidRecord
+  downloadedRecordWithTaskOnly: Bundle<SavedTask>
+}> {
   const previousTask = getTaskFromSavedBundle(record)
 
   const downloadedTask = await createDownloadTask(
@@ -338,13 +341,24 @@ export async function toDownloaded(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
 
+  const filteredEntriesWithoutTask = record.entry.filter(
+    (entry) => entry.resource.id !== previousTask.id
+  )
+  const newTaskEntry = {
+    fullUrl: record.entry.find(
+      (entry) => entry.resource.id === previousTask.id
+    )!.fullUrl,
+    resource: downloadedTask
+  }
+
+  const updatedEntries = [...filteredEntriesWithoutTask, newTaskEntry].concat(
+    taskHistoryEntry
+  )
+
   const downloadedRecord = {
     ...record,
-    entry: [
-      ...record.entry.filter((entry) => entry.resource.id !== previousTask.id),
-      { resource: downloadedTask }
-    ].concat(taskHistoryEntry)
-  }
+    entry: updatedEntries
+  } as ValidRecord
 
   const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',
