@@ -46,8 +46,8 @@ export const correctionFeesPayment: IFormSectionGroup = {
             type: 'NUMBER',
             label: {
               defaultMessage: '',
-              id: 'form.field.label.totalFees',
-              description: 'Label for input Reason for Change'
+              id: 'form.field.label.empty',
+              description: ''
             },
             required: true,
             initialValue: '',
