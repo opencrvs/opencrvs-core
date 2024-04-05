@@ -1258,7 +1258,7 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: Gender
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String
   occupation: String
@@ -1839,6 +1839,8 @@ enum Gender {
   other
   unknown
 }
+
+scalar PlainDate
 
 input AddressInput {
   use: AddressUse

@@ -8,10 +8,10 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # automatically map from FHIR
 
-scalar FieldValue
 scalar Date
 scalar Map
 scalar FieldValue
+scalar PlainDate
 
 input HumanNameInput {
   use: String # bn | en - the language the name text is written in
@@ -132,7 +132,7 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: Gender
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String # Not in BDRIS2 - keep as optional
   occupation: String

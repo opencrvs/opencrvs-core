@@ -1149,7 +1149,7 @@ export interface GQLPersonInput {
   name?: Array<GQLHumanNameInput | null>
   telecom?: Array<GQLContactPointInput | null>
   gender?: GQLGender
-  birthDate?: string
+  birthDate?: GQLPlainDate
   age?: number
   maritalStatus?: string
   occupation?: string
@@ -1732,6 +1732,8 @@ export const enum GQLGender {
   unknown = 'unknown'
 }
 
+export type GQLPlainDate = any
+
 export interface GQLAddressInput {
   use?: GQLAddressUse
   type?: GQLAddressType
@@ -2048,6 +2050,7 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
+  PlainDate?: GraphQLScalarType
   FieldValue?: GraphQLScalarType
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
