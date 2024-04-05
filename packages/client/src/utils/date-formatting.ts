@@ -16,6 +16,14 @@ import fr from 'date-fns/locale/fr'
 import subYears from 'date-fns/subYears'
 import isValid from 'date-fns/isValid'
 
+/*
+ *  The actual type is `${number}-${number}-${number}`
+ *  but as Date constructor is way too permissive so
+ *  using unkonwn to restrict PlainDate's direct usage
+ *  with Date
+ */
+export type PlainDate = unknown
+
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 
 export const formatLongDate = (

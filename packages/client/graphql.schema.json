@@ -6371,7 +6371,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -6406,7 +6406,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "defaultValue": null,
@@ -14009,7 +14009,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -14021,7 +14021,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -14308,7 +14308,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "defaultValue": null,

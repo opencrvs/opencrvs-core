@@ -358,13 +358,13 @@ type Person {
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   multipleBirth: Int
   address: [Address]
   photo: [Attachment]
@@ -1040,6 +1040,8 @@ type ContactPoint {
   use: String
 }
 
+scalar PlainDate
+
 type Address {
   use: String
   type: String
@@ -1075,7 +1077,7 @@ type Attachment {
 
 type Deceased {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 type StatusWiseRegistrationCount {
@@ -1264,7 +1266,7 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   multipleBirth: Int
   address: [AddressInput]
   photo: [AttachmentInput!]
@@ -1840,8 +1842,6 @@ enum Gender {
   unknown
 }
 
-scalar PlainDate
-
 input AddressInput {
   use: AddressUse
   type: AddressType
@@ -1859,7 +1859,7 @@ input AddressInput {
 
 input DeceasedInput {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 enum AttachmentInputStatus {

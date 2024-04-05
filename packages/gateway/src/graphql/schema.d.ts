@@ -188,13 +188,13 @@ export interface GQLPerson {
   name?: Array<GQLHumanName | null>
   telecom?: Array<GQLContactPoint | null>
   gender?: string
-  birthDate?: string
+  birthDate?: GQLPlainDate
   age?: number
   maritalStatus?: string
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   multipleBirth?: number
   address?: Array<GQLAddress | null>
   photo?: Array<GQLAttachment | null>
@@ -907,6 +907,8 @@ export interface GQLContactPoint {
   use?: string
 }
 
+export type GQLPlainDate = any
+
 export interface GQLAddress {
   use?: string
   type?: string
@@ -942,7 +944,7 @@ export interface GQLAttachment {
 
 export interface GQLDeceased {
   deceased?: boolean
-  deathDate?: string
+  deathDate?: GQLPlainDate
 }
 
 export interface GQLStatusWiseRegistrationCount {
@@ -1155,7 +1157,7 @@ export interface GQLPersonInput {
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
   photo?: Array<GQLAttachmentInput>
@@ -1732,8 +1734,6 @@ export const enum GQLGender {
   unknown = 'unknown'
 }
 
-export type GQLPlainDate = any
-
 export interface GQLAddressInput {
   use?: GQLAddressUse
   type?: GQLAddressType
@@ -1751,7 +1751,7 @@ export interface GQLAddressInput {
 
 export interface GQLDeceasedInput {
   deceased?: boolean
-  deathDate?: string
+  deathDate?: GQLPlainDate
 }
 
 export const enum GQLAttachmentInputStatus {
@@ -1992,6 +1992,7 @@ export interface GQLResolver {
   IdentityType?: GQLIdentityTypeTypeResolver
   HumanName?: GQLHumanNameTypeResolver
   ContactPoint?: GQLContactPointTypeResolver
+  PlainDate?: GraphQLScalarType
   Address?: GQLAddressTypeResolver
   Attachment?: GQLAttachmentTypeResolver
   Deceased?: GQLDeceasedTypeResolver
@@ -2050,7 +2051,6 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
-  PlainDate?: GraphQLScalarType
   FieldValue?: GraphQLScalarType
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
