@@ -53,4 +53,7 @@ sequenceDiagram
     Note over Search,Hearth: Compose new history entry
 
     Search->>ElasticSearch: Index composition
+
+    Workflow--)Metrics: POST bundle /events/{event}/archived
+    Metrics->>Influx DB: Write audit point
 ```

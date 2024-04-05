@@ -37,5 +37,8 @@ sequenceDiagram
     Search->>User management: Get user information
     Search->>ElasticSearch: Update composition
 
+    Workflow--)Metrics: POST bundle /events/{event}/downloaded
+    Metrics->>Influx DB: Write audit point
+
     Workflow->>GraphQL Gateway: Return full updated record
 ```
