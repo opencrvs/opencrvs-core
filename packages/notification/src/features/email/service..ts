@@ -32,7 +32,7 @@ export async function sendAllUserEmails(request: Hapi.Request) {
   await preProcessRequest(request)
   await NotificationQueue.create(payload)
   if (!isLoopInprogress) {
-    loopNotificationQueue(request)
+    loopNotificationQueue(request.server)
   }
   return {
     success: true
@@ -40,13 +40,21 @@ export async function sendAllUserEmails(request: Hapi.Request) {
 }
 
 async function countQueueRecordsOfCurrentDay(requestId: string) {
-  const start = new Date()
-  start.setHours(0, 0, 0, 0)
-  const end = new Date()
-  end.setHours(23, 59, 59, 999)
+  const startOfTheDay = new Date()
+  startOfTheDay.setHours(0, 0, 0, 0)
+  const endOfTheDay = new Date()
+  endOfTheDay.setHours(23, 59, 59, 999)
   return NotificationQueue.count({
-    createdAt: { $gte: start, $lt: end },
-    requestId: { $ne: requestId }
+    $and: [
+      { createdAt: { $gte: startOfTheDay, $lt: endOfTheDay } },
+      { requestId: { $ne: requestId } },
+      {
+        $or: [
+          { error: { $exists: false } },
+          { 'error.statusCode': { $gte: 500 } }
+        ]
+      }
+    ]
   })
 }
 
@@ -68,14 +76,21 @@ async function preProcessRequest(request: Hapi.Request) {
   }
 }
 
-async function findOldestNotificationQueueRecord(requestId: string) {
+async function findOldestNotificationQueueRecord() {
   return NotificationQueue.findOne({
-    status: { $exists: false },
-    requestId
+    $and: [
+      { status: { $ne: 'success' } },
+      {
+        $or: [
+          { error: { $exists: false } },
+          { 'error.statusCode': { $gte: 500 } }
+        ]
+      }
+    ]
   }).sort({ createdAt: -1 })
 }
 
-async function dispatch(record: NotificationQueueRecord, token: string) {
+async function dispatch(record: NotificationQueueRecord) {
   return notifyCountryConfig(
     {
       email: 'allUserNotification'
@@ -86,7 +101,7 @@ async function dispatch(record: NotificationQueueRecord, token: string) {
       subject: record.subject,
       body: record.body
     },
-    token,
+    undefined,
     record.locale
   )
 }
@@ -112,29 +127,30 @@ async function markQueueRecordSuccess(record: NotificationQueueRecord) {
   return NotificationQueue.updateOne(
     { _id: record._id },
     {
-      status: 'success'
+      status: 'success',
+      $unset: {
+        error: ''
+      }
     }
   )
 }
 
-export async function loopNotificationQueue(request: Hapi.Request) {
-  const token = request.headers.authorization
-  const payload = request.payload as AllUsersEmailPayloadSchema
+export async function loopNotificationQueue(server: Hapi.Server) {
   isLoopInprogress = true
-  let record = await findOldestNotificationQueueRecord(payload.requestId)
+  let record = await findOldestNotificationQueueRecord()
   while (record) {
     logger.info(
       `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
     )
-    const res = await dispatch(record, token)
+    const res = await dispatch(record)
     if (!res.ok) {
       const error = await res.json()
       await markQueueRecordFailedWithErrorDetails(record, error)
-      request?.log(['error', error.error, internal(error.message)])
+      server.log(['error', error.error, internal(error.message)])
     } else {
       await markQueueRecordSuccess(record)
     }
-    record = await findOldestNotificationQueueRecord(payload.requestId)
+    record = await findOldestNotificationQueueRecord()
   }
   isLoopInprogress = false
 }
