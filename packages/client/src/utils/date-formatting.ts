@@ -21,10 +21,21 @@ import isValid from 'date-fns/isValid'
  *  but as Date constructor is way too permissive so
  *  using unkonwn to restrict PlainDate's direct usage
  *  with Date
+ *  It's of format YYYY-MM-DD
  */
 export type PlainDate = unknown
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
+
+export function formatPlainDate(
+  plainDate: PlainDate,
+  formatString = 'dd MMMM yyyy'
+) {
+  const rawDate = plainDate as `${number}-${number}-${number}`
+  const [yyyy, mm, dd] = rawDate.split('-')
+  const localDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd))
+  return format(localDate, formatString)
+}
 
 export const formatLongDate = (
   date: string,
