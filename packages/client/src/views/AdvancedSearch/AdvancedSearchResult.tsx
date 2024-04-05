@@ -492,7 +492,7 @@ const SearchModifierComponent = () => {
     intl,
     offlineData
   )
-
+    
   return (
     <>
       <SearchParamContainer>

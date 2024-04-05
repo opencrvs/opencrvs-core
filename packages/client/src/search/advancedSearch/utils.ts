@@ -158,7 +158,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
         : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
-        ? Object.values(RegStatus)
+        ? [RegStatus.AnyStatus]
         : [localState.registrationStatuses]
   } else {
     transformedStoreState.registrationStatuses = undefined
@@ -573,14 +573,12 @@ const getLabelForRegistrationStatus = (
     VALIDATED: [RegStatus.Validated],
     WAITING_VALIDATION: [RegStatus.WaitingValidation]
   }
-
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
     return false
   })
-
   const forMattedStatusList = [
     {
       value: 'ALL',

@@ -1941,6 +1941,7 @@ export enum RegAction {
 
 export enum RegStatus {
   Archived = 'ARCHIVED',
+  AnyStatus = 'Any Status',
   Certified = 'CERTIFIED',
   CorrectionRequested = 'CORRECTION_REQUESTED',
   DeclarationUpdated = 'DECLARATION_UPDATED',
