@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { getValidRecordById } from '@workflow/records/index'
 import { Bundle } from '@opencrvs/commons/types'
 import { toViewed } from '@workflow/records/state-transitions'
@@ -22,7 +22,7 @@ export async function viewRecordHandler(
 ) {
   const token = getToken(request)
   const recordId = request.params.id
-  const record = await getValidRecordById(recordId, token)
+  const record = await getValidRecordById(recordId, token, true)
 
   const viewedRecord = await toViewed(record, token)
 

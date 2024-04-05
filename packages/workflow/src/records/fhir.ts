@@ -49,7 +49,8 @@ import {
   ResourceIdentifier,
   isTask,
   urlReferenceToResourceIdentifier,
-  RegistrationStatus
+  RegistrationStatus,
+  getResourceFromBundleById
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -295,6 +296,16 @@ export function createDocumentReferenceEntryForCertificate(
   }
 }
 
+function findPatientReferenceFromRelatedPerson(
+  record: RegisteredRecord | CertifiedRecord,
+  relatedPesonReference: ResourceIdentifier
+): ResourceIdentifier {
+  return getResourceFromBundleById<RelatedPerson>(
+    record,
+    resourceIdentifierToUUID(relatedPesonReference)
+  ).patient.reference
+}
+
 export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
@@ -402,7 +413,13 @@ export function createRelatedPersonEntries(
             ]
           },
           patient: {
-            reference: section.entry[0].reference
+            reference:
+              knownRelationship !== 'INFORMANT'
+                ? section.entry[0].reference
+                : findPatientReferenceFromRelatedPerson(
+                    record,
+                    section.entry[0].reference
+                  )
           }
         }
       }

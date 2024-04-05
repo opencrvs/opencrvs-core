@@ -63,7 +63,7 @@ import {
   updatePatientIdentifierWithRN,
   validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { IEventRegistrationCallbackPayload } from '@workflow/features/registration/handler'
+import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   getTaskEventType,
@@ -442,9 +442,9 @@ export async function initiateRegistration(
 export async function toRegistered(
   request: Hapi.Request,
   record: WaitingForValidationRecord,
-  registrationNumber: IEventRegistrationCallbackPayload['registrationNumber'],
+  registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: IEventRegistrationCallbackPayload['childIdentifiers']
+  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions =
@@ -778,14 +778,20 @@ export async function toUnassigned(record: ValidRecord, token: string) {
   return unassignedRecordWithTaskOnly
 }
 
-export async function toVerified(
+export function toVerified(
   record: RegisteredRecord | IssuedRecord,
   ipInfo: string
 ) {
   const previousTask = getTaskFromSavedBundle(record)
-  const verifyRecordTask = await createVerifyRecordTask(previousTask, ipInfo)
+  const verifyRecordTask = createVerifyRecordTask(previousTask, ipInfo)
 
-  return {
+  const verifiedRecordWithTaskOnly: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: verifyRecordTask }]
+  }
+
+  const verifiedRecord = {
     ...record,
     entry: [
       ...record.entry.filter((e) => e.resource.resourceType !== 'Task'),
@@ -796,6 +802,8 @@ export async function toVerified(
       }
     ]
   }
+
+  return { verifiedRecord, verifiedRecordWithTaskOnly }
 }
 
 export async function toCorrectionRejected(
