@@ -46,6 +46,7 @@ const REINSTATED_STATUS = 'REINSTATED'
 export const CERTIFIED_STATUS = 'CERTIFIED'
 export const ISSUED_STATUS = 'ISSUED'
 const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
+const DECLARATION_UPDATED_STATUS = 'DECLARATION_UPDATED'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
@@ -70,6 +71,7 @@ const validStatusMapping = {
     IN_PROGRESS_STATUS,
     REJECTED_STATUS,
     ARCHIVED_STATUS,
+    DECLARATION_UPDATED_STATUS,
     null
   ] as const,
   [WAITING_VALIDATION_STATUS]: [
@@ -77,7 +79,8 @@ const validStatusMapping = {
     DECLARED_STATUS,
     IN_PROGRESS_STATUS,
     REJECTED_STATUS,
-    VALIDATED_STATUS
+    VALIDATED_STATUS,
+    DECLARATION_UPDATED_STATUS
   ] as const,
   [REGISTERED_STATUS]: [
     null,
