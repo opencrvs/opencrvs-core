@@ -1,6 +1,6 @@
 # Step 1. Build the javascript bundle
 
-FROM node:hydrogen-alpine@sha256:c698ffe060d198dcc6647be78ea1683363f12d5d507dc5ec9855f1c55966ffdd
+FROM node:hydrogen-alpine@sha256:6d9d5269cbe4088803e9ef81da62ac481c063b60cadbe8e628bfcbb12296d901
 WORKDIR /app
 
 RUN apk update && apk upgrade
