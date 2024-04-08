@@ -23,7 +23,6 @@ const config: CodegenConfig = {
     './src/utils/gateway.ts': {
       config: {
         scalars: {
-          // eslint-disable-next-line no-template-curly-in-string
           PlainDate: 'PlainDate'
         }
       },
