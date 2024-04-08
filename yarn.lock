@@ -14003,9 +14003,9 @@ graphql-request@^6.0.0:
     cross-fetch "^3.1.5"
 
 graphql-schema-typescript@^1.5.0:
-  version "1.5.2"
-  resolved "https://registry.npmjs.org/graphql-schema-typescript/-/graphql-schema-typescript-1.5.2.tgz"
-  integrity sha512-r09ycu9BLSeRg8VcEB1Jg2kHeBxeDOdz1iyhA/rja3IcZoau3MRie0203piWI8j+N/KIv60OBPquiEgq1snYAQ==
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/graphql-schema-typescript/-/graphql-schema-typescript-1.6.1.tgz#1b4ed217d8d361a868e10a774f9a9694f3bd9040"
+  integrity sha512-g/IQm7wU55yBHu7Y2wOTKL6PnAUBlY4zPHdWmMPkrOdXEKsqvkZTJK/cwYq/quxRgUkvqDGRoixkgmWjnwNfSA==
   dependencies:
     camelcase "^6.2.0"
     yargs "^16.0.0"
