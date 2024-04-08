@@ -319,7 +319,7 @@ chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch and Hearth docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
