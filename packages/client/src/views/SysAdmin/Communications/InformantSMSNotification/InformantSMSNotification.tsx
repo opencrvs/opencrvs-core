@@ -44,7 +44,6 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { Link } from '@opencrvs/components/lib/Link'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;
@@ -202,7 +201,9 @@ const InformantNotification = () => {
                 label={
                   <Label id={`${item.name}_label`}>
                     {intl.formatMessage(
-                      messages[lowerFirst(item.name.slice(5))]
+                      messages[
+                        lowerFirst(item.name.slice(5)) as keyof typeof messages
+                      ]
                     )}
                   </Label>
                 }
