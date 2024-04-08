@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
 
   openhim-console:
-    image: jembi/openhim-console:1.13@sha256:caf4aef23c3702aaf9375b3a00c5d5c3f0854c15c238f2ea98cd57f9fb9f9ab6
+    image: jembi/openhim-console:1.14@sha256:a750ef096ad3ffdd5e8d45d96518c767a207d743c50bbd5da327ed1e009642fb
     restart: unless-stopped
 
   minio:
