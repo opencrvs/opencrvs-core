@@ -101,7 +101,6 @@ async function dispatch(record: NotificationQueueRecord) {
       subject: record.subject,
       body: record.body
     },
-    undefined,
     record.locale
   )
 }

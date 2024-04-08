@@ -11,7 +11,6 @@
 import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 import { internal } from '@hapi/boom'
 import { notifyCountryConfig } from '@notification/features/sms/service'
-import * as Hapi from '@hapi/hapi'
 import { getDefaultLanguage } from '@notification/i18n/utils'
 
 interface IMessageIdentifier {
@@ -47,7 +46,6 @@ export interface IAuthHeader {
 }
 
 export async function sendNotification(
-  request: Hapi.Request,
   templateName: {
     email?: string
     sms?: string
@@ -59,7 +57,6 @@ export async function sendNotification(
   type: 'user' | 'informant',
   variables: Record<string, unknown>
 ) {
-  const token = request.headers.authorization
   const locale = getDefaultLanguage()
   try {
     return await notifyCountryConfig(
@@ -67,7 +64,6 @@ export async function sendNotification(
       recipient,
       type,
       variables,
-      token,
       locale,
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(getDefaultLanguage()) < 0

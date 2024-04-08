@@ -25,7 +25,6 @@ export async function notifyCountryConfig(
   },
   type: 'user' | 'informant',
   variables: Record<string, unknown>,
-  token: string | undefined,
   locale: string,
   convertUnicode?: boolean
 ) {
@@ -45,8 +44,7 @@ export async function notifyCountryConfig(
         convertUnicode
       }),
       headers: {
-        'Content-Type': 'application/json',
-        authorization: token ?? ''
+        'Content-Type': 'application/json'
       }
     })
   } catch (error) {
