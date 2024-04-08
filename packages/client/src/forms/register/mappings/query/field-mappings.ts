@@ -37,7 +37,7 @@ import {
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
-import format from '@client/utils/date-formatting'
+import { formatPlainDate } from '@client/utils/date-formatting'
 import {
   IOfflineData,
   OFFLINE_FACILITIES_KEY,
@@ -805,7 +805,10 @@ export const dateFormatTransformer =
       if (!transformedData[sectionId]) {
         transformedData[sectionId] = {}
       }
-      transformedData[sectionId][field.name] = format(date, dateFormat)
+      transformedData[sectionId][field.name] = formatPlainDate(
+        queryValue,
+        dateFormat
+      )
       window.__localeId__ = prevLocale
     }
   }

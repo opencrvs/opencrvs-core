@@ -18,7 +18,7 @@ import {
 import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import format from '@client/utils/date-formatting'
+import { formatPlainDate } from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
@@ -160,7 +160,7 @@ export const GetDeclarationInfo = ({
             (key === 'dateOfBirth' ||
             key === 'dateOfDeath' ||
             key === 'dateOfMarriage'
-              ? format(new Date(value), 'MMMM dd, yyyy')
+              ? formatPlainDate(value, 'MMMM dd, yyyy')
               : value)
 
           const message =

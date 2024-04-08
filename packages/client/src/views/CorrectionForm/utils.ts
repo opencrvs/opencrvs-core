@@ -57,7 +57,7 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
-import { formatLongDate } from '@client/utils/date-formatting'
+import { formatPlainDate } from '@client/utils/date-formatting'
 import {
   CorrectionInput,
   PaymentOutcomeType,
@@ -67,6 +67,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
 import { camelCase, clone, flattenDeep, get, isArray, isEqual } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
+import isValid from 'date-fns/isValid'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -507,7 +508,22 @@ export const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    const [yyyy, mm, dd] = value.split('-')
+    if (
+      !dd ||
+      !mm ||
+      !yyyy ||
+      dd.length === 0 ||
+      mm.length === 0 ||
+      yyyy.length < 4
+    ) {
+      return ''
+    }
+
+    if (!isValid(new Date(value))) {
+      return ''
+    }
+    return formatPlainDate(value)
   }
 
   if (field.hideValueInPreview) {

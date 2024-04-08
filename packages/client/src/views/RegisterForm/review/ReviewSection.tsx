@@ -107,7 +107,7 @@ import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
-import { formatLongDate } from '@client/utils/date-formatting'
+import { formatPlainDate } from '@client/utils/date-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
@@ -138,6 +138,7 @@ import {
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
+import isValid from 'date-fns/isValid'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -493,7 +494,22 @@ const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    const [yyyy, mm, dd] = value.split('-')
+    if (
+      !dd ||
+      !mm ||
+      !yyyy ||
+      dd.length === 0 ||
+      mm.length === 0 ||
+      yyyy.length < 4
+    ) {
+      return ''
+    }
+
+    if (!isValid(new Date(value))) {
+      return ''
+    }
+    return formatPlainDate(value)
   }
 
   if (field.hideValueInPreview) {

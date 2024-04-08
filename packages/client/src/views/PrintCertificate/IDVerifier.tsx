@@ -24,7 +24,7 @@ import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { formatLongDate } from '@client/utils/date-formatting'
+import { formatPlainDate } from '@client/utils/date-formatting'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { identityNameMapper } from '@client/forms/certificate/fieldDefinitions/messages'
 
@@ -129,10 +129,7 @@ class IDVerifierComponent extends React.Component<
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
             value={
               collectorInformation.birthDate
-                ? formatLongDate(
-                    collectorInformation.birthDate as string,
-                    intl.locale
-                  )
+                ? formatPlainDate(collectorInformation.birthDate)
                 : '-'
             }
           />
