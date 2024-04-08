@@ -36,7 +36,10 @@ import {
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  formattedDuration,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
@@ -246,7 +249,7 @@ class RequiresUpdateComponent extends React.Component<
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
-        new Date(reg.dateOfEvent)
+        plainDateToLocalDate(reg.dateOfEvent)
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
