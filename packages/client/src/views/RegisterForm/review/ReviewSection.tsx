@@ -111,7 +111,10 @@ import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
-import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
@@ -497,7 +500,7 @@ const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return isValidPlainDate(value) ? formatPlainDate(value) : ''
   }
 
   if (field.hideValueInPreview) {
