@@ -14,5 +14,16 @@
     "after 5pm every weekday",
     "before 3am every weekday",
     "every weekend"
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["Security"]
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "updateTypes": ["patch"],
+      "enabled": false
+    }
   ]
 }
