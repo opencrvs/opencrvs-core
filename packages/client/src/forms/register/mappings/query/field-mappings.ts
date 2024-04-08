@@ -37,7 +37,10 @@ import {
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
-import { formatPlainDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import {
   IOfflineData,
   OFFLINE_FACILITIES_KEY,
@@ -797,8 +800,7 @@ export const dateFormatTransformer =
     const queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
 
-    const date = new Date(queryValue)
-    if (!Number.isNaN(date.getTime())) {
+    if (isValidPlainDate(queryValue)) {
       const prevLocale = window.__localeId__
       window.__localeId__ = locale
 
