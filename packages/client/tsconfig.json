@@ -24,7 +24,8 @@
   },
   "include": [
     "src",
-    "typings"
+    "typings",
+    "codegen.ts"
   ],
   "extends": "./tsconfig.paths.json"
 }

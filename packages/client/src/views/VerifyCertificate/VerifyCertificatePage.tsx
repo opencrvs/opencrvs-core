@@ -34,7 +34,7 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Spinner, Stack } from '@opencrvs/components'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { useParams } from 'react-router'
-import formatDate from '@client/utils/date-formatting'
+import formatDate, { formatPlainDate } from '@client/utils/date-formatting'
 import {
   BirthRegistration,
   DeathRegistration,
@@ -229,13 +229,12 @@ export function VerifyCertificatePage() {
   }
 
   const getDateOfBirthOrOfDeceased = (data: RecordDetails) => {
-    if (isBirthRegistration(data) && data.child?.birthDate)
-      return formatDate(new Date(data.child.birthDate), 'dd MMMM yyyy')
-    if (isDeathRegistration(data) && data.deceased?.deceased?.deathDate)
-      return formatDate(
-        new Date(data.deceased.deceased.deathDate),
-        'dd MMMM yyyy'
-      )
+    if (isBirthRegistration(data) && data.child?.birthDate) {
+      return formatPlainDate(data.child.birthDate)
+    }
+    if (isDeathRegistration(data) && data.deceased?.deceased?.deathDate) {
+      return formatPlainDate(data.deceased.deceased.deathDate)
+    }
     return undefined
   }
 
