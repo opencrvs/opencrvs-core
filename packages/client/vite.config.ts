@@ -20,53 +20,75 @@ process.env.VITE_APP_COUNTRY_CONFIG_URL =
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
 
+  const noTreeshakingForEvalPlugin = () => {
+    return {
+      name: 'no-treeshaking-for-eval',
+      // hotfix for #5679
+      transform(code: string) {
+        if (code.match(/eval\( | getConditionalActionsForField/))
+          return { moduleSideEffects: 'no-treeshake' as const }
+      }
+    }
+  }
+
   const htmlPlugin = () => {
     return {
       name: 'html-transform',
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         return html.replace(/%(.*?)%/g, function (_, p1) {
           return env[p1]
         })
       }
     }
   }
-  const vitePWAPlugin = () => {
+
+  const VitePWAPlugin = () => {
     return VitePWA({
-      strategies: 'generateSW',
+      strategies: 'injectManifest',
       injectManifest: {
-        cacheId: 'ocrvs-login',
         globDirectory: 'build/',
-        globIgnores: ['**/config.js'],
         globPatterns: ['**/*.{json,ico,ttf,html,js}'],
+        globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/],
-        swDest: 'build/service-worker.js'
+        swDest: 'build/src-sw.js'
       },
-      registerType: 'autoUpdate',
-      workbox: {
-        runtimeCaching: [
-          {
-            urlPattern: /config\.js/,
-            handler: 'NetworkFirst'
-          }
-        ]
-      },
+      srcDir: 'src/',
+      filename: 'src-sw.ts',
       devOptions: {
-        enabled: false
+        enabled: false,
+        type: 'module',
+        navigateFallback: 'index.html'
       }
     })
   }
+
   return {
-    // This changes the out put dir from dist to build
+    /*
+     * https://github.com/storybookjs/storybook/issues/18920
+     * the issue occurs because of util.js which is a
+     * transitive depedency of storybook. I think it might
+     * be a good idea to separate components and storybook
+     * in that case because possibly storybook is getting
+     * included in components bundle
+     */
+    define: { 'process.env': {} },
+    // This changes the output dir from dist to build
     build: {
       outDir: 'build',
-      sourcemap: true,
+      rollupOptions: {
+        plugins: [noTreeshakingForEvalPlugin()]
+      },
       commonjsOptions: {
         transformMixedEsModules: true
+      },
+      sourcemap: true
+    },
+    resolve: {
+      alias: {
+        crypto: 'crypto-js'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), vitePWAPlugin()],
+    plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
