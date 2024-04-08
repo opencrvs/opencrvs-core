@@ -340,7 +340,7 @@ export type BirthEventSearchSet = EventSearchSet & {
   childGender?: Maybe<Scalars['String']>
   childIdentifier?: Maybe<Scalars['String']>
   childName?: Maybe<Array<Maybe<HumanName>>>
-  dateOfBirth?: Maybe<Scalars['Date']>
+  dateOfBirth?: Maybe<Scalars['PlainDate']>
   fatherDateOfBirth?: Maybe<Scalars['String']>
   fatherIdentifier?: Maybe<Scalars['String']>
   fathersFirstName?: Maybe<Scalars['String']>
@@ -608,7 +608,7 @@ export type Death = {
 
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
-  dateOfDeath?: Maybe<Scalars['Date']>
+  dateOfDeath?: Maybe<Scalars['PlainDate']>
   deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
@@ -781,7 +781,7 @@ export type EventProgressResultSet = {
 
 export type EventProgressSet = {
   __typename?: 'EventProgressSet'
-  dateOfEvent?: Maybe<Scalars['Date']>
+  dateOfEvent?: Maybe<Scalars['PlainDate']>
   id: Scalars['ID']
   name?: Maybe<Array<Maybe<HumanName>>>
   progressReport?: Maybe<EventProgressData>
@@ -1026,7 +1026,7 @@ export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
   brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
-  dateOfMarriage?: Maybe<Scalars['Date']>
+  dateOfMarriage?: Maybe<Scalars['PlainDate']>
   groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
@@ -3022,7 +3022,7 @@ export type SearchEventsQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -3073,7 +3073,7 @@ export type SearchEventsQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -3124,7 +3124,7 @@ export type SearchEventsQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -5744,7 +5744,7 @@ export type GetOidpUserInfoQuery = {
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {
   __typename?: 'BirthEventSearchSet'
-  dateOfBirth?: any | null
+  dateOfBirth?: PlainDate | null
   id: string
   type?: string | null
   childName?: Array<{
@@ -5797,7 +5797,7 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
 
 type EventSearchFields_DeathEventSearchSet_Fragment = {
   __typename?: 'DeathEventSearchSet'
-  dateOfDeath?: any | null
+  dateOfDeath?: PlainDate | null
   id: string
   type?: string | null
   deceasedName?: Array<{
@@ -5850,7 +5850,7 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
 
 type EventSearchFields_MarriageEventSearchSet_Fragment = {
   __typename?: 'MarriageEventSearchSet'
-  dateOfMarriage?: any | null
+  dateOfMarriage?: PlainDate | null
   id: string
   type?: string | null
   brideName?: Array<{
@@ -5937,7 +5937,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -5989,7 +5989,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6041,7 +6041,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6107,7 +6107,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -6159,7 +6159,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6211,7 +6211,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6277,7 +6277,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -6329,7 +6329,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6381,7 +6381,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6447,7 +6447,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -6499,7 +6499,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6551,7 +6551,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6617,7 +6617,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -6669,7 +6669,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6721,7 +6721,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6787,7 +6787,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -6839,7 +6839,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -6891,7 +6891,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -6957,7 +6957,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -7009,7 +7009,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -7061,7 +7061,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -7127,7 +7127,7 @@ export type RegistrationHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -7179,7 +7179,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -7231,7 +7231,7 @@ export type RegistrationHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -7309,7 +7309,7 @@ export type FieldAgentHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -7361,7 +7361,7 @@ export type FieldAgentHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -7413,7 +7413,7 @@ export type FieldAgentHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -7479,7 +7479,7 @@ export type FieldAgentHomeQuery = {
     results?: Array<
       | {
           __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: any | null
+          dateOfBirth?: PlainDate | null
           id: string
           type?: string | null
           childName?: Array<{
@@ -7531,7 +7531,7 @@ export type FieldAgentHomeQuery = {
         }
       | {
           __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: any | null
+          dateOfDeath?: PlainDate | null
           id: string
           type?: string | null
           deceasedName?: Array<{
@@ -7583,7 +7583,7 @@ export type FieldAgentHomeQuery = {
         }
       | {
           __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: any | null
+          dateOfMarriage?: PlainDate | null
           id: string
           type?: string | null
           brideName?: Array<{
@@ -8271,7 +8271,7 @@ export type GetEventsWithProgressQuery = {
       __typename?: 'EventProgressSet'
       id: string
       type?: string | null
-      dateOfEvent?: any | null
+      dateOfEvent?: PlainDate | null
       startedByFacility?: string | null
       startedAt?: any | null
       name?: Array<{

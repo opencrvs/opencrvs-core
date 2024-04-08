@@ -1198,7 +1198,7 @@ type EventProgressSet {
   id: ID!
   type: String
   name: [HumanName]
-  dateOfEvent: Date
+  dateOfEvent: PlainDate
   registration: RegistrationSearchSet
   startedBy: User
   startedByFacility: String
@@ -1761,7 +1761,7 @@ type BirthEventSearchSet implements EventSearchSet {
   type: String
   childName: [HumanName]
   childIdentifier: String
-  dateOfBirth: Date
+  dateOfBirth: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
   placeOfBirth: String
@@ -1781,7 +1781,7 @@ type DeathEventSearchSet implements EventSearchSet {
   type: String
   deceasedGender: String
   deceasedName: [HumanName]
-  dateOfDeath: Date
+  dateOfDeath: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }
@@ -1793,7 +1793,7 @@ type MarriageEventSearchSet implements EventSearchSet {
   groomName: [HumanName]
   brideIdentifier: String
   groomIdentifier: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }

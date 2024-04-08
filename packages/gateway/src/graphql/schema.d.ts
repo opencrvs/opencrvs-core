@@ -1089,7 +1089,7 @@ export interface GQLEventProgressSet {
   id: string
   type?: string
   name?: Array<GQLHumanName | null>
-  dateOfEvent?: GQLDate
+  dateOfEvent?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   startedBy?: GQLUser
   startedByFacility?: string
@@ -1653,7 +1653,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   type?: string
   childName?: Array<GQLHumanName | null>
   childIdentifier?: string
-  dateOfBirth?: GQLDate
+  dateOfBirth?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
   placeOfBirth?: string
@@ -1673,7 +1673,7 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   type?: string
   deceasedGender?: string
   deceasedName?: Array<GQLHumanName | null>
-  dateOfDeath?: GQLDate
+  dateOfDeath?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
@@ -1685,7 +1685,7 @@ export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
   groomName?: Array<GQLHumanName | null>
   brideIdentifier?: string
   groomIdentifier?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
