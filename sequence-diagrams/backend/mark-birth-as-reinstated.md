@@ -59,21 +59,5 @@ sequenceDiagram
     Search->>ElasticSearch: Index composition
 
     Workflow--)Metrics: POST bundle /events/{event}/reinstated
-
     Metrics->>Influx DB: Write audit point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate certification point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate payment point
-
-    Metrics->>Hearth: Get previous task of Task History
-    Note over Metrics,Hearth: Generate event duration point
-
-    Metrics->>Influx DB: Write points
 ```
