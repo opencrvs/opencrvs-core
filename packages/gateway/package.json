@@ -51,6 +51,7 @@
     "hapi-auth-jwt2": "10.4.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^9.0.0",
+    "hapi-sentry": "^3.1.0",
     "hapi-swagger": "^14.5.5",
     "io-ts": "^2.2.18",
     "joi": "^17.3.0",
