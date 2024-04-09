@@ -57,7 +57,8 @@ import {
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
   DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_MARRIAGE_FORM
+  DRAFT_MARRIAGE_FORM,
+  ALL_USER_EMAIL
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -168,6 +169,10 @@ export function goToUserRolesConfig() {
 
 export function goToInformantNotification() {
   return push(INFORMANT_NOTIFICATION)
+}
+
+export function goToAllUserEmail() {
+  return push(ALL_USER_EMAIL)
 }
 
 export function goToVSExport() {

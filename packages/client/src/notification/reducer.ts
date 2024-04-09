@@ -33,6 +33,13 @@ type userCreateDuplicateEmailFailedToastState = {
   email: string | null
 }
 
+type EmailAllUsers =
+  | { visible: false }
+  | {
+      type: 'success' | 'error'
+      visible: true
+    }
+
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
   configurationError: string | null
@@ -53,6 +60,7 @@ export type NotificationState = {
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
   userCreateDuplicateEmailFailedToast: userCreateDuplicateEmailFailedToastState
   userReconnectedToast: boolean
+  emailAllUsers: EmailAllUsers
 }
 
 const initialState: NotificationState = {
@@ -80,7 +88,8 @@ const initialState: NotificationState = {
     email: null
   },
   userReconnectedToast: false,
-  unassignedDeclarations: []
+  unassignedDeclarations: [],
+  emailAllUsers: { visible: false }
 }
 
 export const notificationReducer: LoopReducer<
@@ -254,6 +263,14 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         userReconnectedToast: false
+      }
+    case actions.TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST:
+      return {
+        ...state,
+        emailAllUsers: {
+          ...state.emailAllUsers,
+          ...action.payload
+        }
       }
     default:
       return state
