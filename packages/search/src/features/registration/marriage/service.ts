@@ -122,6 +122,7 @@ async function createIndexBody(
   await createGroomIndex(body, composition, bundle)
   createWitnessOneIndex(body, composition, bundle)
   createWitnessTwoIndex(body, composition, bundle)
+  await addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
   await createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   await createStatusHistory(body, task, authHeader, bundle)
@@ -268,8 +269,6 @@ async function createDeclarationIndex(
   composition: fhir.Composition,
   bundle: SavedBundle
 ) {
-  await addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
-
   const task = getTaskFromSavedBundle(bundle)
   const contactPersonExtention = findTaskExtension(
     task,

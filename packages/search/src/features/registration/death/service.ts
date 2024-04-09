@@ -110,6 +110,7 @@ async function createIndexBody(
   bundle: SavedBundle
 ) {
   await createDeceasedIndex(body, composition, bundle)
+  await addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
   createFatherIndex(body, composition, bundle)
   createMotherIndex(body, composition, bundle)
   createSpouseIndex(body, composition, bundle)
@@ -129,8 +130,6 @@ async function createDeceasedIndex(
   if (!deceased) {
     return
   }
-
-  await addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
 
   const deceasedName = findName(NAME_EN, deceased.name)
   const deceasedNameLocal = findNameLocale(deceased.name)
