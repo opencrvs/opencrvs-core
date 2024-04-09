@@ -83,7 +83,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
+if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu, WSL or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
 then
     echo "Exiting OpenCRVS setup."
     exit 0
@@ -113,6 +113,7 @@ sleep_if_non_ci 5
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 
+wslKernelWithUbuntu=false
 if  [ -n "$(uname -r | grep microsoft-standard-WSL2)" ] && [ -n "$(cat /etc/os-release | grep Ubuntu)" ]; then
   wslKernelWithUbuntu=true
   echo -e "\033[32m:::::::::::::::: You are running Windows Subsystem for Linux .  Checking distro ::::::::::::::::\033[0m"
