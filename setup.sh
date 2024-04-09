@@ -372,7 +372,7 @@ tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
-tmux split-window -h -p 30
+tmux split-window -h -l '30%'
 tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
