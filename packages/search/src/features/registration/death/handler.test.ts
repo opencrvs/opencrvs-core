@@ -20,8 +20,7 @@ import {
   mockLocationResponse,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
-  mockUserModelResponse,
-  mockEncounterResponse
+  mockUserModelResponse
 } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
@@ -90,11 +89,6 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
         [
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
@@ -133,11 +127,6 @@ describe('Verify handlers', () => {
       )
 
       fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
         [
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
@@ -176,11 +165,6 @@ describe('Verify handlers', () => {
       })
 
       fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
         [
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
