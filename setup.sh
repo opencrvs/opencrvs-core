@@ -175,7 +175,7 @@ do
    :
     if which $i >/dev/null; then
 
-        echo -e "$i \033[32minstalled!\033[0m :)"
+        echo -e "✅ $i \033[32minstalled!\033[0m :)"
 
         sleep_if_non_ci 1
     else
@@ -239,6 +239,41 @@ do
     fi
 done
 
+###
+#
+# Check Node.js version
+#
+###
+
+echo
+echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
+echo
+
+versionCheckOutput=$(npx --yes check-node-version --package --print 2>&1 || true)
+currentVersion=$(echo "$versionCheckOutput" | grep 'node:' | awk '{print $2}')
+
+if echo "$versionCheckOutput" | grep -q 'Wanted node version'; then
+  wantedVersion=$(echo "$versionCheckOutput" | grep 'Wanted node version' | cut -d ' ' -f 4-)
+  pattern=$(node -e "console.log(require('./package.json').engines.node)")
+  latestVersion=$(curl -s https://nodejs.org/dist/index.json | npx -y node-jq -r "[.[] | select(.version | test(\"^v${pattern//x/.}$\"))][0].version")
+
+  echo "❌ Sorry, your Node version is not supported. Your node version is $currentVersion."
+  echo "We recommend you install Node version $latestVersion as this release has been tested on that version."
+  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
+  echo "Then use nvm to install the Node version of choice. For example run:"
+  echo "nvm install $latestVersion"
+  exit 1
+else
+  echo -e "Your Node version: $currentVersion is \033[32msupported!\033[0m :)"
+fi
+
+
+###
+#
+# Stop docker containers
+#
+###
+
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
@@ -252,33 +287,16 @@ openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 303
 for x in "${openCRVSPorts[@]}"
 do
    :
-    if lsof -i:$x; then
-      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
+    if lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x >/dev/null; then
+      echo -e "❌ OpenCRVS thinks that port: $x is in use by another application.\r"
       echo "You need to find out which application is using this port and quit the application."
       echo "You can find out the application by running:"
-      echo "lsof -i:$x"
+      echo "lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x"
       exit 1
     else
-        echo -e "$x \033[32m port is available!\033[0m :)"
+        echo -e "✅ $x \033[32m port is available!\033[0m :)"
     fi
 done
-
-echo
-echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
-echo
-
-myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-if [[ $myNodeVersion != 18.* ]]; then
-  echo "Sorry your Node version is not supported.  Your node version is $myNodeVersion."
-  echo "We recommend you install Node v18.19.0 as this release has been tested on that version."
-  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
-  echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-  echo "nvm install 18.19.0"
-  exit 1
-  else
-    echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
-    echo
-fi
 
 echo
 echo -e "\033[32m:::::::::::::::::::::: Initialising Docker ::::::::::::::::::::::\033[0m"
