@@ -1,4 +1,4 @@
-# Create birth registration (registrar)
+# Create birth registration (registration-agent)
 
 ```mermaid
 ---
@@ -71,33 +71,13 @@ sequenceDiagram
     Workflow->>Hearth: Save bundle
     Note over Workflow,Hearth: Get hearth response for all entries
 
-    Note over Workflow,Hearth: To external waiting validation state
+    Note over Workflow,Hearth: To VALIDATED state
 
     Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
 
-    Workflow--)Metrics: POST bundle to /events/{event}/waiting-external-validation
-
-    Workflow--)Country-Config: POST record to /event-registration
-    Country-Config->>Workflow: POST /confirm/registration
-    Workflow->>Search: Get record by id
-
-    Workflow->>User management: Fetch user/system information
-    Workflow->>Hearth: Get practitioner resource
-
-    loop PractitionerRole Locations
-      Workflow->>Hearth: Get location by user's practitionerId
-    end
-    Note over Workflow,Hearth: Update bundle with practitioner details
-
-    Workflow->>Hearth: Save bundle
-    Note over Workflow,Hearth: Get hearth response for all entries
-
-    Note over Workflow,Hearth: To registered state
-
-    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
+    Workflow--)Metrics: POST bundle to /events/{event}/sent-for-approval
 
     Workflow--)Search: Index bundle
-    Workflow--)Metrics: POST bundle to /events/{event}/registered
 
     Workflow--)Config: Check if notification is enabled
     Workflow--)Notifications: Send notification if enabled
@@ -108,9 +88,6 @@ sequenceDiagram
     Note over Config,Notifications: Get APPLICATION NAME, Notification Delivery Methods
 
     Note over Country-Config: Send notifications
-
-    Workflow--)Webhook: POST to /events/birth/mark-registered
-    Webhook->>User management: Get System Permissions
 
     Workflow--)GraphQL gateway: Return compositionId, trackingId and duplicate status
 ```
