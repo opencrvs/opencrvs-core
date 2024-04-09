@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-var stylelint = require('stylelint')
+var stylelint = import('stylelint')
 
 var ruleName = 'opencrvs/no-font-styles'
 var messages = stylelint.utils.ruleMessages(ruleName, {
