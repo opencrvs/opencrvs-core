@@ -10,15 +10,20 @@
  */
 import {
   CompositionSectionCode,
+  Encounter,
   Extension,
   findCompositionSection,
+  findResourceFromBundleById,
+  getComposition,
   getFromBundleById,
   KnownExtensionType,
+  Location,
   OpenCRVSPatientName,
   Resource,
   resourceIdentifierToUUID,
   SavedBundle,
   SavedComposition,
+  SavedLocation,
   SavedTask
 } from '@opencrvs/commons/types'
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, FHIR_URL } from '@search/constants'
@@ -91,21 +96,32 @@ export function findEntry<T extends Resource = Resource>(
 }
 
 export async function addEventLocation(
+  bundle: SavedBundle,
   body: IBirthCompositionBody | IDeathCompositionBody,
-  code: CompositionSectionCode,
-  composition: SavedComposition
+  code: Extract<
+    CompositionSectionCode,
+    'birth-encounter' | 'death-encounter' | 'marriage-encounter'
+  >
 ) {
-  let data
-  let location: fhir.Location | undefined
+  const composition = getComposition(bundle)
+  let location: SavedLocation | undefined
 
   const encounterSection = findCompositionSection(code, composition)
   if (encounterSection && encounterSection.entry) {
-    data = await getFromFhir(
-      `/Encounter/${encounterSection.entry[0].reference}`
+    const encounter = findResourceFromBundleById<Encounter>(
+      bundle,
+      resourceIdentifierToUUID(encounterSection.entry[0].reference)
     )
 
-    if (data && data.location && data.location[0].location) {
-      location = await getFromFhir(`/${data.location[0].location.reference}`)
+    if (encounter && encounter.location) {
+      const locationResource = findResourceFromBundleById<Location>(
+        bundle,
+        resourceIdentifierToUUID(encounter.location[0].location.reference)
+      )
+
+      if (locationResource !== null) {
+        location = locationResource
+      }
     }
   }
 
