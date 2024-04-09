@@ -150,6 +150,10 @@ if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
         echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     fi
   fi
+elif [ "$(uname)" == "Darwin" ]; then
+  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
+  echo
+  OS="MAC"
 else
   echo "Sorry your operating system is not supported."
   echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
