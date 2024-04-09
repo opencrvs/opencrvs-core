@@ -296,7 +296,7 @@ export const getRoutes = () => {
     // Event assigned / unassigned
     {
       method: 'POST',
-      path: '/events/assigned',
+      path: '/events/{event}/assigned',
       handler: declarationAssignedHandler,
       options: {
         tags: ['api']
@@ -304,7 +304,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/downloaded',
+      path: '/events/{event}/downloaded',
       handler: declarationDownloadedHandler,
       options: {
         tags: ['api']
@@ -346,7 +346,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/unassigned',
+      path: '/events/{event}/unassigned',
       handler: declarationUnassignedHandler,
       options: {
         tags: ['api']

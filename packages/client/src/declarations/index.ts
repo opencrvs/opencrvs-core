@@ -539,7 +539,7 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: status !== 'IN_PROGRESS' ? formData : {},
+    originalData: formData,
     localData: formData,
     review: true,
     event,
@@ -730,13 +730,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        // original data stays empty for in progress declaration
-        const history = (
-          d.originalData && Object.keys(d.originalData).length === 0
-            ? d.localData
-            : d.originalData
-        )?.history as IDynamicValues
-
+        const history = d.originalData?.history as unknown as IDynamicValues
         const downloadedTime = (
           history.filter((h: IDynamicValues) => {
             return h.action === DOWNLOAD_STATUS.DOWNLOADED
