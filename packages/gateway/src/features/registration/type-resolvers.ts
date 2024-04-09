@@ -171,7 +171,7 @@ export const typeResolvers: GQLResolver = {
   },
   HumanName: {
     firstNames(name: fhir3.HumanName) {
-      return name.given?.at(0) ?? ''
+      return Array.isArray(name.given) ? name.given.join(' ') : name.given
     },
     middleName(name: fhir3.HumanName) {
       return name.given?.at(1) ?? ''
