@@ -9,17 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { AppBar } from './AppBar'
 import { Button } from '../Button'
-import {
-  Hamburger,
-  DeclarationIcon,
-  SearchBlue,
-  Phone,
-  BRN,
-  TrackingID
-} from '../icons'
+import { Hamburger, DeclarationIcon } from '../icons'
 import { Stack } from '../Stack'
 import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
@@ -35,15 +28,15 @@ export default {
     mobileLeft: { control: 'null' },
     mobileRight: { control: 'null' }
   }
-} as ComponentMeta<typeof AppBar>
+} satisfies ComponentMeta<typeof AppBar>
 
-const Template: ComponentStory<typeof AppBar> = (args) => (
+const Template: StoryFn<typeof AppBar> = (args) => (
   <div style={{ minHeight: '150px' }}>
     <AppBar {...args} />
   </div>
 )
 
-export const Default = Template.bind({}) as ComponentStory<typeof AppBar>
+export const Default: StoryFn<typeof AppBar> = Template.bind({})
 Default.args = {
   desktopTitle: 'OpenCRVS',
   mobileTitle: 'OpenCRVS',
@@ -76,7 +69,7 @@ Default.parameters = {
   layout: 'fullscreen'
 }
 
-export const Home = Template.bind({}) as ComponentStory<typeof AppBar>
+export const Home: StoryFn<typeof AppBar> = Template.bind({})
 Home.args = {
   mobileLeft: (
     <Button type="icon" aria-label="Go back">
@@ -133,7 +126,7 @@ Home.parameters = {
   layout: 'fullscreen'
 }
 
-export const Declaration = Template.bind({}) as ComponentStory<typeof AppBar>
+export const Declaration: StoryFn<typeof AppBar> = Template.bind({})
 
 Declaration.args = {
   mobileLeft: <DeclarationIcon />,

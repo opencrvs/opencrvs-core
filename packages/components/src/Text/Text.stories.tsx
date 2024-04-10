@@ -20,7 +20,7 @@ import styled from 'styled-components'
 export default {
   title: 'Typography/Text',
   component: Text
-} as ComponentMeta<typeof Text>
+} satisfies ComponentMeta<typeof Text>
 
 const Template: ComponentStory<typeof Text> = (args) => (
   <Text {...args}>Welcome to OpenCRVS</Text>

@@ -15,7 +15,7 @@ import { CheckboxGroup } from './CheckboxGroup'
 export default {
   title: 'Input/Checkbox',
   component: CheckboxGroup
-} as ComponentMeta<typeof CheckboxGroup>
+} satisfies ComponentMeta<typeof CheckboxGroup>
 
 export const Group: ComponentStory<typeof CheckboxGroup> = (args) => {
   const [selectedItems, setSelectedItems] = useState(['bananas'])

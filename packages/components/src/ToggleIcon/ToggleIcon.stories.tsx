@@ -24,7 +24,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof ToggleIcon>
+} satisfies ComponentMeta<typeof ToggleIcon>
 
 const Template: ComponentStory<typeof ToggleIcon> = () => {
   const [selected, setSelected] = React.useState(false)

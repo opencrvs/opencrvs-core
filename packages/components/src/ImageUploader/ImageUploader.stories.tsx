@@ -15,7 +15,7 @@ import { ImageUploader } from './ImageUploader'
 export default {
   title: 'Input/File upload',
   component: ImageUploader
-} as ComponentMeta<typeof ImageUploader>
+} satisfies ComponentMeta<typeof ImageUploader>
 
 const Template: ComponentStory<typeof ImageUploader> = (args) => (
   <ImageUploader {...args} />

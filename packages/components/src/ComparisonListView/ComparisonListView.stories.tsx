@@ -16,7 +16,7 @@ import { Text } from '../Text'
 export default {
   title: 'Data/Comparison List',
   component: ComparisonListView
-} as ComponentMeta<typeof ComparisonListView>
+} satisfies ComponentMeta<typeof ComparisonListView>
 
 const Template: Story<IComparisonListProps> = (args) => {
   return (

@@ -23,7 +23,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof Checkbox>
+} satisfies ComponentMeta<typeof Checkbox>
 
 export const Default: ComponentStory<typeof Checkbox> = (args) => {
   const [isChecked, setChecked] = useState(false)

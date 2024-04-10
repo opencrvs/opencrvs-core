@@ -18,7 +18,7 @@ import { orderBy } from 'lodash'
 export default {
   title: 'Data/Table',
   component: Table
-} as ComponentMeta<typeof Table>
+} satisfies ComponentMeta<typeof Table>
 
 export const OneColumnOneRow = () => (
   <Table

@@ -15,7 +15,7 @@ import { FileSelectLink } from './FileSelectLink'
 export default {
   title: 'Input/File Select Link',
   component: FileSelectLink
-} as ComponentMeta<typeof FileSelectLink>
+} satisfies ComponentMeta<typeof FileSelectLink>
 
 const Template: ComponentStory<typeof FileSelectLink> = (args) => (
   <FileSelectLink {...args} />

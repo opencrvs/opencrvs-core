@@ -16,7 +16,7 @@ import { Pill } from '../Pill'
 export default {
   title: 'Layout/Stack',
   component: Stack
-} as ComponentMeta<typeof Stack>
+} satisfies ComponentMeta<typeof Stack>
 
 const Template: ComponentStory<typeof Stack> = (args) => (
   <Stack {...args}>

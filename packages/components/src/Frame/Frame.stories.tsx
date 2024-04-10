@@ -30,7 +30,7 @@ Frame defines a grid and minimal styling.
       }
     }
   }
-} as ComponentMeta<typeof Frame>
+} satisfies ComponentMeta<typeof Frame>
 
 export const PageTemplateContentLarge = () => (
   <Frame

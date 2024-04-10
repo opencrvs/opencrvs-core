@@ -15,7 +15,7 @@ import { TimeField } from './TimeField'
 export default {
   title: 'Input/Time input',
   component: TimeField
-} as ComponentMeta<typeof TimeField>
+} satisfies ComponentMeta<typeof TimeField>
 
 const Template: ComponentStory<typeof TimeField> = (args) => (
   <TimeField {...args} />

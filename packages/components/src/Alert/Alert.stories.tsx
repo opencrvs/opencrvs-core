@@ -20,7 +20,7 @@ const Template: ComponentStory<typeof Alert> = (args) => {
 export default {
   title: 'Data/Alert',
   component: Alert
-} as ComponentMeta<typeof Alert>
+} satisfies ComponentMeta<typeof Alert>
 
 export const Success = Template.bind({})
 Success.args = {

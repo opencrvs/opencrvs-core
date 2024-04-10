@@ -15,7 +15,7 @@ import { DateField } from './DateField'
 export default {
   title: 'Input/Date input',
   component: DateField
-} as ComponentMeta<typeof DateField>
+} satisfies ComponentMeta<typeof DateField>
 
 const Template: ComponentStory<typeof DateField> = (args) => (
   <DateField {...args} />

@@ -24,7 +24,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof Summary>
+} satisfies ComponentMeta<typeof Summary>
 
 export const Row: ComponentStory<typeof Summary.Row> = (args) => (
   <Summary.Row {...args} />

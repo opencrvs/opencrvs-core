@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ComponentMeta, Story } from '@storybook/react'
+import { Meta, Story } from '@storybook/react'
 import { Accordion, IAccordionProps } from './Accordion'
 import React from 'react'
 
@@ -22,7 +22,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof Accordion>
+} satisfies Meta<typeof Accordion>
 
 const Template: Story<IAccordionProps> = (args) => (
   <Accordion {...args}>This is the content of the accordion.</Accordion>

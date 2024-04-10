@@ -19,7 +19,7 @@ import { Button } from '../Button'
 export default {
   title: 'Data/Workqueue',
   component: Workqueue
-} as ComponentMeta<typeof Workqueue>
+} satisfies ComponentMeta<typeof Workqueue>
 
 const onReviewClick = () => {
   alert('Review clicked')

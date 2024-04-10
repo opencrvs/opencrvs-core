@@ -29,7 +29,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof Icon>
+} satisfies ComponentMeta<typeof Icon>
 
 export const Default = Template.bind({})
 Default.args = {

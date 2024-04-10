@@ -23,7 +23,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof VerificationButton>
+} satisfies ComponentMeta<typeof VerificationButton>
 
 const Template: ComponentStory<typeof VerificationButton> = (args) => {
   return <VerificationButton {...args} />

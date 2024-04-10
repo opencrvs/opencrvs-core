@@ -24,7 +24,7 @@ export default {
       }
     }
   }
-} as ComponentMeta<typeof Toggle>
+} satisfies ComponentMeta<typeof Toggle>
 
 const Template: ComponentStory<typeof Toggle> = () => {
   const [selected, setSelected] = React.useState(true)
