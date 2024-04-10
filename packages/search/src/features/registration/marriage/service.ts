@@ -122,6 +122,7 @@ async function createIndexBody(
   await createGroomIndex(body, composition, bundle)
   createWitnessOneIndex(body, composition, bundle)
   createWitnessTwoIndex(body, composition, bundle)
+  await addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
   await createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   await createStatusHistory(body, task, authHeader, bundle)
@@ -133,8 +134,6 @@ async function createBrideIndex(
   bundle: SavedBundle
 ) {
   const bride = findEntry<Patient>(BRIDE_CODE, composition, bundle)
-
-  await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
@@ -166,8 +165,6 @@ async function createGroomIndex(
   bundle: SavedBundle
 ) {
   const groom = findEntry<Patient>(GROOM_CODE, composition, bundle)
-
-  await addEventLocation(body, MARRIAGE_ENCOUNTER_CODE, composition)
 
   const marriageExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
@@ -270,9 +267,9 @@ function createWitnessTwoIndex(
 async function createDeclarationIndex(
   body: IMarriageCompositionBody,
   composition: fhir.Composition,
-  bundleEntries: SavedBundle
+  bundle: SavedBundle
 ) {
-  const task = getTaskFromSavedBundle(bundleEntries)
+  const task = getTaskFromSavedBundle(bundle)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'

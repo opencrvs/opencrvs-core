@@ -57,7 +57,10 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
-import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import {
   CorrectionInput,
   PaymentOutcomeType,
@@ -507,7 +510,7 @@ export const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return isValidPlainDate(value) ? formatPlainDate(value) : ''
   }
 
   if (field.hideValueInPreview) {

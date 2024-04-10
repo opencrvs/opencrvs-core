@@ -66,7 +66,6 @@ export async function sendCorrectionRejectedNotification(
   const firstNames = nameObject?.given[0] || ''
 
   await sendNotification(
-    request,
     {
       sms: templateNames.CORRECTION_REJECTED['sms'],
       email: templateNames.CORRECTION_REJECTED['email']
@@ -95,7 +94,6 @@ export async function sendCorrectionApprovedNotification(
   const firstNames = nameObject?.given[0] || ''
 
   await sendNotification(
-    request,
     {
       sms: templateNames.CORRECTION_APPROVED['sms'],
       email: templateNames.CORRECTION_APPROVED['email']
