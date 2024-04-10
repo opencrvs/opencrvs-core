@@ -7528,10 +7528,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/pdfmake@^0.1.21":
-  version "0.1.21"
-  resolved "https://registry.npmjs.org/@types/pdfmake/-/pdfmake-0.1.21.tgz"
-  integrity sha512-rDmJr/jzUZSg/AzWYAMVBS4z4weZKTOtrD6Jlt+hzZu87bkIe7WVA02+m+uGGopyTUazFoWYT6HXxwT68Nqfeg==
+"@types/pdfmake@^0.2.0":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@types/pdfmake/-/pdfmake-0.2.9.tgz#241a4a1d00f2d5426383cd5410991c5587ce57f7"
+  integrity sha512-uLDKEH3A1fnCd/qXYJB2OnKkkjfdC1oc6HYVYBKxsyN1UsJL/8Lt67T6WFo3umkL+5Zd74M2IYcOf5kwwd9x9w==
   dependencies:
     "@types/node" "*"
     "@types/pdfkit" "*"
