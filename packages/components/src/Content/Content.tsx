@@ -157,7 +157,7 @@ export enum ContentSize {
   NORMAL = 'normal'
 }
 
-interface IProps {
+export interface ContentProps {
   id?: string
   icon?: () => React.ReactNode
   backButtonLabel?: string
@@ -192,7 +192,7 @@ export const UnstyledContent = ({
   bottomActionButtons,
   size,
   className
-}: IProps) => (
+}: ContentProps) => (
   <Container size={size as string} className={className}>
     <Header>
       {backButtonLabel && (

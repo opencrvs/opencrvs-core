@@ -58,7 +58,7 @@ const NavigationContainer = styled.div`
   animation: 300ms ease-out 0s 1 slideInFromLeft;
 `
 
-interface IProps {
+export interface ExpandingMenuProps {
   showMenu: boolean
   menuCollapse: () => void
   navigation?: () => React.ReactNode
@@ -68,7 +68,7 @@ export const ExpandingMenu = ({
   showMenu,
   menuCollapse,
   navigation
-}: IProps) => {
+}: ExpandingMenuProps) => {
   if (!showMenu) {
     return null
   }

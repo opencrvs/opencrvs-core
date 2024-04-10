@@ -103,7 +103,7 @@ const Input = styled.input<{ buttonSize?: string; disabled?: boolean }>`
 
 type Value = string | number | boolean
 
-interface IRadioButton {
+export interface IRadioButton {
   id: string
   name: string
   label: string

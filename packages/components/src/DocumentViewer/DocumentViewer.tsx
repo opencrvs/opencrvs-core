@@ -54,13 +54,17 @@ export interface IDocumentViewerOptions {
   documentOptions: SelectComponentOptions[]
 }
 
-interface IProps {
+export interface DocumentViewerProps {
   id?: string
   options: IDocumentViewerOptions
   children?: React.ReactNode
 }
 
-export const DocumentViewer = ({ id, options, children }: IProps) => {
+export const DocumentViewer = ({
+  id,
+  options,
+  children
+}: DocumentViewerProps) => {
   const [selectedOption, setSelectedOption] = useState(
     options.selectOptions[0]?.value || ''
   )

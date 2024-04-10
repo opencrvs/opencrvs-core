@@ -10,13 +10,13 @@
  */
 import * as React from 'react'
 
-interface IProps {
+export interface CurrencyProps {
   value: number
   currency: string
   languagesAndCountry: string
 }
 
-export const Currency = (props: IProps) => {
+export const Currency = (props: CurrencyProps) => {
   const numberWithCurrencySymbol = new Intl.NumberFormat(
     `${props.languagesAndCountry}-u-nu-mathsans`,
     {

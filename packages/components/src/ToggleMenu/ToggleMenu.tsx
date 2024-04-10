@@ -77,7 +77,7 @@ export interface IToggleMenuItem {
   handler: () => void
 }
 
-interface IProps {
+export interface ToggleMenuProps {
   id: string
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
@@ -91,7 +91,7 @@ export const ToggleMenu = ({
   toggleButton,
   menuItems,
   hide
-}: IProps) => {
+}: ToggleMenuProps) => {
   const [showSubmenu, setShowSubmenu] = useState(false)
 
   const closeMenuRef = useRef(() => {

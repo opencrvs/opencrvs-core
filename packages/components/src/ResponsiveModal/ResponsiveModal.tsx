@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
@@ -151,7 +151,7 @@ const Action = styled.div`
     width: 100%;
   }
 `
-interface IProps {
+export interface ResponsiveModalProps {
   id?: string
   title: string
   show: boolean
@@ -185,14 +185,14 @@ export const ResponsiveModal = ({
   preventClickOnParent,
   showHeaderBorder,
   children
-}: IProps) => {
-  const toggleScroll = () => {
+}: ResponsiveModalProps) => {
+  const toggleScroll = useCallback(() => {
     const body = document.querySelector('body') as HTMLBodyElement
     if (show) {
       return (body.style.overflow = 'hidden')
     }
     return body.style.removeProperty('overflow')
-  }
+  }, [show])
 
   useEffect(() => {
     toggleScroll()
@@ -201,7 +201,7 @@ export const ResponsiveModal = ({
       const body = document.querySelector('body') as HTMLBodyElement
       body.style.removeProperty('overflow')
     }
-  }, [show])
+  }, [toggleScroll, show])
 
   if (!show) {
     return null

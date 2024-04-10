@@ -33,7 +33,7 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bold14};
 `
 
-interface IProps {
+export interface LineChartProps {
   data: ILineDataPoint[]
   dataKeys: string[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,7 +51,7 @@ interface IProps {
   legendLayout: Recharts.LegendProps['layout']
 }
 
-interface ILineDataPoint {
+export interface ILineDataPoint {
   label: React.ReactNode
   registeredInTargetDays: number
   totalRegistered: number
@@ -98,7 +98,7 @@ interface IAxisTickProps {
   }
 }
 
-interface IThemedAxisTickProps extends IAxisTickProps {
+export interface IThemedAxisTickProps extends IAxisTickProps {
   theme: ITheme
 }
 
@@ -127,7 +127,7 @@ function CustomizedAxisTick(props: IThemedAxisTickProps) {
   )
 }
 
-class LineChartComponent extends React.Component<IProps> {
+class LineChartComponent extends React.Component<LineChartProps> {
   render() {
     const {
       data,
