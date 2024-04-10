@@ -197,13 +197,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
-  markBirthAsRegistered(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): BirthRegistration!
+  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsVoided(id: String!, reason: String!, comment: String!): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
@@ -219,19 +216,13 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
-  markDeathAsRegistered(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration!
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   markEventAsUnassigned(id: String!): ID!
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
-  markMarriageAsRegistered(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): MarriageRegistration!
+  markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
   markEventAsDuplicate(
@@ -1227,7 +1218,6 @@ enum SystemType {
 
 enum IntegratingSystemType {
   MOSIP
-  OSIA
   OTHER
 }
 
@@ -1364,6 +1354,7 @@ input RegistrationInput {
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
+  changedValues: [CorrectionValueInput!]
 }
 
 input RelatedPersonInput {
@@ -2018,7 +2009,6 @@ input CommentInput {
 input PaymentInput {
   paymentId: ID
   type: PaymentType
-  total: Float
   amount: Float
   outcome: PaymentOutcomeType
   date: Date

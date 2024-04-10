@@ -25,10 +25,14 @@ import {
   Task,
   getBusinessStatus,
   getComposition,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   isCorrectionRequestedTask,
   isTask,
-  sortTasksDescending
+  sortTasksDescending,
+  SavedBundle,
+  TrackingID,
+  getStatusFromTask,
+  QuestionnaireResponse
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -56,14 +60,11 @@ export function getEventLabelFromBundle(bundle: Bundle) {
 }
 
 type RecordBase = Bundle
-export type WaitingForValidationRecord = Nominal<
-  RecordBase,
-  'WaitingForValidation'
->
 
-export type ValidatedRecord = Nominal<RecordBase, 'Validated'>
-export type RegisteredRecord = Nominal<
-  Bundle<
+export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
+
+export type WaitingForValidationRecord = Nominal<
+  SavedBundle<
     | Composition
     | DocumentReference
     | Encounter
@@ -76,34 +77,78 @@ export type RegisteredRecord = Nominal<
     | Location
     | Observation
   >,
+  'WaitingForValidation'
+>
+
+export type ValidatedRecord = Nominal<SavedBundle, 'Validated'>
+export type RegisteredRecord = Nominal<
+  SavedBundle<
+    | Composition
+    | DocumentReference
+    | Encounter
+    | Patient
+    | RelatedPerson
+    | PaymentReconciliation
+    | Task
+    | Practitioner
+    | PractitionerRole
+    | Location
+    | Observation
+    | QuestionnaireResponse
+  >,
   'Registered'
 >
 export type CorrectionRequestedRecord = Nominal<
-  RecordBase,
+  SavedBundle,
   'CorrectionRequested'
 >
-export type CertifiedRecord = Nominal<RecordBase, 'Certified'>
-export type IssuedRecord = Nominal<RecordBase, 'Issued'>
+export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
+export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
+export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
+export type RejectedRecord = Nominal<SavedBundle, 'Rejected'>
+export type ArchivedRecord = Nominal<SavedBundle, 'Archived'>
 
 export type ValidRecord =
-  | WaitingForValidationRecord
+  | InProgressRecord
+  | ReadyForReviewRecord
   | ValidatedRecord
   | RegisteredRecord
   | CorrectionRequestedRecord
   | CertifiedRecord
   | IssuedRecord
+  | RejectedRecord
+  | WaitingForValidationRecord
+  | ArchivedRecord
+
+export type RegistrationStatus =
+  | 'ARCHIVED'
+  | 'CERTIFIED'
+  | 'CORRECTION_REQUESTED'
+  | 'DECLARATION_UPDATED'
+  | 'DECLARED'
+  | 'IN_PROGRESS'
+  | 'ISSUED'
+  | 'REGISTERED'
+  | 'REJECTED'
+  | 'VALIDATED'
+  | 'WAITING_VALIDATION'
 
 export type StateIdenfitiers = {
+  IN_PROGRESS: InProgressRecord
+  READY_FOR_REVIEW: ReadyForReviewRecord
   VALIDATED: ValidatedRecord
   REGISTERED: RegisteredRecord
   CORRECTION_REQUESTED: CorrectionRequestedRecord
   CERTIFIED: CertifiedRecord
   ISSUED: IssuedRecord
+  WAITING_VALIDATION: WaitingForValidationRecord
+  REJECTED: RejectedRecord
+  ARCHIVED: ArchivedRecord
 }
 
 export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
   record: R,
-  nextState: A
+  nextState: A | A[]
 ) {
   return record as any as StateIdenfitiers[A]
 }
@@ -116,8 +161,36 @@ export function getState(record: RecordBase) {
   return getBusinessStatus(task) as keyof StateIdenfitiers
 }
 
-export function getCorrectionRequestedTask(record: CorrectionRequestedRecord) {
-  const task: CorrectionRequestedTask | undefined = record.entry
+export function isInProgress(record: ValidRecord): record is InProgressRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'IN_PROGRESS'
+}
+
+export function isReadyForReview(
+  record: ValidRecord
+): record is ReadyForReviewRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'DECLARED'
+}
+
+export function isValidated(record: ValidRecord): record is ValidatedRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'VALIDATED'
+}
+
+export function isWaitingExternalValidation(
+  record: ValidRecord
+): record is WaitingForValidationRecord {
+  return (
+    getStatusFromTask(getTaskFromSavedBundle(record)) === 'WAITING_VALIDATION'
+  )
+}
+
+export function isRejected(record: ValidRecord): record is RejectedRecord {
+  return getStatusFromTask(getTaskFromSavedBundle(record)) === 'REJECTED'
+}
+
+export function getCorrectionRequestedTask(
+  record: CorrectionRequestedRecord
+): CorrectionRequestedTask {
+  const task = record.entry
     .map((entry) => entry.resource)
     .filter(isTask)
     .find(isCorrectionRequestedTask)
@@ -125,7 +198,7 @@ export function getCorrectionRequestedTask(record: CorrectionRequestedRecord) {
   if (!task) {
     throw new Error('No correction requested task found')
   }
-  return task
+  return task as CorrectionRequestedTask
 }
 
 export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
@@ -154,7 +227,7 @@ export function withOnlyLatestTask<
 }
 
 export function getTrackingId(record: ValidRecord) {
-  const task = getTaskFromBundle(record)
+  const task = getTaskFromSavedBundle(record)
 
   const identifier = task.identifier.find((identifier) =>
     identifier.system.endsWith('tracking-id')
@@ -164,7 +237,7 @@ export function getTrackingId(record: ValidRecord) {
     throw new Error('No tracking id found from task')
   }
 
-  return identifier.value
+  return identifier.value as TrackingID
 }
 
 export function replaceFromBundle(
@@ -181,4 +254,14 @@ export function replaceFromBundle(
       return shouldUpdate ? { ...entry, resource: newResource } : entry
     })
   }
+}
+
+export function getRegistrationNumber(record: RegisteredRecord): string {
+  const taskEntryResource = getTaskFromSavedBundle(record)
+  const identiferWithRn = taskEntryResource.identifier.find((obj) =>
+    obj.system.endsWith('registration-number')
+  )
+  if (!identiferWithRn)
+    throw new Error('Could not find registration number in bundle')
+  return identiferWithRn.value
 }

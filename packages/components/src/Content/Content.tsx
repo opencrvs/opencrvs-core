@@ -20,10 +20,17 @@ const Container = styled.div<{ size: string }>`
   border-radius: 4px;
   box-sizing: border-box;
   margin: 24px auto;
-  max-width: min(
-    ${({ size }) => (size === 'large' ? '1140px' : '778px')},
-    100% - 24px - 24px
-  );
+  max-width: ${({ size = 'normal' }) => {
+    switch (size) {
+      case 'large':
+        return '1140px'
+      case 'normal':
+        return '778px'
+      case 'small':
+      default:
+        return '568px'
+    }
+  }};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -113,9 +120,10 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   }
 `
 const BottomActionBar = styled.div`
+  width: 100%;
   display: flex;
-  gap: 16px;
-  margin-right: auto;
+  flex-direction: column;
+  gap: 8px;
 `
 const BackButtonContainer = styled.div`
   padding-left: 8px;
@@ -154,7 +162,8 @@ const Contents = styled.div<{ noPadding?: boolean }>`
 
 export enum ContentSize {
   LARGE = 'large',
-  NORMAL = 'normal'
+  NORMAL = 'normal',
+  SMALL = 'small'
 }
 
 interface IProps {

@@ -17,7 +17,7 @@ import {
   userMessages as messages
 } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   Name,
@@ -42,6 +42,7 @@ export function SettingsPage() {
     >
       <Content
         title={intl.formatMessage(messages.settingsTitle)}
+        size={ContentSize.NORMAL}
         showTitleOnMobile={true}
       >
         <ListViewSimplified>

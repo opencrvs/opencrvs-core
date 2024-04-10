@@ -300,10 +300,10 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to localData
-      //so that we can revert changes back to data.localData when users exits without saving
+      // saving current changes to localData
+      // for reverting back the changes when users exits without saving
       declaration.localData = declaration.data
-      //save declaration and exit
+      // save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
     }
@@ -1095,7 +1095,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
-                        size={ContentSize.NORMAL}
+                        size={ContentSize.SMALL}
                         key={activeSectionGroup.id}
                         id="register_form"
                         title={
@@ -1112,6 +1112,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 id="next_section"
                                 key="next_section"
                                 type="primary"
+                                fullWidth
                                 size="large"
                                 onClick={() => {
                                   this.continueButtonHandler(
@@ -1135,6 +1136,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 key="back-to-review-button"
                                 type="secondary"
                                 size="large"
+                                fullWidth
                                 className="item"
                                 onClick={() => {
                                   this.continueButtonHandler(

@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/data-seeder",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS data-seeder microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
@@ -21,15 +21,14 @@
     "@types/fhir": "^0.0.37",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",
-    "node-fetch": "^2.6.1",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^2.2.0",
+    "node-fetch": "^2.6.1",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.13.0",
     "typescript": "4.9.5",
     "uuid": "^3.3.2",
-    "whatwg-fetch": "^3.0.0",
     "zod": "^3.17.3"
   },
   "lint-staged": {

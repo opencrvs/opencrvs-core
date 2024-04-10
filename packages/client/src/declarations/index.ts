@@ -311,10 +311,9 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 export type Payment = {
   paymentId?: string
   type: PaymentType
-  total: number
   amount: number
   outcome: PaymentOutcomeType
-  date: number
+  date: string
 }
 
 interface IArchiveDeclarationAction {
@@ -540,7 +539,7 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: status !== 'IN_PROGRESS' ? formData : {},
+    originalData: formData,
     localData: formData,
     review: true,
     event,
@@ -732,7 +731,6 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
         const history = d.originalData?.history as unknown as IDynamicValues
-
         const downloadedTime = (
           history.filter((h: IDynamicValues) => {
             return h.action === DOWNLOAD_STATUS.DOWNLOADED

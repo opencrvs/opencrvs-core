@@ -66,25 +66,22 @@ import {
   SPOUSE_CODE,
   Saved,
   Task,
-  TaskStatus,
   ValidRecord,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
   findCompositionSection,
   findObservationByCode,
   getComposition,
-  getEncounterFromRecord,
+  findEncounterFromRecord,
   getEventLabelFromBundle,
   getResourceFromBundleById,
-  getTaskFromBundle,
+  getTaskFromSavedBundle,
   isDocumentReference,
   isObservation,
   isPatient,
   isQuestionnaireResponse,
   isTaskOrTaskHistory,
-  isURLReference,
   resourceIdentifierToUUID,
-  urlReferenceToUUID,
   Address
 } from '@opencrvs/commons/types'
 
@@ -110,7 +107,7 @@ function findRelatedPerson(
     }
     return getResourceFromBundleById<RelatedPerson>(
       record,
-      urlReferenceToUUID(patientSection.entry![0].reference)
+      resourceIdentifierToUUID(patientSection.entry![0].reference)
     )
   }
 }
@@ -137,7 +134,7 @@ function findPatient(
 
     const patientOrRelatedPerson = getResourceFromBundleById<
       Patient | RelatedPerson
-    >(record, urlReferenceToUUID(patientSection.entry![0].reference))
+    >(record, resourceIdentifierToUUID(patientSection.entry![0].reference))
 
     if (isPatient(patientOrRelatedPerson)) {
       return patientOrRelatedPerson
@@ -149,12 +146,24 @@ function findPatient(
 
     return getResourceFromBundleById(
       record,
-      urlReferenceToUUID(patientOrRelatedPerson.patient.reference)
+      resourceIdentifierToUUID(patientOrRelatedPerson.patient.reference)
     )
   }
 }
 
 export const typeResolvers: GQLResolver = {
+  RecordDetails: {
+    __resolveType(record: Saved<ValidRecord>) {
+      const composition = getComposition(record)
+      if (
+        composition.type.coding?.[0].code === 'birth-declaration' ||
+        composition.type.coding?.[0].code === 'birth-notification'
+      ) {
+        return 'BirthRegistration'
+      }
+      return 'DeathRegistration'
+    }
+  },
   EventRegistration: {
     __resolveType(record: Saved<ValidRecord>) {
       return getEventLabelFromBundle(record)
@@ -380,7 +389,7 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return null
       }
-      return urlReferenceToUUID(relatedPerson.patient.reference)
+      return resourceIdentifierToUUID(relatedPerson.patient.reference)
     },
     relationship: (relatedPerson: Saved<RelatedPerson>) => {
       return (
@@ -403,7 +412,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.name) || null
     },
@@ -413,7 +422,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
@@ -427,7 +436,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
@@ -447,7 +456,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.birthDate) || null
     },
@@ -457,7 +466,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.identifier) || null
     },
@@ -467,7 +476,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person && person.maritalStatus && person.maritalStatus.text
     },
@@ -477,7 +486,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
@@ -495,7 +504,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
@@ -517,7 +526,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
@@ -539,7 +548,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
@@ -557,7 +566,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.active
     },
@@ -567,7 +576,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.multipleBirthInteger
     },
@@ -577,7 +586,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person
     },
@@ -587,7 +596,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
       const nationalityExtension = findExtension(
@@ -626,7 +635,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
@@ -644,7 +653,7 @@ export const typeResolvers: GQLResolver = {
       }
       const person = getResourceFromBundleById<Patient>(
         context.record!,
-        urlReferenceToUUID(relatedPerson.patient.reference)
+        resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.address
     }
@@ -760,7 +769,7 @@ export const typeResolvers: GQLResolver = {
       return docRefReferences.map(async (docRefReference) =>
         getResourceFromBundleById(
           context.record!,
-          urlReferenceToUUID(docRefReference)
+          resourceIdentifierToUUID(docRefReference)
         )
       )
     },
@@ -776,7 +785,7 @@ export const typeResolvers: GQLResolver = {
 
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
         context.record!,
-        urlReferenceToUUID(patientSection.entry[0].reference)
+        resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
       if (
@@ -801,7 +810,7 @@ export const typeResolvers: GQLResolver = {
       }
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
         context.record!,
-        urlReferenceToUUID(patientSection.entry[0].reference)
+        resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
       if (
@@ -1591,12 +1600,9 @@ export const typeResolvers: GQLResolver = {
       if (
         action ||
         (status &&
-          ![
-            TaskStatus.REGISTERED,
-            TaskStatus.VALIDATED,
-            TaskStatus.DECLARED,
-            TaskStatus.IN_PROGRESS
-          ].includes(status))
+          !['REGISTERED', 'VALIDATED', 'DECLARED', 'IN_PROGRESS'].includes(
+            status
+          ))
       ) {
         return null
       }
@@ -1649,7 +1655,13 @@ export const typeResolvers: GQLResolver = {
     },
     async _fhirIDMap(record: Saved<Bundle>) {
       const composition = getComposition(record)
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
       const recordResources = record.entry.map((x) => x.resource)
@@ -1695,9 +1707,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
@@ -1713,14 +1729,18 @@ export const typeResolvers: GQLResolver = {
     spouse: findPatient(SPOUSE_CODE),
 
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter || !encounter.location) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToUUID(encounter.location[0].location.reference)
+        resourceIdentifierToUUID(encounter.location[0].location.reference)
       )
     },
     async deathDescription(record: Saved<Bundle>) {
@@ -1754,7 +1774,11 @@ export const typeResolvers: GQLResolver = {
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -1785,10 +1809,9 @@ export const typeResolvers: GQLResolver = {
       }
     },
     async medicalPractitioner(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, DEATH_ENCOUNTER_CODE)
 
-      const encounterParticipant =
-        encounter && encounter.participant && encounter.participant[0]
+      const encounterParticipant = encounter?.participant?.[0]
       if (!encounterParticipant) {
         return null
       }
@@ -1811,7 +1834,13 @@ export const typeResolvers: GQLResolver = {
 
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
 
@@ -1855,9 +1884,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
@@ -1871,7 +1904,7 @@ export const typeResolvers: GQLResolver = {
     child: findPatient(CHILD_CODE),
     informant: findRelatedPerson(INFORMANT_CODE),
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async weightAtBirth(record: Saved<Bundle>) {
       return findObservationByCode(record, BODY_WEIGHT_CODE)?.valueQuantity
@@ -1897,7 +1930,11 @@ export const typeResolvers: GQLResolver = {
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -1928,11 +1965,15 @@ export const typeResolvers: GQLResolver = {
       }
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, BIRTH_ENCOUNTER_CODE)
+
+      if (!encounter || !encounter.location) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToUUID(encounter.location[0].location.reference)
+        resourceIdentifierToUUID(encounter.location[0].location.reference)
       )
     },
     async history(record: Saved<Bundle>) {
@@ -1949,7 +1990,13 @@ export const typeResolvers: GQLResolver = {
     },
     async _fhirIDMap(record: Saved<Bundle>) {
       const composition = getComposition(record)
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return {
+          composition: composition.id
+        }
+      }
 
       const encounterReference = `Encounter/${encounter.id}`
       const recordResources = record.entry.map((x) => x.resource)
@@ -1989,9 +2036,13 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: urlReferenceToUUID(
-          encounter.location[0].location.reference
-        ),
+        ...(encounter.location
+          ? {
+              eventLocation: resourceIdentifierToUUID(
+                encounter.location[0].location.reference
+              )
+            }
+          : {}),
         observation,
         questionnaireResponse: questionnaireResponses[0]?.id
       }
@@ -2007,12 +2058,16 @@ export const typeResolvers: GQLResolver = {
     witnessTwo: findRelatedPerson(WITNESS_TWO_CODE),
 
     async registration(record: Saved<Bundle>) {
-      return getTaskFromBundle(record)
+      return getTaskFromSavedBundle(record)
     },
     async questionnaire(record: Saved<Bundle>) {
       const recordResources = record.entry.map((x) => x.resource)
 
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter) {
+        return null
+      }
 
       const questionnaireResponses = recordResources
         .filter(isQuestionnaireResponse)
@@ -2047,11 +2102,15 @@ export const typeResolvers: GQLResolver = {
         ?.value
     },
     async eventLocation(record: Saved<Bundle>) {
-      const encounter = getEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+      const encounter = findEncounterFromRecord(record, MARRIAGE_ENCOUNTER_CODE)
+
+      if (!encounter || !encounter.location) {
+        return null
+      }
 
       return getResourceFromBundleById(
         record,
-        urlReferenceToUUID(encounter.location[0].location.reference)
+        resourceIdentifierToUUID(encounter.location[0].location.reference)
       )
     },
     async history(record: Saved<Bundle>) {
@@ -2085,11 +2144,7 @@ async function resolveCertificates(
     }
 
     return dataSources.fhirAPI.getDocumentReference(
-      isURLReference(certSection.entry[0].reference)
-        ? urlReferenceToUUID(certSection.entry[0].reference)
-        : resourceIdentifierToUUID(
-            certSection.entry[0].reference as ResourceIdentifier
-          )
+      resourceIdentifierToUUID(certSection.entry[0].reference)
     )
   })
 }

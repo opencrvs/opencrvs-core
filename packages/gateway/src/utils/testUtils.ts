@@ -786,8 +786,7 @@ export const mockDeathComposition = {
       text: '',
       entry: [
         {
-          reference:
-            'http://localhost:3447/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' // reference to Encounter resource contained below
+          reference: 'Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e' // reference to Encounter resource contained below
         }
       ]
     },
@@ -821,7 +820,7 @@ export const mockDeathComposition = {
 
 export const mockDeathEncounter: BundleEntry<Encounter> = {
   fullUrl:
-    'http://localhost:3447/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' as URLReference,
+    '/fhir/Encounter/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57' as URLReference,
   resource: {
     resourceType: 'Encounter',
     status: 'finished',
@@ -830,7 +829,7 @@ export const mockDeathEncounter: BundleEntry<Encounter> = {
       {
         location: {
           reference:
-            'http://localhost:3447/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference
+            'Location/11539b31-0123-4b3e-88a7-db5919b34bd4' as ResourceIdentifier
         }
       }
     ],
@@ -843,7 +842,7 @@ export const mockDeathEncounter: BundleEntry<Encounter> = {
 
 export const mockDeathEncounterLocation: BundleEntry<Location> = {
   fullUrl:
-    'http://localhost:3447/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference,
+    '/fhir/Location/11539b31-0123-4b3e-88a7-db5919b34bd4/_history/ae83b6d8-a772-41dd-9554-94b1749c0473' as URLReference,
   resource: {
     resourceType: 'Location',
     identifier: [
@@ -887,7 +886,7 @@ export const mockDeathEncounterLocation: BundleEntry<Location> = {
 
 export const causeOfDeathObservation: BundleEntry<Observation> = {
   fullUrl:
-    'http://localhost:3447/fhir/Observation/5f08d904-4b70-4f0a-b43c-b0911b5bd6c5/434a745a-be8c-470d-8bfa-c759c600b26f' as URLReference,
+    '/fhir/Observation/5f08d904-4b70-4f0a-b43c-b0911b5bd6c5/_history/434a745a-be8c-470d-8bfa-c759c600b26f' as URLReference,
   resource: {
     resourceType: 'Observation',
     status: 'final',
@@ -932,7 +931,7 @@ export const causeOfDeathObservation: BundleEntry<Observation> = {
 
 export const mannerOfDeathObservation: BundleEntry<Observation> = {
   fullUrl:
-    'http://localhost:3447/fhir/Observation/9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb/ccf928d7-8653-4922-87d2-32907f02f402' as URLReference,
+    '/fhir/Observation/9794cbda-0b99-42b6-8c1f-7b9e5ffa31fb/_history/ccf928d7-8653-4922-87d2-32907f02f402' as URLReference,
   resource: {
     resourceType: 'Observation',
     status: 'final',

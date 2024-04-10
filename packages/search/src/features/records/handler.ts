@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { boomify } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { RecordNotFoundError, getRecordById } from './service'
 
@@ -31,5 +32,6 @@ export async function getRecordByIdHandler(
     if (error instanceof RecordNotFoundError) {
       return h.response({ error: error.message }).code(404)
     }
+    throw boomify(error)
   }
 }

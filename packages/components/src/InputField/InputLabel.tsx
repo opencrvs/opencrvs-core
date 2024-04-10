@@ -24,7 +24,7 @@ export type IInputLabel = {
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ color, disabled, theme }) =>
     disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
   width: 100%;

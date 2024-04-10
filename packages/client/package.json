@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
@@ -169,8 +169,7 @@
     "typescript-react-intl": "^0.3.0",
     "vite-plugin-pwa": "^0.16.4",
     "vitest": "0.25.5",
-    "vitest-fetch-mock": "^0.2.1",
-    "whatwg-fetch": "^3.0.0"
+    "vitest-fetch-mock": "^0.2.1"
   },
   "browserslist": {
     "production": [

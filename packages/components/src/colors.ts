@@ -73,7 +73,7 @@ export const colors = {
 
   primaryDarker: darken(0.2)(config.primary),
   primaryDark: darken(0.1)(config.primary),
-  primaryLight: lighten(0.2)(config.primary),
+  primaryLight: lighten(0.38)(config.primary),
   primaryLighter: lighten(0.45)(config.primary),
 
   purpleDarker: darken(0.2)(config.purple),

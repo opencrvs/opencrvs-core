@@ -9,96 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Bundle, Task } from '@opencrvs/commons/types'
-import { MOTHER_SECTION_CODE } from '@workflow/features/registration/fhir/constants'
-import {
-  findPersonEntry,
-  getTaskResourceFromFhirBundle
-} from '@workflow/features/registration/fhir/fhir-template'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 import { testFhirBundle } from '@workflow/test/utils'
-import * as fetchAny from 'jest-fetch-mock'
-
-const fetch = fetchAny as any
 
 describe('Verify fhir templates', () => {
-  describe('FindPersonEntry', () => {
-    it('returns the right person entry', async () => {
-      const personEntryResourse = await findPersonEntry(
-        MOTHER_SECTION_CODE,
-        testFhirBundle
-      )
-
-      expect(personEntryResourse).toBeDefined()
-      expect(personEntryResourse).toEqual({
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jane'],
-            family: ['Doe'],
-            use: 'bn'
-          }
-        ],
-        gender: 'female',
-        telecom: [
-          {
-            system: 'phone',
-            value: '+8801622688231'
-          }
-        ]
-      })
-    })
-    it('returns the right person entry when task entry is passed', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            ...testFhirBundle.entry[0].resource
-          })
-        ],
-        [
-          JSON.stringify({
-            ...testFhirBundle.entry[3].resource
-          })
-        ]
-      )
-      const personEntryResourse = await findPersonEntry(MOTHER_SECTION_CODE, {
-        resourceType: 'Bundle',
-        type: 'document',
-        entry: [
-          {
-            ...testFhirBundle.entry[1]
-          }
-        ]
-      })
-
-      expect(personEntryResourse).toBeDefined()
-      expect(personEntryResourse).toEqual({
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jane'],
-            family: ['Doe'],
-            use: 'bn'
-          }
-        ],
-        gender: 'female',
-        telecom: [
-          {
-            system: 'phone',
-            value: '+8801622688231'
-          }
-        ]
-      })
-    })
-    it('throws error for invalid section code', async () => {
-      await expect(
-        findPersonEntry('INVALID_SECTION_CODE', testFhirBundle)
-      ).rejects.toThrow(
-        'Invalid person section found for given code: INVALID_SECTION_CODE'
-      )
-    })
-  })
-
   describe('getTaskResource', () => {
     it('returns the task resource properly when FhirBundle is sent', () => {
       const taskResourse = getTaskResourceFromFhirBundle(testFhirBundle)

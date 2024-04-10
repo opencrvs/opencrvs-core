@@ -18,7 +18,8 @@ import {
   ICompositionBody,
   EVENT,
   IBirthCompositionBody,
-  IDeathCompositionBody
+  IDeathCompositionBody,
+  findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
@@ -213,7 +214,8 @@ export async function searchForBirthDeDuplication(
       request.payload as IBirthCompositionBody,
       client
     )
-    return h.response(result).code(200)
+    const duplicateIds = findDuplicateIds(result)
+    return h.response(duplicateIds).code(200)
   } catch (error) {
     logger.error(`Search/searchForDuplicates: error: ${error}`)
     return internal(error)
@@ -229,7 +231,8 @@ export async function searchForDeathDeDuplication(
       request.payload as IDeathCompositionBody,
       client
     )
-    return h.response(result).code(200)
+    const duplicateIds = findDuplicateIds(result)
+    return h.response(duplicateIds).code(200)
   } catch (err) {
     logger.error(`Search for death duplications : error : ${err}`)
     return internal(err)

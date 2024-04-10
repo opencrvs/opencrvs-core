@@ -58,7 +58,7 @@ const UserNameInput = () => {
           {...userNameField}
           {...otherProps}
           touched={Boolean(meta.touched)}
-          label={intl.formatMessage(userNameField.label)}
+          label=""
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
           ignoreMediaQuery
           hideAsterisk
@@ -67,6 +67,7 @@ const UserNameInput = () => {
             {...userNameField}
             {...input}
             touched={Boolean(meta.touched)}
+            placeholder={intl.formatMessage(userNameField.label)}
             error={Boolean(meta.error)}
             type="text"
             ignoreMediaQuery
@@ -87,7 +88,7 @@ const Password = () => {
           {...passwordField}
           {...otherProps}
           touched={Boolean(meta.touched)}
-          label={intl.formatMessage(passwordField.label)}
+          label=""
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
           ignoreMediaQuery
           hideAsterisk
@@ -95,6 +96,7 @@ const Password = () => {
           <PasswordInput
             {...passwordField}
             {...input}
+            placeholder={intl.formatMessage(passwordField.label)}
             touched={Boolean(meta.touched)}
             error={Boolean(meta.error)}
             ignoreMediaQuery
@@ -139,11 +141,10 @@ export function StepOneContainer() {
                 <Text element="h1" variant="h2" align="center">
                   {intl.formatMessage(messages.stepOneLoginText)}
                 </Text>
-
-                <Field name={userNameField.name} component={UserNameInput} />
-
-                <Field name={passwordField.name} component={Password} />
-
+                <Stack direction="column" alignItems="stretch" gap={12}>
+                  <Field name={userNameField.name} component={UserNameInput} />
+                  <Field name={passwordField.name} component={Password} />
+                </Stack>
                 <Button
                   id="login-mobile-submit"
                   type="primary"

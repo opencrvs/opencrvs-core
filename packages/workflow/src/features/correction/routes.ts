@@ -37,7 +37,7 @@ import {
   ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput
-} from '@workflow/records/correction-request'
+} from '@workflow/records/validations'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import {
@@ -47,9 +47,8 @@ import {
   toCorrectionRequested
 } from '@workflow/records/state-transitions'
 import { createRoute } from '@workflow/states'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { z } from 'zod'
-
 import { Request } from '@hapi/hapi'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
@@ -58,7 +57,7 @@ import { getRecordById } from '@workflow/records'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 
-function validateRequest<T extends z.ZodType>(
+export function validateRequest<T extends z.ZodType>(
   validator: T,
   payload: unknown
 ): z.infer<T> {

@@ -29,7 +29,6 @@ enum SystemType {
 
 enum IntegratingSystemType {
   MOSIP
-  OSIA
   OTHER
 }
 

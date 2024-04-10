@@ -291,6 +291,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           exactDateOfBirthUnknown
           gender
           maritalStatus
+          occupation
           nationality
           identifier {
             id

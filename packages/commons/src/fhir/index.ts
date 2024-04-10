@@ -9,14 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ValidRecord } from '../record'
+import { RegistrationStatus, ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
 import { Extension, KnownExtensionType } from './extension'
 import { Patient } from './patient'
-import { CompositionSection, SavedCompositionSection } from './composition'
+import {
+  CompositionSection,
+  CompositionSectionCode,
+  SavedCompositionSection
+} from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
+import { Practitioner, SavedPractitioner } from './practitioner'
 
 export * from './practitioner'
 export * from './task'
@@ -40,16 +45,33 @@ export type ResourceIdentifier<
   }
 > = `${Resource['resourceType']}/${UUID}`
 
-// http://localhost:3447/fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
+// /fhir/Patient/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57
 export type URLReference = Nominal<string, 'URLReference'>
 
+export type Reference = Omit<fhir3.Reference, 'reference'> & {
+  reference: URNReference | ResourceIdentifier
+}
+
+export type SavedReference = Omit<Reference, 'reference'> & {
+  reference: ResourceIdentifier
+}
+
 export function isURLReference(id: string): id is URLReference {
-  return id.startsWith('http:')
+  return id.startsWith('/fhir')
+}
+
+export function isURNReference(id: string): id is URNReference {
+  return id.startsWith('urn:uuid:')
 }
 
 export function urlReferenceToUUID(reference: URLReference) {
   const urlParts = reference.split('/')
-  return urlParts[urlParts.length - 2] as UUID
+  return urlParts[urlParts.length - 3] as UUID
+}
+
+export function urlReferenceToResourceIdentifier(reference: URLReference) {
+  const urlParts = reference.split('/')
+  return urlParts.slice(2, 4).join('/') as ResourceIdentifier
 }
 
 export function resourceIdentifierToUUID(
@@ -88,6 +110,10 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedLocation
   : T extends Task
   ? SavedTask
+  : T extends Practitioner
+  ? SavedPractitioner
+  : T extends QuestionnaireResponse
+  ? SavedQuestionnaireResponse
   : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
@@ -114,8 +140,11 @@ export type BundleEntry<T extends Resource = Resource> = Omit<
   fullUrl?: URNReference | URLReference
 }
 
-export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
-  fullUrl: string
+export type BundleEntryWithFullUrl<T extends Resource = Resource> = Omit<
+  BundleEntry<T>,
+  'fullUrl'
+> & {
+  fullUrl: URNReference | URLReference
 }
 
 /*
@@ -152,14 +181,20 @@ export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
 }
 
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
-  coding: fhir3.Coding[]
+  coding: Array<
+    Omit<fhir3.Coding, 'code' | 'system'> & {
+      system: 'http://opencrvs.org/specs/reg-status'
+      code: RegistrationStatus
+    }
+  >
 }
 
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {
   section: Array<CompositionSection>
   relatesTo?: Array<
-    Omit<fhir3.CompositionRelatesTo, 'code'> & {
+    Omit<fhir3.CompositionRelatesTo, 'code' | 'targetReference'> & {
       code: fhir3.CompositionRelatesTo['code'] | 'duplicate'
+      targetReference: SavedReference
     }
   >
 }
@@ -176,16 +211,14 @@ export type DocumentReference = WithStrictExtensions<
   docStatus?: 'validated' | 'approved' | 'deleted'
 }
 
-export type RelatedPerson = Omit<fhir3.RelatedPerson, 'patient'> & {
-  patient?: {
-    reference: URNReference | URLReference | ResourceIdentifier
-  }
+export type RelatedPerson = WithStrictExtensions<
+  Omit<fhir3.RelatedPerson, 'patient'>
+> & {
+  patient?: Reference
 }
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
-  patient?: {
-    reference: URLReference
-  }
+  patient: SavedReference
 }
 
 export type Location = WithStrictExtensions<
@@ -202,6 +235,14 @@ export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
   partOf?: {
     reference: ResourceIdentifier
   }
+}
+
+export type SavedQuestionnaireResponse = Omit<
+  QuestionnaireResponse,
+  'status' | 'id'
+> & {
+  id: UUID
+  status: 'completed'
 }
 
 export type CompositionHistory = Saved<Composition> & {
@@ -265,12 +306,6 @@ export type FhirResourceType =
 
 export type Identifier = fhir3.Identifier
 
-export type Reference = Omit<fhir3.Reference, 'reference'> & {
-  reference: URNReference | ResourceIdentifier | URLReference
-}
-export type SavedReference = Omit<Reference, 'reference'> & {
-  reference: URLReference
-}
 export type Coding = fhir3.Coding
 export type QuestionnaireResponse = fhir3.QuestionnaireResponse
 export type CompositionRelatesTo = fhir3.CompositionRelatesTo
@@ -313,7 +348,9 @@ export function findResourceFromBundleById<T extends Resource = Resource>(
   }
 }
 
-export function isSaved(resource: Resource): resource is Saved<Resource> {
+export function isSaved<T extends Resource>(
+  resource: T
+): resource is T & Saved<T> {
   return resource.id !== undefined
 }
 
@@ -338,18 +375,34 @@ export function getFromBundleById<T extends Resource = Resource>(
   return resource as SavedBundleEntry<T>
 }
 
+export function findEntryFromBundle<T extends Resource = Resource>(
+  bundle: Bundle,
+  reference: Reference['reference']
+): BundleEntryWithFullUrl<T> | SavedBundleEntry<T> | undefined {
+  return isURNReference(reference)
+    ? bundle.entry.find(
+        (entry): entry is BundleEntryWithFullUrl<T> =>
+          entry.fullUrl === reference
+      )
+    : bundle.entry.find(
+        (entry): entry is SavedBundleEntry<T> =>
+          isSaved(entry.resource) &&
+          entry.resource.id === resourceIdentifierToUUID(reference)
+      )
+}
+
 export function findCompositionSection<T extends SavedComposition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): SavedCompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ): CompositionSection
 
 export function findCompositionSection<T extends Composition>(
-  code: string,
+  code: CompositionSectionCode,
   composition: T
 ) {
   return (composition.section &&
@@ -369,6 +422,16 @@ export function resourceToBundleEntry<T extends Resource>(
   return {
     resource,
     fullUrl: `urn:uuid:${resource.id as UUID}`
+  }
+}
+
+export function resourceToSavedBundleEntry<T extends Resource>(
+  resource: SavedResource<T>
+): SavedBundleEntry<T> {
+  return {
+    resource,
+    fullUrl:
+      `/fhir/${resource.resourceType}/${resource.id}/_history/${resource.meta?.versionId}` as URLReference
   }
 }
 

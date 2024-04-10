@@ -134,7 +134,7 @@ const messagesToDefine: IUserMessages = {
     id: 'settings.message.changeLanguage'
   },
   changeLanguageSuccessMessage: {
-    defaultMessage: 'Language updated to {language}',
+    defaultMessage: 'Language updated',
     description: 'Change language success',
     id: 'settings.changeLanguage.success'
   },
@@ -509,6 +509,10 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.systemLanguage',
     defaultMessage: 'System language',
     description: 'Label for system language'
+  },
+  language: {
+    id: 'system.user.settings.language',
+    defaultMessage: '{language}'
   },
   profileImage: {
     id: 'system.user.settings.profileImage',

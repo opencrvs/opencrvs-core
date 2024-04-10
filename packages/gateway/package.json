@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -32,7 +32,7 @@
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
-    "@types/uuid-validate": "^0.0.1",
+    "@types/uuid-validate": "^0.0.3",
     "apollo-datasource-rest": "^3.7.0",
     "apollo-server-hapi": "^3.5.0",
     "app-module-path": "^2.2.0",
@@ -41,7 +41,6 @@
     "country-code-lookup": "^0.0.23",
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
-    "date-fns": "^2.28.0",
     "file-type": "^16.5.3",
     "flat": "^5.0.0",
     "fp-ts": "^2.12.3",
@@ -100,7 +99,7 @@
     "lint-staged": "^7.1.0",
     "nodemon": "^2.0.22",
     "opener": "^1.5.1",
-    "prettier": "2.5.1",
+    "prettier": "2.8.8",
     "testcontainers": "^9.1.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",

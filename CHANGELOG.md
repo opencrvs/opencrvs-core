@@ -12,10 +12,33 @@
 
 ## New features
 
+- Add loading spinners before JavaScript bundle has loaded for both login and client
+
 ## Bug fixes
 
 - Handle back button click after issuing a declaration [#6424](https://github.com/opencrvs/opencrvs-core/issues/6424)
+- Fix certificate verification QR code for a death declaration [#6230](https://github.com/opencrvs/opencrvs-core/issues/6230#issuecomment-1996766125)
+- Fix certificate verification QR code crashing when gender is unknown [#6422](https://github.com/opencrvs/opencrvs-core/issues/6422)
+- Fix certificate verification page missing registration center and the name of registrar [#6614](https://github.com/opencrvs/opencrvs-core/issues/6614)
+- Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
 
+- Fix record correction e2e failing due to stale data getting saved on redux
+
+## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
+
+- Fix Metabase versions in Dashboards service. Previously the version used for local development wasn't the one built into the docker image, which caused the locally generated initialisation file to fail in deployed environments.
+- Fix a seeding script bug, where it failed when done too quickly [#6553](https://github.com/opencrvs/opencrvs-core/issues/6553)
+- Update minimum password length validation [#6559](https://github.com/opencrvs/opencrvs-core/issues/6559)
+- Include middlename when generating fullnames
+  - Refactored out the scattered logic for generating fullnames and converged them into a single function
+  - Make lastname optional for a registered declaration
+- Recognize occupation as an optional field in informant section
+- Fix download failure when `arrayToFieldTransormer` is used in template mapping
+- Fix multiple records not being downloaded simultaneously [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- Fix showing unassigned toast for reinstated declarations [#6492](https://github.com/opencrvs/opencrvs-core/issues/6492#issuecomment-1961098936)
+- Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
+- Make language names used in language select dropdowns configurable in country resource package copy
+- Fix login to field agent when an incomplete record is previously retrieved by them [#6584](https://github.com/opencrvs/opencrvs-core/issues/6584)
 
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 

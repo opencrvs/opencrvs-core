@@ -15,14 +15,13 @@ import {
   EVENT_TYPE,
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
+import { FHIR_URL, getDefaultLanguage } from '@workflow/constants'
 import {
-  findPersonEntry,
   getSectionEntryBySectionCode,
   findRelatedPersonEntry,
   getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 import {
   getComposition,
@@ -71,30 +70,14 @@ export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
-  })
+  }) as (Omit<fhir3.HumanName, 'family'> & { family?: string[] }) | undefined
 
-  if (!name || !name.family) {
+  if (!name) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family.join(' '))
-}
-
-export async function getSubjectName(
-  fhirBundle: Bundle,
-  sectionCode: string = CHILD_SECTION_CODE
-) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
-  }
-  const person = await findPersonEntry(sectionCode, fhirBundle)
-  if (!person || !person.name) {
-    throw new Error("Didn't find subject's name information")
-  }
-
-  return concatenateName(person.name)
+  return [...(name.given ?? []), ...(name.family ?? [])]
+    .filter(Boolean)
+    .join(' ')
 }
 
 export async function getInformantName(
@@ -109,31 +92,6 @@ export async function getInformantName(
     throw new Error("Didn't find informant's name information")
   }
   return concatenateName(informant.name)
-}
-
-export async function getCRVSOfficeName(fhirBundle: Bundle) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
-    )
-  }
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle as Bundle)
-  const regLastOfficeExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-    taskResource?.extension || []
-  )
-  if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
-    throw new Error('No last registration office found on the bundle')
-  }
-  const office: Location = await getFromFhir(
-    `/${regLastOfficeExt.valueReference.reference}`
-  )
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? office.name
-      : (office.alias && office.alias[0]) || office.name) || ''
-  )
 }
 
 export async function getRegistrationLocation(fhirBundle: Bundle) {
@@ -276,12 +234,15 @@ export function getEntryId(fhirBundle: Bundle) {
   return composition.id
 }
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }
   })
     .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to resolve "${suffix}" from hearth`)
+      }
       return response.json()
     })
     .catch((error) => {
@@ -314,7 +275,7 @@ export async function forwardToHearth(
   } else if (request.method === 'get') {
     path = `${request.path}${request.url.search}`
   }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
+  const res = await fetch(FHIR_URL + path.replace('/fhir', ''), requestOpts)
   const resBody = await res.text()
   const response = h.response(resBody)
 
@@ -328,7 +289,7 @@ export async function forwardToHearth(
 
 export async function postToHearth(payload: any) {
   /* hearth will do put calls if it finds id on the bundle */
-  const res = await fetch(HEARTH_URL, {
+  const res = await fetch(FHIR_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
@@ -345,7 +306,7 @@ export async function postToHearth(payload: any) {
 
 export async function updateResourceInHearth(resource: Resource) {
   const res = await fetch(
-    `${HEARTH_URL}/${resource.resourceType}/${resource.id}`,
+    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
     {
       method: 'PUT',
       body: JSON.stringify(resource),
@@ -419,23 +380,11 @@ export async function getEventInformantName(
 
   const subject =
     subjectSection && (await getFromFhir(`/${subjectSection.reference}`))
-  const language = getDefaultLanguage()
   if (!subject || !subject.name) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const name = subject.name.find((humanName: fhir3.HumanName) => {
-    return humanName.use === language
-  })
-
-  if (!name || !name.family) {
-    throw new Error(`Didn't found informant's ${language} name`)
-  }
-
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family)
+  return concatenateName(subject.name)
 }
 
 export function generateEmptyBundle(): Bundle {
@@ -522,7 +471,7 @@ export async function forwardEntriesToHearth(
   const res = await Promise.all(
     payload.entry.map((entry) => {
       return fetch(
-        `${HEARTH_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
+        `${FHIR_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
         {
           method: 'PUT',
           body: JSON.stringify(entry.resource),

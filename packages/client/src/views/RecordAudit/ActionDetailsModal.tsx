@@ -39,7 +39,7 @@ import {
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { CorrectionReason } from '@client/forms/correction/reason'
-import { Table } from '@client/../../components/lib'
+import { Table } from '@opencrvs/components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -146,8 +146,9 @@ const requesterLabelMapper = (
   const requesterIndividual = CorrectorRelationLabelArray.find(
     (labelItem) => labelItem.value === requester
   )
-  const informant = (declaration.data.informant.otherInformantType ||
-    declaration.data.informant.informantType) as string
+  const informant =
+    ((declaration.data?.informant?.otherInformantType ||
+      declaration.data?.informant?.informantType) as string) ?? ''
 
   // informant info added for corrector being informant
   return requesterIndividual?.label
@@ -536,28 +537,30 @@ const ActionDetailsModalListTable = ({
         )}
 
       {/* For Certificate */}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollector}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollectorVerified}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollector}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollectorVerified}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&

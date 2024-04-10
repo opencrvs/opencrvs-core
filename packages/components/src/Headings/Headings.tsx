@@ -20,8 +20,10 @@ export const Heading2 = styled.h2`
 `
 
 // Form Heading 3
-export const Heading3 = styled.h3`
-  ${({ theme }) => theme.fonts.h3};
+export const Heading3 = styled.h2`
+  padding: 8px 0;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.grey600};
   padding-top: 20px;
 `

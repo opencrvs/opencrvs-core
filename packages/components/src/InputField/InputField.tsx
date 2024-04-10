@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
 import { colors } from '../colors'
+
 const InputHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -121,7 +122,7 @@ export const InputField = (props: IInputFieldProps) => {
       if (!node) return
       return isDomElement(node.type)
         ? node
-        : React.cloneElement(node, { hideBorder })
+        : React.cloneElement(node, { hideBorder, prefix, postfix, unit })
     }
   )
 
@@ -146,12 +147,7 @@ export const InputField = (props: IInputFieldProps) => {
         </InputHeader>
       )}
 
-      <ComponentWrapper>
-        {prefix && <Padding>{prefix}</Padding>}
-        {children}
-        {!unit && postfix && <PostFixPadding>{postfix}</PostFixPadding>}
-        {unit && !postfix && <PostFixPadding>{unit}</PostFixPadding>}
-      </ComponentWrapper>
+      <ComponentWrapper>{children}</ComponentWrapper>
 
       {error && touched && !hideErrorLabel && (
         <InputError

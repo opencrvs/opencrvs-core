@@ -154,7 +154,6 @@ describe('Submission middleware', () => {
             {
               paymentId: '1234',
               type: 'MANUAL',
-              total: 50,
               amount: 50,
               outcome: 'COMPLETED',
               date: '2018-10-22'

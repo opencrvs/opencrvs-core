@@ -33,6 +33,7 @@ export function transformCertificateData(
       collector.otherRelationship = certificateData.collector
         .relationship as string
       collector = {
+        ...collector,
         name: [
           {
             use: 'en',

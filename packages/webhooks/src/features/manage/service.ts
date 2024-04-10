@@ -12,6 +12,7 @@ import * as decode from 'jwt-decode'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
 import fetch from 'node-fetch'
 import * as crypto from 'crypto'
+import { CompositionSectionCode } from '@opencrvs/commons/types'
 
 export interface IAuthHeader {
   Authorization: string
@@ -31,7 +32,7 @@ export enum EventType {
 
 export interface WebHook {
   event: EventType
-  permissions: string[]
+  permissions: CompositionSectionCode[]
 }
 
 export interface ISystem {

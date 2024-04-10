@@ -23,3 +23,9 @@ export function parseGQLResponse<T>(
   }
   return response.data
 }
+
+export async function delay(timeInMilliseconds: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeInMilliseconds)
+  })
+}

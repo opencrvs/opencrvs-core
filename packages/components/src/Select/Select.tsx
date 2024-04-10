@@ -28,7 +28,6 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   touched?: boolean
   hideBorder?: boolean
   options: ISelectOption[]
-  ignoreMediaQuery?: boolean
   color?: string
   placeholder?: string
 }
@@ -45,26 +44,28 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg19};
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
+
+  &:hover {
+  box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.primaryLighter};
+  }
+
   .react-select__control {
-    background: ${({ theme }) => theme.colors.white};
-    border-radius: 4px;
-    height: 40px;
-    box-shadow: none;
-    padding: 0 0 0 8px;
-    border: solid
-      ${({ theme, isDisabled }) =>
-        isDisabled ? theme.colors.grey300 : theme.colors.copy}
-      ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-    ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.negative : theme.colors.copy};
+    height: 46px;
+    border: solid 1px;
+    border-color: ${({ theme }) => theme.colors.grey600};
+
     &:hover {
-      border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-      ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.negative : theme.colors.copy};
+      background-color: ${({ theme }) => theme.colors.grey100}
+      border: solid 1px;
+      border-color: ${({ theme }) => theme.colors.grey600};
     }
+
     &:focus {
-      outline: none;
+      box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.grey600};
+      border-color: ${({ theme }) => theme.colors.grey600};
     }
   }
 
@@ -76,46 +77,42 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     display: none;
   }
 
-  .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-    ${({ theme }) => theme.colors.copy};
+  .react-select__control--is-active {
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.yellow};
   }
 
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 344px;
-      }`
-      : ''
-  }}
+  .react-select__control--is-focused {
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.grey600},
+      0 0 0 4px ${({ theme }) => theme.colors.yellow};
+  }
 
   .react-select__value-container {
-    padding: 0;
+    padding: 4px 16px;
   }
 
   .react-select__option {
+    height: 40px;
     border-radius: 4px;
     margin-bottom: 2px;
-    ${({ theme }) => theme.fonts.reg16};
+    ${({ theme }) => theme.fonts.reg18};
     background-color: ${({ theme }) => theme.colors.white};
   }
 
   .react-select__option--is-focused {
-    background-color: ${({ theme }) => theme.colors.grey100};
+    background-color: ${({ theme }) => theme.colors.primaryLighter};
     color: ${({ theme }) => theme.colors.copy};
     &:active {
-      background: ${({ theme }) => theme.colors.grey200};
+      background: ${({ theme }) => theme.colors.primaryLight};
       color: ${({ theme }) => theme.colors.copy};
     }
   }
 
   .react-select__option--is-selected {
-    background-color: ${({ theme }) => theme.colors.secondary};
-    color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.primaryLight};
+    color: ${({ theme }) => theme.colors.copy};
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
-      color: ${({ theme }) => theme.colors.white};
+      background: ${({ theme }) => theme.colors.primaryLight};
+      color: ${({ theme }) => theme.colors.copy};
     }
   }
 

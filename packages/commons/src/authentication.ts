@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { IAuthHeader } from './http'
+import * as decode from 'jwt-decode'
+
 /** All the scopes user can be assigned to */
 export const userScopes = {
   demo: 'demo',
@@ -77,3 +80,35 @@ export type UserScope = (typeof userScopes)[keyof typeof userScopes]
 export type SystemRole = keyof typeof systemRoleScopes
 export type SystemScope = (typeof systemScopes)[keyof typeof systemScopes]
 export type Scope = UserScope | SystemScope
+
+export interface ITokenPayload {
+  sub: string
+  exp: string
+  algorithm: string
+  scope: string[]
+}
+
+export function hasScope(authHeader: IAuthHeader, scope: Scope) {
+  if (!authHeader || !authHeader.Authorization) {
+    return false
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
+}
+
+export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
+  const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
+  return !!matchedScope
+}
+
+export const getTokenPayload = (token: string): ITokenPayload => {
+  let decoded: ITokenPayload
+  try {
+    decoded = decode(token)
+  } catch (err) {
+    throw new Error(
+      `getTokenPayload: Error occurred during token decode : ${err}`
+    )
+  }
+  return decoded
+}

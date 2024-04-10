@@ -203,7 +203,7 @@ do
             echo
             echo "nvm install 18.19.0"
             echo
-            echo "When the version is installed, us it:"
+            echo "When the version is installed, use it:"
             echo
             echo "nvm use 18.19.0"
             echo
@@ -243,7 +243,7 @@ if [[ $(docker ps -aq) ]] ; then
 fi
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -263,9 +263,8 @@ echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED
 echo
 
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-versionTest=$(do_version_check $myNodeVersion 18.19.0)
-if [ "$versionTest" == "LOWER" ] ; then
-  echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
+if [[ $myNodeVersion != 18.* ]]; then
+  echo "Sorry your Node version is not supported.  Your node version is $myNodeVersion."
   echo "We recommend you install Node v18.19.0 as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
@@ -336,7 +335,6 @@ fi
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
-echo "wait-on tcp:5001" && wait-on -l tcp:5001
 echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
