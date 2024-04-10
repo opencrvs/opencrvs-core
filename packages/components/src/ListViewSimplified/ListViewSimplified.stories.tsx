@@ -29,7 +29,7 @@ const Template: Story = ({ children, ...args }) => {
 export default {
   title: 'Data/List view',
   component: ListViewSimplified
-} as Meta
+} satisfies Meta
 
 const toggleMenu = (
   <ToggleMenu

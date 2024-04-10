@@ -15,7 +15,7 @@ import { ProgressBar } from './ProgressBar'
 export default {
   title: 'Data/Horizontal bar chart',
   component: ProgressBar
-} as Meta
+} satisfies Meta
 
 interface IProgressBarProps {
   id?: string

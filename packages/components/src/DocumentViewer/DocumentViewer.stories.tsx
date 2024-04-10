@@ -44,4 +44,4 @@ DocumentView.args = {
 export default {
   title: 'Data/Document viewer',
   component: DocumentViewer
-} as Meta
+} satisfies Meta

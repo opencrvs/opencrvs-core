@@ -22,7 +22,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 interface IProps {
   sections: IFormTabs[]

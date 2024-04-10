@@ -43,7 +43,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 const Template: Story<IProps> = () => {
   const [showMenu, setMenu] = useState(false)

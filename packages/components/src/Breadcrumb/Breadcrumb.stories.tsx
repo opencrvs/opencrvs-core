@@ -24,7 +24,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 const Template: Story<IBreadCrumbProps> = (args) => <BreadCrumb {...args} />
 

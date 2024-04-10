@@ -26,7 +26,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 const Template: ComponentStory<typeof Dialog> = ({ children, ...args }) => {
   const [isOpen, setIsVisible] = useState(false)

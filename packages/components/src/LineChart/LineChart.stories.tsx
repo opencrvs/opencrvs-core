@@ -15,7 +15,7 @@ import { LineChart } from './LineChart'
 export default {
   title: 'Data/Line chart',
   component: LineChart
-} as Meta
+} satisfies Meta
 
 const Template: ComponentStory<typeof LineChart> = (args) => (
   <LineChart {...args} />

@@ -23,4 +23,4 @@ PINKeypadView.args = {
 export default {
   title: 'Input/PIN entry',
   component: PINKeypad
-} as Meta
+} satisfies Meta

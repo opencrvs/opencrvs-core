@@ -21,7 +21,7 @@ import { ValidIndicator } from './ValidIndicator'
 export default {
   title: 'Input/Input field',
   component: InputField
-} as Meta
+} satisfies Meta
 
 const Template: Story<IInputFieldProps> = (args) => <InputField {...args} />
 

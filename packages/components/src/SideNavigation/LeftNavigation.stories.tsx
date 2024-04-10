@@ -75,4 +75,4 @@ SideNav.args = {
 export default {
   title: 'Layout/Side Nav',
   component: LeftNavigation
-} as Meta
+} satisfies Meta

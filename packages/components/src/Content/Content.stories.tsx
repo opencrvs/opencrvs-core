@@ -28,7 +28,7 @@ Content is often used by \`<Frame>\` where you can find more complex examples of
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 interface IProps {
   icon?: () => React.ReactNode

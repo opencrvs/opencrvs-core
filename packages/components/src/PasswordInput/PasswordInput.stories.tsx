@@ -16,7 +16,7 @@ import React from 'react'
 export default {
   title: 'Input/Password input',
   component: PasswordInput
-} as Meta
+} satisfies Meta
 
 const Template: Story<IPasswordInputProps> = (args) => (
   <PasswordInput {...args} />

@@ -15,7 +15,7 @@ import { Currency } from './Currency'
 export default {
   title: 'Typography/Currency',
   component: Currency
-} as Meta
+} satisfies Meta
 
 const Template: Story<{}> = () => (
   <Currency value={1000} currency={'AUD'} languagesAndCountry={'en-AU'} />

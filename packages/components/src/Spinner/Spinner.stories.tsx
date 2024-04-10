@@ -23,4 +23,4 @@ SpinnerExample.args = {
 export default {
   title: 'Data/Spinner',
   component: Spinner
-} as Meta
+} satisfies Meta

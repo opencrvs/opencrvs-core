@@ -23,7 +23,7 @@ export default {
     theme: { table: { disable: true } }, // Exclude theme prop
     color: { control: 'color' } // Display color prop as a color picker in controls panel
   }
-} as Meta
+} satisfies Meta
 
 const Template: Story<DividerProps> = (args) => <Divider {...args} />
 

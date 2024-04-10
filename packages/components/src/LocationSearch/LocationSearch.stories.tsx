@@ -15,7 +15,7 @@ import React from 'react'
 export default {
   title: 'Input/Location search',
   component: LocationSearch
-} as Meta
+} satisfies Meta
 
 const Template: ComponentStory<typeof LocationSearch> = (args) => (
   <LocationSearch {...args} />

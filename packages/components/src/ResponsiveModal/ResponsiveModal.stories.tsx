@@ -58,4 +58,4 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta

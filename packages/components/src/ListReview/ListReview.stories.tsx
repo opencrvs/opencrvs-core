@@ -28,7 +28,7 @@ export default {
     }
   },
   component: ListReview
-} as Meta
+} satisfies Meta
 
 const LinkExample = (
   <Link font="reg16" key="linkButton">

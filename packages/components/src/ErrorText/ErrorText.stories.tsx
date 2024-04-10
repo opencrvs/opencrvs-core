@@ -15,7 +15,7 @@ import { ErrorText } from './ErrorText'
 export default {
   title: 'Data/Error',
   component: ErrorText
-} as Meta
+} satisfies Meta
 
 const Template: Story<{}> = () => (
   <ErrorText>An unexpected error occured</ErrorText>

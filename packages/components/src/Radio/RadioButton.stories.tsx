@@ -15,7 +15,7 @@ import React from 'react'
 export default {
   title: 'Input/Radio/Radio',
   component: RadioButton
-} as Meta
+} satisfies Meta
 
 type Value = string | number | boolean
 

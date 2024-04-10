@@ -67,4 +67,4 @@ ToggleMenuView.args = {
 export default {
   title: 'Controls/Toggle menu',
   component: ToggleMenu
-} as Meta
+} satisfies Meta

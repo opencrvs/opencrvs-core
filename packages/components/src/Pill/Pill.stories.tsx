@@ -32,7 +32,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 export const Default = Template.bind({})
 Default.args = {

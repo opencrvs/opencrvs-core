@@ -22,7 +22,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />
 export const PaginationView = Template.bind({})

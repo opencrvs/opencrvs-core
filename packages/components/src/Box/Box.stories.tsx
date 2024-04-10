@@ -22,4 +22,4 @@ BoxView.args = {
 export default {
   title: 'Layout/Box',
   component: Box
-} as Meta
+} satisfies Meta

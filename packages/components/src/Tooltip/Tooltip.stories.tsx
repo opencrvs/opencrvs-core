@@ -34,7 +34,7 @@ export default {
       }
     }
   }
-} as Meta
+} satisfies Meta
 
 const ButtonContainer = ({ children }: { children: React.ReactNode }) => (
   <div

@@ -15,7 +15,7 @@ import { TextArea } from './TextArea'
 export default {
   title: 'Input/Text area',
   component: TextArea
-} as Meta
+} satisfies Meta
 
 const Template: Story = (args) => <TextArea {...args} />
 

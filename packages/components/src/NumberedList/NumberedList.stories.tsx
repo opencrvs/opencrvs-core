@@ -15,7 +15,7 @@ import { NumberedList, NumberedListProps } from './NumberedList'
 export default {
   title: 'Typography/Numbered List',
   component: NumberedList
-} as Meta
+} satisfies Meta
 
 const Template: Story<NumberedListProps> = (args) => <NumberedList {...args} />
 
