@@ -10767,10 +10767,10 @@ cosmiconfig@^7, cosmiconfig@^7.0.0, cosmiconfig@^7.0.1, cosmiconfig@^7.1.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
-country-code-lookup@^0.0.23:
-  version "0.0.23"
-  resolved "https://registry.npmjs.org/country-code-lookup/-/country-code-lookup-0.0.23.tgz"
-  integrity sha512-kxhIGcau9/X+tgPg9yO2q1OLu8jiYYsdwXuiXzHdsgNChd36xrJMlOba7ka9O1xShCVTiVQPQpq/tcuy4WiW+Q==
+country-code-lookup@^0.1.0:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/country-code-lookup/-/country-code-lookup-0.1.2.tgz#05a4a62a6392bc407f959415778ec7c7bfeec849"
+  integrity sha512-8eBEgTQWAlWw+0OLqN5GBXNMR2r184vB9Z+rLjhl+ZgprlAr9xQdFN6Mdt0JXmZXg4uA8BB3hYIZcO8s92KzlA==
 
 country-data@^0.0.31:
   version "0.0.31"
