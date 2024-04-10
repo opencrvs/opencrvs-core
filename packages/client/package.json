@@ -45,7 +45,7 @@
     "@types/history": "^4.6.2",
     "@types/json2csv": "^4.4.0",
     "@types/nock": "^10.0.3",
-    "@types/pdfmake": "^0.1.21",
+    "@types/pdfmake": "^0.2.0",
     "@types/react-redux": "^7.1.5",
     "@types/react-router": "^5.1.2",
     "@types/react-tooltip": "^4.2.4",
