@@ -258,8 +258,6 @@ versionCheckOutput=$(npx --yes check-node-version --package --print 2>&1 || true
 currentVersion=$(echo "$versionCheckOutput" | grep 'node:' | awk '{print $2}')
 
 if echo "$versionCheckOutput" | grep -q 'Wanted node version'; then
-  pattern=$(node -e "console.log(require('./package.json').engines.node)")
-
   echo "❌ Sorry, your Node version is not supported. Your node version is $currentVersion."
   echo "We recommend you install Node version $nvmVersion as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
