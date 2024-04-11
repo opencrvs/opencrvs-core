@@ -23,7 +23,7 @@ RUN yarn build-storybook
 
 # Step 2. Build the actual image
 
-FROM nginx@sha256:6db391d1c0cfb30588ba0bf72ea999404f2764febf0f1f196acd5867ac7efa7e
+FROM nginx@sha256:07145ce64726c77459474a1e283d45d6755d9b175c2cc0bd85fe693ee09db744
 
 RUN apt-get update && apt-get upgrade -y
 
