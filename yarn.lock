@@ -15365,10 +15365,10 @@ is-subset@^0.1.1:
   resolved "https://registry.npmjs.org/is-subset/-/is-subset-0.1.1.tgz"
   integrity sha512-6Ybun0IkarhmEqxXCNw/C0bna6Zb/TkfUX9UbwJtK6ObwAVCxmAP308WWTHviM/zAqXk05cdhYsUsZeGQh99iw==
 
-is-svg@^4.3.2, is-svg@^4.4.0:
-  version "4.4.0"
-  resolved "https://registry.npmjs.org/is-svg/-/is-svg-4.4.0.tgz"
-  integrity sha512-v+AgVwiK5DsGtT9ng+m4mClp6zDAmwrW8nZi6Gg15qzvBnRWWdfWA1TGaXyCDnWq5g5asofIgMVl3PjKxvk1ug==
+is-svg@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/is-svg/-/is-svg-5.0.0.tgz#b3039213d6f4805669bb5afb043e05e5632ed206"
+  integrity sha512-sRl7J0oX9yUNamSdc8cwgzh9KBLnQXNzGmW0RVHwg/jEYjGNYHC6UvnYD8+hAeut9WwxRvhG9biK7g/wDGxcMw==
   dependencies:
     fast-xml-parser "^4.1.3"
 
