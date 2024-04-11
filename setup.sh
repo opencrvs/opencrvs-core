@@ -166,6 +166,9 @@ echo
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 
+# Reads .nvmrc and trims the whitespace
+nvmVersion=$(cat .nvmrc | tr -d '[:space:]')
+
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
   dependencies+=("docker compose")
@@ -200,21 +203,21 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node 18.19.0 as this release has been tested on that version."
+            echo "We recommend you install Node $nvmVersion as this release has been tested on that version."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
             echo
-            echo "nvm install 18.19.0"
+            echo "nvm install $nvmVersion"
             echo
             echo "When the version is installed, use it:"
             echo
-            echo "nvm use 18.19.0"
+            echo "nvm use $nvmVersion"
             echo
             echo "Finally set the version to be the default:"
             echo
-            echo "nvm alias default 18.19.0"
+            echo "nvm alias default $nvmVersion"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
@@ -253,15 +256,11 @@ versionCheckOutput=$(npx --yes check-node-version --package --print 2>&1 || true
 currentVersion=$(echo "$versionCheckOutput" | grep 'node:' | awk '{print $2}')
 
 if echo "$versionCheckOutput" | grep -q 'Wanted node version'; then
-  wantedVersion=$(echo "$versionCheckOutput" | grep 'Wanted node version' | cut -d ' ' -f 4-)
-  pattern=$(node -e "console.log(require('./package.json').engines.node)")
-  latestVersion=$(curl -s https://nodejs.org/dist/index.json | npx -y node-jq -r "[.[] | select(.version | test(\"^v${pattern//x/.}$\"))][0].version")
-
   echo "❌ Sorry, your Node version is not supported. Your node version is $currentVersion."
-  echo "We recommend you install Node version $latestVersion as this release has been tested on that version."
+  echo "We recommend you install Node version $nvmVersion as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice. For example run:"
-  echo "nvm install $latestVersion"
+  echo "nvm install $nvmVersion"
   exit 1
 else
   echo -e "Your Node version: $currentVersion is \033[32msupported!\033[0m :)"
