@@ -25,7 +25,7 @@ export async function svgUploadHandler(
   h: Hapi.ResponseToolkit
 ) {
   const ref = uuid()
-  const bufferData = request.payload as Buffer
+  const bufferData = request.payload.toString()
   if (!isSvg(bufferData)) {
     throw badRequest()
   }
