@@ -199,22 +199,25 @@ do
             fi
         fi
         if [ $i == "node" ] ; then
+            # Reads .nvmrc and trims the whitespace
+            nvm_version=$(cat .nvmrc | tr -d '[:space:]')
+
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node 18.19.0 as this release has been tested on that version."
+            echo "We recommend you install Node $nvm_version as this release has been tested on that version."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
             echo
-            echo "nvm install 18.19.0"
+            echo "nvm install $nvm_version"
             echo
             echo "When the version is installed, use it:"
             echo
-            echo "nvm use 18.19.0"
+            echo "nvm use $nvm_version"
             echo
             echo "Finally set the version to be the default:"
             echo
-            echo "nvm alias default 18.19.0"
+            echo "nvm alias default $nvm_version"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
