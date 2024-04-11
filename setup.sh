@@ -163,8 +163,6 @@ fi
 echo -e "\033[32m:::::::: Checking that you have nothing running on OpenCRVS ports ::::::::\033[0m"
 echo
 
-
-
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 
