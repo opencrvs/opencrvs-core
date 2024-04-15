@@ -33,6 +33,7 @@ import updateInformantSMSNotificationHandler, {
 import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
+import { ServerRoute } from '@hapi/hapi'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -44,19 +45,19 @@ export const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
 
-export default function getRoutes() {
+export default function getRoutes(): ServerRoute[] {
   return [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: (request, h) => {
         // Perform any health checks and return true or false for success prop
         return {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -66,7 +67,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/config',
       handler: configHandler,
-      config: {
+      options: {
         auth: {
           scope: [
             RouteScope.NATLSYSADMIN,
@@ -86,7 +87,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/publicConfig',
       handler: getLoginConfigHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
@@ -96,7 +97,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/integrationConfig',
       handler: getSystems,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieve Application integrations'
       }
@@ -105,7 +106,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/forms',
       handler: getForms,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieve forms'
       }
@@ -114,7 +115,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/getCertificate',
       handler: getCertificateHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieves certificate',
         auth: {
@@ -134,7 +135,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/getActiveCertificates',
       handler: getActiveCertificatesHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieves active certificates for birth and death',
         auth: {
@@ -154,7 +155,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/createCertificate',
       handler: createCertificateHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Creates a new Certificate',
         auth: {
@@ -169,7 +170,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/updateCertificate',
       handler: updateCertificateHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Updates an existing Certificate',
         auth: {
@@ -184,7 +185,7 @@ export default function getRoutes() {
       method: 'DELETE',
       path: '/certificate/{certificateId}',
       handler: deleteCertificateHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Delete certificate',
         auth: {
@@ -196,7 +197,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/updateApplicationConfig',
       handler: updateApplicationConfigHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Updates an existing Config',
         auth: {
@@ -211,7 +212,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/informantSMSNotification',
       handler: createInformantSMSNotificationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Creates informantSMSNotifications',
         auth: {
@@ -226,7 +227,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/informantSMSNotification',
       handler: getInformantSMSNotificationsHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Get informantSMSNotifications',
         auth: {
@@ -244,7 +245,7 @@ export default function getRoutes() {
       method: 'PUT',
       path: '/informantSMSNotification',
       handler: updateInformantSMSNotificationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Update informantSMSNotification',
         auth: {
@@ -259,7 +260,7 @@ export default function getRoutes() {
       method: 'GET',
       path: '/dashboardQueries',
       handler: getDashboardQueries,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Fetch dashboard queries from country config'
       }
