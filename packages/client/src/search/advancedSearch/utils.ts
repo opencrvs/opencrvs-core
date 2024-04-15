@@ -158,7 +158,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
         : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
-        ? [RegStatus.AnyStatus]
+        ? Object.values(RegStatus)
         : [localState.registrationStatuses]
   } else {
     transformedStoreState.registrationStatuses = undefined
@@ -549,6 +549,7 @@ const getLabelForRegistrationStatus = (
     ALL: [
       RegStatus.Archived,
       RegStatus.Certified,
+      RegStatus.CorrectionRequested,
       RegStatus.DeclarationUpdated,
       RegStatus.Declared,
       RegStatus.InProgress,
@@ -613,7 +614,6 @@ const getLabelForRegistrationStatus = (
   const formattedLabel =
     forMattedStatusList.find((e) => statusType === e.value)?.label ||
     statusList[0]
-
   return formattedLabel
 }
 
