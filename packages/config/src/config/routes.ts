@@ -34,6 +34,8 @@ import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
+import { getOffices } from '@config/handlers/locations/offices'
+import * as Joi from 'joi'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -61,6 +63,20 @@ export default function getRoutes(): ServerRoute[] {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}/offices',
+      handler: getOffices,
+      options: {
+        tags: ['api'],
+        description: 'Retrieve offices under a location',
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string()
+          })
+        }
       }
     },
     {
