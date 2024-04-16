@@ -110,7 +110,7 @@ done
 echo
 echo -e "\033[32m:::::::::: STARTING OPENCRVS ::::::::::\033[0m"
 echo
-echo "If you did not previously run our setup command, Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then docker will build them.  If you did run our setup command, OpenCRVS will start much faster. Wait for the OpenCRVS stack to start up completely (output will slow and gradually stop ...), then OpenCRVS Core will be available."
+echo "If you did not previously run our setup command, Docker is downloading Mongo DB, ElasticSearch and Hearth docker images.  These are large files.  Then docker will build them.  If you did run our setup command, OpenCRVS will start much faster. Wait for the OpenCRVS stack to start up completely (output will slow and gradually stop ...), then OpenCRVS Core will be available."
 echo
 echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
