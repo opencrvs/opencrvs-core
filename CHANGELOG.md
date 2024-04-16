@@ -23,6 +23,7 @@
 - Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
 - Fix record correction e2e failing due to stale data getting saved on redux
 - Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
+- In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
 
 ## Refactor
 
@@ -44,7 +45,7 @@
 - Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
 - Make language names used in language select dropdowns configurable in country resource package copy
 - Fix login to field agent when an incomplete record is previously retrieved by them [#6584](https://github.com/opencrvs/opencrvs-core/issues/6584)
-- In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
+
 
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 
