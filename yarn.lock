@@ -10684,12 +10684,12 @@ cookie-signature@1.0.6:
   resolved "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz"
   integrity sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==
 
-cookie@0.6.0:
+cookie@0.6.0, cookie@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.6.0.tgz#2798b04b071b0ecbff0dbb62a505a8efa4e19051"
   integrity sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==
 
-cookie@^0.4.0, cookie@^0.4.1, cookie@^0.4.2:
+cookie@^0.4.1, cookie@^0.4.2:
   version "0.4.2"
   resolved "https://registry.npmjs.org/cookie/-/cookie-0.4.2.tgz"
   integrity sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==
@@ -14156,13 +14156,13 @@ handlebars@*, handlebars@4.x.x, handlebars@^4.7.6, handlebars@^4.7.7:
   optionalDependencies:
     uglify-js "^3.1.4"
 
-hapi-auth-jwt2@10.4.0:
-  version "10.4.0"
-  resolved "https://registry.npmjs.org/hapi-auth-jwt2/-/hapi-auth-jwt2-10.4.0.tgz"
-  integrity sha512-x733a6bdLSd0bMQeuvkENlNwLRHzsenhoUan7JQLEIizqTWPzPJtukixjx+LCLMyC/5BG3Si4npVB5mqfIMAog==
+hapi-auth-jwt2@10.5.1:
+  version "10.5.1"
+  resolved "https://registry.yarnpkg.com/hapi-auth-jwt2/-/hapi-auth-jwt2-10.5.1.tgz#9c42d8b228f82b92ac4c2f0fe39a386242520e37"
+  integrity sha512-ArvG1LOIiB5OEq8E1vy4gxrpXXULE39+NBf+IFHw0RzGLjL+HG8uSvaaFEyq7EeISj5FUrsY0u8CuI0UC8CBAw==
   dependencies:
-    "@hapi/boom" "^9.0.0"
-    cookie "^0.4.0"
+    "@hapi/boom" "^10.0.0"
+    cookie "^0.6.0"
     jsonwebtoken "^9.0.0"
 
 hapi-boom-decorators@^3.0.0:
