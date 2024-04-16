@@ -25,7 +25,7 @@ services:
       - discovery.type=single-node
 
   influxdb:
-    image: influxdb:1.8.10@sha256:0752b8858dbdc1812aa98dfd5c1856b188809af9990dab6c24383897119fb328
+    image: influxdb:1.8.10@sha256:8e3ed6d1759d62a63c185462f5f9c8e2aa45dfe3e3876ea0c2eeaa71e6b70a43
     restart: unless-stopped
 
   hearth:
