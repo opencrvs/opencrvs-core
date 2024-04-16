@@ -122,7 +122,7 @@ async function createIndexBody(
   await createGroomIndex(body, composition, bundle)
   createWitnessOneIndex(body, composition, bundle)
   createWitnessTwoIndex(body, composition, bundle)
-  await addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
+  addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
   await createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   await createStatusHistory(body, task, authHeader, bundle)

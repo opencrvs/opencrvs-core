@@ -110,7 +110,7 @@ async function createIndexBody(
   bundle: SavedBundle
 ) {
   await createDeceasedIndex(body, composition, bundle)
-  await addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
+  addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
   createFatherIndex(body, composition, bundle)
   createMotherIndex(body, composition, bundle)
   createSpouseIndex(body, composition, bundle)

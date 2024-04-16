@@ -23,15 +23,10 @@ import {
   resourceIdentifierToUUID,
   SavedBundle,
   SavedComposition,
-  SavedLocation,
   SavedTask
 } from '@opencrvs/commons/types'
 import { FLAGGED_AS_POTENTIAL_DUPLICATE, FHIR_URL } from '@search/constants'
-import {
-  IBirthCompositionBody,
-  ICompositionBody,
-  IDeathCompositionBody
-} from '@search/elasticsearch/utils'
+import { ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 import fetch from 'node-fetch'
 
@@ -95,71 +90,60 @@ export function findEntry<T extends Resource = Resource>(
   return getFromBundleById<T>(bundle, reference!.split('/')[1]).resource
 }
 
-export async function addEventLocation(
+export function addEventLocation(
   bundle: SavedBundle,
-  body: IBirthCompositionBody | IDeathCompositionBody,
+  body: ICompositionBody,
   code: Extract<
     CompositionSectionCode,
     'birth-encounter' | 'death-encounter' | 'marriage-encounter'
   >
 ) {
   const composition = getComposition(bundle)
-  let location: SavedLocation | undefined
 
   const encounterSection = findCompositionSection(code, composition)
-  if (encounterSection && encounterSection.entry) {
-    const encounter = findResourceFromBundleById<Encounter>(
-      bundle,
-      resourceIdentifierToUUID(encounterSection.entry[0].reference)
-    )
 
-    if (encounter && encounter.location) {
-      const locationResource = findResourceFromBundleById<Location>(
-        bundle,
-        resourceIdentifierToUUID(encounter.location[0].location.reference)
-      )
-
-      if (locationResource !== null) {
-        location = locationResource
-      }
-    }
+  if (!encounterSection) {
+    return
   }
 
-  if (location) {
-    const isLocationHealthFacility =
-      location.type &&
-      location.type.coding &&
-      location.type.coding.find((obCode) => obCode.code === 'HEALTH_FACILITY')
+  const encounter = findResourceFromBundleById<Encounter>(
+    bundle,
+    resourceIdentifierToUUID(encounterSection.entry[0].reference)
+  )
 
-    if (isLocationHealthFacility) {
-      body.eventLocationId = location.id
-    } else {
-      body.eventJurisdictionIds = []
-      if (location.address?.country) {
-        body.eventCountry = location.address.country
-      }
-      //eventLocationLevel1
-      if (location.address?.state) {
-        body.eventJurisdictionIds.push(location.address.state)
-      }
-      //eventLocationLevel2
-      if (location.address?.district) {
-        body.eventJurisdictionIds.push(location.address.district)
-      }
-      //eventLocationLevel3
-      if (location.address?.line?.[10]) {
-        body.eventJurisdictionIds.push(location.address.line[10])
-      }
-      //eventLocationLevel4
-      if (location.address?.line?.[11]) {
-        body.eventJurisdictionIds.push(location.address.line[11])
-      }
-      //eventLocationLevel5
-      if (location.address?.line?.[12]) {
-        body.eventJurisdictionIds.push(location.address.line[12])
-      }
-    }
+  if (!encounter || !encounter.location) {
+    return
   }
+
+  const location = findResourceFromBundleById<Location>(
+    bundle,
+    resourceIdentifierToUUID(encounter.location[0].location.reference)
+  )
+
+  if (!location) {
+    return
+  }
+
+  const isLocationHealthFacility = location.type?.coding?.some(
+    (obCode) => obCode.code === 'HEALTH_FACILITY'
+  )
+
+  if (isLocationHealthFacility) {
+    body.eventLocationId = location.id
+    return
+  }
+
+  if (location.address?.country) {
+    body.eventCountry = location.address.country
+  }
+
+  body.eventJurisdictionIds = [
+    location.address?.state, //eventLocationLevel1
+    location.address?.district, //eventLocationLevel2
+    location.address?.line?.[10], //eventLocationLevel3
+    location.address?.line?.[11], //eventLocationLevel4
+    location.address?.line?.[12] //eventLocationLevel5
+  ].filter((maybeString): maybeString is string => Boolean(maybeString))
 }
 
 export function findEntryResourceByUrl<T extends fhir.Resource = fhir.Resource>(
