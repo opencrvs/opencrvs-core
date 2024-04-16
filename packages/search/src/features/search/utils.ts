@@ -14,8 +14,16 @@ import {
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 
+export type QueryBuilderParams = Omit<
+  IAdvancedSearchParam,
+  `eventLocationLevel${1 | 2 | 3 | 4 | 5}` | 'declarationJurisdictionId'
+> & {
+  eventJurisdictionIds?: string[]
+  declarationJurisdictionIds?: string[]
+}
+
 export function advancedQueryBuilder(
-  params: IAdvancedSearchParam,
+  params: QueryBuilderParams,
   createdBy: string,
   isExternalSearch: boolean
 ) {
@@ -155,13 +163,11 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (params.declarationJurisdictionId) {
+  if (params.declarationJurisdictionIds) {
     must.push({
-      match: {
-        declarationJurisdictionIds: {
-          query: params.declarationJurisdictionId,
-          boost: 2.0
-        }
+      terms: {
+        declarationJurisdictionIds: params.declarationJurisdictionIds,
+        boost: 2.0
       }
     })
   }
@@ -182,21 +188,11 @@ export function advancedQueryBuilder(
     })
   }
 
-  const eventJurisdictionIds = [
-    params.eventLocationLevel1,
-    params.eventLocationLevel2,
-    params.eventLocationLevel3,
-    params.eventLocationLevel4,
-    params.eventLocationLevel5
-  ].filter((id) => Boolean(id))
-
-  if (eventJurisdictionIds.length > 0) {
-    eventJurisdictionIds.forEach((locationId) => {
-      must.push({
-        match: {
-          eventJurisdictionIds: locationId
-        }
-      })
+  if (params.eventJurisdictionIds) {
+    must.push({
+      terms: {
+        eventJurisdictionIds: params.eventJurisdictionIds
+      }
     })
   }
 
