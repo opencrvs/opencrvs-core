@@ -75,7 +75,10 @@ const auditEventHandler = rest.post(
       'registered',
       'certified',
       'reinstated',
-      'issued'
+      'issued',
+      'downloaded',
+      'archived',
+      'unassigned'
     ] satisfies RecordEvent[]
     if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)

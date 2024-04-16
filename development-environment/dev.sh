@@ -94,11 +94,11 @@ openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 303
 for x in "${openCRVSPorts[@]}"
 do
    :
-    if lsof -i:$x; then
+    if lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x >/dev/null; then
       echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
       echo "You need to find out which application is using this port and quit the application."
       echo "You can find out the application by running:"
-      echo "lsof -i:$x"
+      echo "lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x"
       exit 1
     else
         echo -e "$x \033[32m port is available!\033[0m :)"

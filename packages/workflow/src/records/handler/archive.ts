@@ -14,6 +14,7 @@ import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { createRoute } from '@workflow/states'
+import { auditEvent } from '@workflow/records/audit'
 
 const requestSchema = z.object({
   reason: z.string().optional(),
@@ -42,6 +43,7 @@ export const archiveRoute = [
       )
 
       await indexBundle(archivedRecord, token)
+      await auditEvent('archived', archivedRecord, token)
       return archivedRecord
     }
   })

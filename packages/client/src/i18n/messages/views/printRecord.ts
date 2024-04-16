@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessage } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
   warningDeclarationDetails: {
@@ -39,4 +39,4 @@ const messagesToDefine = {
   }
 }
 
-export const printRecordMessages = defineMessage(messagesToDefine)
+export const printRecordMessages = defineMessages(messagesToDefine)

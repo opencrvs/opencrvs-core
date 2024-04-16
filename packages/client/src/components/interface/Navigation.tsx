@@ -18,6 +18,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
+  goToAllUserEmail,
   goToApplicationConfig,
   goToCertificateConfig,
   goToDashboardView,
@@ -96,6 +97,7 @@ export const WORKQUEUE_TABS = {
   logout: 'logout',
   communications: 'communications',
   informantNotification: 'informantnotification',
+  emailAllUsers: 'emailAllUsers',
   readyToIssue: 'readyToIssue'
 } as const
 
@@ -238,6 +240,7 @@ interface IDispatchProps {
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
   goToInformantNotification: typeof goToInformantNotification
+  goToAllUserEmail: typeof goToAllUserEmail
 }
 
 interface IStateProps {
@@ -319,6 +322,7 @@ const NavigationView = (props: IFullProps) => {
     goToDashboardView,
     goToLeaderBoardsView,
     goToInformantNotification,
+    goToAllUserEmail,
     className
   } = props
   const tabId = deselectAllTabs
@@ -334,7 +338,10 @@ const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.systems,
     WORKQUEUE_TABS.userRoles
   ]
-  const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
+  const conmmunicationTab: string[] = [
+    WORKQUEUE_TABS.informantNotification,
+    WORKQUEUE_TABS.emailAllUsers
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
@@ -809,6 +816,17 @@ const NavigationView = (props: IFullProps) => {
                                 WORKQUEUE_TABS.informantNotification
                             }
                           />
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.emailAllUsers]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
+                            onClick={goToAllUserEmail}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.emailAllUsers
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -993,6 +1011,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
       ? WORKQUEUE_TABS.informantNotification
+      : window.location.href.endsWith(WORKQUEUE_TABS.emailAllUsers)
+      ? WORKQUEUE_TABS.emailAllUsers
       : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
       ? WORKQUEUE_TABS.userRoles
       : ''
@@ -1022,7 +1042,8 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
-  goToInformantNotification
+  goToInformantNotification,
+  goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

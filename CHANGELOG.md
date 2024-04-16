@@ -26,7 +26,8 @@
 
 ## Refactor
 
-- Remove dependency on openhim. The openhim db is kept for backwards compatibility reasons and will be removed in v1.6
+- Remove dependency on openhim. The openhim db is kept for backwards compatibility reasons and will be removed in v1.6. It has brought some major changes 
+  in how the microservices are communicating among them. More on this can be found on the updated [sequence diagrams](https://github.com/opencrvs/opencrvs-core/tree/develop/sequence-diagrams/backend)
 
 ## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
 
