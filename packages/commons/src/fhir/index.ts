@@ -391,29 +391,13 @@ export function findEntryFromBundle<T extends Resource = Resource>(
       )
 }
 
-export function findCompositionSection<T extends SavedComposition>(
-  code: CompositionSectionCode,
-  composition: T
-): SavedCompositionSection
-
 export function findCompositionSection<T extends Composition>(
   code: CompositionSectionCode,
   composition: T
-): CompositionSection
-
-export function findCompositionSection<T extends Composition>(
-  code: CompositionSectionCode,
-  composition: T
-) {
-  return (composition.section &&
-    composition.section.find((section) => {
-      if (!section.code || !section.code.coding || !section.code.coding.some) {
-        return false
-      }
-      return section.code.coding.some((coding) => coding.code === code)
-    })) as T extends SavedComposition
-    ? SavedCompositionSection
-    : CompositionSection
+): T['section'][number] | undefined {
+  return composition.section.find((section) =>
+    section.code.coding.some((coding) => coding.code === code)
+  )
 }
 
 export function resourceToBundleEntry<T extends Resource>(
