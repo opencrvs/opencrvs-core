@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18@sha256:ed43613fe3c372e98e883f36fab2597ea63c86ff8bb22b2a298d1cd4fb436bab
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19@sha256:d7c71fa33140df19a4a4a355f6c1aee1eddeb35519de84bf7e8205c06f40b90a
     restart: unless-stopped
     environment:
       - discovery.type=single-node
@@ -38,21 +38,6 @@ services:
       - server__fhirVersion=stu3
     depends_on:
       - mongo1
-    restart: unless-stopped
-
-  openhim-core:
-    image: jembi/openhim-core:7@sha256:863e3d868923a7972c44b6812fdb830ef5ea9b64f35c9392bb506c69ffab249e
-    environment:
-      - mongo_url=mongodb://mongo1/openhim-dev
-      - mongo_atnaUrl=mongodb://mongo1/openhim-dev
-      - logger_level=error
-      - router_timeout=180000
-    depends_on:
-      - mongo1
-    restart: unless-stopped
-
-  openhim-console:
-    image: jembi/openhim-console:1.13@sha256:caf4aef23c3702aaf9375b3a00c5d5c3f0854c15c238f2ea98cd57f9fb9f9ab6
     restart: unless-stopped
 
   minio:

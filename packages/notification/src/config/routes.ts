@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  allUsersEmailHandler,
+  allUsersEmailPayloadSchema
+} from '@notification/features/email/all-user-handler'
+import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendBirthRejectionConfirmation,
@@ -61,7 +65,8 @@ const enum RouteScope {
   VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin'
+  SYSADMIN = 'sysadmin',
+  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
 }
 
 const recordValidation: RouteOptionsValidate = {
@@ -139,6 +144,28 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description:
           'Sends a notification to country-config for death ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-for-approval',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated birth declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-for-approval',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated death declaration',
         validate: recordValidation
       }
     },
@@ -391,6 +418,21 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description: 'Sends an sms to a user with new username',
         validate: {
           payload: retrieveUserNameNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/allUsersEmail',
+      handler: allUsersEmailHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+        },
+        description: 'Sends emails to all users given in payload',
+        validate: {
+          payload: allUsersEmailPayloadSchema
         }
       }
     }

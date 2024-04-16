@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",
@@ -42,7 +42,7 @@
     "@types/fhir": "0.0.30",
     "mongodb": "^4.17.1",
     "prettier": "^2.5.0",
-    "rimraf": "^2.6.2",
+    "rimraf": "^5.0.0",
     "typescript": "4.9.5"
   },
   "lint-staged": {

@@ -44,7 +44,10 @@ import {
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import styled, { withTheme } from 'styled-components'
-import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  formattedDuration,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
@@ -200,7 +203,7 @@ class ReadyForReviewComponent extends React.Component<
       const dateOfEvent =
         (reg.dateOfEvent &&
           reg.dateOfEvent.length > 0 &&
-          new Date(reg.dateOfEvent)) ||
+          plainDateToLocalDate(reg.dateOfEvent)) ||
         ''
       const createdAt =
         getPreviousOperationDateByOperationType(
