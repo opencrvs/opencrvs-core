@@ -546,19 +546,7 @@ const getLabelForRegistrationStatus = (
   intl: IntlShape
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
-    ALL: [
-      RegStatus.Archived,
-      RegStatus.Certified,
-      RegStatus.CorrectionRequested,
-      RegStatus.DeclarationUpdated,
-      RegStatus.Declared,
-      RegStatus.InProgress,
-      RegStatus.Registered,
-      RegStatus.Rejected,
-      RegStatus.Validated,
-      RegStatus.WaitingValidation,
-      RegStatus.Issued
-    ],
+    ALL: Object.values(RegStatus),
     IN_REVIEW: [
       RegStatus.WaitingValidation,
       RegStatus.Validated,
