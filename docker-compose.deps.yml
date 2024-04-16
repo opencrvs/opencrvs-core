@@ -11,7 +11,7 @@ volumes:
   metricbeat:
 services:
   mongo1:
-    image: mongo:4.4@sha256:ce3d0eade688a2299e9e20454efc561a6fc8de1cbde5abb0f50feadfe758037b
+    image: mongo:4.4@sha256:becc9cfff9de203e208194f649042b0396906d45b559d94d418a8cec70f7ad79
     restart: unless-stopped
 
   redis:
