@@ -10,6 +10,7 @@
 
 scalar Date
 scalar Map
+scalar PlainDate
 
 input HumanNameInput {
   use: String # bn | en - the language the name text is written in
@@ -109,12 +110,12 @@ type RelatedPerson { # -> Related Person
 
 input DeceasedInput {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 type Deceased {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 input PersonInput {
@@ -123,13 +124,13 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String # Not in BDRIS2 - keep as optional
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date # Not in BDRIS2
+  dateOfMarriage: PlainDate # Not in BDRIS2
   # For order of birth 3 equals 3rd born
   multipleBirth: Int # Not in BDRIS2
   address: [AddressInput]
@@ -147,13 +148,13 @@ type Person { # -> Patient
   name: [HumanName] # -> .name
   telecom: [ContactPoint] # -> .telecom
   gender: String # -> .gender
-  birthDate: String # -> birthDate
+  birthDate: PlainDate # -> birthDate
   age: Float # -> .extension(url='http://opencrvs.org/specs/age').valueInteger
   maritalStatus: String # -> .maritalStatus
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime
+  dateOfMarriage: PlainDate # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime
   # For order of birth 3 equals 3rd born
   multipleBirth: Int # -> .multipleBirthInteger
   address: [Address] # -> .address

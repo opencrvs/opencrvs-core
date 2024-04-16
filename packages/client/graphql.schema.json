@@ -3028,7 +3028,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -5338,7 +5338,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -6092,7 +6092,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -6127,7 +6127,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "defaultValue": null,
@@ -6917,7 +6917,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -8880,7 +8880,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -12958,7 +12958,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -12970,7 +12970,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "isDeprecated": false,
@@ -13245,7 +13245,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "PlainDate",
               "ofType": null
             },
             "defaultValue": null,
@@ -13257,7 +13257,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Date",
+              "name": "PlainDate",
               "ofType": null
             },
             "defaultValue": null,
@@ -13445,6 +13445,16 @@
             "deprecationReason": null
           }
         ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "PlainDate",
+        "description": "A date string such as 2024-04-15",
+        "fields": null,
+        "inputFields": null,
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
