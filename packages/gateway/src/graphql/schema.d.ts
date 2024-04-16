@@ -183,13 +183,13 @@ export interface GQLPerson {
   name?: Array<GQLHumanName | null>
   telecom?: Array<GQLContactPoint | null>
   gender?: string
-  birthDate?: string
+  birthDate?: GQLPlainDate
   age?: number
   maritalStatus?: string
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   multipleBirth?: number
   address?: Array<GQLAddress | null>
   photo?: Array<GQLAttachment | null>
@@ -882,6 +882,8 @@ export interface GQLContactPoint {
   use?: string
 }
 
+export type GQLPlainDate = any
+
 export interface GQLAddress {
   use?: string
   type?: string
@@ -916,7 +918,7 @@ export interface GQLAttachment {
 
 export interface GQLDeceased {
   deceased?: boolean
-  deathDate?: string
+  deathDate?: GQLPlainDate
 }
 
 export interface GQLStatusWiseRegistrationCount {
@@ -1061,7 +1063,7 @@ export interface GQLEventProgressSet {
   id: string
   type?: string
   name?: Array<GQLHumanName | null>
-  dateOfEvent?: GQLDate
+  dateOfEvent?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   startedBy?: GQLUser
   startedByFacility?: string
@@ -1123,13 +1125,13 @@ export interface GQLPersonInput {
   name?: Array<GQLHumanNameInput | null>
   telecom?: Array<GQLContactPointInput | null>
   gender?: string
-  birthDate?: string
+  birthDate?: GQLPlainDate
   age?: number
   maritalStatus?: string
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
   photo?: Array<GQLAttachmentInput>
@@ -1557,7 +1559,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   type?: string
   childName?: Array<GQLHumanName | null>
   childIdentifier?: string
-  dateOfBirth?: GQLDate
+  dateOfBirth?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
   placeOfBirth?: string
@@ -1577,7 +1579,7 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   type?: string
   deceasedGender?: string
   deceasedName?: Array<GQLHumanName | null>
-  dateOfDeath?: GQLDate
+  dateOfDeath?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
@@ -1589,7 +1591,7 @@ export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
   groomName?: Array<GQLHumanName | null>
   brideIdentifier?: string
   groomIdentifier?: string
-  dateOfMarriage?: GQLDate
+  dateOfMarriage?: GQLPlainDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
@@ -1661,7 +1663,7 @@ export interface GQLAttachmentInput {
 
 export interface GQLDeceasedInput {
   deceased?: boolean
-  deathDate?: string
+  deathDate?: GQLPlainDate
 }
 
 export interface GQLRegWorkflowInput {
@@ -1875,6 +1877,7 @@ export interface GQLResolver {
   IdentityType?: GQLIdentityTypeTypeResolver
   HumanName?: GQLHumanNameTypeResolver
   ContactPoint?: GQLContactPointTypeResolver
+  PlainDate?: GraphQLScalarType
   Address?: GQLAddressTypeResolver
   Attachment?: GQLAttachmentTypeResolver
   Deceased?: GQLDeceasedTypeResolver

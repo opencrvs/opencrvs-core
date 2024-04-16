@@ -51,7 +51,10 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
   getConditionalActionsForField,
@@ -484,7 +487,7 @@ export const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return isValidPlainDate(value) ? formatPlainDate(value) : ''
   }
 
   if (field.hideValueInPreview) {

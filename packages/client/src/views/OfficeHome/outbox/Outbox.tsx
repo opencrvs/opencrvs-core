@@ -31,7 +31,10 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -218,10 +221,9 @@ export function Outbox() {
     const sortedItems = getSortedItems(items, sortedColumn, sortOrder)
     return sortedItems.map((item) => ({
       ...item,
-      dateOfEvent:
-        item.dateOfEvent && typeof item.dateOfEvent === 'string'
-          ? formatLongDate(item.dateOfEvent)
-          : ''
+      dateOfEvent: isValidPlainDate(item.dateOfEvent)
+        ? formatPlainDate(item.dateOfEvent)
+        : ''
     }))
   }
 

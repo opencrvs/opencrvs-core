@@ -33,7 +33,10 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
-import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  formattedDuration,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
@@ -241,7 +244,7 @@ class SentForReviewComponent extends React.Component<
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
-        new Date(reg.dateOfEvent)
+        plainDateToLocalDate(reg.dateOfEvent)
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}

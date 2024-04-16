@@ -35,7 +35,7 @@ import { Spinner, Stack } from '@opencrvs/components'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { useParams } from 'react-router'
 import { gql, useQuery } from '@apollo/client'
-import formatDate from '@client/utils/date-formatting'
+import formatDate, { formatPlainDate } from '@client/utils/date-formatting'
 import {
   BirthRegistration,
   DeathRegistration,
@@ -334,13 +334,10 @@ export function VerifyCertificatePage() {
 
   const getDateOfBirthOrOfDeceased = (data: any) => {
     if (data.registration?.type === RegistrationType.Birth)
-      return formatDate(new Date(data?.child.birthDate), 'dd MMMM yyyy')
+      return formatPlainDate(data.child.birthDate)
 
     if (data.registration?.type === RegistrationType.Death) {
-      return formatDate(
-        new Date(data.deceased.deceased.deathDate),
-        'dd MMMM yyyy'
-      )
+      return formatPlainDate(data.deceased.deceased.deathDate)
     }
   }
 
