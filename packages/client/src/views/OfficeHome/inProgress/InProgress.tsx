@@ -57,7 +57,11 @@ import { DownloadAction } from '@client/forms'
 import { Event, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
-import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  formattedDuration,
+  isValidPlainDate,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { IAction } from '@opencrvs/components/lib/common-types'
@@ -220,8 +224,9 @@ class InProgressComponent extends React.Component<
         }
       }
 
-      const dateOfEvent =
-        eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
+      const dateOfEvent = isValidPlainDate(eventDate)
+        ? plainDateToLocalDate(eventDate)
+        : ''
       const actions: IAction[] = []
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -392,7 +397,10 @@ class InProgressComponent extends React.Component<
           : draft.event === Event.Death
           ? draft.data.deathEvent?.deathDate || ''
           : draft.data.marriageEvent?.marriageDate || ''
-      const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
+
+      const dateOfEvent = isValidPlainDate(eventTime)
+        ? plainDateToLocalDate(eventTime)
+        : ''
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}

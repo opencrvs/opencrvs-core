@@ -1,6 +1,6 @@
 # Step 1. Build the javascript bundle
 
-FROM node:hydrogen-alpine
+FROM node:hydrogen-alpine@sha256:6d9d5269cbe4088803e9ef81da62ac481c063b60cadbe8e628bfcbb12296d901
 WORKDIR /app
 
 COPY . .
@@ -29,7 +29,7 @@ RUN yarn build
 
 # Step 2. Build the actual image
 
-FROM nginx
+FROM nginx@sha256:6db391d1c0cfb30588ba0bf72ea999404f2764febf0f1f196acd5867ac7efa7e
 
 RUN apt-get update && apt-get upgrade -y
 

@@ -18,17 +18,14 @@ import {
   InputField,
   ISelectOption as SelectComponentOptions,
   Text,
-  TextArea
-} from '@opencrvs/components/lib/'
-
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { Accordion } from '@opencrvs/components/lib/Accordion'
-import { Link } from '@opencrvs/components/lib/Link'
-import {
+  TextArea,
+  Link,
+  Alert,
+  Accordion,
   DocumentViewer,
-  IDocumentViewerOptions
-} from '@opencrvs/components/lib/DocumentViewer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+  IDocumentViewerOptions,
+  ResponsiveModal
+} from '@opencrvs/components'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -70,7 +67,6 @@ import {
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
   WARNING,
-  SUBSECTION_HEADER,
   DIVIDER,
   HIDDEN
 } from '@client/forms'
@@ -111,7 +107,10 @@ import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
-import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { camelCase, clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import {
@@ -132,10 +131,7 @@ import {
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { ListReview } from '@opencrvs/components/lib/ListReview'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import {
@@ -195,10 +191,6 @@ const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
   overflow: hidden;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    border: 0;
-    margin: 0;
-  }
 `
 
 const Card = styled.div`
@@ -208,6 +200,10 @@ const Card = styled.div`
   margin-bottom: 40px;
   &:last-child {
     margin-bottom: 200px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+    margin: 0;
   }
 `
 
@@ -242,26 +238,17 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const ReviewContainter = styled.div<{ paddingT?: boolean }>`
-  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
+
+const ReviewContainter = styled.div`
+  padding: 0px 32px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0px 24px;
+    padding: 0;
   }
 `
 const StyledAlert = styled(Alert)`
   margin-top: 24px;
 `
 const DeclarationDataContainer = styled.div``
-
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
-const StyledLabel = styled.span`
-  ${({ theme }) => theme.fonts.h3}
-`
-const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
-`
 
 const DocumentListPreviewContainer = styled.div`
   display: block;
@@ -509,7 +496,7 @@ const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return isValidPlainDate(value) ? formatPlainDate(value) : ''
   }
 
   if (field.hideValueInPreview) {
@@ -1174,13 +1161,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             ))
         )
 
-        completeValue = (
-          <>
-            {previousCompleteValue}
-            <br />
-            {completeValue}
-          </>
-        )
+        completeValue =
+          draft.registrationStatus !== 'IN_PROGRESS' ? (
+            <>
+              {previousCompleteValue}
+              <br />
+              {completeValue}
+            </>
+          ) : (
+            <>{completeValue}</>
+          )
       }
 
       return this.getRenderableField(
@@ -1266,7 +1256,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean
+    ignoreNestedFieldWrapping?: boolean,
+    status?: string
   ) {
     const {
       draft: { data, originalData }
@@ -1285,22 +1276,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.hasFieldChanged(field, data[section.id], originalData[section.id]) &&
       !this.fieldHasErrors(section, field, sectionErrors)
     ) {
-      value = (
-        <>
-          <Deleted>
-            {this.getValueOrError(
-              section,
-              originalData,
-              field,
-              sectionErrors,
-              ignoreNestedFieldWrapping,
-              true
-            )}
-          </Deleted>
-          <br />
-          {value}
-        </>
-      )
+      value =
+        status !== 'IN_PROGRESS' ? (
+          <>
+            <Deleted>
+              {this.getValueOrError(
+                section,
+                originalData,
+                field,
+                sectionErrors,
+                ignoreNestedFieldWrapping,
+                true
+              )}
+            </Deleted>
+            <br />
+            {value}
+          </>
+        ) : (
+          <>{value}</>
+        )
     }
 
     return this.getRenderableField(
@@ -1599,7 +1593,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   section,
                   group,
                   field,
-                  errorsOnFields
+                  errorsOnFields,
+                  undefined,
+                  draft.registrationStatus
                 )
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
@@ -1843,10 +1839,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         <Row>
           <LeftColumn>
             {reviewSummaryHeader}
+            {!isCorrection(declaration) && isDuplicate && (
+              <DuplicateForm declaration={declaration} />
+            )}
             <Card>
-              {!isCorrection(declaration) && isDuplicate && (
-                <DuplicateForm declaration={declaration} />
-              )}
               <ReviewHeader
                 id="review_header"
                 logoSource={
@@ -1870,7 +1866,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     .filter((sec) => sec.items.length > 0)
                     .map((sec, index) => {
                       return (
-                        <DeclarationDataContainer key={index}>
+                        <DeclarationDataContainer key={'Section_' + sec.id}>
                           <Accordion
                             name={sec.id}
                             label={sec.title}
@@ -1891,40 +1887,32 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             )}
                             expand={true}
                           >
-                            <ListViewSimplified id={'Section_' + sec.id}>
-                              {sec.items.map((item, index) => {
-                                return (
-                                  <ListViewItemSimplified
-                                    key={index}
-                                    label={
-                                      item.type === SUBSECTION_HEADER ? (
-                                        <StyledLabel>{item.label}</StyledLabel>
-                                      ) : (
-                                        <Label>{item.label}</Label>
-                                      )
-                                    }
-                                    value={
-                                      <Value id={item.label.split(' ')[0]}>
-                                        {item.value}
-                                      </Value>
-                                    }
-                                    actions={
-                                      !item?.action?.disabled &&
-                                      declaration.registrationStatus !==
-                                        SUBMISSION_STATUS.CORRECTION_REQUESTED && (
-                                        <LinkButton
-                                          id={item.action.id}
-                                          disabled={item.action.disabled}
-                                          onClick={item.action.handler}
-                                        >
-                                          {item.action.label}
-                                        </LinkButton>
-                                      )
-                                    }
-                                  />
-                                )
-                              })}
-                            </ListViewSimplified>
+                            <ListReview id={'Section_' + sec.id}>
+                              {sec.items.map((item) => (
+                                <ListReview.Row
+                                  id={item.label.split(' ')[0]}
+                                  key={sec.id + '_' + item.label}
+                                  label={item.label}
+                                  value={item.value}
+                                  actions={
+                                    !item?.action?.disabled &&
+                                    declaration.registrationStatus !==
+                                      SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                      <Link
+                                        key={item.action.id}
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                        element="button"
+                                        font="reg16"
+                                      >
+                                        {item.action.label}
+                                      </Link>
+                                    )
+                                  }
+                                />
+                              ))}
+                            </ListReview>
                           </Accordion>
                         </DeclarationDataContainer>
                       )
@@ -2026,6 +2014,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
+                          hasErrorsOnFields={hasValidationErrors}
                         />
                       </>
                     ) : (

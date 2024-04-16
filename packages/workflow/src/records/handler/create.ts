@@ -36,7 +36,7 @@ import {
   getToken,
   hasRegisterScope,
   hasValidateScope
-} from '@workflow/utils/authUtils'
+} from '@workflow/utils/auth-utils'
 import {
   findTaskFromIdentifier,
   mergeBundles,
@@ -51,7 +51,7 @@ import {
   findDuplicateIds,
   updateCompositionWithDuplicateIds,
   updateTaskWithDuplicateIds
-} from '@workflow/utils/duplicateChecker'
+} from '@workflow/utils/duplicate-checker'
 import {
   generateTrackingIdForEvents,
   isHospitalNotification,
@@ -284,17 +284,14 @@ export default async function createRecordHandler(
     await auditEvent('waiting-external-validation', record, token)
   }
   const eventAction = getEventAction(record)
+  await indexBundle(record, token)
 
   // Notification not implemented for marriage yet
   // don't forward hospital notifications
   const notificationDisabled =
     isHospitalNotification(record) ||
-    event === EVENT_TYPE.MARRIAGE ||
-    eventAction === 'sent-for-approval' ||
     eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
-
-  await indexBundle(record, token)
 
   if (!notificationDisabled) {
     await sendNotification(eventAction, record, token)

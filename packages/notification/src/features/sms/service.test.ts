@@ -30,7 +30,6 @@ describe('.sendSMS()', () => {
         },
         'informant',
         { test: 'test' },
-        'Bearer token...',
         'en'
       )
     )
@@ -52,7 +51,6 @@ describe('.sendSMS()', () => {
         },
         'informant',
         { test: 'test' },
-        'Bearer token...',
         'en'
       )
     ).rejects.toThrow()

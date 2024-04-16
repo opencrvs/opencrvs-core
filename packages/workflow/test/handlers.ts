@@ -14,7 +14,7 @@ import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
 import { TransactionResponse } from '@workflow/records/fhir'
-import { RecordEvent } from '@workflow/records/recordEvents'
+import { RecordEvent } from '@workflow/records/record-events'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -75,7 +75,10 @@ const auditEventHandler = rest.post(
       'registered',
       'certified',
       'reinstated',
-      'issued'
+      'issued',
+      'downloaded',
+      'archived',
+      'unassigned'
     ] satisfies RecordEvent[]
     if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)
@@ -119,6 +122,7 @@ const hearthHandler = rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
     type: 'batch-response',
     entry: []
   }
+
   return res(ctx.json(responseBundle))
 })
 

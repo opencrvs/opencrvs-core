@@ -76,8 +76,8 @@ jobs:
         run: |
           export VERSION="${{ needs.base.outputs.version }}"
           echo ${{ matrix.service }}
-          docker-compose build ${{ matrix.service }}
-          docker-compose push ${{ matrix.service }}
+          docker compose build ${{ matrix.service }}
+          docker compose push ${{ matrix.service }}
 
   security-scans:
     needs: [base, build]

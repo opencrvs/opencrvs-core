@@ -63,9 +63,16 @@ export default async function configHandler(
   }
 }
 
-async function getConfigFromCountry() {
+async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
-  const res = await fetch(url)
+
+  const res = await fetch(url, {
+    headers: authToken
+      ? {
+          Authorization: `Bearer ${authToken}`
+        }
+      : {}
+  })
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
@@ -94,7 +101,9 @@ export async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
-  const configFromCountryConfig = await getConfigFromCountry()
+  const configFromCountryConfig = await getConfigFromCountry(
+    request?.headers?.authorization
+  )
   const stripApplicationConfig = stripIdFromApplicationConfig(
     configFromCountryConfig
   )

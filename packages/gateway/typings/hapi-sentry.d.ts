@@ -8,18 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export type RecordEvent =
-  | 'sent-notification'
-  | 'sent-notification-for-review'
-  | 'sent-for-approval'
-  | 'waiting-external-validation'
-  | 'registered'
-  | 'certified'
-  | 'issued'
-  | 'sent-for-updates'
-  | 'archived'
-  | 'reinstated'
-  | 'updated'
-  | 'marked-as-duplicate'
-  | 'viewed'
-  | 'not-duplicate'
+declare module 'hapi-sentry'

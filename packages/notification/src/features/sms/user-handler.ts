@@ -46,7 +46,6 @@ export async function sendUserCredentials(
   const firstNames = nameObject?.given[0] as string
 
   await sendNotification(
-    request,
     {
       sms: templateNames.ONBOARDING_INVITE['sms'],
       email: templateNames.ONBOARDING_INVITE['email']
@@ -73,7 +72,6 @@ export async function sendResetPasswordInvite(
   const firstNames = nameObject?.given[0] as string
 
   await sendNotification(
-    request,
     {
       sms: templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN['sms'],
       email: templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN['email']
@@ -100,7 +98,6 @@ export async function retrieveUserName(
   const firstNames = nameObject?.given[0] as string
 
   await sendNotification(
-    request,
     {
       sms: templateNames.USERNAME_REMINDER['sms'],
       email: templateNames.USERNAME_REMINDER['email']
@@ -127,7 +124,6 @@ export async function sendUserAuthenticationCode(
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
   await sendNotification(
-    request,
     {
       sms: templateNames[payload.notificationEvent]['sms'],
       email: templateNames[payload.notificationEvent]['email']
@@ -154,7 +150,6 @@ export async function updateUserName(
   const firstNames = nameObject?.given[0] as string
 
   await sendNotification(
-    request,
     {
       sms: templateNames.USERNAME_UPDATED['sms'],
       email: templateNames.USERNAME_UPDATED['email']

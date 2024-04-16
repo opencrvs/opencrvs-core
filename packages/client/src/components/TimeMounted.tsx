@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 interface IProps {
   onUnmount: (duration: number) => void // in milliseconds
@@ -17,11 +17,11 @@ interface IProps {
 
 export function TimeMounted(props: IProps) {
   const [startTime] = useState(new Date())
-  const { onUnmount } = props
+  const onUnmountRef = useRef(props.onUnmount)
 
   useEffect(() => {
+    const onUnmount = onUnmountRef.current
     return () => onUnmount(new Date().getTime() - startTime.getTime())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startTime])
 
   return <>{props.children}</>

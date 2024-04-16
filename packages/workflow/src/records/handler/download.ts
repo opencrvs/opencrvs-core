@@ -18,19 +18,14 @@ import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { IAuthHeader } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
-import { getSystem, getUser } from '@workflow/features/user/utils'
-import {
-  getTokenPayload,
-  hasScope,
-  inScope
-} from '@opencrvs/commons/authentication'
+import { hasScope, inScope } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
-import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 import { logger } from '@workflow/logger'
+import { auditEvent } from '@workflow/records/audit'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -57,7 +52,6 @@ export async function downloadRecordHandler(
   )
 
   const token = getToken(request)
-  const tokenPayload = getTokenPayload(token)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
 
@@ -68,19 +62,6 @@ export async function downloadRecordHandler(
     throw new Error("Task didn't have any status. This should never happen")
   }
 
-  const isRecordSearch = hasScope(
-    { Authorization: `Bearer ${token}` },
-    'recordsearch'
-  )
-
-  const user: IUserModelData | ISystemModelData = !isRecordSearch
-    ? await getUser(tokenPayload.sub, {
-        Authorization: `Bearer ${token}`
-      })
-    : await getSystem(tokenPayload.sub, {
-        Authorization: `Bearer ${token}`
-      })
-
   const extensionUrl = getDownloadedOrAssignedExtension(
     { Authorization: `Bearer ${token}` },
     businessStatus
@@ -88,9 +69,14 @@ export async function downloadRecordHandler(
 
   const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
     record,
-    user,
+    token,
     extensionUrl
   )
+
+  const auditRecordEvent =
+    extensionUrl === 'http://opencrvs.org/specs/extension/regDownloaded'
+      ? 'downloaded'
+      : 'assigned'
 
   /*
    * Storing the details of the downloaded record in the database(s) is slow.
@@ -101,6 +87,7 @@ export async function downloadRecordHandler(
     try {
       // Here the sent bundle is saved with task only
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
+      await auditEvent(auditRecordEvent, downloadedRecord, token)
 
       if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
         await indexBundleToRoute(

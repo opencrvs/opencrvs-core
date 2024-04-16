@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { getToken, getTokenPayload } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { getValidRecordById } from '@workflow/records/index'
-import { getPractitionerOffice, getUser } from '@workflow/features/user/utils'
-import { Bundle, Location } from '@opencrvs/commons/types'
+import { Bundle } from '@opencrvs/commons/types'
 import { toViewed } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
@@ -23,15 +22,9 @@ export async function viewRecordHandler(
 ) {
   const token = getToken(request)
   const recordId = request.params.id
-  const record = await getValidRecordById(recordId, token)
+  const record = await getValidRecordById(recordId, token, true)
 
-  const tokenPayload = getTokenPayload(token)
-  const user = await getUser(tokenPayload.sub, {
-    Authorization: `Bearer ${token}`
-  })
-  const office = (await getPractitionerOffice(user.practitionerId)) as Location
-
-  const viewedRecord = await toViewed(record, user, office)
+  const viewedRecord = await toViewed(record, token)
 
   const viewedRecordWithTaskOnly: Bundle = {
     ...viewedRecord,

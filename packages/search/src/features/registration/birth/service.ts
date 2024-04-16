@@ -123,6 +123,7 @@ async function createIndexBody(
   bundle: SavedBundle
 ) {
   await createChildIndex(body, composition, bundle)
+  await addEventLocation(bundle, body, BIRTH_ENCOUNTER_CODE)
   createMotherIndex(body, composition, bundle)
   createFatherIndex(body, composition, bundle)
   createInformantIndex(body, composition, bundle)
@@ -141,8 +142,6 @@ async function createChildIndex(
   if (!child) {
     return
   }
-
-  await addEventLocation(body, BIRTH_ENCOUNTER_CODE, composition)
 
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)

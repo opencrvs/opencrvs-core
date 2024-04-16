@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { toArchived } from '@workflow/records/state-transitions'
-import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import { createRoute } from '@workflow/states'
+import { auditEvent } from '@workflow/records/audit'
 
 const requestSchema = z.object({
   reason: z.string().optional(),
@@ -35,17 +34,16 @@ export const archiveRoute = [
 
       const { reason, comment, duplicateTrackingId } = payload
 
-      const { archivedRecord, archivedRecordWithTaskOnly } = await toArchived(
+      const archivedRecord = await toArchived(
         record,
-        await getLoggedInPractitionerResource(token),
+        token,
         reason,
         comment,
         duplicateTrackingId
       )
 
-      await sendBundleToHearth(archivedRecordWithTaskOnly)
       await indexBundle(archivedRecord, token)
-
+      await auditEvent('archived', archivedRecord, token)
       return archivedRecord
     }
   })

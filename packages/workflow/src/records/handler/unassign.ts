@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { getToken } from '@workflow/utils/authUtils'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 import { getRecordById } from '@workflow/records/index'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
+import { auditEvent } from '@workflow/records/audit'
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
@@ -45,9 +45,9 @@ export async function unassignRecordHandler(
     ]
   )
 
-  const unassignedRecordWithTaskOnly = await toUnassigned(
+  const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
     record,
-    await getLoggedInPractitionerResource(token)
+    token
   )
 
   await sendBundleToHearth(unassignedRecordWithTaskOnly)
@@ -56,6 +56,7 @@ export async function unassignRecordHandler(
     token,
     '/events/unassigned'
   )
+  await auditEvent('unassigned', unassignedRecord, token)
 
-  return unassignedRecordWithTaskOnly
+  return unassignedRecord
 }
