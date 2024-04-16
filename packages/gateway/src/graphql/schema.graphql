@@ -6,6 +6,12 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
+  sendNotificationToAllUsers(
+    subject: String!
+    body: String!
+    locale: String!
+    type: NotificationType = EMAIL
+  ): NotificationResult
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
   searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
@@ -305,6 +311,15 @@ type Notification {
 
 scalar Date
 
+type NotificationResult {
+  success: Boolean!
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+}
+
 type BirthRegistration implements EventRegistration {
   id: ID!
   _fhirIDMap: Map
@@ -358,13 +373,13 @@ type Person {
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   multipleBirth: Int
   address: [Address]
   photo: [Attachment]
@@ -1040,6 +1055,8 @@ type ContactPoint {
   use: String
 }
 
+scalar PlainDate
+
 type Address {
   use: String
   type: String
@@ -1075,7 +1092,7 @@ type Attachment {
 
 type Deceased {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 type StatusWiseRegistrationCount {
@@ -1196,7 +1213,7 @@ type EventProgressSet {
   id: ID!
   type: String
   name: [HumanName]
-  dateOfEvent: Date
+  dateOfEvent: PlainDate
   registration: RegistrationSearchSet
   startedBy: User
   startedByFacility: String
@@ -1258,13 +1275,13 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: Gender
-  birthDate: String
+  birthDate: PlainDate
   age: Float
   maritalStatus: String
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   multipleBirth: Int
   address: [AddressInput]
   photo: [AttachmentInput!]
@@ -1759,7 +1776,7 @@ type BirthEventSearchSet implements EventSearchSet {
   type: String
   childName: [HumanName]
   childIdentifier: String
-  dateOfBirth: Date
+  dateOfBirth: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
   placeOfBirth: String
@@ -1779,7 +1796,7 @@ type DeathEventSearchSet implements EventSearchSet {
   type: String
   deceasedGender: String
   deceasedName: [HumanName]
-  dateOfDeath: Date
+  dateOfDeath: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }
@@ -1791,7 +1808,7 @@ type MarriageEventSearchSet implements EventSearchSet {
   groomName: [HumanName]
   brideIdentifier: String
   groomIdentifier: String
-  dateOfMarriage: Date
+  dateOfMarriage: PlainDate
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }
@@ -1857,7 +1874,7 @@ input AddressInput {
 
 input DeceasedInput {
   deceased: Boolean
-  deathDate: String
+  deathDate: PlainDate
 }
 
 enum AttachmentInputStatus {

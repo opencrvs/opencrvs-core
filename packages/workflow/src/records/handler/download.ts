@@ -25,6 +25,7 @@ import { hasScope, inScope } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { logger } from '@workflow/logger'
+import { auditEvent } from '@workflow/records/audit'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -72,6 +73,11 @@ export async function downloadRecordHandler(
     extensionUrl
   )
 
+  const auditRecordEvent =
+    extensionUrl === 'http://opencrvs.org/specs/extension/regDownloaded'
+      ? 'downloaded'
+      : 'assigned'
+
   /*
    * Storing the details of the downloaded record in the database(s) is slow.
    * So we return the requested record to the requesting users optimistically immediately.
@@ -81,6 +87,7 @@ export async function downloadRecordHandler(
     try {
       // Here the sent bundle is saved with task only
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
+      await auditEvent(auditRecordEvent, downloadedRecord, token)
 
       if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
         await indexBundleToRoute(

@@ -32,7 +32,7 @@ import {
   ToggleInformantSmsNotificationMutation,
   ToggleInformantSmsNotificationMutationVariables
 } from '@client/utils/gateway'
-import { find, lowerFirst } from 'lodash'
+import { find } from 'lodash'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -44,7 +44,6 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { Link } from '@opencrvs/components/lib/Link'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;
@@ -189,8 +188,19 @@ const InformantNotification = () => {
     })
   }
 
+  const getNotificationMessage = (name: INotificationName): string | null => {
+    if (name === 'birthInProgressSMS' || name === 'deathInProgressSMS')
+      return intl.formatMessage(messages.inProgressSMS)
+    else if (name === 'birthDeclarationSMS' || name === 'deathDeclarationSMS')
+      return intl.formatMessage(messages.declarationSMS)
+    else if (name === 'birthRegistrationSMS' || name === 'deathRegistrationSMS')
+      return intl.formatMessage(messages.registrationSMS)
+    else if (name === 'birthRejectionSMS' || name === 'deathRejectionSMS')
+      return intl.formatMessage(messages.rejectionSMS)
+    return null
+  }
+
   const TabContent = (props: SmsNotificationProps) => {
-    const intl = useIntl()
     const items: SmsNotification[] = props.items
     return (
       <>
@@ -201,9 +211,7 @@ const InformantNotification = () => {
                 key={`${item.name}_label`}
                 label={
                   <Label id={`${item.name}_label`}>
-                    {intl.formatMessage(
-                      messages[lowerFirst(item.name.slice(5))]
-                    )}
+                    {getNotificationMessage(item.name as INotificationName)}
                   </Label>
                 }
                 actions={

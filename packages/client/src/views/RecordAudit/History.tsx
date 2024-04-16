@@ -148,7 +148,6 @@ const getIndexByAction = (histories: any, index: number): number => {
         item.action === newHistories[index].action &&
         (item.regStatus === 'ISSUED' || item.regStatus === 'CERTIFIED')
     )
-    .reverse()
     .findIndex((item) => item.uuid === uid)
 
   return actionIndex

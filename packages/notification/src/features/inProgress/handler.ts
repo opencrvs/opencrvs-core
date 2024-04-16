@@ -118,7 +118,6 @@ export async function birthInProgressNotification(
 ) {
   const inProgressRecord = req.payload as InProgressRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.birthInProgressNotification,
       email: messageKeys.birthInProgressNotification
@@ -144,7 +143,6 @@ export async function deathInProgressNotification(
 ) {
   const inProgressRecord = req.payload as InProgressRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.birthInProgressNotification,
       email: messageKeys.birthInProgressNotification

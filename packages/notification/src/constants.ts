@@ -27,3 +27,6 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const DEFAULT_TIMEOUT = 600000
+
+export const MONGO_URL =
+  process.env.MONGO_URL || 'mongodb://localhost/notification'

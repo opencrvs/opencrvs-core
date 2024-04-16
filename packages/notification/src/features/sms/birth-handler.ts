@@ -57,7 +57,6 @@ export async function sendBirthInProgressConfirmation(
   logger.info(`Notifying from sendBirthInProgressConfirmation`)
   const templateName = messageKeys.birthInProgressNotification
   await sendNotification(
-    request,
     {
       sms: templateName,
       email: templateName
@@ -85,7 +84,6 @@ export async function sendBirthDeclarationConfirmation(
   logger.info(`Notifying from sendBirthDeclarationConfirmation`)
   const templateName = messageKeys.birthDeclarationNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',
@@ -108,7 +106,6 @@ export async function sendBirthRegistrationConfirmation(
   logger.info(`Notifying from sendBirthRegistrationConfirmation`)
   const templateName = messageKeys.birthRegistrationNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',
@@ -133,7 +130,6 @@ export async function sendBirthRejectionConfirmation(
 
   const templateName = messageKeys.birthRejectionNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',

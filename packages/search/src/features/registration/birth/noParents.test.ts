@@ -38,11 +38,6 @@ describe('Verify handlers', () => {
     it('should return status code 200 while father and mother sections is not present', async () => {
       ;(searchForBirthDuplicates as jest.Mock).mockResolvedValueOnce([])
       fetch.mockResponses(
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [
-          JSON.stringify({ partOf: { reference: 'Location/123' } }),
-          { status: 200 }
-        ],
         [
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
