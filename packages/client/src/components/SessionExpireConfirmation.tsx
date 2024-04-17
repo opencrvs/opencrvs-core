@@ -25,34 +25,31 @@ interface IProps {
   redirectToAuthentication: typeof redirectToAuthentication
 }
 
-class SessionExpireComponent extends React.Component<
-  SessionExpireProps & IProps & IntlShapeProps
-> {
-  handleLogin = () => {}
-  render() {
-    const { intl, sessionExpired } = this.props
-    return (
-      <>
-        {sessionExpired && (
-          <ResponsiveModal
-            title={intl.formatMessage(messages.sessionExpireTxt)}
-            contentHeight={96}
-            responsive={false}
-            actions={[
-              <PrimaryButton
-                key="login"
-                id="login"
-                onClick={() => this.props.redirectToAuthentication(true)}
-              >
-                {intl.formatMessage(buttonMessages.login)}
-              </PrimaryButton>
-            ]}
-            show={true}
-          />
-        )}
-      </>
-    )
+const SessionExpireComponent = ({
+  intl,
+  sessionExpired,
+  redirectToAuthentication
+}: SessionExpireProps & IProps & IntlShapeProps) => {
+  if (!sessionExpired) {
+    return null
   }
+  return (
+    <ResponsiveModal
+      title={intl.formatMessage(messages.sessionExpireTxt)}
+      contentHeight={96}
+      responsive={false}
+      actions={[
+        <PrimaryButton
+          key="login"
+          id="login"
+          onClick={() => redirectToAuthentication(true)}
+        >
+          {intl.formatMessage(buttonMessages.login)}
+        </PrimaryButton>
+      ]}
+      show={true}
+    />
+  )
 }
 
 const mapStateToProps = (store: IStoreState) => {
