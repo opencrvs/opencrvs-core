@@ -29,7 +29,7 @@ RUN yarn build
 
 # Step 2. Build the actual image
 
-FROM nginx@sha256:6db391d1c0cfb30588ba0bf72ea999404f2764febf0f1f196acd5867ac7efa7e
+FROM nginx@sha256:d2cb0992f098fb075674730da5e1c6cccdd4890516e448a1db96e0245c1b7fca
 
 RUN apt-get update && apt-get upgrade -y
 
