@@ -1,6 +1,7 @@
-## [1.3.4](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.3.4) (TBD)
+## [1.3.4](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.3.4)
 
 ## Bug fixes
+
 - #### Include middlename when generating fullnames
   - Refactored out the scattered logic for generating fullnames and converged them into a single function
   - Make lastname optional for a registered declaration
@@ -33,6 +34,7 @@
 - Unassign declaration from a user if the declaration has already been proceeded through the workqueues by a separate user
 
 ## Dependency upgrades
+
 - #### Metabase from v0.45.2.1 to v0.46.6.1
 
 See [Releases](https://github.com/opencrvs/opencrvs-core/releases) for release notes of older releases.
