@@ -191,10 +191,6 @@ const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
   overflow: hidden;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    border: 0;
-    margin: 0;
-  }
 `
 
 const Card = styled.div`
@@ -204,6 +200,10 @@ const Card = styled.div`
   margin-bottom: 40px;
   &:last-child {
     margin-bottom: 200px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+    margin: 0;
   }
 `
 
@@ -1839,10 +1839,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         <Row>
           <LeftColumn>
             {reviewSummaryHeader}
+            {!isCorrection(declaration) && isDuplicate && (
+              <DuplicateForm declaration={declaration} />
+            )}
             <Card>
-              {!isCorrection(declaration) && isDuplicate && (
-                <DuplicateForm declaration={declaration} />
-              )}
               <ReviewHeader
                 id="review_header"
                 logoSource={

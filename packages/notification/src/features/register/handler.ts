@@ -32,7 +32,6 @@ export async function birthRegisterNotification(
 ) {
   const registeredRecord = req.payload as RegisteredRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.birthRegistrationNotification,
       email: messageKeys.birthRegistrationNotification
@@ -60,7 +59,6 @@ export async function deathRegisterNotification(
 ) {
   const registeredRecord = req.payload as RegisteredRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.deathRegistrationNotification,
       email: messageKeys.deathRegistrationNotification

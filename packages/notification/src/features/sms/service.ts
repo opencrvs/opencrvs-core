@@ -21,10 +21,10 @@ export async function notifyCountryConfig(
   recipient: {
     email?: string | null
     sms?: string | null
+    bcc?: string[]
   },
   type: 'user' | 'informant',
   variables: Record<string, unknown>,
-  token: string,
   locale: string,
   convertUnicode?: boolean
 ) {
@@ -44,8 +44,7 @@ export async function notifyCountryConfig(
         convertUnicode
       }),
       headers: {
-        'Content-Type': 'application/json',
-        authorization: token
+        'Content-Type': 'application/json'
       }
     })
   } catch (error) {
