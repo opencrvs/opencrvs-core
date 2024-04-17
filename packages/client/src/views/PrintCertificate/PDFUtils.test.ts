@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { downloadFile } from '@client/views/PrintCertificate/PDFUtils'
-import { createIntl } from 'react-intl'
 import { validImageB64String } from '@client/tests/mock-offline-data'
 import { vi } from 'vitest'
 
