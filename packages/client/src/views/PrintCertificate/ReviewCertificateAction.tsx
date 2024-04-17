@@ -19,8 +19,8 @@ import {
   AppBar,
   Spinner
 } from '@opencrvs/components'
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
+import { useDispatch } from 'react-redux'
 import { useLocation, useParams } from 'react-router'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
@@ -32,9 +32,6 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
-import { IStoreState } from '@client/store'
-import { IPrintableDeclaration } from '@client/declarations'
-
 const CertificateContainer = styled.div``
 
 const ReviewCertificateFrame = ({
@@ -160,45 +157,37 @@ export const ReviewCertificate = () => {
   return (
     <ReviewCertificateFrame>
       <Frame.LayoutCentered>
-        {svg && (
-          <Stack direction="column">
-            <Box>
-              <CertificateContainer
-                id="print"
-                dangerouslySetInnerHTML={{ __html: svg }}
-              />
-            </Box>
-            <Content
-              title={intl.formatMessage(certificateMessages.reviewTitle)}
-              subtitle={intl.formatMessage(
-                certificateMessages.reviewDescription
-              )}
-              bottomActionButtons={[
-                <Button
-                  key="confirm-and-print"
-                  type="primary"
-                  id="confirm-print"
-                  onClick={confirmAndPrint}
-                >
-                  <Icon name="Check" size="medium" />
-                  {intl.formatMessage(certificateMessages.confirmAndPrint)}
-                </Button>,
+        <Stack direction="column">
+          <Box>
+            <CertificateContainer
+              id="print"
+              dangerouslySetInnerHTML={{ __html: svg }}
+            />
+          </Box>
+          <Content
+            title={intl.formatMessage(certificateMessages.reviewTitle)}
+            subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
+            bottomActionButtons={[
+              <Button
+                key="confirm-and-print"
+                type="positive"
+                id="confirm-print"
+                onClick={confirmAndPrint}
+              >
+                <Icon name="Check" size="medium" />
+                {intl.formatMessage(certificateMessages.confirmAndPrint)}
+              </Button>,
 
-                canUserEditRecord ? (
-                  <Button
-                    key="edit-record"
-                    type="negative"
-                    onClick={handleEdit}
-                  >
-                    {intl.formatMessage(buttonMessages.editRecord)}
-                  </Button>
-                ) : (
-                  <></>
-                )
-              ]}
-            ></Content>
-          </Stack>
-        )}
+              canUserEditRecord ? (
+                <Button key="edit-record" type="negative" onClick={handleEdit}>
+                  {intl.formatMessage(buttonMessages.editRecord)}
+                </Button>
+              ) : (
+                <></>
+              )
+            ]}
+          ></Content>
+        </Stack>
       </Frame.LayoutCentered>
       {modal}
     </ReviewCertificateFrame>
