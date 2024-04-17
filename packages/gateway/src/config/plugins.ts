@@ -12,6 +12,7 @@
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import * as Sentry from '@sentry/node'
+import * as HapiSentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
 import * as HapiSwagger from 'hapi-swagger'
@@ -19,10 +20,6 @@ import { ServerRegisterPluginObject } from '@hapi/hapi'
 import * as H2o2 from '@hapi/h2o2'
 
 export const getPlugins = () => {
-  if (SENTRY_DSN) {
-    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.DOMAIN })
-  }
-
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
@@ -35,7 +32,7 @@ export const getPlugins = () => {
     documentationPage: false
   }
 
-  return [
+  const plugins = [
     JWT,
     {
       plugin: Pino,
@@ -51,4 +48,18 @@ export const getPlugins = () => {
     },
     H2o2
   ] as Array<ServerRegisterPluginObject<any>>
+
+  if (SENTRY_DSN) {
+    plugins.push({
+      plugin: HapiSentry,
+      options: {
+        client: Sentry.init({
+          dsn: SENTRY_DSN,
+          environment: process.env.DOMAIN
+        }),
+        catchLogErrors: true
+      }
+    })
+  }
+  return plugins
 }

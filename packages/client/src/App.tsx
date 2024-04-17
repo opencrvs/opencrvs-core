@@ -62,7 +62,7 @@ import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import InformantNotification from '@client/views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
@@ -73,6 +73,7 @@ import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
+import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -273,6 +274,14 @@ export function App(props: IAppProps) {
                                                 routes.INFORMANT_NOTIFICATION
                                               }
                                               component={InformantNotification}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              roles={[
+                                                SystemRoleType.NationalSystemAdmin
+                                              ]}
+                                              path={routes.ALL_USER_EMAIL}
+                                              component={AllUserEmail}
                                             />
                                             <ProtectedRoute
                                               exact

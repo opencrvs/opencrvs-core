@@ -27,7 +27,6 @@ export async function birthReadyForReviewNotification(
 ) {
   const readyForReviewRecord = req.payload as ReadyForReviewRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.birthDeclarationNotification,
       email: messageKeys.birthDeclarationNotification
@@ -54,7 +53,6 @@ export async function deathReadyForReviewNotification(
 ) {
   const readyForReviewRecord = req.payload as ReadyForReviewRecord
   await sendNotification(
-    req,
     {
       sms: messageKeys.deathDeclarationNotification,
       email: messageKeys.deathDeclarationNotification
