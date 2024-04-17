@@ -27,7 +27,10 @@ import {
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  formattedDuration,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
 import {
   getSortedItems,
   changeSortedColumn
@@ -115,7 +118,7 @@ function InExternalValidationComponent(props: IProps) {
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
-        new Date(reg.dateOfEvent)
+        plainDateToLocalDate(reg.dateOfEvent)
       const sentForValidation =
         (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
           ? new Date(reg.modifiedAt)
