@@ -49,7 +49,7 @@ const deathDeclaration = {
 describe('when user wants to review death certificate', () => {
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
 
-  it('displays have the Continue and print Button', async () => {
+  it('displays the "Confirm & Print" button', async () => {
     const { history, match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
