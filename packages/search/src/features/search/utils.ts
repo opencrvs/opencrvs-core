@@ -166,7 +166,7 @@ export function advancedQueryBuilder(
   if (params.declarationJurisdictionIds) {
     must.push({
       terms: {
-        declarationJurisdictionIds: params.declarationJurisdictionIds,
+        'declarationJurisdictionIds.keyword': params.declarationJurisdictionIds,
         boost: 2.0
       }
     })
@@ -191,7 +191,7 @@ export function advancedQueryBuilder(
   if (params.eventJurisdictionIds) {
     must.push({
       terms: {
-        eventJurisdictionIds: params.eventJurisdictionIds
+        'eventJurisdictionIds.keyword': params.eventJurisdictionIds
       }
     })
   }
