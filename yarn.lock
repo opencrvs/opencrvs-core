@@ -14071,12 +14071,13 @@ graphql-config@^4.5.0:
     string-env-interpolation "1.0.1"
     tslib "^2.4.0"
 
-graphql-import@^0.5.2:
-  version "0.5.3"
-  resolved "https://registry.npmjs.org/graphql-import/-/graphql-import-0.5.3.tgz"
-  integrity sha512-ll1wQ33GWj3YkBa6ilMx0istCdZ4LnsSaVmv5YPMILwaftyIXVvbwztlG1NG9M2hZBf9WbMi+cc/PlKP5QenYA==
+graphql-import@^0.7.0:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/graphql-import/-/graphql-import-0.7.1.tgz#4add8d91a5f752d764b0a4a7a461fcd93136f223"
+  integrity sha512-YpwpaPjRUVlw2SN3OPljpWbVRWAhMAyfSba5U47qGMOSsPLi2gYeJtngGpymjm9nk57RFWEpjqwh4+dpYuFAPw==
   dependencies:
     lodash "^4.17.4"
+    resolve-from "^4.0.0"
 
 graphql-request@^6.0.0:
   version "6.1.0"
