@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, ReactNode } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router'
 
-type ScrollToTopProps = RouteComponentProps & { children?: ReactNode }
+import gql from 'graphql-tag'
 
-const ScrollToTop = ({ children, location }: ScrollToTopProps) => {
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location])
-
-  return <>{children}</>
-}
-
-export default withRouter(ScrollToTop)
+export const EMAIL_ALL_USERS = gql`
+  query emailAllUsers($subject: String!, $body: String!, $locale: String!) {
+    sendNotificationToAllUsers(
+      subject: $subject
+      body: $body
+      locale: $locale
+    ) {
+      success
+    }
+  }
+`

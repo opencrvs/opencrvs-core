@@ -27,7 +27,6 @@ export async function sendDeathInProgressConfirmation(
   logger.info('Notifying from sendDeathInProgressConfirmation')
   const templateName = messageKeys.deathInProgressNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',
@@ -49,7 +48,6 @@ export async function sendDeathDeclarationConfirmation(
   logger.info('Notifying from sendDeathDeclarationConfirmation')
   const templateName = messageKeys.deathDeclarationNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',
@@ -72,7 +70,6 @@ export async function sendDeathRegistrationConfirmation(
   logger.info('Notifying from sendDeathRegistrationConfirmation')
   const templateName = messageKeys.deathRegistrationNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',
@@ -96,7 +93,6 @@ export async function sendDeathRejectionConfirmation(
   logger.info('Notifying from sendDeathRejectionConfirmation')
   const templateName = messageKeys.deathRejectionNotification
   await sendNotification(
-    request,
     { sms: templateName, email: templateName },
     { sms: payload.recipient.sms, email: payload.recipient.email },
     'informant',

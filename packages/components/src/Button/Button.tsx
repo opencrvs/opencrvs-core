@@ -30,6 +30,8 @@ type ButtonModifier = 'disabled' | 'loading'
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   /** Size of the button */
   size?: ButtonSize
+  /** Size of the button */
+  fullWidth?: boolean
   /** Element the button renders as */
   element?: 'a' | 'button'
   /** Button type */
@@ -72,6 +74,7 @@ const StyledButton = styled.button.withConfig({
 
 export const Button = ({
   size = 'medium',
+  fullWidth,
   element = 'button',
   type,
   loading,
@@ -81,6 +84,7 @@ export const Button = ({
   return (
     <StyledButton
       size={size}
+      fullWidth={fullWidth}
       variant={type}
       loading={loading}
       as={element}

@@ -546,18 +546,7 @@ const getLabelForRegistrationStatus = (
   intl: IntlShape
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
-    ALL: [
-      RegStatus.Archived,
-      RegStatus.Certified,
-      RegStatus.DeclarationUpdated,
-      RegStatus.Declared,
-      RegStatus.InProgress,
-      RegStatus.Registered,
-      RegStatus.Rejected,
-      RegStatus.Validated,
-      RegStatus.WaitingValidation,
-      RegStatus.Issued
-    ],
+    ALL: Object.values(RegStatus),
     IN_REVIEW: [
       RegStatus.WaitingValidation,
       RegStatus.Validated,
@@ -573,14 +562,12 @@ const getLabelForRegistrationStatus = (
     VALIDATED: [RegStatus.Validated],
     WAITING_VALIDATION: [RegStatus.WaitingValidation]
   }
-
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
     return false
   })
-
   const forMattedStatusList = [
     {
       value: 'ALL',
@@ -615,7 +602,6 @@ const getLabelForRegistrationStatus = (
   const formattedLabel =
     forMattedStatusList.find((e) => statusType === e.value)?.label ||
     statusList[0]
-
   return formattedLabel
 }
 

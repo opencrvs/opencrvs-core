@@ -21,16 +21,14 @@
 - Fix certificate verification QR code crashing when gender is unknown [#6422](https://github.com/opencrvs/opencrvs-core/issues/6422)
 - Fix certificate verification page missing registration center and the name of registrar [#6614](https://github.com/opencrvs/opencrvs-core/issues/6614)
 - Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
-
 - Fix record correction e2e failing due to stale data getting saved on redux
+- Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
+- In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
 
 ## Refactor
 
-- Remove OPENHIM from Workflow service
-- Redirect all operations to the Workflow service, thereby establishing it as the primary source for all services.
-- Current operations are demonstrated in the updated sequence diagrams.(https://github.com/opencrvs/opencrvs-core/tree/develop/sequence-diagrams/backend)
-
-- Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
+- Remove dependency on openhim. The openhim db is kept for backwards compatibility reasons and will be removed in v1.6. It has brought some major changes 
+  in how the microservices are communicating among them. More on this can be found on the updated [sequence diagrams](https://github.com/opencrvs/opencrvs-core/tree/develop/sequence-diagrams/backend)
 
 ## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
 
@@ -47,6 +45,7 @@
 - Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
 - Make language names used in language select dropdowns configurable in country resource package copy
 - Fix login to field agent when an incomplete record is previously retrieved by them [#6584](https://github.com/opencrvs/opencrvs-core/issues/6584)
+
 
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 

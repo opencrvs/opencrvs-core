@@ -6,6 +6,12 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
+  sendNotificationToAllUsers(
+    subject: String!
+    body: String!
+    locale: String!
+    type: NotificationType = EMAIL
+  ): NotificationResult
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
   searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
@@ -304,6 +310,15 @@ type Notification {
 }
 
 scalar Date
+
+type NotificationResult {
+  success: Boolean!
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+}
 
 type BirthRegistration implements EventRegistration {
   id: ID!
