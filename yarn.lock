@@ -5380,25 +5380,14 @@
     "@sentry/utils" "7.74.1"
     tslib "^2.4.1 || ^1.9.3"
 
-"@sentry/browser@^4.0.0":
-  version "4.6.6"
-  resolved "https://registry.npmjs.org/@sentry/browser/-/browser-4.6.6.tgz"
-  integrity sha512-+9VsQ+oQYU+PYlLJG2ex7JCMSVQbnUvWPI2uZOofWdI9sWIPUub3boWItMzRQNQ1T4S3FZd4FqAWNFd3azdnBw==
+"@sentry/browser@^5.0.0 || ^6.0.0":
+  version "6.19.7"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-6.19.7.tgz#a40b6b72d911b5f1ed70ed3b4e7d4d4e625c0b5f"
+  integrity sha512-oDbklp4O3MtAM4mtuwyZLrgO1qDVYIujzNJQzXmi9YzymJCuzMLSRDvhY83NNDCRxf0pds4DShgYeZdbSyKraA==
   dependencies:
-    "@sentry/core" "4.6.6"
-    "@sentry/types" "4.5.3"
-    "@sentry/utils" "4.6.5"
-    tslib "^1.9.3"
-
-"@sentry/core@4.6.6":
-  version "4.6.6"
-  resolved "https://registry.npmjs.org/@sentry/core/-/core-4.6.6.tgz"
-  integrity sha512-7z9HKLTNr3zVBR3tBRheTxkkkuK2IqISUc5Iyo3crN2OecOLtpptT96f5XjLndBEL2ab39eCBPpA5OFjbpzrIA==
-  dependencies:
-    "@sentry/hub" "4.6.5"
-    "@sentry/minimal" "4.6.5"
-    "@sentry/types" "4.5.3"
-    "@sentry/utils" "4.6.5"
+    "@sentry/core" "6.19.7"
+    "@sentry/types" "6.19.7"
+    "@sentry/utils" "6.19.7"
     tslib "^1.9.3"
 
 "@sentry/core@5.30.0":
@@ -5432,15 +5421,6 @@
     "@sentry/utils" "7.74.1"
     tslib "^2.4.1 || ^1.9.3"
 
-"@sentry/hub@4.6.5":
-  version "4.6.5"
-  resolved "https://registry.npmjs.org/@sentry/hub/-/hub-4.6.5.tgz"
-  integrity sha512-v9vee8s8C1fK/DPtNOzv6r+AMbPDOWfnasouNcBUkbQUSN5wUNyCDvt51QbWaw5kMMY5TSqjdVqY6gXQZI0APQ==
-  dependencies:
-    "@sentry/types" "4.5.3"
-    "@sentry/utils" "4.6.5"
-    tslib "^1.9.3"
-
 "@sentry/hub@5.30.0":
   version "5.30.0"
   resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-5.30.0.tgz#2453be9b9cb903404366e198bd30c7ca74cdc100"
@@ -5457,15 +5437,6 @@
   dependencies:
     "@sentry/types" "6.19.7"
     "@sentry/utils" "6.19.7"
-    tslib "^1.9.3"
-
-"@sentry/minimal@4.6.5":
-  version "4.6.5"
-  resolved "https://registry.npmjs.org/@sentry/minimal/-/minimal-4.6.5.tgz"
-  integrity sha512-tf+J+uUNmSgzC7d9JSN8Ekw1HeBAX87Efa/jyFbzLvaw80oibvTiLSLqDjQ9PgvyIzBUuuPImkS2NpvPQGWFtg==
-  dependencies:
-    "@sentry/hub" "4.6.5"
-    "@sentry/types" "4.5.3"
     tslib "^1.9.3"
 
 "@sentry/minimal@5.30.0":
@@ -5553,11 +5524,6 @@
   dependencies:
     "@sentry-internal/tracing" "7.74.1"
 
-"@sentry/types@4.5.3":
-  version "4.5.3"
-  resolved "https://registry.npmjs.org/@sentry/types/-/types-4.5.3.tgz"
-  integrity sha512-7ll1PAFNjrBNX9rzy3P2qAQrpQwHaDO3uKj735qsnGw34OtAS8Xr8WYrjI14f9fMPa/XIeWvMPb4GMic28V/ag==
-
 "@sentry/types@5.30.0":
   version "5.30.0"
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-5.30.0.tgz#19709bbe12a1a0115bc790b8942917da5636f402"
@@ -5572,14 +5538,6 @@
   version "7.74.1"
   resolved "https://registry.npmjs.org/@sentry/types/-/types-7.74.1.tgz"
   integrity sha512-2jIuPc+YKvXqZETwr2E8VYnsH1zsSUR/wkIvg1uTVeVNyoowJv+YsOtCdeGyL2AwiotUBSPKu7O1Lz0kq5rMOQ==
-
-"@sentry/utils@4.6.5":
-  version "4.6.5"
-  resolved "https://registry.npmjs.org/@sentry/utils/-/utils-4.6.5.tgz"
-  integrity sha512-rTISJtRRbWsd3UE+TkA3QG1C0VzPKPW8w74tieBwYhtTCGmOHNwz2nDC/MZGbGj4OgDmNKKl4CCyQr88EX08hA==
-  dependencies:
-    "@sentry/types" "4.5.3"
-    tslib "^1.9.3"
 
 "@sentry/utils@5.30.0":
   version "5.30.0"
@@ -7711,12 +7669,12 @@
   dependencies:
     redux "^4.0.5"
 
-"@types/redux-sentry-middleware@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/@types/redux-sentry-middleware/-/redux-sentry-middleware-0.0.1.tgz"
-  integrity sha512-5kNbRTiRqAH0KHPr4zZn/f660hNSN98Jn2bfcubwagwSImV+JQQfJEP5DIPoBkiNNXAr9T1v56LF9q0Q9UU62Q==
+"@types/redux-sentry-middleware@^0.2.0":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@types/redux-sentry-middleware/-/redux-sentry-middleware-0.2.8.tgz#5b74ad00d1f778bfaf17a98283f183796e38ea1c"
+  integrity sha512-SAvwB+AdbfjbEXpOibXpIUNsF/YPRtL5QPoNjWCeqz570n5hOQkl3q99Dqc6Mj0+xyAqOQpxr4HK2Bu4/4wfnA==
   dependencies:
-    "@sentry/browser" "^4.0.0"
+    "@sentry/browser" "^5.0.0 || ^6.0.0"
     redux "^4.0.0"
 
 "@types/resolve@1.17.1":
@@ -20793,10 +20751,10 @@ redux-mock-store@^1.5.3:
   dependencies:
     lodash.isplainobject "^4.0.6"
 
-redux-sentry-middleware@^0.0.15:
-  version "0.0.15"
-  resolved "https://registry.npmjs.org/redux-sentry-middleware/-/redux-sentry-middleware-0.0.15.tgz"
-  integrity sha512-ZwnvUyZcpiji6QwTlLAmaV3GM4evM/dMU2jSGfz3VGFmDqCayzKl4zHp6l+voRWRdGGsCbBpyD7amJkq9hXPeQ==
+redux-sentry-middleware@^0.2.0:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/redux-sentry-middleware/-/redux-sentry-middleware-0.2.2.tgz#79140377b4fa6a606797cb2a13cc1b8ab7d68cec"
+  integrity sha512-SOxNkPNgU+zZT6cW4XV1+B2IpWrVXW4yuFHzOJvVjHn4yRV71nAj0Clj6XjhD0K2TKUxvwmjLn01mDL2RarMUQ==
 
 redux-thunk@^2.4.2:
   version "2.4.2"
