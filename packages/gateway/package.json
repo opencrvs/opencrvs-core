@@ -46,7 +46,7 @@
     "fp-ts": "^2.12.3",
     "glob": "^7.1.2",
     "graphql": "^15.0.0",
-    "graphql-import": "^0.5.2",
+    "graphql-import": "^0.7.0",
     "graphql-tools": "^4.0.7",
     "hapi-auth-jwt2": "10.5.1",
     "hapi-boom-decorators": "^3.0.0",
