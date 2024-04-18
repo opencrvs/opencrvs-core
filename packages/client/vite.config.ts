@@ -12,6 +12,11 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
+import dns from 'node:dns'
+
+// fixes issue where Cypress was not able to resolve Vite's localhost
+// https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
+dns.setDefaultResultOrder('ipv4first')
 
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
@@ -98,6 +103,10 @@ export default defineConfig(({ mode }) => {
       coverage: {
         reporter: ['text', 'json', 'html']
       }
+    },
+    server: {
+      //
+      host: true
     }
   }
 })
