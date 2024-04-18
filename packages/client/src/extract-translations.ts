@@ -27,7 +27,8 @@ export async function writeJSONToCSV(
   const csv = await csvStringify(data, {
     header: true
   })
-  return fs.promises.writeFile(filename, csv, 'utf8')
+  console.log(csv)
+  return fs.promises.writeFile(filename, csv as any, 'utf8')
 }
 
 export async function readCSVToJSON<T>(filename: string) {
