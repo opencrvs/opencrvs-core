@@ -262,17 +262,25 @@ export function VerifyCertificatePage() {
       const state =
         location.address.state &&
         offlineData.locations[location.address.state].name
-let eventLocationLevel3, eventLocationLevel4, eventLocationLevel5
-      eventLocationLevel3 = 
-        location.address.line?.[10] && 
+      let eventLocationLevel3, eventLocationLevel4, eventLocationLevel5
+      eventLocationLevel3 =
+        location.address.line?.[10] &&
         offlineData.locations[location.address.line[10]]?.name
-      eventLocationLevel4 = 
-        location.address.line?.[11] && 
+      eventLocationLevel4 =
+        location.address.line?.[11] &&
         offlineData.locations[location.address.line[11]]?.name
-      eventLocationLevel5 = 
-        location.address.line?.[12] && 
+      eventLocationLevel5 =
+        location.address.line?.[12] &&
         offlineData.locations[location.address.line[12]]?.name
-      return [city, eventLocationLevel5, eventLocationLevel4, eventLocationLevel3,  district, state, country]
+      return [
+        city,
+        eventLocationLevel5,
+        eventLocationLevel4,
+        eventLocationLevel3,
+        district,
+        state,
+        country
+      ]
         .filter((label) => Boolean(label))
         .join(', ')
     }

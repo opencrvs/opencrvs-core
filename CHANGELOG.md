@@ -24,6 +24,7 @@
 - Fix record correction e2e failing due to stale data getting saved on redux
 - Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
 - In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
+- Verify certificate only supports 2 location levels [#6621](https://github.com/opencrvs/opencrvs-core/issues/6621)
 
 ## Refactor
 

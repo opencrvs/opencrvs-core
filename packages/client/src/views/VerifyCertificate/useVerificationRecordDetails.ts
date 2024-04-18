@@ -124,5 +124,4 @@ export const useVerificationRecordDetails = () => {
   const data = queryData?.fetchRecordDetailsForVerification
 
   return { loading, error, data }
-
 }
