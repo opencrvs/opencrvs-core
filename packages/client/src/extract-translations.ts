@@ -13,21 +13,19 @@ import * as fs from 'fs'
 import glob from 'glob'
 import chalk from 'chalk'
 import csv2json from 'csv2json'
-import { stringify, Options } from 'csv-stringify'
+import { stringify } from 'csv-stringify'
 import { promisify } from 'util'
 import { sortBy } from 'lodash'
 import ts from 'typescript'
 import { MessageDescriptor } from 'react-intl'
-const csvStringify = promisify<Array<Record<string, any>>, Options>(stringify)
 
 export async function writeJSONToCSV(
   filename: string,
   data: Array<Record<string, any>>
 ) {
-  const csv = await csvStringify(data, {
+  const csv = stringify(data, {
     header: true
   })
-  console.log(csv)
   return fs.promises.writeFile(filename, csv as any, 'utf8')
 }
 
