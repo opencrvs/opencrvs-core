@@ -12,6 +12,6 @@
     "opencrvs/no-font-styles": true
   },
   "plugins": [
-    "./no-font-styles.js"
+    "./no-font-styles.cjs"
   ]
 }
