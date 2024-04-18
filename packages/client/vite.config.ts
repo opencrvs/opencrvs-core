@@ -103,10 +103,6 @@ export default defineConfig(({ mode }) => {
       coverage: {
         reporter: ['text', 'json', 'html']
       }
-    },
-    server: {
-      //
-      host: true
     }
   }
 })
