@@ -37,7 +37,7 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "@types/archiver": "^3.0.0",
+    "@types/archiver": "^6.0.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi__boom": "^9.0.1",
     "@types/hapi__hapi": "^20.0.0",
