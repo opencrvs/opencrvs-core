@@ -22,7 +22,7 @@
     "@opencrvs/commons": "^1.5.0",
     "app-module-path": "^2.2.0",
     "bullmq": "^1.9.0",
-    "hapi-auth-jwt2": "10.4.0",
+    "hapi-auth-jwt2": "10.5.1",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
     "joi": "^17.3.0",
