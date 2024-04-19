@@ -50,13 +50,11 @@ export const getPlugins = () => {
   ] as Array<ServerRegisterPluginObject<any>>
 
   if (SENTRY_DSN) {
+    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.DOMAIN })
     plugins.push({
       plugin: HapiSentry,
       options: {
-        client: Sentry.init({
-          dsn: SENTRY_DSN,
-          environment: process.env.DOMAIN
-        }),
+        client: Sentry,
         catchLogErrors: true
       }
     })
