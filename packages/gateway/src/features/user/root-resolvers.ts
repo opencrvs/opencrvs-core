@@ -635,7 +635,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName?.trim() as string,
-      given: [name.firstNames || ''] as string[]
+      given: [name.firstNames?.trim() || ''] as string[]
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
