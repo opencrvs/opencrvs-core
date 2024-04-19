@@ -108,7 +108,6 @@ const BirthSection = () => {
       'birth'
     )
   })
-
   const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )

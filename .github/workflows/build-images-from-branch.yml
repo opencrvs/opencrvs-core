@@ -24,12 +24,12 @@ jobs:
   base:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Set version
@@ -58,12 +58,12 @@ jobs:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Login to DockerHub

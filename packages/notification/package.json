@@ -24,7 +24,7 @@
     "app-module-path": "^2.2.0",
     "dotenv": "^16.0.0",
     "handlebars": "^4.7.6",
-    "hapi-auth-jwt2": "10.4.0",
+    "hapi-auth-jwt2": "10.5.1",
     "hapi-i18n": "^2.0.0",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
