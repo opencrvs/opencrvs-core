@@ -11,8 +11,7 @@
 
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
-import * as Sentry from '@sentry/node'
-import * as HapiSentry from 'hapi-sentry'
+import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
 import * as HapiSwagger from 'hapi-swagger'
@@ -50,11 +49,13 @@ export const getPlugins = () => {
   ] as Array<ServerRegisterPluginObject<any>>
 
   if (SENTRY_DSN) {
-    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.DOMAIN })
     plugins.push({
-      plugin: HapiSentry,
+      plugin: Sentry,
       options: {
-        client: Sentry,
+        client: {
+          dsn: SENTRY_DSN,
+          environment: process.env.DOMAIN
+        },
         catchLogErrors: true
       }
     })
