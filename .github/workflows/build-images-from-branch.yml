@@ -17,6 +17,7 @@ on:
         required: true
   push:
     branches:
+      - 'release-*'
       - 'develop'
 
 jobs:
