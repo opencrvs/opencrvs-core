@@ -37,11 +37,7 @@ function storeOutboxDeclaration(
   store.dispatch(storeDeclaration(declaration))
 }
 describe('outbox component tests', () => {
-  let testComponent: ReactWrapper<
-    any,
-    Readonly<{}>,
-    React.Component<{}, {}, any>
-  >
+  let testComponent: ReactWrapper
   let store: AppStore
   let history
   beforeAll(async () => {

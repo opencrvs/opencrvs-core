@@ -109,7 +109,7 @@ describe('form component', () => {
       }
     )
   })
-  describe('when user is in the moth​​er section', () => {
+  describe('when user is in the mother section', () => {
     it('renders the page', async () => {
       const label = await waitForElement(component, '#countryPrimary_label')
       expect(label.hostNodes()).toHaveLength(1)

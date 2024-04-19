@@ -184,7 +184,7 @@ export const resizeWindow = (width: number, height: number) => {
 }
 
 export const selectOption = (
-  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  wrapper: ReactWrapper,
   selector: string,
   option: string
 ): ReactWrapper => {
