@@ -254,9 +254,7 @@ export function VerifyCertificatePage() {
     const country =
       location?.address?.country &&
       intl.formatMessage(countryMessages[location?.address?.country])
-
     const city = location?.address?.city ?? EMPTY_STRING
-
     if (location?.address?.country === window.config.COUNTRY) {
       const district =
         location.address.district &&
@@ -264,7 +262,24 @@ export function VerifyCertificatePage() {
       const state =
         location.address.state &&
         offlineData.locations[location.address.state].name
-      return [city, district, state, country]
+      const eventLocationLevel3 =
+        location.address?.line?.[10] &&
+        offlineData.locations[location.address.line[10]]?.name
+      const eventLocationLevel4 =
+        location.address?.line?.[11] &&
+        offlineData.locations[location.address.line[11]]?.name
+      const eventLocationLevel5 =
+        location.address?.line?.[12] &&
+        offlineData.locations[location.address.line[12]]?.name
+      return [
+        city,
+        eventLocationLevel5,
+        eventLocationLevel4,
+        eventLocationLevel3,
+        district,
+        state,
+        country
+      ]
         .filter((label) => Boolean(label))
         .join(', ')
     }
