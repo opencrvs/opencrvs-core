@@ -50,6 +50,7 @@ export function isValidPlainDate(rawDate: unknown): rawDate is PlainDate {
 }
 
 export function plainDateToLocalDate(plainDate: PlainDate) {
+  if (!plainDate) return ''
   const rawDate = plainDate as unknown as `${number}-${number}-${number}`
   const [yyyy, mm, dd] = rawDate.split('-')
   return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
@@ -60,6 +61,7 @@ export function formatPlainDate(
   formatString = 'dd MMMM yyyy'
 ) {
   const localDate = plainDateToLocalDate(plainDate)
+  if (!localDate) return ''
   return format(localDate, formatString, {
     locale: locales[window.__localeId__]
   })
