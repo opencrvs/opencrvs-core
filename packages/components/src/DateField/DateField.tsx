@@ -51,8 +51,8 @@ const DateSegment = styled(TextInput)`
 `
 
 const MAX_DAY_NUMBER = 31
-const MAX_YEAR_NUMBER = 12
-const MAX_MONTH_NUMBER = 2100
+const MAX_YEAR_NUMBER = 2100
+const MAX_MONTH_NUMBER = 12
 
 export const DateField = ({
   id,
