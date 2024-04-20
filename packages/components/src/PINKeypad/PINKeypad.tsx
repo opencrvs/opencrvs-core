@@ -122,7 +122,7 @@ export const PINKeypad = ({
           {new Array(pin.length).fill('').map((_, i) => (
             <DotFilled key={`dot-filled-${i}`} />
           ))}
-          {new Array(4 - pin.length).fill('').map((_, i) => (
+          {new Array(MAX_PIN_LENGTH - pin.length).fill('').map((_, i) => (
             <DotUnfilled key={`dot-unfilled-${i}`} />
           ))}
         </div>
