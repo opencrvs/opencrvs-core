@@ -115,14 +115,15 @@ export const DateField = ({
           break
       }
 
-      if (yyyy === '' && mm === '' && dd === '') {
-        return onChange('')
-      }
-      onChange(`${yyyy}-${mm}-${dd}`)
       setDate((prevDate) => ({
         ...prevDate,
         [segmentType]: val
       }))
+
+      if (yyyy === '' && mm === '' && dd === '') {
+        return onChange('')
+      }
+      onChange(`${yyyy}-${mm}-${dd}`)
     }
   }
 
