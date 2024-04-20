@@ -93,7 +93,7 @@ export const DateField = ({
             return
           }
           if (val.length > 1 && mmRef.current) {
-            mmRef?.current?.focusField()
+            mmRef.current.focusField()
           }
           break
         case 'mm':
