@@ -146,7 +146,7 @@ export const LocationSearch = ({
       }
       document.removeEventListener('click', handler)
     }
-  }, [selectedLocation])
+  }, [selectedLocation, handler, searchTimeout])
 
   const search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
