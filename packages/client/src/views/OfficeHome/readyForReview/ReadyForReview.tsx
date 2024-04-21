@@ -26,7 +26,7 @@ import {
   IAction
 } from '@opencrvs/components/lib/Workqueue'
 import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
@@ -82,87 +82,81 @@ interface IBaseReviewTabProps {
   error?: boolean
 }
 
-interface IReviewTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-
 type IReviewTabProps = IntlShapeProps & IBaseReviewTabProps
 
-class ReadyForReviewComponent extends React.Component<
-  IReviewTabProps,
-  IReviewTabState
-> {
-  pageSize = 10
-  constructor(props: IReviewTabProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol: COLUMNS.SENT_FOR_REVIEW,
-      sortOrder: SORT_ORDER.DESCENDING
+const ReadyForReviewComponent = ({
+  theme,
+  scope,
+  goToPage,
+  goToDeclarationRecordAudit,
+  outboxDeclarations,
+  queryData,
+  paginationId,
+  onPageChange,
+  loading,
+  pageSize = 10,
+  error,
+  intl
+}: IReviewTabProps) => {
+  const [width, setWidth] = useState(window.innerWidth)
+  const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+
+  const recordWindowWidth = () => {
+    setWidth(window.innerWidth)
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', recordWindowWidth)
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
     }
+  }, [])
+
+  const userHasRegisterScope = () => {
+    return scope && hasRegisterScope(scope)
   }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  userHasRegisterScope() {
-    return this.props.scope && hasRegisterScope(this.props.scope)
-  }
-
-  onColumnClick = (columnName: string) => {
+  const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
   }
 
-  transformDeclaredContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
+  const transformDeclaredContent = (data: GQLEventSearchResultSet) => {
     if (!data || !data.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(data, intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
-      const foundDeclaration = this.props.outboxDeclarations.find(
+      const foundDeclaration = outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
       const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (width > theme.grid.breakpoints.lg) {
           actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
+            label: intl.formatMessage(constantsMessages.review),
             handler: () => {},
             disabled: true
           })
         }
       } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (width > theme.grid.breakpoints.lg) {
           actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
+            label: intl.formatMessage(constantsMessages.review),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
               e && e.stopPropagation()
-              this.props.goToPage(
+              goToPage(
                 reg.declarationStatus === 'CORRECTION_REQUESTED'
                   ? REVIEW_CORRECTION
                   : REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -197,7 +191,7 @@ class ReadyForReviewComponent extends React.Component<
         ''
       const isValidatedOnReview =
         reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        this.userHasRegisterScope()
+        userHasRegisterScope()
           ? true
           : false
       const dateOfEvent =
@@ -222,18 +216,14 @@ class ReadyForReviewComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
-          }
+          onClick={() => goToDeclarationRecordAudit('reviewTab', reg.id)}
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
-          }
+          onClick={() => goToDeclarationRecordAudit('reviewTab', reg.id)}
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -264,11 +254,7 @@ class ReadyForReviewComponent extends React.Component<
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
     return sortedItems.map((item) => {
       return {
         ...item,
@@ -280,36 +266,36 @@ class ReadyForReviewComponent extends React.Component<
     })
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           width: 30,
           key: COLUMNS.ICON_WITH_NAME,
-          sortFunction: this.onColumnClick,
-          isSorted: this.state.sortedCol === COLUMNS.NAME
+          sortFunction: onColumnClick,
+          isSorted: sortedCol === COLUMNS.NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
-          sortFunction: this.onColumnClick,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT
+          sortFunction: onColumnClick,
+          isSorted: sortedCol === COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT
+          sortFunction: onColumnClick,
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.sentForReview),
+          label: intl.formatMessage(constantsMessages.sentForReview),
           width: 18,
           key: COLUMNS.SENT_FOR_REVIEW,
-          sortFunction: this.onColumnClick,
-          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW
+          sortFunction: onColumnClick,
+          isSorted: sortedCol === COLUMNS.SENT_FOR_REVIEW
         },
         {
           width: 18,
@@ -321,7 +307,7 @@ class ReadyForReviewComponent extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -335,49 +321,41 @@ class ReadyForReviewComponent extends React.Component<
     }
   }
 
-  render() {
-    const { intl, queryData, paginationId, pageSize, onPageChange } = this.props
-    const { data } = queryData
-    const totalPages = this.props.queryData.data.totalItems
-      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.readyForReview)}
-        isMobileSize={
-          this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
-        }
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={this.props.loading}
-        error={this.props.error}
-        noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
-        noContent={this.transformDeclaredContent(data).length <= 0}
-      >
-        <ReactTooltip id="validateTooltip">
-          <ToolTipContainer>
-            {this.props.intl.formatMessage(
-              messages.validatedDeclarationTooltipForRegistrar
-            )}
-          </ToolTipContainer>
-        </ReactTooltip>
-        <Workqueue
-          content={this.transformDeclaredContent(data)}
-          columns={this.getColumns()}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
-        />
-      </WQContentWrapper>
-    )
-  }
+  const { data } = queryData
+  const totalPages = queryData.data.totalItems
+    ? Math.ceil(queryData.data.totalItems / pageSize)
+    : 0
+  const isShowPagination =
+    queryData.data.totalItems && queryData.data.totalItems > pageSize
+      ? true
+      : false
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.readyForReview)}
+      isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      loading={loading}
+      error={error}
+      noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
+      noContent={transformDeclaredContent(data).length <= 0}
+    >
+      <ReactTooltip id="validateTooltip">
+        <ToolTipContainer>
+          {intl.formatMessage(messages.validatedDeclarationTooltipForRegistrar)}
+        </ToolTipContainer>
+      </ReactTooltip>
+      <Workqueue
+        content={transformDeclaredContent(data)}
+        columns={getColumns()}
+        loading={loading}
+        sortOrder={sortOrder}
+        hideLastBorder={!isShowPagination}
+      />
+    </WQContentWrapper>
+  )
 }
 
 function mapStateToProps(state: IStoreState) {
