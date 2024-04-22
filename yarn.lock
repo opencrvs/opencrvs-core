@@ -3311,7 +3311,7 @@
   dependencies:
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/wreck@17.x.x", "@hapi/wreck@^17.0.0":
+"@hapi/wreck@17.x.x":
   version "17.2.0"
   resolved "https://registry.npmjs.org/@hapi/wreck/-/wreck-17.2.0.tgz"
   integrity sha512-pJ5kjYoRPYDv+eIuiLQqhGon341fr2bNIYZjuotuPJG/3Ilzr/XtI+JAp0A86E2bYfsS3zBPABuS2ICkaXFT8g==
@@ -3319,6 +3319,15 @@
     "@hapi/boom" "9.x.x"
     "@hapi/bourne" "2.x.x"
     "@hapi/hoek" "9.x.x"
+
+"@hapi/wreck@^18.0.0":
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/@hapi/wreck/-/wreck-18.1.0.tgz#68e631fc7568ebefc6252d5b86cb804466c8dbe6"
+  integrity sha512-0z6ZRCmFEfV/MQqkQomJ7sl/hyxvcZM7LtuVqN3vdAO4vM9eBbowl0kaqQj9EJJQab+3Uuh1GxbGIBFy4NfJ4w==
+  dependencies:
+    "@hapi/boom" "^10.0.1"
+    "@hapi/bourne" "^3.0.0"
+    "@hapi/hoek" "^11.0.2"
 
 "@hapi/wreck@^18.0.1":
   version "18.0.1"
@@ -7095,17 +7104,18 @@
   resolved "https://registry.npmjs.org/@types/hapi__catbox/-/hapi__catbox-10.2.5.tgz"
   integrity sha512-vomIMP6dUDSbiasbPglH5LJvnnl8jFmRTjPgPl4l9Vi1L9fto3VXJQZtl8LzyIQUUoocyT5bmvWeYWsVgxAHQg==
 
-"@types/hapi__h2o2@8.3.3":
-  version "8.3.3"
-  resolved "https://registry.npmjs.org/@types/hapi__h2o2/-/hapi__h2o2-8.3.3.tgz"
-  integrity sha512-+qWZVFVGc5Y0wuNZvVe876VJjUBCJ8eQdXovg4Rg9laHpeERQejluI7aw31xXWfLojTuHz3ThZzC6Orqras05Q==
+"@types/hapi__h2o2@10.0.4":
+  version "10.0.4"
+  resolved "https://registry.yarnpkg.com/@types/hapi__h2o2/-/hapi__h2o2-10.0.4.tgz#8a6383b51101480075aa9085b1a591d0e77ddd9d"
+  integrity sha512-s7F+kS45aUopQVzLqp+zRAuOLYcJflhJM3+tuw5ph8RtGiG9nl698AnGRimb8jHRHioi8UR/8xPnsZx/s4ZLsQ==
   dependencies:
-    "@hapi/boom" "^9.0.0"
-    "@hapi/wreck" "^17.0.0"
-    "@types/hapi__hapi" "*"
+    "@hapi/boom" "^10.0.0"
+    "@hapi/hapi" "^21.1.0"
+    "@hapi/wreck" "^18.0.0"
     "@types/node" "*"
+    joi "^17.7.0"
 
-"@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
+"@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
   version "20.0.13"
   resolved "https://registry.npmjs.org/@types/hapi__hapi/-/hapi__hapi-20.0.13.tgz"
   integrity sha512-LP4IPfhIO5ZPVOrJo7H8c8Slc0WYTFAUNQX1U0LBPKyXioXhH5H2TawIgxKujIyOhbwoBbpvOsBf6o5+ToJIrQ==
