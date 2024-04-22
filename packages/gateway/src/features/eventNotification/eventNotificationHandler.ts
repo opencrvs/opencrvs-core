@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
-import { fetchFHIR, fetchFromHearth } from '@gateway/features/fhir/service'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
@@ -26,6 +26,8 @@ import {
   Task,
   findExtension
 } from '@opencrvs/commons/types'
+import { forwardBundleToWorkflow } from '@gateway/workflow/index'
+import { getAuthHeader } from '@gateway/../../commons/build/dist/http'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
@@ -160,8 +162,9 @@ export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  let bundle: Bundle
   try {
-    const bundle = req.payload as Bundle
+    bundle = req.payload as Bundle
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
@@ -176,12 +179,8 @@ export async function eventNotificationHandler(
     }
     return badRequest(e)
   }
-  return fetchFHIR(
-    '',
-    { Authorization: req.headers.authorization },
-    'POST',
-    JSON.stringify(req.payload)
-  )
+
+  return await forwardBundleToWorkflow(getAuthHeader(req), bundle)
 }
 
 export async function validateAddressesOfTask(bundle: Bundle) {
@@ -292,10 +291,6 @@ export function BoomErrorWithCustomMessage(message: string) {
   boomError.output.payload.boomCustomMessage = message
   return boomError
 }
-function isPatient(
-  value: Resource,
-  index: number,
-  array: Resource[]
-): value is Resource {
-  throw new Error('Function not implemented.')
+function isPatient<T extends Resource>(resource: T): resource is T & Patient {
+  return resource.resourceType === 'Patient'
 }
