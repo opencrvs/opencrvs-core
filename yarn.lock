@@ -2981,6 +2981,30 @@
     "@hapi/validate" "1.x.x"
     "@hapi/wreck" "17.x.x"
 
+"@hapi/hapi@*":
+  version "21.3.9"
+  resolved "https://registry.yarnpkg.com/@hapi/hapi/-/hapi-21.3.9.tgz#953220abe26d12a7cbd308a57e434dedf0278cb3"
+  integrity sha512-AT5m+Rb8iSOFG3zWaiEuTJazf4HDYl5UpRpyxMJ3yR+g8tOEmqDv6FmXrLHShdvDOStAAepHGnr1G7egkFSRdw==
+  dependencies:
+    "@hapi/accept" "^6.0.1"
+    "@hapi/ammo" "^6.0.1"
+    "@hapi/boom" "^10.0.1"
+    "@hapi/bounce" "^3.0.1"
+    "@hapi/call" "^9.0.1"
+    "@hapi/catbox" "^12.1.1"
+    "@hapi/catbox-memory" "^6.0.1"
+    "@hapi/heavy" "^8.0.1"
+    "@hapi/hoek" "^11.0.2"
+    "@hapi/mimos" "^7.0.1"
+    "@hapi/podium" "^5.0.1"
+    "@hapi/shot" "^6.0.1"
+    "@hapi/somever" "^4.1.1"
+    "@hapi/statehood" "^8.1.1"
+    "@hapi/subtext" "^8.1.0"
+    "@hapi/teamwork" "^6.0.0"
+    "@hapi/topo" "^6.0.1"
+    "@hapi/validate" "^2.0.1"
+
 "@hapi/hapi@^20.0.1", "@hapi/hapi@^20.2.1":
   version "20.3.0"
   resolved "https://registry.npmjs.org/@hapi/hapi/-/hapi-20.3.0.tgz"
@@ -7105,7 +7129,7 @@
     "@types/hapi__hapi" "*"
     "@types/node" "*"
 
-"@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.0", "@types/hapi__hapi@^20.0.10":
+"@types/hapi__hapi@*", "@types/hapi__hapi@^20.0.10":
   version "20.0.13"
   resolved "https://registry.npmjs.org/@types/hapi__hapi/-/hapi__hapi-20.0.13.tgz"
   integrity sha512-LP4IPfhIO5ZPVOrJo7H8c8Slc0WYTFAUNQX1U0LBPKyXioXhH5H2TawIgxKujIyOhbwoBbpvOsBf6o5+ToJIrQ==
@@ -7118,6 +7142,13 @@
     "@types/hapi__shot" "*"
     "@types/node" "*"
     joi "^17.3.0"
+
+"@types/hapi__hapi@^21.0.0":
+  version "21.0.0"
+  resolved "https://registry.yarnpkg.com/@types/hapi__hapi/-/hapi__hapi-21.0.0.tgz#4bf30e6a08a3adc164c9a301a7af3914d1060d35"
+  integrity sha512-urNzL9HQgOp4QbeEOG/Y/XIcU1pB6skGh7LKMd0hGkxb8oRmWe083x5LAuLjZNtuhRU6yKhiSjjqQEJ+3pWjpQ==
+  dependencies:
+    "@hapi/hapi" "*"
 
 "@types/hapi__inert@^5.2.3":
   version "5.2.10"
