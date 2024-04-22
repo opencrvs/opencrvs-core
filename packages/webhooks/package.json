@@ -44,7 +44,7 @@
     "@types/ioredis": "^4.28.5",
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^8.3.0",
-    "@types/jwt-decode": "^2.2.1",
+    "@types/jwt-decode": "^3.0.0",
     "@types/lodash": "^4.14.135",
     "@types/node-fetch": "^2.5.12",
     "@types/redis": "^2.8.26",

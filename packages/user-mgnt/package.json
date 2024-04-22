@@ -43,7 +43,7 @@
     "@types/jsonwebtoken": "^8.3.0",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
-    "@types/jwt-decode": "^2.2.1",
+    "@types/jwt-decode": "^3.0.0",
     "@types/lodash": "^4.14.135",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
