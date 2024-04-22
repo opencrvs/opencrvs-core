@@ -23,7 +23,7 @@
     "app-module-path": "^2.2.0",
     "date-fns": "^2.28.0",
     "file-type": "^16.5.3",
-    "hapi-auth-jwt2": "10.4.0",
+    "hapi-auth-jwt2": "10.5.1",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
     "is-svg": "^4.4.0",
