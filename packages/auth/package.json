@@ -39,7 +39,7 @@
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
-    "@types/dotenv": "^6.1.0",
+    "@types/dotenv": "^8.0.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
