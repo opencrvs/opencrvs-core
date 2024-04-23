@@ -10,47 +10,51 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
+  addExtensionsToTask,
   Bundle,
   getTaskFromSavedBundle,
+  SavedTask,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { getToken } from '@workflow/utils/auth-utils'
-import {
-  createEventNotificationTask,
-  mergeChangedResourcesIntoRecord,
-  withPractitionerDetails
-} from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
+import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as ValidRecord
+  const payload = request.payload as Bundle
   const token = getToken(request)
 
-  const previousTask = getTaskFromSavedBundle(payload)
+  const responseBundle = await sendBundleToHearth(payload)
+  const savedBundle = toSavedBundle(payload, responseBundle) as ValidRecord
 
-  const updatedTaskWithoutPractitionerExtensions =
-    createEventNotificationTask(previousTask)
+  const task = getTaskFromSavedBundle(savedBundle) as SavedTask
+  const system = await getLoggedInPractitionerResource(token)
 
-  const [taskWithLocation, practitionerResourcesBundle] =
-    await withPractitionerDetails(
-      updatedTaskWithoutPractitionerExtensions,
-      token
-    )
+  const savedTaskWithRegLastUser = addExtensionsToTask(task, [
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: {
+        reference: `Practitioner/${system.id}`
+      }
+    }
+  ]) as SavedTask
 
-  const unsavedChangedResources: Bundle = {
-    type: 'document',
-    resourceType: 'Bundle',
-    entry: [{ resource: taskWithLocation }]
-  }
+  const savedBundleWithRegLastUser = {
+    ...savedBundle,
+    entry: [
+      ...savedBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
+      {
+        fullUrl: savedBundle.entry.find(
+          (e) => e.resource.resourceType === 'Task'
+        )?.fullUrl,
+        resource: savedTaskWithRegLastUser
+      }
+    ]
+  } as ValidRecord
 
-  const responseBundle = await mergeChangedResourcesIntoRecord(
-    payload,
-    unsavedChangedResources,
-    practitionerResourcesBundle
-  )
-
-  await indexBundle(responseBundle, token)
+  await indexBundle(savedBundleWithRegLastUser, token)
 }
