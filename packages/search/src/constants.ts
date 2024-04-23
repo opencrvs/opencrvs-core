@@ -22,6 +22,8 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const OPENCRVS_INDEX_NAME = 'ocrvs'
 export const DEFAULT_TIMEOUT = 600000
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 
 export const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'

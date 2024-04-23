@@ -34,17 +34,9 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir/'
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const DEFAULT_TIMEOUT = 600000
-
-export const enum LOCATION_LEVEL {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  STATE = 'STATE',
-  DISTRICT = 'DISTRICT',
-  LOCATION_LEVEL_3 = 'LOCATION_LEVEL_3',
-  LOCATION_LEVEL_4 = 'LOCATION_LEVEL_4',
-  LOCATION_LEVEL_5 = 'LOCATION_LEVEL_5'
-}

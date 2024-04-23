@@ -30,7 +30,6 @@ import {
   findNameLocale,
   findTaskExtension,
   findTaskIdentifier,
-  getdeclarationJurisdictionIds,
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
@@ -337,9 +336,9 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationJurisdictionIds = await getdeclarationJurisdictionIds(
-    body.declarationLocationId
-  )
+  body.declarationJurisdictionIds = body.declarationLocationId
+    ? [body.declarationLocationId]
+    : []
 
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'death-declaration'

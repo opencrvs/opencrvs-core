@@ -34,8 +34,8 @@ import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
-import { getOffices } from '@config/handlers/locations/offices'
 import * as Joi from 'joi'
+import { resolveLocationLeafLevel } from '@config/handlers/locations/resolveChildren'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -65,16 +65,19 @@ export default function getRoutes(): ServerRoute[] {
         description: 'Health check endpoint'
       }
     },
+
     {
       method: 'GET',
-      path: '/locations/{locationId}/offices',
-      handler: getOffices,
+      path: '/locations/{locationId}/leaf',
+      handler: resolveLocationLeafLevel,
       options: {
+        // @TODO: :thinking: if auth should be used, as it's not a public API in the end of the day?
+        auth: false,
         tags: ['api'],
-        description: 'Retrieve offices under a location',
+        description: 'Retrieve the leaf level of a particular location',
         validate: {
           params: Joi.object({
-            locationId: Joi.string()
+            locationId: Joi.string().uuid()
           })
         }
       }

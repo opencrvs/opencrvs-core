@@ -10,56 +10,13 @@
  */
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
-import {
-  IAdvancedSearchParam,
-  ISearchCriteria,
-  SortOrder
-} from '@search/features/search/types'
-import {
-  advancedQueryBuilder,
-  QueryBuilderParams
-} from '@search/features/search/utils'
+import { ISearchCriteria, SortOrder } from '@search/features/search/types'
+import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@search/logger'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import {
-  getBottommostLocations,
-  getOffices
-} from '@search/features/fhir/fhir-utils'
 
 export const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
-
-async function transformLocationParams({
-  eventLocationLevel1,
-  eventLocationLevel2,
-  eventLocationLevel3,
-  eventLocationLevel4,
-  eventLocationLevel5,
-  declarationJurisdictionId,
-  ...params
-}: IAdvancedSearchParam): Promise<QueryBuilderParams> {
-  const eventLocationHierarchy = [
-    eventLocationLevel1,
-    eventLocationLevel2,
-    eventLocationLevel3,
-    eventLocationLevel4,
-    eventLocationLevel5
-  ].filter((maybeId): maybeId is string => Boolean(maybeId))
-  const queryParams: QueryBuilderParams = params
-
-  if (eventLocationHierarchy.length > 0) {
-    queryParams.eventJurisdictionIds = (
-      await getBottommostLocations(eventLocationHierarchy)
-    ).map(({ id }) => id)
-  }
-
-  if (declarationJurisdictionId) {
-    queryParams.declarationJurisdictionIds = (
-      await getOffices(declarationJurisdictionId)
-    ).map(({ id }) => id)
-  }
-  return queryParams
-}
 
 export async function formatSearchParams(
   searchPayload: ISearchCriteria,
@@ -82,8 +39,8 @@ export async function formatSearchParams(
     from,
     size,
     body: {
-      query: advancedQueryBuilder(
-        await transformLocationParams(parameters),
+      query: await advancedQueryBuilder(
+        parameters,
         createdBy,
         isExternalSearch
       ),

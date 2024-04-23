@@ -13,20 +13,16 @@ import {
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
+import { transformDeprecatedParamsToSupported } from './deprecation-support'
+import { resolveLocationLeafLevels } from './location'
 
-export type QueryBuilderParams = Omit<
-  IAdvancedSearchParam,
-  `eventLocationLevel${1 | 2 | 3 | 4 | 5}` | 'declarationJurisdictionId'
-> & {
-  eventJurisdictionIds?: string[]
-  declarationJurisdictionIds?: string[]
-}
-
-export function advancedQueryBuilder(
-  params: QueryBuilderParams,
+export async function advancedQueryBuilder(
+  params: IAdvancedSearchParam,
   createdBy: string,
   isExternalSearch: boolean
 ) {
+  params = transformDeprecatedParamsToSupported(params)
+
   const must: any[] = []
   const should: any[] = []
 
@@ -163,11 +159,13 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (params.declarationJurisdictionIds) {
+  if (params.declarationJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationLeafLevels(
+      params.declarationJurisdictionId
+    )
     must.push({
       terms: {
-        'declarationJurisdictionIds.keyword': params.declarationJurisdictionIds,
-        boost: 2.0
+        'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
       }
     })
   }
@@ -188,10 +186,13 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (params.eventJurisdictionIds) {
+  if (params.eventJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationLeafLevels(
+      params.eventJurisdictionId
+    )
     must.push({
       terms: {
-        'eventJurisdictionIds.keyword': params.eventJurisdictionIds
+        'eventJurisdictionIds.keyword': leafLevelJurisdictionIds
       }
     })
   }

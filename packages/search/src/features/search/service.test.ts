@@ -14,6 +14,7 @@ import {
 } from '@search/features/search/service'
 import { client } from '@search/elasticsearch/client'
 import { SortOrder } from '@search/features/search/types'
+import { UUID } from '@opencrvs/commons'
 
 describe('elasticsearch db helper', () => {
   it('should index a composition with proper configuration', async () => {
@@ -26,7 +27,7 @@ describe('elasticsearch db helper', () => {
         event: 'birth',
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration'],
-        declarationLocationId: ''
+        declarationLocationId: '00000000-0000-0000-0000-000000000001' as UUID
       },
       from: 0,
       size: 10
@@ -73,8 +74,8 @@ describe('elasticsearch params formatter', () => {
           event: 'birth',
           registrationStatuses: ['DECLARED'],
           compositionType: ['birth-declaration'],
-          declarationLocationId: '123',
-          eventLocationId: '456'
+          declarationLocationId: '00000000-0000-0000-0000-000000000002' as UUID,
+          eventLocationId: '00000000-0000-0000-0000-000000000003' as UUID
         },
         createdBy: 'EMPTY_STRING',
         from: 0,
