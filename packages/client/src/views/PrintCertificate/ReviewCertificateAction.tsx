@@ -166,7 +166,6 @@ export const ReviewCertificate = () => {
           </Box>
           <Content
             title={intl.formatMessage(certificateMessages.reviewTitle)}
-            subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
             bottomActionButtons={[
               <Button
                 key="confirm-and-print"
@@ -186,7 +185,9 @@ export const ReviewCertificate = () => {
                 <></>
               )
             ]}
-          ></Content>
+          >
+            {intl.formatMessage(certificateMessages.reviewDescription)}
+          </Content>
         </Stack>
       </Frame.LayoutCentered>
       {modal}
