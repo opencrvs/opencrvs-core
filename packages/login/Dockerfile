@@ -1,6 +1,6 @@
 # Step 1. Build the javascript bundle
 
-FROM node:hydrogen-alpine@sha256:6d9d5269cbe4088803e9ef81da62ac481c063b60cadbe8e628bfcbb12296d901
+FROM node:hydrogen-alpine@sha256:4837c2ac8998cf172f5892fb45f229c328e4824c43c8506f8ba9c7996d702430
 WORKDIR /app
 
 COPY . .
