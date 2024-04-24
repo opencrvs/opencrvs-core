@@ -34,6 +34,8 @@ import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
+import * as Joi from 'joi'
+import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -253,6 +255,21 @@ export default function getRoutes(): ServerRoute[] {
         },
         validate: {
           payload: updateInformantSMSNotificationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/location/{locationId}/hierarchy',
+      handler: locationHierarchyHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: "Get location's hierarchy",
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
         }
       }
     },
