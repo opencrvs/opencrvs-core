@@ -14,7 +14,7 @@ import {
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
-import { resolveLocationLeafLevels } from './location'
+import { resolveLocationChildren } from './location'
 
 export async function advancedQueryBuilder(
   params: IAdvancedSearchParam,
@@ -159,7 +159,7 @@ export async function advancedQueryBuilder(
   }
 
   if (params.declarationJurisdictionId) {
-    const leafLevelJurisdictionIds = await resolveLocationLeafLevels(
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
       params.declarationJurisdictionId
     )
     must.push({
@@ -186,7 +186,7 @@ export async function advancedQueryBuilder(
   }
 
   if (params.eventJurisdictionId) {
-    const leafLevelJurisdictionIds = await resolveLocationLeafLevels(
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
       params.eventJurisdictionId
     )
     must.push({

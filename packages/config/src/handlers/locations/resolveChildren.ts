@@ -11,19 +11,16 @@
 import {
   SavedBundle,
   Location,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  SavedLocation
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@config/config/constants'
 import { UUID } from '@opencrvs/commons'
-import { compact } from 'lodash'
 import { ServerRoute } from '@hapi/hapi'
 
-/**
- * Fetches the location itself and the children of it as a flat FHIR array
- */
-async function fetchLocationChildren(locationId: UUID) {
+const fetchLocations = async () => {
   const locationHierarchyUrl = new URL(
-    `Location?_count=0&status=active&partof=${locationId}`,
+    `Location?_count=0&status=active`,
     FHIR_URL
   )
 
@@ -37,15 +34,51 @@ async function fetchLocationChildren(locationId: UUID) {
   return bundle.entry.map(({ resource }) => resource)
 }
 
-export const resolveLocationLeafLevel: ServerRoute['handler'] = async (req) => {
-  const { locationId } = req.params as { locationId: UUID }
-  const locations = await fetchLocationChildren(locationId)
-  const allPartOfs = compact(
-    locations.map(
-      ({ partOf }) => partOf && resourceIdentifierToUUID(partOf.reference)
-    )
-  )
+/**
+ * Creates a new Map<SavedLocation.partOf, SavedLocation[]>
+ * This sets every location under it's corresponding parent, which helps to find the children.
+ */
+const createLocationTree = (locations: SavedLocation[]) => {
+  const tree = new Map<UUID, SavedLocation[]>()
 
-  // Finds the locations that aren't part of anything
-  return locations.filter(({ id }) => !allPartOfs.includes(id))
+  for (const child of locations) {
+    if (!child.partOf) continue
+
+    const parentId = resourceIdentifierToUUID(child.partOf.reference)
+    const parentChildrenRelationship = tree.get(parentId)
+
+    if (!parentChildrenRelationship) {
+      tree.set(parentId, [child])
+    } else {
+      parentChildrenRelationship.push(child)
+    }
+  }
+
+  return tree
+}
+
+/** Resolves the location tree using a depth-first search */
+const resolveLocationChildren = (
+  parentId: UUID,
+  locations: SavedLocation[]
+) => {
+  const locationTree = createLocationTree(locations)
+  const children = []
+  const stack = locationTree.get(parentId) ?? []
+
+  while (stack.length) {
+    const child = stack.pop()!
+    children.push(child)
+    if (locationTree.get(child.id)) {
+      stack.push(...(locationTree.get(child.id) ?? []))
+    }
+  }
+
+  return children
+}
+
+export const resolveChildren: ServerRoute['handler'] = async (req) => {
+  const { locationId } = req.params as { locationId: UUID }
+  const locations = await fetchLocations()
+  return resolveLocationChildren(locationId, locations)
 }

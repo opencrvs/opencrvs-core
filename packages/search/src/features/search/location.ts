@@ -12,11 +12,11 @@ import { UUID } from '@opencrvs/commons'
 import { SavedLocation } from '@search/../../commons/build/dist/types'
 import { APPLICATION_CONFIG_URL } from '@search/constants'
 
-const FETCH_LEAF_LEVELS_LOCATION_URL = (id: UUID) =>
+const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
   new URL(`/locations/${id}/leaf`, APPLICATION_CONFIG_URL)
 
-export async function resolveLocationLeafLevels(locationId: UUID) {
-  const response = await fetch(FETCH_LEAF_LEVELS_LOCATION_URL(locationId))
+export async function resolveLocationChildren(locationId: UUID) {
+  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(locationId))
   if (!response.ok) {
     throw new Error(
       "Couldn't fetch the leaf level location from config: " +

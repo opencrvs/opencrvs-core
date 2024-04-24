@@ -32,6 +32,11 @@ export async function formatSearchParams(
   } = searchPayload
 
   const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
+  const query = await advancedQueryBuilder(
+    parameters,
+    createdBy,
+    isExternalSearch
+  )
 
   return {
     index: OPENCRVS_INDEX_NAME,
@@ -39,11 +44,7 @@ export async function formatSearchParams(
     from,
     size,
     body: {
-      query: await advancedQueryBuilder(
-        parameters,
-        createdBy,
-        isExternalSearch
-      ),
+      query,
       sort
     }
   }
