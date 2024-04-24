@@ -21,7 +21,10 @@ import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { hasRegisterScope } from '@client/utils/authUtils'
+import {
+  hasRegisterScope,
+  hasRegistrationClerkScope
+} from '@client/utils/authUtils'
 import { countries } from '@client/utils/countries'
 import { cloneDeep } from 'lodash'
 import { useState, useEffect } from 'react'
@@ -57,7 +60,8 @@ export const usePrintableCertificate = (declarationId: string) => {
   )
   const scope = useSelector(getScope)
   const canUserEditRecord =
-    declaration?.event !== Event.Marriage && hasRegisterScope(scope)
+    declaration?.event !== Event.Marriage &&
+    (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
   const userDetails = useSelector(getUserDetails)
 
   useEffect(() => {
