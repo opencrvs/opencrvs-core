@@ -93,7 +93,8 @@ async function findOldestNotificationQueueRecord() {
 async function dispatch(record: NotificationQueueRecord) {
   return notifyCountryConfig(
     {
-      email: 'allUserNotification'
+      email: 'allUserNotification',
+      sms: 'allUserNotification'
     },
     { email: record.bcc[0], bcc: record.bcc.slice(1) },
     'user',
