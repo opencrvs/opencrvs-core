@@ -24,7 +24,6 @@ export async function advancedQueryBuilder(
   params = transformDeprecatedParamsToSupported(params)
 
   const must: any[] = []
-  const should: any[] = []
 
   if (params.event) {
     must.push({
@@ -720,8 +719,7 @@ export async function advancedQueryBuilder(
 
   return {
     bool: {
-      must,
-      should
+      must
     }
   }
 }
