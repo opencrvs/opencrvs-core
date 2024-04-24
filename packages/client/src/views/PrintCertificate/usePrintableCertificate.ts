@@ -15,7 +15,7 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { getDraftsState, useDeclaration } from '@client/declarations/selectors'
+import { useDeclaration } from '@client/declarations/selectors'
 import { CorrectionSection, SubmissionAction } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
