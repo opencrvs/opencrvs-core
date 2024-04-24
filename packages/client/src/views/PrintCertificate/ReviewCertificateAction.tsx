@@ -93,7 +93,7 @@ export const ReviewCertificate = () => {
   const {
     svg,
     handleCertify,
-    isPrintInAdvanced,
+    isPrintInAdvance,
     canUserEditRecord,
     handleEdit
   } = usePrintableCertificate(registrationId)
@@ -115,7 +115,7 @@ export const ReviewCertificate = () => {
       <ResponsiveModal
         id="confirm-print-modal"
         title={
-          isPrintInAdvanced
+          isPrintInAdvance
             ? intl.formatMessage(certificateMessages.printModalTitle)
             : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
         }
@@ -143,7 +143,7 @@ export const ReviewCertificate = () => {
         handleClose={() => close(false)}
         contentHeight={100}
       >
-        {isPrintInAdvanced
+        {isPrintInAdvance
           ? intl.formatMessage(certificateMessages.printModalBody)
           : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
       </ResponsiveModal>

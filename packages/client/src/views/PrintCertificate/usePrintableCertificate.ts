@@ -45,14 +45,37 @@ import {
 } from './utils'
 import { Event } from '@client/utils/gateway'
 
+const withEnhancedTemplateVariables = (
+  declaration: IPrintableDeclaration | undefined
+) => {
+  if (!declaration || !isCertificateForPrintInAdvance(declaration)) {
+    return declaration
+  }
+
+  return {
+    ...declaration,
+    data: {
+      ...declaration.data,
+      template: {
+        ...declaration.data.template,
+        printInAdvance: true
+      }
+    }
+  }
+}
+
 export const usePrintableCertificate = (declarationId: string) => {
-  const offlineData = useSelector(getOfflineData)
-  const declaration = useDeclaration<IPrintableDeclaration | undefined>(
-    declarationId
+  const declarationWithoutAllTemplateVariables = useDeclaration<
+    IPrintableDeclaration | undefined
+  >(declarationId)
+  const declaration = withEnhancedTemplateVariables(
+    declarationWithoutAllTemplateVariables
   )
+
+  const offlineData = useSelector(getOfflineData)
   const state = useSelector((store: IStoreState) => store)
   const [svg, setSvg] = useState<string>()
-  const isPrintInAdvanced = isCertificateForPrintInAdvance(declaration)
+  const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const intl = useIntl()
   const dispatch = useDispatch()
   const languages = useSelector((store: IStoreState) =>
@@ -81,14 +104,14 @@ export const usePrintableCertificate = (declarationId: string) => {
     const draft = cloneDeep(declaration) as IPrintableDeclaration
 
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = isPrintInAdvanced
+    draft.action = isPrintInAdvance
       ? SubmissionAction.CERTIFY_DECLARATION
       : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
-    if (!isPrintInAdvanced) {
+    if (!isPrintInAdvance) {
       if (isFreeOfCost(draft.event, eventDate, registeredDate, offlineData)) {
         certificate.payments = {
           type: 'MANUAL' as const,
@@ -137,7 +160,7 @@ export const usePrintableCertificate = (declarationId: string) => {
   return {
     svg,
     handleCertify,
-    isPrintInAdvanced,
+    isPrintInAdvance,
     canUserEditRecord,
     handleEdit
   }
