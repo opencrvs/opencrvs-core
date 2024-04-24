@@ -60,7 +60,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { hasRegisterScope } from '@client/utils/authUtils'
+import { hasRegisterScope, hasRegistrationClerkScope } from '@client/utils/authUtils'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
@@ -222,7 +222,6 @@ class ReviewCertificateActionComponent extends React.Component<
     const { intl, scope } = this.props
     const isPrintInAdvanced = isCertificateForPrintInAdvance(this.props.draft)
     const isEventMarriage = this.props.draft.event === Event.Marriage
-
     /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
       return (
@@ -263,7 +262,7 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            {!isEventMarriage && hasRegisterScope(scope) && (
+            {!isEventMarriage && (hasRegisterScope(scope) || hasRegistrationClerkScope(scope)) && (
               <DangerButton
                 onClick={() =>
                   this.props.goToCertificateCorrection(
