@@ -24,10 +24,11 @@ import {
   Patient,
   Resource,
   Task,
-  findExtension
+  findExtension,
+  isPatient
 } from '@opencrvs/commons/types'
 import { forwardBundleToWorkflow } from '@gateway/workflow/index'
-import { getAuthHeader } from '@gateway/../../commons/build/dist/http'
+import { getAuthHeader } from '@opencrvs/commons/http'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
@@ -290,7 +291,4 @@ export function BoomErrorWithCustomMessage(message: string) {
   const boomError = badImplementation()
   boomError.output.payload.boomCustomMessage = message
   return boomError
-}
-function isPatient<T extends Resource>(resource: T): resource is T & Patient {
-  return resource.resourceType === 'Patient'
 }

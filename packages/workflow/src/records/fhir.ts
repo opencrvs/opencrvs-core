@@ -50,8 +50,7 @@ import {
   isTask,
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
-  getResourceFromBundleById,
-  getBusinessStatus
+  getResourceFromBundleById
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1060,16 +1059,6 @@ export function createCorrectionRequestTask(
       ]
     }
   }
-}
-
-export function createEventNotificationTask(
-  previousTask: SavedTask
-): SavedTask {
-  return createNewTaskResource(
-    previousTask,
-    [],
-    getBusinessStatus(previousTask)
-  )
 }
 
 function createNewTaskResource(

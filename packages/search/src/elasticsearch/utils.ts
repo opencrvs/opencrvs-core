@@ -357,6 +357,7 @@ export const createStatusHistory = async (
         return system
       })()
 
+  // for a system the user name is a string
   if (typeof user.name !== 'object') user.name = [user.name]
 
   const operatorName = user && findName(NAME_EN, user.name)
