@@ -45,6 +45,10 @@ export async function eventNotificationHandler(
   const unsavedTask = getTaskResourceFromFhirBundle(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
 
+  //@ts-ignore
+  const { name, username, type } = practitioner
+  const systemInformationJSON = { name, username, type }
+
   const taskWithRegLastUser = addExtensionsToTask(unsavedTask, [
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
@@ -74,6 +78,10 @@ export async function eventNotificationHandler(
           event.toLowerCase() as Lowercase<EVENT_TYPE>
         }-tracking-id`,
         value: trackingId
+      },
+      {
+        system: 'http://opencrvs.org/specs/id/system_identifier',
+        value: JSON.stringify(systemInformationJSON)
       }
     ]
   }
