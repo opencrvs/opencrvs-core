@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { modifyDeclaration, writeDeclaration } from '@client/declarations'
+import {
+  IDeclaration,
+  modifyDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { selectCountryLogo, getOfflineData } from '@client/offline/selectors'
 import React from 'react'
 import { useIntl } from 'react-intl'
@@ -68,7 +72,7 @@ export const OIDPVerificationCallback = () => {
     ?.settings?.openIdProviderClientId
   const intl = useIntl()
   const logo = useSelector(selectCountryLogo)
-  const declaration = useDeclaration(declarationId)
+  const declaration = useDeclaration<IDeclaration>(declarationId)
   const dispatch = useDispatch()
   const history = useHistory()
   const oidpUserInfoQueryVariables = {

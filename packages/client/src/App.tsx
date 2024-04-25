@@ -25,7 +25,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
-import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
@@ -73,6 +72,7 @@ import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
+import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 
 interface IAppProps {
@@ -354,9 +354,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               path={routes.REVIEW_CERTIFICATE}
-                                              component={
-                                                ReviewCertificateAction
-                                              }
+                                              component={ReviewCertificate}
                                             />
                                             <ProtectedRoute
                                               path={
