@@ -93,7 +93,8 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@config/(.*)": "<rootDir>/src/$1"
+      "@config/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "coverageReporters": [
       "json",

@@ -8,15 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  SavedBundle,
-  Location,
-  resourceIdentifierToUUID,
-  SavedLocation
-} from '@opencrvs/commons/types'
+import { SavedBundle } from '@opencrvs/commons/types'
+import * as fhir from '@opencrvs/commons/types'
 import { FHIR_URL } from '@config/config/constants'
 import { UUID } from '@opencrvs/commons'
 import { ServerRoute } from '@hapi/hapi'
+import { resolveLocationChildren } from './locationTreeSolver'
 
 const fetchLocations = async () => {
   const locationHierarchyUrl = new URL(
@@ -30,51 +27,8 @@ const fetchLocations = async () => {
     throw new Error(`Failed to fetch locations: ${await response.text()}`)
   }
 
-  const bundle = (await response.json()) as SavedBundle<Location>
+  const bundle = (await response.json()) as SavedBundle<fhir.Location>
   return bundle.entry.map(({ resource }) => resource)
-}
-
-/**
- * Creates a new Map<SavedLocation.partOf, SavedLocation[]>
- * It sets the first-level children under their parents
- */
-const resolveParentChildrenMap = (locations: SavedLocation[]) => {
-  const parentChildrenMap = new Map<UUID, SavedLocation[]>()
-
-  for (const child of locations) {
-    if (!child.partOf) continue
-
-    const parentId = resourceIdentifierToUUID(child.partOf.reference)
-    const parentChildrenRelationship = parentChildrenMap.get(parentId)
-
-    if (!parentChildrenRelationship) {
-      parentChildrenMap.set(parentId, [child])
-    } else {
-      parentChildrenRelationship.push(child)
-    }
-  }
-
-  return parentChildrenMap
-}
-
-/** Resolves any given location's children multi-level down to the leaf node */
-const resolveLocationChildren = (
-  parentId: UUID,
-  locations: SavedLocation[]
-) => {
-  const parentChildrenMap = resolveParentChildrenMap(locations)
-  const children: SavedLocation[] = []
-  const stack = parentChildrenMap.get(parentId) ?? []
-
-  while (stack.length) {
-    const child = stack.pop()!
-    children.push(child)
-    if (parentChildrenMap.get(child.id)) {
-      stack.push(...(parentChildrenMap.get(child.id) ?? []))
-    }
-  }
-
-  return children
 }
 
 export const resolveChildren: ServerRoute['handler'] = async (req) => {

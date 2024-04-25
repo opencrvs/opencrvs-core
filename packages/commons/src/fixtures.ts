@@ -12,3 +12,4 @@
 export * from './fixtures/birth-bundle'
 export * from './fixtures/death-bundle'
 export * from './fixtures/marriage-bundle'
+export * from './fixtures/location'
