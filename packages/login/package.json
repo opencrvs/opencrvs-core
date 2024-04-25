@@ -29,7 +29,7 @@
     "focus-visible": "^5.0.2",
     "google-libphonenumber": "^3.2.32",
     "history": "^4.7.2",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "lodash-es": "^4.17.0",
@@ -71,8 +71,7 @@
       "prettier --write",
       "yarn lint:ts",
       "stylelint",
-      "yarn extract:translations",
-      "git add"
+      "yarn extract:translations"
     ]
   },
   "devDependencies": {

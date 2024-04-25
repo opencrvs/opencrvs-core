@@ -28,10 +28,9 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "yarn lint:ts",
+      "eslint --fix",
       "stylelint",
-      "yarn extract:translations",
-      "git add"
+      "yarn extract:translations"
     ]
   },
   "dependencies": {
@@ -74,7 +73,7 @@
     "iframe-resizer-react": "^1.1.0",
     "jsdom-worker": "^0.3.0",
     "jwt-decode": "^2.2.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "patch-package": "^6.1.2",
