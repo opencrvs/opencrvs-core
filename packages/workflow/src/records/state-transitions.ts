@@ -216,13 +216,8 @@ export async function toCorrectionApproved(
     paymentReconciliation
   )
 
-  const correctionRequestTaskWithPractitionerExtensions = setupLastRegUser(
-    correctedTask,
-    practitioner
-  )
-
-  const correctionRequestWithLocationExtensions = await setupLastRegLocation(
-    correctionRequestTaskWithPractitionerExtensions,
+  const correctedWithLocationExtensions = await setupLastRegLocation(
+    setupLastRegUser(correctedTask, practitioner),
     practitioner
   )
 
@@ -234,7 +229,7 @@ export async function toCorrectionApproved(
           (entry) => entry.resource.id !== correctionAcceptedTask.id
         ),
         { resource: correctionAcceptedTask },
-        { resource: correctionRequestWithLocationExtensions }
+        { resource: correctedWithLocationExtensions }
       ]
     },
     'REGISTERED'

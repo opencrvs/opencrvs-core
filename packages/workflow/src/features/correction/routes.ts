@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { badRequest, conflict } from '@hapi/boom'
+import { Request } from '@hapi/hapi'
+import { getAuthHeader } from '@opencrvs/commons/http'
 import {
   BirthRegistration,
   Bundle,
@@ -19,25 +21,29 @@ import {
   MarriageRegistration,
   OpenCRVSPractitionerName,
   RegisteredRecord,
+  ValidRecord,
+  addTaskToRecord,
   changeState,
   getPractitioner,
   getPractitionerContactDetails,
+  getRecordWithoutTasks,
+  getTaskFromSavedBundle,
+  getTasksInAscendingOrder,
   getTrackingId,
   isCorrectionRequestedTask,
   isTask,
   updateFHIRBundle,
   withOnlyLatestTask
 } from '@opencrvs/commons/types'
+import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import {
   uploadBase64AttachmentsToDocumentsStore,
   uploadBase64ToMinio
 } from '@workflow/documents'
+import { getEventType } from '@workflow/features/registration/utils'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import { getRecordById } from '@workflow/records'
 import { createNewAuditEvent } from '@workflow/records/audit'
-import {
-  ApproveRequestInput,
-  CorrectionRejectionInput,
-  CorrectionRequestInput
-} from '@workflow/records/validations'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import {
@@ -46,16 +52,15 @@ import {
   toCorrectionRejected,
   toCorrectionRequested
 } from '@workflow/records/state-transitions'
+import {
+  ApproveRequestInput,
+  CorrectionRejectionInput,
+  CorrectionRequestInput
+} from '@workflow/records/validations'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
-import { z } from 'zod'
-import { Request } from '@hapi/hapi'
-import { getAuthHeader } from '@opencrvs/commons/http'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
-import { getRecordById } from '@workflow/records'
 import fetch from 'node-fetch'
-import { getEventType } from '@workflow/features/registration/utils'
+import { z } from 'zod'
 
 export function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -293,28 +298,56 @@ export const routes = [
       const { correction, ...registration } =
         recordInputWithUploadedAttachments.registration!
 
+      /*
+       * Separate tasks from the record
+       */
+      const [correctionRequestApprovedTask, correctedTask] =
+        getTasksInAscendingOrder(recordInCorrectedState)
+      const recordWithoutTasks = getRecordWithoutTasks(recordInCorrectedState)
+
+      /*
+       * Create and update the valid record that only has one task (the corrected task)
+       */
+      const newRecord = addTaskToRecord(recordWithoutTasks, correctedTask)
+
+      newRecord satisfies ValidRecord
+
       const recordWithUpdatedValues = updateFHIRBundle(
-        recordInCorrectedState,
+        newRecord,
         { ...recordInputWithUploadedAttachments, registration },
         getEventType(record)
       )
 
       /*
        * Saves the previous task in the "approved" state and the new task (record put to Registered state)
+       * Note that because we are storing the task "twice", the approved task needs to be first in the list!
        */
 
-      await sendBundleToHearth(recordWithUpdatedValues)
-
-      const recordWithOnlyTheNewTask = withOnlyLatestTask(
+      const updatedCorrectedTask = getTaskFromSavedBundle(
         recordWithUpdatedValues
       )
+      const recordWithNoTasks = getRecordWithoutTasks(recordWithUpdatedValues)
+
+      // First add the approved task to the record
+      const recordWithApprovedTask = addTaskToRecord(
+        recordWithNoTasks,
+        correctionRequestApprovedTask
+      )
+
+      // Then add the corrected task to the record
+      const fullBundleToBeSaved = addTaskToRecord(
+        recordWithApprovedTask,
+        updatedCorrectedTask
+      )
+
+      await sendBundleToHearth(fullBundleToBeSaved)
 
       /*
        * Create metrics events & reindex the bundle in elasticsearch
        */
 
-      await createNewAuditEvent(recordWithOnlyTheNewTask, token)
-      await indexBundle(recordWithOnlyTheNewTask, token)
+      await createNewAuditEvent(newRecord, token)
+      await indexBundle(newRecord, token)
 
       /*
        * Notify the requesting practitioner that the correction request has been approved
@@ -335,12 +368,12 @@ export const routes = [
         getAuthHeader(request),
         {
           event: 'BIRTH',
-          trackingId: getTrackingId(recordWithOnlyTheNewTask)!,
+          trackingId: getTrackingId(newRecord)!,
           userFullName: requestingPractitioner.name
         }
       )
 
-      return recordWithOnlyTheNewTask
+      return newRecord
     }
   })
 ]

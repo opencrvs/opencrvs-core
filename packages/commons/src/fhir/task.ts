@@ -194,6 +194,13 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
   return task
 }
 
+export function sortTasksAscending(tasks: Task[]) {
+  return tasks.slice().sort((a, b) => {
+    return (
+      new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
+    )
+  })
+}
 export function sortTasksDescending(tasks: Task[]) {
   return tasks.slice().sort((a, b) => {
     return (

@@ -32,7 +32,8 @@ import {
   SavedBundle,
   TrackingID,
   getStatusFromTask,
-  QuestionnaireResponse
+  QuestionnaireResponse,
+  sortTasksAscending
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -201,6 +202,10 @@ export function getCorrectionRequestedTask(
   return task as CorrectionRequestedTask
 }
 
+export type RecordWithoutTasks<T extends ValidRecord> = NestedNominal<
+  T,
+  'RecordWithoutTasks'
+>
 export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
   T,
   'RecordWithPreviousTask'
@@ -208,7 +213,7 @@ export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
 
 export function withOnlyLatestTask<
   T extends RecordWithPreviousTask<ValidRecord>
->(record: T): T extends RecordWithPreviousTask<infer X> ? X : never {
+>(record: T) {
   const tasks = sortTasksDescending(
     record.entry.map((entry) => entry.resource).filter(isTask)
   )
@@ -223,7 +228,49 @@ export function withOnlyLatestTask<
     getState(record)
   )
 
-  return newRec as any
+  return newRec as any as T extends RecordWithPreviousTask<infer S> ? S : void
+}
+
+export function addResourceToRecord<T extends Bundle>(
+  bundle: T,
+  resource: Resource
+): T {
+  return {
+    ...bundle,
+    entry: [...bundle.entry, { resource }]
+  }
+}
+
+export function addTaskToRecord<T extends Bundle>(
+  bundle: T,
+  resource: Resource
+) {
+  return addResourceToRecord(
+    bundle,
+    resource
+  ) as any as T extends RecordWithoutTasks<infer S>
+    ? S
+    : T extends ValidRecord
+    ? RecordWithPreviousTask<T>
+    : void
+}
+
+export function getRecordWithoutTasks<T extends Bundle>(record: T) {
+  return {
+    ...record,
+    entry: record.entry.filter((entry) => !isTask(entry.resource))
+  } as any as T extends RecordWithPreviousTask<infer S>
+    ? RecordWithoutTasks<S>
+    : T extends ValidRecord
+    ? RecordWithoutTasks<T>
+    : void
+}
+export function getTasksInAscendingOrder<
+  T extends RecordWithPreviousTask<ValidRecord>
+>(record: T) {
+  return sortTasksAscending(
+    record.entry.map((entry) => entry.resource).filter(isTask)
+  )
 }
 
 export function getTrackingId(record: ValidRecord) {
