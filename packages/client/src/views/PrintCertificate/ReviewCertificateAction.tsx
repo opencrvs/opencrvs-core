@@ -60,7 +60,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { hasRegisterScope, hasRegistrationClerkScope } from '@client/utils/authUtils'
+import {
+  hasRegisterScope,
+  hasRegistrationClerkScope
+} from '@client/utils/authUtils'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
@@ -262,18 +265,19 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            {!isEventMarriage && (hasRegisterScope(scope) || hasRegistrationClerkScope(scope)) && (
-              <DangerButton
-                onClick={() =>
-                  this.props.goToCertificateCorrection(
-                    this.props.registrationId,
-                    CorrectionSection.Corrector
-                  )
-                }
-              >
-                {intl.formatMessage(buttonMessages.editRecord)}
-              </DangerButton>
-            )}
+            {!isEventMarriage &&
+              (hasRegisterScope(scope) || hasRegistrationClerkScope(scope)) && (
+                <DangerButton
+                  onClick={() =>
+                    this.props.goToCertificateCorrection(
+                      this.props.registrationId,
+                      CorrectionSection.Corrector
+                    )
+                  }
+                >
+                  {intl.formatMessage(buttonMessages.editRecord)}
+                </DangerButton>
+              )}
           </ButtonWrapper>
         </Content>
         <ResponsiveModal

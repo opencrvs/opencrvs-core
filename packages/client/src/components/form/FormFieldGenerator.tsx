@@ -520,8 +520,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
                 e.preventDefault()
               }
-             const maxLength = (fieldDefinition as Ii18nNumberFormField).maxLength
-              if(maxLength && e.currentTarget.value.length >= maxLength){
+              const maxLength = (fieldDefinition as Ii18nNumberFormField)
+                .maxLength
+              if (maxLength && e.currentTarget.value.length >= maxLength) {
                 e.preventDefault()
               }
             }}
