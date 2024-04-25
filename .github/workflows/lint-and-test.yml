@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get list of packages
         id: set-matrix
@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Check package.json and scripts
         id: check-scripts
@@ -66,7 +66,7 @@ jobs:
 
       - name: Use Node.js 18.19
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '18.19'
           cache: 'npm'
@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner in fs mode
         uses: aquasecurity/trivy-action@master
         with:
