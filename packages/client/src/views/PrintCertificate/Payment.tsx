@@ -25,7 +25,7 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import * as React from 'react'
+import React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -63,15 +63,23 @@ interface IProps {
 
 type IFullProps = IProps & IntlShapeProps
 
-class PaymentComponent extends React.Component<IFullProps> {
-  continue = (paymentAmount: string) => {
-    const { declaration } = this.props
+const PaymentComponent = ({
+  declaration,
+  intl,
+  event,
+  goBack,
+  offlineCountryConfig,
+  modifyDeclaration,
+  goToReviewCertificate,
+  registrationId
+}: IFullProps) => {
+  const handleContinue = (paymentAmount: string) => {
     const certificates =
       declaration && declaration.data.registration.certificates
 
     const certificate = (certificates && certificates[0]) || {}
 
-    this.props.modifyDeclaration({
+    modifyDeclaration({
       ...declaration,
       data: {
         ...declaration.data,
@@ -92,91 +100,80 @@ class PaymentComponent extends React.Component<IFullProps> {
       }
     })
 
-    this.props.goToReviewCertificate(
-      this.props.registrationId,
-      this.props.event
-    )
+    goToReviewCertificate(registrationId, event)
   }
 
-  render = () => {
-    const { intl, declaration, event, goBack, offlineCountryConfig } =
-      this.props
-    if (!declaration) {
-      return (
-        <Redirect
-          to={formatUrl(REGISTRAR_HOME_TAB, {
-            tabId: WORKQUEUE_TABS.readyToPrint,
-            selectorId: ''
-          })}
-        />
-      )
-    }
-
-    const registeredDate = getRegisteredDate(declaration.data)
-
-    const eventDate = getEventDate(declaration.data, event)
-
-    const paymentAmount = calculatePrice(
-      event,
-      eventDate,
-      registeredDate,
-      offlineCountryConfig
-    )
-
-    const serviceMessage = getServiceMessage(
-      intl,
-      event,
-      eventDate,
-      registeredDate,
-      offlineCountryConfig
-    )
-
+  if (!declaration) {
     return (
-      <>
-        <ActionPageLight
-          title={intl.formatMessage(messages.print)}
-          goBack={goBack}
-          hideBackground
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
-        >
-          <Content
-            title={intl.formatMessage(messages.payment)}
-            showTitleOnMobile
-          >
-            <Summary id="summary">
-              <Summary.Row
-                id="service"
-                label={intl.formatMessage(messages.receiptService)}
-                value={serviceMessage}
-              />
-              <Summary.Row
-                id="amountDue"
-                label={intl.formatMessage(messages.amountDue)}
-                value={
-                  <Currency
-                    value={paymentAmount}
-                    currency={offlineCountryConfig.config.CURRENCY.isoCode}
-                    languagesAndCountry={
-                      offlineCountryConfig.config.CURRENCY
-                        .languagesAndCountry[0]
-                    }
-                  />
-                }
-              />
-            </Summary>
-            <Action>
-              <PrimaryButton
-                id="Continue"
-                onClick={() => this.continue(paymentAmount.toString())}
-              >
-                {intl.formatMessage(buttonMessages.continueButton)}
-              </PrimaryButton>
-            </Action>
-          </Content>
-        </ActionPageLight>
-      </>
+      <Redirect
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToPrint,
+          selectorId: ''
+        })}
+      />
     )
   }
+
+  const registeredDate = getRegisteredDate(declaration.data)
+
+  const eventDate = getEventDate(declaration.data, event)
+
+  const paymentAmount = calculatePrice(
+    event,
+    eventDate,
+    registeredDate,
+    offlineCountryConfig
+  )
+
+  const serviceMessage = getServiceMessage(
+    intl,
+    event,
+    eventDate,
+    registeredDate,
+    offlineCountryConfig
+  )
+
+  return (
+    <>
+      <ActionPageLight
+        title={intl.formatMessage(messages.print)}
+        goBack={goBack}
+        hideBackground
+        goHome={() => goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+      >
+        <Content title={intl.formatMessage(messages.payment)} showTitleOnMobile>
+          <Summary id="summary">
+            <Summary.Row
+              id="service"
+              label={intl.formatMessage(messages.receiptService)}
+              value={serviceMessage}
+            />
+            <Summary.Row
+              id="amountDue"
+              label={intl.formatMessage(messages.amountDue)}
+              value={
+                <Currency
+                  value={paymentAmount}
+                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                  languagesAndCountry={
+                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
+                  }
+                />
+              }
+            />
+          </Summary>
+          <Action>
+            <PrimaryButton
+              id="Continue"
+              onClick={() => handleContinue(paymentAmount.toString())}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </PrimaryButton>
+          </Action>
+        </Content>
+      </ActionPageLight>
+    </>
+  )
 }
 
 const getEvent = (eventType: string | undefined) => {
