@@ -36,41 +36,41 @@ const fetchLocations = async () => {
 
 /**
  * Creates a new Map<SavedLocation.partOf, SavedLocation[]>
- * This sets every location under it's corresponding parent, which helps to find the children.
+ * It sets the first-level children under their parents
  */
-const createLocationTree = (locations: SavedLocation[]) => {
-  const tree = new Map<UUID, SavedLocation[]>()
+const resolveParentChildrenMap = (locations: SavedLocation[]) => {
+  const parentChildrenMap = new Map<UUID, SavedLocation[]>()
 
   for (const child of locations) {
     if (!child.partOf) continue
 
     const parentId = resourceIdentifierToUUID(child.partOf.reference)
-    const parentChildrenRelationship = tree.get(parentId)
+    const parentChildrenRelationship = parentChildrenMap.get(parentId)
 
     if (!parentChildrenRelationship) {
-      tree.set(parentId, [child])
+      parentChildrenMap.set(parentId, [child])
     } else {
       parentChildrenRelationship.push(child)
     }
   }
 
-  return tree
+  return parentChildrenMap
 }
 
-/** Resolves the location tree using a depth-first search */
+/** Resolves any given location's children multi-level down to the leaf node */
 const resolveLocationChildren = (
   parentId: UUID,
   locations: SavedLocation[]
 ) => {
-  const locationTree = createLocationTree(locations)
-  const children = []
-  const stack = locationTree.get(parentId) ?? []
+  const parentChildrenMap = resolveParentChildrenMap(locations)
+  const children: SavedLocation[] = []
+  const stack = parentChildrenMap.get(parentId) ?? []
 
   while (stack.length) {
     const child = stack.pop()!
     children.push(child)
-    if (locationTree.get(child.id)) {
-      stack.push(...(locationTree.get(child.id) ?? []))
+    if (parentChildrenMap.get(child.id)) {
+      stack.push(...(parentChildrenMap.get(child.id) ?? []))
     }
   }
 
