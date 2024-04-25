@@ -12,11 +12,12 @@ import * as Hapi from '@hapi/hapi'
 import {
   addExtensionsToTask,
   Bundle,
-  getTaskFromSavedBundle,
+  EVENT_TYPE,
   KnownExtensionType,
+  Resource,
   resourceToSavedBundleEntry,
-  SavedTask,
   StringExtensionType,
+  Task,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { getToken } from '@workflow/utils/auth-utils'
@@ -27,31 +28,37 @@ import {
   getLoggedInPractitionerResource
 } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
+import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
+import { auditEvent } from '@workflow/records/audit'
+import {
+  generateTrackingIdForEvents,
+  getEventType
+} from '@workflow/features/registration/utils'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as Bundle
+  const bundle = request.payload as Bundle<Resource>
   const token = getToken(request)
 
-  const responseBundle = await sendBundleToHearth(payload)
-  const savedBundle = toSavedBundle(payload, responseBundle) as ValidRecord
+  const unsavedTask = getTaskResourceFromFhirBundle(bundle)
+  const practitioner = await getLoggedInPractitionerResource(token)
 
-  const task = getTaskFromSavedBundle(savedBundle) as SavedTask
-  const systemInfo = await getLoggedInPractitionerResource(token)
-
-  const savedTaskWithRegLastUser = addExtensionsToTask(task, [
+  const taskWithRegLastUser = addExtensionsToTask(unsavedTask, [
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: {
-        reference: `Practitioner/${systemInfo.id}`
+        reference: `Practitioner/${practitioner.id}`
       }
     }
-  ]) as SavedTask
+  ])
 
-  const savedTask: SavedTask = {
-    ...savedTaskWithRegLastUser,
+  const event = getEventType(bundle)
+  const trackingId = await generateTrackingIdForEvents(event, bundle, token)
+
+  const taskWithRegLastUserAndStatus: Task = {
+    ...taskWithRegLastUser,
     businessStatus: {
       coding: [
         {
@@ -59,10 +66,19 @@ export async function eventNotificationHandler(
           code: 'IN_PROGRESS'
         }
       ]
-    }
+    },
+    identifier: [
+      ...taskWithRegLastUser.identifier,
+      {
+        system: `http://opencrvs.org/specs/id/${
+          event.toLowerCase() as Lowercase<EVENT_TYPE>
+        }-tracking-id`,
+        value: trackingId
+      }
+    ]
   }
 
-  const officeExtension = savedTask.extension.find(
+  const officeExtension = taskWithRegLastUserAndStatus.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/regLastOffice'
   ) as
     | StringExtensionType['http://opencrvs.org/specs/extension/regLastOffice']
@@ -72,7 +88,7 @@ export async function eventNotificationHandler(
 
   if (!officeId) throw internal('Office id not found in bundle')
 
-  const officeLocationExtension = savedTaskWithRegLastUser.extension.find(
+  const officeLocationExtension = taskWithRegLastUserAndStatus.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/regLastLocation'
   ) as
     | KnownExtensionType['http://opencrvs.org/specs/extension/regLastLocation']
@@ -88,20 +104,30 @@ export async function eventNotificationHandler(
   const officeLocation = await getLocationOrOfficeById(officeLocationId)
 
   const savedBundleWithRegLastUserAndBusinessStatus = {
-    ...savedBundle,
+    ...bundle,
     entry: [
-      ...savedBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
+      ...bundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
       {
-        fullUrl: savedBundle.entry.find(
-          (e) => e.resource.resourceType === 'Task'
-        )?.fullUrl,
-        resource: savedTask
+        fullUrl: bundle.entry.find((e) => e.resource.resourceType === 'Task')
+          ?.fullUrl,
+        resource: taskWithRegLastUserAndStatus
       },
-      ...[office, officeLocation].map((r) => resourceToSavedBundleEntry(r))
+      ...[office, officeLocation, practitioner].map((r) =>
+        resourceToSavedBundleEntry(r)
+      )
     ]
-  } as ValidRecord
+  }
 
-  await indexBundle(savedBundleWithRegLastUserAndBusinessStatus, token)
+  const responseBundle = await sendBundleToHearth(
+    savedBundleWithRegLastUserAndBusinessStatus
+  )
+  const savedBundle = toSavedBundle(
+    savedBundleWithRegLastUserAndBusinessStatus,
+    responseBundle
+  ) as ValidRecord
 
-  return h.response(savedBundleWithRegLastUserAndBusinessStatus).code(200)
+  await indexBundle(savedBundle, token)
+  await auditEvent('sent-notification', savedBundle, token)
+
+  return h.response(savedBundle).code(200)
 }
