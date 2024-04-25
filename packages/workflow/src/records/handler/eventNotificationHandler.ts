@@ -13,13 +13,20 @@ import {
   addExtensionsToTask,
   Bundle,
   getTaskFromSavedBundle,
+  KnownExtensionType,
+  resourceToSavedBundleEntry,
   SavedTask,
+  StringExtensionType,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { getToken } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
 import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import {
+  getLocationOrOfficeById,
+  getLoggedInPractitionerResource
+} from '@workflow/features/user/utils'
+import { internal } from '@hapi/boom'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -32,18 +39,55 @@ export async function eventNotificationHandler(
   const savedBundle = toSavedBundle(payload, responseBundle) as ValidRecord
 
   const task = getTaskFromSavedBundle(savedBundle) as SavedTask
-  const system = await getLoggedInPractitionerResource(token)
+  const systemInfo = await getLoggedInPractitionerResource(token)
 
   const savedTaskWithRegLastUser = addExtensionsToTask(task, [
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: {
-        reference: `Practitioner/${system.id}`
+        reference: `Practitioner/${systemInfo.id}`
       }
     }
   ]) as SavedTask
 
-  const savedBundleWithRegLastUser = {
+  const savedTask: SavedTask = {
+    ...savedTaskWithRegLastUser,
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'IN_PROGRESS'
+        }
+      ]
+    }
+  }
+
+  const officeExtension = savedTask.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regLastOffice'
+  ) as
+    | StringExtensionType['http://opencrvs.org/specs/extension/regLastOffice']
+    | undefined
+
+  const officeId = officeExtension?.valueReference.reference.split('/')[1]
+
+  if (!officeId) throw internal('Office id not found in bundle')
+
+  const officeLocationExtension = savedTaskWithRegLastUser.extension.find(
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regLastLocation'
+  ) as
+    | KnownExtensionType['http://opencrvs.org/specs/extension/regLastLocation']
+    | undefined
+
+  const officeLocationId =
+    officeLocationExtension?.valueReference.reference.split('/')[1]
+
+  if (!officeLocationId)
+    throw internal('Office location id not found in bundle')
+
+  const office = await getLocationOrOfficeById(officeId)
+  const officeLocation = await getLocationOrOfficeById(officeLocationId)
+
+  const savedBundleWithRegLastUserAndBusinessStatus = {
     ...savedBundle,
     entry: [
       ...savedBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
@@ -51,10 +95,13 @@ export async function eventNotificationHandler(
         fullUrl: savedBundle.entry.find(
           (e) => e.resource.resourceType === 'Task'
         )?.fullUrl,
-        resource: savedTaskWithRegLastUser
-      }
+        resource: savedTask
+      },
+      ...[office, officeLocation].map((r) => resourceToSavedBundleEntry(r))
     ]
   } as ValidRecord
 
-  await indexBundle(savedBundleWithRegLastUser, token)
+  await indexBundle(savedBundleWithRegLastUserAndBusinessStatus, token)
+
+  return h.response(savedBundleWithRegLastUserAndBusinessStatus).code(200)
 }
