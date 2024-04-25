@@ -19,13 +19,17 @@ describe('resolveLocationChildren', () => {
   })
 
   test('parent with no children', () => {
-    const locations = [fixtures.savedLocation({ id: 'uuid1' as UUID })]
-    const result = resolveLocationChildren('uuid1' as UUID, locations)
+    const result = resolveLocationChildren('uuid1' as UUID, [
+      fixtures.savedLocation({ id: 'uuid1' as UUID, partOf: undefined })
+    ])
     expect(result).toEqual([])
   })
 
   test('single level hierarchy', () => {
-    const uuid1 = fixtures.savedLocation({ id: 'uuid1' as UUID })
+    const uuid1 = fixtures.savedLocation({
+      id: 'uuid1' as UUID,
+      partOf: undefined
+    })
     const uuid2 = fixtures.savedLocation({
       id: 'uuid2' as UUID,
       partOf: { reference: 'Location/uuid1' }
@@ -37,7 +41,10 @@ describe('resolveLocationChildren', () => {
   })
 
   test('multi-level hierarchy', () => {
-    const uuid1 = fixtures.savedLocation({ id: 'uuid1' as UUID })
+    const uuid1 = fixtures.savedLocation({
+      id: 'uuid1' as UUID,
+      partOf: undefined
+    })
     const uuid2 = fixtures.savedLocation({
       id: 'uuid2' as UUID,
       partOf: { reference: 'Location/uuid1' }
