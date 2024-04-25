@@ -20,20 +20,19 @@ import {
   Patient,
   PaymentReconciliation,
   Practitioner,
+  QuestionnaireResponse,
   RelatedPerson,
   Resource,
+  SavedBundle,
   Task,
+  TrackingID,
   getBusinessStatus,
   getComposition,
+  getStatusFromTask,
   getTaskFromSavedBundle,
   isCorrectionRequestedTask,
   isTask,
-  sortTasksDescending,
-  SavedBundle,
-  TrackingID,
-  getStatusFromTask,
-  QuestionnaireResponse,
-  sortTasksAscending
+  sortTasksDescending
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -239,38 +238,6 @@ export function addResourceToRecord<T extends Bundle>(
     ...bundle,
     entry: [...bundle.entry, { resource }]
   }
-}
-
-export function addTaskToRecord<T extends Bundle>(
-  bundle: T,
-  resource: Resource
-) {
-  return addResourceToRecord(
-    bundle,
-    resource
-  ) as any as T extends RecordWithoutTasks<infer S>
-    ? S
-    : T extends ValidRecord
-    ? RecordWithPreviousTask<T>
-    : void
-}
-
-export function getRecordWithoutTasks<T extends Bundle>(record: T) {
-  return {
-    ...record,
-    entry: record.entry.filter((entry) => !isTask(entry.resource))
-  } as any as T extends RecordWithPreviousTask<infer S>
-    ? RecordWithoutTasks<S>
-    : T extends ValidRecord
-    ? RecordWithoutTasks<T>
-    : void
-}
-export function getTasksInAscendingOrder<
-  T extends RecordWithPreviousTask<ValidRecord>
->(record: T) {
-  return sortTasksAscending(
-    record.entry.map((entry) => entry.resource).filter(isTask)
-  )
 }
 
 export function getTrackingId(record: ValidRecord) {
