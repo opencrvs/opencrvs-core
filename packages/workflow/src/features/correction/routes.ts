@@ -288,11 +288,9 @@ export const routes = [
         )
       }
 
-      const approvingPractitioner = await getLoggedInPractitionerResource(token)
-
       const recordInCorrectedState = await toCorrectionApproved(
         record,
-        approvingPractitioner,
+        getToken(request),
         correctionDetails
       )
       const { correction, ...registration } =

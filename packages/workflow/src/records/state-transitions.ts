@@ -103,7 +103,8 @@ import {
   createCertifiedTask,
   withPractitionerDetails,
   mergeChangedResourcesIntoRecord,
-  createReinstateTask
+  createReinstateTask,
+  mergeBundles
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 
@@ -174,7 +175,7 @@ export async function toCorrected(
 
 export async function toCorrectionApproved(
   record: CorrectionRequestedRecord,
-  practitioner: Practitioner,
+  token: string,
   correctionDetails: ApproveRequestInput
 ): Promise<RecordWithPreviousTask<RegisteredRecord>> {
   const currentCorrectionRequestedTask = getCorrectionRequestedTask(record)
@@ -216,22 +217,21 @@ export async function toCorrectionApproved(
     paymentReconciliation
   )
 
-  const correctedWithLocationExtensions = await setupLastRegLocation(
-    setupLastRegUser(correctedTask, practitioner),
-    practitioner
-  )
+  const [correctedWithExtensions, bundleWithRelatedResources] =
+    await withPractitionerDetails(correctedTask, token)
 
+  const updatedBundle = {
+    ...record,
+    entry: [
+      ...record.entry.filter(
+        (entry) => entry.resource.id !== correctionAcceptedTask.id
+      ),
+      { resource: correctionAcceptedTask },
+      { resource: correctedWithExtensions }
+    ]
+  }
   return changeState(
-    {
-      ...record,
-      entry: [
-        ...record.entry.filter(
-          (entry) => entry.resource.id !== correctionAcceptedTask.id
-        ),
-        { resource: correctionAcceptedTask },
-        { resource: correctedWithLocationExtensions }
-      ]
-    },
+    mergeBundles(updatedBundle, bundleWithRelatedResources),
     'REGISTERED'
   ) as any as RecordWithPreviousTask<RegisteredRecord>
 }
