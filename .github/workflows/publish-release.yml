@@ -31,12 +31,12 @@ jobs:
           issue-title: 'Release: ${{ github.event.inputs.release_version }}'
           issue-body: 'Please approve or deny the publishing of release: ${{ github.event.inputs.release_version }} to Dockerhub'
           exclude-workflow-initiator-as-approver: false
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Set version
@@ -65,12 +65,12 @@ jobs:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Login to DockerHub

@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
-    "precommit": "yarn lint && lint-staged",
+    "precommit": "lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",
     "test:compilation": "tsc --noEmit",
@@ -30,7 +30,7 @@
     "io-ts": "^2.2.18",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.2.2",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "redis": "^3.1.1",
@@ -46,15 +46,15 @@
     "@types/jsonwebtoken": "^7.2.7",
     "@types/node-fetch": "^2.5.12",
     "@types/redis": "^2.8.6",
-    "command-line-args": "^5.0.2",
-    "eslint": "^7.11.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-config-prettier": "^8.3.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "cross-env": "^5.2.0",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest": "26.6.3",
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^2.0.22",
@@ -67,7 +67,7 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "git add"
+      "eslint -c .eslintrc.js --fix"
     ]
   },
   "jest": {
