@@ -11,8 +11,8 @@
 import { advancedQueryBuilder } from '@search/features/search/utils'
 
 describe('elasticsearch db helper', () => {
-  it('should create a query that searches child and mother name fields and event location', () => {
-    const newQuery = advancedQueryBuilder(
+  it('should create a query that searches child and mother name fields and event location', async () => {
+    const newQuery = await advancedQueryBuilder(
       {
         event: 'birth',
         compositionType: ['birth-declaration', 'death-declaration']

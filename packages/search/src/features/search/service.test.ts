@@ -64,8 +64,8 @@ describe('elasticsearch db helper', () => {
 })
 
 describe('elasticsearch params formatter', () => {
-  it('should prepare search params to search birth declarations using a single name against all fields', () => {
-    const params = formatSearchParams(
+  it('should prepare search params to search birth declarations using a single name against all fields', async () => {
+    const params = await formatSearchParams(
       {
         parameters: {
           trackingId: 'myTrackingId',
@@ -154,8 +154,8 @@ describe('elasticsearch params formatter', () => {
     })
   })
 
-  it('should prepare search params to search birth declarations using names against all name fields', () => {
-    const params = formatSearchParams(
+  it('should prepare search params to search birth declarations using names against all name fields', async () => {
+    const params = await formatSearchParams(
       {
         parameters: {
           name: 'sadman anik'
