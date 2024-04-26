@@ -8,26 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as glob from 'glob'
-import { join, resolve } from 'path'
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
-import {
-  createLocationHandler,
-  requestSchema,
-  updateLocationHandler,
-  updateSchema,
-  fetchLocationHandler,
-  requestParamsSchema,
-  locationQuerySchema
-} from '@gateway/features/restLocation/locationHandler'
 import {
   eventNotificationHandler,
   fhirBundleSchema,
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
-import { AUTH_URL } from '@gateway/constants'
-import { rateLimitedRoute } from '@gateway/rate-limit'
+import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -50,66 +38,6 @@ export const getRoutes = () => {
         notes: 'Pass the service as a query param: service'
       }
     },
-    // get all locations
-    {
-      method: 'GET',
-      path: '/location',
-      handler: fetchLocationHandler,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: 'Get all locations',
-        validate: {
-          query: locationQuerySchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/location/{locationId}',
-      handler: fetchLocationHandler,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: 'Get a single location',
-        validate: {
-          params: requestParamsSchema
-        }
-      }
-    },
-    // create Location/Facility
-    {
-      method: 'POST',
-      path: '/location',
-      handler: createLocationHandler,
-      options: {
-        tags: ['api'],
-        auth: {
-          scope: ['natlsysadmin']
-        },
-        description: 'Create a location',
-        validate: {
-          payload: requestSchema
-        }
-      }
-    },
-    // update Location/Facility
-    {
-      method: 'PUT',
-      path: '/location/{locationId}',
-      handler: updateLocationHandler,
-      options: {
-        tags: ['api'],
-        auth: {
-          scope: ['natlsysadmin']
-        },
-        description: 'Update a location or facility',
-        validate: {
-          payload: updateSchema,
-          params: requestParamsSchema
-        }
-      }
-    },
     // create event notification
     {
       method: 'POST',
@@ -127,82 +55,12 @@ export const getRoutes = () => {
         }
       }
     },
-    // Authentication routes. These are proxied to the auth service
-    {
-      method: 'POST',
-      path: '/auth/{suffix}',
-      handler: (_, h) =>
-        h.proxy({
-          uri: AUTH_URL + '/{suffix}'
-        }),
-      options: {
-        auth: false,
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/auth/authenticate',
-      handler: rateLimitedRoute(
-        { requestsPerMinute: 10, pathForKey: 'username' },
-        (_, h) =>
-          h.proxy({
-            uri: AUTH_URL + '/authenticate'
-          })
-      ),
-      options: {
-        auth: false,
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/auth/authenticate-super-user',
-      handler: rateLimitedRoute(
-        { requestsPerMinute: 10, pathForKey: 'username' },
-        (_, h) =>
-          h.proxy({
-            uri: AUTH_URL + '/authenticate-super-user'
-          })
-      ),
-      options: {
-        auth: false,
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/auth/verifyUser',
-      handler: rateLimitedRoute(
-        { requestsPerMinute: 10, pathOptionsForKey: ['mobile', 'email'] },
-        (_, h) =>
-          h.proxy({
-            uri: AUTH_URL + '/verifyUser'
-          })
-      ),
-      options: {
-        auth: false,
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    }
+    catchAllProxy.locations,
+    catchAllProxy.auth,
+    rateLimitedAuthProxy.authenticate,
+    rateLimitedAuthProxy.authenticateSuperUser,
+    rateLimitedAuthProxy.verifyUser
   ]
-  // add all routes from all modules to the routes array manually or write your routes inside a folder inside the server folder
-  // with suffix as -routes.ts
-  glob.sync(join(__dirname, '../routes/**/*-route.[t|j]s')).forEach((file) => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    routes.push(require(resolve(file)).default)
-  })
+
   return routes
 }

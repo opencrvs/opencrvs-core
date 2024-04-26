@@ -24,7 +24,8 @@ import configHandler, {
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createInformantSMSNotificationHandler, {
-  requestSchema as createInformantSMSNotificationReqSchema
+  requestSchema as createInformantSMSNotificationReqSchema,
+  requestSchema
 } from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
 import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
 import updateInformantSMSNotificationHandler, {
@@ -36,6 +37,14 @@ import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQuer
 import { ServerRoute } from '@hapi/hapi'
 import * as Joi from 'joi'
 import { resolveChildren } from '@config/handlers/locations/resolveChildren'
+import {
+  fetchLocationHandler,
+  locationQuerySchema,
+  requestParamsSchema,
+  createLocationHandler,
+  updateLocationHandler,
+  updateSchema
+} from '@config/handlers/locations/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -63,23 +72,6 @@ export default function getRoutes(): ServerRoute[] {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
-      }
-    },
-
-    {
-      method: 'GET',
-      path: '/locations/{locationId}/children',
-      handler: resolveChildren,
-      options: {
-        auth: false,
-        tags: ['api'],
-        description:
-          'Retrieve all the children (multi-level) of a particular location',
-        validate: {
-          params: Joi.object({
-            locationId: Joi.string().uuid()
-          })
-        }
       }
     },
     {
@@ -282,6 +274,81 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         description: 'Fetch dashboard queries from country config'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations',
+      handler: fetchLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get all locations',
+        validate: {
+          query: locationQuerySchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}',
+      handler: fetchLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get a single location',
+        validate: {
+          params: requestParamsSchema
+        }
+      }
+    },
+    // create Location/Facility
+    {
+      method: 'POST',
+      path: '/locations',
+      handler: createLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Create a location',
+        validate: {
+          payload: requestSchema
+        }
+      }
+    },
+    // update Location/Facility
+    {
+      method: 'PUT',
+      path: '/locations/{locationId}',
+      handler: updateLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Update a location or facility',
+        validate: {
+          payload: updateSchema,
+          params: requestParamsSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}/children',
+      handler: resolveChildren,
+      options: {
+        auth: false,
+        tags: ['api'],
+        description:
+          'Retrieve all the children (multi-level) of a particular location',
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
+        }
       }
     }
   ]
