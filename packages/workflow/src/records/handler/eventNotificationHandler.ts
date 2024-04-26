@@ -71,6 +71,7 @@ export async function eventNotificationHandler(
 
   const taskWithRegLastUserAndStatus: Task = {
     ...taskWithRegLastUser,
+    lastModified: new Date().toISOString(),
     businessStatus: {
       coding: [
         {
