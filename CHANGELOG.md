@@ -5,10 +5,16 @@
 ## Breaking changes
 
 - #### Upgrade node version to 18
+
   This version enforces environment to have Node 18 installed (supported until April 2025) and removes support for Node 16
+
   - Supports node version `18.19.x`
   - Specified operating systems in js modules as `darwin, linux`
   - Dev scripts and Vite run with an environment variable `NODE_OPTIONS=--dns-result-order=ipv4first` to resolve ipv4 addresses for `localhost` to support systems that resolves ipv6 addresses by default in Node versions >=17
+
+- #### Update the certificate preview mechanism
+
+  In effort of minimizing JavaScript-bundle size, we have streamlined the way how review certificate -page renders certificates. In case the images in your certificates are previewing blurry, you need to update your SVG-certificates to print QR-codes and other images directly with `<image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>` instead of the more complicated `<rect fill="url(#pattern)"></rect>` -paradigm. This doesn't affect printed certificates as they are still created as previously.
 
 ## New features
 
