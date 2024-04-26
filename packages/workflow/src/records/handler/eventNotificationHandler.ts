@@ -20,12 +20,12 @@ import {
   Task,
   ValidRecord
 } from '@opencrvs/commons/types'
-import { getToken } from '@workflow/utils/auth-utils'
+import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
 import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
 import {
   getLocationOrOfficeById,
-  getLoggedInPractitionerResource
+  getSystem
 } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
@@ -34,6 +34,7 @@ import {
   generateTrackingIdForEvents,
   getEventType
 } from '@workflow/features/registration/utils'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -43,10 +44,17 @@ export async function eventNotificationHandler(
   const token = getToken(request)
 
   const unsavedTask = getTaskResourceFromFhirBundle(bundle)
-  const practitioner = await getLoggedInPractitionerResource(token)
 
-  //@ts-ignore
-  const { name, username, type } = practitioner
+  const tokenPayload = getTokenPayload(token)
+  const system = await getSystem(tokenPayload.sub, {
+    Authorization: `Bearer ${token}`
+  })
+
+  const practitioner = await getFromFhir(
+    `/Practitioner/${system.practitionerId}`
+  )
+
+  const { name, username, type } = system
   const systemInformationJSON = { name, username, type }
 
   const taskWithRegLastUser = addExtensionsToTask(unsavedTask, [
