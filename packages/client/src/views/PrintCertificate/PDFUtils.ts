@@ -14,7 +14,6 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import {
   AdminStructure,
@@ -22,13 +21,11 @@ import {
   IOfflineData
 } from '@client/offline/reducer'
 import {
-  OptionalData,
-  IPDFTemplate
+  IPDFTemplate,
+  OptionalData
 } from '@client/pdfRenderer/transformer/types'
-import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
-import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
@@ -36,6 +33,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
+import { FontFamilyTypes } from '@client/utils/referenceApi'
+import { PageSize } from 'pdfmake/interfaces'
+import { printPDF } from '@client/pdfRenderer'
+import { UserDetails } from '@client/utils/userUtils'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -207,30 +208,29 @@ export function executeHandlebarsTemplate(
   return output
 }
 
-export async function previewCertificate(
-  intl: IntlShape,
-  declaration: IDeclaration,
-  userDetails: UserDetails | null,
-  offlineResource: IOfflineData,
-  callBack: (pdf: string) => void,
-  state: IStoreState,
-  optionalData?: OptionalData,
-  pageSize: PageSize = 'A4'
+export function addFontsToSvg(
+  svgString: string,
+  fonts: Record<string, FontFamilyTypes>
 ) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-
-  createPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
-    declaration,
-    userDetails,
-    offlineResource,
-    intl,
-    optionalData
-  ).getDataUrl((pdf: string) => {
-    callBack(pdf)
-  })
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgString, 'image/svg+xml')
+  const svg = doc.documentElement
+  const style = document.createElement('style')
+  style.innerHTML = Object.entries(fonts)
+    .flatMap(([font, families]) =>
+      Object.entries(families).map(
+        ([family, url]) => `
+@font-face {
+font-family: "${font}";
+font-weight: ${family};
+src: url("${url}") format("truetype");
+}`
+      )
+    )
+    .join('')
+  svg.prepend(style)
+  const serializer = new XMLSerializer()
+  return serializer.serializeToString(svg)
 }
 
 export async function printCertificate(
@@ -246,7 +246,8 @@ export async function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
+    (await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state))
+      .pdfTemplate,
     declaration,
     userDetails,
     offlineResource,
@@ -255,12 +256,12 @@ export async function printCertificate(
   )
 }
 
-async function getPDFTemplateWithSVG(
+export async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
   pageSize: PageSize,
   state: IStoreState
-): Promise<IPDFTemplate> {
+) {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
@@ -268,7 +269,7 @@ async function getPDFTemplateWithSVG(
   const resolvedSignatures = await Promise.all(
     MARRIAGE_SIGNATURE_KEYS.map((k) => ({
       signatureKey: k,
-      url: declaration.data.template[k]
+      url: declaration.data.template?.[k]
     }))
       .filter(({ url }) => Boolean(url))
       .map(({ signatureKey, url }) =>
@@ -297,7 +298,7 @@ async function getPDFTemplateWithSVG(
   }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
-  return pdfTemplate
+  return { pdfTemplate, svgCode }
 }
 
 export function downloadFile(
