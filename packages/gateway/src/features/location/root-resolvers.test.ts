@@ -16,15 +16,7 @@ const fetch = fetchAny as any
 describe('Location root resolvers', () => {
   describe('hasChildLocation()', () => {
     it('returns a location object if found', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          entry: [
-            {
-              resource: {}
-            }
-          ]
-        })
-      )
+      fetch.mockResponseOnce(JSON.stringify([{ id: 'woohoo' }]))
       // @ts-ignore
       const composition = await resolvers.Query!.hasChildLocation(
         {},

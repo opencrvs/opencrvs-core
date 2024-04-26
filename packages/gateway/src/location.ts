@@ -12,6 +12,7 @@
 import { UUID } from '@opencrvs/commons'
 import { Location, SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from './constants'
+import fetch from 'node-fetch'
 
 export const fetchLocation = async (id: UUID) => {
   const response = await fetch(
