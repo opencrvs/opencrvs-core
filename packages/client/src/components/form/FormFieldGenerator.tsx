@@ -667,39 +667,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-const NAME_TO_IDENTIFIER = {
-  district: 'DISTRICT',
-  state: 'STATE',
-  locationLevel3: 'LOCATION_LEVEL_3',
-  locationLevel4: 'LOCATION_LEVEL_4',
-  locationLevel5: 'LOCATION_LEVEL_5'
-} as const
-
-export function getInitialValueForSelectDynamicValue(
-  field: IFormField,
-  userDetails: UserDetails | null
-) {
-  return (
-    Object.keys(NAME_TO_IDENTIFIER)
-      .filter((fieldNameIdentifier) => field.name.includes(fieldNameIdentifier))
-      .map(
-        (fieldNameIdentifier) =>
-          userDetails?.catchmentArea?.find((catchmentArea) =>
-            catchmentArea.identifier?.some(
-              (identifier) =>
-                identifier.value ===
-                NAME_TO_IDENTIFIER[
-                  fieldNameIdentifier as keyof typeof NAME_TO_IDENTIFIER
-                ]
-            )
-          )?.id ?? ''
-      )
-      .at(0) ??
-    field.initialValue ??
-    ''
-  )
-}
-
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: UserDetails | null
@@ -724,16 +691,6 @@ const mapFieldsToValues = (
       }
     }
 
-    if (
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-      !field.initialValue &&
-      field.dynamicOptions.initialValue === 'agentDefault'
-    ) {
-      fieldInitialValue = getInitialValueForSelectDynamicValue(
-        field,
-        userDetails
-      )
-    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 
