@@ -323,6 +323,10 @@ const ActionDetailsModalListTable = ({
           (field) => field.name === nestedField
         )
 
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
         if (fieldObj) {
           result.push({
             item: getItemName(section.name, fieldObj.label),
@@ -339,6 +343,10 @@ const ActionDetailsModalListTable = ({
           })
         ).find((field) => field.name === parentField)
 
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
         if (fieldObj) {
           result.push({
             item: getItemName(section.name, fieldObj.label),
