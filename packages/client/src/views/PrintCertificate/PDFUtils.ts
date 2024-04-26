@@ -300,8 +300,8 @@ export async function getPDFTemplateWithSVG(
     'image/svg+xml'
   ).documentElement
 
-  const widthValue = svgElement.attributes.getNamedItem('width')?.value
-  const heightValue = svgElement.attributes.getNamedItem('height')?.value
+  const widthValue = svgElement.getAttribute('width')
+  const heightValue = svgElement.getAttribute('height')
 
   if (widthValue && heightValue) {
     const width = Number.parseInt(widthValue)
