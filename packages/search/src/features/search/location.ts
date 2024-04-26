@@ -13,13 +13,13 @@ import { SavedLocation } from '@search/../../commons/build/dist/types'
 import { APPLICATION_CONFIG_URL } from '@search/constants'
 
 const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
-  new URL(`/locations/${id}/leaf`, APPLICATION_CONFIG_URL)
+  new URL(`/locations/${id}/children`, APPLICATION_CONFIG_URL)
 
 export async function resolveLocationChildren(locationId: UUID) {
   const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(locationId))
   if (!response.ok) {
     throw new Error(
-      "Couldn't fetch the leaf level location from config: " +
+      "Couldn't fetch the children of the location from config: " +
         (await response.text())
     )
   }
