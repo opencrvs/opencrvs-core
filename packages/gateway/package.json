@@ -18,7 +18,7 @@
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
-    "precommit": "yarn lint && lint-staged"
+    "precommit": "lint-staged"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.13",
@@ -29,7 +29,6 @@
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.3.0",
-    "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
     "@types/uuid-validate": "^0.0.3",
@@ -73,7 +72,7 @@
     "@types/code": "^4.0.3",
     "@types/dotenv": "^6.1.0",
     "@types/fhir": "0.0.37",
-    "@types/glob": "^5.0.35",
+    "@types/glob": "^8.0.0",
     "@types/hapi__h2o2": "8.3.3",
     "@types/hapi__hapi": "^20.0.0",
     "@types/hapi__inert": "^5.2.3",
@@ -109,7 +108,7 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "git add"
+      "eslint -c .eslintrc.js --fix"
     ]
   },
   "jest": {
