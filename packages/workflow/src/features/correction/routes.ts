@@ -346,8 +346,8 @@ export const routes = [
        * Create metrics events & reindex the bundle in elasticsearch
        */
 
-      await createNewAuditEvent(newRecord, token)
-      await indexBundle(newRecord, token)
+      await createNewAuditEvent(recordWithUpdatedValues, token)
+      await indexBundle(recordWithUpdatedValues, token)
 
       /*
        * Notify the requesting practitioner that the correction request has been approved
@@ -368,12 +368,12 @@ export const routes = [
         getAuthHeader(request),
         {
           event: 'BIRTH',
-          trackingId: getTrackingId(newRecord)!,
+          trackingId: getTrackingId(recordWithUpdatedValues)!,
           userFullName: requestingPractitioner.name
         }
       )
 
-      return newRecord
+      return recordWithUpdatedValues
     }
   })
 ]
