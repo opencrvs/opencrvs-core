@@ -239,7 +239,7 @@ export const testFhirBundle: StrictBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: { reference: '123' }
+            valueReference: { reference: 'Location/123' }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
