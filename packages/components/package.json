@@ -17,7 +17,6 @@
     "rc-progress": "^2.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-pdf": "^4.0.2",
     "react-select": "^2.0.0",
     "react-stickynode": "^2.1.1",
     "react-tooltip": "^4.2.21",
@@ -44,8 +43,7 @@
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
       "eslint",
-      "stylelint",
-      "git add"
+      "stylelint"
     ]
   },
   "devDependencies": {
@@ -71,7 +69,7 @@
     "@types/recharts": "^1.8.26",
     "@types/styled-components": "^5.1.3",
     "@types/webfontloader": "^1.6.34",
-    "concurrently": "^3.5.1",
+    "concurrently": "^8.0.0",
     "dotenv": "^6.1.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-styled-components-a11y": "^1.0.0",

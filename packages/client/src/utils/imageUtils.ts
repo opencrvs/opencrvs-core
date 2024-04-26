@@ -120,15 +120,12 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
 export async function fetchImageAsBase64(url: string): Promise<string> {
   const response = await fetch(url)
   const blob = await response.blob()
-  const mimeType =
-    response.headers.get('Content-Type') || 'application/octet-stream'
 
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       const base64 = reader.result as string
-      const dataUrl = `data:${mimeType};base64,${base64}`
-      resolve(dataUrl)
+      resolve(base64)
     }
     reader.onerror = reject
     reader.readAsDataURL(blob)
