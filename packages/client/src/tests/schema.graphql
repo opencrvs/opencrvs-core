@@ -1347,7 +1347,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  hasChildLocation(parentId: UUID!): Location
+  hasChildLocation(parentId: String!): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User

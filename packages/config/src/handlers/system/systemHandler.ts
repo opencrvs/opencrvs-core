@@ -9,16 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { fetchSystems } from '@config/services/userManagementService'
-import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 
 export default async function getSystems(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  try {
-    return await fetchSystems(request)
-  } catch (error) {
-    throw internal(error.message)
-  }
+  return await fetchSystems(request)
 }

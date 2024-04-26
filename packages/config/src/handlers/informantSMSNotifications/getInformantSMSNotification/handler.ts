@@ -8,21 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
-import InformantSMSNotification, {
-  IInformantSMSNotificationsModel
-} from '@config/models/informantSMSNotifications'
-import { internal } from '@hapi/boom'
+import InformantSMSNotification from '@config/models/informantSMSNotifications'
 
-export default async function getInformantSMSNotifications(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  let informantSMSNotifications: IInformantSMSNotificationsModel[]
-  try {
-    informantSMSNotifications = await InformantSMSNotification.find().exec()
-  } catch (error) {
-    throw internal(error.message)
-  }
+export default async function getInformantSMSNotifications() {
+  const informantSMSNotifications = await InformantSMSNotification.find().exec()
   return informantSMSNotifications
 }

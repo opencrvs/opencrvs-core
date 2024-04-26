@@ -124,7 +124,7 @@ export async function getApplicationConfig(
     )
     return finalConfig
   } catch (error) {
-    throw internal(error.message)
+    throw internal('Error when fetching application config from Mongo', error)
   }
 }
 
