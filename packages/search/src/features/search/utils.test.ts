@@ -36,8 +36,7 @@ describe('elasticsearch db helper', () => {
               ]
             }
           }
-        ],
-        should: []
+        ]
       }
     })
   })
