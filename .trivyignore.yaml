@@ -21,8 +21,6 @@ vulnerabilities:
     statement: only applies to SHA-1 usage - should still be patched though
   - id: CVE-2023-52079
     statement: msgpackr vulnerable to dos
-  - id: CVE-2024-23331
-    statement: Vites vuln only applicable to server.fs.deny
   - id: CVE-2020-8231
     statement: curl vuln scheduler - low prio
   - id: CVE-2022-42003

@@ -11,25 +11,25 @@ volumes:
   metricbeat:
 services:
   mongo1:
-    image: mongo:4.4@sha256:ce3d0eade688a2299e9e20454efc561a6fc8de1cbde5abb0f50feadfe758037b
+    image: mongo:4.4
     restart: unless-stopped
 
   redis:
-    image: redis:5@sha256:fc5ecd863862f89f04334b7cbb57e93c9790478ea8188a49f6e57b0967d38c75
+    image: redis:5
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19@sha256:d7c71fa33140df19a4a4a355f6c1aee1eddeb35519de84bf7e8205c06f40b90a
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19
     restart: unless-stopped
     environment:
       - discovery.type=single-node
 
   influxdb:
-    image: influxdb:1.8.10@sha256:0752b8858dbdc1812aa98dfd5c1856b188809af9990dab6c24383897119fb328
+    image: influxdb:1.8.10
     restart: unless-stopped
 
   hearth:
-    image: opencrvs/hearth:1.1.0@sha256:12892d665c395d9022eb322f713e92a0cec1e315641fe05eb1470d6dafc42148
+    image: opencrvs/hearth:1.1.0
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
       - logger__level=warn
@@ -41,5 +41,5 @@ services:
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2023-09-16T01-01-47Z.fips@sha256:013e82e0030c9ce8d41f9cffaf91a5514f3dc41aa0942ea58cf3f4e35798f2cf
+    image: quay.io/minio/minio:RELEASE.2023-09-16T01-01-47Z.fips
     restart: unless-stopped
