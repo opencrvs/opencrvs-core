@@ -146,5 +146,5 @@ export async function eventNotificationHandler(
   await indexBundle(savedBundle, token)
   await auditEvent('sent-notification', savedBundle, token)
 
-  return h.response(savedBundle).code(200)
+  return h.response(responseBundle).code(200)
 }

@@ -28,7 +28,7 @@ import {
   SavedLocation,
   SavedTask
 } from '@opencrvs/commons/types'
-import { getTokenPayload, hasScope } from '@opencrvs/commons/authentication'
+import { hasScope } from '@opencrvs/commons/authentication'
 import { IAuthHeader } from '@opencrvs/commons/http'
 
 export const enum EVENT {
@@ -342,23 +342,10 @@ export const createStatusHistory = async (
     return
   }
 
-  let isSystem = false
-  if (hasScope({ Authorization: authHeader }, 'notification-api'))
-    isSystem = true
-
+  const isSystem = hasScope({ Authorization: authHeader }, 'notification-api')
   const user = !isSystem
     ? await getUser(body.updatedBy || '', authHeader)
-    : await (async () => {
-        const payload = getTokenPayload(authHeader)
-        const system = await getSystem(
-          { systemId: payload.sub },
-          { Authorization: authHeader }
-        )
-        return system
-      })()
-
-  // for a system the user name is a string
-  if (typeof user.name !== 'object') user.name = [user.name]
+    : null
 
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)
@@ -387,8 +374,7 @@ export const createStatusHistory = async (
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
     operatorRole:
-      // user could be a system as well and systems don't have role
-      user.role?.labels.find((label: any) => label.lang === 'en')?.label || '',
+      user?.role?.labels.find((label) => label.lang === 'en')?.label || '',
     operatorFirstNames,
     operatorFamilyName,
     operatorFirstNamesLocale,
@@ -445,7 +431,10 @@ export function findDuplicateIds(
     }))
 }
 
-export async function getUser(practitionerId: string, authHeader: any) {
+export async function getUser(
+  practitionerId: string,
+  authHeader: any
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify({
