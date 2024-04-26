@@ -34,7 +34,6 @@ import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { FontFamilyTypes } from '@client/utils/referenceApi'
-import { PageSize } from 'pdfmake/interfaces'
 import { printPDF } from '@client/pdfRenderer'
 import { UserDetails } from '@client/utils/userUtils'
 
@@ -239,14 +238,13 @@ export async function printCertificate(
   userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   state: IStoreState,
-  optionalData?: OptionalData,
-  pageSize: PageSize = 'A4'
+  optionalData?: OptionalData
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
   }
   printPDF(
-    (await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state))
+    (await getPDFTemplateWithSVG(offlineResource, declaration, state))
       .pdfTemplate,
     declaration,
     userDetails,
@@ -259,7 +257,6 @@ export async function printCertificate(
 export async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize,
   state: IStoreState
 ) {
   const svgTemplate =
@@ -296,8 +293,28 @@ export async function getPDFTemplateWithSVG(
       ...offlineResource.templates.fonts
     }
   }
-  pdfTemplate.definition.pageSize = pageSize
-  updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
+
+  const parser = new DOMParser()
+  const svgElement = parser.parseFromString(
+    svgCode,
+    'image/svg+xml'
+  ).documentElement
+
+  const widthValue = svgElement.attributes.getNamedItem('width')?.value
+  const heightValue = svgElement.attributes.getNamedItem('height')?.value
+
+  if (widthValue && heightValue) {
+    const width = Number.parseInt(widthValue)
+    const height = Number.parseInt(heightValue)
+    if (width > height) {
+      pdfTemplate.definition.pageOrientation = 'landscape'
+    }
+  }
+
+  pdfTemplate.definition.content = {
+    svg: svgCode
+  }
+
   return { pdfTemplate, svgCode }
 }
 
@@ -311,35 +328,4 @@ export function downloadFile(
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
-}
-
-function updatePDFTemplateWithSVGContent(
-  template: IPDFTemplate,
-  svg: string,
-  pageSize: PageSize
-) {
-  template.definition['content'] = {
-    svg,
-    fit: getPageDimensions(pageSize)
-  }
-}
-
-const standardPageSizes: Record<string, [number, number]> = {
-  A2: [1190.55, 1683.78],
-  A3: [841.89, 1190.55],
-  A4: [595.28, 841.89],
-  A5: [419.53, 595.28]
-}
-
-function getPageDimensions(pageSize: PageSize) {
-  if (
-    typeof pageSize === 'string' &&
-    standardPageSizes.hasOwnProperty(pageSize)
-  ) {
-    return standardPageSizes[pageSize]
-  } else {
-    throw new Error(
-      `Pagesize ${pageSize} is not found in standardPageSizes map`
-    )
-  }
 }
