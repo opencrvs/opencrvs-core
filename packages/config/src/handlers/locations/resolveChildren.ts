@@ -16,12 +16,8 @@ import { ServerRoute } from '@hapi/hapi'
 import { resolveLocationChildren } from './locationTreeSolver'
 
 const fetchLocations = async () => {
-  const locationHierarchyUrl = new URL(
-    `Location?_count=0&status=active`,
-    FHIR_URL
-  )
-
-  const response = await fetch(locationHierarchyUrl)
+  const allLocationsUrl = new URL(`Location?_count=0&status=active`, FHIR_URL)
+  const response = await fetch(allLocationsUrl)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch locations: ${await response.text()}`)
