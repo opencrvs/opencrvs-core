@@ -648,6 +648,19 @@ export function createCorrectedTask(
           }
         ]
       },
+      ...getFHIRValueField(update.oldValue)
+    })),
+    output: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
       ...getFHIRValueField(update.newValue)
     })),
     reason: {

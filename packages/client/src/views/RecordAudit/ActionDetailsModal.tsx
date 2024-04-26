@@ -524,6 +524,7 @@ const ActionDetailsModalListTable = ({
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
         (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected ||
           actionDetailsData.regStatus === RegStatus.DeclarationUpdated) && (
           <Table
             noResultText=" "
