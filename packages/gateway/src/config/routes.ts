@@ -55,7 +55,10 @@ export const getRoutes = () => {
         }
       }
     },
+
     catchAllProxy.locations,
+    catchAllProxy.locationId,
+
     catchAllProxy.auth,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,

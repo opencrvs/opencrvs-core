@@ -12,7 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
 import { fetchFHIR, fetchFromHearth } from '@gateway/features/fhir/service'
-import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
 
@@ -26,6 +25,13 @@ import {
   Task,
   findExtension
 } from '@opencrvs/commons/types'
+
+export enum Code {
+  CRVS_OFFICE = 'CRVS_OFFICE',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  HEALTH_FACILITY = 'HEALTH_FACILITY'
+}
+
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({

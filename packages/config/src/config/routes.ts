@@ -38,13 +38,14 @@ import { ServerRoute } from '@hapi/hapi'
 import * as Joi from 'joi'
 import { resolveChildren } from '@config/handlers/locations/resolveChildren'
 import {
-  fetchLocationHandler,
+  fetchLocationsHandler,
   locationQuerySchema,
   requestParamsSchema,
   createLocationHandler,
   updateLocationHandler,
   updateSchema
 } from '@config/handlers/locations/handler'
+import { fetchLocationHandler } from '@config/handlers/locations/location'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -279,7 +280,7 @@ export default function getRoutes(): ServerRoute[] {
     {
       method: 'GET',
       path: '/locations',
-      handler: fetchLocationHandler,
+      handler: fetchLocationsHandler,
       options: {
         tags: ['api'],
         auth: false,
@@ -302,7 +303,6 @@ export default function getRoutes(): ServerRoute[] {
         }
       }
     },
-    // create Location/Facility
     {
       method: 'POST',
       path: '/locations',
@@ -318,7 +318,6 @@ export default function getRoutes(): ServerRoute[] {
         }
       }
     },
-    // update Location/Facility
     {
       method: 'PUT',
       path: '/locations/{locationId}',

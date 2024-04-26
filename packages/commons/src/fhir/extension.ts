@@ -130,7 +130,7 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/regLastOffice': {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'
-    valueReference: { reference: string }
+    valueReference: { reference: ResourceIdentifier<Location> }
     /**
      * Human readable office name
      */

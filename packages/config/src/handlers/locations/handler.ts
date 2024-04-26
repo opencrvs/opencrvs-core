@@ -158,19 +158,14 @@ export const requestParamsSchema = Joi.object({
 
 const LOCATION_CHUNK_SIZE = 400
 
-export async function fetchLocationHandler(
+export async function fetchLocationsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const searchParam = request.url.search
-  const locationId = request.params.locationId
-  let response
-
-  if (locationId) {
-    response = await fetchFromHearth<Saved<Bundle>>(`Location/${locationId}`)
-  } else {
-    response = await fetchFromHearth<Saved<Bundle>>(`Location${searchParam}`)
-  }
+  const response = await fetchFromHearth<Saved<Bundle>>(
+    `Location${searchParam}`
+  )
 
   response.link = response.link?.map((link) => ({
     ...link,

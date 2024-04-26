@@ -8,17 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { SavedLocation } from '@opencrvs/commons/types'
+import { fetchFromHearth } from './hearthApi'
+import * as Hapi from '@hapi/hapi'
 
-import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchLocationChildren } from '@gateway/location'
-import { UUID } from '@opencrvs/commons'
+export async function fetchLocationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const locationId = request.params.locationId
+  const response = await fetchFromHearth<SavedLocation>(
+    `Location/${locationId}`
+  )
 
-export const resolvers: GQLResolver = {
-  Query: {
-    async hasChildLocation(_, { parentId }, { headers: authHeader }) {
-      const children = await fetchLocationChildren(parentId as UUID)
-      const [childLocation] = children
-      return childLocation
-    }
-  }
+  return response
 }

@@ -30,10 +30,26 @@ export const catchAllProxy = {
   },
   locations: {
     method: '*',
-    path: '/location{suffix}',
+    path: '/location',
     handler: (req, h) =>
       h.proxy({
-        uri: `${APPLICATION_CONFIG_URL}/locations{suffix}${req.url.search}`,
+        uri: `${APPLICATION_CONFIG_URL}locations${req.url.search}`,
+        passThrough: true
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  locationId: {
+    method: '*',
+    path: '/location/{id}',
+    handler: (req, h) =>
+      h.proxy({
+        uri: `${APPLICATION_CONFIG_URL}locations/{id}`,
         passThrough: true
       }),
     options: {
@@ -44,7 +60,7 @@ export const catchAllProxy = {
       }
     }
   }
-} as Record<string, ServerRoute>
+} satisfies Record<string, ServerRoute>
 
 export const rateLimitedAuthProxy = {
   authenticate: {
@@ -101,4 +117,4 @@ export const rateLimitedAuthProxy = {
       }
     }
   }
-} as Record<string, ServerRoute>
+} satisfies Record<string, ServerRoute>

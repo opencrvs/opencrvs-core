@@ -1653,8 +1653,6 @@ export type Query = {
   informantSMSNotifications?: Maybe<Array<SmsNotification>>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
-  locationById?: Maybe<Location>
-  locationsByParent?: Maybe<Array<Maybe<Location>>>
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
   queryRegistrationByIdentifier?: Maybe<BirthRegistration>

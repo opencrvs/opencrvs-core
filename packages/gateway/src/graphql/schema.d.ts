@@ -29,8 +29,6 @@ export interface GQLQuery {
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
-  locationsByParent?: Array<GQLLocation | null>
-  locationById?: GQLLocation
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
   getUserByMobile?: GQLUser
@@ -2089,8 +2087,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
-  locationsByParent?: QueryToLocationsByParentResolver<TParent>
-  locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
@@ -2378,36 +2374,8 @@ export interface QueryToFetchRecordDetailsForVerificationResolver<
   ): TResult
 }
 
-export interface QueryToLocationsByParentArgs {
-  parentId?: string
-  type?: string
-}
-export interface QueryToLocationsByParentResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToLocationsByParentArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToLocationByIdArgs {
-  locationId?: string
-}
-export interface QueryToLocationByIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: QueryToLocationByIdArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface QueryToHasChildLocationArgs {
-  parentId?: string
+  parentId: string
 }
 export interface QueryToHasChildLocationResolver<TParent = any, TResult = any> {
   (

@@ -38,9 +38,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  locationsByParent(parentId: String, type: String): [Location]
-  locationById(locationId: String): Location
-  hasChildLocation(parentId: String): Location
+  hasChildLocation(parentId: String!): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
