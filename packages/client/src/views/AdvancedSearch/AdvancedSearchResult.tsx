@@ -86,6 +86,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
+import { useWindowWidth } from '@client/offline/hooks/useWindowWidth'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -125,7 +126,7 @@ type IFullProps = ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const windowWidth = useWindowWidth()
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { searchId, ...advancedSearchParams } = useSelector(
@@ -139,14 +140,6 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const offlineData = useSelector(getOfflineData)
   const DEFAULT_PAGE_SIZE = 10
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
-
-  useEffect(() => {
-    const recordWindowWidth = () => {
-      setWindowWidth(window.innerWidth)
-    }
-    window.addEventListener('resize', recordWindowWidth)
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
 
   const isEnoughParams = () => {
     return isAdvancedSearchFormValid(
