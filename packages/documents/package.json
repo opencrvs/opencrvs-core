@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
-    "precommit": "yarn lint && lint-staged",
+    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "build:clean": "rm -rf build"
@@ -46,7 +46,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
-    "cross-env": "^5.2.0",
+    "cross-env": "^7.0.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-config-prettier": "^8.3.0",
@@ -65,7 +65,7 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "git add"
+      "eslint -c .eslintrc.js --fix"
     ]
   },
   "jest": {

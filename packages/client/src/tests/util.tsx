@@ -701,6 +701,7 @@ export function appendStringToKeys(
 }
 
 export const mockDeclarationData = {
+  template: {},
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -793,6 +794,7 @@ export const mockDeclarationData = {
 }
 
 export const mockDeathDeclarationData = {
+  template: {},
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',

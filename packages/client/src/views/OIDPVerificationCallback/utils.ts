@@ -208,7 +208,7 @@ export const useNidAuthentication = () => {
     pageId: string
   }
   const offlineCountryConfig = useSelector(getOfflineData)
-  const declaration = useDeclaration(matchParams.declarationId)
+  const declaration = useDeclaration<IDeclaration>(matchParams.declarationId)
 
   const onClick = () =>
     dispatch(

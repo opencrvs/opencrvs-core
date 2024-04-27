@@ -28,10 +28,9 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "yarn lint:ts",
+      "eslint --fix",
       "stylelint",
-      "yarn extract:translations",
-      "git add"
+      "yarn extract:translations"
     ]
   },
   "dependencies": {
@@ -52,7 +51,7 @@
     "@types/redux-sentry-middleware": "^0.2.0",
     "@types/styled-components": "^5.1.3",
     "@types/xregexp": "^3.0.29",
-    "@vitejs/plugin-react": "^2.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "apollo3-cache-persist": "^0.14.1",
     "bcryptjs": "^2.4.3",
     "bowser": "^2.11.0",
@@ -74,7 +73,7 @@
     "iframe-resizer-react": "^1.1.0",
     "jsdom-worker": "^0.3.0",
     "jwt-decode": "^2.2.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "patch-package": "^6.1.2",
@@ -98,7 +97,7 @@
     "sanitize-html": "^2.4.0",
     "styled-components": "^5.2.0",
     "tsconfig-paths": "^3.13.0",
-    "vite": "^3.0.0",
+    "vite": "^5.0.0",
     "vite-plugin-svgr": "^0.6.0",
     "vite-tsconfig-paths": "^3.5.0",
     "webfontloader": "^1.6.28",
@@ -123,7 +122,7 @@
     "@types/handlebars": "^4.1.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^10.12.5",
+    "@types/node": "^20.12.7",
     "@types/qrcode": "^1.5.0",
     "@types/query-string": "^6.1.0",
     "@types/react": "18.2.74",
@@ -167,7 +166,7 @@
     "traverse": "^0.6.6",
     "ts-node": "^7.0.1",
     "typescript": "4.9.5",
-    "vite-plugin-pwa": "^0.16.4",
+    "vite-plugin-pwa": "^0.19.8",
     "vitest": "0.25.5",
     "vitest-fetch-mock": "^0.2.1"
   },

@@ -12,6 +12,11 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
+import dns from 'node:dns'
+
+// fixes issue where Cypress was not able to resolve Vite's localhost
+// https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
+dns.setDefaultResultOrder('ipv4first')
 
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
@@ -23,7 +28,7 @@ export default defineConfig(({ mode }) => {
   const htmlPlugin = () => {
     return {
       name: 'html-transform',
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         return html.replace(/%(.*?)%/g, function (_, p1) {
           return env[p1]
         })
@@ -34,23 +39,23 @@ export default defineConfig(({ mode }) => {
     return VitePWA({
       strategies: 'generateSW',
       injectManifest: {
-        cacheId: 'ocrvs-login',
         globDirectory: 'build/',
         globIgnores: ['**/config.js'],
         globPatterns: ['**/*.{json,ico,ttf,html,js}'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/],
         swDest: 'build/service-worker.js'
       },
       registerType: 'autoUpdate',
       workbox: {
+        cacheId: 'ocrvs-login',
         runtimeCaching: [
           {
             urlPattern: /config\.js/,
             handler: 'NetworkFirst'
           }
-        ]
+        ],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/__.*$/]
       },
       devOptions: {
         enabled: false
