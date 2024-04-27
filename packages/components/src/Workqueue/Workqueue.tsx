@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { grid } from '../grid'
 import { IColumn, IActionObject } from './types'
@@ -18,6 +18,7 @@ import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
+import { useWindowWidth } from '@client/offline/hooks/useWindowWidth'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -149,17 +150,7 @@ const WorkqueueComp = ({
   hideLastBorder,
   theme
 }: IWorkqueueProps) => {
-  const [width, setWidth] = useState(window.innerWidth)
-
-  const recordWindowWidth = () => setWidth(window.innerWidth)
-
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
-    }
-  }, [])
+  const width = useWindowWidth()
 
   const renderActionBlock = (
     itemId: string,
