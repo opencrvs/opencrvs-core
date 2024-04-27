@@ -26,7 +26,7 @@ import {
   IAction
 } from '@opencrvs/components/lib/Workqueue'
 import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
@@ -62,6 +62,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
+import { useWindowWidth } from '@client/hooks/useWindowWidth'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -98,20 +99,9 @@ const ReadyForReviewComponent = ({
   error,
   intl
 }: IReviewTabProps) => {
-  const [width, setWidth] = useState(window.innerWidth)
+  const width = useWindowWidth()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-
-  const recordWindowWidth = () => {
-    setWidth(window.innerWidth)
-  }
-
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
-    }
-  }, [])
 
   const userHasRegisterScope = () => {
     return scope && hasRegisterScope(scope)
