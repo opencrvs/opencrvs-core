@@ -56,6 +56,7 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useEffect, useState } from 'react'
 import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { useWindowSize } from '@client/hooks/useWindowSize'
 
 interface IBasePrintTabProps {
   queryData: {
@@ -76,7 +77,7 @@ export const ReadyToIssue = ({
   loading,
   error
 }: IBasePrintTabProps) => {
-  const [width, setWidth] = useState(window.innerWidth)
+  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
   const dispatch = useDispatch()
@@ -90,19 +91,7 @@ export const ReadyToIssue = ({
     (store: IStoreState) => store.declarationsState.declarations
   )
 
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
-    }
-  }, [])
-
   const theme = useTheme()
-
-  const recordWindowWidth = () => {
-    setWidth(window.innerWidth)
-  }
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -269,18 +258,6 @@ export const ReadyToIssue = ({
 
     return finalContent
   }
-
-  const handleResize = () => {
-    setWidth(window.innerWidth)
-  }
-
-  React.useEffect(() => {
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
 
   return (
     <WQContentWrapper

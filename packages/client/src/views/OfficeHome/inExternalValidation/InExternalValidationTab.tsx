@@ -42,8 +42,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-
-const { useState, useEffect } = React
+import { useWindowSize } from '@client/hooks/useWindowSize'
 
 interface IBaseProps {
   theme: ITheme
@@ -69,7 +68,7 @@ function InExternalValidationComponent(props: IProps) {
   const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
     SORT_ORDER.ASCENDING
   )
-  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
+  const { width: viewportWidth } = useWindowSize()
   const { intl, queryData, paginationId, pageSize, onPageChange } = props
   const { data } = queryData
   const totalPages = props.queryData.data.totalItems
@@ -80,16 +79,6 @@ function InExternalValidationComponent(props: IProps) {
     props.queryData.data.totalItems > pageSize
       ? true
       : false
-
-  useEffect(() => {
-    function recordWindowWidth() {
-      setViewportWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(

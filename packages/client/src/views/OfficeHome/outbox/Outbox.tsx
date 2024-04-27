@@ -54,6 +54,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
+import { useWindowSize } from '@client/hooks/useWindowSize'
 
 const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
@@ -135,22 +136,14 @@ const isOutboxDeclaration = (
 
 export function Outbox() {
   const intl = useIntl()
-  const [width, setWidth] = React.useState(window.innerWidth)
   const [sortedColumn, setSortedColumn] = React.useState(COLUMNS.ICON_WITH_NAME)
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
+  const { width } = useWindowSize()
   const isOnline = useOnlineStatus()
   const theme = getTheme()
   const declarations = useSelector((state: IStoreState) =>
     state.declarationsState?.declarations.filter(isOutboxDeclaration)
   )
-
-  React.useEffect(() => {
-    function recordWindowWidth() {
-      setWidth(window.innerWidth)
-    }
-    window.addEventListener('resize', recordWindowWidth)
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
