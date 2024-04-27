@@ -18,7 +18,7 @@ import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
-import { useWindowWidth } from '@client/hooks/useWindowWidth'
+import { useWindowSize } from '@opencrvs/client/src/hooks/useWindowSize'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -150,7 +150,7 @@ const WorkqueueComp = ({
   hideLastBorder,
   theme
 }: IWorkqueueProps) => {
-  const width = useWindowWidth()
+  const { width } = useWindowSize()
 
   const renderActionBlock = (
     itemId: string,

@@ -62,7 +62,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
-import { useWindowWidth } from '@client/hooks/useWindowWidth'
+import { useWindowSize } from '@client/hooks/useWindowSize'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -99,7 +99,7 @@ const ReadyForReviewComponent = ({
   error,
   intl
 }: IReviewTabProps) => {
-  const width = useWindowWidth()
+  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 

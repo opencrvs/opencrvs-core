@@ -86,7 +86,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
-import { useWindowWidth } from '@client/hooks/useWindowWidth'
+import { useWindowSize } from '@client/hooks/useWindowSize'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -126,7 +126,7 @@ type IFullProps = ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
-  const windowWidth = useWindowWidth()
+  const { width: windowWidth } = useWindowSize()
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { searchId, ...advancedSearchParams } = useSelector(

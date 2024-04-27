@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { grid } from '../grid'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
-import { useWindowSize } from './useWindowSize'
+import { useWindowSize } from '@opencrvs/client/src/hooks/useWindowSize'
 
 const AppBarWrapper = styled.div`
   padding: 0 16px;
