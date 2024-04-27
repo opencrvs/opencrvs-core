@@ -18,7 +18,7 @@ import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
-import { useWindowWidth } from '@client/offline/hooks/useWindowWidth'
+import { useWindowWidth } from '@client/hooks/useWindowWidth'
 
 const Wrapper = styled.div`
   width: 100%;

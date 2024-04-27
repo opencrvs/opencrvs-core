@@ -86,7 +86,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
-import { useWindowWidth } from '@client/offline/hooks/useWindowWidth'
+import { useWindowWidth } from '@client/hooks/useWindowWidth'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
