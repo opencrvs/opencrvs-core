@@ -12,7 +12,7 @@ import React from 'react'
 import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
 import { grid } from '../grid'
 import { MobileHeader, IMobileHeaderProps } from './Mobile/MobileHeader'
-import { useWindowWidth } from '@client/hooks/useWindowWidth'
+import { useWindowSize } from '@opencrvs/client/src/hooks/useWindowSize'
 
 export interface IDomProps {
   id?: string
@@ -22,7 +22,7 @@ export interface IDomProps {
 type IProps = IMobileHeaderProps & IDesktopHeaderProps & IDomProps
 
 export const AppHeader = (props: IProps) => {
-  const width = useWindowWidth()
+  const { width } = useWindowSize()
 
   if (width > grid.breakpoints.lg) {
     return <DesktopHeader {...props} />
