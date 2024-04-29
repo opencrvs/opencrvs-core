@@ -89,6 +89,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - FHIR_URL=http://hearth:3447/fhir
+      - APPLICATION_CONFIG_URL=http://localhost:2021/
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION}
     build:
@@ -185,6 +186,7 @@ services:
       - GATEWAY_URL=http://gateway:7070/
       - DOCUMENTS_URL=http://documents:9050
       - CHECK_INVALID_TOKEN=true
+      - FHIR_URL=http://hearth:3447/fhir
   migration:
     image: opencrvs/ocrvs-migration:${VERSION}
     build:
