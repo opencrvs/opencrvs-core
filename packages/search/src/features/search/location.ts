@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UUID } from '@opencrvs/commons'
-import { SavedLocation } from '@search/../../commons/build/dist/types'
+import { SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from '@search/constants'
 import fetch from 'node-fetch'
 

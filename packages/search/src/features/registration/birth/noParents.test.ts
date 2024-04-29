@@ -22,7 +22,7 @@ import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
-import { isComposition } from '@search/../../commons/build/dist/types'
+import { isComposition } from '@opencrvs/commons/types'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 jest.mock('@search/features/registration/deduplicate/service')
