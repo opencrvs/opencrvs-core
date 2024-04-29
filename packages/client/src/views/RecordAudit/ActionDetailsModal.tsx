@@ -15,7 +15,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { IForm, IFormSection, IFormField } from '@client/forms'
+import { IForm, IFormSection } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -321,13 +321,19 @@ const ActionDetailsModalListTable = ({
 
         const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
           (field) => field.name === nestedField
-        ) as IFormField
+        )
 
-        result.push({
-          item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(item.value, fieldObj, offlineData, intl),
-          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
-        })
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
+        if (fieldObj) {
+          result.push({
+            item: getItemName(section.name, fieldObj.label),
+            original: getFieldValue(item.value, fieldObj, offlineData, intl),
+            edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
+          })
+        }
       } else {
         const [parentField] = indexes
 
@@ -335,13 +341,19 @@ const ActionDetailsModalListTable = ({
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name === parentField) as IFormField
+        ).find((field) => field.name === parentField)
 
-        result.push({
-          item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(item.value, fieldObj, offlineData, intl),
-          edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
-        })
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
+        if (fieldObj) {
+          result.push({
+            item: getItemName(section.name, fieldObj.label),
+            original: getFieldValue(item.value, fieldObj, offlineData, intl),
+            edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
+          })
+        }
       }
     })
 
@@ -524,6 +536,7 @@ const ActionDetailsModalListTable = ({
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
         (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected ||
           actionDetailsData.regStatus === RegStatus.DeclarationUpdated) && (
           <Table
             noResultText=" "
