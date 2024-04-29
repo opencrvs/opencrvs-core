@@ -3,6 +3,7 @@
 ## [1.4.2](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.2)
 
 - Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
+- Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
 
 ## [1.4.1](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.1)
 
