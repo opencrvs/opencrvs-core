@@ -25,7 +25,7 @@ import {
   URLReference,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { fetchFromHearth, sendToFhir } from './hearthApi'
+import { fetchFromHearth, sendToFhir } from '@config/services/hearth'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',

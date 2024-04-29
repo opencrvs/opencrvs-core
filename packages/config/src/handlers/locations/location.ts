@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SavedLocation } from '@opencrvs/commons/types'
-import { fetchFromHearth } from './hearthApi'
+import { fetchFromHearth } from '@config/services/hearth'
 import * as Hapi from '@hapi/hapi'
 
 export async function fetchLocationHandler(

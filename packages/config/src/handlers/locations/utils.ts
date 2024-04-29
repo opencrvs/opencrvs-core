@@ -24,7 +24,7 @@ import {
   ResourceIdentifier,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
-import { fetchFromHearth } from './hearthApi'
+import { fetchFromHearth } from '@config/services/hearth'
 
 export const composeFhirLocation = (
   location: LocationInput | FacilityInput
