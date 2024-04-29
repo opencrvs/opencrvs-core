@@ -56,7 +56,7 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useEffect, useState } from 'react'
 import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { useWindowSize } from '@client/hooks/useWindowSize'
+import { useWindowSize } from '@opencrvs/components/lib/Hooks'
 
 interface IBasePrintTabProps {
   queryData: {

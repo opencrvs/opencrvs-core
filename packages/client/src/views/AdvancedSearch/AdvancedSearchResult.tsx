@@ -86,7 +86,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
-import { useWindowSize } from '@client/hooks/useWindowSize'
+import { useWindowSize } from '@opencrvs/components/lib/Hooks'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;

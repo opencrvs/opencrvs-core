@@ -12,7 +12,7 @@ import React from 'react'
 import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
 import { grid } from '../grid'
 import { MobileHeader, IMobileHeaderProps } from './Mobile/MobileHeader'
-import { useWindowSize } from '@opencrvs/client/src/hooks/useWindowSize'
+import { useWindowSize } from '../Hooks'
 
 export interface IDomProps {
   id?: string

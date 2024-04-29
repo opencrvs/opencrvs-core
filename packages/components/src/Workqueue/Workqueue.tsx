@@ -18,7 +18,7 @@ import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
-import { useWindowSize } from '@opencrvs/client/src/hooks/useWindowSize'
+import { useWindowSize } from '../Hooks'
 
 const Wrapper = styled.div`
   width: 100%;
