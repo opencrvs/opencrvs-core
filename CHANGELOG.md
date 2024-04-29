@@ -32,6 +32,7 @@
 - In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
 - Fix first name issues when creating a user [#6631](https://github.com/opencrvs/opencrvs-core/issues/6631)
 - Show correct record option in certificate preview page when trying to print by RA [#6224](https://github.com/opencrvs/opencrvs-core/issues/6224)
+- Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 
 ## Refactor
 
