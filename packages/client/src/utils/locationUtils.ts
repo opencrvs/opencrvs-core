@@ -279,7 +279,7 @@ export function getLocationHierarchy(
 export function generateFullAddress(
   address: Address,
   offlineData: IOfflineData
-): (string | null | undefined)[] {
+): string[] {
   const district =
     address.district && offlineData.locations[address.district].name
 
@@ -300,5 +300,5 @@ export function generateFullAddress(
     eventLocationLevel3,
     district,
     state
-  ]
+  ].filter((maybeLocation): maybeLocation is string => Boolean(maybeLocation))
 }

@@ -257,21 +257,9 @@ export function VerifyCertificatePage() {
       intl.formatMessage(countryMessages[location?.address?.country])
     const city = location?.address?.city ?? EMPTY_STRING
     if (location?.address?.country === window.config.COUNTRY) {
-      const [
-        eventLocationLevel5,
-        eventLocationLevel4,
-        eventLocationLevel3,
-        district,
-        state
-      ] = generateFullAddress(location.address, offlineData)
-
       return [
         city,
-        eventLocationLevel5,
-        eventLocationLevel4,
-        eventLocationLevel3,
-        district,
-        state,
+        ...generateFullAddress(location.address, offlineData),
         country
       ]
         .filter((label) => Boolean(label))
