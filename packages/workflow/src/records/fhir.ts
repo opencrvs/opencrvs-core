@@ -139,9 +139,7 @@ export async function withPractitionerDetails<T extends Task>(
     ]
   }
   const user = userOrSystem
-  const practitioner = (await getLoggedInPractitionerResource(
-    token
-  )) as SavedPractitioner
+  const practitioner = await getLoggedInPractitionerResource(token)
   const relatedLocations = (await getPractitionerLocations(
     user.practitionerId
   )) as [SavedLocation]
@@ -638,6 +636,19 @@ export function createCorrectedTask(
       }
     ],
     input: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      ...getFHIRValueField(update.oldValue)
+    })),
+    output: correctionDetails.values.map((update) => ({
       valueCode: update.section,
       valueId: update.fieldName,
       type: {
@@ -1395,10 +1406,10 @@ export function toSavedBundle<T extends Resource>(
   } as SavedBundle<T>
 }
 
-export function mergeBundles<R extends ValidRecord>(
-  record: R,
-  newOrUpdatedResourcesBundle: SavedBundle
-): R {
+export function mergeBundles<T extends Bundle, R extends Bundle>(
+  record: T,
+  newOrUpdatedResourcesBundle: R
+): T {
   const existingResourceIds = record.entry.map(({ resource }) => resource.id)
   const newEntries = newOrUpdatedResourcesBundle.entry.filter(
     ({ resource }) => !existingResourceIds.includes(resource.id)
