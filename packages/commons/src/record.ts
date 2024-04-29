@@ -20,19 +20,19 @@ import {
   Patient,
   PaymentReconciliation,
   Practitioner,
+  QuestionnaireResponse,
   RelatedPerson,
   Resource,
+  SavedBundle,
   Task,
+  TrackingID,
   getBusinessStatus,
   getComposition,
+  getStatusFromTask,
   getTaskFromSavedBundle,
   isCorrectionRequestedTask,
   isTask,
-  sortTasksDescending,
-  SavedBundle,
-  TrackingID,
-  getStatusFromTask,
-  QuestionnaireResponse
+  sortTasksDescending
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -201,6 +201,10 @@ export function getCorrectionRequestedTask(
   return task as CorrectionRequestedTask
 }
 
+export type RecordWithoutTasks<T extends ValidRecord> = NestedNominal<
+  T,
+  'RecordWithoutTasks'
+>
 export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
   T,
   'RecordWithPreviousTask'
@@ -208,7 +212,7 @@ export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
 
 export function withOnlyLatestTask<
   T extends RecordWithPreviousTask<ValidRecord>
->(record: T): T extends RecordWithPreviousTask<infer X> ? X : never {
+>(record: T) {
   const tasks = sortTasksDescending(
     record.entry.map((entry) => entry.resource).filter(isTask)
   )
@@ -223,7 +227,17 @@ export function withOnlyLatestTask<
     getState(record)
   )
 
-  return newRec as any
+  return newRec as any as T extends RecordWithPreviousTask<infer S> ? S : void
+}
+
+export function addResourceToRecord<T extends Bundle>(
+  bundle: T,
+  resource: Resource
+): T {
+  return {
+    ...bundle,
+    entry: [...bundle.entry, { resource }]
+  }
 }
 
 export function getTrackingId(record: ValidRecord) {

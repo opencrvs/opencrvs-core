@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormField, IFormData } from '@client/forms'
-import { formatPlainDate } from '@client/utils/date-formatting'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 
 export const deceasedDateToFieldTransformation =
   (alternativeSectionId?: string) =>
@@ -46,8 +49,7 @@ export const deceasedDateFormatTransformation =
     }
     const queryValue = queryData[fromSectionId].deceased.deathDate
 
-    const date = new Date(queryValue)
-    if (!Number.isNaN(date.getTime())) {
+    if (isValidPlainDate(queryValue)) {
       const prevLocale = window.__localeId__
       window.__localeId__ = locale
 
