@@ -32,7 +32,7 @@ export const selectDeclaration =
   (store: IStoreState) =>
     getKey(store, 'declarations').find(({ id }) => declarationId === id) as T
 
-export const useDeclaration = <T extends IDeclaration>(
+export const useDeclaration = <T extends IDeclaration | undefined>(
   declarationId: string
 ) => {
   return useSelector(selectDeclaration<T>(declarationId))

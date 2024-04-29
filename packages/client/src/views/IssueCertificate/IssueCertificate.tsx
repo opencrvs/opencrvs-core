@@ -33,7 +33,9 @@ export function IssueCertificate() {
     pageId: string
   }>()
 
-  const declaration = useDeclaration<IPrintableDeclaration>(registrationId)
+  const declaration = useDeclaration<IPrintableDeclaration | undefined>(
+    registrationId
+  )
 
   if (!declaration) {
     return (

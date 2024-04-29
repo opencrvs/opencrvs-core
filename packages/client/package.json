@@ -28,10 +28,9 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "yarn lint:ts",
+      "eslint --fix",
       "stylelint",
-      "yarn extract:translations",
-      "git add"
+      "yarn extract:translations"
     ]
   },
   "dependencies": {
@@ -74,15 +73,15 @@
     "iframe-resizer-react": "^1.1.0",
     "jsdom-worker": "^0.3.0",
     "jwt-decode": "^2.2.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
     "query-string": "^6.1.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-easy-crop": "^4.0.1",
     "react-idle-timer": "^4.2.11",
     "react-intl": "5.25.1",
@@ -126,8 +125,8 @@
     "@types/node": "^20.12.7",
     "@types/qrcode": "^1.5.0",
     "@types/query-string": "^6.1.0",
-    "@types/react": "18.2.74",
-    "@types/react-dom": "18.2.24",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
     "@types/react-stickynode": "^1.4.0",
     "@types/redux-logger": "^3.0.6",
     "@types/sanitize-html": "^2.3.1",
@@ -142,7 +141,7 @@
     "csv2json": "^2.0.2",
     "enzyme": "^3.4.4",
     "eslint": "^7.11.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-formatjs": "2.21.0",

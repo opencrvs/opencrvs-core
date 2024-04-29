@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Nominal } from '../nominal'
 import {
   ASSIGNED_EXTENSION_URL,
   Bundle,
@@ -27,15 +26,22 @@ import {
   Resource,
   ResourceIdentifier,
   Saved,
+  SavedBundle,
   UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   findExtension,
-  isSaved,
-  SavedBundle
+  isSaved
 } from '.'
 import { UUID } from '..'
-import { RegistrationStatus } from '../record'
+import { Nominal } from '../nominal'
+import {
+  RecordWithPreviousTask,
+  RecordWithoutTasks,
+  RegistrationStatus,
+  ValidRecord,
+  addResourceToRecord
+} from '../record'
 
 export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
@@ -194,12 +200,51 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
   return task
 }
 
+export function sortTasksAscending(tasks: Task[]) {
+  return tasks.slice().sort((a, b) => {
+    return (
+      new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
+    )
+  })
+}
 export function sortTasksDescending(tasks: Task[]) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
     )
   })
+}
+
+export function addTaskToRecord<T extends Bundle>(
+  bundle: T,
+  resource: Resource
+) {
+  return addResourceToRecord(
+    bundle,
+    resource
+  ) as any as T extends RecordWithoutTasks<infer S>
+    ? S
+    : T extends ValidRecord
+    ? RecordWithPreviousTask<T>
+    : void
+}
+
+export function getRecordWithoutTasks<T extends Bundle>(record: T) {
+  return {
+    ...record,
+    entry: record.entry.filter((entry) => !isTask(entry.resource))
+  } as any as T extends RecordWithPreviousTask<infer S>
+    ? RecordWithoutTasks<S>
+    : T extends ValidRecord
+    ? RecordWithoutTasks<T>
+    : void
+}
+export function getTasksInAscendingOrder<
+  T extends RecordWithPreviousTask<ValidRecord>
+>(record: T) {
+  return sortTasksAscending(
+    record.entry.map((entry) => entry.resource).filter(isTask)
+  )
 }
 
 export const enum TaskAction {

@@ -19,7 +19,6 @@ import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import { SubmissionController } from '@client/SubmissionController'
-import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
 
@@ -28,8 +27,6 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const pdfjsWorker = import('pdfjs-dist/build/pdf.worker.entry')
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 storage.configStorage('OpenCRVS')
 
