@@ -145,8 +145,7 @@ describe('elasticsearch params formatter', () => {
                   'compositionType.keyword': ['birth-declaration']
                 }
               }
-            ],
-            should: []
+            ]
           }
         },
         sort: [{ dateOfDeclaration: 'asc' }]
