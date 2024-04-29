@@ -994,6 +994,12 @@ function createInformantShareEmail(resource: Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
+
+  resource.extension = resource.extension.filter(
+    (e) =>
+      e.url !== `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
+  )
+
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
     valueString: fieldValue
