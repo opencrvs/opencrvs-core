@@ -109,13 +109,13 @@ describe('elasticsearch params formatter', () => {
                 match: {
                   declarationLocationId: {
                     boost: 2,
-                    query: '123'
+                    query: '00000000-0000-0000-0000-000000000002'
                   }
                 }
               },
               {
                 match: {
-                  eventLocationId: '456'
+                  eventLocationId: '00000000-0000-0000-0000-000000000003'
                 }
               },
               {
@@ -205,8 +205,7 @@ describe('elasticsearch params formatter', () => {
                   fuzziness: 'AUTO'
                 }
               }
-            ],
-            should: []
+            ]
           }
         },
         sort: [{ dateOfDeclaration: 'asc' }]
