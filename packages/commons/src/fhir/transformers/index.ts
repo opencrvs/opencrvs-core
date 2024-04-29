@@ -668,6 +668,10 @@ function createNationalityBuilder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
+  resource.extension = resource.extension.filter(
+    (e) => e.url !== `${FHIR_SPECIFICATION_URL}patient-nationality`
+  )
+
   resource.extension.push({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
@@ -783,6 +787,11 @@ function createEducationalAttainmentBuilder(
   if (!resource.extension) {
     resource.extension = []
   }
+
+  resource.extension = resource.extension.filter(
+    (e) =>
+      e.url !== `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
+  )
 
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
