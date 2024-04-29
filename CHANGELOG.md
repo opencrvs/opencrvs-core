@@ -19,6 +19,7 @@
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
+- Support for landscape certificate templates
 
 ## Bug fixes
 
