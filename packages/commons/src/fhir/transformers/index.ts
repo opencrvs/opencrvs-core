@@ -864,6 +864,11 @@ function createInformantShareContactNumber(resource: Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
+  resource.extension = resource.extension.filter(
+    (e) =>
+      e.url !==
+      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
+  )
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: fieldValue
