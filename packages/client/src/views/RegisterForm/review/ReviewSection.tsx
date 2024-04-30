@@ -1834,6 +1834,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
     }
 
+    const options = this.prepSectionDocOptions(declaration)
     return (
       <Wrapper>
         <Row>
@@ -2039,30 +2040,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
-              <DocumentViewer
-                id="document_section"
-                options={this.prepSectionDocOptions(declaration)}
-              >
-                <ZeroDocument id={`zero_document`}>
-                  {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord ||
-                  isDuplicate ||
-                  declaration.registrationStatus ===
-                    SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
-                    <LinkButton
-                      id="edit-document"
-                      disabled={isCorrection(declaration)}
-                      onClick={() =>
-                        this.editLinkClickHandlerForDraft(
-                          documentsSection.id,
-                          documentsSection.groups[0].id!
-                        )
-                      }
-                    >
-                      {intl.formatMessage(messages.editDocuments)}
-                    </LinkButton>
-                  )}
-                </ZeroDocument>
+              <DocumentViewer id="document_section" options={options}>
+                {options.uploadedDocuments.length == 0 && (
+                  <ZeroDocument id={`zero_document`}>
+                    {intl.formatMessage(
+                      messages.zeroDocumentsTextForAnySection
+                    )}
+                    {viewRecord ||
+                    isDuplicate ||
+                    declaration.registrationStatus ===
+                      SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                      <LinkButton
+                        id="edit-document"
+                        disabled={isCorrection(declaration)}
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </LinkButton>
+                    )}
+                  </ZeroDocument>
+                )}
               </DocumentViewer>
             </ResponsiveDocumentViewer>
           </RightColumn>
