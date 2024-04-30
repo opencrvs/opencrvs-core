@@ -16,6 +16,8 @@
 
   In effort of minimizing JavaScript-bundle size, we have streamlined the way how review certificate -page renders certificates. In case the images in your certificates are previewing blurry, you need to update your SVG-certificates to print QR-codes and other images directly with `<image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>` instead of the more complicated `<rect fill="url(#pattern)"></rect>` -paradigm. This doesn't affect printed certificates as they are still created as previously.
 
+- #### Remove unused GraphQL resolvers locationById and locationsByParent
+
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
