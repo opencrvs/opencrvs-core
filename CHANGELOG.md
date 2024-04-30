@@ -20,6 +20,7 @@
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
 - Support for landscape certificate templates
+- Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
 
 ## Bug fixes
 
