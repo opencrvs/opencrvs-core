@@ -1,5 +1,8 @@
 ## [1.3.5](https://github.com/opencrvs/opencrvs-core/compare/v1.3.4...v1.3.5)
 
+## Bug fixes
+- #### Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
+
 ## [1.3.4](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.3.4)
 
 ## Bug fixes
