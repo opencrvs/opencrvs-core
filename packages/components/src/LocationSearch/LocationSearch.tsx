@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 import { PrimaryButton } from '../buttons'
@@ -126,8 +126,7 @@ export const LocationSearch = ({
   const [selectedItem, setSelectedItem] = useState<ISearchLocation | null>(null)
   const [selectedText, setSelectedText] = useState<string | null>(null)
   const [isFocused, setIsFocused] = useState(false)
-
-  let searchTimeout: NodeJS.Timeout | undefined = undefined
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handler = () => {
     document.removeEventListener('click', handler)
@@ -141,12 +140,12 @@ export const LocationSearch = ({
     }
 
     return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout)
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
       }
       document.removeEventListener('click', handler)
     }
-  }, [selectedLocation, handler, searchTimeout])
+  }, [selectedLocation, handler, searchTimeoutRef])
 
   const search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
@@ -177,10 +176,10 @@ export const LocationSearch = ({
   }
 
   const debounce = (callback: () => void, duration: number) => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
     }
-    searchTimeout = setTimeout(callback, duration)
+    searchTimeoutRef.current = setTimeout(callback, duration)
   }
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
