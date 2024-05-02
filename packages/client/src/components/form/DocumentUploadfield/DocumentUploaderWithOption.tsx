@@ -23,7 +23,7 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 
@@ -33,15 +33,6 @@ const options = {
   useWebWorker: true
 }
 
-const UploaderWrapper = styled.div`
-  margin-bottom: 28px;
-`
-
-const Label = styled.label`
-  position: relative;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg18};
-`
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
   flex-wrap: nowrap;
@@ -56,7 +47,6 @@ export const ErrorMessage = styled.div`
 
 type IFullProps = {
   name: string
-  label: string
   placeholder?: string
   extraValue: IFormFieldValue
   options: ISelectOption[]
@@ -64,6 +54,7 @@ type IFullProps = {
   files: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
+  onBlur: React.FocusEventHandler
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -309,11 +300,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
       <Flex>
         <Select
           id={name}
+          inputId={name}
           placeholder={placeholder}
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}
           isDisabled={this.state.filesBeingProcessed.length > 0}
+          onBlur={this.props.onBlur}
         />
 
         <ImageUploader
@@ -328,11 +321,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, intl, requiredErrorMessage } = this.props
+    const { intl, requiredErrorMessage } = this.props
 
     return (
-      <UploaderWrapper>
-        <ErrorMessage id="upload-error">
+      <div>
+        <div id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>
               {(requiredErrorMessage &&
@@ -340,9 +333,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
                 this.state.errorMessage}
             </ErrorText>
           )}
-        </ErrorMessage>
+        </div>
 
-        <Label>{label}</Label>
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
           documents={this.props.files}
@@ -364,7 +356,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onDelete={this.onDelete}
           />
         )}
-      </UploaderWrapper>
+      </div>
     )
   }
 }

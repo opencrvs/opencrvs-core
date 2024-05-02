@@ -262,22 +262,23 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
-        <DocumentUploaderWithOption
-          {...inputProps}
-          name={fieldDefinition.name}
-          label={fieldDefinition.label}
-          options={fieldDefinition.options}
-          splitView={fieldDefinition.splitView}
-          files={value as IFileValue[]}
-          extraValue={fieldDefinition.extraValue || ''}
-          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-          onComplete={(files: IFileValue[]) => {
-            onSetFieldValue(fieldDefinition.name, files)
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-          }}
-          onUploadingStateChanged={onUploadingStateChanged}
-          requiredErrorMessage={requiredErrorMessage}
-        />
+        <InputField {...inputFieldProps}>
+          <DocumentUploaderWithOption
+            {...inputProps}
+            name={fieldDefinition.name}
+            options={fieldDefinition.options}
+            splitView={fieldDefinition.splitView}
+            files={value as IFileValue[]}
+            extraValue={fieldDefinition.extraValue || ''}
+            hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+            onComplete={(files: IFileValue[]) => {
+              onSetFieldValue(fieldDefinition.name, files)
+              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            }}
+            onUploadingStateChanged={onUploadingStateChanged}
+            requiredErrorMessage={requiredErrorMessage}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
