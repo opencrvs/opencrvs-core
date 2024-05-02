@@ -37,27 +37,56 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     <title>Loading...</title>
 
     <style>
-      body,
-      html {
+      body {
         background-color: #f5f5f5;
+        margin: 0;
       }
-      #spinner {
+      .progress-container {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         opacity: 0;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-25px, -25px);
-        animation: a 2s forwards;
+        animation: progressVisibility 2s forwards;
       }
-      #spinner g {
-        transform-origin: center;
-        animation: b 2s linear infinite;
+      .progress-bar {
+        width: 276px;
+        height: 8px;
+        margin-top: 27px;
+        border-radius: 100px;
+        background: #d9d9d9;
       }
-      #spinner g circle {
-        stroke-linecap: round;
-        animation: c 1.5s ease-in-out infinite;
+      #progress {
+        width: 0;
+        height: 8px;
+        gap: 0px;
+        border-radius: 100px;
+        background: #4972bb;
+        animation: progressAnimation 300s ease;
       }
-      @keyframes a {
+      @keyframes progressAnimation {
+        0% {
+          min-width: 10%;
+        }
+        1% {
+          min-width: 20%;
+        }
+        2% {
+          min-width: 40%;
+        }
+        10% {
+          min-width: 60%;
+        }
+        50% {
+          min-width: 80%;
+        }
+        100% {
+          min-width: 90%;
+        }
+      }
+      @keyframes progressVisibility {
         85% {
           opacity: 0;
         }
@@ -65,44 +94,18 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
           opacity: 1;
         }
       }
-      @keyframes b {
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-      @keyframes c {
-        0% {
-          stroke-dasharray: 0 150;
-          stroke-dashoffset: 0;
-        }
-        47.5% {
-          stroke-dasharray: 42 150;
-          stroke-dashoffset: -16;
-        }
-        95%,
-        100% {
-          stroke-dasharray: 42 150;
-          stroke-dashoffset: -59;
-        }
-      }
     </style>
   </head>
-
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <div id="root">
-      <svg
-        id="spinner"
-        width="50"
-        height="50"
-        stroke="#4C68C1"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g>
-          <circle cx="12" cy="12" r="9.5" fill="none" stroke-width="2"></circle>
-        </g>
-      </svg>
+      <div class="progress-container">
+        <img src="./public/images/logo-90x90.svg" />
+        <div class="progress-bar">
+          <div id="progress"></div>
+        </div>
+        <p>Installing application...</p>
+      </div>
     </div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
