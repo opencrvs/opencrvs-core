@@ -647,6 +647,11 @@ function createDateOfMarriageBuilder(resource: Patient, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
+
+  resource.extension = resource.extension.filter(
+    (e) => e.url !== `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`
+  )
+
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
     valueDateTime: fieldValue
@@ -709,19 +714,11 @@ function createOccupationBulder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
-  const hasOccupation = findExtension(
+  setExtension(
+    resource.extension,
     `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-    resource.extension
+    fieldValue
   )
-
-  if (hasOccupation) {
-    hasOccupation.valueString = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-      valueString: fieldValue
-    })
-  }
 }
 
 function createReasonNotApplyingBuilder(resource: Patient, fieldValue: string) {
@@ -729,19 +726,11 @@ function createReasonNotApplyingBuilder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
-  const hasReasonNotApplying = findExtension(
+  setExtension(
+    resource.extension,
     `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-    resource.extension
+    fieldValue
   )
-
-  if (hasReasonNotApplying) {
-    hasReasonNotApplying.valueString = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-      valueString: fieldValue
-    })
-  }
 }
 
 function createAgeOfIndividualInYearsBuilder(
@@ -788,15 +777,11 @@ function createEducationalAttainmentBuilder(
     resource.extension = []
   }
 
-  resource.extension = resource.extension.filter(
-    (e) =>
-      e.url !== `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
+  setExtension(
+    resource.extension,
+    `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
+    fieldValue
   )
-
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
-    valueString: fieldValue
-  })
 }
 
 function setExtension<T extends keyof StringExtensionType>(
@@ -851,28 +836,20 @@ function createOrUpdateSignatureExtension(
   }
   const signatureUrl =
     `http://opencrvs.org/specs/extension/${extensionPostfix}` as const
-  resource.extension = resource.extension.filter(
-    (ext) => ext.url !== signatureUrl
-  )
-  resource.extension.push({
-    url: signatureUrl,
-    valueString: fieldValue
-  })
+
+  setExtension(resource.extension, signatureUrl, fieldValue)
 }
 
 function createInformantShareContactNumber(resource: Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
-  resource.extension = resource.extension.filter(
-    (e) =>
-      e.url !==
-      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
+
+  setExtension(
+    resource.extension,
+    'http://opencrvs.org/specs/extension/contact-person-phone-number',
+    fieldValue
   )
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
-    valueString: fieldValue
-  })
 }
 function createInformantType(
   fhirBundle: Bundle,
@@ -1000,15 +977,11 @@ function createInformantShareEmail(resource: Task, fieldValue: string) {
     resource.extension = []
   }
 
-  resource.extension = resource.extension.filter(
-    (e) =>
-      e.url !== `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
+  setExtension(
+    resource.extension,
+    `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+    fieldValue
   )
-
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
-    valueString: fieldValue
-  })
 }
 
 function createInCompleteFieldListExt(resource: Task, fieldValue: string) {
