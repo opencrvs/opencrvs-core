@@ -24,8 +24,7 @@ import configHandler, {
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createInformantSMSNotificationHandler, {
-  requestSchema as createInformantSMSNotificationReqSchema,
-  requestSchema
+  requestSchema as createInformantSMSNotificationReqSchema
 } from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
 import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
 import updateInformantSMSNotificationHandler, {
@@ -43,7 +42,8 @@ import {
   requestParamsSchema,
   createLocationHandler,
   updateLocationHandler,
-  updateSchema
+  updateSchema,
+  requestSchema as createLocationReqSchema
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 
@@ -314,7 +314,7 @@ export default function getRoutes(): ServerRoute[] {
         },
         description: 'Create a location',
         validate: {
-          payload: requestSchema
+          payload: createLocationReqSchema
         }
       }
     },
