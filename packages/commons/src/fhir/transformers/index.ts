@@ -1965,7 +1965,10 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
           'given',
           context
         )
