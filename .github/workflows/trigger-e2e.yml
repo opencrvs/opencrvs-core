@@ -1,0 +1,22 @@
+name: Trigger E2E
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'opencrvs-farajaland',
+              event_type: 'run_e2e',
+              client_payload: {}
+            })
+            console.log(result);

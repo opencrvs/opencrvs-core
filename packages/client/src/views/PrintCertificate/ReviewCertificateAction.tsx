@@ -32,6 +32,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
+
 const CertificateContainer = styled.div``
 
 const ReviewCertificateFrame = ({
