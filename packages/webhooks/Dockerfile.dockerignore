@@ -1,0 +1,21 @@
+*.md
+*.yml
+*.yaml
+.vscode
+**/.git
+**/test
+
+# From root
+**/node_modules
+**/coverage
+**/.DS_Store
+**/.env
+**/*.log
+.secrets/*
+data
+grafana
+
+# Exclude unused packages
+packages/*
+!packages/webhooks
+!packages/commons

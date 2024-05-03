@@ -9,38 +9,61 @@
 version: '3.3'
 
 services:
+  base:
+    image: opencrvs/ocrvs-base:${VERSION}
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/Dockerfile.base
+    deploy:
+      replicas: 0
   client:
     image: opencrvs/ocrvs-client:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
 
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
+    platform: linux/amd64
     build:
-      context: ./packages/dashboards
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./packages/dashboards/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
 
   components:
     image: opencrvs/ocrvs-components:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/components/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
   login:
     image: opencrvs/ocrvs-login:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
@@ -62,10 +85,13 @@ services:
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/workflow/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - NODE_ENV=development
       - SEARCH_URL=http://search:9090/
@@ -80,10 +106,13 @@ services:
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
     image: opencrvs/ocrvs-search:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/search/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - NODE_ENV=development
@@ -93,10 +122,13 @@ services:
       - APPLICATION_CONFIG_URL=http://config:2021/
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/metrics/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
@@ -113,19 +145,25 @@ services:
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/scheduler/Dockerfile
+    depends_on:
+      - base
     environment:
       - NODE_ENV=development
       - METRICS_URL=http://metrics:1050
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
   auth:
     image: opencrvs/ocrvs-auth:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/auth/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - REDIS_HOST=redis
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
@@ -135,10 +173,13 @@ services:
       - METRICS_URL=http://metrics:1050
   user-mgnt:
     image: opencrvs/ocrvs-user-mgnt:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/user-mgnt/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
@@ -148,10 +189,13 @@ services:
       - APPLICATION_CONFIG_URL=http://config:2021/
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/webhooks/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - REDIS_HOST=redis://redis:6379
       - MONGO_URL=mongodb://mongo1/webhooks
@@ -162,20 +206,26 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
   notification:
     image: opencrvs/ocrvs-notification:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
   config:
     image: opencrvs/ocrvs-config:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/config/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
@@ -191,10 +241,13 @@ services:
       - CHECK_INVALID_TOKEN=true
   migration:
     image: opencrvs/ocrvs-migration:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
@@ -208,10 +261,13 @@ services:
       - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000,elasticsearch:9200
   documents:
     image: opencrvs/ocrvs-documents:${VERSION}
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./packages/documents/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - base
     environment:
       - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
