@@ -735,7 +735,7 @@ export function setQuestionnaireItem(
     questionnaire.item = []
   }
 
-  if (label && questionnaire.item[context._index.questionnaire]) {
+  if (label) {
     questionnaire.item[context._index.questionnaire] = {
       text: label,
       linkId: ''
