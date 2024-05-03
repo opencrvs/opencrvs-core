@@ -8,7 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Location, SavedBundle } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@config/config/constants'
+import { memoize } from 'lodash'
+
+export const fetchLocations = memoize(async () => {
+  const allLocationsUrl = new URL(`Location?_count=0&status=active`, FHIR_URL)
+  const response = await fetch(allLocationsUrl)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch locations: ${await response.text()}`)
+  }
+
+  const bundle = (await response.json()) as SavedBundle<Location>
+  return bundle.entry.map(({ resource }) => resource)
+})
 
 export const fetchFromHearth = async <T = any>(
   suffix: string,

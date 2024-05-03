@@ -56,3 +56,21 @@ export const resolveLocationChildren = (
 
   return children
 }
+
+/** Resolves any given location's parents multi-level up to the root node */
+export const resolveLocationParents = (
+  childId: UUID,
+  locations: SavedLocation[]
+) => {
+  let location = locations.find((location) => location.id === childId)!
+  const hierarchy = [location]
+  let parentLocationId =
+    location.partOf && resourceIdentifierToUUID(location.partOf?.reference)
+  while (parentLocationId && parentLocationId !== '0') {
+    location = locations.find((location) => location.id === childId)!
+    hierarchy.push(location)
+    parentLocationId =
+      location.partOf && resourceIdentifierToUUID(location.partOf.reference)
+  }
+  return hierarchy.reverse()
+}
