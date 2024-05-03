@@ -140,7 +140,7 @@
     "csv-stringify": "^6.4.6",
     "csv2json": "^2.0.2",
     "enzyme": "^3.4.4",
-    "eslint": "^7.11.0",
+    "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
