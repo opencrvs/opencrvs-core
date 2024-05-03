@@ -89,15 +89,13 @@ export const usePrintableCertificate = (declarationId: string) => {
 
   useEffect(() => {
     if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, 'A4', state).then(
-        (svg) => {
-          const svgWithFonts = addFontsToSvg(
-            svg.svgCode,
-            offlineData.templates.fonts ?? {}
-          )
-          setSvg(svgWithFonts)
-        }
-      )
+      getPDFTemplateWithSVG(offlineData, declaration, state).then((svg) => {
+        const svgWithFonts = addFontsToSvg(
+          svg.svgCode,
+          offlineData.templates.fonts ?? {}
+        )
+        setSvg(svgWithFonts)
+      })
   }, [offlineData, declaration, state])
 
   const handleCertify = () => {

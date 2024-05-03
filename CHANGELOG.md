@@ -23,6 +23,8 @@
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
+- Support for landscape certificate templates
+- Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
 
 ## Bug fixes
 
@@ -37,6 +39,9 @@
 - Fix first name issues when creating a user [#6631](https://github.com/opencrvs/opencrvs-core/issues/6631)
 - Show correct record option in certificate preview page when trying to print by RA [#6224](https://github.com/opencrvs/opencrvs-core/issues/6224)
 - Fix certificate templates not getting populated for health facility event locations & ADMIN_LEVEL > 2
+- Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
+- Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
+- In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
 
 ## Refactor
 

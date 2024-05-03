@@ -10,14 +10,14 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Upload } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { SubmissionAction } from '@client/forms'
 import styled from 'styled-components'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
@@ -293,191 +293,181 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (
   }
 })
 
-interface IReviewActionState {
-  showSubmitModal: boolean
-}
-class ReviewActionComponent extends React.Component<
-  IReviewActionProps & IntlShapeProps,
-  IReviewActionState
-> {
-  state = { showSubmitModal: false }
-  toggleSubmitModalOpen = () => {
-    this.setState((prevState) => ({
-      showSubmitModal: !prevState.showSubmitModal
-    }))
+const ReviewActionComponent = ({
+  id,
+  declarationToBeValidated,
+  declarationToBeRegistered,
+  alreadyRejectedDeclaration,
+  completeDeclaration,
+  totalFileSizeExceeded,
+  declaration,
+  submitDeclarationAction,
+  draftDeclaration,
+  rejectDeclarationAction,
+  intl,
+  hasErrorsOnFields
+}: IReviewActionProps & IntlShapeProps) => {
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+
+  const toggleSubmitModalOpen = () => {
+    setShowSubmitModal(!showSubmitModal)
   }
-  render() {
-    const {
-      id,
-      declarationToBeValidated,
-      declarationToBeRegistered,
-      alreadyRejectedDeclaration,
-      completeDeclaration,
-      totalFileSizeExceeded,
-      declaration,
-      submitDeclarationAction,
-      draftDeclaration,
-      rejectDeclarationAction,
-      intl,
-      hasErrorsOnFields
-    } = this.props
-    const ACTION_TO_CONTENT_MAP = ACTION_TO_CONTENT_MAP_SKELETON(
-      window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD,
-      !!hasErrorsOnFields
-    )
+  const ACTION_TO_CONTENT_MAP = ACTION_TO_CONTENT_MAP_SKELETON(
+    window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD,
+    !!hasErrorsOnFields
+  )
 
-    const background = !completeDeclaration
-      ? 'error'
-      : draftDeclaration
-      ? 'success'
-      : ''
-    const action = declarationToBeRegistered
-      ? ACTION.DECLARATION_TO_BE_REGISTERED
-      : declarationToBeValidated
-      ? ACTION.DECLARATION_TO_BE_VALIDATED
-      : ACTION.DECLARATION_TO_BE_DECLARED
+  const background = !completeDeclaration
+    ? 'error'
+    : draftDeclaration
+    ? 'success'
+    : ''
+  const action = declarationToBeRegistered
+    ? ACTION.DECLARATION_TO_BE_REGISTERED
+    : declarationToBeValidated
+    ? ACTION.DECLARATION_TO_BE_VALIDATED
+    : ACTION.DECLARATION_TO_BE_DECLARED
 
-    const actionContent =
-      (ACTION_TO_CONTENT_MAP[action].draftStatus[
+  const actionContent =
+    (ACTION_TO_CONTENT_MAP[action].draftStatus[
+      String(draftDeclaration || alreadyRejectedDeclaration)
+    ] &&
+      ACTION_TO_CONTENT_MAP[action].draftStatus[
         String(draftDeclaration || alreadyRejectedDeclaration)
-      ] &&
-        ACTION_TO_CONTENT_MAP[action].draftStatus[
-          String(draftDeclaration || alreadyRejectedDeclaration)
-        ].completionStatus[String(completeDeclaration)]) ||
-      null
-    return !actionContent ? null : (
-      <Container id={id}>
-        <UnderLayBackground background={background} />
-        <Content>
-          <Title>
-            {intl.formatMessage(
-              actionContent.title.message,
-              actionContent.title.payload
-            )}
-          </Title>
-          <Description>
-            {intl.formatMessage(actionContent.description.message, {
-              ...actionContent.description.payload,
-              eventType: declaration.event
-            })}
-          </Description>
-          <ActionContainer>
-            {declarationToBeRegistered ? (
-              <Button
-                type="positive"
-                size="large"
-                id="registerDeclarationBtn"
-                onClick={this.toggleSubmitModalOpen}
-                disabled={!completeDeclaration || totalFileSizeExceeded}
-              >
-                <Icon name="Check" />
-                {intl.formatMessage(buttonMessages.register)}
-              </Button>
-            ) : declarationToBeValidated ? (
-              <Button
-                type="positive"
-                size="large"
-                id="validateDeclarationBtn"
-                onClick={this.toggleSubmitModalOpen}
-                disabled={!completeDeclaration || totalFileSizeExceeded}
-              >
-                <Icon name="PaperPlaneTilt" />
-                {intl.formatMessage(buttonMessages.sendForApproval)}
-              </Button>
-            ) : (
-              <Button
-                type="primary"
-                size="large"
-                id="submit_form"
-                onClick={this.toggleSubmitModalOpen}
-                disabled={hasErrorsOnFields || totalFileSizeExceeded}
-              >
-                <Upload />
-                {intl.formatMessage(
-                  completeDeclaration
-                    ? buttonMessages.sendForReview
-                    : buttonMessages.sendIncomplete
-                )}
-              </Button>
-            )}
+      ].completionStatus[String(completeDeclaration)]) ||
+    null
+  return !actionContent ? null : (
+    <Container id={id}>
+      <UnderLayBackground background={background} />
+      <Content>
+        <Title>
+          {intl.formatMessage(
+            actionContent.title.message,
+            actionContent.title.payload
+          )}
+        </Title>
+        <Description>
+          {intl.formatMessage(actionContent.description.message, {
+            ...actionContent.description.payload,
+            eventType: declaration.event
+          })}
+        </Description>
+        <ActionContainer>
+          {declarationToBeRegistered ? (
+            <Button
+              type="positive"
+              size="large"
+              id="registerDeclarationBtn"
+              onClick={toggleSubmitModalOpen}
+              disabled={!completeDeclaration || totalFileSizeExceeded}
+            >
+              <Icon name="Check" />
+              {intl.formatMessage(buttonMessages.register)}
+            </Button>
+          ) : declarationToBeValidated ? (
+            <Button
+              type="positive"
+              size="large"
+              id="validateDeclarationBtn"
+              onClick={toggleSubmitModalOpen}
+              disabled={!completeDeclaration || totalFileSizeExceeded}
+            >
+              <Icon name="PaperPlaneTilt" />
+              {intl.formatMessage(buttonMessages.sendForApproval)}
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              size="large"
+              id="submit_form"
+              onClick={toggleSubmitModalOpen}
+              disabled={hasErrorsOnFields || totalFileSizeExceeded}
+            >
+              <Upload />
+              {intl.formatMessage(
+                completeDeclaration
+                  ? buttonMessages.sendForReview
+                  : buttonMessages.sendIncomplete
+              )}
+            </Button>
+          )}
 
-            {rejectDeclarationAction && !alreadyRejectedDeclaration && (
-              <Button
-                type="negative"
-                size="large"
-                id="rejectDeclarationBtn"
-                onClick={rejectDeclarationAction}
-              >
-                <Icon name="X" />
-                {intl.formatMessage(buttonMessages.reject)}
-              </Button>
-            )}
-          </ActionContainer>
-        </Content>
-        {actionContent.modal && (
-          <ResponsiveModal
-            title={intl.formatMessage(actionContent.modal.title.message, {
-              ...actionContent.modal.title.payload,
+          {rejectDeclarationAction && !alreadyRejectedDeclaration && (
+            <Button
+              type="negative"
+              size="large"
+              id="rejectDeclarationBtn"
+              onClick={rejectDeclarationAction}
+            >
+              <Icon name="X" />
+              {intl.formatMessage(buttonMessages.reject)}
+            </Button>
+          )}
+        </ActionContainer>
+      </Content>
+      {actionContent.modal && (
+        <ResponsiveModal
+          title={intl.formatMessage(actionContent.modal.title.message, {
+            ...actionContent.modal.title.payload,
+            event: declaration.event
+          })}
+          responsive={false}
+          autoHeight={true}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={() => {
+                toggleSubmitModalOpen()
+                if (document.documentElement) {
+                  document.documentElement.scrollTop = 0
+                }
+              }}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() =>
+                draftDeclaration
+                  ? submitDeclarationAction(
+                      declaration,
+                      SUBMISSION_STATUS.READY_TO_SUBMIT,
+                      SubmissionAction.SUBMIT_FOR_REVIEW
+                    )
+                  : declarationToBeRegistered
+                  ? submitDeclarationAction(
+                      declaration,
+                      SUBMISSION_STATUS.READY_TO_REGISTER,
+                      SubmissionAction.REGISTER_DECLARATION
+                    )
+                  : submitDeclarationAction(
+                      declaration,
+                      SUBMISSION_STATUS.READY_TO_APPROVE,
+                      SubmissionAction.APPROVE_DECLARATION
+                    )
+              }
+            >
+              {declarationToBeRegistered
+                ? intl.formatMessage(buttonMessages.register)
+                : declarationToBeValidated
+                ? intl.formatMessage(buttonMessages.send)
+                : intl.formatMessage(buttonMessages.send)}
+            </PrimaryButton>
+          ]}
+          show={showSubmitModal}
+          handleClose={toggleSubmitModalOpen}
+        >
+          {actionContent.modal.description &&
+            intl.formatMessage(actionContent.modal.description.message, {
+              ...actionContent.modal.description.payload,
               event: declaration.event
             })}
-            responsive={false}
-            autoHeight={true}
-            actions={[
-              <TertiaryButton
-                id="cancel-btn"
-                key="cancel"
-                onClick={() => {
-                  this.toggleSubmitModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(buttonMessages.cancel)}
-              </TertiaryButton>,
-              <PrimaryButton
-                key="submit"
-                id="submit_confirm"
-                onClick={() =>
-                  draftDeclaration
-                    ? submitDeclarationAction(
-                        declaration,
-                        SUBMISSION_STATUS.READY_TO_SUBMIT,
-                        SubmissionAction.SUBMIT_FOR_REVIEW
-                      )
-                    : declarationToBeRegistered
-                    ? submitDeclarationAction(
-                        declaration,
-                        SUBMISSION_STATUS.READY_TO_REGISTER,
-                        SubmissionAction.REGISTER_DECLARATION
-                      )
-                    : submitDeclarationAction(
-                        declaration,
-                        SUBMISSION_STATUS.READY_TO_APPROVE,
-                        SubmissionAction.APPROVE_DECLARATION
-                      )
-                }
-              >
-                {declarationToBeRegistered
-                  ? intl.formatMessage(buttonMessages.register)
-                  : declarationToBeValidated
-                  ? intl.formatMessage(buttonMessages.send)
-                  : intl.formatMessage(buttonMessages.send)}
-              </PrimaryButton>
-            ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {actionContent.modal.description &&
-              intl.formatMessage(actionContent.modal.description.message, {
-                ...actionContent.modal.description.payload,
-                event: declaration.event
-              })}
-          </ResponsiveModal>
-        )}
-      </Container>
-    )
-  }
+        </ResponsiveModal>
+      )}
+    </Container>
+  )
 }
 
 export const ReviewAction = injectIntl(ReviewActionComponent)

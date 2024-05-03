@@ -59,6 +59,7 @@ import {
   ISelectFormFieldWithOptions,
   ITextFormField,
   Ii18nTextFormField,
+  Ii18nNumberFormField,
   LINK,
   BULLET_LIST,
   NUMBER,
@@ -508,7 +509,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       if (fieldDefinition?.inputWidth) {
         inputFieldWidth = fieldDefinition.inputWidth + 'px'
       }
-
       return (
         <InputField {...inputFieldProps}>
           <TextInput
@@ -516,12 +516,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             step={fieldDefinition.step}
             max={fieldDefinition.max}
             {...inputProps}
-            onKeyPress={(e: { key: string; preventDefault: () => void }) => {
+            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+                e.preventDefault()
+              }
+              const maxLength = (fieldDefinition as Ii18nNumberFormField)
+                .maxLength
+              if (maxLength && e.currentTarget.value.length >= maxLength) {
                 e.preventDefault()
               }
             }}
             value={inputProps.value as string}
+            maxLength={(fieldDefinition as Ii18nNumberFormField).maxLength}
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
