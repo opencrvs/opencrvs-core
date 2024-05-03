@@ -673,52 +673,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export function getInitialValueForSelectDynamicValue(
-  field: IFormField,
-  userDetails: UserDetails | null
-) {
-  let fieldInitialValue = field.initialValue as IFormFieldValue
-  const catchmentAreas = userDetails?.catchmentArea
-  let district = ''
-  let state = ''
-  let locationLevel3 = ''
-
-  if (catchmentAreas) {
-    catchmentAreas.forEach((catchmentArea) => {
-      if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
-        )
-      ) {
-        locationLevel3 = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'DISTRICT'
-        )
-      ) {
-        district = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'STATE'
-        )
-      ) {
-        state = catchmentArea.id
-      }
-    })
-  }
-
-  if (field.name.includes('district') && !field.initialValue && district) {
-    fieldInitialValue = district as IFormFieldValue
-  }
-  if (field.name.includes('state') && !field.initialValue && state) {
-    fieldInitialValue = state as IFormFieldValue
-  }
-  if (!field.initialValue && locationLevel3) {
-    fieldInitialValue = locationLevel3 as IFormFieldValue
-  }
-  return fieldInitialValue
-}
-
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: UserDetails | null
@@ -743,16 +697,6 @@ const mapFieldsToValues = (
       }
     }
 
-    if (
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-      !field.initialValue &&
-      field.dynamicOptions.initialValue === 'agentDefault'
-    ) {
-      fieldInitialValue = getInitialValueForSelectDynamicValue(
-        field,
-        userDetails
-      )
-    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 

@@ -46,6 +46,7 @@ import {
   requestSchema as createLocationReqSchema
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
+import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -265,6 +266,21 @@ export default function getRoutes(): ServerRoute[] {
         },
         validate: {
           payload: updateInformantSMSNotificationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/location/{locationId}/hierarchy',
+      handler: locationHierarchyHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: "Get location's hierarchy",
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
         }
       }
     },

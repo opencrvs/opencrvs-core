@@ -18,6 +18,10 @@
 
 - #### Remove unused GraphQL resolvers locationById and locationsByParent
 
+- #### Move default address generation to country-config
+
+  We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
+
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
@@ -36,6 +40,7 @@
 - In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
 - Fix first name issues when creating a user [#6631](https://github.com/opencrvs/opencrvs-core/issues/6631)
 - Show correct record option in certificate preview page when trying to print by RA [#6224](https://github.com/opencrvs/opencrvs-core/issues/6224)
+- Fix certificate templates not getting populated for health facility event locations & ADMIN_LEVEL > 2
 - Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
