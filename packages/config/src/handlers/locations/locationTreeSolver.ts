@@ -67,7 +67,7 @@ export const resolveLocationParents = (
   let parentLocationId =
     location.partOf && resourceIdentifierToUUID(location.partOf?.reference)
   while (parentLocationId && parentLocationId !== '0') {
-    location = locations.find((location) => location.id === childId)!
+    location = locations.find((location) => location.id === parentLocationId)!
     hierarchy.push(location)
     parentLocationId =
       location.partOf && resourceIdentifierToUUID(location.partOf.reference)
