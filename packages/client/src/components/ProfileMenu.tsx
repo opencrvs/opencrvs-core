@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import {
@@ -21,7 +21,6 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib/ToggleMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
 import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
@@ -51,29 +50,34 @@ interface IProps {
   goToSettings: typeof goToSettings
 }
 
-interface IState {
-  showLogoutModal: boolean
-}
-
 type FullProps = IProps & IntlShapeProps
 
-class ProfileMenuComponent extends React.Component<FullProps, IState> {
-  getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
+const ProfileMenuComponent = ({
+  intl,
+  language,
+  userDetails,
+  goToSettings,
+  redirectToAuthentication
+}: FullProps) => {
+  const getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
       icon: <Icon name="Gear" size="small" />,
       label: intl.formatMessage(buttonMessages.settings),
-      handler: this.props.goToSettings
+      handler: goToSettings
     })
     items.push({
       icon: <Icon name="SignOut" size="small" />,
       label: intl.formatMessage(buttonMessages.logout),
-      handler: () => this.props.redirectToAuthentication()
+      handler: () => redirectToAuthentication()
     })
     return items
   }
 
-  getUserName = (language: string, userDetails: UserDetails | null): string => {
+  const getUserName = (
+    language: string,
+    userDetails: UserDetails | null
+  ): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
@@ -87,11 +91,11 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return userName
   }
 
-  getMenuHeader = (
+  const getMenuHeader = (
     language: string,
     userDetails: UserDetails | null
   ): JSX.Element => {
-    const userName = this.getUserName(language, userDetails)
+    const userName = getUserName(language, userDetails)
     // let's remove this type assertion after #4458 merges in
     const userRole =
       userDetails?.role && getUserRole(language, userDetails.role)
@@ -104,25 +108,21 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     )
   }
 
-  render() {
-    const { intl, language, userDetails } = this.props
-
-    return (
-      <>
-        <ToggleMenu
-          id="ProfileMenu"
-          toggleButton={
-            <AvatarSmall
-              name={this.getUserName(language, userDetails)}
-              avatar={userDetails?.avatar}
-            />
-          }
-          menuHeader={this.getMenuHeader(language, userDetails)}
-          menuItems={this.getMenuItems(intl)}
-        />
-      </>
-    )
-  }
+  return (
+    <>
+      <ToggleMenu
+        id="ProfileMenu"
+        toggleButton={
+          <AvatarSmall
+            name={getUserName(language, userDetails)}
+            avatar={userDetails?.avatar}
+          />
+        }
+        menuHeader={getMenuHeader(language, userDetails)}
+        menuItems={getMenuItems(intl)}
+      />
+    </>
+  )
 }
 
 const mapStateToProps = (store: IStoreState) => {
