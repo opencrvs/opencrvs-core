@@ -73,7 +73,6 @@ export const resolvers: GQLResolver = {
           systemRole = null,
           status = null,
           primaryOfficeId = null,
-          locationId = null,
           count = 10,
           skip = 0,
           sort = 'desc'
@@ -102,9 +101,6 @@ export const resolvers: GQLResolver = {
         }
         if (systemRole) {
           payload = { ...payload, systemRole }
-        }
-        if (locationId) {
-          payload = { ...payload, locationId }
         }
         if (primaryOfficeId) {
           payload = { ...payload, primaryOfficeId }
