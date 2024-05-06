@@ -44,7 +44,6 @@ import {
 } from '@client/declarations'
 import {
   FormFieldGenerator,
-  getInitialValueForSelectDynamicValue,
   ITouchedNestedFields
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
@@ -57,7 +56,6 @@ import {
   IFormData,
   CorrectionSection,
   IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -1368,14 +1366,6 @@ function getInitialValue(
       getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
   }
 
-  if (
-    field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-    !field.initialValue &&
-    field.dynamicOptions.initialValue === 'agentDefault' &&
-    userDetails !== undefined
-  ) {
-    fieldInitialValue = getInitialValueForSelectDynamicValue(field, userDetails)
-  }
   return fieldInitialValue
 }
 
