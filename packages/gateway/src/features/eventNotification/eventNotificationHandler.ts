@@ -27,7 +27,7 @@ import {
   findExtension,
   isPatient
 } from '@opencrvs/commons/types'
-import { forwardBundleToWorkflow } from '@gateway/workflow/index'
+import { createHospitalNotification } from '@gateway/workflow/index'
 import { getAuthHeader } from '@opencrvs/commons/http'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
@@ -181,7 +181,7 @@ export async function eventNotificationHandler(
     return badRequest(e)
   }
 
-  return await forwardBundleToWorkflow(getAuthHeader(req), bundle)
+  return await createHospitalNotification(getAuthHeader(req), bundle)
 }
 
 export async function validateAddressesOfTask(bundle: Bundle) {

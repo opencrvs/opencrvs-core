@@ -358,7 +358,7 @@ export async function verifyRegistration(id: string, authHeader: IAuthHeader) {
   })
 }
 
-export async function forwardBundleToWorkflow(
+export async function createHospitalNotification(
   authHeader: IAuthHeader,
   bundle: Bundle
 ) {
