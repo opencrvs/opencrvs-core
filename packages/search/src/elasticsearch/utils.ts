@@ -29,7 +29,6 @@ import {
   SavedTask
 } from '@opencrvs/commons/types'
 import { hasScope } from '@opencrvs/commons/authentication'
-import { IAuthHeader } from '@opencrvs/commons/http'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -281,21 +280,6 @@ interface IUserRole {
   labels: Label[]
 }
 
-interface ISystemModelData {
-  scope?: string[]
-  name: string
-  createdBy: string
-  client_id: string
-  username: string
-  status: string
-  sha_secret: string
-  type: 'HEALTH'
-  practitionerId: string
-  settings: {
-    dailyQuota: number
-  }
-}
-
 export interface IUserModelData {
   _id: string
   role: IUserRole
@@ -448,20 +432,6 @@ export async function getUser(
   return await res.json()
 }
 
-export async function getSystem(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<ISystemModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
-}
 function getPreviousStatus(body: IBirthCompositionBody) {
   if (body.operationHistories && body.operationHistories.length > 0) {
     return body.operationHistories[body.operationHistories.length - 1]
