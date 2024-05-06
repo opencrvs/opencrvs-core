@@ -148,177 +148,49 @@ describe('User type resolvers', () => {
     expect(res).toEqual(mockOffice)
   })
   it('return catchmentArea type', async () => {
-    const mockLocations = [
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '3'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/bbs-code',
-            value: '30'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'DIVISION'
-          }
-        ],
-        name: 'Dhaka',
-        alias: ['ঢাকা'],
-        description: 'division=3',
-        status: 'active',
-        partOf: {
-          reference: 'Location/0'
+    const mockLocation = {
+      resourceType: 'Location',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/geo-id',
+          value: '3476'
         },
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/location-type',
-              code: 'ADMIN_STRUCTURE'
-            }
-          ]
+        {
+          system: 'http://opencrvs.org/specs/id/bbs-code',
+          value: '94'
         },
-        physicalType: {
-          coding: [
-            {
-              code: 'jdn',
-              display: 'Jurisdiction'
-            }
-          ]
-        },
-        id: 'b21ce04e-7ccd-4d65-929f-453bc193a736'
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
+        }
+      ],
+      name: 'Moktarpur',
+      alias: ['মোক্তারপুর'],
+      description: 'division=3&district=20&upazila=165&union=3476',
+      status: 'active',
+      partOf: {
+        reference: 'Location/7719942b-16a7-474a-8af1-cd0c94c730d2'
       },
-      {
-        resourceType: 'Location',
-        identifier: [
+      type: {
+        coding: [
           {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '20'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/bbs-code',
-            value: '33'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'DISTRICT'
+            system: 'http://opencrvs.org/specs/location-type',
+            code: 'ADMIN_STRUCTURE'
           }
-        ],
-        name: 'Gazipur',
-        alias: ['গাজীপুর '],
-        description: 'division=3&district=20',
-        status: 'active',
-        partOf: {
-          reference: 'Location/b21ce04e-7ccd-4d65-929f-453bc193a736'
-        },
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/location-type',
-              code: 'ADMIN_STRUCTURE'
-            }
-          ]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'jdn',
-              display: 'Jurisdiction'
-            }
-          ]
-        },
-        id: '95754572-ab6f-407b-b51a-1636cb3d0683'
+        ]
       },
-      {
-        resourceType: 'Location',
-        identifier: [
+      physicalType: {
+        coding: [
           {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '165'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/bbs-code',
-            value: '34'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UPAZILA'
+            code: 'jdn',
+            display: 'Jurisdiction'
           }
-        ],
-        name: 'Kaliganj',
-        alias: ['কালীগঞ্জ'],
-        description: 'division=3&district=20&upazila=165',
-        status: 'active',
-        partOf: {
-          reference: 'Location/95754572-ab6f-407b-b51a-1636cb3d0683'
-        },
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/location-type',
-              code: 'ADMIN_STRUCTURE'
-            }
-          ]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'jdn',
-              display: 'Jurisdiction'
-            }
-          ]
-        },
-        id: '7719942b-16a7-474a-8af1-cd0c94c730d2'
+        ]
       },
-      {
-        resourceType: 'Location',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '3476'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/bbs-code',
-            value: '94'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ],
-        name: 'Moktarpur',
-        alias: ['মোক্তারপুর'],
-        description: 'division=3&district=20&upazila=165&union=3476',
-        status: 'active',
-        partOf: {
-          reference: 'Location/7719942b-16a7-474a-8af1-cd0c94c730d2'
-        },
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/location-type',
-              code: 'ADMIN_STRUCTURE'
-            }
-          ]
-        },
-        physicalType: {
-          coding: [
-            {
-              code: 'jdn',
-              display: 'Jurisdiction'
-            }
-          ]
-        },
-        id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-      }
-    ]
-    mockGet
-      .mockResolvedValueOnce(mockLocations[0])
-      .mockResolvedValueOnce(mockLocations[1])
-      .mockResolvedValueOnce(mockLocations[2])
-      .mockResolvedValueOnce(mockLocations[3])
+      id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+    }
+
+    mockGet.mockResolvedValueOnce(mockLocation)
     const locationsAPI = new LocationsAPI()
     locationsAPI.context = { record: null }
     const res = await userTypeResolvers.User.catchmentArea(
@@ -328,7 +200,7 @@ describe('User type resolvers', () => {
         dataSources: { locationsAPI }
       }
     )
-    expect(res).toEqual(mockLocations)
+    expect(res).toEqual(mockLocation)
   })
 
   it('return user signature as registration agent', async () => {

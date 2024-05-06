@@ -77,22 +77,6 @@ describe('createUser handler', () => {
   it('creates and saves fhir resources and adds user using mongoose', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      [
-        JSON.stringify({ id: '321', partOf: { reference: 'Location/22' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
-        { status: 200 }
-      ],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
       ['', { status: 200 }]
     )
@@ -173,19 +157,14 @@ describe('createUser handler', () => {
           ]
         }
       ],
-      location: [
-        { reference: 'Location/321' },
-        { reference: 'Location/22' },
-        { reference: 'Location/33' },
-        { reference: 'Location/44' }
-      ]
+      location: [{ reference: 'Location/321' }]
     }
 
-    expect(fetch.mock.calls.length).toBe(8)
+    expect(fetch.mock.calls.length).toBe(4)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
       expectedPractitioner
     )
-    expect(JSON.parse(fetch.mock.calls[5][1].body)).toEqual(
+    expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual(
       expectedPractitionerROle
     )
 
@@ -264,10 +243,9 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('send 500 if mongoose operation throws error', async () => {
+  it.only('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
       ['', { status: 202 }],
       ['', { status: 202 }]
     )

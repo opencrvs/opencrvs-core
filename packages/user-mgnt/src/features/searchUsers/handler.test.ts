@@ -138,7 +138,6 @@ describe('searchUsers tests', () => {
         mobile: '+8801733333333',
         systemRole: 'LOCAL_REGISTRAR',
         primaryOfficeId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-        locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
         status: 'active'
       },
       headers: {
