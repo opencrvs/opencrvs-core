@@ -293,12 +293,7 @@ export function VerifyCertificatePage() {
         history?.user?.name[0]?.firstNames +
           ' ' +
           history?.user?.name[0]?.familyName,
-      center:
-        history &&
-        history?.user?.catchmentArea?.length &&
-        history?.user?.catchmentArea
-          ?.map((_: { name?: string | null }) => _?.name)
-          .join(', ')
+      center: history?.user?.catchmentArea?.name
     }
   }
 

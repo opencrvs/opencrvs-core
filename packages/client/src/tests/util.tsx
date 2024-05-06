@@ -319,76 +319,23 @@ export const userDetails: UserDetails = {
     alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
     status: 'active'
   },
-  catchmentArea: [
-    {
-      id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
-      name: 'Dhaka',
-      alias: ['ঢাকা'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/geo-id',
-          value: '3'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'DIVISION'
-        }
-      ]
-    },
-    {
-      id: '812ed387-f8d5-4d55-ad05-936292385990',
-      name: 'GAZIPUR',
-      alias: ['গাজীপুর'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/geo-id',
-          value: '20'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'DISTRICT'
-        }
-      ]
-    },
-    {
-      id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-      name: 'KALIGANJ',
-      alias: ['কালিগাঞ্জ'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/geo-id',
-          value: '165'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'UPAZILA'
-        }
-      ]
-    },
-    {
-      id: '43c17986-62cf-4551-877c-be095fb6e5d0',
-      name: 'BAKTARPUR',
-      alias: ['বক্তারপুর'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/geo-id',
-          value: '3473'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'UNION'
-        }
-      ]
-    }
-  ],
+  catchmentArea: {
+    id: '43c17986-62cf-4551-877c-be095fb6e5d0',
+    name: 'BAKTARPUR',
+    alias: ['বক্তারপুর'],
+    status: 'active',
+    identifier: [
+      {
+        system: 'http://opencrvs.org/specs/id/geo-id',
+        value: '3473'
+      },
+      { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+      {
+        system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+        value: 'UNION'
+      }
+    ]
+  },
   localRegistrar: {
     role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
@@ -416,76 +363,23 @@ export const mockUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: [
-        {
-          id: 'ddab090d-040e-4bef-9475-314a448a576a',
-          name: 'Dhaka',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'DIVISION'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
-          name: 'GAZIPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '20'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'DISTRICT'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
-          name: 'KALIGANJ',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '165'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UPAZILA'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '123456789',
-          name: 'BAKTARPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3473'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION'
-            }
-          ],
-          __typename: 'Location'
-        }
-      ],
+      catchmentArea: {
+        id: '123456789',
+        name: 'BAKTARPUR',
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/geo-id',
+            value: '3473'
+          },
+          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+          {
+            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+            value: 'UNION'
+          }
+        ],
+        __typename: 'Location'
+      },
       primaryOffice: {
         id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
         name: 'Kaliganj Union Sub Center',
@@ -521,56 +415,18 @@ export const mockLocalSysAdminUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: [
-        {
-          id: 'ddab090d-040e-4bef-9475-314a448a576a',
-          name: 'Dhaka',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
-          name: 'GAZIPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '20'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
-          name: 'KALIGANJ',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '165'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '123456789',
-          name: 'BAKTARPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3473'
-            }
-          ],
-          __typename: 'Location'
-        }
-      ],
+      catchmentArea: {
+        id: '123456789',
+        name: 'BAKTARPUR',
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/geo-id',
+            value: '3473'
+          }
+        ],
+        __typename: 'Location'
+      },
       primaryOffice: {
         id: '0d8474da-0361-4d32-979e-af91f012340a',
         name: 'Kaliganj Union Sub Center',
@@ -605,56 +461,18 @@ export const mockRegistrarUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: [
-        {
-          id: 'ddab090d-040e-4bef-9475-314a448a576a',
-          name: 'Dhaka',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
-          name: 'GAZIPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '20'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
-          name: 'KALIGANJ',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '165'
-            }
-          ],
-          __typename: 'Location'
-        },
-        {
-          id: '123456789',
-          name: 'BAKTARPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '3473'
-            }
-          ],
-          __typename: 'Location'
-        }
-      ],
+      catchmentArea: {
+        id: '123456789',
+        name: 'BAKTARPUR',
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/geo-id',
+            value: '3473'
+          }
+        ],
+        __typename: 'Location'
+      },
       primaryOffice: {
         id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
         name: 'Kaliganj Union Sub Center',
@@ -1257,20 +1075,18 @@ export function loginAsFieldAgent(store: AppStore) {
               familyName: 'Al Hasan'
             }
           ],
-          catchmentArea: [
-            {
-              id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
-              name: 'Baniajan',
-              alias: ['বানিয়াজান'],
-              status: 'active',
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-                  value: 'division=9&district=30&upazila=233&union=4194'
-                }
-              ]
-            }
-          ],
+          catchmentArea: {
+            id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+            name: 'Baniajan',
+            alias: ['বানিয়াজান'],
+            status: 'active',
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                value: 'division=9&district=30&upazila=233&union=4194'
+              }
+            ]
+          },
           primaryOffice: {
             id: '0d8474da-0361-4d32-979e-af91f012340a',
             name: 'Kaliganj Union Sub Center',

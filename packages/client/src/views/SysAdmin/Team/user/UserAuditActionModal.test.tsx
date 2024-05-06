@@ -58,20 +58,18 @@ const users: UserDetails[] = [
     userMgntUserID: '5eba726866458970cf2e23c2',
     practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     mobile: '+8801711111111',
-    catchmentArea: [
-      {
-        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
-        name: 'Baniajan',
-        alias: ['বানিয়াজান'],
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-            value: 'division=9&district=30&upazila=233&union=4194'
-          }
-        ]
-      }
-    ],
+    catchmentArea: {
+      id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+      name: 'Baniajan',
+      alias: ['বানিয়াজান'],
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+          value: 'division=9&district=30&upazila=233&union=4194'
+        }
+      ]
+    },
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
@@ -115,20 +113,18 @@ const users: UserDetails[] = [
     userMgntUserID: '5eba726866458970cf2e23c2',
     practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     mobile: '+8801711111111',
-    catchmentArea: [
-      {
-        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
-        name: 'Baniajan',
-        alias: ['বানিয়াজান'],
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-            value: 'division=9&district=30&upazila=233&union=4194'
-          }
-        ]
-      }
-    ],
+    catchmentArea: {
+      id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+      name: 'Baniajan',
+      alias: ['বানিয়াজান'],
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+          value: 'division=9&district=30&upazila=233&union=4194'
+        }
+      ]
+    },
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',

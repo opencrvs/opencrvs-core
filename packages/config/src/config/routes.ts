@@ -47,6 +47,7 @@ import {
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
+import { locationParentHandler } from '@config/handlers/locations/parent'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -269,21 +270,7 @@ export default function getRoutes(): ServerRoute[] {
         }
       }
     },
-    {
-      method: 'GET',
-      path: '/location/{locationId}/hierarchy',
-      handler: locationHierarchyHandler,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: "Get location's hierarchy",
-        validate: {
-          params: Joi.object({
-            locationId: Joi.string().uuid()
-          })
-        }
-      }
-    },
+
     {
       method: 'GET',
       path: '/dashboardQueries',
@@ -307,19 +294,6 @@ export default function getRoutes(): ServerRoute[] {
       }
     },
     {
-      method: 'GET',
-      path: '/locations/{locationId}',
-      handler: fetchLocationHandler,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: 'Get a single location',
-        validate: {
-          params: requestParamsSchema
-        }
-      }
-    },
-    {
       method: 'POST',
       path: '/locations',
       handler: createLocationHandler,
@@ -331,6 +305,19 @@ export default function getRoutes(): ServerRoute[] {
         description: 'Create a location',
         validate: {
           payload: createLocationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}',
+      handler: fetchLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get a single location',
+        validate: {
+          params: requestParamsSchema
         }
       }
     },
@@ -347,6 +334,36 @@ export default function getRoutes(): ServerRoute[] {
         validate: {
           payload: updateSchema,
           params: requestParamsSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}/hierarchy',
+      handler: locationHierarchyHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: "Get location's hierarchy",
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}/parent',
+      handler: locationParentHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: "Get location's parent",
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
         }
       }
     },

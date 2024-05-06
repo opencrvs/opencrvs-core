@@ -77,19 +77,17 @@ const mockAuditedUserGqlResponse = {
           name: 'Narsingdi Paurasabha',
           alias: ['নরসিংদী পৌরসভা']
         },
-        catchmentArea: [
-          {
-            id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-            name: 'Sample location',
-            alias: 'স্যাম্পল লোকেশান',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'UNION'
-              }
-            ]
-          }
-        ],
+        catchmentArea: {
+          id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+          name: 'Sample location',
+          alias: 'স্যাম্পল লোকেশান',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION'
+            }
+          ]
+        },
         creationDate: '2019-03-31T18:00:00.000Z'
       }
     }

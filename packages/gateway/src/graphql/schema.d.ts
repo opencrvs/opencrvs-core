@@ -304,7 +304,7 @@ export interface GQLUser {
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation>
+  catchmentArea?: GQLLocation
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
@@ -673,7 +673,6 @@ export interface GQLUserInput {
   role?: string
   email?: string
   primaryOffice?: string
-  catchmentArea?: Array<string | null>
   device?: string
   signature?: GQLSignatureInput
 }

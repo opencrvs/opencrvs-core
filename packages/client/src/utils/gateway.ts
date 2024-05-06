@@ -1471,6 +1471,16 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
+export type NotificationResult = {
+  __typename?: 'NotificationResult'
+  success: Scalars['Boolean']
+}
+
+export enum NotificationType {
+  Email = 'EMAIL',
+  Sms = 'SMS'
+}
+
 export type OidpUserAddress = {
   __typename?: 'OIDPUserAddress'
   city?: Maybe<Scalars['String']>
@@ -1661,6 +1671,7 @@ export type Query = {
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
+  sendNotificationToAllUsers?: Maybe<NotificationResult>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
 
@@ -1815,7 +1826,7 @@ export type QueryGetUserByMobileArgs = {
 }
 
 export type QueryHasChildLocationArgs = {
-  parentId?: InputMaybe<Scalars['String']>
+  parentId: Scalars['String']
 }
 
 export type QueryListBirthRegistrationsArgs = {
@@ -1834,15 +1845,6 @@ export type QueryListNotificationsArgs = {
   status?: InputMaybe<Scalars['String']>
   to?: InputMaybe<Scalars['Date']>
   userId?: InputMaybe<Scalars['String']>
-}
-
-export type QueryLocationByIdArgs = {
-  locationId?: InputMaybe<Scalars['String']>
-}
-
-export type QueryLocationsByParentArgs = {
-  parentId?: InputMaybe<Scalars['String']>
-  type?: InputMaybe<Scalars['String']>
 }
 
 export type QueryQueryPersonByIdentifierArgs = {
@@ -1895,7 +1897,6 @@ export type QuerySearchFieldAgentsArgs = {
 export type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
   email?: InputMaybe<Scalars['String']>
-  locationId?: InputMaybe<Scalars['String']>
   mobile?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
   skip?: InputMaybe<Scalars['Int']>
@@ -1903,6 +1904,13 @@ export type QuerySearchUsersArgs = {
   status?: InputMaybe<Scalars['String']>
   systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type QuerySendNotificationToAllUsersArgs = {
+  body: Scalars['String']
+  locale: Scalars['String']
+  subject: Scalars['String']
+  type?: InputMaybe<NotificationType>
 }
 
 export type QueryVerifyPasswordByIdArgs = {
@@ -2373,7 +2381,7 @@ export type UpdatePermissionsInput = {
 export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
-  catchmentArea?: Maybe<Array<Location>>
+  catchmentArea?: Maybe<Location>
   creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
@@ -2438,7 +2446,6 @@ export type UserInfo = {
 }
 
 export type UserInput = {
-  catchmentArea?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   device?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
@@ -2905,7 +2912,7 @@ export type FetchUserQuery = {
       firstNames?: string | null
       familyName?: string | null
     }>
-    catchmentArea?: Array<{
+    catchmentArea?: {
       __typename?: 'Location'
       id: string
       name?: string | null
@@ -2916,7 +2923,7 @@ export type FetchUserQuery = {
         system?: string | null
         value?: string | null
       }> | null
-    }> | null
+    } | null
     primaryOffice?: {
       __typename?: 'Location'
       id: string
@@ -3321,7 +3328,7 @@ export type GetUserQuery = {
       name?: string | null
       alias?: Array<string> | null
     } | null
-    catchmentArea?: Array<{
+    catchmentArea?: {
       __typename?: 'Location'
       id: string
       name?: string | null
@@ -3331,7 +3338,7 @@ export type GetUserQuery = {
         system?: string | null
         value?: string | null
       }> | null
-    }> | null
+    } | null
     signature?: {
       __typename?: 'Signature'
       type?: string | null
@@ -7872,6 +7879,54 @@ export type GetUserByEmailQuery = {
   } | null
 }
 
+export type EmailAllUsersQueryVariables = Exact<{
+  subject: Scalars['String']
+  body: Scalars['String']
+  locale: Scalars['String']
+}>
+
+export type EmailAllUsersQuery = {
+  __typename?: 'Query'
+  sendNotificationToAllUsers?: {
+    __typename?: 'NotificationResult'
+    success: boolean
+  } | null
+}
+
+export type ToggleInformantSmsNotificationMutationVariables = Exact<{
+  smsNotifications?: InputMaybe<
+    Array<SmsNotificationInput> | SmsNotificationInput
+  >
+}>
+
+export type ToggleInformantSmsNotificationMutation = {
+  __typename?: 'Mutation'
+  toggleInformantSMSNotification?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type GetInformantSmsNotificationsQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetInformantSmsNotificationsQuery = {
+  __typename?: 'Query'
+  informantSMSNotifications?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
 export type UpdateApplicationConfigMutationVariables = Exact<{
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }>
@@ -8079,40 +8134,6 @@ export type DeleteSystemMutation = {
     status: SystemStatus
     type: SystemType
   } | null
-}
-
-export type ToggleInformantSmsNotificationMutationVariables = Exact<{
-  smsNotifications?: InputMaybe<
-    Array<SmsNotificationInput> | SmsNotificationInput
-  >
-}>
-
-export type ToggleInformantSmsNotificationMutation = {
-  __typename?: 'Mutation'
-  toggleInformantSMSNotification?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
-}
-
-export type GetInformantSmsNotificationsQueryVariables = Exact<{
-  [key: string]: never
-}>
-
-export type GetInformantSmsNotificationsQuery = {
-  __typename?: 'Query'
-  informantSMSNotifications?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
 }
 
 export type GetTotalCorrectionsQueryVariables = Exact<{
@@ -8556,10 +8577,10 @@ export type FetchRecordDetailsForVerificationQuery = {
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: Array<{
+            catchmentArea?: {
               __typename?: 'Location'
               name?: string | null
-            }> | null
+            } | null
           } | null
         } | null> | null
       }
@@ -8612,10 +8633,10 @@ export type FetchRecordDetailsForVerificationQuery = {
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: Array<{
+            catchmentArea?: {
               __typename?: 'Location'
               name?: string | null
-            }> | null
+            } | null
           } | null
         } | null> | null
       }

@@ -1917,7 +1917,7 @@ type User {
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location!]
+  catchmentArea: Location
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -1978,7 +1978,6 @@ input UserInput {
   role: String
   email: String
   primaryOffice: String
-  catchmentArea: [String]
   device: String
   signature: SignatureInput
 }
