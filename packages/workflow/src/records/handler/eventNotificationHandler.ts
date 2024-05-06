@@ -12,13 +12,13 @@ import * as Hapi from '@hapi/hapi'
 import {
   addExtensionsToTask,
   Bundle,
+  changeState,
   EVENT_TYPE,
   KnownExtensionType,
   Resource,
   resourceToSavedBundleEntry,
   StringExtensionType,
-  Task,
-  ValidRecord
+  Task
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
@@ -141,10 +141,12 @@ export async function eventNotificationHandler(
   const savedBundle = toSavedBundle(
     savedBundleWithRegLastUserAndBusinessStatus,
     responseBundle
-  ) as ValidRecord
+  )
 
-  await indexBundle(savedBundle, token)
-  await auditEvent('sent-notification', savedBundle, token)
+  const record = changeState(savedBundle, ['IN_PROGRESS', 'READY_FOR_REVIEW'])
+
+  await indexBundle(record, token)
+  await auditEvent('sent-notification', record, token)
 
   return h.response(responseBundle).code(200)
 }
