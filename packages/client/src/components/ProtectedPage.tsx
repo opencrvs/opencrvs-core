@@ -130,7 +130,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     newState.loading = false
     const timeSinceMount = Date.now() - mountedOn
     const progress = document.getElementById('progress')
-    progress!.style.width = '100%'
+    if (progress != null) progress.style.width = '100%'
     setTimeout(() => {
       this.setState(newState)
     }, Math.max(200, 2000 - timeSinceMount))
