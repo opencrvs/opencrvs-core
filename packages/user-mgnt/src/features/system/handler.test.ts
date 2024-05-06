@@ -55,7 +55,6 @@ const mockUser = {
   role: 'LOCAL_REGISTRAR',
   type: 'SOME_TYPE',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   deviceId: 'D444',
   status: 'active',

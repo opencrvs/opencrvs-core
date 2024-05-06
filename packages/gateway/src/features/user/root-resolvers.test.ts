@@ -84,12 +84,6 @@ describe('User root resolvers', () => {
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-        catchmentAreaIds: [
-          'b21ce04e-7ccd-4d65-929f-453bc193a736',
-          '95754572-ab6f-407b-b51a-1636cb3d0683',
-          '7719942b-16a7-474a-8af1-cd0c94c730d2',
-          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-        ],
         creationDate: 1559054406433
       },
       {
@@ -110,12 +104,6 @@ describe('User root resolvers', () => {
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-        catchmentAreaIds: [
-          'b21ce04e-7ccd-4d65-929f-453bc193a736',
-          '95754572-ab6f-407b-b51a-1636cb3d0683',
-          '7719942b-16a7-474a-8af1-cd0c94c730d2',
-          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-        ],
         creationDate: 1559054406444
       },
       {
@@ -136,12 +124,6 @@ describe('User root resolvers', () => {
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-        catchmentAreaIds: [
-          'b21ce04e-7ccd-4d65-929f-453bc193a736',
-          '95754572-ab6f-407b-b51a-1636cb3d0683',
-          '7719942b-16a7-474a-8af1-cd0c94c730d2',
-          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-        ],
         creationDate: 1559054406555
       }
     ]
@@ -267,12 +249,6 @@ describe('User root resolvers', () => {
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-        catchmentAreaIds: [
-          'b21ce04e-7ccd-4d65-929f-453bc193a736',
-          '95754572-ab6f-407b-b51a-1636cb3d0683',
-          '7719942b-16a7-474a-8af1-cd0c94c730d2',
-          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-        ],
         creationDate: 1559054406433
       },
       {
@@ -294,12 +270,6 @@ describe('User root resolvers', () => {
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-        catchmentAreaIds: [
-          'b21ce04e-7ccd-4d65-929f-453bc193a736',
-          '95754572-ab6f-407b-b51a-1636cb3d0683',
-          '7719942b-16a7-474a-8af1-cd0c94c730d2',
-          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-        ],
         creationDate: 1559054406444
       }
     ]

@@ -26,16 +26,26 @@ export async function countUsersByLocation(
     ])
     return resArray[0] ?? { registrars: 0 }
   }
+
+  // @TODO: Resolve the children
+
   const resArray = await User.aggregate([
     {
       $match: {
-        catchmentAreaIds: locationId,
+        primaryOfficeId: { $in: ['ee919880-db4b-4aa1-9ffe-637a532c7849'] },
         systemRole
       }
     },
-    { $unwind: '$catchmentAreaIds' },
-    { $group: { _id: '$catchmentAreaIds', registrars: { $sum: 1 } } },
-    { $match: { _id: locationId } }
+    {
+      $group: { _id: '$primaryOfficeId', registrars: { $addToSet: '$_id' } }
+    },
+    {
+      $project: {
+        _id: 0,
+        registrars: { $size: '$registrars' } // Count the number of unique user ids collected in registrars
+      }
+    }
   ])
+
   return resArray[0] ?? { registrars: 0 }
 }

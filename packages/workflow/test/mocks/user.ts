@@ -43,11 +43,6 @@ export const user = {
   },
   practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
   primaryOfficeId: 'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-  catchmentAreaIds: [
-    'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-    '0f7684aa-8c65-4901-8318-bf1e22c247cb',
-    'ed6195ff-0f83-4852-832e-dc9db07151ff'
-  ],
   scope: ['declare', 'demo'],
   status: 'active',
   securityQuestionAnswers: [],

@@ -42,7 +42,6 @@ const mockUser = {
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   deviceId: 'D444',
   password: 'test',
@@ -216,7 +215,6 @@ describe('updateUser handler', () => {
         systemRole: 'REGISTRATION_AGENT',
         role: '',
         primaryOfficeId: '322',
-        catchmentAreaIds: [],
         deviceId: 'D444'
       },
       headers: {
@@ -277,7 +275,6 @@ describe('updateUser handler', () => {
         systemRole: 'FIELD_AGENT',
         role: 'POLICE_OFFICER',
         primaryOfficeId: '323',
-        catchmentAreaIds: [],
         deviceId: 'D444'
       },
       headers: {
@@ -409,7 +406,6 @@ describe('updateUser handler', () => {
         systemRole: 'FIELD_AGENT',
         role: 'SOCIAL_WORKER',
         primaryOfficeId: '322',
-        catchmentAreaIds: [],
         deviceId: 'D444'
       },
       headers: {

@@ -137,7 +137,6 @@ export interface IUser {
   role: Types.ObjectId
   practitionerId: string
   primaryOfficeId: string
-  catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
   localRegistrar?: ILocalRegistrar
@@ -310,7 +309,6 @@ const userSchema = new Schema({
   role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
-  catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], enum: Object.values(userScopes), required: true },
   status: {
     type: String,

@@ -67,11 +67,6 @@ const MOCK_USER: IUserModelData = {
   },
   practitionerId: '511ab59f-54df-4331-8c22-97062a602154',
   primaryOfficeId: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
-  catchmentAreaIds: [
-    '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
-    'c1ddb556-8b22-4182-9a6c-64358c0e96c9',
-    '1a2a2cca-c77c-4c15-8d12-be4e949b2b00'
-  ],
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   auditHistory: []

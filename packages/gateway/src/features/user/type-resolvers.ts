@@ -67,7 +67,6 @@ export interface IUserModelData {
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
-  catchmentAreaIds: string[]
   identifiers: GQLIdentifier[]
   device: string
   auditHistory?: IAuditHistory[]
@@ -98,13 +97,7 @@ export function isSystem(
 export interface IUserPayload
   extends Omit<
     IUserModelData,
-    | '_id'
-    | 'catchmentAreaIds'
-    | 'status'
-    | 'practitionerId'
-    | 'username'
-    | 'identifiers'
-    | 'role'
+    '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
@@ -193,13 +186,6 @@ export const userTypeResolvers: GQLResolver = {
     },
     async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
       return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
-    },
-    async catchmentArea(userModel: IUserModelData, _, { dataSources }) {
-      return await Promise.all(
-        userModel.catchmentAreaIds.map((areaId: string) => {
-          return dataSources.locationsAPI.getLocation(areaId)
-        })
-      )
     },
     async localRegistrar(
       userModel: IUserModelData,

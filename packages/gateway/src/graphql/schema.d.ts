@@ -2429,7 +2429,6 @@ export interface QueryToSearchUsersArgs {
   status?: string
   systemRole?: string
   primaryOfficeId?: string
-  locationId?: string
   count?: number
   skip?: number
   sort?: string

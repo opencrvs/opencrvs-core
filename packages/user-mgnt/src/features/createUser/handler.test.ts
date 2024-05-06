@@ -43,7 +43,6 @@ const mockUser = {
   systemRole: 'LOCAL_REGISTRAR',
   role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   deviceId: 'D444',
   password: 'test',
@@ -135,7 +134,6 @@ describe('createUser handler', () => {
         systemRole: 'FIELD_AGENT',
         role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
         primaryOfficeId: '321',
-        catchmentAreaIds: [],
         deviceId: 'D444',
         password: 'test'
       },
