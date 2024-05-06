@@ -169,22 +169,6 @@ describe('updateUser handler', () => {
     fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
     fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
-      [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
-        { status: 200 }
-      ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
@@ -229,22 +213,6 @@ describe('updateUser handler', () => {
     fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
     fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
-      [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
-        { status: 200 }
-      ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
@@ -355,22 +323,6 @@ describe('updateUser handler', () => {
     fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
     fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
-      [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
-        { status: 200 }
-      ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
