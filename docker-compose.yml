@@ -144,6 +144,7 @@ services:
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
+      - APPLICATION_CONFIG_URL=http://localhost:2021/
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     build:
