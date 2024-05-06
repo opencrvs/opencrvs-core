@@ -145,11 +145,11 @@ describe('Rate limit', () => {
   it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
     const resolverCalls = Array.from({ length: 20 }, async () => {
       fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Location' }))
-      await locationResolvers.Query.locationById(
+      await locationResolvers.Query.hasChildLocation(
         {},
-        { locationId: '1' },
+        { parentId: '1' },
         { headers: authHeaderRegAgent },
-        { fieldName: 'locationById' }
+        { fieldName: 'hasChildLocation' }
       )
     })
 
