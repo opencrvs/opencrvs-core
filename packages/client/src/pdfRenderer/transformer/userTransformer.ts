@@ -132,38 +132,5 @@ export const userTransformers: IFunctionTransformer = {
         templateData.userDetails.primaryOffice.alias[0]) ||
       ''
     )
-  },
-
-  CRVSLocationName: (
-    templateData: TemplateTransformerData,
-    intl: IntlShape,
-    payload?: TransformerPayload
-  ) => {
-    const key = payload && (payload as ILocationPayload)
-    if (!key) {
-      throw new Error('No payload found for this transformer')
-    }
-    if (!templateData.userDetails.catchmentArea) {
-      return ''
-    }
-    const crvsLocation =
-      templateData.userDetails.catchmentArea &&
-      templateData.userDetails.catchmentArea.find((cArea) => {
-        return (
-          (cArea?.identifier &&
-            cArea.identifier.find(
-              (identifier) =>
-                identifier?.system ===
-                  'http://opencrvs.org/specs/id/jurisdiction-type' &&
-                identifier.value === key.jurisdictionType
-            )) ||
-          false
-        )
-      })
-
-    if (!key.language || key.language === 'en') {
-      return (crvsLocation && crvsLocation.name) || ''
-    }
-    return (crvsLocation && crvsLocation.alias && crvsLocation.alias[0]) || ''
   }
 }

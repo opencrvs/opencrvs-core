@@ -16,12 +16,10 @@ import {
   CRVSOffice,
   AdminStructure
 } from '@client/offline/reducer'
-import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'
-import { UserDetails } from './userUtils'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
@@ -80,25 +78,6 @@ export function filterLocations(
   })
 
   return filteredLocations
-}
-
-export function getLocation(userDetails: UserDetails, locationKey: string) {
-  if (!userDetails.catchmentArea) {
-    throw Error('The user has no catchment area')
-  }
-  const filteredArea = userDetails.catchmentArea.filter((area) => {
-    if (area.identifier) {
-      const relevantIdentifier: Identifier[] = area.identifier.filter(
-        (identifier: Identifier) => {
-          return identifier.value === locationKey
-        }
-      )
-      return relevantIdentifier[0] ? area : false
-    } else {
-      throw Error('The catchment area has no identifier')
-    }
-  })
-  return filteredArea[0] ? filteredArea[0].id : ''
 }
 
 export function generateLocationName(

@@ -15,12 +15,12 @@ import {
   findResourceFromBundleById
 } from '@opencrvs/commons/types'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { FHIR_URL } from '@gateway/constants'
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 
 export default class LocationsAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = FHIR_URL
+    this.baseURL = APPLICATION_CONFIG_URL
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
@@ -43,6 +43,10 @@ export default class LocationsAPI extends RESTDataSource {
       }
     }
 
-    return this.get(`/Location/${id}`)
+    return this.get(`/locations/${id}`)
+  }
+
+  getParent(id: string): Promise<Saved<Location>> {
+    return this.get(`/locations/${id}/parent`)
   }
 }

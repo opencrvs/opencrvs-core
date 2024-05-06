@@ -154,45 +154,4 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('')
     })
   })
-  describe('CRVSLocationName transformer tests', () => {
-    it('Returns the location name properly', () => {
-      const transformedValue = userTransformers.CRVSLocationName(data, intl, {
-        jurisdictionType: 'UNION'
-      })
-      expect(transformedValue).toEqual('BAKTARPUR')
-    })
-    it('Returns the location alias properly', () => {
-      const transformedValue = userTransformers.CRVSLocationName(data, intl, {
-        jurisdictionType: 'UNION',
-        language: 'bn'
-      })
-      expect(transformedValue).toEqual('বক্তারপুর')
-    })
-    it('Returns empty name if no location found for given jurisdiction type', () => {
-      const transformedValue = userTransformers.CRVSLocationName(data, intl, {
-        jurisdictionType: 'INVALID'
-      })
-      expect(transformedValue).toEqual('')
-    })
-    it('Returns empty alias if no location found for given jurisdiction type', () => {
-      const transformedValue = userTransformers.CRVSLocationName(data, intl, {
-        jurisdictionType: 'INVALID',
-        language: 'bn'
-      })
-      expect(transformedValue).toEqual('')
-    })
-    it('Returns empty if no catchmentArea found', () => {
-      data.userDetails = omit(userDetails, 'catchmentArea') as UserDetails
-      const transformedValue = userTransformers.CRVSLocationName(data, intl, {
-        jurisdictionType: 'UNION',
-        language: 'bn'
-      })
-      expect(transformedValue).toEqual('')
-    })
-    it('Throws exception if payload is not provided', () => {
-      expect(() => userTransformers.CRVSLocationName(data, intl)).toThrowError(
-        'No payload found for this transformer'
-      )
-    })
-  })
 })

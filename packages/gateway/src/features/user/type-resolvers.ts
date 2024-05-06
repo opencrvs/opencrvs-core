@@ -187,6 +187,9 @@ export const userTypeResolvers: GQLResolver = {
     async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
       return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },
+    async catchmentArea(userModel: IUserModelData, _, { dataSources }) {
+      return dataSources.locationsAPI.getParent(userModel.primaryOfficeId)
+    },
     async localRegistrar(
       userModel: IUserModelData,
       _,
