@@ -20,6 +20,7 @@
 - Fix system crash when opening the started action modal [#6551](https://github.com/opencrvs/opencrvs-core/issues/6551)
 - Make language names used in language select dropdowns configurable in country resource package copy
 - Fix login to field agent when an incomplete record is previously retrieved by them [#6584](https://github.com/opencrvs/opencrvs-core/issues/6584)
+- Fix duplicate comparison page [#6705](https://github.com/opencrvs/opencrvs-core/pull/6884)
 
 ## [1.4.0](https://github.com/opencrvs/opencrvs-core/compare/v1.3.3...v1.4.0)
 

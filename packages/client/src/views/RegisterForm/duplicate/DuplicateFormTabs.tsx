@@ -23,7 +23,7 @@ import {
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { Event, HumanName, RegStatus, History } from '@client/utils/gateway'
+import { Event, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -683,7 +683,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           (eventData.history as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name ?? [],
           language
         )
       }
@@ -706,7 +706,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           (props.declaration.data.history as unknown as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name ?? [],
           language
         )
       }
