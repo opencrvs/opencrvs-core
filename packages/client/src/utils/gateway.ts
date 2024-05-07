@@ -956,13 +956,14 @@ export type Location = {
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
+  hierarchy?: Maybe<Array<Location>>
   id: Scalars['ID']
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
   longitude?: Maybe<Scalars['Float']>
   name?: Maybe<Scalars['String']>
   partOf?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
+  status: Scalars['String']
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
   type?: Maybe<Scalars['String']>
 }
@@ -2916,7 +2917,7 @@ export type FetchUserQuery = {
       id: string
       name?: string | null
       alias?: Array<string> | null
-      status?: string | null
+      status: string
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
@@ -8548,6 +8549,15 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8600,6 +8610,15 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

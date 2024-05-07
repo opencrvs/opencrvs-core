@@ -14,6 +14,7 @@ import {
   Saved,
   findResourceFromBundleById
 } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 
@@ -44,5 +45,9 @@ export default class LocationsAPI extends RESTDataSource {
     }
 
     return this.get(`/locations/${id}`)
+  }
+
+  getHierarchy(id: UUID): Promise<Saved<Location>> {
+    return this.get(`/locations/${id}/hierarchy`)
   }
 }

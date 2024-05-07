@@ -27,7 +27,7 @@ type Location { # -> Location (mostly the same property name except:)
   id: ID!
   _fhirID: ID # -> .id
   identifier: [Identifier!]
-  status: String
+  status: String!
   name: String
   alias: [String!]
   description: String
@@ -39,6 +39,7 @@ type Location { # -> Location (mostly the same property name except:)
   latitude: Float # -> position.latitude
   altitude: Float # -> position.altitude
   geoData: String # -> extension(url=http://hl7.org/fhir/StructureDefinition/location-boundary-geojson).valueAttachment (as base64)
+  hierarchy: [Location!]
 }
 
 type Query {
