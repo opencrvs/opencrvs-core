@@ -44,7 +44,7 @@
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/node-fetch": "^2.5.12",
-    "chalk": "^4.1.0",
+    "chalk": "^5.0.0",
     "copyfiles": "^2.1.1",
     "cross-env": "^7.0.0",
     "jest": "26.6.3",

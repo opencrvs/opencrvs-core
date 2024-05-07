@@ -136,7 +136,7 @@
     "@typescript-eslint/parser": "^4.5.0",
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
-    "chalk": "^2.4.1",
+    "chalk": "^5.0.0",
     "csv-stringify": "^6.4.6",
     "csv2json": "^2.0.2",
     "enzyme": "^3.4.4",
