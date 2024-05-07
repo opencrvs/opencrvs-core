@@ -319,23 +319,6 @@ export const userDetails: UserDetails = {
     alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
     status: 'active'
   },
-  catchmentArea: {
-    id: '43c17986-62cf-4551-877c-be095fb6e5d0',
-    name: 'BAKTARPUR',
-    alias: ['বক্তারপুর'],
-    status: 'active',
-    identifier: [
-      {
-        system: 'http://opencrvs.org/specs/id/geo-id',
-        value: '3473'
-      },
-      { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-      {
-        system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-        value: 'UNION'
-      }
-    ]
-  },
   localRegistrar: {
     role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
@@ -363,23 +346,6 @@ export const mockUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: {
-        id: '123456789',
-        name: 'BAKTARPUR',
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '3473'
-          },
-          { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'UNION'
-          }
-        ],
-        __typename: 'Location'
-      },
       primaryOffice: {
         id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
         name: 'Kaliganj Union Sub Center',
@@ -415,18 +381,6 @@ export const mockLocalSysAdminUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: {
-        id: '123456789',
-        name: 'BAKTARPUR',
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '3473'
-          }
-        ],
-        __typename: 'Location'
-      },
       primaryOffice: {
         id: '0d8474da-0361-4d32-979e-af91f012340a',
         name: 'Kaliganj Union Sub Center',
@@ -461,18 +415,6 @@ export const mockRegistrarUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
-      catchmentArea: {
-        id: '123456789',
-        name: 'BAKTARPUR',
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/geo-id',
-            value: '3473'
-          }
-        ],
-        __typename: 'Location'
-      },
       primaryOffice: {
         id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
         name: 'Kaliganj Union Sub Center',
@@ -1075,18 +1017,6 @@ export function loginAsFieldAgent(store: AppStore) {
               familyName: 'Al Hasan'
             }
           ],
-          catchmentArea: {
-            id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
-            name: 'Baniajan',
-            alias: ['বানিয়াজান'],
-            status: 'active',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-                value: 'division=9&district=30&upazila=233&union=4194'
-              }
-            ]
-          },
           primaryOffice: {
             id: '0d8474da-0361-4d32-979e-af91f012340a',
             name: 'Kaliganj Union Sub Center',

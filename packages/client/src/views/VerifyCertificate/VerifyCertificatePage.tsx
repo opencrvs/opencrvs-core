@@ -294,7 +294,7 @@ export function VerifyCertificatePage() {
           ' ' +
           history?.user?.name[0]?.familyName,
       // @TODO: Do we  want the full hierarchy here?
-      center: history?.user?.catchmentArea?.name
+      center: '@TODO: Figure out what to show here now'
     }
   }
 

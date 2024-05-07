@@ -52,9 +52,6 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
               firstNames
               familyName
             }
-            catchmentArea {
-              name
-            }
           }
         }
       }
@@ -96,9 +93,6 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
             name {
               firstNames
               familyName
-            }
-            catchmentArea {
-              name
             }
           }
         }

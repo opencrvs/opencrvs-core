@@ -45,8 +45,4 @@ export default class LocationsAPI extends RESTDataSource {
 
     return this.get(`/locations/${id}`)
   }
-
-  getParent(id: string): Promise<Saved<Location>> {
-    return this.get(`/locations/${id}/parent`)
-  }
 }

@@ -2381,7 +2381,6 @@ export type UpdatePermissionsInput = {
 export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
-  catchmentArea?: Maybe<Location>
   creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
@@ -2912,18 +2911,6 @@ export type FetchUserQuery = {
       firstNames?: string | null
       familyName?: string | null
     }>
-    catchmentArea?: {
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string> | null
-      status?: string | null
-      identifier?: Array<{
-        __typename?: 'Identifier'
-        system?: string | null
-        value?: string | null
-      }> | null
-    } | null
     primaryOffice?: {
       __typename?: 'Location'
       id: string
@@ -3327,17 +3314,6 @@ export type GetUserQuery = {
       id: string
       name?: string | null
       alias?: Array<string> | null
-    } | null
-    catchmentArea?: {
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string> | null
-      identifier?: Array<{
-        __typename?: 'Identifier'
-        system?: string | null
-        value?: string | null
-      }> | null
     } | null
     signature?: {
       __typename?: 'Signature'
@@ -8577,10 +8553,6 @@ export type FetchRecordDetailsForVerificationQuery = {
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: {
-              __typename?: 'Location'
-              name?: string | null
-            } | null
           } | null
         } | null> | null
       }
@@ -8633,10 +8605,6 @@ export type FetchRecordDetailsForVerificationQuery = {
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: {
-              __typename?: 'Location'
-              name?: string | null
-            } | null
           } | null
         } | null> | null
       }

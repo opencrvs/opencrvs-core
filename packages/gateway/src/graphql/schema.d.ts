@@ -304,7 +304,6 @@ export interface GQLUser {
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: GQLLocation
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
@@ -5001,7 +5000,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
-  catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
@@ -5114,15 +5112,6 @@ export interface UserToUnderInvestigationResolver<
 }
 
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

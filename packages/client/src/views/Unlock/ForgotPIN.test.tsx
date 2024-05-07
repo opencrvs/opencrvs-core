@@ -65,18 +65,6 @@ describe('ForgotPIN tests', () => {
                 familyName: 'Al Hasan'
               }
             ],
-            catchmentArea: {
-              id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
-              name: 'Baniajan',
-              alias: ['বানিয়াজান'],
-              status: 'active',
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-                  value: 'division=9&district=30&upazila=233&union=4194'
-                }
-              ]
-            },
             primaryOffice: undefined,
             localRegistrar: {
               name: [

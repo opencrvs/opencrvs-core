@@ -147,62 +147,6 @@ describe('User type resolvers', () => {
     )
     expect(res).toEqual(mockOffice)
   })
-  it('return catchmentArea type', async () => {
-    const mockLocation = {
-      resourceType: 'Location',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/geo-id',
-          value: '3476'
-        },
-        {
-          system: 'http://opencrvs.org/specs/id/bbs-code',
-          value: '94'
-        },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'UNION'
-        }
-      ],
-      name: 'Moktarpur',
-      alias: ['মোক্তারপুর'],
-      description: 'division=3&district=20&upazila=165&union=3476',
-      status: 'active',
-      partOf: {
-        reference: 'Location/7719942b-16a7-474a-8af1-cd0c94c730d2'
-      },
-      type: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/location-type',
-            code: 'ADMIN_STRUCTURE'
-          }
-        ]
-      },
-      physicalType: {
-        coding: [
-          {
-            code: 'jdn',
-            display: 'Jurisdiction'
-          }
-        ]
-      },
-      id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-    }
-
-    mockGet.mockResolvedValueOnce(mockLocation)
-    const locationsAPI = new LocationsAPI()
-    locationsAPI.context = { record: null }
-    const res = await userTypeResolvers.User.catchmentArea(
-      mockResponse,
-      undefined,
-      {
-        dataSources: { locationsAPI }
-      }
-    )
-    expect(res).toEqual(mockLocation)
-  })
-
   it('return user signature as registration agent', async () => {
     const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
     const roleBundle = {

@@ -41,16 +41,6 @@ const FETCH_USER = gql`
         firstNames
         familyName
       }
-      catchmentArea {
-        id
-        name
-        alias
-        status
-        identifier {
-          system
-          value
-        }
-      }
       primaryOffice {
         id
         name

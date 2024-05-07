@@ -112,15 +112,6 @@ export const GET_USER = gql`
         name
         alias
       }
-      catchmentArea {
-        id
-        name
-        alias
-        identifier {
-          system
-          value
-        }
-      }
       creationDate
       signature {
         type

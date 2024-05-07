@@ -215,12 +215,6 @@ export function getPrimaryLocationIdOfOffice(
   return location.id
 }
 
-export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: UserDetails
-) {
-  return userDetails.catchmentArea?.id
-}
-
 export enum CompletenessRateTime {
   WithinTarget = 'withinTarget',
   Within1Year = 'within1Year',
