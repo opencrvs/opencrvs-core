@@ -131,9 +131,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     const timeSinceMount = Date.now() - mountedOn
     const progress = document.getElementById('progress')
     if (progress != null) progress.style.width = '100%'
-    setTimeout(() => {
-      this.setState(newState)
-    }, Math.max(200, 2000 - timeSinceMount))
+    setTimeout(
+      () => {
+        this.setState(newState)
+      },
+      import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
+    )
 
     setInterval(async () => {
       if (!(await refreshToken())) this.props.redirectToAuthentication()
