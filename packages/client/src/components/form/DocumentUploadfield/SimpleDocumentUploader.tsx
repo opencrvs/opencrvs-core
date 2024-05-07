@@ -12,7 +12,7 @@ import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
-import * as React from 'react'
+import React, { useState } from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -58,149 +58,125 @@ type IFullProps = {
   previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
 } & IntlShapeProps
 
-type IState = {
-  error: string
-  previewImage: IAttachmentValue | null
-  filesBeingUploaded: Array<{ label: string }>
-}
-class SimpleDocumentUploaderComponent extends React.Component<
-  IFullProps,
-  IState
-> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      error: '',
-      previewImage: null,
-      filesBeingUploaded: []
-    }
-  }
+const SimpleDocumentUploaderComponent = ({
+  allowedDocType,
+  onUploadingStateChanged,
+  intl,
+  previewTransformer,
+  onComplete,
+  label,
+  files,
+  description,
+  error: errorProps,
+  disableDeleteInPreview,
+  requiredErrorMessage,
+  touched
+}: IFullProps) => {
+  const [error, setError] = useState('')
+  const [previewImage, setPreviewImage] = useState<IAttachmentValue | null>(
+    null
+  )
+  const [filesBeingUploaded, setFilesBeingUploaded] = useState<
+    { label: string }[]
+  >([])
 
-  handleFileChange = async (uploadedImage: File) => {
+  const handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
-    const allowedDocType = this.props.allowedDocType
 
-    this.setState(() => ({
-      filesBeingUploaded: [
-        ...this.state.filesBeingUploaded,
-        {
-          label: uploadedImage.name
-        }
-      ]
-    }))
+    setFilesBeingUploaded([
+      ...filesBeingUploaded,
+      { label: uploadedImage.name }
+    ])
 
-    this.props.onUploadingStateChanged &&
-      this.props.onUploadingStateChanged(true)
+    onUploadingStateChanged && onUploadingStateChanged(true)
 
     if (
       allowedDocType &&
       allowedDocType.length > 0 &&
       !allowedDocType.includes(uploadedImage.type)
     ) {
-      this.props.onUploadingStateChanged &&
-        this.props.onUploadingStateChanged(false)
-      this.setState({
-        filesBeingUploaded: []
+      onUploadingStateChanged && onUploadingStateChanged(false)
+      setFilesBeingUploaded([])
+      const newErrorMessage = intl.formatMessage(messages.fileUploadError, {
+        type: allowedDocType
+          .map((docTypeStr) => docTypeStr.split('/').pop())
+          .join(', ')
       })
-      this.setState({
-        error: this.props.intl.formatMessage(messages.fileUploadError, {
-          type: allowedDocType
-            .map((docTypeStr) => docTypeStr.split('/').pop())
-            .join(', ')
-        })
-      })
+
+      setError(newErrorMessage)
     } else {
-      this.props.onUploadingStateChanged &&
-        this.props.onUploadingStateChanged(false)
-      this.props.onComplete({
+      onUploadingStateChanged && onUploadingStateChanged(false)
+      onComplete({
         name: uploadedImage.name,
         type: uploadedImage.type,
         data: await getBase64String(uploadedImage)
       })
-      this.setState({
-        error: ''
-      })
-      this.setState({
-        filesBeingUploaded: []
-      })
+      setError('')
+      setFilesBeingUploaded([])
     }
   }
 
-  selectForPreview = (previewImage: IFormFieldValue) => {
-    if (this.props.previewTransformer) {
-      return this.setState({
-        previewImage: this.props.previewTransformer(
-          previewImage as IAttachmentValue
-        )
-      })
+  const selectForPreview = (previewImage: IFormFieldValue) => {
+    if (previewTransformer) {
+      return setPreviewImage(
+        previewTransformer(previewImage as IAttachmentValue)
+      )
     }
-    this.setState({ previewImage: previewImage as IAttachmentValue })
+    setPreviewImage(previewImage as IAttachmentValue)
   }
 
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
+  const closePreviewSection = () => {
+    setPreviewImage(null)
   }
 
-  onDelete = (image: IFormFieldValue) => {
-    this.props.onComplete('')
-    this.closePreviewSection()
+  const onDelete = (image: IFormFieldValue) => {
+    onComplete('')
+    closePreviewSection()
   }
 
-  render() {
-    const {
-      label,
-      intl,
-      files,
-      description,
-      error,
-      disableDeleteInPreview,
-      requiredErrorMessage,
-      touched
-    } = this.props
-    const errorMessage =
-      (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
-      this.state.error ||
-      error ||
-      ''
+  const errorMessage =
+    (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
+    error ||
+    errorProps ||
+    ''
 
-    return (
-      <>
-        {description && <FieldDescription>{description}</FieldDescription>}
-        <ErrorMessage>
-          {errorMessage && (touched || this.state.error) && (
-            <ErrorText ignoreMediaQuery id="field-error">
-              {errorMessage}
-            </ErrorText>
-          )}
-        </ErrorMessage>
-        <DocumentListPreview
-          attachment={files}
-          onSelect={this.selectForPreview}
-          label={label}
-          onDelete={this.onDelete}
-          processingDocuments={this.state.filesBeingUploaded}
+  return (
+    <>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <ErrorMessage>
+        {errorMessage && (touched || error) && (
+          <ErrorText ignoreMediaQuery id="field-error">
+            {errorMessage}
+          </ErrorText>
+        )}
+      </ErrorMessage>
+      <DocumentListPreview
+        attachment={files}
+        onSelect={selectForPreview}
+        label={label}
+        onDelete={onDelete}
+        processingDocuments={filesBeingUploaded}
+      />
+      {previewImage && (
+        <DocumentPreview
+          previewImage={previewImage}
+          disableDelete={disableDeleteInPreview}
+          title={intl.formatMessage(buttonMessages.preview)}
+          goBack={closePreviewSection}
+          onDelete={onDelete}
         />
-        {this.state.previewImage && (
-          <DocumentPreview
-            previewImage={this.state.previewImage}
-            disableDelete={disableDeleteInPreview}
-            title={intl.formatMessage(buttonMessages.preview)}
-            goBack={this.closePreviewSection}
-            onDelete={this.onDelete}
-          />
-        )}
-        {(!files || !files.data) && (
-          <DocumentUploader
-            id="upload_document"
-            title={intl.formatMessage(messages.uploadFile)}
-            handleFileChange={this.handleFileChange}
-          />
-        )}
-      </>
-    )
-  }
+      )}
+      {(!files || !files.data) && (
+        <DocumentUploader
+          id="upload_document"
+          title={intl.formatMessage(messages.uploadFile)}
+          handleFileChange={handleFileChange}
+        />
+      )}
+    </>
+  )
 }
 
 export const SimpleDocumentUploader = injectIntl<'intl', IFullProps>(
