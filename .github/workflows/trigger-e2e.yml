@@ -17,6 +17,8 @@ jobs:
               owner: 'opencrvs',
               repo: 'opencrvs-farajaland',
               event_type: 'run_e2e',
-              client_payload: {}
+              client_payload: {
+                actor: '${{ github.actor }}'
+              }
             })
             console.log(result);
