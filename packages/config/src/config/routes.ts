@@ -35,7 +35,7 @@ import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
 import * as Joi from 'joi'
-import { resolveChildren } from '@config/handlers/locations/resolveChildren'
+import { resolveChildren } from '@config/handlers/locations/children'
 import {
   fetchLocationsHandler,
   locationQuerySchema,

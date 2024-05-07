@@ -12,9 +12,17 @@ import { UUID } from '@opencrvs/commons'
 import { ServerRoute } from '@hapi/hapi'
 import { resolveLocationChildren } from './locationTreeSolver'
 import { fetchLocations } from '@config/services/hearth'
+import { find } from 'lodash'
+import { notFound } from '@hapi/boom'
 
 export const resolveChildren: ServerRoute['handler'] = async (req) => {
   const { locationId } = req.params as { locationId: UUID }
   const locations = await fetchLocations()
-  return resolveLocationChildren(locationId, locations)
+  const location = find(locations, { id: locationId })
+
+  if (!location) {
+    return notFound()
+  }
+
+  return resolveLocationChildren(location, locations)
 }
