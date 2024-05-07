@@ -25084,21 +25084,13 @@ wordwrapjs@^3.0.0:
     reduce-flatten "^1.0.1"
     typical "^2.6.1"
 
-workbox-background-sync@7.1.0:
+workbox-background-sync@7.1.0, workbox-background-sync@^7.0.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/workbox-background-sync/-/workbox-background-sync-7.1.0.tgz#dac65e30af603511f1c92c3e99f53d6c064fde90"
   integrity sha512-rMbgrzueVWDFcEq1610YyDW71z0oAXLfdRHRQcKw4SGihkfOK0JUEvqWHFwA6rJ+6TClnMIn7KQI5PNN1XQXwQ==
   dependencies:
     idb "^7.0.1"
     workbox-core "7.1.0"
-
-workbox-background-sync@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/workbox-background-sync/-/workbox-background-sync-7.0.0.tgz"
-  integrity sha512-S+m1+84gjdueM+jIKZ+I0Lx0BDHkk5Nu6a3kTVxP4fdj3gKouRNmhO8H290ybnJTOPfBDtTMXSQA/QLTvr7PeA==
-  dependencies:
-    idb "^7.0.1"
-    workbox-core "7.0.0"
 
 workbox-broadcast-update@7.1.0:
   version "7.1.0"
@@ -25192,7 +25184,7 @@ workbox-navigation-preload@7.1.0:
   dependencies:
     workbox-core "7.1.0"
 
-workbox-precaching@7.1.0:
+workbox-precaching@7.1.0, workbox-precaching@^7.0.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/workbox-precaching/-/workbox-precaching-7.1.0.tgz#71e27ec2e85661a41b48dec0c92dae707c429eaa"
   integrity sha512-LyxzQts+UEpgtmfnolo0hHdNjoB7EoRWcF7EDslt+lQGd0lW4iTvvSe3v5JiIckQSB5KTW5xiCqjFviRKPj1zA==
@@ -25200,15 +25192,6 @@ workbox-precaching@7.1.0:
     workbox-core "7.1.0"
     workbox-routing "7.1.0"
     workbox-strategies "7.1.0"
-
-workbox-precaching@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/workbox-precaching/-/workbox-precaching-7.0.0.tgz"
-  integrity sha512-EC0vol623LJqTJo1mkhD9DZmMP604vHqni3EohhQVwhJlTgyKyOkMrZNy5/QHfOby+39xqC01gv4LjOm4HSfnA==
-  dependencies:
-    workbox-core "7.0.0"
-    workbox-routing "7.0.0"
-    workbox-strategies "7.0.0"
 
 workbox-range-requests@7.1.0:
   version "7.1.0"
@@ -25229,13 +25212,6 @@ workbox-recipes@7.1.0:
     workbox-routing "7.1.0"
     workbox-strategies "7.1.0"
 
-workbox-routing@7.0.0, workbox-routing@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/workbox-routing/-/workbox-routing-7.0.0.tgz"
-  integrity sha512-8YxLr3xvqidnbVeGyRGkaV4YdlKkn5qZ1LfEePW3dq+ydE73hUUJJuLmGEykW3fMX8x8mNdL0XrWgotcuZjIvA==
-  dependencies:
-    workbox-core "7.0.0"
-
 workbox-routing@7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/workbox-routing/-/workbox-routing-7.1.0.tgz#c44bda350d1c5eb633ee97a660e64ce5473250c4"
@@ -25243,10 +25219,10 @@ workbox-routing@7.1.0:
   dependencies:
     workbox-core "7.1.0"
 
-workbox-strategies@7.0.0, workbox-strategies@^7.0.0:
+workbox-routing@^7.0.0:
   version "7.0.0"
-  resolved "https://registry.npmjs.org/workbox-strategies/-/workbox-strategies-7.0.0.tgz"
-  integrity sha512-dg3qJU7tR/Gcd/XXOOo7x9QoCI9nk74JopaJaYAQ+ugLi57gPsXycVdBnYbayVj34m6Y8ppPwIuecrzkpBVwbA==
+  resolved "https://registry.npmjs.org/workbox-routing/-/workbox-routing-7.0.0.tgz"
+  integrity sha512-8YxLr3xvqidnbVeGyRGkaV4YdlKkn5qZ1LfEePW3dq+ydE73hUUJJuLmGEykW3fMX8x8mNdL0XrWgotcuZjIvA==
   dependencies:
     workbox-core "7.0.0"
 
@@ -25256,6 +25232,13 @@ workbox-strategies@7.1.0:
   integrity sha512-/UracPiGhUNehGjRm/tLUQ+9PtWmCbRufWtV0tNrALuf+HZ4F7cmObSEK+E4/Bx1p8Syx2tM+pkIrvtyetdlew==
   dependencies:
     workbox-core "7.1.0"
+
+workbox-strategies@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/workbox-strategies/-/workbox-strategies-7.0.0.tgz"
+  integrity sha512-dg3qJU7tR/Gcd/XXOOo7x9QoCI9nk74JopaJaYAQ+ugLi57gPsXycVdBnYbayVj34m6Y8ppPwIuecrzkpBVwbA==
+  dependencies:
+    workbox-core "7.0.0"
 
 workbox-streams@7.1.0:
   version "7.1.0"
