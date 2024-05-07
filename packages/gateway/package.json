@@ -43,7 +43,7 @@
     "file-type": "^16.5.3",
     "flat": "^5.0.0",
     "fp-ts": "^2.12.3",
-    "glob": "^7.1.2",
+    "glob": "^10.0.0",
     "graphql": "^15.0.0",
     "graphql-import": "^0.7.0",
     "graphql-tools": "^4.0.7",
