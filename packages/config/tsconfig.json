@@ -8,7 +8,7 @@
     "module": "commonjs",
     "rootDir": ".",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "outDir": "build/dist",
     "lib": ["esnext.asynciterable", "es6", "es2017"],
     "forceConsistentCasingInFileNames": true,

@@ -60,255 +60,231 @@ type DispatchProps = {
   toggleEmailAllUsersFeedbackToast: typeof toggleEmailAllUsersFeedbackToast
 }
 
-class Component extends React.Component<
-  NotificationProps &
-    DispatchProps &
-    IntlShapeProps &
-    RouteComponentProps<{}> & { isOnline: boolean }
-> {
-  hideConfigurationErrorNotification = () => {
-    this.props.hideConfigurationErrorNotification()
+type Props = NotificationProps &
+  DispatchProps &
+  IntlShapeProps &
+  RouteComponentProps<{}> & { isOnline: boolean }
+
+const Component = ({
+  hideConfigurationErrorNotification,
+  hideSubmitFormSuccessToast,
+  hideSubmitFormErrorToast,
+  toggleDraftSavedNotification,
+  hideUserAuditSuccessToast,
+  hidePINUpdateSuccessToast,
+  hideDuplicateRecordsToast,
+  hideDownloadDeclarationFailedToast,
+  hideUnassignedModal,
+  hideCreateUserErrorToast,
+  hideCreateUserFormDuplicateEmailErrorToast,
+  hideUnassignedDeclarationsToast,
+  hideUserReconnectedToast,
+  goToDeclarationRecordAudit,
+  toggleEmailAllUsersFeedbackToast,
+  children,
+  configurationError,
+  configurationErrorVisible,
+  intl,
+  saveDraftClicked,
+  submitFormSuccessToast,
+  submitFormErrorToast,
+  userAuditSuccessToast,
+  showPINUpdateSuccess,
+  showDuplicateRecordsToast,
+  duplicateTrackingId,
+  duplicateCompositionId,
+  downloadDeclarationFailedToast,
+  unassignedModal,
+  userCreateDuplicateMobileFailedToast,
+  userCreateDuplicateEmailFailedToast,
+  userReconnectedToast,
+  isOnline,
+  unassignedDeclarations,
+  emailAllUsers
+}: Props) => {
+  const hideEmailAllUsersFeedbackToast = () => {
+    toggleEmailAllUsersFeedbackToast({ visible: false })
   }
 
-  hideDraftsSavedNotification = () => {
-    this.props.toggleDraftSavedNotification()
-  }
+  const userFormSubmitErrorMessage = isOnline
+    ? intl.formatMessage(messages.userFormFail)
+    : intl.formatMessage(messages.userFormFailForOffline)
 
-  hideSubmitFormSuccessToast = () => {
-    this.props.hideSubmitFormSuccessToast()
-  }
+  return (
+    <div>
+      {children}
+      {userReconnectedToast && (
+        <Toast
+          type="success"
+          id="userOnlineReconnectedToast"
+          onClose={hideUserReconnectedToast}
+        >
+          {intl.formatMessage(messages.onlineUserStatus)}
+        </Toast>
+      )}
+      {configurationError && (
+        <Toast type="warning" id="formValidationErrorNotification">
+          {configurationError}
+        </Toast>
+      )}
+      {configurationErrorVisible && (
+        <Toast
+          type="warning"
+          id="configErrorShowNotification"
+          onClose={hideConfigurationErrorNotification}
+        >
+          OpenCRVS has been only partially configured - Awaiting facilities and
+          locations
+        </Toast>
+      )}
+      {saveDraftClicked && (
+        <Toast
+          type="success"
+          id="draftsSavedNotification"
+          onClose={toggleDraftSavedNotification}
+        >
+          {intl.formatMessage(messages.draftsSaved)}
+        </Toast>
+      )}
 
-  hideSubmitFormErrorToast = () => {
-    this.props.hideSubmitFormErrorToast()
-  }
+      {submitFormSuccessToast && (
+        <Toast
+          id="submissionSuccessToast"
+          type="success"
+          onClose={hideSubmitFormSuccessToast}
+        >
+          {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
+            ? intl.formatMessage(messages.userFormUpdateSuccess)
+            : intl.formatMessage(messages.userFormSuccess)}
+        </Toast>
+      )}
 
-  hideCreateUserFormErrorToast = () => {
-    this.props.hideCreateUserErrorToast()
-  }
-
-  hideCreateUserFormDuplicateEmailErrorToast = () => {
-    this.props.hideCreateUserFormDuplicateEmailErrorToast()
-  }
-
-  hideUnassignedDeclarationsToast = () => {
-    this.props.hideUnassignedDeclarationsToast()
-  }
-
-  hideUserAuditSuccessToast = () => {
-    this.props.hideUserAuditSuccessToast()
-  }
-  hideUserReconnectedToast = () => {
-    this.props.hideUserReconnectedToast()
-  }
-  hideEmailAllUsersFeedbackToast = () => {
-    this.props.toggleEmailAllUsersFeedbackToast({ visible: false })
-  }
-
-  render() {
-    const {
-      children,
-      configurationError,
-      configurationErrorVisible,
-      intl,
-      saveDraftClicked,
-      submitFormSuccessToast,
-      submitFormErrorToast,
-      userAuditSuccessToast,
-      showPINUpdateSuccess,
-      showDuplicateRecordsToast,
-      duplicateTrackingId,
-      duplicateCompositionId,
-      downloadDeclarationFailedToast,
-      unassignedModal,
-      userCreateDuplicateMobileFailedToast,
-      userCreateDuplicateEmailFailedToast,
-      userReconnectedToast,
-      goToDeclarationRecordAudit,
-      isOnline,
-      unassignedDeclarations,
-      emailAllUsers
-    } = this.props
-
-    const userFormSubmitErrorMessage = isOnline
-      ? intl.formatMessage(messages.userFormFail)
-      : intl.formatMessage(messages.userFormFailForOffline)
-
-    return (
-      <div>
-        {children}
-        {userReconnectedToast && (
-          <Toast
-            type="success"
-            id="userOnlineReconnectedToast"
-            onClose={this.hideUserReconnectedToast}
-          >
-            {intl.formatMessage(messages.onlineUserStatus)}
-          </Toast>
-        )}
-        {configurationError && (
-          <Toast type="warning" id="formValidationErrorNotification">
-            {configurationError}
-          </Toast>
-        )}
-        {configurationErrorVisible && (
-          <Toast
-            type="warning"
-            id="configErrorShowNotification"
-            onClose={this.hideConfigurationErrorNotification}
-          >
-            OpenCRVS has been only partially configured - Awaiting facilities
-            and locations
-          </Toast>
-        )}
-        {saveDraftClicked && (
-          <Toast
-            type="success"
-            id="draftsSavedNotification"
-            onClose={this.hideDraftsSavedNotification}
-          >
-            {intl.formatMessage(messages.draftsSaved)}
-          </Toast>
-        )}
-
-        {submitFormSuccessToast && (
-          <Toast
-            id="submissionSuccessToast"
-            type="success"
-            onClose={this.hideSubmitFormSuccessToast}
-          >
-            {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
-              ? intl.formatMessage(messages.userFormUpdateSuccess)
-              : intl.formatMessage(messages.userFormSuccess)}
-          </Toast>
-        )}
-
-        {submitFormErrorToast && (
-          <Toast
-            id="submissionErrorToast"
-            type="warning"
-            onClose={this.hideSubmitFormErrorToast}
-          >
-            {userFormSubmitErrorMessage}
-          </Toast>
-        )}
-        {userAuditSuccessToast.visible && (
-          <Toast
-            id="userAuditSuccessToast"
-            type="success"
-            onClose={this.hideUserAuditSuccessToast}
-          >
-            {intl.formatMessage(messages.userAuditSuccess, {
-              name: userAuditSuccessToast.userFullName,
-              action: userAuditSuccessToast.action
-            })}
-          </Toast>
-        )}
-        {showPINUpdateSuccess && (
-          <Toast
-            id="PINUpdateSuccessToast"
-            type="success"
-            onClose={this.props.hidePINUpdateSuccessToast}
-          >
-            {intl.formatMessage(messages.updatePINSuccess)}
-          </Toast>
-        )}
-        {showDuplicateRecordsToast && duplicateCompositionId && (
-          <Toast
-            id="duplicateRecordsToast"
-            type="error"
-            onClose={this.props.hideDuplicateRecordsToast}
-          >
-            {intl.formatMessage(messages.duplicateRecord, {
-              trackingId: (
-                <Link
-                  underline
-                  color="white"
-                  element="button"
-                  onClick={() =>
-                    this.props.hideDuplicateRecordsToast() &&
-                    goToDeclarationRecordAudit(
-                      'reviewTab',
-                      duplicateCompositionId
-                    )
-                  }
-                >
-                  {duplicateTrackingId}
-                </Link>
-              )
-            })}
-          </Toast>
-        )}
-        {downloadDeclarationFailedToast && (
-          <Toast
-            id="PINUpdateSuccessToast"
-            type="warning"
-            onClose={this.props.hideDownloadDeclarationFailedToast}
-          >
-            {intl.formatMessage(messages.downloadDeclarationFailed)}
-          </Toast>
-        )}
-        {unassignedModal !== null && (
-          <Toast
-            id="unassignedModal"
-            type="warning"
-            onClose={this.props.hideUnassignedModal}
-          >
-            {intl.formatMessage(messages.unassigned, {
-              trackingId: unassignedModal.trackingId
-            })}
-          </Toast>
-        )}
-        {userCreateDuplicateMobileFailedToast.visible && (
-          <Toast
-            id="createUserDuplicateMobileFailedToast"
-            type="warning"
-            onClose={this.hideCreateUserFormErrorToast}
-          >
-            {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
-              number: userCreateDuplicateMobileFailedToast.mobile
-            })}
-          </Toast>
-        )}
-        {userCreateDuplicateEmailFailedToast.visible && (
-          <Toast
-            id="createUserDuplicateEmailFailedToast"
-            type="warning"
-            onClose={this.hideCreateUserFormDuplicateEmailErrorToast}
-          >
-            {intl.formatMessage(userMessages.duplicateUserEmailErrorMessege, {
-              email: userCreateDuplicateEmailFailedToast.email
-            })}
-          </Toast>
-        )}
-        {unassignedDeclarations.length > 0 && (
-          <Toast
-            id="unassignedDeclarationsToast"
-            type="info"
-            onClose={this.hideUnassignedDeclarationsToast}
-          >
-            {intl.formatMessage(messages.unassigned, {
-              trackingId:
-                unassignedDeclarations.length > 3
-                  ? `${unassignedDeclarations.slice(0, 3).join(', ')}...`
-                  : unassignedDeclarations.join(', ')
-            })}
-          </Toast>
-        )}
-        {emailAllUsers.visible && (
-          <Toast
-            id="emailAllUsersFeedback"
-            type={emailAllUsers.type}
-            onClose={this.hideEmailAllUsersFeedbackToast}
-          >
-            {emailAllUsers.type === 'success'
-              ? intl.formatMessage(messages.emailAllUsersSuccess)
-              : intl.formatMessage(messages.emailAllUsersError)}
-          </Toast>
-        )}
-        {/* More notification types can be added here */}
-      </div>
-    )
-  }
+      {submitFormErrorToast && (
+        <Toast
+          id="submissionErrorToast"
+          type="warning"
+          onClose={hideSubmitFormErrorToast}
+        >
+          {userFormSubmitErrorMessage}
+        </Toast>
+      )}
+      {userAuditSuccessToast.visible && (
+        <Toast
+          id="userAuditSuccessToast"
+          type="success"
+          onClose={hideUserAuditSuccessToast}
+        >
+          {intl.formatMessage(messages.userAuditSuccess, {
+            name: userAuditSuccessToast.userFullName,
+            action: userAuditSuccessToast.action
+          })}
+        </Toast>
+      )}
+      {showPINUpdateSuccess && (
+        <Toast
+          id="PINUpdateSuccessToast"
+          type="success"
+          onClose={hidePINUpdateSuccessToast}
+        >
+          {intl.formatMessage(messages.updatePINSuccess)}
+        </Toast>
+      )}
+      {showDuplicateRecordsToast && duplicateCompositionId && (
+        <Toast
+          id="duplicateRecordsToast"
+          type="error"
+          onClose={hideDuplicateRecordsToast}
+        >
+          {intl.formatMessage(messages.duplicateRecord, {
+            trackingId: (
+              <Link
+                underline
+                color="white"
+                element="button"
+                onClick={() =>
+                  hideDuplicateRecordsToast() &&
+                  goToDeclarationRecordAudit(
+                    'reviewTab',
+                    duplicateCompositionId
+                  )
+                }
+              >
+                {duplicateTrackingId}
+              </Link>
+            )
+          })}
+        </Toast>
+      )}
+      {downloadDeclarationFailedToast && (
+        <Toast
+          id="PINUpdateSuccessToast"
+          type="warning"
+          onClose={hideDownloadDeclarationFailedToast}
+        >
+          {intl.formatMessage(messages.downloadDeclarationFailed)}
+        </Toast>
+      )}
+      {unassignedModal !== null && (
+        <Toast
+          id="unassignedModal"
+          type="warning"
+          onClose={hideUnassignedModal}
+        >
+          {intl.formatMessage(messages.unassigned, {
+            trackingId: unassignedModal.trackingId
+          })}
+        </Toast>
+      )}
+      {userCreateDuplicateMobileFailedToast.visible && (
+        <Toast
+          id="createUserDuplicateMobileFailedToast"
+          type="warning"
+          onClose={hideCreateUserErrorToast}
+        >
+          {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+            number: userCreateDuplicateMobileFailedToast.mobile
+          })}
+        </Toast>
+      )}
+      {userCreateDuplicateEmailFailedToast.visible && (
+        <Toast
+          id="createUserDuplicateEmailFailedToast"
+          type="warning"
+          onClose={hideCreateUserFormDuplicateEmailErrorToast}
+        >
+          {intl.formatMessage(userMessages.duplicateUserEmailErrorMessege, {
+            email: userCreateDuplicateEmailFailedToast.email
+          })}
+        </Toast>
+      )}
+      {unassignedDeclarations.length > 0 && (
+        <Toast
+          id="unassignedDeclarationsToast"
+          type="info"
+          onClose={hideUnassignedDeclarationsToast}
+        >
+          {intl.formatMessage(messages.unassigned, {
+            trackingId:
+              unassignedDeclarations.length > 3
+                ? `${unassignedDeclarations.slice(0, 3).join(', ')}...`
+                : unassignedDeclarations.join(', ')
+          })}
+        </Toast>
+      )}
+      {emailAllUsers.visible && (
+        <Toast
+          id="emailAllUsersFeedback"
+          type={emailAllUsers.type}
+          onClose={hideEmailAllUsersFeedbackToast}
+        >
+          {emailAllUsers.type === 'success'
+            ? intl.formatMessage(messages.emailAllUsersSuccess)
+            : intl.formatMessage(messages.emailAllUsersError)}
+        </Toast>
+      )}
+      {/* More notification types can be added here */}
+    </div>
+  )
 }
 
 const mapStateToProps = (store: IStoreState) => {
