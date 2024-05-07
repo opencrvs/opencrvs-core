@@ -48,6 +48,9 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           action
           regStatus
           user {
+            primaryOffice {
+              name
+            }
             name {
               firstNames
               familyName
@@ -90,6 +93,9 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           action
           regStatus
           user {
+            primaryOffice {
+              name
+            }
             name {
               firstNames
               familyName
