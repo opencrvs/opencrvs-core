@@ -125,7 +125,6 @@ export interface IDynamicOptions {
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
-  initialValue?: string
 }
 
 export interface IDispatchOptions {
@@ -584,6 +583,7 @@ export interface INumberFormField extends IFormFieldBase {
   max?: number
   inputFieldWidth?: string
   inputWidth?: number
+  maxLength?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -1083,6 +1083,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   max?: number
   inputFieldWidth?: string
   inputWidth?: number
+  maxLength?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {

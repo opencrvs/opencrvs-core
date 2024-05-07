@@ -726,7 +726,7 @@ const BodyContent = ({
           variables={{
             id: declarationId
           }}
-          fetchPolicy="no-cache"
+          fetchPolicy="network-only"
         >
           {({ loading, error, data, refetch }) => {
             if (loading) {

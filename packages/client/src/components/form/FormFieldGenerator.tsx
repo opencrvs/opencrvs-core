@@ -59,6 +59,7 @@ import {
   ISelectFormFieldWithOptions,
   ITextFormField,
   Ii18nTextFormField,
+  Ii18nNumberFormField,
   LINK,
   BULLET_LIST,
   NUMBER,
@@ -508,7 +509,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       if (fieldDefinition?.inputWidth) {
         inputFieldWidth = fieldDefinition.inputWidth + 'px'
       }
-
       return (
         <InputField {...inputFieldProps}>
           <TextInput
@@ -516,12 +516,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             step={fieldDefinition.step}
             max={fieldDefinition.max}
             {...inputProps}
-            onKeyPress={(e: { key: string; preventDefault: () => void }) => {
+            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+                e.preventDefault()
+              }
+              const maxLength = (fieldDefinition as Ii18nNumberFormField)
+                .maxLength
+              if (maxLength && e.currentTarget.value.length >= maxLength) {
                 e.preventDefault()
               }
             }}
             value={inputProps.value as string}
+            maxLength={(fieldDefinition as Ii18nNumberFormField).maxLength}
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
@@ -667,52 +673,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export function getInitialValueForSelectDynamicValue(
-  field: IFormField,
-  userDetails: UserDetails | null
-) {
-  let fieldInitialValue = field.initialValue as IFormFieldValue
-  const catchmentAreas = userDetails?.catchmentArea
-  let district = ''
-  let state = ''
-  let locationLevel3 = ''
-
-  if (catchmentAreas) {
-    catchmentAreas.forEach((catchmentArea) => {
-      if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
-        )
-      ) {
-        locationLevel3 = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'DISTRICT'
-        )
-      ) {
-        district = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'STATE'
-        )
-      ) {
-        state = catchmentArea.id
-      }
-    })
-  }
-
-  if (field.name.includes('district') && !field.initialValue && district) {
-    fieldInitialValue = district as IFormFieldValue
-  }
-  if (field.name.includes('state') && !field.initialValue && state) {
-    fieldInitialValue = state as IFormFieldValue
-  }
-  if (!field.initialValue && locationLevel3) {
-    fieldInitialValue = locationLevel3 as IFormFieldValue
-  }
-  return fieldInitialValue
-}
-
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: UserDetails | null
@@ -737,16 +697,6 @@ const mapFieldsToValues = (
       }
     }
 
-    if (
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-      !field.initialValue &&
-      field.dynamicOptions.initialValue === 'agentDefault'
-    ) {
-      fieldInitialValue = getInitialValueForSelectDynamicValue(
-        field,
-        userDetails
-      )
-    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 
