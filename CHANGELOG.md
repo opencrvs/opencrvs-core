@@ -18,6 +18,8 @@
 
 - #### Remove unused GraphQL resolvers locationById and locationsByParent
 
+- #### Remove unused GraphQL type `user.catchmentArea` in favor of `user.primaryOffice`
+
 - #### Move default address generation to country-config
 
   We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
