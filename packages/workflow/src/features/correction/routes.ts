@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { badRequest, conflict } from '@hapi/boom'
+import { conflict } from '@hapi/boom'
 import { Request } from '@hapi/hapi'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import {
@@ -59,18 +59,7 @@ import {
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
-import { z } from 'zod'
-
-export function validateRequest<T extends z.ZodType>(
-  validator: T,
-  payload: unknown
-): z.infer<T> {
-  try {
-    return validator.parse(payload)
-  } catch (error) {
-    throw badRequest(error.message)
-  }
-}
+import { validateRequest } from '@workflow/utils/index'
 
 export const routes = [
   createRoute({
