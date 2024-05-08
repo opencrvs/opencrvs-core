@@ -10,7 +10,7 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
-    "precommit": "yarn lint && lint-staged",
+    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "build:clean": "rm -rf build",
@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^9.0.0",
     "@typescript-eslint/parser": "^4.5.0",
     "ts-node": "^6.1.1",
     "typescript": "4.9.5"
@@ -57,7 +57,7 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "git add"
+      "eslint -c .eslintrc.js --fix"
     ]
   },
   "jest": {
