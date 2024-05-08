@@ -108,13 +108,12 @@ export const getCorrectorSection = (
 ): IFormSection => {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
-
   const initialOptions: IRadioOption[] = [
     {
       value: CorrectorRelationship.INFORMANT,
       label: messages.informant,
       param: {
-        informant: labelFormatterForInformant(informant)
+        informant: informant
       }
     },
     {
