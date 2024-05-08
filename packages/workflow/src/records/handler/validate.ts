@@ -16,33 +16,31 @@ import { auditEvent } from '@workflow/records/audit'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
-export const validateRoute = [
-  createRoute({
-    method: 'POST',
-    path: '/records/{recordId}/validate',
-    allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
-    action: 'VALIDATE',
-    handler: async (request, record) => {
-      const token = getToken(request)
-      const payload = validateRequest(
-        z.object({
-          comments: z.string().optional(),
-          timeLoggedMS: z.number().optional()
-        }),
-        request.payload
-      )
+export const validateRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/validate',
+  allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
+  action: 'VALIDATE',
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(
+      z.object({
+        comments: z.string().optional(),
+        timeLoggedMS: z.number().optional()
+      }),
+      request.payload
+    )
 
-      const validatedRecord = await toValidated(
-        record,
-        token,
-        payload.comments,
-        payload.timeLoggedMS
-      )
+    const validatedRecord = await toValidated(
+      record,
+      token,
+      payload.comments,
+      payload.timeLoggedMS
+    )
 
-      await indexBundle(validatedRecord, token)
-      await auditEvent('sent-for-approval', validatedRecord, token)
+    await indexBundle(validatedRecord, token)
+    await auditEvent('sent-for-approval', validatedRecord, token)
 
-      return validatedRecord
-    }
-  })
-]
+    return validatedRecord
+  }
+})

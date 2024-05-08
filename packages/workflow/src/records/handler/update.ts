@@ -43,46 +43,40 @@ const requestSchema = z.object({
   >()
 })
 
-export const updateRoute = [
-  createRoute({
-    method: 'POST',
-    path: '/records/{recordId}/update',
-    allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
-    action: 'UPDATE_DECLARATION',
-    handler: async (request, record) => {
-      const token = getToken(request)
-      const payload = validateRequest(requestSchema, request.payload)
+export const updateRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/update',
+  allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
+  action: 'UPDATE_DECLARATION',
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(requestSchema, request.payload)
 
-      const { details, event } = payload
-      const {
-        registration: registrationWithChangedValues,
-        ...detailsWithoutReg
-      } = details
-      const { changedValues, ...registration } = registrationWithChangedValues
-      const payloadRecordDetails = {
-        ...detailsWithoutReg,
-        registration
-      }
-      const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
-      const recordInputWithUploadedAttachments =
-        await uploadBase64AttachmentsToDocumentsStore(
-          payloadRecordDetails,
-          getAuthHeader(request)
-        )
-
-      const updatedBundle = updateFHIRBundle(
-        record,
-        recordInputWithUploadedAttachments,
-        event
-      )
-      const updatedRecord = await toUpdated(
-        updatedBundle,
-        token,
-        updatedDetails
-      )
-
-      await indexBundle(updatedRecord, token)
-      return updatedRecord
+    const { details, event } = payload
+    const {
+      registration: registrationWithChangedValues,
+      ...detailsWithoutReg
+    } = details
+    const { changedValues, ...registration } = registrationWithChangedValues
+    const payloadRecordDetails = {
+      ...detailsWithoutReg,
+      registration
     }
-  })
-]
+    const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
+    const recordInputWithUploadedAttachments =
+      await uploadBase64AttachmentsToDocumentsStore(
+        payloadRecordDetails,
+        getAuthHeader(request)
+      )
+
+    const updatedBundle = updateFHIRBundle(
+      record,
+      recordInputWithUploadedAttachments,
+      event
+    )
+    const updatedRecord = await toUpdated(updatedBundle, token, updatedDetails)
+
+    await indexBundle(updatedRecord, token)
+    return updatedRecord
+  }
+})
