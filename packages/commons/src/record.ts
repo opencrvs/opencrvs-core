@@ -31,8 +31,7 @@ import {
   getStatusFromTask,
   getTaskFromSavedBundle,
   isCorrectionRequestedTask,
-  isTask,
-  sortTasksDescending
+  isTask
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
 
@@ -209,26 +208,6 @@ export type RecordWithPreviousTask<T extends ValidRecord> = NestedNominal<
   T,
   'RecordWithPreviousTask'
 >
-
-export function withOnlyLatestTask<
-  T extends RecordWithPreviousTask<ValidRecord>
->(record: T) {
-  const tasks = sortTasksDescending(
-    record.entry.map((entry) => entry.resource).filter(isTask)
-  )
-
-  const newRec = changeState(
-    {
-      ...record,
-      entry: record.entry.filter(
-        (entry) => !isTask(entry.resource) || entry.resource === tasks[0] // match by reference
-      )
-    },
-    getState(record)
-  )
-
-  return newRec as any as T extends RecordWithPreviousTask<infer S> ? S : void
-}
 
 export function addResourceToRecord<T extends Bundle>(
   bundle: T,
