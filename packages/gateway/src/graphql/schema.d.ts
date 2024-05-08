@@ -277,7 +277,7 @@ export interface GQLLocation {
   id: string
   _fhirID?: string
   identifier?: Array<GQLIdentifier>
-  status: string
+  status?: string
   name?: string
   alias?: Array<string>
   description?: string

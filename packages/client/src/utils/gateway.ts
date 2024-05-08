@@ -963,7 +963,7 @@ export type Location = {
   longitude?: Maybe<Scalars['Float']>
   name?: Maybe<Scalars['String']>
   partOf?: Maybe<Scalars['String']>
-  status: Scalars['String']
+  status?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
   type?: Maybe<Scalars['String']>
 }
@@ -2917,7 +2917,7 @@ export type FetchUserQuery = {
       id: string
       name?: string | null
       alias?: Array<string> | null
-      status: string
+      status?: string | null
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
