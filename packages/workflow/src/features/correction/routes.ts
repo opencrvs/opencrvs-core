@@ -32,8 +32,7 @@ import {
   getTrackingId,
   isCorrectionRequestedTask,
   isTask,
-  updateFHIRBundle,
-  withOnlyLatestTask
+  updateFHIRBundle
 } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import {
@@ -154,18 +153,43 @@ export const routes = [
           rejectionDetails
         )
 
-      // Mark previous CORRECTION_REQUESTED task as rejected
-      // Reinstate previous REGISTERED / CERTIFIED / ISSUED task
-      await sendBundleToHearth(recordInPreviousStateWithCorrectionRejection)
-
       // This is just for backwards compatibility reasons as a lot of existing code assimes there
       // is only one task in the bundle
-      const recordWithOnlyTheNewTask = withOnlyLatestTask(
+      const [correctionRejectedTask, prevTask] = getTasksInAscendingOrder(
         recordInPreviousStateWithCorrectionRejection
       )
 
-      await createNewAuditEvent(recordWithOnlyTheNewTask, getToken(request))
-      await indexBundle(recordWithOnlyTheNewTask, getToken(request))
+      const recordWithoutTasks = getRecordWithoutTasks(
+        recordInPreviousStateWithCorrectionRejection
+      )
+      const recordWithCorrectionRejectedTask = addTaskToRecord(
+        recordWithoutTasks,
+        correctionRejectedTask
+      )
+
+      // Then add the corrected task to the record
+      const fullBundleToBeSaved = addTaskToRecord(
+        recordWithCorrectionRejectedTask,
+        prevTask
+      )
+
+      const recordWithUpdatedStatus = addTaskToRecord(
+        recordWithoutTasks,
+        prevTask
+      )
+
+      // Mark previous CORRECTION_REQUESTED task as rejected
+      // Reinstate previous REGISTERED / CERTIFIED / ISSUED task
+      await sendBundleToHearth(fullBundleToBeSaved)
+
+      // has reason and timeLoggedMS
+      await createNewAuditEvent(
+        recordWithCorrectionRejectedTask,
+        getToken(request)
+      )
+
+      // has the previous business status
+      await indexBundle(recordWithUpdatedStatus, getToken(request))
 
       /*
        * Notify the requesting practitioner that the correction request has been approved
@@ -186,13 +210,13 @@ export const routes = [
         getAuthHeader(request),
         {
           event: 'BIRTH',
-          trackingId: getTrackingId(recordWithOnlyTheNewTask)!,
+          trackingId: getTrackingId(recordWithCorrectionRejectedTask)!,
           userFullName: requestingPractitioner.name,
           reason: rejectionDetails.reason
         }
       )
 
-      return recordWithOnlyTheNewTask
+      return recordWithCorrectionRejectedTask
     }
   }),
   createRoute({
