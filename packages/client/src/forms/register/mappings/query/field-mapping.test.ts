@@ -99,6 +99,7 @@ describe('Query FieldMapping', () => {
       eventLocation: {
         id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
         type: 'HEALTH_FACILITY',
+        status: 'active',
         address: {
           line: [],
           district: null,

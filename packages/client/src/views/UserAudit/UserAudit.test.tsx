@@ -151,6 +151,7 @@ describe('User audit list tests for sys admin', () => {
     userDetails.systemRole = SystemRoleType.LocalSystemAdmin
     userDetails.primaryOffice = {
       id: '895cc945-94a9-4195-9a29-22e9310f3385',
+      status: 'active',
       name: 'Narsingdi Paurasabha',
       alias: ['নরসিংদী পৌরসভা']
     }
