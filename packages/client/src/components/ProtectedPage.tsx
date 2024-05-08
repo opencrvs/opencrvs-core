@@ -26,11 +26,11 @@ import {
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
-import styled, { keyframes } from 'styled-components'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
+import { LoadingBar } from './LoadingBar'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -53,43 +53,6 @@ interface IProtectPageState {
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
 
-const ProgressBackground = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`
-
-const ProgressBar = styled.div`
-  width: 276px;
-  height: 8px;
-  margin-top: 27px;
-  border-radius: 100px;
-  opacity: 0px;
-  background: ${({ theme }) => theme.colors.grey300};
-`
-
-const ProgressAnimation = keyframes`
-  0% { min-width: 5%; }
-  1% { min-width: 20%; }
-  2% { min-width: 40%; }
-  10% { min-width: 60%; }
-  50% { min-width: 80%; }
-  100% { min-width: 90%; }
-  `
-const Progress = styled.div`
-  width: 0;
-  height: 8px;
-  gap: 0px;
-  border-radius: 100px;
-  opacity: 0px;
-  background: ${({ theme }) => theme.colors.blueDark};
-  animation: ${ProgressAnimation} 300s ease;
-`
-const LoadingText = styled.p``
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
     super(props)
@@ -203,15 +166,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   renderLoadingScreen() {
-    return (
-      <ProgressBackground>
-        <img src="../../public/images/logo-90x90.svg" alt="logo" />
-        <ProgressBar>
-          <Progress id="progress" />
-        </ProgressBar>
-        <LoadingText>Loading records...</LoadingText>
-      </ProgressBackground>
-    )
+    return <LoadingBar />
   }
 
   conditionalRenderUponSecuredState() {

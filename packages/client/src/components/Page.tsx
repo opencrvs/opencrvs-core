@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   getOfflineData,
   getOfflineDataLoaded,
@@ -32,6 +31,7 @@ import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
+import { LoadingBar } from './LoadingBar'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
@@ -51,25 +51,6 @@ const StyledPage = styled.div<IPageProps>`
     box-sizing: border-box;
   }
 `
-
-const spinnerAppearAnimation = keyframes`
-  85% { opacity: 0; }
-  100% {  opacity: 1; }
-`
-
-const StyledSpinner = styled(Spinner)`
-  opacity: 0;
-  position: absolute;
-  margin-left: -24px;
-  margin-top: -24px;
-  top: calc(50% - 20px);
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  /** Show spinner after 2 seconds */
-  animation: ${spinnerAppearAnimation} 2s forwards;
-`
-
 interface IPageProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
@@ -144,7 +125,7 @@ class Component extends React.Component<
     } else {
       return (
         <>
-          <StyledSpinner id="appSpinner" />
+          <LoadingBar />
         </>
       )
     }
