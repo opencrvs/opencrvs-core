@@ -8,12 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { USER_MANAGEMENT_URL } from '@workflow/constants'
+import {
+  APPLICATION_CONFIG_URL,
+  USER_MANAGEMENT_URL
+} from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
+import { UUID, joinURL } from '@opencrvs/commons'
 
 export async function getUser(
   userId: string,
@@ -163,21 +166,25 @@ export async function getPractitionerLocations(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
   const roleEntry = roleResponse.entry[0].resource
-  if (!roleEntry || !roleEntry.location) {
+  if (!roleEntry || !roleEntry.location || roleEntry.location.length === 0) {
     throw new Error('PractitionerRole has no locations associated')
   }
-  const locList = []
-  for (const location of roleEntry.location) {
-    const splitRef = location.reference.split('/')
-    const locationResponse: fhir3.Location = await getFromFhir(
-      `/Location/${splitRef[1]}`
+
+  const res = await fetch(
+    joinURL(
+      APPLICATION_CONFIG_URL,
+      `/locations/${roleEntry.location[0].reference.replace(
+        'Location/',
+        ''
+      )}/hierarchy`
     )
-    if (!locationResponse) {
-      throw new Error(`Location not found for ${location}`)
-    }
-    locList.push(locationResponse)
+  )
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch locations ' + res.statusText)
   }
-  return locList as [fhir3.Location]
+
+  return res.json() as Promise<[fhir3.Location]>
 }
 
 export function getPractitionerRef(practitioner: Practitioner) {
