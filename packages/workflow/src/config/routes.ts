@@ -28,6 +28,7 @@ import { rejectCorrectionRoute } from '@workflow/records/handler/correction/reje
 import { approveCorrectionRoute } from '@workflow/records/handler/correction/approve'
 import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
+import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
 
 export const getRoutes = () => {
   const routes = [
@@ -129,6 +130,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Mark as not-duplicate record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/event-notification',
+      handler: eventNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Saves full fhir bundle to search and hearth'
       }
     },
     validateRoute,
