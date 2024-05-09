@@ -27,7 +27,9 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  :not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  }
   height: 40px;
   padding: 0px 8px;
 `
