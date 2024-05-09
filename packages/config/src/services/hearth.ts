@@ -12,8 +12,16 @@ import { Location, SavedBundle } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@config/config/constants'
 import { memoize } from 'lodash'
 
+function addPathToBase(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return new URL(path, baseWithSlash)
+}
+
 export const fetchLocations = memoize(async () => {
-  const allLocationsUrl = new URL(`Location?_count=0&status=active`, FHIR_URL)
+  const allLocationsUrl = addPathToBase(
+    FHIR_URL,
+    `Location?_count=0&status=active`
+  )
   const response = await fetch(allLocationsUrl)
 
   if (!response.ok) {
@@ -29,7 +37,7 @@ export const fetchFromHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const response = await fetch(new URL(suffix, FHIR_URL), {
+  const response = await fetch(addPathToBase(FHIR_URL, suffix), {
     method,
     headers: {
       'Content-Type': 'application/fhir+json'
