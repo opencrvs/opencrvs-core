@@ -33,6 +33,15 @@ const options = {
   useWebWorker: true
 }
 
+const FullWidthImageUploader = styled(ImageUploader)`
+  width: 100%;
+`
+
+const UploadWrapper = styled.div`
+  max-width: 461px;
+  width: 100%;
+`
+
 const Flex = styled.div`
   display: flex;
   flex-wrap: nowrap;
@@ -88,13 +97,17 @@ class DocumentUploaderWithOptionComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
+    const dropdownOptions = this.initializeDropDownOption()
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
-      dropDownOptions: this.initializeDropDownOption(),
+      dropDownOptions: dropdownOptions,
       filesBeingProcessed: [],
       fields: {
-        documentType: EMPTY_STRING,
+        documentType:
+          dropdownOptions.length === 1
+            ? dropdownOptions[0].value
+            : EMPTY_STRING,
         documentData: EMPTY_STRING
       }
     }
@@ -271,7 +284,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     const { intl, requiredErrorMessage } = this.props
 
     return (
-      <div>
+      <UploadWrapper>
         <div id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>
@@ -290,7 +303,16 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onDelete={this.onDelete}
         />
         {this.props.hideOnEmptyOption &&
-        this.state.dropDownOptions.length === 0 ? null : (
+        this.state.dropDownOptions.length === 0 ? null : this.state
+            .dropDownOptions.length === 1 ? (
+          <FullWidthImageUploader
+            id="upload_document"
+            title={intl.formatMessage(formMessages.addFile)}
+            onClick={(e) => !this.isValid() && e.preventDefault()}
+            handleFileChange={this.handleFileChange}
+            disabled={this.state.filesBeingProcessed.length > 0}
+          />
+        ) : (
           <Flex>
             <Select
               id={this.props.name}
@@ -302,7 +324,6 @@ class DocumentUploaderWithOptionComp extends React.Component<
               isDisabled={this.state.filesBeingProcessed.length > 0}
               onBlur={this.props.onBlur}
             />
-
             <ImageUploader
               id="upload_document"
               title={intl.formatMessage(formMessages.addFile)}
@@ -323,7 +344,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onDelete={this.onDelete}
           />
         )}
-      </div>
+      </UploadWrapper>
     )
   }
 }
