@@ -18,7 +18,6 @@ import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
 const Wrapper = styled.div`
-  margin: 8px 0px;
   max-width: 100%;
 `
 
