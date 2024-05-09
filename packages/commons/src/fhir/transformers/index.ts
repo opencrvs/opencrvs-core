@@ -2276,7 +2276,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [fieldValue],
           'given',
           context
         )
@@ -2369,7 +2369,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [fieldValue],
           'given',
           context
         )
