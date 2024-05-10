@@ -20,50 +20,48 @@ import { isRejected } from '@opencrvs/commons/types'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
-export const registerRoute = [
-  createRoute({
-    method: 'POST',
-    path: '/records/{recordId}/register',
-    allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
-    action: 'WAITING_VALIDATION',
-    handler: async (request, record) => {
-      const token = getToken(request)
+export const registerRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/register',
+  allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
+  action: 'WAITING_VALIDATION',
+  handler: async (request, record) => {
+    const token = getToken(request)
 
-      const payload = validateRequest(
-        z.object({
-          comments: z.string().optional(),
-          timeLoggedMS: z.number().optional()
-        }),
-        request.payload
+    const payload = validateRequest(
+      z.object({
+        comments: z.string().optional(),
+        timeLoggedMS: z.number().optional()
+      }),
+      request.payload
+    )
+
+    const recordInWaitingValidationState =
+      await toWaitingForExternalValidationState(
+        record,
+        token,
+        payload.comments,
+        payload.timeLoggedMS
       )
 
-      const recordInWaitingValidationState =
-        await toWaitingForExternalValidationState(
-          record,
-          token,
-          payload.comments,
-          payload.timeLoggedMS
-        )
+    await indexBundle(recordInWaitingValidationState, token)
+    await auditEvent(
+      'waiting-external-validation',
+      recordInWaitingValidationState,
+      token
+    )
 
-      await indexBundle(recordInWaitingValidationState, token)
-      await auditEvent(
-        'waiting-external-validation',
-        recordInWaitingValidationState,
-        token
-      )
+    const rejectedOrWaitingValidationRecord = await initiateRegistration(
+      recordInWaitingValidationState,
+      request.headers,
+      token
+    )
 
-      const rejectedOrWaitingValidationRecord = await initiateRegistration(
-        recordInWaitingValidationState,
-        request.headers,
-        token
-      )
-
-      if (isRejected(rejectedOrWaitingValidationRecord)) {
-        await indexBundle(rejectedOrWaitingValidationRecord, token)
-        await auditEvent('sent-for-updates', record, token)
-      }
-
-      return rejectedOrWaitingValidationRecord
+    if (isRejected(rejectedOrWaitingValidationRecord)) {
+      await indexBundle(rejectedOrWaitingValidationRecord, token)
+      await auditEvent('sent-for-updates', record, token)
     }
-  })
-]
+
+    return rejectedOrWaitingValidationRecord
+  }
+})
