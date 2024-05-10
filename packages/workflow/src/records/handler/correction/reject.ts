@@ -72,12 +72,6 @@ export const rejectCorrectionRoute = createRoute({
       correctionRejectedTask
     )
 
-    // Then add the corrected task to the record
-    const fullBundleToBeSaved = addTaskToRecord(
-      recordWithCorrectionRejectedTask,
-      prevTask
-    )
-
     const recordWithUpdatedStatus = addTaskToRecord(
       recordWithoutTasks,
       prevTask
@@ -85,7 +79,7 @@ export const rejectCorrectionRoute = createRoute({
 
     // Mark previous CORRECTION_REQUESTED task as rejected
     // Reinstate previous REGISTERED / CERTIFIED / ISSUED task
-    await sendBundleToHearth(fullBundleToBeSaved)
+    await sendBundleToHearth(recordInPreviousStateWithCorrectionRejection)
 
     // has reason and timeLoggedMS
     await createNewAuditEvent(
