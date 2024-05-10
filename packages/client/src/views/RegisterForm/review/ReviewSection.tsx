@@ -1873,7 +1873,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <ReviewContainter>
                   {transformedSectionData
                     .filter((sec) => sec.items.length > 0)
-                    .map((sec, index) => {
+                    .map((sec) => {
                       return (
                         <DeclarationDataContainer key={'Section_' + sec.id}>
                           <Accordion
@@ -1952,33 +1952,34 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     }
                     expand={true}
                   >
-                    {Object.entries(errorsOnFields.documents)
-                      .map(
-                        ([fieldName, { errors }]) =>
-                          [
-                            documentsSection.groups[0].fields.find(
-                              ({ name }) => name === fieldName
-                            )!,
-                            errors
-                          ] as const
-                      )
-                      .filter(([_, errors]) => errors.length > 0)
-                      .map(([field, errors]) => (
-                        <RequiredDocument key={field.name}>
-                          <Icon
-                            color="currentColor"
-                            name="Paperclip"
-                            size="medium"
-                          />
-                          <Text variant="reg16" element="span">
-                            {intl.formatMessage(field.label)}
-                          </Text>
+                    {errorsOnFields.documents &&
+                      Object.entries(errorsOnFields.documents)
+                        .map(
+                          ([fieldName, { errors }]) =>
+                            [
+                              documentsSection.groups[0].fields.find(
+                                ({ name }) => name === fieldName
+                              )!,
+                              errors
+                            ] as const
+                        )
+                        .filter(([_, errors]) => errors.length > 0)
+                        .map(([field, errors]) => (
+                          <RequiredDocument key={field.name}>
+                            <Icon
+                              color="currentColor"
+                              name="Paperclip"
+                              size="medium"
+                            />
+                            <Text variant="reg16" element="span">
+                              {intl.formatMessage(field.label)}
+                            </Text>
 
-                          <Text variant="reg16" element="span" color="red">
-                            ({intl.formatMessage(errors[0].message)})
-                          </Text>
-                        </RequiredDocument>
-                      ))}
+                            <Text variant="reg16" element="span" color="red">
+                              ({intl.formatMessage(errors[0].message)})
+                            </Text>
+                          </RequiredDocument>
+                        ))}
                     {this.getAllAttachmentInPreviewList(declaration)}
                   </Accordion>
 
@@ -2076,7 +2077,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer id="document_section" options={options}>
-                {options.uploadedDocuments.length == 0 && (
+                {options.uploadedDocuments.length === 0 && (
                   <ZeroDocument id={`zero_document`}>
                     {intl.formatMessage(
                       messages.zeroDocumentsTextForAnySection
