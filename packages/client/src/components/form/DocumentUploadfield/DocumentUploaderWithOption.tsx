@@ -97,17 +97,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    const dropdownOptions = this.initializeDropDownOption()
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
-      dropDownOptions: dropdownOptions,
+      dropDownOptions: this.initializeDropDownOption(),
       filesBeingProcessed: [],
       fields: {
-        documentType:
-          dropdownOptions.length === 1
-            ? dropdownOptions[0].value
-            : EMPTY_STRING,
+        documentType: EMPTY_STRING,
         documentData: EMPTY_STRING
       }
     }
@@ -133,7 +129,10 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   isValid = (): boolean => {
-    const isValid = !!this.state.fields.documentType
+    // If there is only one option available then no need to select it
+    // and it's not shown either
+    const isValid =
+      !!this.state.fields.documentType || this.props.options.length === 1
 
     this.setState({
       errorMessage: isValid
@@ -173,10 +172,14 @@ class DocumentUploaderWithOptionComp extends React.Component<
       return
     }
 
+    // If there is only one option available then it would stay selected
+    const documentType =
+      this.state.fields.documentType || this.state.dropDownOptions[0].value
+
     let fileAsBase64: string
     const optionValues: [IFormFieldValue, string] = [
       this.props.extraValue,
-      this.state.fields.documentType
+      documentType
     ]
 
     this.setState((state) => ({
@@ -221,7 +224,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
     remove(
       tempOptions,
-      (option: ISelectOption) => option.value === this.state.fields.documentType
+      (option: ISelectOption) => option.value === documentType
     )
 
     const newDocument: IFileValue = {
@@ -303,8 +306,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onDelete={this.onDelete}
         />
         {this.props.hideOnEmptyOption &&
-        this.state.dropDownOptions.length === 0 ? null : this.state
-            .dropDownOptions.length === 1 ? (
+        this.state.dropDownOptions.length === 0 ? null : this.props.options
+            .length === 1 ? (
           <FullWidthImageUploader
             id="upload_document"
             title={intl.formatMessage(formMessages.addFile)}
