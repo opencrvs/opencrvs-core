@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled from 'styled-components'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
@@ -35,12 +35,6 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
-
-const Actions = styled.div`
-  & > div {
-    margin-bottom: 16px;
-  }
-`
 
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
@@ -116,6 +110,7 @@ class SelectVitalEventView extends React.Component<
         )}
       >
         <Content
+          size={ContentSize.SMALL}
           title={intl.formatMessage(messages.registerNewEventHeading)}
           bottomActionButtons={[
             <Button
@@ -123,9 +118,11 @@ class SelectVitalEventView extends React.Component<
               id="continue"
               type="primary"
               size="large"
+              fullWidth
               onClick={this.handleContinue}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
+              <Icon name="ArrowRight" />
             </Button>
           ]}
         >
@@ -134,7 +131,12 @@ class SelectVitalEventView extends React.Component<
               {intl.formatMessage(messages.errorMessage)}
             </ErrorText>
           )}
-          <Actions id="select_vital_event_view">
+          <Stack
+            id="select_vital_event_view"
+            direction="column"
+            alignItems="left"
+            gap={0}
+          >
             <RadioButton
               size="large"
               key="birthevent"
@@ -178,7 +180,7 @@ class SelectVitalEventView extends React.Component<
                 }
               />
             )}
-          </Actions>
+          </Stack>
         </Content>
       </Frame>
     )
