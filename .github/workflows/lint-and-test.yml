@@ -26,7 +26,7 @@ jobs:
         run: |
           PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
           echo "Found packages: $PACKAGES"
-          echo "::set-output name=matrix::${PACKAGES}"
+          echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
   test:
     needs: setup
@@ -45,31 +45,30 @@ jobs:
         run: |
           if [ ! -f "${{ matrix.package }}/package.json" ]; then
             echo "No package.json found for ${{ matrix.package }}. Stopping pipeline."
-            echo "::set-output name=skip::true"
+            echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=skip::false"
+            echo "skip=false" >> $GITHUB_OUTPUT
 
             if ! grep -q "\"test\":" "${{ matrix.package }}/package.json"; then
               echo "Test not found in ${{ matrix.package }}"
-              echo "::set-output name=skip-test::true"
+              echo "skip-test=true" >> $GITHUB_OUTPUT
             else
-              echo "::set-output name=skip-test::false"
+              echo "skip=false" >> $GITHUB_OUTPUT
             fi
 
             if ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
               echo "Lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
-              echo "::set-output name=skip-lint::true"
+              echo "skip-lint=true" >> $GITHUB_OUTPUT
             else
-              echo "::set-output name=skip-lint::false"
+              echo "skip-lint=false" >> $GITHUB_OUTPUT
             fi
           fi
 
-      - name: Use Node.js 18.19
+      - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: '18.19'
-          cache: 'npm'
+          node-version-file: .nvmrc
 
       - name: Remove other package directories
         if: steps.check-scripts.outputs.skip != 'true'
@@ -85,14 +84,25 @@ jobs:
             fi
           done
 
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'
-        run: CI="" yarn
+        run: CI="" yarn install --frozen-lockfile
 
+      # TODO: Move out of the matrix to be built once and shared
       - name: Build common package
         if: steps.check-scripts.outputs.skip != 'true'
         run: cd packages/commons && yarn build
@@ -104,6 +114,7 @@ jobs:
             cd packages/components && yarn build
           fi
 
+      # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: cd ${{ matrix.package }} && yarn lint
