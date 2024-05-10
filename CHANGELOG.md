@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0 (TBD)
+
+## New features
+- Supporting document fields can now be made required
+- If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+
+
 ## 1.5.0 (TBD)
 
 ## Breaking changes
