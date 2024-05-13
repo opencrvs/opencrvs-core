@@ -51,14 +51,14 @@ import {
   TaskHistory,
   RejectedRecord
 } from '@opencrvs/commons/types'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
   invokeRegistrationValidation,
-  setupLastRegLocation,
+  setupLastRegOffice,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
   validateDeceasedDetails
@@ -111,6 +111,7 @@ import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fh
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
   practitioner: Practitioner,
+  practitionerOfficeId: UUID,
   correctionDetails: MakeCorrectionRequestInput,
   proofOfLegalCorrectionAttachments: Attachment[],
   paymentAttachmentURL?: string
@@ -152,9 +153,9 @@ export async function toCorrected(
     practitioner
   )
 
-  const correctionRequestWithLocationExtensions = await setupLastRegLocation(
+  const correctionRequestWithLocationExtensions = setupLastRegOffice(
     correctionRequestTaskWithPractitionerExtensions,
-    practitioner
+    practitionerOfficeId
   )
 
   const newEntries = [
@@ -710,6 +711,7 @@ export async function toValidated(
 export async function toCorrectionRequested(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
   practitioner: Practitioner,
+  practitionerOfficeId: UUID,
   correctionDetails: CorrectionRequestInput,
   proofOfLegalCorrectionAttachments: Array<{ type: string; url: string }>,
   paymentAttachmentURL?: string
@@ -752,9 +754,9 @@ export async function toCorrectionRequested(
     practitioner
   )
 
-  const correctionRequestWithLocationExtensions = await setupLastRegLocation(
+  const correctionRequestWithLocationExtensions = setupLastRegOffice(
     correctionRequestTaskWithPractitionerExtensions,
-    practitioner
+    practitionerOfficeId
   )
 
   return changeState(
@@ -833,6 +835,7 @@ export function toVerified(
 export async function toCorrectionRejected(
   record: CorrectionRequestedRecord,
   practitioner: Practitioner,
+  practitionerOfficeId: UUID,
   rejectionDetails: CorrectionRejectionInput
 ): Promise<
   RecordWithPreviousTask<RegisteredRecord | CertifiedRecord | IssuedRecord>
@@ -859,9 +862,9 @@ export async function toCorrectionRejected(
     practitioner
   )
 
-  const correctionRejectionWithLocationExtensions = await setupLastRegLocation(
+  const correctionRejectionWithLocationExtensions = setupLastRegOffice(
     correctionRejectionTaskWithPractitionerExtensions,
-    practitioner
+    practitionerOfficeId
   )
 
   const taskHistory = await getTaskHistory(currentCorrectionRequestedTask.id)
@@ -890,9 +893,9 @@ export async function toCorrectionRejected(
     practitioner
   )
 
-  const previousTaskWithLocationExtensions = await setupLastRegLocation(
+  const previousTaskWithLocationExtensions = setupLastRegOffice(
     previousTaskWithPractitionerExtensions,
-    practitioner
+    practitionerOfficeId
   )
 
   // This is important as otherwise the when the older task is removed later on this one gets dropped out

@@ -217,12 +217,6 @@ export type KnownExtensionType = StringExtensionType & {
   'http://opencrvs.org/specs/extension/regUnassigned': {
     url: 'http://opencrvs.org/specs/extension/regUnassigned'
   }
-  'http://opencrvs.org/specs/extension/regLastLocation': {
-    url: 'http://opencrvs.org/specs/extension/regLastLocation'
-    valueReference: {
-      reference: ResourceIdentifier<Location>
-    }
-  }
   'http://opencrvs.org/specs/extension/part-of': {
     url: 'http://opencrvs.org/specs/extension/part-of'
     valueReference: {

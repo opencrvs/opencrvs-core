@@ -32,6 +32,7 @@ export * from './encounter'
 export * from './patient'
 export * from './composition'
 export * from './constants'
+export * from './location'
 
 export type Resource = fhir3.Resource
 
@@ -234,6 +235,16 @@ export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
   address?: Address
   partOf?: {
     reference: ResourceIdentifier
+  }
+}
+export type Office = Omit<Location, 'type'> & {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type'
+        code: 'CRVS_OFFICE'
+      }
+    ]
   }
 }
 

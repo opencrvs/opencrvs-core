@@ -8,20 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  APPLICATION_CONFIG_URL,
-  USER_MANAGEMENT_URL
-} from '@workflow/constants'
+import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   Practitioner,
+  PractitionerRole,
   resourceIdentifierToUUID,
   SavedLocation,
   SavedPractitioner
 } from '@opencrvs/commons/types'
-import { UUID, joinURL } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
 
 export async function getUser(
   userId: string,
@@ -71,75 +69,13 @@ export async function getSystem(
   return body
 }
 
-export async function getPractitionerPrimaryLocation(
-  practitionerId: string
-): Promise<fhir3.Location> {
-  return getPrimaryLocationFromLocationList(
-    await getPractitionerLocations(practitionerId)
+/** Find the office location of a given practitioner */
+export const getPractitionerOfficeId = async (practitionerId: string) => {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
   )
-}
-
-export async function getPractitionerOffice(
-  practitionerId: string
-): Promise<fhir3.Location> {
-  return getOfficeLocationFromLocationList(
-    await getPractitionerLocations(practitionerId)
-  )
-}
-
-export function getPrimaryLocationFromLocationList(
-  locations: [fhir3.Location]
-): fhir3.Location {
-  const primaryOffice = getOfficeLocationFromLocationList(locations)
-  const primaryLocationId =
-    primaryOffice &&
-    primaryOffice.partOf &&
-    primaryOffice.partOf.reference &&
-    primaryOffice.partOf.reference.split('/')[1]
-
-  if (!primaryLocationId) {
-    throw new Error('No primary location found')
-  }
-
-  const location = locations.find((loc) => loc.id === primaryLocationId)
-  if (!location) {
-    throw new Error(
-      `No primary location not found for office: ${primaryLocationId}`
-    )
-  }
-  return location
-}
-
-function getOfficeLocationFromLocationList(
-  locations: fhir3.Location[]
-): fhir3.Location {
-  let office: fhir3.Location | undefined
-  locations.forEach((location: fhir3.Location) => {
-    if (location.type && location.type.coding) {
-      location.type.coding.forEach((code) => {
-        if (code.code === 'CRVS_OFFICE') {
-          office = location
-        }
-      })
-    }
-  })
-
-  if (!office) {
-    throw new Error('No CRVS office found')
-  }
-  return office
-}
-
-export async function getLoggedInPractitionerLocations(
-  token: string
-): Promise<[fhir3.Location]> {
-  const practitionerResource = await getLoggedInPractitionerResource(token)
-
-  if (!practitionerResource || !practitionerResource.id) {
-    throw new Error('Invalid practioner found')
-  }
-  /* getting location list for practitioner */
-  return await getPractitionerLocations(practitionerResource.id)
+  const roleEntry = roleResponse.entry[0].resource as PractitionerRole
+  return resourceIdentifierToUUID(roleEntry.location[0].reference)
 }
 
 export async function getLoggedInPractitionerResource(
@@ -168,33 +104,6 @@ export async function getLocationOrOfficeById(
   locationId: string
 ): Promise<SavedLocation> {
   return await getFromFhir(`/Location/${locationId}`)
-}
-
-export async function getPractitionerLocations(
-  practitionerId: string
-): Promise<[fhir3.Location]> {
-  const roleResponse = await getFromFhir(
-    `/PractitionerRole?practitioner=${practitionerId}`
-  )
-  const roleEntry = roleResponse.entry[0].resource
-  if (!roleEntry || !roleEntry.location || roleEntry.location.length === 0) {
-    throw new Error('PractitionerRole has no locations associated')
-  }
-
-  const res = await fetch(
-    joinURL(
-      APPLICATION_CONFIG_URL,
-      `/locations/${resourceIdentifierToUUID(
-        roleEntry.location[0].reference
-      )}/hierarchy`
-    )
-  )
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch locations ' + res.statusText)
-  }
-
-  return res.json() as Promise<[fhir3.Location]>
 }
 
 export function getPractitionerRef(practitioner: Practitioner) {

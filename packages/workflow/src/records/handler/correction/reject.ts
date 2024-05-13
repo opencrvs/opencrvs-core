@@ -21,7 +21,10 @@ import {
   getTasksInAscendingOrder,
   getTrackingId
 } from '@opencrvs/commons/types'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerOfficeId
+} from '@workflow/features/user/utils'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
@@ -51,10 +54,14 @@ export const rejectCorrectionRoute = createRoute({
       throw conflict('There is no a pending correction request for this record')
     }
 
+    const loggedInPractitioner = await getLoggedInPractitionerResource(
+      getToken(request)
+    )
     const recordInPreviousStateWithCorrectionRejection =
       await toCorrectionRejected(
         record,
         await getLoggedInPractitionerResource(getToken(request)),
+        await getPractitionerOfficeId(loggedInPractitioner.id),
         rejectionDetails
       )
 

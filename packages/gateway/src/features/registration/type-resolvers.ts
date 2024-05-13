@@ -1148,17 +1148,15 @@ export const typeResolvers: GQLResolver = {
     comments: (task) => task.note,
     location: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-        task.extension
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension as Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      const found = await dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
+      return dataSources.locationsAPI.getParent(
+        resourceIdentifierToUUID(taskLocation.valueReference.reference)
       )
-
-      return found
     },
     office: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
@@ -1169,7 +1167,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
+        resourceIdentifierToUUID(taskLocation.valueReference.reference)
       )
     },
     timeLogged: async (task, _, { dataSources }) => {
@@ -1572,14 +1570,14 @@ export const typeResolvers: GQLResolver = {
     },
     location: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
+      return dataSources.locationsAPI.getParent(
+        resourceIdentifierToUUID(taskLocation.valueReference.reference)
       )
     },
     office: async (task: Task, _: any, { dataSources }) => {

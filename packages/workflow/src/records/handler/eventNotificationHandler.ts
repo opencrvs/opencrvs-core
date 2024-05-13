@@ -14,7 +14,6 @@ import {
   Bundle,
   changeState,
   EVENT_TYPE,
-  KnownExtensionType,
   Resource,
   resourceToSavedBundleEntry,
   StringExtensionType,
@@ -105,20 +104,7 @@ export async function eventNotificationHandler(
 
   if (!officeId) throw internal('Office id not found in bundle')
 
-  const officeLocationExtension = taskWithRegLastUserAndStatus.extension.find(
-    (e) => e.url === 'http://opencrvs.org/specs/extension/regLastLocation'
-  ) as
-    | KnownExtensionType['http://opencrvs.org/specs/extension/regLastLocation']
-    | undefined
-
-  const officeLocationId =
-    officeLocationExtension?.valueReference.reference.split('/')[1]
-
-  if (!officeLocationId)
-    throw internal('Office location id not found in bundle')
-
   const office = await getLocationOrOfficeById(officeId)
-  const officeLocation = await getLocationOrOfficeById(officeLocationId)
 
   const savedBundleWithRegLastUserAndBusinessStatus = {
     ...bundle,
@@ -129,9 +115,8 @@ export async function eventNotificationHandler(
           ?.fullUrl,
         resource: taskWithRegLastUserAndStatus
       },
-      ...[office, officeLocation, practitioner].map((r) =>
-        resourceToSavedBundleEntry(r)
-      )
+      // @TODO: Do we need officeLocation here?
+      ...[office, practitioner].map((r) => resourceToSavedBundleEntry(r))
     ]
   }
 

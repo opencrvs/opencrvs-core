@@ -384,27 +384,6 @@ export async function getEncounterLocationType(
   }
   return type
 }
-export function getRegLastLocation(bundle: fhir.Bundle) {
-  const task: fhir.Task = getResourceByType(
-    bundle,
-    FHIR_RESOURCE_TYPE.TASK
-  ) as fhir.Task
-  if (!task) {
-    throw new Error('Task not found!')
-  }
-  const regLastLocation =
-    task.extension &&
-    task.extension.find(
-      (extension) =>
-        extension.url === 'http://opencrvs.org/specs/extension/regLastLocation'
-    )
-
-  return (
-    regLastLocation &&
-    regLastLocation.valueReference &&
-    regLastLocation.valueReference.reference
-  )
-}
 
 export function getResourceByType<T = fhir.Resource>(
   bundle: fhir.Bundle,

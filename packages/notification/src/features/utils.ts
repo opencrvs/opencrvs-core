@@ -15,10 +15,11 @@ import {
   findCompositionSection,
   findExtension,
   getComposition,
+  getOfficeLocationFromSavedBundle,
   getResourceFromBundleById,
   getStatusFromTask,
   getTaskFromSavedBundle,
-  Location,
+  InProgressRecord,
   Patient,
   ReadyForReviewRecord,
   RegisteredRecord,
@@ -50,7 +51,7 @@ export function getContactEmail(
 }
 
 function error(
-  record: ReadyForReviewRecord | RegisteredRecord,
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord,
   message: string
 ): never {
   const task = getTaskFromSavedBundle(record)
@@ -121,20 +122,13 @@ export function getPersonName(
 }
 
 export function getRegistrationLocation(
-  record: ReadyForReviewRecord | RegisteredRecord
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
 ) {
-  const task = getTaskFromSavedBundle(record)
-  const locationExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastLocation',
-    task.extension
-  )
-  if (!locationExtension) {
-    error(record, 'No last registration office found')
+  const location = getOfficeLocationFromSavedBundle(record)
+  if (!location) {
+    error(record, 'no last registration office location found')
   }
-  const location = getResourceFromBundleById<Location>(
-    record,
-    resourceIdentifierToUUID(locationExtension.valueReference.reference)
-  )
+
   const language = getDefaultLanguage()
   return (
     (language === 'en'

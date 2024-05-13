@@ -67,7 +67,7 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerLocations
+  getPractitionerOfficeId
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 
@@ -140,22 +140,8 @@ export async function withPractitionerDetails<T extends Task>(
   }
   const user = userOrSystem
   const practitioner = await getLoggedInPractitionerResource(token)
-  const relatedLocations = (await getPractitionerLocations(
-    user.practitionerId
-  )) as [SavedLocation]
-  const office = relatedLocations.find((l) =>
-    l.type?.coding?.some(({ code }) => code === 'CRVS_OFFICE')
-  )
-  if (!office) {
-    throw internal('Office not found for the requesting user')
-  }
-  const officeLocationId = office.partOf?.reference.split('/').at(1)
-  const officeLocation = relatedLocations.find((l) => l.id === officeLocationId)
-  if (!officeLocation) {
-    throw internal(
-      'Parent location of office not found for the requesting user'
-    )
-  }
+  const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
+
   newTask.extension.push(
     ...([
       {
@@ -165,19 +151,9 @@ export async function withPractitionerDetails<T extends Task>(
         }
       },
       {
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: `Location/${resourceIdentifierToUUID(
-            office.partOf!.reference
-          )}`
-        }
-      },
-      {
         url: 'http://opencrvs.org/specs/extension/regLastOffice',
-        //@todo: make this field required
-        valueString: office.name,
         valueReference: {
-          reference: `Location/${office.id}`
+          reference: `Location/${practitionerOfficeId}`
         }
       }
     ] satisfies Task['extension'])
@@ -187,9 +163,8 @@ export async function withPractitionerDetails<T extends Task>(
     {
       type: 'document',
       resourceType: 'Bundle',
-      entry: [practitioner, office, officeLocation].map((r) =>
-        resourceToSavedBundleEntry(r)
-      )
+      // @TODO: Office & office location?
+      entry: [practitioner].map((r) => resourceToSavedBundleEntry(r))
     }
   ]
 }

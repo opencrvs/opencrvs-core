@@ -9,18 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import {
   findCompositionSection,
   findExtension,
   findResourceFromBundleById,
   getComposition,
   getResourceFromBundleById,
-  getStatusFromTask,
   getTaskFromSavedBundle,
   getTrackingId,
   InProgressRecord,
-  Location,
   Patient,
   RelatedPerson,
   resourceIdentifierToUUID,
@@ -28,13 +25,7 @@ import {
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
-import { badRequest as boomBadRequest } from '@hapi/boom'
-
-function badRequest(record: InProgressRecord, message: string): never {
-  const task = getTaskFromSavedBundle(record)
-  const taskStatus = getStatusFromTask(task)
-  throw boomBadRequest(`${message} in ${taskStatus} record`)
-}
+import { getRegistrationLocation } from '@notification/features/utils'
 
 function getOfficeName(record: InProgressRecord) {
   const task = getTaskFromSavedBundle(record)
@@ -71,27 +62,6 @@ function getInformantName(record: InProgressRecord) {
     return null
   }
   return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
-}
-
-function getRegistrationLocation(record: InProgressRecord) {
-  const task = getTaskFromSavedBundle(record)
-  const locationExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastLocation',
-    task.extension
-  )
-  if (!locationExtension) {
-    badRequest(record, 'no last registration office found')
-  }
-  const location = getResourceFromBundleById<Location>(
-    record,
-    resourceIdentifierToUUID(locationExtension.valueReference.reference)
-  )
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? location.name
-      : location.alias?.[0] ?? location.name) ?? ''
-  )
 }
 
 function getContactPhoneNo(record: InProgressRecord) {
