@@ -615,7 +615,13 @@ function applyCorrectionToData(record: IDeclaration) {
     )
   }
 
-  const proposedChangesPatch = correctionRequestTask.output!.reduce(
+  if (!correctionRequestTask.output) {
+    throw new Error(
+      'Correction request task did not have an output field. Should never happen'
+    )
+  }
+
+  const proposedChangesPatch = correctionRequestTask.output.reduce(
     (acc: Record<string, Record<string, IFormFieldValue>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
 
@@ -647,11 +653,11 @@ function applyCorrectionToData(record: IDeclaration) {
     },
     reason: correctionRequestTask.reason!,
     requester: correctionRequestTask.requester!,
-    values: correctionRequestTask.input.map((input) => ({
+    values: correctionRequestTask.input.map((input, index) => ({
       fieldName: input!.valueId,
-      newValue: input!.value!,
+      newValue: correctionRequestTask.output![index]?.value,
       section: input!.valueCode,
-      oldValue: (record.data[input!.valueCode][input!.valueId] || '').toString()
+      oldValue: input!.value!
     }))
   }
 
