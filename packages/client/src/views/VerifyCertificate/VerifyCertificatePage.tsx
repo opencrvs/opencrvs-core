@@ -48,6 +48,7 @@ import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
 import { useVerificationRecordDetails } from './useVerificationRecordDetails'
+import { useLocationIntl } from '@client/hooks/useLocationIntl'
 import { generateFullAddress } from '@client/utils/locationUtils'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
@@ -179,6 +180,7 @@ export function VerifyCertificatePage() {
   const intl = useIntl()
   const dispatch = useDispatch()
   const { declarationId } = useParams<{ declarationId: string }>()
+  const { localizeLocation } = useLocationIntl()
 
   const logo = useSelector(selectCountryLogo)
   const appName = useSelector(selectApplicationName)
@@ -290,7 +292,7 @@ export function VerifyCertificatePage() {
         history?.user?.name[0]?.firstNames +
           ' ' +
           history?.user?.name[0]?.familyName,
-      center: history?.user?.primaryOffice?.name
+      officeHierarchy: history?.user?.primaryOffice?.hierarchy
     }
   }
 
@@ -440,9 +442,23 @@ export function VerifyCertificatePage() {
                         </Text>
                       }
                       value={
-                        <Text variant={'reg16'} element={'span'}>
-                          {getRegistarData(data).center}
-                        </Text>
+                        <Stack
+                          direction="column-reverse"
+                          alignItems="flex-start"
+                          gap={0}
+                        >
+                          {getRegistarData(data).officeHierarchy?.map(
+                            (location) => (
+                              <Text
+                                key={location.id}
+                                variant="reg16"
+                                element="span"
+                              >
+                                {localizeLocation(location)}
+                              </Text>
+                            )
+                          )}
+                        </Stack>
                       }
                     />
                     <ListViewItemSimplified

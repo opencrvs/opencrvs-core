@@ -943,6 +943,35 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    /*
+     * Resolve location hierarchies for all locations
+     */
+    {
+      $addFields: {
+        allLocationIds: {
+          $map: {
+            input: filterByType(['Location']),
+            as: 'location',
+            in: '$$location.id'
+          }
+        }
+      }
+    },
+
+    {
+      $graphLookup: {
+        from: 'Location_view_with_plain_ids',
+        startWith: '$allLocationIds',
+        connectFromField: 'partOf.reference',
+        connectToField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
     {
       $addFields: {
         bundle: {

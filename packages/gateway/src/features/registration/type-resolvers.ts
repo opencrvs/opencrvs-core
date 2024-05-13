@@ -55,6 +55,7 @@ import {
   INFORMANT_CODE,
   Identifier,
   Location,
+  SavedLocation,
   MOTHER_CODE,
   OPENCRVS_SPECIFICATION_URL,
   Patient,
@@ -1304,7 +1305,10 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    address: (location) => location.address
+    address: (location: Location) => location.address,
+    hierarchy: (location: SavedLocation, _, { dataSources }) => {
+      return dataSources.locationsAPI.getHierarchy(location.id)
+    }
   },
   MedicalPractitioner: {
     name: async (encounterParticipant: EncounterParticipant, _, context) => {

@@ -439,6 +439,7 @@ type Location {
   latitude: Float
   altitude: Float
   geoData: String
+  hierarchy: [Location!]
 }
 
 type User {

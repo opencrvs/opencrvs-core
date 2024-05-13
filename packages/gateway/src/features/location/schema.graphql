@@ -39,6 +39,7 @@ type Location { # -> Location (mostly the same property name except:)
   latitude: Float # -> position.latitude
   altitude: Float # -> position.altitude
   geoData: String # -> extension(url=http://hl7.org/fhir/StructureDefinition/location-boundary-geojson).valueAttachment (as base64)
+  hierarchy: [Location!]
 }
 
 type Query {

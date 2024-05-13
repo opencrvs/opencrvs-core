@@ -289,6 +289,7 @@ export interface GQLLocation {
   latitude?: number
   altitude?: number
   geoData?: string
+  hierarchy?: Array<GQLLocation>
 }
 
 export interface GQLUser {
@@ -4851,6 +4852,7 @@ export interface GQLLocationTypeResolver<TParent = any> {
   latitude?: LocationToLatitudeResolver<TParent>
   altitude?: LocationToAltitudeResolver<TParent>
   geoData?: LocationToGeoDataResolver<TParent>
+  hierarchy?: LocationToHierarchyResolver<TParent>
 }
 
 export interface LocationToIdResolver<TParent = any, TResult = any> {
@@ -4980,6 +4982,15 @@ export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
 }
 
 export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToHierarchyResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

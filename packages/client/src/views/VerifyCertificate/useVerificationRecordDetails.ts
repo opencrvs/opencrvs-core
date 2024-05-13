@@ -50,7 +50,11 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           regStatus
           user {
             primaryOffice {
-              name
+              hierarchy {
+                id
+                name
+                alias
+              }
             }
             name {
               firstNames
@@ -95,7 +99,11 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           regStatus
           user {
             primaryOffice {
-              name
+              hierarchy {
+                id
+                name
+                alias
+              }
             }
             name {
               firstNames

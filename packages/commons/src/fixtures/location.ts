@@ -11,7 +11,6 @@
 
 import { ResourceIdentifier, SavedLocation } from '../fhir'
 import { UUID } from '../uuid'
-import { defaults } from 'lodash'
 
 const defaultSavedLocation = {
   resourceType: 'Location',
@@ -53,5 +52,5 @@ const defaultSavedLocation = {
 }
 
 export function savedLocation(overrides = {} as Partial<SavedLocation>) {
-  return defaults({}, overrides, defaultSavedLocation)
+  return { ...defaultSavedLocation, ...overrides } as SavedLocation
 }

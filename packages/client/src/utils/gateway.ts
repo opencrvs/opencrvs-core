@@ -957,6 +957,7 @@ export type Location = {
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
+  hierarchy?: Maybe<Array<Location>>
   id: Scalars['ID']
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
@@ -8549,6 +8550,15 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8601,6 +8611,15 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

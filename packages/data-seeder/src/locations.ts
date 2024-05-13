@@ -211,7 +211,7 @@ export async function seedLocations(token: string) {
   const savedLocations = (
     await Promise.all(
       ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${GATEWAY_HOST}/location?type=${type}&_count=0`, {
+        fetch(`${GATEWAY_HOST}/locations?type=${type}&_count=0`, {
           headers: {
             'Content-Type': 'application/fhir+json'
           }
@@ -227,7 +227,7 @@ export async function seedLocations(token: string) {
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_HOST}/location?`, {
+  const res = await fetch(`${GATEWAY_HOST}/locations?`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
