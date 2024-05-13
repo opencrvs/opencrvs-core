@@ -29,6 +29,10 @@ const AccordionHeader = styled.div`
     background: ${({ theme }) => theme.colors.grey100};
     cursor: pointer;
   }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    cursor: pointer;
+  }
 `
 
 const AccordionHeaderTitle = styled.div`
