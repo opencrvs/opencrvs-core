@@ -10,15 +10,13 @@
  */
 import React, { useRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { EyeOn, EyeOff } from '../icons'
-import { CircleButton } from '../buttons'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 interface ICustomProps {
   error?: boolean
   touched?: boolean
   focusInput?: boolean
-  ignoreMediaQuery?: boolean
-  hideBorder?: boolean
   ignoreVisibility?: boolean
   showIcon?: React.ReactNode
   hideIcon?: React.ReactNode
@@ -34,39 +32,30 @@ const StyledField = styled.div<IPasswordInputProps>`
 `
 const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
-  padding: 8px 10px;
-  height: 40px;
+  padding: 10px 16px;
+  height: 46px;
   border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
-  ${({ hideBorder, error, touched, theme }) =>
-    hideBorder
-      ? `
-      border:none;
-      ${
-        error && touched
-          ? `box-shadow: 0 0 0px 2px ${theme.colors.negative};`
-          : 'box-shadow: none;'
-      }
-      &:focus {
-        box-shadow: 0 0 0px 2px ${
-          error && touched ? theme.colors.negative : theme.colors.yellow
-        };
-      }
-        `
-      : `
-      border: 2px solid ${
-        error && touched ? theme.colors.negative : theme.colors.copy
-      };
-      &:focus {
-        box-shadow: 0 0 0px 3px ${theme.colors.yellow};
-      }
-      `}
+  ${({ error, touched, theme }) =>
+    `
+  border: 1.5px solid ${
+    error && touched ? theme.colors.negative : theme.colors.copy
+  };
+  &:hover {
+    box-shadow: 0 0 0px 4px ${theme.colors.grey200};
+  } 
+  &:focus {
+    outline: 0.5px solid ${theme.colors.grey600};
+    border: 1.5px solid ${theme.colors.grey600};
+    box-shadow: 0 0 0px 4px ${theme.colors.yellow};
+  }
+  `}
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholderCopy};
@@ -92,48 +81,18 @@ const StyledInput = styled.input<IPasswordInputProps>`
     padding: 0;
     text-align: center;
   }
-
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
-      }`
-      : ''
-  }}
 `
 
-const IconButton = styled((props) => <CircleButton {...props} />)`
-  height: 32px;
-  width: 32px;
-  margin-right: 4px;
-  padding: 0px 4px;
+const IconButton = styled(Button)`
+  margin-right: 8px;
   right: 0;
   position: absolute;
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.background};
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-  &:not([data-focus-visible-added]) {
-    outline: none;
-    color: ${({ theme }) => theme.colors.secondary};
-    background: ${({ theme }) => theme.colors.background};
-  }
-  &:active:not([data-focus-visible-added]) {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
 `
 
 export const PasswordInput = ({
   error,
   touched,
   focusInput,
-  ignoreMediaQuery,
-  hideBorder,
   ignoreVisibility,
   showIcon,
   hideIcon,
@@ -170,17 +129,17 @@ export const PasswordInput = ({
         type={isVisible ? 'text' : 'password'}
       />
       {!ignoreVisibility && (
-        <IconButton onClick={toggleVisibility} type="button">
+        <IconButton size="small" onClick={toggleVisibility} type="icon">
           {isVisible ? (
             hideIcon ? (
               hideIcon
             ) : (
-              <EyeOn />
+              <Icon name="Eye" size="small" />
             )
           ) : showIcon ? (
             showIcon
           ) : (
-            <EyeOff />
+            <Icon name="EyeSlash" size="small" />
           )}
         </IconButton>
       )}
