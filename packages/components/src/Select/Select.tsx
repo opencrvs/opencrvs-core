@@ -26,10 +26,7 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   id: string
   error?: boolean
   touched?: boolean
-  hideBorder?: boolean
   options: ISelectOption[]
-  ignoreMediaQuery?: boolean
-  color?: string
   placeholder?: string
 }
 
@@ -45,26 +42,44 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg19};
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.grey600};
+  border-radius: 4px;
+  &:hover {
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.grey200};
+  }
+
   .react-select__control {
-    background: ${({ theme }) => theme.colors.white};
-    border-radius: 4px;
-    height: 40px;
-    box-shadow: none;
-    padding: 0 0 0 8px;
-    border: solid
-      ${({ theme, isDisabled }) =>
-        isDisabled ? theme.colors.grey300 : theme.colors.copy}
-      ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-    ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.negative : theme.colors.copy};
+    height: 46px;
+    cursor: pointer;
+    border: 1.5px solid
+      ${({ error, touched, disabled, theme }) =>
+        error && touched
+          ? theme.colors.negative
+          : disabled
+          ? theme.colors.grey300
+          : theme.colors.copy};
     &:hover {
-      border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-      ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.negative : theme.colors.copy};
+      border: 1.5px solid
+        ${({ error, touched, disabled, theme }) =>
+          error && touched
+            ? theme.colors.negative
+            : disabled
+            ? theme.colors.grey300
+            : theme.colors.copy};
+      outline: 0.5px solid
+        ${({ error, touched, disabled, theme }) =>
+          error && touched
+            ? theme.colors.negative
+            : disabled
+            ? theme.colors.grey300
+            : theme.colors.copy};
     }
     &:focus {
-      outline: none;
+      outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
+      color: ${({ theme }) => theme.colors.grey600};
     }
   }
 
@@ -77,27 +92,25 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-    ${({ theme }) => theme.colors.copy};
+    outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
+    border: 1.5px solid ${({ theme }) => theme.colors.grey600};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.yellow};
   }
 
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 344px;
-      }`
-      : ''
-  }}
+  .react-select__control--is-active {
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.yellow};
+  }
 
   .react-select__value-container {
-    padding: 0;
+    padding: 4px 16px;
   }
 
   .react-select__option {
+    height: 40px;
+    cursor: pointer;
     border-radius: 4px;
     margin-bottom: 2px;
-    ${({ theme }) => theme.fonts.reg16};
+    ${({ theme }) => theme.fonts.reg18};
     background-color: ${({ theme }) => theme.colors.white};
   }
 
@@ -109,13 +122,12 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
       color: ${({ theme }) => theme.colors.copy};
     }
   }
-
   .react-select__option--is-selected {
-    background-color: ${({ theme }) => theme.colors.secondary};
-    color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.copy};
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
-      color: ${({ theme }) => theme.colors.white};
+      background: ${({ theme }) => theme.colors.grey200};
+      color: ${({ theme }) => theme.colors.copy};
     }
   }
 
@@ -145,12 +157,11 @@ export interface ISelectProps
   extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
-  color?: string
   searchableLength?: number
 }
 
 export const Select = (props: ISelectProps) => {
-  const { searchableLength, onChange, disabled, options, value } = props
+  const { searchableLength, onChange, disabled, options, value, error } = props
 
   const handleChange = (selectedOption: ISelectOption) => {
     if (onChange) {
@@ -168,6 +179,7 @@ export const Select = (props: ISelectProps) => {
       isDisabled={disabled}
       isSearchable={options.length > length}
       value={getSelectedOption(value, options)}
+      error={error}
       isOptionDisabled={({ value }: { value: string }) =>
         options.some(
           (option: ISelectOption) => option.value === value && option.disabled
