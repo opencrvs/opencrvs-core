@@ -13,8 +13,7 @@ import { ServerRoute } from '@hapi/hapi'
 import { FHIR_URL } from '@config/config/constants'
 
 async function fetchLocation(locationId: string) {
-  const url = new URL(`Location/${locationId}`, FHIR_URL)
-  const res = await fetch(url, {
+  const res = await fetch(`${FHIR_URL}/Location/${locationId}`, {
     headers: {
       'Content-Type': 'application/fhir+json'
     }

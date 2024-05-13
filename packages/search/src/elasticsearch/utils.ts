@@ -28,6 +28,7 @@ import {
   SavedLocation,
   SavedTask
 } from '@opencrvs/commons/types'
+import { hasScope } from '@opencrvs/commons/authentication'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -325,7 +326,11 @@ export const createStatusHistory = async (
     return
   }
 
-  const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
+  const isSystem = hasScope({ Authorization: authHeader }, 'notification-api')
+  const user = !isSystem
+    ? await getUser(body.updatedBy || '', authHeader)
+    : null
+
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)
 
@@ -334,16 +339,16 @@ export const createStatusHistory = async (
   const operatorFirstNamesLocale = operatorNameLocale?.given?.join(' ') || ''
   const operatorFamilyNameLocale = operatorNameLocale?.family || ''
 
-  const regLasOfficeExtension = findTaskExtension(
+  const regLastOfficeExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
   let office: SavedLocation | undefined
-  if (regLasOfficeExtension) {
+  if (regLastOfficeExtension) {
     office = getFromBundleById<SavedLocation>(
       bundle,
-      regLasOfficeExtension.valueReference.reference.split('/')[1]
+      regLastOfficeExtension.valueReference.reference.split('/')[1]
     )?.resource
   }
 
@@ -353,8 +358,7 @@ export const createStatusHistory = async (
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
     operatorRole:
-      // user could be a system as well and systems don't have role
-      user.role?.labels.find((label) => label.lang === 'en')?.label || '',
+      user?.role?.labels.find((label) => label.lang === 'en')?.label || '',
     operatorFirstNames,
     operatorFamilyName,
     operatorFirstNamesLocale,
@@ -411,7 +415,10 @@ export function findDuplicateIds(
     }))
 }
 
-export async function getUser(practitionerId: string, authHeader: any) {
+export async function getUser(
+  practitionerId: string,
+  authHeader: any
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify({
