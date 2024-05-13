@@ -457,3 +457,33 @@ function updateTaskTemplate(
   }
   return task
 }
+
+export function excludeTaskCorrectedHistory(tasks: Task[]): Task[] {
+  const { transformedTasks } = tasks.reduce<{
+    context: number[]
+    transformedTasks: Task[]
+  }>(
+    ({ context, transformedTasks }, task, i) => {
+      if (getActionFromTask(task) === TaskAction.REQUESTED_CORRECTION) {
+        context.push(i)
+        transformedTasks.push(task)
+      } else if (getActionFromTask(task) === TaskAction.APPROVED_CORRECTION) {
+        context.push(i)
+        transformedTasks.push(task)
+      } else if (getActionFromTask(task) === TaskAction.CORRECTED) {
+        if (
+          context[context.length - 2] < context[context.length - 1] &&
+          context[context.length - 1] < i
+        ) {
+          // clear the context and dont add the entry in the transformed entry array
+          context = []
+        }
+      } else {
+        transformedTasks.push(task)
+      }
+      return { context, transformedTasks }
+    },
+    { context: [], transformedTasks: [] }
+  )
+  return transformedTasks
+}
