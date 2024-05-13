@@ -18,18 +18,23 @@ interface ITextAreaProps {
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg19};
   width: 100%;
-  padding: 10px;
+  padding: 8px 16px;
   min-height: 104px;
   border-radius: 4px;
-  border: 2px solid ${({ theme }) => theme.colors.grey600};
-  &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
-    outline: 0;
-  }
+  border: 1.5px solid ${({ theme }) => theme.colors.grey600};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
+
+  &:hover {
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.grey200};
+  }
+  &:focus {
+    outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
+    border: 1.5px solid $ ${({ theme }) => theme.colors.grey600};
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.yellow};
+  }
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholderCopy};
