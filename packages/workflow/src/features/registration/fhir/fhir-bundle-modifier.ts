@@ -352,7 +352,6 @@ export async function setupLastRegLocation<T extends Task>(
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-      valueString: primaryOffice.name!,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
