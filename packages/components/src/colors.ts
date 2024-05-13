@@ -33,11 +33,12 @@ const config = {
 
   // Monochrome
   white: '#FFFFFF',
-  grey100: '#F5F5F5', // background
-  grey200: '#EEEEEE', // dividers, hover
-  grey300: '#CCCCCC', // disabled state, borders
-  grey400: '#959595', // placeholder copy
-  grey500: '#5B5B5B', // supporting copy
+  grey50: '#F8F8F8', // background
+  grey100: '#F2F2F2', // hover
+  grey200: '#E1E1E1', // dividers, active
+  grey300: '#DDDDDD', // disabled state, borders
+  grey400: '#B5B5B5', // placeholder copy
+  grey500: '#6B6B6B', // supporting copy
   grey600: '#222222', // copy
 
   // Opacity
@@ -46,10 +47,10 @@ const config = {
 
   // Alternative definitions
   copy: '#222222', // grey600
-  supportingCopy: '#5B5B5B', // grey500
-  placeholderCopy: '#959595', // grey400
-  disabled: '#CCCCCC', // grey300
-  background: '#F5F5F5', // grey100
+  supportingCopy: '#6B6B6B', // grey500
+  placeholderCopy: '#B5B5B5', // grey400
+  disabled: '#B5B5B5', // grey400
+  background: '#F8F8F8', // grey50
   backgroundPrimary: '#36304E',
   subheaderCopyBirth: '#007A5E',
   subheaderCopyDeath: '#4B5EAA',
