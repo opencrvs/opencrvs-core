@@ -615,7 +615,7 @@ function applyCorrectionToData(record: IDeclaration) {
     )
   }
 
-  const proposedChangesPatch = correctionRequestTask.input.reduce(
+  const proposedChangesPatch = correctionRequestTask.output!.reduce(
     (acc: Record<string, Record<string, IFormFieldValue>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
 
