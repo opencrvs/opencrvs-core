@@ -37,6 +37,8 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
@@ -300,34 +302,81 @@ describe('Verify fhir bundle modifier functions', () => {
     }
   })
   describe('setupLastRegLocation', () => {
-    beforeEach(() => {})
+    beforeEach(() => {
+      fetch.resetMocks()
+    })
     it('set regLastLocation properly', async () => {
+      mswServer.use(
+        rest.get(
+          'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+          (_, res, ctx) => {
+            return res(
+              ctx.json([
+                // 2 level hierarchy
+                fixtures.savedLocation({
+                  id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
+                  partOf: {
+                    reference: 'Location/0'
+                  }
+                }),
+                fixtures.savedLocation({
+                  id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                  partOf: {
+                    reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                  }
+                })
+              ])
+            )
+          }
+        )
+      )
+
       const taskResource = await setupLastRegLocation(
         testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      if (taskResource && taskResource.extension && taskResource.extension[4]) {
-        expect(taskResource.extension[3]).toEqual({
-          url: 'http://opencrvs.org/specs/extension/regLastLocation',
-          valueReference: {
-            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
-          }
-        })
-      }
+      expect(taskResource.extension[3]).toEqual({
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueReference: {
+          reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+        }
+      })
     })
     it('set regLastOffice properly', async () => {
+      mswServer.use(
+        rest.get(
+          'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+          (_, res, ctx) => {
+            return res(
+              ctx.json([
+                // 2 level hierarchy
+                fixtures.savedLocation({
+                  id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
+                  partOf: {
+                    reference: 'Location/0'
+                  }
+                }),
+                fixtures.savedLocation({
+                  id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                  partOf: {
+                    reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                  }
+                })
+              ])
+            )
+          }
+        )
+      )
       const taskResource = await setupLastRegLocation(
         testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      if (taskResource && taskResource.extension && taskResource.extension[2]) {
-        expect(taskResource.extension[2]).toEqual({
-          url: 'http://opencrvs.org/specs/extension/regLastOffice',
-          valueReference: {
-            reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-          }
-        })
-      }
+      expect(taskResource.extension[2]).toEqual({
+        url: 'http://opencrvs.org/specs/extension/regLastOffice',
+        valueReference: {
+          reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+        }
+      })
     })
     it('throws error if invalid practitioner is provided', async () => {
       const practitioner = JSON.parse(fieldAgentPractitionerMock)
@@ -339,6 +388,9 @@ describe('Verify fhir bundle modifier functions', () => {
         )
       ).rejects.toThrowError('Invalid practitioner data found')
     })
+  })
+  afterAll(async () => {
+    jest.clearAllMocks()
   })
 })
 
