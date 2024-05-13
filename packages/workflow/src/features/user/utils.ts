@@ -17,6 +17,7 @@ import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   Practitioner,
+  resourceIdentifierToUUID,
   SavedLocation,
   SavedPractitioner
 } from '@opencrvs/commons/types'
@@ -183,9 +184,8 @@ export async function getPractitionerLocations(
   const res = await fetch(
     joinURL(
       APPLICATION_CONFIG_URL,
-      `/locations/${roleEntry.location[0].reference.replace(
-        'Location/',
-        ''
+      `/locations/${resourceIdentifierToUUID(
+        roleEntry.location[0].reference
       )}/hierarchy`
     )
   )
