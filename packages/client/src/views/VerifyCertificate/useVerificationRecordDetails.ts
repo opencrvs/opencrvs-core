@@ -36,6 +36,7 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
             state
             city
             country
+            line
           }
         }
         registration {

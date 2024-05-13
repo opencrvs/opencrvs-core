@@ -14,7 +14,7 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { getRecordById } from '@workflow/records/index'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { toVerified } from '@workflow/records/state-transitions'
-import { validateRequest } from '@workflow/features/correction/routes'
+import { validateRequest } from '@workflow/utils/index'
 
 export async function verifyRecordHandler(
   request: Hapi.Request,

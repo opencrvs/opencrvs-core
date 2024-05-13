@@ -590,6 +590,7 @@ export interface GQLCorrectionInput {
 
 export interface GQLCorrectionRejectionInput {
   reason: string
+  timeLoggedMS: number
 }
 
 export interface GQLBirthRegistrationInput {

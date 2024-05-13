@@ -413,9 +413,9 @@ export function resourceToSavedBundleEntry<T extends Resource>(
   resource: SavedResource<T>
 ): SavedBundleEntry<T> {
   return {
-    resource,
     fullUrl:
-      `/fhir/${resource.resourceType}/${resource.id}/_history/${resource.meta?.versionId}` as URLReference
+      `/fhir/${resource.resourceType}/${resource.id}/_history/${resource.meta?.versionId}` as URLReference,
+    resource
   }
 }
 

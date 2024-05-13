@@ -48,6 +48,7 @@ import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
 import { useVerificationRecordDetails } from './useVerificationRecordDetails'
+import { generateFullAddress } from '@client/utils/locationUtils'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -254,17 +255,13 @@ export function VerifyCertificatePage() {
     const country =
       location?.address?.country &&
       intl.formatMessage(countryMessages[location?.address?.country])
-
     const city = location?.address?.city ?? EMPTY_STRING
-
     if (location?.address?.country === window.config.COUNTRY) {
-      const district =
-        location.address.district &&
-        offlineData.locations[location.address.district].name
-      const state =
-        location.address.state &&
-        offlineData.locations[location.address.state].name
-      return [city, district, state, country]
+      return [
+        city,
+        ...generateFullAddress(location.address, offlineData),
+        country
+      ]
         .filter((label) => Boolean(label))
         .join(', ')
     }

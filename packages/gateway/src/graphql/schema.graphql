@@ -727,6 +727,7 @@ input CorrectionInput {
 
 input CorrectionRejectionInput {
   reason: String!
+  timeLoggedMS: Int!
 }
 
 input BirthRegistrationInput {
