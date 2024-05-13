@@ -17,14 +17,6 @@ import {
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
-import {
-  MAKE_CORRECTION_EXTENSION_URL,
-  Resource,
-  SavedBundle,
-  SavedBundleEntry,
-  SavedTask,
-  WithUUID
-} from '@opencrvs/commons/types'
 
 export async function getPresignedUrlFromUri(
   fileUri: string,
