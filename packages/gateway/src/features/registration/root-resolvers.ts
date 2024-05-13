@@ -38,7 +38,10 @@ import {
 } from '@gateway/utils/validators'
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
-import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
+import {
+  excludeTaskCorrectedHistory,
+  setCollectorForPrintInAdvance
+} from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
   certifyRegistration,
@@ -137,6 +140,7 @@ export const resolvers: GQLResolver = {
           id,
           context.headers
         )
+        context.record = excludeTaskCorrectedHistory(context.record)
         return context.record
       } else {
         return await Promise.reject(
@@ -154,6 +158,7 @@ export const resolvers: GQLResolver = {
           id,
           context.headers
         )
+        context.record = excludeTaskCorrectedHistory(context.record)
         return context.record
       } else {
         return await Promise.reject(
@@ -175,6 +180,7 @@ export const resolvers: GQLResolver = {
           id,
           context.headers
         )
+        context.record = excludeTaskCorrectedHistory(context.record)
         return context.record
       } else {
         return await Promise.reject(
@@ -222,7 +228,7 @@ export const resolvers: GQLResolver = {
       context
     ): Promise<Saved<Bundle>> {
       context.record = await viewDeclaration(id, context.headers)
-
+      context.record = excludeTaskCorrectedHistory(context.record)
       return context.record
     },
     async queryPersonByIdentifier(_, { identifier }, { headers: authHeader }) {
