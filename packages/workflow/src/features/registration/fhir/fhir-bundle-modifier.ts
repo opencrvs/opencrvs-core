@@ -58,27 +58,6 @@ import {
 } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
-export async function markBundleAsValidated<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.VALIDATED
-  )
-
-  await setupLastRegLocation(taskResource, practitioner)
-
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
 export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
   headers: Record<string, string>
@@ -98,54 +77,6 @@ export async function invokeRegistrationValidation(
     const errorData = await res.json()
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
-  return bundle
-}
-
-export async function markBundleAsWaitingValidation<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.WAITING_VALIDATION
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
-export async function markBundleAsDeclarationUpdated<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.DECLARATION_UPDATED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
   return bundle
 }
 
@@ -177,30 +108,6 @@ export async function markEventAsRegistered(
   return taskResource
 }
 
-export async function markBundleAsCertified(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.CERTIFIED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
 export function makeTaskAnonymous(bundle: Bundle) {
   const taskResource = getTaskResourceFromFhirBundle(bundle)
 
@@ -212,30 +119,6 @@ export function makeTaskAnonymous(bundle: Bundle) {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
       ].includes(url)
   )
-
-  return bundle
-}
-
-export async function markBundleAsIssued(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.ISSUED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
 
   return bundle
 }
