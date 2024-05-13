@@ -48,12 +48,6 @@ export const practitionerRoleBundle: SavedBundle<PractitionerRole> = {
         location: [
           {
             reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-          },
-          {
-            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
-          },
-          {
-            reference: 'Location/ed6195ff-0f83-4852-832e-dc9db07151ff'
           }
         ],
         meta: {
