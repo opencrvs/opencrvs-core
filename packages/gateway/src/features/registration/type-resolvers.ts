@@ -82,8 +82,7 @@ import {
   isQuestionnaireResponse,
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
-  Address,
-  excludeTaskCorrectedHistory
+  Address
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1819,11 +1818,10 @@ export const typeResolvers: GQLResolver = {
       return encounterParticipant
     },
     async history(record: Saved<Bundle>) {
-      const tasks = record.entry
+      return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-
-      return excludeTaskCorrectedHistory(tasks).sort(sortDescending)
+        .sort(sortDescending)
     }
   },
   BirthRegistration: {
@@ -1979,11 +1977,10 @@ export const typeResolvers: GQLResolver = {
       )
     },
     async history(record: Saved<Bundle>) {
-      const tasks = record.entry
+      return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-
-      return excludeTaskCorrectedHistory(tasks).sort(sortDescending)
+        .sort(sortDescending)
     }
   },
   MarriageRegistration: {
@@ -2117,11 +2114,10 @@ export const typeResolvers: GQLResolver = {
       )
     },
     async history(record: Saved<Bundle>) {
-      const tasks = record.entry
+      return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
-
-      return excludeTaskCorrectedHistory(tasks).sort(sortDescending)
+        .sort(sortDescending)
     }
   }
 }
