@@ -13,27 +13,27 @@ import { ClearText } from '../icons'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
-import { Text } from '../Text'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${({ theme }) => theme.colors.primaryLighter};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
   border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey400};
-    background: ${({ theme }) => theme.colors.grey100};
+    outline: 1.5px solid ${({ theme }) => theme.colors.primaryLight};
   }
 
   &:focus-within {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
+    outline: 1.5px solid ${({ theme }) => theme.colors.grey600};
+    box-shadow: 0px 0px 0px 4px ${({ theme }) => theme.colors.yellow};
     background: ${({ theme }) => theme.colors.white};
   }
 
   &:active {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
+    outline: 1.5px solid ${({ theme }) => theme.colors.grey600};
+    box-shadow: 0px 0px 0px 4px ${({ theme }) => theme.colors.yellow};
   }
 
   &:focus-within input {
@@ -52,16 +52,15 @@ const SearchBox = styled.div`
 
 const Wrapper = styled.form`
   align-items: center;
-  border-radius: 2px;
+  height: 40px;
   display: flex;
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.primary};
-  padding: 0px 8px 0px 4px;
+  padding: 0px 2px 0px 4px;
   position: relative;
 `
 const SearchInput = styled.input`
   border: none;
-  margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
   background-color: transparent;
   flex-grow: 1;
@@ -134,15 +133,6 @@ const AdvancedSearchWrapper = styled.div`
   padding-bottom: 0;
 `
 
-const IconWrapper = styled.span`
-  display: flex;
-  padding-right: 12px;
-  padding-left: 0;
-`
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.copy};
-`
 const SelectedSearchCriteria = styled.span`
   display: flex;
   margin-right: 16px;
@@ -332,12 +322,12 @@ export class SearchTool extends React.Component<IProps, IState> {
         <Wrapper onSubmit={this.search}>
           <Button
             type="icon"
-            size="medium"
+            size="small"
             aria-label="Search"
             id="searchIconButton"
             onClick={this.search}
           >
-            <Icon color="currentColor" name="MagnifyingGlass" size="large" />
+            <Icon color="currentColor" name="MagnifyingGlass" size="medium" />
           </Button>
           <SearchInput
             id="searchText"
