@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
-import { fetchFHIR, fetchFromHearth } from '@gateway/features/fhir/service'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
 
@@ -23,8 +23,11 @@ import {
   Patient,
   Resource,
   Task,
-  findExtension
+  findExtension,
+  isPatient
 } from '@opencrvs/commons/types'
+import { createHospitalNotification } from '@gateway/workflow/index'
+import { getAuthHeader } from '@opencrvs/commons/http'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -166,8 +169,9 @@ export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  let bundle: Bundle
   try {
-    const bundle = req.payload as Bundle
+    bundle = req.payload as Bundle
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
@@ -182,12 +186,8 @@ export async function eventNotificationHandler(
     }
     return badRequest(e)
   }
-  return fetchFHIR(
-    '',
-    { Authorization: req.headers.authorization },
-    'POST',
-    JSON.stringify(req.payload)
-  )
+
+  return await createHospitalNotification(getAuthHeader(req), bundle)
 }
 
 export async function validateAddressesOfTask(bundle: Bundle) {
@@ -297,11 +297,4 @@ export function BoomErrorWithCustomMessage(message: string) {
   const boomError = badImplementation()
   boomError.output.payload.boomCustomMessage = message
   return boomError
-}
-function isPatient(
-  value: Resource,
-  index: number,
-  array: Resource[]
-): value is Resource {
-  throw new Error('Function not implemented.')
 }

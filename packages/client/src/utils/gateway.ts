@@ -561,6 +561,7 @@ export type CorrectionPaymentInput = {
 
 export type CorrectionRejectionInput = {
   reason: Scalars['String']
+  timeLoggedMS: Scalars['Int']
 }
 
 export type CorrectionValueInput = {
@@ -1471,6 +1472,16 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
+export type NotificationResult = {
+  __typename?: 'NotificationResult'
+  success: Scalars['Boolean']
+}
+
+export enum NotificationType {
+  Email = 'EMAIL',
+  Sms = 'SMS'
+}
+
 export type OidpUserAddress = {
   __typename?: 'OIDPUserAddress'
   city?: Maybe<Scalars['String']>
@@ -1661,6 +1672,7 @@ export type Query = {
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
+  sendNotificationToAllUsers?: Maybe<NotificationResult>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
 
@@ -1903,6 +1915,13 @@ export type QuerySearchUsersArgs = {
   status?: InputMaybe<Scalars['String']>
   systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type QuerySendNotificationToAllUsersArgs = {
+  body: Scalars['String']
+  locale: Scalars['String']
+  subject: Scalars['String']
+  type?: InputMaybe<NotificationType>
 }
 
 export type QueryVerifyPasswordByIdArgs = {
@@ -7872,6 +7891,54 @@ export type GetUserByEmailQuery = {
   } | null
 }
 
+export type EmailAllUsersQueryVariables = Exact<{
+  subject: Scalars['String']
+  body: Scalars['String']
+  locale: Scalars['String']
+}>
+
+export type EmailAllUsersQuery = {
+  __typename?: 'Query'
+  sendNotificationToAllUsers?: {
+    __typename?: 'NotificationResult'
+    success: boolean
+  } | null
+}
+
+export type ToggleInformantSmsNotificationMutationVariables = Exact<{
+  smsNotifications?: InputMaybe<
+    Array<SmsNotificationInput> | SmsNotificationInput
+  >
+}>
+
+export type ToggleInformantSmsNotificationMutation = {
+  __typename?: 'Mutation'
+  toggleInformantSMSNotification?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type GetInformantSmsNotificationsQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetInformantSmsNotificationsQuery = {
+  __typename?: 'Query'
+  informantSMSNotifications?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
 export type UpdateApplicationConfigMutationVariables = Exact<{
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }>
@@ -8079,40 +8146,6 @@ export type DeleteSystemMutation = {
     status: SystemStatus
     type: SystemType
   } | null
-}
-
-export type ToggleInformantSmsNotificationMutationVariables = Exact<{
-  smsNotifications?: InputMaybe<
-    Array<SmsNotificationInput> | SmsNotificationInput
-  >
-}>
-
-export type ToggleInformantSmsNotificationMutation = {
-  __typename?: 'Mutation'
-  toggleInformantSMSNotification?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
-}
-
-export type GetInformantSmsNotificationsQueryVariables = Exact<{
-  [key: string]: never
-}>
-
-export type GetInformantSmsNotificationsQuery = {
-  __typename?: 'Query'
-  informantSMSNotifications?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
 }
 
 export type GetTotalCorrectionsQueryVariables = Exact<{
