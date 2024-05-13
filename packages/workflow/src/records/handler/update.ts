@@ -16,7 +16,13 @@ import {
   MarriageRegistration as GQLMarriageRegistration,
   EVENT_TYPE,
   updateFHIRBundle,
-  Registration
+  Registration,
+  InProgressRecord,
+  ReadyForReviewRecord,
+  getComposition,
+  findCompositionSection,
+  findEntryFromBundle,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
@@ -43,6 +49,46 @@ const requestSchema = z.object({
   >()
 })
 
+function filterInformantSection<
+  T extends InProgressRecord | ReadyForReviewRecord
+>(record: T): T {
+  const composition = getComposition(record)
+
+  const filteredComposition = composition.section.filter(
+    (sec) => sec.code.coding[0].code !== 'informant-details'
+  )
+
+  return {
+    ...record,
+    entry: [
+      {
+        fullUrl: record.entry.find(
+          (e) => e.resource.resourceType === 'Composition'
+        )!.fullUrl,
+        resource: {
+          ...composition,
+          section: filteredComposition
+        }
+      },
+      ...record.entry.filter((e) => e.resource.resourceType !== 'Composition')
+    ]
+  }
+}
+
+function getInformantType(record: InProgressRecord | ReadyForReviewRecord) {
+  const compositionSection = findCompositionSection(
+    'informant-details',
+    getComposition(record)
+  )
+  const personSectionEntry = compositionSection.entry[0]
+  const personEntry = findEntryFromBundle<RelatedPerson>(
+    record,
+    personSectionEntry.reference
+  )
+
+  return personEntry?.resource.relationship?.coding?.[0].code
+}
+
 export const updateRoute = createRoute({
   method: 'POST',
   path: '/records/{recordId}/update',
@@ -51,6 +97,12 @@ export const updateRoute = createRoute({
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)
+
+    const informantTypeOfBundle = getInformantType(record)
+    const payloadInformantType = payload.details.registration.informantType
+
+    if (informantTypeOfBundle !== payloadInformantType)
+      record = filterInformantSection(record)
 
     const { details, event } = payload
     const {
