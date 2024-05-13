@@ -8,30 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  CHILD_SECTION_CODE,
-  RegStatus,
-  EVENT_TYPE,
-  DECEASED_SECTION_CODE
-} from '@workflow/features/registration/fhir/constants'
-import { FHIR_URL, getDefaultLanguage } from '@workflow/constants'
-import {
-  getSectionEntryBySectionCode,
-  findRelatedPersonEntry,
-  getTaskResourceFromFhirBundle
-} from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
-import fetch, { RequestInit } from 'node-fetch'
-import {
-  getComposition,
-  getEventType,
-  getPatientBySection
-} from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@workflow/logger'
-import { SECTION_CODE } from '@workflow/features/events/utils'
-import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
   Bundle,
   BundleEntry,
@@ -44,6 +21,28 @@ import {
   findExtension,
   isSaved
 } from '@opencrvs/commons/types'
+import { FHIR_URL, getDefaultLanguage } from '@workflow/constants'
+import { SECTION_CODE } from '@workflow/features/events/utils'
+import {
+  CHILD_SECTION_CODE,
+  DECEASED_SECTION_CODE,
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL,
+  RegStatus
+} from '@workflow/features/registration/fhir/constants'
+import {
+  getSectionEntryBySectionCode,
+  getTaskResourceFromFhirBundle
+} from '@workflow/features/registration/fhir/fhir-template'
+import {
+  getComposition,
+  getEventType,
+  getPatientBySection
+} from '@workflow/features/registration/utils'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import { logger } from '@workflow/logger'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
+import fetch, { RequestInit } from 'node-fetch'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -77,20 +76,6 @@ export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   return [...(name.given ?? []), ...(name.family ?? [])]
     .filter(Boolean)
     .join(' ')
-}
-
-export async function getInformantName(
-  fhirBundle: Bundle,
-  sectionCode: string = CHILD_SECTION_CODE
-) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
-  }
-  const informant = await findRelatedPersonEntry(sectionCode, fhirBundle)
-  if (!informant || !informant.name) {
-    throw new Error("Didn't find informant's name information")
-  }
-  return concatenateName(informant.name)
 }
 
 export function getTrackingId(fhirBundle: Bundle) {

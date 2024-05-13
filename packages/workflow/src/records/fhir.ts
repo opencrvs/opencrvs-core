@@ -1443,11 +1443,3 @@ export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
 
   return res.json()
 }
-
-export function sortTasksDescending(tasks: Task[]) {
-  return tasks.slice().sort((a, b) => {
-    return (
-      new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
-    )
-  })
-}

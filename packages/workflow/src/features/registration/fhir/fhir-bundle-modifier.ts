@@ -8,25 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { UUID } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
   Patient,
   Practitioner,
-  RegistrationNumber,
+  RegistrationStatus,
+  ResourceIdentifier,
   Saved,
   Task,
-  findExtension,
-  RegistrationStatus,
   WaitingForValidationRecord,
+  findExtension,
   getResourceFromBundleById,
-  ResourceIdentifier,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
-  EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
@@ -40,7 +39,7 @@ import {
 import { getMosipUINToken } from '@workflow/features/registration/utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import { ITokenPayload, getTokenPayload } from '@workflow/utils/auth-utils'
+import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
 export async function invokeRegistrationValidation(
@@ -63,34 +62,6 @@ export async function invokeRegistrationValidation(
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
   return bundle
-}
-
-export async function markEventAsRegistered(
-  taskResource: Task,
-  registrationNumber: RegistrationNumber,
-  eventType: EVENT_TYPE,
-  token: string
-): Promise<Task> {
-  /* Setting registration number here */
-  const system = `${OPENCRVS_SPECIFICATION_URL}id/${
-    eventType.toLowerCase() as Lowercase<typeof eventType>
-  }-registration-number` as const
-
-  if (taskResource && taskResource.identifier) {
-    taskResource.identifier.push({
-      system: system,
-      value: registrationNumber as RegistrationNumber
-    })
-  }
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.REGISTERED
-  )
-
-  return taskResource
 }
 
 export async function setupRegistrationWorkflow(
@@ -169,7 +140,7 @@ export function setupLastRegUser<T extends Task>(
   return taskResource
 }
 
-export async function checkForDuplicateStatusUpdate(taskResource: Task) {
+async function checkForDuplicateStatusUpdate(taskResource: Task) {
   const regStatusCode =
     taskResource &&
     taskResource.businessStatus &&
