@@ -15,7 +15,11 @@ import {
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
+import {
+  Practitioner,
+  SavedLocation,
+  SavedPractitioner
+} from '@opencrvs/commons/types'
 import { UUID, joinURL } from '@opencrvs/commons'
 
 export async function getUser(
@@ -157,6 +161,12 @@ export async function getLoggedInPractitionerResource(
   }
 
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
+}
+
+export async function getLocationOrOfficeById(
+  locationId: string
+): Promise<SavedLocation> {
+  return await getFromFhir(`/Location/${locationId}`)
 }
 
 export async function getPractitionerLocations(

@@ -75,6 +75,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - FHIR_URL=http://hearth:3447/fhir
+      - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:

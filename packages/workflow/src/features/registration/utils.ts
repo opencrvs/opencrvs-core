@@ -161,29 +161,6 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
   )
 }
 
-export function isHospitalNotification(fhirBundle: Bundle) {
-  const compositionEntry =
-    fhirBundle &&
-    fhirBundle.entry &&
-    fhirBundle.entry.find(
-      (entry) => entry.resource && entry.resource.resourceType === 'Composition'
-    )
-  const composition =
-    compositionEntry && (compositionEntry.resource as Composition)
-  const compositionDocTypeCode =
-    composition &&
-    composition.type.coding &&
-    composition.type.coding.find(
-      (coding) => coding.system === 'http://opencrvs.org/doc-types'
-    )
-  return (
-    (compositionDocTypeCode &&
-      compositionDocTypeCode.code &&
-      compositionDocTypeCode.code.endsWith('-notification')) ||
-    false
-  )
-}
-
 interface IMosipAuthData {
   vid?: string
   name?: string

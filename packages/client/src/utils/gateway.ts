@@ -561,6 +561,7 @@ export type CorrectionPaymentInput = {
 
 export type CorrectionRejectionInput = {
   reason: Scalars['String']
+  timeLoggedMS: Scalars['Int']
 }
 
 export type CorrectionValueInput = {
