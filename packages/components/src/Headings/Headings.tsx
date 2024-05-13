@@ -15,13 +15,14 @@ import styled from 'styled-components'
 export const Heading2 = styled.h2`
   ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.grey600};
-  padding-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  padding: 12px 0px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 // Form Heading 3
 export const Heading3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
-  padding-top: 20px;
+  padding: 8px 0px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
