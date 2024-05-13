@@ -52,7 +52,7 @@ export const ImageUploader = (props: IImagePickerProps) => {
       }}
       disabled={disabled}
     >
-      <Icon name="UploadSimple" />
+      <Icon name="UploadSimple" size="medium" />
       {title}
       <HiddenInput
         ref={fileUploader}
