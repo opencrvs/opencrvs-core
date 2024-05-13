@@ -23,13 +23,13 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  background-color: ${({ theme }) => theme.colors.grey100};
-  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.grey500};
+  background-color: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.fonts.bold12};
   height: 36px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -40,6 +40,7 @@ export const NoResultText = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
+  padding: 16px 24px 4px 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: fixed;
     left: 0;
@@ -218,7 +219,6 @@ const WorkqueueComp = ({
           clickable={clickable}
           getRowClickHandler={getRowClickHandler}
           renderActionBlock={renderActionBlock}
-          hideLastBorder={hideLastBorder}
         />
       ) : (
         <WorkqueueRowMobile

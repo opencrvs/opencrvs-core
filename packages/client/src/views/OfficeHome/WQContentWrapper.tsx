@@ -110,6 +110,7 @@ const WQContentWrapperComp = (props: IProps) => {
           tabBarContent={props.tabBarContent}
           topActionButtons={props.topActionButtons}
           showTitleOnMobile={props.showTitleOnMobile}
+          noPadding
         >
           <Body {...props} />
         </Content>

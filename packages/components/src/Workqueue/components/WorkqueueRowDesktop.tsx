@@ -27,17 +27,17 @@ export interface IWorkqueueRow {
     alignment?: ColumnContentAlignment | undefined
   ) => JSX.Element
   clickable: boolean | undefined
-  hideLastBorder?: boolean
 }
 
-const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
+const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
+  padding: 0 8px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   &:last-child {
-    ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
+    border-bottom: 0}
   }
 
   height: 72px;
@@ -84,7 +84,7 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
       {props.displayItems.map((item, index) => {
         const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
+          <StyledBox key={index}>
             <RowWrapper
               id={'row_' + index}
               clickable={clickable}

@@ -200,7 +200,7 @@ export const small = ({ loading }: { loading?: boolean }) => css`
 export const medium = css`
   ${({ theme }) => theme.fonts.bold16};
   height: 40px;
-  padding: 0 12px;
+  padding: 0 14px;
 
   svg {
     height: 20px;
@@ -208,7 +208,7 @@ export const medium = css`
   }
 `
 
-export const large = css`
+export const large = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold18};
   height: 54px;
   padding: 0 16px;
@@ -216,7 +216,15 @@ export const large = css`
   svg {
     height: 24px;
     width: 24px;
+    margin: 0px 8px;
   }
+
+  ${fullWidth &&
+  css`
+    svg {
+      margin: 0px 8px;
+    }
+  `}
 `
 
 export const loading = css`

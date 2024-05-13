@@ -591,6 +591,7 @@ class InProgressComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         hideLastBorder={!isShowPagination}
+        noPadding
       />
     )
   }

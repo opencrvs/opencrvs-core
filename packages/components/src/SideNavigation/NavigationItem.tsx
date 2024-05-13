@@ -31,7 +31,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   border-radius: 4px;
   padding: 0 8px;
   background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.grey200 : theme.colors.white};
+    isSelected ? theme.colors.grey100 : theme.colors.white};
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme, isSelected }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
