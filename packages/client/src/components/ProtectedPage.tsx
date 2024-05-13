@@ -55,7 +55,7 @@ interface IProtectPageState {
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
 
 const SpinnerBackground = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
 `
 
