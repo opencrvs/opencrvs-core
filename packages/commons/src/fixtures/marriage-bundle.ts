@@ -564,12 +564,6 @@ export const MARRIAGE_BUNDLE: Saved<
             valueInteger: 62588
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueString: 'Ibombo District Office',
             valueReference: {
