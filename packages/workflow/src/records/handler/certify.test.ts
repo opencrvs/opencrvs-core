@@ -21,6 +21,8 @@ import {
 } from '@opencrvs/commons/types'
 import { REGISTERED_BIRTH_RECORD } from '@test/mocks/records/register'
 import { TransactionResponse } from '@workflow/records/fhir'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 
 describe('Certify record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -51,6 +53,28 @@ describe('Certify record endpoint', () => {
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
           return res(ctx.json(REGISTERED_BIRTH_RECORD))
+        }
+      )
+    )
+
+    // Gets the location hierarchy to find the regLastOffice / regLastLocation
+    mswServer.use(
+      rest.get(
+        'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+        (_, res, ctx) => {
+          return res(
+            ctx.json([
+              fixtures.savedAdministrativeLocation({
+                id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
+              }),
+              fixtures.savedLocation({
+                id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                partOf: {
+                  reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                }
+              })
+            ])
+          )
         }
       )
     )
@@ -147,6 +171,28 @@ describe('Certify record endpoint', () => {
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
           return res(ctx.json(REGISTERED_BIRTH_RECORD))
+        }
+      )
+    )
+
+    // Gets the location hierarchy to find the regLastOffice / regLastLocation
+    mswServer.use(
+      rest.get(
+        'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+        (_, res, ctx) => {
+          return res(
+            ctx.json([
+              fixtures.savedAdministrativeLocation({
+                id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
+              }),
+              fixtures.savedLocation({
+                id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                partOf: {
+                  reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                }
+              })
+            ])
+          )
         }
       )
     )
