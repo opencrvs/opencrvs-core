@@ -27,6 +27,8 @@ import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { TransactionResponse } from '@workflow/records/fhir'
 import { URLReference } from '@opencrvs/commons/types'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -136,6 +138,24 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       rest.get('http://localhost:9090/records/123', (_, res, ctx) =>
         res(ctx.json(BIRTH_BUNDLE))
       ),
+      rest.get(
+        'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+        (_, res, ctx) => {
+          return res(
+            ctx.json([
+              fixtures.savedAdministrativeLocation({
+                id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
+              }),
+              fixtures.savedLocation({
+                id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                partOf: {
+                  reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                }
+              })
+            ])
+          )
+        }
+      ),
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
@@ -190,6 +210,24 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       rest.post(
         'http://localhost:1050/events/death/registered',
         (_, res, ctx) => res(ctx.json({}))
+      ),
+      rest.get(
+        'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+        (_, res, ctx) => {
+          return res(
+            ctx.json([
+              fixtures.savedAdministrativeLocation({
+                id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
+              }),
+              fixtures.savedLocation({
+                id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                partOf: {
+                  reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+                }
+              })
+            ])
+          )
+        }
       ),
       rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
         const responseBundle: TransactionResponse = {
