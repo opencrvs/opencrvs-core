@@ -16,7 +16,6 @@ import { InputDescriptor } from './InputDescriptor'
 export type IInputLabel = {
   inputDescriptor?: string
   disabled?: boolean
-  ignoreMediaQuery?: boolean
   color?: string
   required?: boolean
   hideAsterisk?: boolean
@@ -24,26 +23,18 @@ export type IInputLabel = {
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ color, disabled, theme }) =>
     disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
-
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 615px;
-      }`
-      : ''
-  }}
 `
 
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
