@@ -44,6 +44,7 @@
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
 - Fix Registrar of any location should be able to review a correction request [#6247](https://github.com/opencrvs/opencrvs-core/issues/6247)
 
+
 ## Refactor
 
 - Remove dependency on openhim. The openhim db is kept for backwards compatibility reasons and will be removed in v1.6. It has brought some major changes
