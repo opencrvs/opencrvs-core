@@ -17,6 +17,7 @@ import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
@@ -35,12 +36,6 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
-
-const Actions = styled.div`
-  & > div {
-    margin-bottom: 16px;
-  }
-`
 
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
@@ -134,7 +129,7 @@ class SelectVitalEventView extends React.Component<
               {intl.formatMessage(messages.errorMessage)}
             </ErrorText>
           )}
-          <Actions id="select_vital_event_view">
+          <Stack direction="column" gap={4} id="select_vital_event_view">
             <RadioButton
               size="large"
               key="birthevent"
@@ -178,7 +173,7 @@ class SelectVitalEventView extends React.Component<
                 }
               />
             )}
-          </Actions>
+          </Stack>
         </Content>
       </Frame>
     )

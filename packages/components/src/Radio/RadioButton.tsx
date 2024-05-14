@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 
-const Wrapper = styled.li`
+const Wrapper = styled.div`
   list-style-type: none;
   display: flex;
   flex-direction: row;
