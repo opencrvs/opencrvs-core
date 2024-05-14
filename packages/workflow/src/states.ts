@@ -25,21 +25,21 @@ import {
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
-export type Certify = Nominal<{}, 'Certify'>
-export type Validate = Nominal<{}, 'Validate'>
-export type Update = Nominal<{}, 'Update'>
-export type Register = Nominal<{}, 'Register'>
-export type Issue = Nominal<{}, 'Issue'>
-export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
-export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
-export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
-export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
-export type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
-export type Archive = Nominal<{}, 'Archive'>
-export type Reject = Nominal<{}, 'Reject'>
-export type Reinstate = Nominal<{}, 'Reinstate'>
+type Certify = Nominal<{}, 'Certify'>
+type Validate = Nominal<{}, 'Validate'>
+type Update = Nominal<{}, 'Update'>
+type Register = Nominal<{}, 'Register'>
+type Issue = Nominal<{}, 'Issue'>
+type RequestCorrection = Nominal<{}, 'RequestCorrection'>
+type RejectCorrection = Nominal<{}, 'RejectCorrection'>
+type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
+type MakeCorrection = Nominal<{}, 'MakeCorrection'>
+type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
+type Archive = Nominal<{}, 'Archive'>
+type Reject = Nominal<{}, 'Reject'>
+type Reinstate = Nominal<{}, 'Reinstate'>
 
-export type ActionIdentifiers = {
+type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
   APPROVE_CORRECTION: ApproveCorrection
   MAKE_CORRECTION: MakeCorrection
@@ -59,7 +59,7 @@ export type ActionIdentifiers = {
  * Amend this state tree to allow more state transitions
  */
 
-export type StateTree =
+type StateTree =
   | Transition<ReadyForReviewRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
@@ -113,7 +113,7 @@ export type StateTree =
  * Internals
  */
 
-export type GetEndState<StartState, Action> = Extract<
+type GetEndState<StartState, Action> = Extract<
   StateTree,
   { start: StartState; action: Action }
 >['end']
