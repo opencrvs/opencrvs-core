@@ -104,7 +104,6 @@ function ContentComponent({
             required={true}
             label={intl.formatMessage(messages.pattern)}
             error={patternErrorMessage}
-            ignoreMediaQuery={true}
           >
             <HalfWidthInput
               id={`${changeModalName}Input`}
@@ -112,7 +111,6 @@ function ContentComponent({
               error={!isValidRegEx(pattern)}
               value={pattern}
               onChange={setPattern}
-              ignoreMediaQuery={true}
             />
           </InputField>
           <ErrorMessage id={`${changeModalName}-regex-error`}>
@@ -126,7 +124,6 @@ function ContentComponent({
               touched={false}
               required={false}
               label={intl.formatMessage(messages.example)}
-              ignoreMediaQuery={true}
             >
               <HalfWidthInput
                 id={`${changeModalName}ExampleInput`}
@@ -134,7 +131,6 @@ function ContentComponent({
                 error={false}
                 value={example}
                 onChange={setExample}
-                ignoreMediaQuery={true}
               />
             </InputField>
             <LinkContainer

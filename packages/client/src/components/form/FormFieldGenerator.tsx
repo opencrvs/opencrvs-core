@@ -209,9 +209,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       hideAsterisk: fieldDefinition.hideAsterisk,
       hideInputHeader: fieldDefinition.hideHeader,
       error,
-      touched,
-      mode: fieldDefinition.mode,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      touched
     }
 
     const intl = useIntl()
