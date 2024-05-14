@@ -20,7 +20,7 @@ interface IUserRole {
   labels: Label[]
 }
 
-export interface IUserModelData {
+interface IUserModelData {
   _id: string
   username: string
   name: {
@@ -46,7 +46,7 @@ export interface IUserModelData {
   device: string
 }
 
-export interface ISystemModelData {
+interface ISystemModelData {
   scope?: string[]
   name: string
   createdBy: string

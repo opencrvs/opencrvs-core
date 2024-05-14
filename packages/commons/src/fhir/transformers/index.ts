@@ -945,7 +945,7 @@ function createInformantShareEmail(resource: Task, fieldValue: string) {
     resource.extension = []
   }
 
-  setExtension(resource.extension, {
+  resource.extension = setExtension(resource.extension, {
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
     valueString: fieldValue
   })
@@ -2276,7 +2276,27 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
+          'given',
+          context
+        )
+      },
+      middleName: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_ONE_CODE,
+          WITNESS_ONE_TITLE
+        )
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
           'given',
           context
         )
@@ -2369,7 +2389,27 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
+          'given',
+          context
+        )
+      },
+      middleName: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_TWO_CODE,
+          WITNESS_TWO_TITLE
+        )
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
           'given',
           context
         )

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { routes as correctionRoutes } from '@workflow/features/correction/routes'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import { certifyRoute } from '@workflow/records/handler/certify'
 import { archiveRoute } from '@workflow/records/handler/archive'
@@ -25,6 +24,10 @@ import { validateRoute } from '@workflow/records/handler/validate'
 import { viewRecordHandler } from '@workflow/records/handler/view'
 import { verifyRecordHandler } from '@workflow/records/handler/verify'
 import { markAsNotDuplicateHandler } from '@workflow/records/handler/not-duplicate'
+import { rejectCorrectionRoute } from '@workflow/records/handler/correction/reject'
+import { approveCorrectionRoute } from '@workflow/records/handler/correction/approve'
+import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
+import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
 
 export const getRoutes = () => {
@@ -66,7 +69,6 @@ export const getRoutes = () => {
           'Register event based on tracking id and registration number.'
       }
     },
-    ...correctionRoutes,
     {
       method: 'POST',
       path: '/create-record',
@@ -103,14 +105,6 @@ export const getRoutes = () => {
         description: 'View record endpoint'
       }
     },
-    ...validateRoute,
-    ...updateRoute,
-    ...registerRoute,
-    certifyRoute,
-    issueRoute,
-    ...archiveRoute,
-    rejectRoute,
-    reinstateRoute,
     {
       method: 'POST',
       path: '/records/{id}/duplicate',
@@ -146,7 +140,19 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Saves full fhir bundle to search and hearth'
       }
-    }
+    },
+    validateRoute,
+    updateRoute,
+    registerRoute,
+    certifyRoute,
+    issueRoute,
+    archiveRoute,
+    rejectRoute,
+    reinstateRoute,
+    approveCorrectionRoute,
+    rejectCorrectionRoute,
+    requestCorrectionRoute,
+    makeCorrectionRoute
   ]
 
   return routes
