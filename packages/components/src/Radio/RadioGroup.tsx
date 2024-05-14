@@ -25,6 +25,12 @@ const List = styled.ul<{ flexDirection?: string }>`
   & > div {
     margin-bottom: 4px;
   }
+  ${({ flexDirection }) =>
+    flexDirection &&
+    `display: flex;
+    & > div {
+      margin-right: 16px;
+    }`}
 `
 const LargeList = styled.ul<{ flexDirection?: string }>`
   list-style: none;
@@ -33,6 +39,12 @@ const LargeList = styled.ul<{ flexDirection?: string }>`
   & > div {
     margin-bottom: 4px;
   }
+  ${({ flexDirection }) =>
+    flexDirection &&
+    `display: flex;
+    & > div {
+      margin-right: 16px;
+    }`}
 `
 const NestedChildren = styled.div`
   margin: 15px 0px 0px 18px;
@@ -104,7 +116,7 @@ export const RadioGroup = ({
                       ).toString()}`
                     : `${name}_${option.value}`
                 }
-                selected={option.value === value}
+                selected={value}
                 onChange={props.onChange}
                 hasFlexDirection={flexDirection ? true : false}
               />
