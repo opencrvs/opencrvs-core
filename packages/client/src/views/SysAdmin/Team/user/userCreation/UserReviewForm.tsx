@@ -47,11 +47,8 @@ import {
   submitUserFormData
 } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
-import {
-  PrimaryButton,
-  SuccessButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
+import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ApolloClient } from '@apollo/client'
@@ -301,8 +298,11 @@ class UserReviewFormComponent extends React.Component<
     } else {
       title = section.title && intl.formatMessage(section.title)
       actionComponent = (
-        <PrimaryButton
+        <Button
           id="submit_user_form"
+          type="positive"
+          size="large"
+          fullWidth
           disabled={
             (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
               this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
@@ -311,7 +311,7 @@ class UserReviewFormComponent extends React.Component<
           onClick={() => this.props.submitForm(userFormSection)}
         >
           {intl.formatMessage(messages.createUser)}
-        </PrimaryButton>
+        </Button>
       )
     }
     return (

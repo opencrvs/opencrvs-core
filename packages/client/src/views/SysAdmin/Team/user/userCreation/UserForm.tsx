@@ -36,7 +36,7 @@ import {
   ISystemRolesMap,
   modifyUserFormData
 } from '@client/user/userReducer'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
@@ -45,7 +45,7 @@ import { connect } from 'react-redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
 
 export const Action = styled.div`
@@ -165,7 +165,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}
           hideBackground={true}
         >
-          <Content title={title}>
+          <Content size={ContentSize.SMALL} title={title}>
             <FormFieldGenerator
               key={activeGroup.id}
               id={section.id}
@@ -179,8 +179,11 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               onUploadingStateChanged={this.onUploadingStateChanged}
             />
             <Action>
-              <PrimaryButton
+              <Button
                 id="confirm_form"
+                type="primary"
+                size="large"
+                fullWidth
                 onClick={this.handleFormAction}
                 disabled={
                   this.state.disableContinueOnLocation ||
@@ -188,7 +191,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
                 }
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
-              </PrimaryButton>
+              </Button>
             </Action>
           </Content>
         </ActionPageLight>

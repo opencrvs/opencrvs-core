@@ -119,11 +119,16 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
     }}
   }
 `
-const BottomActionBar = styled.div`
+const BottomActionBar = styled.div<{
+  bottomActionDirection?: 'row'
+}>`
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: ${(props) => props.bottomActionDirection || 'column'};
   gap: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+  }
 `
 const BackButtonContainer = styled.div`
   padding-left: 8px;
@@ -181,6 +186,7 @@ interface IProps {
   subtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
+  bottomActionDirection?: 'row'
   size?: ContentSize
   className?: string
 }
@@ -199,6 +205,7 @@ export const UnstyledContent = ({
   subtitle,
   children,
   bottomActionButtons,
+  bottomActionDirection,
   size,
   className
 }: IProps) => (
@@ -237,7 +244,9 @@ export const UnstyledContent = ({
     </Contents>
     {bottomActionButtons && (
       <Footer>
-        <BottomActionBar>{bottomActionButtons}</BottomActionBar>
+        <BottomActionBar bottomActionDirection={bottomActionDirection}>
+          {bottomActionButtons}
+        </BottomActionBar>
       </Footer>
     )}
   </Container>

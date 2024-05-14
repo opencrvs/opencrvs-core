@@ -19,7 +19,7 @@ import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -213,6 +213,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
             onSubmit={this.handleContinue}
           >
             <Content
+              size={ContentSize.SMALL}
               title={
                 notificationMethod === 'sms'
                   ? intl.formatMessage(

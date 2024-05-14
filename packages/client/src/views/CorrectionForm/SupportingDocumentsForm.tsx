@@ -87,7 +87,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   const contentProps = {
     title: intl.formatMessage(messages.supportingDocumentsTitle),
     subtitle: intl.formatMessage(messages.supportingDocumentsSubtitle),
-    size: ContentSize.LARGE
+    size: ContentSize.SMALL
   }
 
   const modifyDeclaration = (

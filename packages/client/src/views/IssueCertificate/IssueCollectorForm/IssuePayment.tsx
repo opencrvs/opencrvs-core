@@ -32,11 +32,12 @@ import {
 import {
   ActionPageLight,
   Content,
+  ContentSize,
   Summary,
   Currency,
   ResponsiveModal
 } from '@opencrvs/components/lib'
-import { SuccessButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
@@ -48,10 +49,6 @@ import { SubmissionAction } from '@client/forms'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useState } from 'react'
 import { useDeclaration } from '@client/declarations/selectors'
-
-const Action = styled.div`
-  margin-top: 32px;
-`
 
 export const IssuePayment = () => {
   const intl = useIntl()
@@ -145,7 +142,23 @@ export const IssuePayment = () => {
         hideBackground
         goHome={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
       >
-        <Content title={titleMessage} showTitleOnMobile>
+        <Content
+          title={titleMessage}
+          size={ContentSize.SMALL}
+          showTitleOnMobile
+          bottomActionButtons={[
+            <Button
+              key="Continue"
+              id="Continue"
+              type="primary"
+              size="large"
+              fullWidth
+              onClick={() => toggleModal()}
+            >
+              {intl.formatMessage(issueMessages.issueCertificate)}
+            </Button>
+          ]}
+        >
           <Summary id="summary">
             <Summary.Row
               id="service"
@@ -166,11 +179,6 @@ export const IssuePayment = () => {
               }
             />
           </Summary>
-          <Action>
-            <SuccessButton id="Continue" onClick={() => toggleModal()}>
-              {intl.formatMessage(issueMessages.issueCertificate)}
-            </SuccessButton>
-          </Action>
         </Content>
         <ResponsiveModal
           id="issue-certificate-confirm"

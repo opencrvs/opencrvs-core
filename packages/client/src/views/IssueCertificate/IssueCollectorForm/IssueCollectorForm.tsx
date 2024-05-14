@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Content } from '@opencrvs/components/lib'
+import { Content, ContentSize } from '@opencrvs/components/lib'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { FormFieldGenerator } from '@client/components/form'
@@ -95,6 +95,7 @@ export function IssueCollectorForm({
   return (
     <Content
       title={intl.formatMessage(issueMessages.issueCertificate)}
+      size={ContentSize.SMALL}
       bottomActionButtons={[
         <PrimaryButton
           key="continue-button"

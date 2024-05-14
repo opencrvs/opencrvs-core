@@ -14,7 +14,8 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import {
   ProtectedAccoutStep,
@@ -35,7 +36,6 @@ import {
   constantsMessages,
   errorMessages
 } from '@client/i18n/messages'
-import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -45,12 +45,6 @@ import { ErrorText } from '@opencrvs/components/lib/'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-`
-
-const ConfirmButton = styled(PrimaryButton)`
-  & svg {
-    margin-right: 16px;
-  }
 `
 
 interface IProps {
@@ -172,14 +166,17 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
               <Content
                 title={intl.formatMessage(messages.userSetupReviewHeader)}
                 bottomActionButtons={[
-                  <ConfirmButton
+                  <Button
                     key="confirm"
                     id="Confirm"
+                    type="primary"
+                    size="large"
+                    fullWidth
                     onClick={() => submitActivateUser()}
                   >
-                    <Check />
+                    <Icon name="Check" />
                     {intl.formatMessage(buttonMessages.confirm)}
-                  </ConfirmButton>
+                  </Button>
                 ]}
               >
                 <GlobalError id="GlobalError">

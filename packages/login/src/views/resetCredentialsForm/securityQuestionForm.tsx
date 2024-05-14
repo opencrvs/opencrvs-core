@@ -28,7 +28,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -213,6 +213,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
         >
           <form id="security-question-form" onSubmit={this.handleContinue}>
             <Content
+              size={ContentSize.SMALL}
               title={intl.formatMessage(messages[this.state.questionKey])}
               showTitleOnMobile
               subtitle={intl.formatMessage(
