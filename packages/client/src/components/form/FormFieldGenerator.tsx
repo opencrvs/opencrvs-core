@@ -141,13 +141,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const LocationSearchFormField = styled(LocationSearch)`
-  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 344px;
-  }`}
+    ignoreBottomMargin ? '0px' : '22px'};
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -578,7 +572,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       return (
         <InputField {...inputFieldProps}>
-          <LocationSearchFormField
+          <LocationSearch
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             {...inputProps}
             selectedLocation={selectedLocation}
