@@ -8,21 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
 import { UUID } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
   Patient,
   Practitioner,
-  RegistrationNumber,
+  RegistrationStatus,
+  ResourceIdentifier,
   Saved,
   Task,
-  findExtension,
-  RegistrationStatus,
   WaitingForValidationRecord,
+  findExtension,
   getResourceFromBundleById,
-  ResourceIdentifier,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
@@ -31,10 +29,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
-import {
-  getSectionEntryBySectionCode,
-  getTaskResourceFromFhirBundle
-} from '@workflow/features/registration/fhir/fhir-template'
+import { getSectionEntryBySectionCode } from '@workflow/features/registration/fhir/fhir-template'
 import {
   fetchExistingRegStatusCode,
   getFromFhir,
@@ -43,41 +38,13 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getMosipUINToken } from '@workflow/features/registration/utils'
 import {
-  getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef,
-  getSystem
+  getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import {
-  ITokenPayload,
-  USER_SCOPE,
-  getToken,
-  getTokenPayload
-} from '@workflow/utils/auth-utils'
+import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
-
-export async function markBundleAsValidated<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.VALIDATED
-  )
-
-  await setupLastRegLocation(taskResource, practitioner)
-
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
 
 export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
@@ -98,165 +65,6 @@ export async function invokeRegistrationValidation(
     const errorData = await res.json()
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
-  return bundle
-}
-
-export async function markBundleAsWaitingValidation<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.WAITING_VALIDATION
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
-export async function markBundleAsDeclarationUpdated<T extends Bundle>(
-  bundle: T,
-  token: string
-): Promise<T> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.DECLARATION_UPDATED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
-export async function markEventAsRegistered(
-  taskResource: Task,
-  registrationNumber: RegistrationNumber,
-  eventType: EVENT_TYPE,
-  token: string
-): Promise<Task> {
-  /* Setting registration number here */
-  const system = `${OPENCRVS_SPECIFICATION_URL}id/${
-    eventType.toLowerCase() as Lowercase<typeof eventType>
-  }-registration-number` as const
-
-  if (taskResource && taskResource.identifier) {
-    taskResource.identifier.push({
-      system: system,
-      value: registrationNumber as RegistrationNumber
-    })
-  }
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.REGISTERED
-  )
-
-  return taskResource
-}
-
-export async function markBundleAsCertified(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.CERTIFIED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
-export function makeTaskAnonymous(bundle: Bundle) {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  taskResource.extension = taskResource.extension?.filter(
-    ({ url }) =>
-      ![
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
-      ].includes(url)
-  )
-
-  return bundle
-}
-
-export async function markBundleAsIssued(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  /* setting registration workflow status here */
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.ISSUED
-  )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
-  return bundle
-}
-
-export async function touchBundle(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-
-  const payload = getTokenPayload(token)
-  /* setting lastRegLocation here */
-  if (!payload.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
-    await setupLastRegLocation(taskResource, practitioner)
-  }
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
-
   return bundle
 }
 
@@ -359,45 +167,6 @@ export async function setupLastRegLocation<T extends Task>(
   return taskResource
 }
 
-const SYSTEM_SCOPES = ['recordsearch', 'notification-api']
-
-function isSystemInitiated(scopes: string[] | undefined) {
-  return Boolean(scopes?.some((scope) => SYSTEM_SCOPES.includes(scope)))
-}
-
-export async function setupSystemIdentifier(request: Hapi.Request) {
-  const token = getToken(request)
-  const { sub: systemId } = getTokenPayload(token)
-  const bundle = request.payload as Bundle
-  const taskResource = getTaskResourceFromFhirBundle(bundle)
-  const systemIdentifierUrl =
-    `${OPENCRVS_SPECIFICATION_URL}id/system_identifier` as const
-
-  if (!isSystemInitiated(request.auth.credentials.scope)) {
-    return
-  }
-
-  if (!taskResource.identifier) {
-    taskResource.identifier = []
-  }
-
-  taskResource.identifier = taskResource.identifier.filter(
-    ({ system }) => system != systemIdentifierUrl
-  )
-
-  const systemInformation = await getSystem(systemId, {
-    Authorization: `Bearer ${token}`
-  })
-
-  const { name, username, type } = systemInformation
-  const systemInformationJSON = { name, username, type }
-
-  taskResource.identifier.push({
-    system: systemIdentifierUrl,
-    value: JSON.stringify(systemInformationJSON)
-  })
-}
-
 export function setupLastRegUser<T extends Task>(
   taskResource: T,
   practitioner: Practitioner
@@ -438,7 +207,7 @@ export function setupAuthorOnNotes(
   return taskResource
 }
 
-export async function checkForDuplicateStatusUpdate(taskResource: Task) {
+async function checkForDuplicateStatusUpdate(taskResource: Task) {
   const regStatusCode =
     taskResource &&
     taskResource.businessStatus &&

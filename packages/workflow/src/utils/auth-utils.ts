@@ -61,10 +61,3 @@ export function hasValidateScope(request: Hapi.Request): boolean {
     USER_SCOPE.VALIDATE
   )
 }
-
-export function hasDeclareScope(request: Hapi.Request): boolean {
-  return hasScope(
-    { Authorization: request.headers.authorization },
-    USER_SCOPE.DECLARE
-  )
-}

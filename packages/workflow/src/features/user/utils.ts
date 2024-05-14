@@ -83,7 +83,7 @@ export async function getPractitionerOffice(
   )
 }
 
-export function getPrimaryLocationFromLocationList(
+function getPrimaryLocationFromLocationList(
   locations: [fhir3.Location]
 ): fhir3.Location {
   const primaryOffice = getOfficeLocationFromLocationList(locations)
@@ -124,18 +124,6 @@ function getOfficeLocationFromLocationList(
     throw new Error('No CRVS office found')
   }
   return office
-}
-
-export async function getLoggedInPractitionerLocations(
-  token: string
-): Promise<[fhir3.Location]> {
-  const practitionerResource = await getLoggedInPractitionerResource(token)
-
-  if (!practitionerResource || !practitionerResource.id) {
-    throw new Error('Invalid practioner found')
-  }
-  /* getting location list for practitioner */
-  return await getPractitionerLocations(practitionerResource.id)
 }
 
 export async function getLoggedInPractitionerResource(
