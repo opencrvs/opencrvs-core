@@ -469,10 +469,7 @@ export function notCorrectedHistory(
       .slice(0, index)
       .filter((task) => getActionFromTask(task) !== TaskAction.ASSIGNED)
     const lastAction = getActionFromTask(pastTasks[pastTasks.length - 1])
-    if (
-      lastAction === TaskAction.APPROVED_CORRECTION ||
-      lastAction === TaskAction.REJECTED_CORRECTION
-    ) {
+    if (lastAction === TaskAction.APPROVED_CORRECTION) {
       return false
     }
   }
