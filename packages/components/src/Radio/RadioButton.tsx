@@ -16,6 +16,7 @@ const Wrapper = styled.li`
   list-style-type: none;
   display: flex;
   flex-direction: row;
+  gap: 16px;
   border-radius: 4px;
   width: 100%;
   padding: 8px 8px;
@@ -38,7 +39,6 @@ const Label = styled.label<{
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
   align-self: center;
-  padding-left: 12px;
   ${({ theme }) => theme.fonts.h4};
   ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
 `
@@ -56,9 +56,9 @@ const Radio = styled.span<{
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
-    width: 40px;`
+    min-width: 40px;`
       : ` height: 24px;
-    width: 24px;`}
+    min-width: 24px;`}
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
@@ -105,6 +105,15 @@ const Input = styled.input`
   cursor: pointer;
 
   &:active ~ ${Radio} {
+    &::after {
+      border: 2px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+    }
+  }
+
+  &:checked ~ ${Radio} {
     &::after {
       border: 2px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
@@ -187,7 +196,11 @@ export const RadioButton = ({
           )
         ) : null}
       </Radio>
-      <Label disabled={disabled} htmlFor={id}>
+      <Label
+        disabled={disabled}
+        htmlFor={id}
+        hasFlexDirection={hasFlexDirection}
+      >
         {label}
       </Label>
     </Wrapper>

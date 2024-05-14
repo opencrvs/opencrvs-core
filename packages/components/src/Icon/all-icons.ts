@@ -16,6 +16,7 @@ export {
   ArrowLeft,
   ArrowRight,
   Buildings,
+  Circle,
   CaretDown,
   CaretLeft,
   CaretRight,
