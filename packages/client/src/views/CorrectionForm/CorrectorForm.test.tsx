@@ -176,7 +176,7 @@ describe('Corrector form', () => {
 
     it('should not disable the continue button if an option is selected', () => {
       wrapper
-        .find('#relationship_INFORMANT_Spouse')
+        .find('#relationship_INFORMANT_SPOUSE')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
