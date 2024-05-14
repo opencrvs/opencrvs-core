@@ -43,6 +43,7 @@
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231](https://github.com/opencrvs/opencrvs-core/issues/6231)
 - In record audit page, after 'Correction request approved' the “record corrected” action is removed from history [#6228](https://github.com/opencrvs/opencrvs-core/issues/6228)
+- Fix Registrar of any location should be able to review a correction request [#6247](https://github.com/opencrvs/opencrvs-core/issues/6247)
 
 ## Refactor
 
