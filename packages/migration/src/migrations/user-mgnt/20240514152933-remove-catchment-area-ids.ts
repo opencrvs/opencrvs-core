@@ -96,4 +96,5 @@ export const down = async (db: Db, client: MongoClient) => {
         { $set: { catchmentAreaIds: officeHierarchy } }
       )
   }
+  await connectedHearthClient.close()
 }
