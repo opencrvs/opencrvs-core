@@ -11,10 +11,10 @@
 import React from 'react'
 import { PrintRecordHeader as Header } from '@client/views/PrintRecord/Header'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { formatUrl } from '@client/navigation'
+import { formatUrl, goBack } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useParams, Redirect } from 'react-router'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
@@ -30,6 +30,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 import { constantsMessages } from '@client/i18n/messages'
+import { AppBar, Button, Icon } from '@opencrvs/components/lib'
 
 const Container = styled.div`
   padding: 16px;
@@ -46,7 +47,14 @@ const AvoidBreak = styled.div`
     page-break-after: avoid;
   }
 `
+const StyledAppBar = styled(AppBar)`
+  @media print {
+    display: none;
+  }
+`
+
 export function PrintRecord() {
+  const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
   const offlineData = useSelector(getOfflineData)
   const cache = createIntlCache()
@@ -72,36 +80,50 @@ export function PrintRecord() {
   }
 
   return (
-    <Container>
-      <Content>
-        <AvoidBreak>
-          <Header
-            logoSrc={offlineData.config.COUNTRY_LOGO.file}
-            title={formatMessage(intls, reviewMessages.govtName)}
-            heading={formatMessage(
-              intls,
-              printRecordMessages.civilRegistrationCentre
-            )}
-            subject={formatMessage(
-              intls,
-              reviewMessages.headerSubjectWithoutName,
-              {
-                eventType: declaration.event
+    <>
+      <StyledAppBar
+        desktopRight={
+          <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+            <Icon name="X" />
+          </Button>
+        }
+        mobileRight={
+          <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+            <Icon name="X" />
+          </Button>
+        }
+      />
+      <Container>
+        <Content>
+          <AvoidBreak>
+            <Header
+              logoSrc={offlineData.config.COUNTRY_LOGO.file}
+              title={formatMessage(intls, reviewMessages.govtName)}
+              heading={formatMessage(
+                intls,
+                printRecordMessages.civilRegistrationCentre
+              )}
+              subject={formatMessage(
+                intls,
+                reviewMessages.headerSubjectWithoutName,
+                {
+                  eventType: declaration.event
+                }
+              )}
+              info={
+                declaration.data?.registration?.trackingId
+                  ? {
+                      label: formatMessage(intls, constantsMessages.trackingId),
+                      value: declaration.data.registration.trackingId as string
+                    }
+                  : undefined
               }
-            )}
-            info={
-              declaration.data?.registration?.trackingId
-                ? {
-                    label: formatMessage(intls, constantsMessages.trackingId),
-                    value: declaration.data.registration.trackingId as string
-                  }
-                : undefined
-            }
-            subjectColor={getEventwiseSubjectColor(declaration.event)}
-          />
-        </AvoidBreak>
-        <Body declaration={declaration} intls={intls} />
-      </Content>
-    </Container>
+              subjectColor={getEventwiseSubjectColor(declaration.event)}
+            />
+          </AvoidBreak>
+          <Body declaration={declaration} intls={intls} />
+        </Content>
+      </Container>
+    </>
   )
 }
