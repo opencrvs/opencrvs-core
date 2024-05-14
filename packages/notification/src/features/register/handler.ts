@@ -43,7 +43,7 @@ export async function birthRegisterNotification(
     'informant',
     {
       trackingId: getTrackingId(registeredRecord),
-      crvsOffice: getOfficeName(registeredRecord),
+      crvsOffice: await getOfficeName(registeredRecord),
       registrationLocation: getRegistrationLocation(registeredRecord),
       name: getPersonName(registeredRecord, 'child'),
       informantName: getInformantName(registeredRecord),
@@ -70,7 +70,7 @@ export async function deathRegisterNotification(
     'informant',
     {
       trackingId: getTrackingId(registeredRecord),
-      crvsOffice: getOfficeName(registeredRecord),
+      crvsOffice: await getOfficeName(registeredRecord),
       registrationLocation: getRegistrationLocation(registeredRecord),
       name: getPersonName(registeredRecord, 'deceased'),
       informantName: getInformantName(registeredRecord),

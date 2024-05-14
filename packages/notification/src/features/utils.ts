@@ -27,6 +27,7 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { badRequest as boomBadRequest } from '@hapi/boom'
+import { fetchLocation } from '@notification/location'
 
 export function getContactPhoneNo(
   record: ReadyForReviewRecord | RegisteredRecord
@@ -59,16 +60,21 @@ function error(
   throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
-export function getOfficeName(record: ReadyForReviewRecord | RegisteredRecord) {
+export async function getOfficeName(
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
+) {
   const task = getTaskFromSavedBundle(record)
   const officeExtension = findExtension(
     'http://opencrvs.org/specs/extension/regLastOffice',
     task.extension
   )
-  if (!officeExtension?.valueString) {
+  if (!officeExtension) {
     error(record, 'Office extension not found')
   }
-  return officeExtension.valueString
+  const location = await fetchLocation(
+    resourceIdentifierToUUID(officeExtension.valueReference.reference)
+  )
+  return location.name
 }
 
 export function getInformantName(

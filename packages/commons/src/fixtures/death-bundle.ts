@@ -529,7 +529,6 @@ export const DEATH_BUNDLE: SavedBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }

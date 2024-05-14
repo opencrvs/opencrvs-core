@@ -66,6 +66,7 @@ import {
 import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
+  getLocationOrOfficeById,
   getLoggedInPractitionerResource,
   getPractitionerOfficeId
 } from '@workflow/features/user/utils'
@@ -141,6 +142,7 @@ export async function withPractitionerDetails<T extends Task>(
   const user = userOrSystem
   const practitioner = await getLoggedInPractitionerResource(token)
   const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
+  const office = await getLocationOrOfficeById(practitionerOfficeId)
 
   newTask.extension.push(
     ...([
@@ -163,8 +165,8 @@ export async function withPractitionerDetails<T extends Task>(
     {
       type: 'document',
       resourceType: 'Bundle',
-      // @TODO: Office & office location?
-      entry: [practitioner].map((r) => resourceToSavedBundleEntry(r))
+      // @TODO: Do we need office location here?
+      entry: [practitioner, office].map((r) => resourceToSavedBundleEntry(r))
     }
   ]
 }

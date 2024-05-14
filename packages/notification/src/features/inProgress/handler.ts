@@ -25,16 +25,10 @@ import {
 } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
-import { getRegistrationLocation } from '@notification/features/utils'
-
-function getOfficeName(record: InProgressRecord) {
-  const task = getTaskFromSavedBundle(record)
-  const officeExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastOffice',
-    task.extension
-  )
-  return officeExtension?.valueString
-}
+import {
+  getOfficeName,
+  getRegistrationLocation
+} from '@notification/features/utils'
 
 function getInformantName(record: InProgressRecord) {
   const composition = getComposition(record)
@@ -99,7 +93,7 @@ export async function birthInProgressNotification(
     'informant',
     {
       trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: getOfficeName(inProgressRecord),
+      crvsOffice: await getOfficeName(inProgressRecord),
       registrationLocation: getRegistrationLocation(inProgressRecord),
       informantName: getInformantName(inProgressRecord)
     }
@@ -124,7 +118,7 @@ export async function deathInProgressNotification(
     'informant',
     {
       trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: getOfficeName(inProgressRecord),
+      crvsOffice: await getOfficeName(inProgressRecord),
       registrationLocation: getRegistrationLocation(inProgressRecord),
       informantName: getInformantName(inProgressRecord)
     }
