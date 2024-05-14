@@ -47,13 +47,12 @@ const Flex = styled.div<{ splitView?: boolean }>`
   flex-wrap: nowrap;
   gap: 8px;
   margin-bottom: ${({ splitView }) => {
-    return splitView ? '2px' : '0px'
+    return splitView ? '10px' : '0px'
   }};
 `
 
 const DocumentUploadButton = styled(ImageUploader)`
   height: 46px;
-  }
 `
 
 export const ErrorMessage = styled.div`
