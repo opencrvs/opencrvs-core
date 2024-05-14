@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
-export const MOTHER_SECTION_CODE = 'mother-details'
-export const FATHER_SECTION_CODE = 'father-details'
+
 export const CHILD_SECTION_CODE = 'child-details'
-export const INFORMANT_SECTION_CODE = 'informant-details'
 export const DECEASED_SECTION_CODE = 'deceased-details'
 export const BIRTH_REG_NUMBER_SYSTEM = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REG_NUMBER_SYSTEM = 'DEATH_REGISTRATION_NUMBER'
@@ -32,7 +30,7 @@ export enum RegStatus {
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   ISSUED = 'ISSUED'
 }
-export const DOWNLOADED = 'DOWNLOADED'
+
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH',

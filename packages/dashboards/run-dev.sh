@@ -24,6 +24,9 @@ echo 'OpenCRVS Metabase development environment'
 METABASE_VERSION="v0.46.6.1"
 METABASE_JAR="./$METABASE_VERSION-metabase.jar"
 
+# enable job control
+set -m
+
 if [ ! -f "$METABASE_JAR" ]; then
   echo "You don't seem to have Metabase installed. Downloading Metabase..."
   curl https://downloads.metabase.com/$METABASE_VERSION/metabase.jar --output $METABASE_JAR
