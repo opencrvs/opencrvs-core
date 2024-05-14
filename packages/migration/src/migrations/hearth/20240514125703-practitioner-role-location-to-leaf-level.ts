@@ -26,6 +26,8 @@ export const up = async (db: Db, client: MongoClient) => {
 }
 
 export const down = async (db: Db, client: MongoClient) => {
+  // Traverses the locations from leaf level to up,
+  // returning Array<{ reference: `Location/${string}` }> where the FIRST item in the array is the smallest (office)
   const pipeline = [
     {
       $addFields: {
