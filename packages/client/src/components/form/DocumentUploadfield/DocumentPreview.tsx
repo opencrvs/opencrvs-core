@@ -92,7 +92,7 @@ export const DocumentPreview = ({
                   type="icon"
                   onClick={() => onDelete(previewImage)}
                 >
-                  <Icon name="TrashSimple" color="red" />
+                  <Icon name="Trash" color="red" />
                 </Button>
               </>
             )}
@@ -123,7 +123,7 @@ export const DocumentPreview = ({
                 type="icon"
                 onClick={() => onDelete(previewImage)}
               >
-                <Icon name="TrashSimple" color="red" />
+                <Icon name="Trash" color="red" />
               </Button>
             )}
             <Button

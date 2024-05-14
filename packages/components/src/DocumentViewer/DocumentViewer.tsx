@@ -36,7 +36,8 @@ const ViewerHeader = styled.div`
   height: 64px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  gap: 8px;
+  padding: 0 10px;
   z-index: 99;
   justify-content: space-between;
   background-color: ${({ theme }) => theme.colors.white};

@@ -13,16 +13,17 @@ import styled from 'styled-components'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
-const Wrapper = styled.div`
-  margin: 4px 0px;
-  width: 100%;
+const Wrapper = styled(Stack)`
+  margin: 2px 0px 6px 0px;
 `
 
 const Container = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,7 +32,6 @@ const Container = styled.div`
   background: ${({ theme }) => theme.colors.blueLighter};
   height: 48px;
   padding: 0px 8px 0px 12px;
-  margin-bottom: 4px;
 `
 
 const SpinnerContainer = styled(Spinner)`
@@ -88,7 +88,7 @@ export const DocumentListPreview = ({
   }
 
   return (
-    <Wrapper id={`preview-list-${id}`}>
+    <Wrapper id={`preview-list-${id}`} direction="column" gap={4}>
       {documents &&
         documents.map((document: IFileValue, key: number) => (
           <Container key={`preview_${key}`}>
@@ -130,7 +130,7 @@ export const DocumentListPreview = ({
         processingDocuments.map(({ label }) => (
           <Container key={label}>
             <Label>
-              <Icon color="disabled" name="Paperclip" size="large" />
+              <Icon color="grey400" name="Paperclip" size="large" />
               <Link disabled={true} key={label}>
                 <span>{getFormattedLabelForDocType(label) || label}</span>
               </Link>

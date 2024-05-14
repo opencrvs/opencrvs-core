@@ -35,16 +35,9 @@ const options = {
 
 const UploaderWrapper = styled.div`
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 `
-
-const DocumentUploadButton = styled(ImageUploader)`
-  height: 48px;
-  }
-`
-
 const Label = styled.label`
-  position: relative;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4};
 `
@@ -54,9 +47,15 @@ const Flex = styled.div<{ splitView?: boolean }>`
   flex-wrap: nowrap;
   gap: 8px;
   margin-bottom: ${({ splitView }) => {
-    return splitView ? '10px' : '0px'
+    return splitView ? '2px' : '0px'
   }};
 `
+
+const DocumentUploadButton = styled(ImageUploader)`
+  height: 46px;
+  }
+`
+
 export const ErrorMessage = styled.div`
   margin-bottom: 8px;
 `

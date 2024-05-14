@@ -14,6 +14,7 @@ import { css } from 'styled-components'
 export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
   display: inline-flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
   border: 0;
