@@ -41,7 +41,8 @@
 - Fix certificate templates not getting populated for health facility event locations & ADMIN_LEVEL > 2
 - Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
-- In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
+- In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231](https://github.com/opencrvs/opencrvs-core/issues/6231)
+- In record audit page, after 'Correction request approved' the “record corrected” action is removed from history [#6228](https://github.com/opencrvs/opencrvs-core/issues/6228)
 
 ## Refactor
 
