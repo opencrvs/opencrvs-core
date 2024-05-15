@@ -16,28 +16,19 @@ import { Text } from '../Text'
 interface IErrorTextProps {
   id?: string
   children: string
-  ignoreMediaQuery?: boolean
 }
 
-const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
+const Container = styled.div`
   flex-direction: row;
   display: flex;
   align-items: center;
   margin-top: -20px;
   margin-bottom: 4px;
-
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
-      }`
-      : ''
-  }}
 `
 
 export function ErrorText(props: IErrorTextProps) {
   return (
-    <Container id={props.id} ignoreMediaQuery={props.ignoreMediaQuery}>
+    <Container id={props.id}>
       <Warning />
       <Text variant="bold16" element="p" color="negative">
         {props.children}

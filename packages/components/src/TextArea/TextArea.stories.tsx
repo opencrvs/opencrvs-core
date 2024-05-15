@@ -20,6 +20,4 @@ export default {
 const Template: Story = (args) => <TextArea {...args} />
 
 export const TextAreaView = Template.bind({})
-TextAreaView.args = {
-  ignoreMediaQuery: false
-}
+TextAreaView.args = {}

@@ -60,7 +60,6 @@ const UserNameInput = () => {
           touched={Boolean(meta.touched)}
           label={intl.formatMessage(userNameField.label)}
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
-          ignoreMediaQuery
           hideAsterisk
         >
           <TextInput
@@ -69,7 +68,6 @@ const UserNameInput = () => {
             touched={Boolean(meta.touched)}
             error={Boolean(meta.error)}
             type="text"
-            ignoreMediaQuery
           />
         </InputField>
       )}
@@ -89,7 +87,6 @@ const Password = () => {
           touched={Boolean(meta.touched)}
           label={intl.formatMessage(passwordField.label)}
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
-          ignoreMediaQuery
           hideAsterisk
         >
           <PasswordInput
@@ -97,7 +94,6 @@ const Password = () => {
             {...input}
             touched={Boolean(meta.touched)}
             error={Boolean(meta.error)}
-            ignoreMediaQuery
           />
         </InputField>
       )}

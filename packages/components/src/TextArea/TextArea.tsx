@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 interface ITextAreaProps {
-  ignoreMediaQuery?: boolean
   maxLength?: number
   readonly?: boolean
 }

@@ -39,14 +39,6 @@ const SubPageContent = styled(Content)`
   max-width: 100%;
 `
 
-const StyledSelect = styled(Select)`
-  width: 192px;
-  ${({ theme }) => theme.fonts.reg18};
-  padding-bottom: 20px;
-  .react-select__control {
-    border-radius: 4px;
-  }
-`
 const StyledText = styled(Text)`
   padding-bottom: 4px;
 `
@@ -191,7 +183,7 @@ export const DuplicateForm = (props: IProps) => {
               <Text variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
               </Text>
-              <StyledSelect
+              <Select
                 id="selectTrackingId"
                 isDisabled={false}
                 value={selectedTrackingId}
@@ -207,7 +199,6 @@ export const DuplicateForm = (props: IProps) => {
                 {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
               </StyledText>
               <StyledTextArea
-                ignoreMediaQuery
                 {...{
                   onChange: handleCommentChange
                 }}

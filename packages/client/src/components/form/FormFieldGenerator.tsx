@@ -227,8 +227,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      placeholder: fieldDefinition.placeholder
     }
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
@@ -619,8 +618,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
-        inputProps
+      const { error, touched, ...allowedInputProps } = inputProps
 
       return (
         <input

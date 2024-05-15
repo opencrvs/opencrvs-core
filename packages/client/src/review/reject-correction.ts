@@ -26,7 +26,6 @@ export const rejectCorrection: IRejectCorrectionForm = {
       hideHeader: false,
       validator: [],
       maxLength: 500,
-      ignoreMediaQuery: true,
       ignoreBottomMargin: true
     }
   ]

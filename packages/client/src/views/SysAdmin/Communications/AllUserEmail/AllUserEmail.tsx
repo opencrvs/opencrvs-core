@@ -37,11 +37,7 @@ const Form = styled.form`
     margin-bottom: 24px;
   }
 `
-const FullWidthInputField = styled(InputField)`
-  input {
-    width: 100%;
-  }
-`
+
 const AllUserEmail = () => {
   const intl = useIntl()
   const [subject, setSubject] = useState('')
@@ -109,7 +105,7 @@ const AllUserEmail = () => {
               setConfirmationModalOpen(true)
             }}
           >
-            <FullWidthInputField
+            <InputField
               id="subject"
               label={intl.formatMessage(constantsMessages.emailSubject)}
               touched={false}
@@ -120,8 +116,8 @@ const AllUserEmail = () => {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               />
-            </FullWidthInputField>
-            <FullWidthInputField
+            </InputField>
+            <InputField
               id="body"
               label={intl.formatMessage(constantsMessages.emailBody)}
               touched={false}
@@ -129,14 +125,13 @@ const AllUserEmail = () => {
               hideAsterisk
             >
               <TextArea
-                ignoreMediaQuery
                 {...{
                   value: body,
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
                     setBody(e.target.value)
                 }}
               />
-            </FullWidthInputField>
+            </InputField>
             <Button type="primary" disabled={!subject || !body}>
               <Icon name="PaperPlaneTilt" size="medium" />
               {intl.formatMessage(buttonMessages.send)}

@@ -26,7 +26,6 @@ export const rejectRegistration: IRejectRegistrationForm = {
       hideHeader: true,
       validator: [],
       maxLength: 500,
-      ignoreMediaQuery: true,
       ignoreBottomMargin: true
     },
     {

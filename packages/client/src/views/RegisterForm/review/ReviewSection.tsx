@@ -1713,8 +1713,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       value:
         (declaration.data.registration &&
           declaration.data.registration.commentsOrNotes) ||
-        '',
-      ignoreMediaQuery: true
+        ''
     }
 
     const informantName = getDeclarationFullName(

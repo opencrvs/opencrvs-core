@@ -147,9 +147,7 @@ const SimpleDocumentUploaderComponent = ({
       {description && <FieldDescription>{description}</FieldDescription>}
       <ErrorMessage>
         {errorMessage && (touched || error) && (
-          <ErrorText ignoreMediaQuery id="field-error">
-            {errorMessage}
-          </ErrorText>
+          <ErrorText id="field-error">{errorMessage}</ErrorText>
         )}
       </ErrorMessage>
       <DocumentListPreview
