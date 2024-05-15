@@ -49,7 +49,7 @@ const requestSchema = z.object({
   >()
 })
 
-function filterInformantSection<
+function filterInformantSectionFromComposition<
   T extends InProgressRecord | ReadyForReviewRecord
 >(record: T): T {
   const composition = getComposition(record)
@@ -101,8 +101,12 @@ export const updateRoute = createRoute({
     const informantTypeOfBundle = getInformantType(record)
     const payloadInformantType = payload.details.registration.informantType
 
+    // When new informant details are provided, we should create a patient entry
+    // by removing the composition section from the bundle.
+    // If the section is not found, the builders from updateFhirBundle
+    // create a new patient resource from scratch.
     if (informantTypeOfBundle !== payloadInformantType)
-      record = filterInformantSection(record)
+      record = filterInformantSectionFromComposition(record)
 
     const { details, event } = payload
     const {
