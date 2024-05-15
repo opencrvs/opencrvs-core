@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi, Mock } from 'vitest'
+import { Mock } from 'vitest'
 import * as React from 'react'
 import { createStore } from '@client/store'
 import { storeDeclaration, IDeclaration } from '@client/declarations'
@@ -28,7 +28,6 @@ import { Event } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
-import * as pdfRender from '@client/pdfRenderer'
 import { useParams } from 'react-router'
 
 const deathDeclaration = {
@@ -47,8 +46,6 @@ const deathDeclaration = {
 }
 
 describe('when user wants to review death certificate', () => {
-  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
-
   it('displays the "Confirm & Print" button', async () => {
     const { history, match } = createRouterProps(
       '/',
@@ -87,7 +84,16 @@ describe('when user wants to review death certificate', () => {
 describe('back button behavior tests of review certificate action', () => {
   let component: ReactWrapper
 
-  const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
+  const mockBirthDeclarationData = {
+    ...cloneDeep(mockDeclarationData),
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ]
+  }
   mockBirthDeclarationData.registration.certificates[0] = {
     collector: {
       type: 'PRINT_IN_ADVANCE'
@@ -114,16 +120,7 @@ describe('back button behavior tests of review certificate action', () => {
     loginAsFieldAgent(store)
     const birthDeclaration = {
       id: 'asdhdqe2472487jsdfsdf',
-      data: {
-        ...mockBirthDeclarationData,
-        history: [
-          {
-            date: '2022-03-21T08:16:24.467+00:00',
-            regStatus: 'REGISTERED',
-            reinstated: false
-          }
-        ]
-      },
+      data: mockBirthDeclarationData,
       event: Event.Birth
     }
     store.dispatch(
@@ -155,6 +152,7 @@ describe('back button behavior tests of review certificate action', () => {
 
     loginAsFieldAgent(store)
     store.dispatch(
+      // @ts-ignore
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthDeclarationData,
@@ -256,7 +254,7 @@ describe('when user wants to review marriage certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { history, location, match } = createRouterProps(
+    const { history, match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
       {
