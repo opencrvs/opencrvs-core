@@ -59,7 +59,7 @@ const findHierarchyForOffice = async (officeId: string) => {
     },
     {
       $sort: {
-        'hierarchy.depth': -1
+        'hierarchy.depth': 1
       }
     },
     {
