@@ -14,8 +14,9 @@ import {
   CompositionSectionCode,
   findCompositionSection,
   findExtension,
+  findLastOfficeFromSavedBundle,
   getComposition,
-  getOfficeLocationFromSavedBundle,
+  findLastOfficeLocationFromSavedBundle,
   getResourceFromBundleById,
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -27,7 +28,6 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { badRequest as boomBadRequest } from '@hapi/boom'
-import { fetchLocation } from '@notification/location'
 
 export function getContactPhoneNo(
   record: ReadyForReviewRecord | RegisteredRecord
@@ -63,18 +63,8 @@ function error(
 export async function getOfficeName(
   record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
 ) {
-  const task = getTaskFromSavedBundle(record)
-  const officeExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastOffice',
-    task.extension
-  )
-  if (!officeExtension) {
-    error(record, 'Office extension not found')
-  }
-  const location = await fetchLocation(
-    resourceIdentifierToUUID(officeExtension.valueReference.reference)
-  )
-  return location.name
+  const office = findLastOfficeFromSavedBundle(record)
+  return office.name
 }
 
 export function getInformantName(
@@ -130,11 +120,7 @@ export function getPersonName(
 export function getRegistrationLocation(
   record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
 ) {
-  const location = getOfficeLocationFromSavedBundle(record)
-  if (!location) {
-    error(record, 'no last registration office location found')
-  }
-
+  const location = findLastOfficeLocationFromSavedBundle(record)
   const language = getDefaultLanguage()
   return (
     (language === 'en'

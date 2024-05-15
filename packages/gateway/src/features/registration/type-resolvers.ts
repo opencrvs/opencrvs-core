@@ -83,7 +83,8 @@ import {
   isQuestionnaireResponse,
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
-  Address
+  Address,
+  findLastOfficeFromSavedBundle
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1095,10 +1096,8 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
       )
-      const regLastOfficeExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        task.extension
-      )
+      const office =
+        context.record && findLastOfficeFromSavedBundle(context.record)
 
       if (assignmentExtension) {
         const regLastUserExtension = findExtension(
@@ -1114,12 +1113,13 @@ export const typeResolvers: GQLResolver = {
             await context.dataSources.usersAPI.getUserByPractitionerId(
               practitionerId
             )
+
           if (user) {
             return {
               userId: user._id,
               firstName: user.name[0].given.join(' '),
               lastName: user.name[0].family,
-              officeName: regLastOfficeExtension?.valueString || ''
+              officeName: office?.name || ''
             }
           }
         }

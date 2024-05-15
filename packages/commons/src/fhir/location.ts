@@ -9,46 +9,99 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  Location,
-  Office,
-  Resource,
+  findExtension,
+  findResourceFromBundleById,
+  getTaskFromSavedBundle,
+  KnownExtensionType,
+  OPENCRVS_SPECIFICATION_URL,
+  ResourceIdentifier,
   resourceIdentifierToUUID,
-  SavedBundle
+  SavedBundle,
+  WithStrictExtensions
 } from '.'
+import { UUID } from '..'
 
-export function isLocation<T extends Resource>(
-  resource: T
-): resource is T & Location {
-  return resource.resourceType === 'Location'
+export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
+  type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
+  extension?: Array<
+    KnownExtensionType['http://opencrvs.org/specs/extension/part-of']
+  >
 }
 
-export function isOffice<T extends Resource>(
-  resource: T
-): resource is T & Office {
-  return (
-    (isLocation(resource) &&
-      resource.type?.coding?.some(({ code }) => code === 'CRVS_OFFICE')) ??
-    false
-  )
+export type Location = WithStrictExtensions<
+  Omit<fhir3.Location, 'address' | 'partOf'> & {
+    address?: Address
+    partOf?: {
+      reference: ResourceIdentifier
+    }
+  }
+>
+export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
+  id: UUID
+  address?: Address
+  partOf?: {
+    reference: ResourceIdentifier
+  }
+}
+export type Office = Omit<Location, 'partOf' | 'type'> & {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type'
+        code: 'CRVS_OFFICE'
+      }
+    ]
+  }
+  partOf: {
+    reference: ResourceIdentifier
+  }
+}
+export type SavedOffice = Omit<Office, 'id'> & {
+  id: UUID
 }
 
-export function getOfficeFromSavedBundle<T extends SavedBundle>(bundle: T) {
-  return bundle.entry.map(({ resource }) => resource).find(isOffice)
-}
-
-export function getOfficeLocationFromSavedBundle<T extends SavedBundle>(
+export function findLastOfficeFromSavedBundle<T extends SavedBundle>(
   bundle: T
 ) {
-  const office = getOfficeFromSavedBundle(bundle)
-  if (!office || !office.partOf) {
-    throw new Error('Office not found in the bundle.')
+  const task = getTaskFromSavedBundle(bundle)
+  const regLastOfficeExtension = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    task.extension
+  )
+  if (!regLastOfficeExtension) {
+    throw new Error(
+      `regLastOffice extension wasn't found in task in bundle ${bundle.id}`
+    )
+  }
+  const officeId = resourceIdentifierToUUID(
+    regLastOfficeExtension.valueReference.reference
+  )
+  const office = findResourceFromBundleById<SavedOffice>(bundle, officeId)
+  if (!office) {
+    throw new Error(`Office wasn't found in a saved bundle ${bundle.id}`)
+  }
+  return office
+}
+
+export function findLastOfficeLocationFromSavedBundle<T extends SavedBundle>(
+  bundle: T
+) {
+  const office = findLastOfficeFromSavedBundle(bundle)
+  if (!office) {
+    throw new Error(
+      `Office which was referenced in lastRegOffice in bundle ${bundle.id} wasn't found`
+    )
   }
 
   const locationId = resourceIdentifierToUUID(office.partOf.reference)
-  const location = bundle.entry
-    .map(({ resource }) => resource)
-    .filter(isLocation)
-    .find((location) => location.id === locationId)
-
-  return location
+  const officeLocation = findResourceFromBundleById<SavedOffice>(
+    bundle,
+    locationId
+  )
+  if (!officeLocation) {
+    throw new Error(
+      `Office's location (parent location) wasn't found in a saved bundle ${bundle.id}`
+    )
+  }
+  return officeLocation
 }

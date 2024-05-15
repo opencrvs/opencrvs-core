@@ -13,7 +13,7 @@ import { RegistrationStatus, ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
-import { Extension, KnownExtensionType } from './extension'
+import { Extension } from './extension'
 import { Patient } from './patient'
 import {
   CompositionSection,
@@ -22,6 +22,7 @@ import {
 } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
 import { Practitioner, SavedPractitioner } from './practitioner'
+import { Location, SavedLocation, Office, SavedOffice } from './location'
 
 export * from './practitioner'
 export * from './task'
@@ -107,6 +108,8 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedCompositionHistory
   : T extends Reference
   ? SavedReference
+  : T extends Office
+  ? SavedOffice
   : T extends Location
   ? SavedLocation
   : T extends Task
@@ -174,13 +177,6 @@ export type StrictBundle<T extends Resource[]> = Omit<Bundle, 'entry'> & {
   entry: { [Property in keyof T]: BundleEntry<T[Property]> }
 }
 
-export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
-  type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
-  extension?: Array<
-    KnownExtensionType['http://opencrvs.org/specs/extension/part-of']
-  >
-}
-
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
   coding: Array<
     Omit<fhir3.Coding, 'code' | 'system'> & {
@@ -220,32 +216,6 @@ export type RelatedPerson = WithStrictExtensions<
 export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   id: UUID
   patient: SavedReference
-}
-
-export type Location = WithStrictExtensions<
-  Omit<fhir3.Location, 'address' | 'partOf'> & {
-    address?: Address
-    partOf?: {
-      reference: ResourceIdentifier
-    }
-  }
->
-export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
-  id: UUID
-  address?: Address
-  partOf?: {
-    reference: ResourceIdentifier
-  }
-}
-export type Office = Omit<Location, 'type'> & {
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/location-type'
-        code: 'CRVS_OFFICE'
-      }
-    ]
-  }
 }
 
 export type SavedQuestionnaireResponse = Omit<
