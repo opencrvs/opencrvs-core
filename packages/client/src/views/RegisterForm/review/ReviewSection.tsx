@@ -2046,6 +2046,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )}
                     {viewRecord ||
                     isDuplicate ||
+                    documentsSection.groups[0].fields.length == 0 ||
                     declaration.registrationStatus ===
                       SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
                       <LinkButton
