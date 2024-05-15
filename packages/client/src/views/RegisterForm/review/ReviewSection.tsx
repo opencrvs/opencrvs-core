@@ -425,8 +425,7 @@ const renderValue = (
       window.config.COUNTRY
     ) {
       const dynamicOption: IDynamicOptions = {
-        resource: 'locations',
-        initialValue: 'agentDefault'
+        resource: 'locations'
       }
       dynamicOption.dependency = [
         'internationalStatePrimary',
@@ -450,8 +449,7 @@ const renderValue = (
       window.config.COUNTRY
     ) {
       const dynamicOption: IDynamicOptions = {
-        resource: 'locations',
-        initialValue: 'agentDefault'
+        resource: 'locations'
       }
       dynamicOption.dependency = [
         'internationalStateSecondary',
