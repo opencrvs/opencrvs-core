@@ -178,7 +178,7 @@ export const RadioButton = ({
         onChange={disabled ? () => null : handleChange}
       />
       <Radio size={size} disabled={disabled}>
-        {selected ? (
+        {value === selected ? (
           size === 'large' ? (
             <Icon
               name="Circle"
