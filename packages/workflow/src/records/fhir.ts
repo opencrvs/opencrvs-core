@@ -66,11 +66,11 @@ import {
 import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
-  getLocationOrOfficeById,
   getLoggedInPractitionerResource,
   getPractitionerOfficeId
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
+import { fetchLocationHierarchy } from '@workflow/utils/location'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -142,7 +142,7 @@ export async function withPractitionerDetails<T extends Task>(
   const user = userOrSystem
   const practitioner = await getLoggedInPractitionerResource(token)
   const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
-  const office = await getLocationOrOfficeById(practitionerOfficeId)
+  const hierarchy = await fetchLocationHierarchy(practitionerOfficeId)
 
   newTask.extension.push(
     ...([
@@ -165,8 +165,9 @@ export async function withPractitionerDetails<T extends Task>(
     {
       type: 'document',
       resourceType: 'Bundle',
-      // @TODO: Do we need office location here?
-      entry: [practitioner, office].map((r) => resourceToSavedBundleEntry(r))
+      entry: [practitioner, ...hierarchy].map((r) =>
+        resourceToSavedBundleEntry(r)
+      )
     }
   ]
 }

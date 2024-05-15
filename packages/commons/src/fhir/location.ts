@@ -87,12 +87,6 @@ export function findLastOfficeLocationFromSavedBundle<T extends SavedBundle>(
   bundle: T
 ) {
   const office = findLastOfficeFromSavedBundle(bundle)
-  if (!office) {
-    throw new Error(
-      `Office which was referenced in lastRegOffice in bundle ${bundle.id} wasn't found`
-    )
-  }
-
   const locationId = resourceIdentifierToUUID(office.partOf.reference)
   const officeLocation = findResourceFromBundleById<SavedOffice>(
     bundle,

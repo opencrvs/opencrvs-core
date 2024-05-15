@@ -15,17 +15,13 @@ import {
   changeState,
   EVENT_TYPE,
   Resource,
-  resourceToSavedBundleEntry,
   StringExtensionType,
   Task
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
 import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
-import {
-  getLocationOrOfficeById,
-  getSystem
-} from '@workflow/features/user/utils'
+import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 import { auditEvent } from '@workflow/records/audit'
@@ -34,6 +30,7 @@ import {
   getEventType
 } from '@workflow/features/registration/utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { getValidRecordById } from '@workflow/records'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -100,11 +97,7 @@ export async function eventNotificationHandler(
     | StringExtensionType['http://opencrvs.org/specs/extension/regLastOffice']
     | undefined
 
-  const officeId = officeExtension?.valueReference.reference.split('/')[1]
-
-  if (!officeId) throw internal('Office id not found in bundle')
-
-  const office = await getLocationOrOfficeById(officeId)
+  if (!officeExtension) throw internal('Office id not found in bundle')
 
   const savedBundleWithRegLastUserAndBusinessStatus = {
     ...bundle,
@@ -114,9 +107,7 @@ export async function eventNotificationHandler(
         fullUrl: bundle.entry.find((e) => e.resource.resourceType === 'Task')
           ?.fullUrl,
         resource: taskWithRegLastUserAndStatus
-      },
-      // @TODO: Do we need officeLocation here?
-      ...[office, practitioner].map((r) => resourceToSavedBundleEntry(r))
+      }
     ]
   }
 
@@ -133,5 +124,6 @@ export async function eventNotificationHandler(
   await indexBundle(record, token)
   await auditEvent('sent-notification', record, token)
 
-  return h.response(responseBundle).code(200)
+  const updatedBundle = await getValidRecordById(responseBundle.id!, token)
+  return h.response(updatedBundle).code(200)
 }
