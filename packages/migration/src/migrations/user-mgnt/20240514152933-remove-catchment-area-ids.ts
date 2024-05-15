@@ -39,35 +39,34 @@ const findHierarchyForOffice = async (officeId: string) => {
         depthField: 'level'
       }
     },
+    { $unwind: '$hierarchy' },
+    { $sort: { 'hierarchy.level': 1 } },
+    {
+      $group: {
+        _id: '$_id',
+        id: { $first: '$id' },
+        hierarchy: { $push: '$hierarchy' }
+      }
+    },
     {
       $addFields: {
-        allIds: {
-          $concatArrays: [
-            {
-              $map: {
-                input: {
-                  $reverseArray: '$hierarchy'
-                },
-                as: 'node',
-                in: '$$node.id'
-              }
-            },
-            ['$id']
-          ]
+        sortedHierarchyIds: {
+          $map: {
+            input: '$hierarchy',
+            as: 'node',
+            in: '$$node.id'
+          }
         }
       }
     },
     {
-      $sort: {
-        'hierarchy.depth': 1
+      $addFields: {
+        allIds: {
+          $concatArrays: [['$id'], '$sortedHierarchyIds']
+        }
       }
     },
-    {
-      $project: {
-        allIds: 1,
-        _id: 0
-      }
-    }
+    { $project: { allIds: 1, _id: 0 } }
   ]
 
   const coll = connectedHearthClient
