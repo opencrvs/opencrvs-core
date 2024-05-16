@@ -243,7 +243,7 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it.only('send 500 if mongoose operation throws error', async () => {
+  it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 202 }],
