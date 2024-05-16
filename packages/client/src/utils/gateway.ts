@@ -8536,6 +8536,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             state?: string | null
             city?: string | null
             country?: string | null
+            line?: Array<string | null> | null
           } | null
         } | null
         registration?: {
