@@ -13,7 +13,8 @@ import {
   SavedReference,
   SavedComposition,
   Composition,
-  TransactionResponse
+  TransactionResponse,
+  urlReferenceToUUID
 } from '.'
 
 export const MOTHER_TITLE = "Mother's details"
@@ -233,7 +234,7 @@ export function findCompositionIdFromTransactionResponse({
     response?.location?.startsWith('/fhir/Composition')
   )
 
-  return compositionResponse?.response?.location?.match(
-    /\/fhir\/Composition\/([a-z0-9-]+)\//
-  )?.[1]
+  return compositionResponse
+    ? urlReferenceToUUID(compositionResponse.response.location)
+    : null
 }
