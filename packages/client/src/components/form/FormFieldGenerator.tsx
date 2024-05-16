@@ -223,7 +223,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       id: fieldDefinition.name,
       onChange,
       onBlur,
-      value: value,
+      value,
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
