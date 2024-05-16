@@ -62,7 +62,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
-import { useWindowSize } from '@opencrvs/components/lib/Hooks'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 const ToolTipContainer = styled.span`
   text-align: center;

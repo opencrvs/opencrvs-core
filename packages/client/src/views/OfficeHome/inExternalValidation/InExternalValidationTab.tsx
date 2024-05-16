@@ -42,7 +42,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { useWindowSize } from '@opencrvs/components/lib/Hooks'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IBaseProps {
   theme: ITheme

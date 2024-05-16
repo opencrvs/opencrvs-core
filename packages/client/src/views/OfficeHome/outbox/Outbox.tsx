@@ -54,7 +54,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
-import { useWindowSize } from '@opencrvs/components/lib/Hooks'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
