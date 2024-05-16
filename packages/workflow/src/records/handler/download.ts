@@ -11,8 +11,7 @@
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
-  TaskStatus,
-  ValidRecord
+  TaskStatus
 } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
@@ -67,7 +66,7 @@ export async function downloadRecordHandler(
     businessStatus
   )
 
-  const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
+  const { downloadedRecordWithTaskOnly } = await toDownloaded(
     record,
     token,
     extensionUrl
@@ -78,6 +77,9 @@ export async function downloadRecordHandler(
       ? 'downloaded'
       : 'assigned'
 
+  await sendBundleToHearth(downloadedRecordWithTaskOnly)
+  const updatedRecord = await getValidRecordById(payload.id, token, true)
+
   /*
    * Storing the details of the downloaded record in the database(s) is slow.
    * So we return the requested record to the requesting users optimistically immediately.
@@ -86,19 +88,14 @@ export async function downloadRecordHandler(
   process.nextTick(async () => {
     try {
       // Here the sent bundle is saved with task only
-      await sendBundleToHearth(downloadedRecordWithTaskOnly)
-      await auditEvent(auditRecordEvent, downloadedRecord, token)
+      await auditEvent(auditRecordEvent, updatedRecord, token)
 
       if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
-        await indexBundleToRoute(
-          downloadedRecordWithTaskOnly,
-          token,
-          '/events/assigned'
-        )
+        await indexBundleToRoute(updatedRecord, token, '/events/assigned')
     } catch (error) {
       logger.error(error)
     }
   })
 
-  return downloadedRecord as ValidRecord
+  return updatedRecord
 }
