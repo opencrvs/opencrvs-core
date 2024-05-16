@@ -34,7 +34,10 @@ import {
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
@@ -319,7 +322,9 @@ class SearchResultView extends React.Component<
                   : this.props.intl.formatMessage(constantsMessages.review),
               handler: () =>
                 this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.declarationStatus === 'CORRECTION_REQUESTED'
+                    ? REVIEW_CORRECTION
+                    : REVIEW_EVENT_PARENT_FORM_PAGE,
                   reg.id,
                   'review',
                   reg.event.toLowerCase()

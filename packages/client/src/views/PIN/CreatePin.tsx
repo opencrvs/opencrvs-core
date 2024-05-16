@@ -8,20 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/client/src/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
-import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Box, Stack, Text, Toast } from '@opencrvs/components'
+import { Box, Text, Toast } from '@opencrvs/components'
 import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
 import styled from 'styled-components'
 
@@ -34,49 +33,46 @@ const Content = styled.div`
   padding: 16px 0;
 `
 
-class CreatePinComponent extends React.Component<IProps> {
-  pinKeyRef: any
+const CreatePinComponent = ({
+  intl,
+  offlineCountryConfiguration,
+  onComplete
+}: IProps) => {
+  const [pin, setPin] = useState<string | null>(null)
+  const [pinMatchError, setPinMatchError] = useState(false)
+  const [pinHasSameDigits, setPinHasSameDigits] = useState(false)
+  const [pinHasSeqDigits, setPinHasSeqDigits] = useState(false)
+  const [refresher, setRefresher] = useState(false)
 
-  state = {
-    pin: null,
-    pinMatchError: false,
-    pinHasSameDigits: false,
-    pinHasSeqDigits: false,
-    refresher: false
-  }
-
-  firstPINEntry = (pin: string) => {
-    this.setState({ refresher: !this.state.refresher })
-    const sameDigits = this.sameDigits(pin)
-    const seqDigits = this.sequential(pin)
-    if (sameDigits || seqDigits) {
-      this.setState({
-        pinHasSameDigits: sameDigits,
-        pinHasSeqDigits: seqDigits
-      })
-    } else {
-      this.setState({ pin, pinHasSameDigits: false, pinHasSeqDigits: false })
+  const firstPINEntry = (pin: string) => {
+    setRefresher(!refresher)
+    const isSameDigits = sameDigits(pin)
+    const seqDigits = sequential(pin)
+    if (isSameDigits || seqDigits) {
+      setPinHasSameDigits(isSameDigits)
+      return setPinHasSeqDigits(seqDigits)
     }
+    setPin(pin)
+    setPinHasSameDigits(false)
+    setPinHasSeqDigits(false)
   }
 
-  secondPINEntry = (pin: string) => {
-    const { pin: firstEnteredPIN } = this.state
-    if (pin !== firstEnteredPIN) {
-      this.setState({ pinMatchError: true, pin: null })
-      return
+  const secondPINEntry = (newPin: string) => {
+    if (newPin !== pin) {
+      setPin(null)
+      return setPinMatchError(true)
     }
-
-    this.storePINForUser(pin)
+    storePINForUser(pin)
   }
 
-  sameDigits = (pin: string) => pin && Number(pin) % 1111 === 0
+  const sameDigits = (pin: string) => Number(pin) % 1111 === 0
 
-  sequential = (pin: string) => {
+  const sequential = (pin: string) => {
     const d = pin.split('').map((i) => Number(i))
     return d[0] + 1 === d[1] && d[1] + 1 === d[2] && d[2] + 1 === d[3]
   }
 
-  storePINForUser = async (pin: string) => {
+  const storePINForUser = async (pin: string) => {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(pin, salt)
 
@@ -96,133 +92,117 @@ class CreatePinComponent extends React.Component<IProps> {
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-    this.props.onComplete()
+    onComplete()
   }
 
-  render() {
-    const { pin, pinMatchError, pinHasSameDigits, pinHasSeqDigits, refresher } =
-      this.state
-    const { intl, offlineCountryConfiguration } = this.props
-
-    return (
-      <BackgroundWrapper>
-        <Box id="Box">
-          <Content>
-            <LogoContainer>
-              <CountryLogo
-                size="small"
-                src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+  return (
+    <BackgroundWrapper>
+      <Box id="Box">
+        <Content>
+          <LogoContainer>
+            <CountryLogo
+              size="small"
+              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+            />
+          </LogoContainer>
+          {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
+            <>
+              <Text element="h1" variant="h2" align="center" id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </Text>
+              <Text element="p" variant="reg16" align="center">
+                {intl.formatMessage(messages.createDescription)}
+              </Text>
+              {pinMatchError && (
+                <Toast
+                  type="error"
+                  id="pinMatchErrorMsg"
+                  onClose={() => setPinMatchError(false)}
+                >
+                  {intl.formatMessage(messages.pinMatchError)}
+                </Toast>
+              )}
+              <PINKeypad pin="" onComplete={firstPINEntry} />
+            </>
+          )}
+          {pinHasSeqDigits && (
+            <>
+              <Text element="h1" variant="h2" align="center" id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </Text>
+              <Text
+                element="p"
+                variant="reg16"
+                color="supportingCopy"
+                align="center"
+                id="description-text"
+              >
+                {intl.formatMessage(messages.createDescription)}
+              </Text>
+              <Toast
+                type="error"
+                id="pinHasSeqDigitsErrorMsg"
+                onClose={() => {
+                  setPinHasSeqDigits(false)
+                }}
+              >
+                {intl.formatMessage(messages.pinSequentialDigitsError)}
+              </Toast>
+              <PINKeypad
+                onComplete={firstPINEntry}
+                key={refresher.toString()}
               />
-            </LogoContainer>
-            {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
-              <>
-                <Text element="h1" variant="h2" align="center" id="title-text">
-                  {intl.formatMessage(messages.createTitle)}
-                </Text>
-                <Text element="p" variant="reg16" align="center">
-                  {intl.formatMessage(messages.createDescription)}
-                </Text>
-                {pinMatchError && (
-                  <Toast
-                    type="error"
-                    id="pinMatchErrorMsg"
-                    onClose={() => {
-                      this.setState({ pinMatchError: false })
-                    }}
-                  >
-                    {intl.formatMessage(messages.pinMatchError)}
-                  </Toast>
-                )}
-                <PINKeypad
-                  pin=""
-                  ref={(elem: any) => (this.pinKeyRef = elem)}
-                  onComplete={this.firstPINEntry}
-                />
-              </>
-            )}
-            {pinHasSeqDigits && (
-              <>
-                <Text element="h1" variant="h2" align="center" id="title-text">
-                  {intl.formatMessage(messages.createTitle)}
-                </Text>
-                <Text
-                  element="p"
-                  variant="reg16"
-                  color="supportingCopy"
-                  align="center"
-                  id="description-text"
-                >
-                  {intl.formatMessage(messages.createDescription)}
-                </Text>
-                <Toast
-                  type="error"
-                  id="pinHasSeqDigitsErrorMsg"
-                  onClose={() => {
-                    this.setState({ pinHasSeqDigits: false })
-                  }}
-                >
-                  {intl.formatMessage(messages.pinSequentialDigitsError)}
-                </Toast>
-                <PINKeypad
-                  onComplete={this.firstPINEntry}
-                  key={refresher.toString()}
-                />
-              </>
-            )}
-            {pinHasSameDigits && (
-              <>
-                <Text element="h1" variant="h2" align="center" id="title-text">
-                  {intl.formatMessage(messages.createTitle)}
-                </Text>
-                <Text
-                  element="p"
-                  variant="reg16"
-                  align="center"
-                  id="description-text"
-                >
-                  {intl.formatMessage(messages.createDescription)}
-                </Text>
-                <Toast
-                  type="error"
-                  id="pinHasSameDigitsErrorMsg"
-                  onClose={() => {
-                    this.setState({ pinHasSameDigits: false })
-                  }}
-                >
-                  {intl.formatMessage(messages.pinSameDigitsError)}
-                </Toast>
-                <PINKeypad
-                  ref={(elem: any) => (this.pinKeyRef = elem)}
-                  onComplete={this.firstPINEntry}
-                  key={refresher.toString()}
-                />
-              </>
-            )}
-            {pin && (
-              <>
-                <Text element="h1" variant="h2" align="center" id="title-text">
-                  {intl.formatMessage(messages.reEnterTitle)}
-                </Text>
-                <Text
-                  element="p"
-                  variant="reg16"
-                  align="center"
-                  id="description-text"
-                >
-                  {intl.formatMessage(messages.reEnterDescription)}
-                </Text>
+            </>
+          )}
+          {pinHasSameDigits && (
+            <>
+              <Text element="h1" variant="h2" align="center" id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </Text>
+              <Text
+                element="p"
+                variant="reg16"
+                align="center"
+                id="description-text"
+              >
+                {intl.formatMessage(messages.createDescription)}
+              </Text>
+              <Toast
+                type="error"
+                id="pinHasSameDigitsErrorMsg"
+                onClose={() => {
+                  setPinHasSameDigits(false)
+                }}
+              >
+                {intl.formatMessage(messages.pinSameDigitsError)}
+              </Toast>
+              <PINKeypad
+                onComplete={firstPINEntry}
+                key={refresher.toString()}
+              />
+            </>
+          )}
+          {pin && (
+            <>
+              <Text element="h1" variant="h2" align="center" id="title-text">
+                {intl.formatMessage(messages.reEnterTitle)}
+              </Text>
+              <Text
+                element="p"
+                variant="reg16"
+                align="center"
+                id="description-text"
+              >
+                {intl.formatMessage(messages.reEnterDescription)}
+              </Text>
 
-                <PINKeypad
-                  ref={(elem: any) => (this.pinKeyRef = elem)}
-                  onComplete={this.secondPINEntry}
-                />
-              </>
-            )}
-          </Content>
-        </Box>
-      </BackgroundWrapper>
-    )
-  }
+              <PINKeypad onComplete={secondPINEntry} />
+            </>
+          )}
+        </Content>
+      </Box>
+    </BackgroundWrapper>
+  )
 }
 
 export const CreatePin = connect((store: IStoreState) => ({

@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, IRef, TextInput } from '../TextInput/TextInput'
+import { ITextInputProps, TextInput, IRef } from '../TextInput/TextInput'
 import { InputLabel } from '../InputField/InputLabel'
 
 const DateWrapper = styled.div`
@@ -50,70 +50,64 @@ const DateSegment = styled(TextInput)`
   }
 `
 
-export class DateField extends React.Component<IDateFieldProps, IState> {
-  private dd: React.RefObject<IRef>
-  private mm: React.RefObject<IRef>
-  private yyyy: React.RefObject<IRef>
+const MAX_DAY_NUMBER = 31
+const MAX_YEAR_NUMBER = 2100
+const MAX_MONTH_NUMBER = 12
 
-  constructor(props: IDateFieldProps) {
-    super(props)
-    this.dd = React.createRef()
-    this.mm = React.createRef()
-    this.yyyy = React.createRef()
+export const DateField = ({
+  id,
+  disabled,
+  meta,
+  focusInput,
+  notice,
+  ignorePlaceHolder,
+  value: initialValue,
+  onChange,
+  ...props
+}: IDateFieldProps) => {
+  const [date, setDate] = useState<IState>({ yyyy: '', mm: '', dd: '' })
+  const ddRef = useRef<IRef>(null)
+  const mmRef = useRef<IRef>(null)
+  const yyyyRef = useRef<IRef>(null)
+  const { dd, mm, yyyy } = date
 
-    this.state = this.getInitialState()
-  }
-
-  componentDidUpdate(prevProps: IDateFieldProps) {
-    if (this.props.value !== prevProps.value) {
-      const state = this.getInitialState()
-      this.setState(() => state)
+  useEffect(() => {
+    if (initialValue && typeof initialValue === 'string') {
+      const dateSegmentVals = initialValue?.split('-') || []
+      setDate({
+        yyyy: dateSegmentVals[0] || '',
+        mm: dateSegmentVals[1] || '',
+        dd: dateSegmentVals[2] || ''
+      })
     }
-  }
+  }, [initialValue])
 
-  getInitialState() {
-    if (this.props.value && typeof this.props.value === 'string') {
-      const dateSegmentVals = this.props.value.split('-')
-      return {
-        yyyy: dateSegmentVals[0],
-        mm: dateSegmentVals[1],
-        dd: dateSegmentVals[2]
-      }
-    } else {
-      return {
-        yyyy: '',
-        mm: '',
-        dd: ''
-      }
-    }
-  }
-
-  change = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const change = (event: React.ChangeEvent<HTMLInputElement>) => {
     const segmentType = String(event.target.id.split('-').pop())
     const val = event.target.value
 
     if (['dd', 'mm', 'yyyy'].includes(segmentType)) {
       switch (segmentType) {
         case 'dd':
-          if (val.length > 2 || Number(val) > 31) {
+          if (val.length > 2 || Number(val) > MAX_DAY_NUMBER) {
             return
           }
-          if (val.length > 1 && this.mm.current) {
-            this.mm.current.focusField()
+          if (val.length > 1 && mmRef.current) {
+            mmRef.current.focusField()
           }
           break
         case 'mm':
-          if (val.length > 2 || Number(val) > 12) {
+          if (val.length > 2 || Number(val) > MAX_MONTH_NUMBER) {
             return
           }
-          if (val.length > 1 && this.yyyy.current) {
-            this.yyyy.current.focusField()
+          if (val.length > 1 && yyyyRef.current) {
+            yyyyRef.current.focusField()
           }
           break
         case 'yyyy':
           if (
             val.length > 4 ||
-            Number(val) > 2100 ||
+            Number(val) > MAX_YEAR_NUMBER ||
             (val.length === 2 && Number(val) < 19)
           ) {
             return
@@ -121,95 +115,80 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           break
       }
 
-      this.setState(
-        { [segmentType]: val } as Pick<IState, 'dd' | 'mm' | 'yyyy'>,
-        () => {
-          if (this.props.onChange) {
-            if (
-              this.state.yyyy === '' &&
-              this.state.mm === '' &&
-              this.state.dd === ''
-            ) {
-              this.props.onChange('')
-            } else {
-              this.props.onChange(
-                `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
-              )
-            }
-          }
-        }
-      )
+      const updatedValue = { ...date, [segmentType]: val }
+      setDate(updatedValue)
+
+      if (yyyy === '' && mm === '' && dd === '') {
+        return onChange('')
+      }
+      onChange(`${updatedValue.yyyy}-${updatedValue.mm}-${updatedValue.dd}`)
     }
   }
 
-  render() {
-    const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
-      this.props
-    return (
-      <>
-        <DateWrapper id={id}>
-          {notice && (
-            <NoticeWrapper>
-              <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
-            </NoticeWrapper>
-          )}
-          <DateSegment
-            {...props}
-            id={`${id}-dd`}
-            ref={this.dd}
-            error={Boolean(meta && meta.error)}
-            isDisabled={props.disabled}
-            touched={meta && meta.touched}
-            focusInput={focusInput}
-            type="number"
-            placeholder={ignorePlaceHolder ? '' : 'dd'}
-            min={1}
-            max={31}
-            value={this.state.dd}
-            onChange={this.change}
-            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-              event.currentTarget.blur()
-            }}
-          />
-          <DateSegment
-            {...props}
-            id={`${id}-mm`}
-            ref={this.mm}
-            error={Boolean(meta && meta.error)}
-            isDisabled={props.disabled}
-            touched={meta && meta.touched}
-            focusInput={false}
-            type="number"
-            placeholder={ignorePlaceHolder ? '' : 'mm'}
-            maxLength={2}
-            min={1}
-            max={12}
-            value={this.state.mm}
-            onChange={this.change}
-            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-              event.currentTarget.blur()
-            }}
-          />
-          <DateSegment
-            {...props}
-            id={`${id}-yyyy`}
-            ref={this.yyyy}
-            error={Boolean(meta && meta.error)}
-            isDisabled={props.disabled}
-            touched={meta && meta.touched}
-            focusInput={false}
-            type="number"
-            placeholder={ignorePlaceHolder ? '' : 'yyyy'}
-            maxLength={4}
-            min={1900}
-            value={this.state.yyyy}
-            onChange={this.change}
-            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-              event.currentTarget.blur()
-            }}
-          />
-        </DateWrapper>
-      </>
-    )
-  }
+  return (
+    <>
+      <DateWrapper id={id}>
+        {notice && (
+          <NoticeWrapper>
+            <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
+          </NoticeWrapper>
+        )}
+        <DateSegment
+          {...props}
+          id={`${id}-dd`}
+          ref={ddRef}
+          error={Boolean(meta && meta.error)}
+          isDisabled={disabled}
+          touched={meta && meta.touched}
+          focusInput={focusInput}
+          type="number"
+          placeholder={ignorePlaceHolder ? '' : 'dd'}
+          min={1}
+          max={31}
+          value={dd}
+          onChange={change}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
+        />
+        <DateSegment
+          {...props}
+          id={`${id}-mm`}
+          ref={mmRef}
+          error={Boolean(meta && meta.error)}
+          isDisabled={disabled}
+          touched={meta && meta.touched}
+          focusInput={false}
+          type="number"
+          placeholder={ignorePlaceHolder ? '' : 'mm'}
+          maxLength={2}
+          min={1}
+          max={12}
+          value={mm}
+          onChange={change}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
+        />
+        <DateSegment
+          {...props}
+          id={`${id}-yyyy`}
+          ref={yyyyRef}
+          error={Boolean(meta && meta.error)}
+          isDisabled={disabled}
+          touched={meta && meta.touched}
+          focusInput={false}
+          type="number"
+          placeholder={ignorePlaceHolder ? '' : 'yyyy'}
+          maxLength={4}
+          min={1900}
+          value={yyyy}
+          onChange={change}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
+        />
+      </DateWrapper>
+    </>
+  )
 }
