@@ -262,7 +262,10 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       if (
         (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        (downloadConfigs.declarationStatus !== 'VALIDATED' ||
+        ((downloadConfigs.declarationStatus &&
+          !['VALIDATED', 'CORRECTION_REQUESTED'].includes(
+            downloadConfigs.declarationStatus
+          )) ||
           userRole !== ROLE_REGISTRATION_AGENT) &&
         !FIELD_AGENT_ROLES.includes(String(userRole))
       ) {
