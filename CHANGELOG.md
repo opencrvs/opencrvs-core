@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0 (TBD)
+
+### New features
+
+- Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
+- Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
+
 ## 1.5.0 (TBD)
 
 ## Breaking changes
@@ -29,8 +36,6 @@
 - Add loading spinners before JavaScript bundle has loaded for both login and client
 - Support for landscape certificate templates
 - Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
-- Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
-- Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
 
 ## Bug fixes
 
