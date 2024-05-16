@@ -94,14 +94,15 @@ export const PasswordInput = ({
   touched,
   focusInput,
   ignoreVisibility,
-  showIcon,
-  hideIcon,
   ...props
 }: IPasswordInputProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const toggleVisibility = () => setIsVisible(!isVisible)
+  const toggleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    setIsVisible(!isVisible)
+  }
 
   const focusField = () => {
     /*
@@ -131,13 +132,7 @@ export const PasswordInput = ({
       {!ignoreVisibility && (
         <IconButton size="small" onClick={toggleVisibility} type="icon">
           {isVisible ? (
-            hideIcon ? (
-              hideIcon
-            ) : (
-              <Icon name="Eye" size="small" />
-            )
-          ) : showIcon ? (
-            showIcon
+            <Icon name="Eye" size="small" />
           ) : (
             <Icon name="EyeSlash" size="small" />
           )}
