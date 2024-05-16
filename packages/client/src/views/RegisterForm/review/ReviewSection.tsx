@@ -1703,17 +1703,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const textAreaProps = {
       id: 'additional_comments',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
           declaration
         )
       },
-      value:
-        (declaration.data.registration &&
-          declaration.data.registration.commentsOrNotes) ||
-        ''
+      value: ((declaration.data.registration &&
+        declaration.data.registration.commentsOrNotes) ||
+        '') as string
     }
 
     const informantName = getDeclarationFullName(
@@ -1962,10 +1961,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         required={false}
                       >
                         <TextArea
-                          {...{
-                            ...textAreaProps,
-                            disabled: viewRecord || isDuplicate
-                          }}
+                          {...textAreaProps}
+                          disabled={viewRecord || isDuplicate}
                         />
                       </InputField>
                     </Accordion>

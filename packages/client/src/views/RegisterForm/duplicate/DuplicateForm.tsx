@@ -82,7 +82,9 @@ export const DuplicateForm = (props: IProps) => {
     setShowModal((prev) => !prev)
   }
 
-  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setComment(event.target.value)
   }
 

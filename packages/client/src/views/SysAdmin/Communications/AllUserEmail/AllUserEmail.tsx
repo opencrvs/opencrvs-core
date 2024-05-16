@@ -125,11 +125,10 @@ const AllUserEmail = () => {
               hideAsterisk
             >
               <TextArea
-                {...{
-                  value: body,
-                  onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                    setBody(e.target.value)
-                }}
+                value={body}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setBody(e.target.value)
+                }
               />
             </InputField>
             <Button type="primary" disabled={!subject || !body}>
