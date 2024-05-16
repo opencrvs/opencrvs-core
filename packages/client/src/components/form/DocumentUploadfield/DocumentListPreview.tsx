@@ -39,12 +39,6 @@ const SpinnerContainer = styled(Spinner)`
   margin-right: 6px;
 `
 
-const DeleteButton = styled(Button)`
-  &:hover:not(:focus-visible) {
-    background: none;
-  }
-`
-
 const Label = styled.div`
   display: flex;
   align-items: center;
@@ -115,7 +109,7 @@ export const DocumentListPreview = ({
               </Link>
             </Label>
             {onDelete && (
-              <DeleteButton
+              <Button
                 id="preview_delete"
                 type="icon"
                 size="small"
@@ -123,7 +117,7 @@ export const DocumentListPreview = ({
                 onClick={() => onDelete(document)}
               >
                 <Icon color="red" name="Trash" size="small" />
-              </DeleteButton>
+              </Button>
             )}
           </Container>
         ))}
@@ -147,7 +141,7 @@ export const DocumentListPreview = ({
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
-          <DeleteButton
+          <Button
             id="preview_delete"
             type="icon"
             size="small"
@@ -155,7 +149,7 @@ export const DocumentListPreview = ({
             onClick={() => onDelete && onDelete(attachment)}
           >
             <Icon color="red" name="Trash" size="small" />
-          </DeleteButton>
+          </Button>
         </Container>
       )}
     </Wrapper>
