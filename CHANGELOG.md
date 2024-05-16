@@ -49,6 +49,7 @@
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
 - Fix Registrar of any location should be able to review a correction request [#6247](https://github.com/opencrvs/opencrvs-core/issues/6247)
+ - Removing 'upload' option in supporting document from review page When there are no supporting docs required as per the logic in the form [#5944](https://github.com/opencrvs/opencrvs-core/issues/5944)
 
 ## Refactor
 
