@@ -13,29 +13,26 @@ import styled from 'styled-components'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { Stack } from '@opencrvs/components/lib/Stack'
-
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
-const Wrapper = styled(Stack)`
+const Wrapper = styled.div`
   max-width: 100%;
   & > *:last-child {
-    margin-bottom: 8px; /* Adjust the value as needed */
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid ${({ theme }) => theme.colors.grey100};
   }
 `
-
 const Container = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-radius: 4px;
-  background: ${({ theme }) => theme.colors.blueLighter};
+  border-top: 1.5px solid ${({ theme }) => theme.colors.grey100};
   height: 48px;
-  padding: 0px 12px;
+  padding: 0px 10px;
 `
 
 const SpinnerContainer = styled(Spinner)`
@@ -92,7 +89,7 @@ export const DocumentListPreview = ({
   }
 
   return (
-    <Wrapper id={`preview-list-${id}`} direction="column" gap={4}>
+    <Wrapper id={`preview-list-${id}`}>
       {documents &&
         documents.map((document: IFileValue, key: number) => (
           <Container key={`preview_${key}`}>
