@@ -93,7 +93,7 @@ export async function birthInProgressNotification(
     'informant',
     {
       trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: await getOfficeName(inProgressRecord),
+      crvsOffice: getOfficeName(inProgressRecord),
       registrationLocation: getRegistrationLocation(inProgressRecord),
       informantName: getInformantName(inProgressRecord)
     }
@@ -118,7 +118,7 @@ export async function deathInProgressNotification(
     'informant',
     {
       trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: await getOfficeName(inProgressRecord),
+      crvsOffice: getOfficeName(inProgressRecord),
       registrationLocation: getRegistrationLocation(inProgressRecord),
       informantName: getInformantName(inProgressRecord)
     }

@@ -60,7 +60,7 @@ function error(
   throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
-export async function getOfficeName(
+export function getOfficeName(
   record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
 ) {
   const office = findLastOfficeFromSavedBundle(record)
