@@ -13,32 +13,39 @@ import styled from 'styled-components'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
+import { Stack } from '@opencrvs/components/lib/Stack'
+
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
-const Wrapper = styled.div`
+const Wrapper = styled(Stack)`
   max-width: 100%;
+  & > *:last-child {
+    margin-bottom: 8px; /* Adjust the value as needed */
+  }
 `
 
 const Container = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  :not(:last-child) {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  }
-  height: 40px;
-  padding: 0px 8px;
+  border-radius: 4px;
+  background: ${({ theme }) => theme.colors.blueLighter};
+  height: 48px;
+  padding: 0px 12px;
 `
 
 const SpinnerContainer = styled(Spinner)`
   margin-right: 6px;
 `
 
-const DeleteContainer = styled(Button)`
-  min-width: 32px;
+const DeleteButton = styled(Button)`
+  &:hover:not(:focus-visible) {
+    background: none;
+  }
 `
 
 const Label = styled.div`
@@ -85,12 +92,12 @@ export const DocumentListPreview = ({
   }
 
   return (
-    <Wrapper id={`preview-list-${id}`}>
+    <Wrapper id={`preview-list-${id}`} direction="column" gap={4}>
       {documents &&
         documents.map((document: IFileValue, key: number) => (
           <Container key={`preview_${key}`}>
             <Label>
-              <Icon color="currentColor" name="Paperclip" size="medium" />
+              <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 id={`document_${(document.optionValues[1] as string).replace(
                   /\s/g,
@@ -111,15 +118,15 @@ export const DocumentListPreview = ({
               </Link>
             </Label>
             {onDelete && (
-              <DeleteContainer
+              <DeleteButton
                 id="preview_delete"
                 type="icon"
                 size="small"
                 aria-label="Delete attachment"
                 onClick={() => onDelete(document)}
               >
-                <Icon color="red" name="TrashSimple" size="small" />
-              </DeleteContainer>
+                <Icon color="red" name="Trash" size="small" />
+              </DeleteButton>
             )}
           </Container>
         ))}
@@ -127,7 +134,7 @@ export const DocumentListPreview = ({
         processingDocuments.map(({ label }) => (
           <Container key={label}>
             <Label>
-              <Icon color="disabled" name="Paperclip" size="medium" />
+              <Icon color="grey400" name="Paperclip" size="large" />
               <Link disabled={true} key={label}>
                 <span>{getFormattedLabelForDocType(label) || label}</span>
               </Link>
@@ -143,15 +150,15 @@ export const DocumentListPreview = ({
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
-          <DeleteContainer
+          <DeleteButton
             id="preview_delete"
             type="icon"
             size="small"
             aria-label="Delete attachment"
             onClick={() => onDelete && onDelete(attachment)}
           >
-            <Icon color="red" name="TrashSimple" size="small" />
-          </DeleteContainer>
+            <Icon color="red" name="Trash" size="small" />
+          </DeleteButton>
         </Container>
       )}
     </Wrapper>

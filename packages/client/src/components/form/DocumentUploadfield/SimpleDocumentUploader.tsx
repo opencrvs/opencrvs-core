@@ -21,7 +21,7 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
+import { getBase64String } from './DocumentUploaderWithOption'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -145,13 +145,11 @@ const SimpleDocumentUploaderComponent = ({
   return (
     <>
       {description && <FieldDescription>{description}</FieldDescription>}
-      <ErrorMessage>
-        {errorMessage && (touched || error) && (
-          <ErrorText ignoreMediaQuery id="field-error">
-            {errorMessage}
-          </ErrorText>
-        )}
-      </ErrorMessage>
+      {errorMessage && (touched || error) && (
+        <ErrorText ignoreMediaQuery id="field-error">
+          {errorMessage}
+        </ErrorText>
+      )}
       <DocumentListPreview
         attachment={files}
         onSelect={selectForPreview}
