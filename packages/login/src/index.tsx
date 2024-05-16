@@ -19,6 +19,11 @@ import { BrowserTracing } from '@sentry/tracing'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
+import { authApi } from './utils/authApi'
+import { delay } from 'lodash'
+import { applicationConfigLoadedAction } from './login/actions'
+
+const RETRY_TIMEOUT = 5000
 
 WebFont.load({
   google: {
@@ -44,4 +49,18 @@ const { store, history } = createStore()
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
-root.render(<App store={store} history={history} />)
+
+async function renderAppWithConfig() {
+  return authApi.getApplicationConfig().then((res) => {
+    store.dispatch(applicationConfigLoadedAction(res))
+    root.render(<App store={store} history={history} />)
+  })
+}
+
+function withRetry(render: () => Promise<void>) {
+  render().catch(() => {
+    delay(() => withRetry(renderAppWithConfig), RETRY_TIMEOUT)
+  })
+}
+
+withRetry(renderAppWithConfig)
