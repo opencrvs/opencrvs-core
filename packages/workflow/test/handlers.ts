@@ -13,8 +13,8 @@ import { practitioner } from './mocks/practitioner'
 import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
-import { TransactionResponse } from '@workflow/records/fhir'
 import { RecordEvent } from '@workflow/records/record-events'
+import { TransactionResponse } from '@opencrvs/commons/types'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',

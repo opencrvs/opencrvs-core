@@ -17,7 +17,6 @@ import {
   Practitioner,
   Task,
   URNReference,
-  URLReference,
   SavedTask,
   Composition,
   SavedComposition,
@@ -50,7 +49,8 @@ import {
   isTask,
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
-  getResourceFromBundleById
+  getResourceFromBundleById,
+  TransactionResponse
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1093,16 +1093,6 @@ function createNewTaskResource(
       lastUpdated: new Date().toISOString()
     }
   }
-}
-
-export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
-  entry: Array<
-    Omit<fhir3.BundleEntry, 'response'> & {
-      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
-        location: URLReference
-      }
-    }
-  >
 }
 
 export async function sendBundleToHearth(
