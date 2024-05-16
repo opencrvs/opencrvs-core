@@ -20,7 +20,7 @@ const hero = `
 const h1 = `
   font-family: ${family};
   font-weight: 600;
-  font-size: 28px;
+  font-size: 27px;
   line-height: 120%;
 `
 const h2 = `
@@ -32,22 +32,29 @@ const h2 = `
 const h3 = `
   font-family: ${family};
   font-weight: 600;
-  font-size: 20px;
-  line-height: 140%;
+  font-size: 19px;
+  line-height: 120%;
 `
 const h4 = `
   font-family: ${family};
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: 500;
+  font-size: 17px;
   line-height: 140%;
 `
+
+const reg19 = `
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 140%;
+`
+
 const reg18 = `
   font-family: ${family};
   font-weight: 400;
   font-size: 18px;
   line-height: 140%;
 `
-
 const bold18 = `
   font-family: ${family};
   font-weight: 600;
@@ -107,6 +114,7 @@ export const fonts = {
   bold16,
   bold14,
   bold12,
+  reg19,
   reg18,
   reg16,
   reg14,
