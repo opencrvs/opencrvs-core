@@ -40,8 +40,6 @@ interface IState {
 
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
-const DateSegment = styled(TextInput)``
-
 export class DateField extends React.Component<IDateFieldProps, IState> {
   private dd: React.RefObject<IRef>
   private mm: React.RefObject<IRef>
@@ -145,7 +143,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
               <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
             </NoticeWrapper>
           )}
-          <DateSegment
+          <TextInput
             {...props}
             id={`${id}-dd`}
             ref={this.dd}
@@ -163,7 +161,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
               event.currentTarget.blur()
             }}
           />
-          <DateSegment
+          <TextInput
             {...props}
             id={`${id}-mm`}
             ref={this.mm}
@@ -182,7 +180,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
               event.currentTarget.blur()
             }}
           />
-          <DateSegment
+          <TextInput
             {...props}
             id={`${id}-yyyy`}
             ref={this.yyyy}
