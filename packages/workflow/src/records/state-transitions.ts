@@ -845,9 +845,13 @@ export async function toCorrectionRejected(
     reason: {
       text: rejectionDetails.reason
     },
-    extension: extensionsWithoutAssignment(
-      currentCorrectionRequestedTask.extension
-    )
+    extension: extensionsWithoutAssignment([
+      ...currentCorrectionRequestedTask.extension,
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: rejectionDetails.timeLoggedMS ?? 0
+      }
+    ])
   }
 
   const correctionRejectionTaskWithPractitionerExtensions = setupLastRegUser(

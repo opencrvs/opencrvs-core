@@ -569,6 +569,7 @@ type Query {
 
 input CorrectionRejectionInput {
   reason: String!
+  timeLoggedMS: Int!
 }
 
 type Mutation {

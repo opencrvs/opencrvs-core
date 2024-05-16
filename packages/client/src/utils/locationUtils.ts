@@ -16,7 +16,7 @@ import {
   CRVSOffice,
   AdminStructure
 } from '@client/offline/reducer'
-import { Identifier } from '@client/utils/gateway'
+import { Address, Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
@@ -274,4 +274,31 @@ export function getLocationHierarchy(
     ...hierarchy,
     [camelCasedJurisdictionType(jurisdictionType)]: id
   })
+}
+
+export function generateFullAddress(
+  address: Address,
+  offlineData: IOfflineData
+): string[] {
+  const district =
+    address.district && offlineData.locations[address.district].name
+
+  const state = address.state && offlineData.locations[address.state].name
+
+  const eventLocationLevel3 =
+    address?.line?.[10] && offlineData.locations[address.line[10]]?.name
+
+  const eventLocationLevel4 =
+    address?.line?.[11] && offlineData.locations[address.line[11]]?.name
+
+  const eventLocationLevel5 =
+    address?.line?.[12] && offlineData.locations[address.line[12]]?.name
+
+  return [
+    eventLocationLevel5,
+    eventLocationLevel4,
+    eventLocationLevel3,
+    district,
+    state
+  ].filter((maybeLocation): maybeLocation is string => Boolean(maybeLocation))
 }

@@ -117,7 +117,8 @@ export const ApproveRequestInput = CorrectionRequestInput.extend({
 })
 
 export const CorrectionRejectionInput = z.object({
-  reason: z.string()
+  reason: z.string(),
+  timeLoggedMS: z.number()
 })
 
 export type ChangedValuesInput = z.infer<typeof ChangedValuesInput>

@@ -357,3 +357,15 @@ export async function verifyRegistration(id: string, authHeader: IAuthHeader) {
     'x-real-ip': authHeader['x-real-ip']
   })
 }
+
+export async function createHospitalNotification(
+  authHeader: IAuthHeader,
+  bundle: Bundle
+) {
+  return await createRequest(
+    'POST',
+    `/records/event-notification`,
+    authHeader,
+    bundle
+  )
+}

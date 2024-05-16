@@ -101,7 +101,11 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     const payload = {
       id: this.props.declaration.id,
       details: {
-        reason
+        reason,
+        timeLoggedMS:
+          (this.props.declaration.timeLoggedMS || 0) +
+          Date.now() -
+          this.state.startTime
       }
     }
     const updatedDeclaration = {

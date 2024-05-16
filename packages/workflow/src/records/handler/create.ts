@@ -54,7 +54,6 @@ import {
 } from '@workflow/utils/duplicate-checker'
 import {
   generateTrackingIdForEvents,
-  isHospitalNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import { auditEvent } from '@workflow/records/audit'
@@ -287,9 +286,7 @@ export default async function createRecordHandler(
   await indexBundle(record, token)
 
   // Notification not implemented for marriage yet
-  // don't forward hospital notifications
   const notificationDisabled =
-    isHospitalNotification(record) ||
     eventAction === 'waiting-external-validation' ||
     !(await isNotificationEnabled(eventAction, event, token))
 

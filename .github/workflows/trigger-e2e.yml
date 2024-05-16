@@ -17,7 +17,7 @@ jobs:
   e2e:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
           script: |
@@ -25,6 +25,8 @@ jobs:
               owner: 'opencrvs',
               repo: 'opencrvs-farajaland',
               event_type: 'run_e2e',
-              client_payload: {}
+              client_payload: {
+                actor: '${{ github.actor }}'
+              }
             })
             console.log(result);

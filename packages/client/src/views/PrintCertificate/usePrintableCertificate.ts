@@ -16,7 +16,11 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { useDeclaration } from '@client/declarations/selectors'
-import { CorrectionSection, SubmissionAction } from '@client/forms'
+import {
+  CorrectionSection,
+  IFormSectionData,
+  SubmissionAction
+} from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -44,22 +48,44 @@ import {
   getCountryTranslations
 } from './utils'
 import { Event } from '@client/utils/gateway'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { IOfflineData } from '@client/offline/reducer'
 
 const withEnhancedTemplateVariables = (
-  declaration: IPrintableDeclaration | undefined
+  declaration: IPrintableDeclaration | undefined,
+  userDetails: UserDetails | null,
+  offlineData: IOfflineData
 ) => {
-  if (!declaration || !isCertificateForPrintInAdvance(declaration)) {
+  if (!declaration) {
     return declaration
   }
 
+  const registeredDate = getRegisteredDate(declaration.data)
+  const eventDate = getEventDate(declaration.data, declaration.event)
+  const registrationFees = calculatePrice(
+    declaration.event,
+    eventDate,
+    registeredDate,
+    offlineData
+  )
   return {
     ...declaration,
     data: {
       ...declaration.data,
       template: {
         ...declaration.data.template,
-        printInAdvance: true
-      }
+        printInAdvance: isCertificateForPrintInAdvance(declaration),
+        certificateDate: formatLongDate(new Date().toISOString()),
+        registrationFees,
+        ...(userDetails && {
+          loggedInUser: {
+            name: getUserName(userDetails),
+            officeId: userDetails.primaryOffice?.id,
+            signature: userDetails.localRegistrar?.signature
+          }
+        })
+      } as IFormSectionData
     }
   }
 }
@@ -68,11 +94,14 @@ export const usePrintableCertificate = (declarationId: string) => {
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
   >(declarationId)
+  const userDetails = useSelector(getUserDetails)
+  const offlineData = useSelector(getOfflineData)
   const declaration = withEnhancedTemplateVariables(
-    declarationWithoutAllTemplateVariables
+    declarationWithoutAllTemplateVariables,
+    userDetails,
+    offlineData
   )
 
-  const offlineData = useSelector(getOfflineData)
   const state = useSelector((store: IStoreState) => store)
   const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
@@ -85,7 +114,6 @@ export const usePrintableCertificate = (declarationId: string) => {
   const canUserEditRecord =
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
-  const userDetails = useSelector(getUserDetails)
 
   useEffect(() => {
     if (declaration)
