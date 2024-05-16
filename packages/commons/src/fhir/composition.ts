@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Reference, SavedReference, SavedComposition, Composition } from '.'
+import {
+  Reference,
+  SavedReference,
+  SavedComposition,
+  Composition,
+  TransactionResponse
+} from '.'
 
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
@@ -218,4 +224,16 @@ export function addRelatesToToComposition(
       )
       .concat(relatesTo)
   }
+}
+
+export function findCompositionIdFromTransactionResponse({
+  entry
+}: TransactionResponse) {
+  const compositionResponse = entry?.find(({ response }) =>
+    response?.location?.startsWith('/fhir/Composition')
+  )
+
+  return compositionResponse?.response?.location?.match(
+    /\/fhir\/Composition\/([a-z0-9-]+)\//
+  )?.[1]
 }

@@ -234,6 +234,16 @@ export type SavedCompositionHistory = SavedComposition & {
   resourceType: 'CompositionHistory'
 }
 
+export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
+  entry: Array<
+    Omit<fhir3.BundleEntry, 'response'> & {
+      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
+        location: URLReference
+      }
+    }
+  >
+}
+
 export function isComposition<T extends Resource>(
   resource: T
 ): resource is (T & Composition) | (T & SavedComposition) {

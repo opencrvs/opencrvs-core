@@ -12,15 +12,15 @@ import * as Hapi from '@hapi/hapi'
 import {
   addExtensionsToTask,
   Bundle,
-  changeState,
   EVENT_TYPE,
+  findCompositionIdFromTransactionResponse,
   Resource,
   StringExtensionType,
   Task
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
-import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
+import { sendBundleToHearth } from '@workflow/records/fhir'
 import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
@@ -114,16 +114,12 @@ export async function eventNotificationHandler(
   const responseBundle = await sendBundleToHearth(
     savedBundleWithRegLastUserAndBusinessStatus
   )
-  const savedBundle = toSavedBundle(
-    savedBundleWithRegLastUserAndBusinessStatus,
-    responseBundle
-  )
+  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
 
-  const record = changeState(savedBundle, ['IN_PROGRESS', 'READY_FOR_REVIEW'])
+  const updatedBundle = await getValidRecordById(compositionId!, token)
 
-  await indexBundle(record, token)
-  await auditEvent('sent-notification', record, token)
+  await indexBundle(updatedBundle, token)
+  await auditEvent('sent-notification', updatedBundle, token)
 
-  const updatedBundle = await getValidRecordById(responseBundle.id!, token)
   return h.response(updatedBundle).code(200)
 }
