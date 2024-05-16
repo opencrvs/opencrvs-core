@@ -28,3 +28,17 @@ export async function resolveLocationChildren(locationId: UUID) {
   const locations = (await response.json()) as Array<SavedLocation>
   return locations.map((location) => location.id)
 }
+
+const FETCH_LOCATION = (id: UUID) =>
+  new URL(`/locations/${id}`, APPLICATION_CONFIG_URL)
+
+export async function fetchLocation(locationId: UUID) {
+  const response = await fetch(FETCH_LOCATION(locationId))
+  if (!response.ok) {
+    throw new Error(
+      "Couldn't fetch the location from config: " + (await response.text())
+    )
+  }
+
+  return (await response.json()) as SavedLocation
+}

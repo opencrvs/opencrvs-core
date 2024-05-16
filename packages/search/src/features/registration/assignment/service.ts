@@ -21,10 +21,11 @@ import * as Hapi from '@hapi/hapi'
 import { getTokenPayload, ITokenPayload } from '@search/utils/authUtils'
 import { client } from '@search/elasticsearch/client'
 import {
-  findLastOfficeFromSavedBundle,
   getTaskFromSavedBundle,
+  resourceIdentifierToUUID,
   SavedBundle
 } from '@opencrvs/commons/types'
+import { fetchLocation } from '@search/features/search/location'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as SavedBundle
@@ -45,7 +46,15 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
-  const regLastOffice = findLastOfficeFromSavedBundle(bundle)
+  const regLastOfficeIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastOffice'
+  )
+  const regLastOffice =
+    regLastOfficeIdentifier &&
+    (await fetchLocation(
+      resourceIdentifierToUUID(regLastOfficeIdentifier.valueReference.reference)
+    ))
 
   const body: ICompositionBody = {}
   body.modifiedAt = Date.now().toString()
