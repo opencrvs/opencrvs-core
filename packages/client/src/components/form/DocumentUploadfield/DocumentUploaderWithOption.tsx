@@ -23,7 +23,7 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 
@@ -33,22 +33,19 @@ const options = {
   useWebWorker: true
 }
 
-const UploaderWrapper = styled.div`
-  margin-bottom: 28px;
+const FullWidthImageUploader = styled(ImageUploader)`
+  width: 100%;
 `
 
-const Label = styled.label`
-  position: relative;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg18};
+const UploadWrapper = styled.div`
+  max-width: 461px;
+  width: 100%;
 `
-const Flex = styled.div<{ splitView?: boolean }>`
+
+const Flex = styled.div`
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
-  margin-bottom: ${({ splitView }) => {
-    return splitView ? '10px' : '0px'
-  }};
 `
 export const ErrorMessage = styled.div`
   margin-bottom: 16px;
@@ -56,14 +53,13 @@ export const ErrorMessage = styled.div`
 
 type IFullProps = {
   name: string
-  label: string
   placeholder?: string
   extraValue: IFormFieldValue
   options: ISelectOption[]
-  splitView?: boolean
   files: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
+  onBlur: React.FocusEventHandler
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -133,7 +129,10 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   isValid = (): boolean => {
-    const isValid = !!this.state.fields.documentType
+    // If there is only one option available then no need to select it
+    // and it's not shown either
+    const isValid =
+      !!this.state.fields.documentType || this.props.options.length === 1
 
     this.setState({
       errorMessage: isValid
@@ -173,10 +172,14 @@ class DocumentUploaderWithOptionComp extends React.Component<
       return
     }
 
+    // If there is only one option available then it would stay selected
+    const documentType =
+      this.state.fields.documentType || this.state.dropDownOptions[0].value
+
     let fileAsBase64: string
     const optionValues: [IFormFieldValue, string] = [
       this.props.extraValue,
-      this.state.fields.documentType
+      documentType
     ]
 
     this.setState((state) => ({
@@ -221,7 +224,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
     remove(
       tempOptions,
-      (option: ISelectOption) => option.value === this.state.fields.documentType
+      (option: ISelectOption) => option.value === documentType
     )
 
     const newDocument: IFileValue = {
@@ -280,59 +283,12 @@ class DocumentUploaderWithOptionComp extends React.Component<
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
 
-  renderDocumentUploaderWithDocumentTypeBlock = () => {
-    const { name, intl, placeholder } = this.props
-    return this.props.splitView ? (
-      this.state.dropDownOptions.map((opt, idx) => (
-        <Flex splitView key={idx}>
-          <Select
-            id={`${name}${idx}`}
-            placeholder={placeholder}
-            options={[opt]}
-            value={opt.value}
-            onChange={this.onChange}
-          />
-
-          <ImageUploader
-            id={`upload_document${idx}`}
-            title={intl.formatMessage(formMessages.addFile)}
-            onClick={(e) => {
-              this.onChange(opt.value)
-              return !this.isValid() && e.preventDefault()
-            }}
-            handleFileChange={this.handleFileChange}
-            disabled={this.state.filesBeingProcessed.length > 0}
-          />
-        </Flex>
-      ))
-    ) : (
-      <Flex>
-        <Select
-          id={name}
-          placeholder={placeholder}
-          options={this.state.dropDownOptions}
-          value={this.state.fields.documentType}
-          onChange={this.onChange}
-          isDisabled={this.state.filesBeingProcessed.length > 0}
-        />
-
-        <ImageUploader
-          id="upload_document"
-          title={intl.formatMessage(formMessages.addFile)}
-          onClick={(e) => !this.isValid() && e.preventDefault()}
-          handleFileChange={this.handleFileChange}
-          disabled={this.state.filesBeingProcessed.length > 0}
-        />
-      </Flex>
-    )
-  }
-
   render() {
-    const { label, intl, requiredErrorMessage } = this.props
+    const { intl, requiredErrorMessage } = this.props
 
     return (
-      <UploaderWrapper>
-        <ErrorMessage id="upload-error">
+      <UploadWrapper>
+        <div id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>
               {(requiredErrorMessage &&
@@ -340,9 +296,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
                 this.state.errorMessage}
             </ErrorText>
           )}
-        </ErrorMessage>
+        </div>
 
-        <Label>{label}</Label>
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
           documents={this.props.files}
@@ -350,9 +305,37 @@ class DocumentUploaderWithOptionComp extends React.Component<
           dropdownOptions={this.props.options}
           onDelete={this.onDelete}
         />
-        {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
-          ? null
-          : this.renderDocumentUploaderWithDocumentTypeBlock()}
+        {this.props.hideOnEmptyOption &&
+        this.state.dropDownOptions.length === 0 ? null : this.props.options
+            .length === 1 ? (
+          <FullWidthImageUploader
+            id="upload_document"
+            title={intl.formatMessage(formMessages.addFile)}
+            onClick={(e) => !this.isValid() && e.preventDefault()}
+            handleFileChange={this.handleFileChange}
+            disabled={this.state.filesBeingProcessed.length > 0}
+          />
+        ) : (
+          <Flex>
+            <Select
+              id={this.props.name}
+              inputId={this.props.name}
+              placeholder={this.props.placeholder}
+              options={this.state.dropDownOptions}
+              value={this.state.fields.documentType}
+              onChange={this.onChange}
+              isDisabled={this.state.filesBeingProcessed.length > 0}
+              onBlur={this.props.onBlur}
+            />
+            <ImageUploader
+              id="upload_document"
+              title={intl.formatMessage(formMessages.addFile)}
+              onClick={(e) => !this.isValid() && e.preventDefault()}
+              handleFileChange={this.handleFileChange}
+              disabled={this.state.filesBeingProcessed.length > 0}
+            />
+          </Flex>
+        )}
 
         {this.state.previewImage && (
           <DocumentPreview
@@ -364,7 +347,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onDelete={this.onDelete}
           />
         )}
-      </UploaderWrapper>
+      </UploadWrapper>
     )
   }
 }
