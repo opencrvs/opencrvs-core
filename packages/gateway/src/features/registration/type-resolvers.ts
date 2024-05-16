@@ -84,7 +84,8 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  findLastOfficeFromSavedBundle
+  findLastOfficeFromSavedBundle,
+  findLastOfficeLocationFromSavedBundle
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1146,17 +1147,15 @@ export const typeResolvers: GQLResolver = {
     reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
-    location: async (task, _, { dataSources }) => {
+    location: async (task, _, { dataSources, record }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
       )
-      if (!taskLocation || !taskLocation.valueReference) {
+      if (!taskLocation || !record) {
         return null
       }
-      return dataSources.locationsAPI.getParent(
-        resourceIdentifierToUUID(taskLocation.valueReference.reference)
-      )
+      return findLastOfficeLocationFromSavedBundle(record)
     },
     office: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
@@ -1568,17 +1567,15 @@ export const typeResolvers: GQLResolver = {
       }
       return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: Task, _: any, { dataSources }) => {
+    location: async (task: Task, _: any, { dataSources, record }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
       )
-      if (!taskLocation || !taskLocation.valueReference) {
+      if (!taskLocation || !record) {
         return null
       }
-      return dataSources.locationsAPI.getParent(
-        resourceIdentifierToUUID(taskLocation.valueReference.reference)
-      )
+      return findLastOfficeLocationFromSavedBundle(record)
     },
     office: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(

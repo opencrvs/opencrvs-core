@@ -50,8 +50,4 @@ export default class LocationsAPI extends RESTDataSource {
   getHierarchy(id: UUID): Promise<Array<Saved<Location>>> {
     return this.get(`/locations/${id}/hierarchy`)
   }
-
-  getParent(id: UUID): Promise<Saved<Location>> {
-    return this.get(`/locations/${id}/parent`)
-  }
 }

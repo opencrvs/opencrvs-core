@@ -47,7 +47,6 @@ import {
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
-import { locationParentHandler } from '@config/handlers/locations/parent'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -341,21 +340,6 @@ export default function getRoutes(): ServerRoute[] {
       method: 'GET',
       path: '/locations/{locationId}/hierarchy',
       handler: locationHierarchyHandler,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: "Get location's hierarchy",
-        validate: {
-          params: Joi.object({
-            locationId: Joi.string().uuid()
-          })
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/locations/{locationId}/parent',
-      handler: locationParentHandler,
       options: {
         tags: ['api'],
         auth: false,
