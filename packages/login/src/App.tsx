@@ -23,7 +23,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ForgottenItem } from './views/ResetCredentialsForm/ForgottenItemForm'
 import { ResetCredentialsSuccessPage } from './views/ResetCredentialsForm/ResetCredentialsSuccessPage'
-import { PhoneNumberVerification } from './views/ResetCredentialsForm/PhoneNumberVerificationForm'
+import { AuthDetailsVerification } from './views/ResetCredentialsForm/AuthDetailsVerificationForm'
 import { RecoveryCodeEntry } from './views/ResetCredentialsForm/RecoveryCodeEntryForm'
 import { SecurityQuestion } from './views/ResetCredentialsForm/SecurityQuestionForm'
 import { UpdatePassword } from './views/ResetCredentialsForm/UpdatePasswordForm'
@@ -72,7 +72,7 @@ export const App = ({ store, history }: IAppProps) => (
                 </Route>
                 <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
                   <PageContainer>
-                    <PhoneNumberVerification />
+                    <AuthDetailsVerification />
                   </PageContainer>
                 </Route>
                 <Route exact path={routes.RECOVERY_CODE_ENTRY}>
