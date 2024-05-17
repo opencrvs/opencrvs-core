@@ -12,44 +12,35 @@
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
-  const session = client.startSession()
-  try {
-    await session.withTransaction(async () => {
-      await db.createCollection('Location_view_with_plain_ids', {
-        viewOn: 'Location',
-        pipeline: [
-          {
-            $addFields: {
-              'partOf.reference': {
-                $cond: {
-                  if: {
-                    $regexMatch: {
-                      input: '$partOf.reference',
-                      regex: /^Location\//
-                    }
-                  },
-                  then: {
-                    $replaceOne: {
-                      input: '$partOf.reference',
-                      find: 'Location/',
-                      replacement: ''
-                    }
-                  },
-                  else: '$partOf.reference'
+  await db.createCollection('Location_view_with_plain_ids', {
+    viewOn: 'Location',
+    pipeline: [
+      {
+        $addFields: {
+          'partOf.reference': {
+            $cond: {
+              if: {
+                $regexMatch: {
+                  input: '$partOf.reference',
+                  regex: /^Location\//
                 }
-              }
+              },
+              then: {
+                $replaceOne: {
+                  input: '$partOf.reference',
+                  find: 'Location/',
+                  replacement: ''
+                }
+              },
+              else: '$partOf.reference'
             }
           }
-        ]
-      })
-    })
-  } finally {
-    await session.endSession()
-  }
+        }
+      }
+    ]
+  })
 }
 
 export const down = async (db: Db, client: MongoClient) => {
-  // Add migration logic for reverting changes made by the up() function
-  // This code will be executed when rolling back the migration
-  // It should reverse the changes made in the up() function
+  await db.dropCollection('Location_view_with_plain_ids')
 }
