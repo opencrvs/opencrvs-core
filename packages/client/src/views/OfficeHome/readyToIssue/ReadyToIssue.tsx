@@ -53,7 +53,7 @@ import {
   IconWithNameEvent
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
