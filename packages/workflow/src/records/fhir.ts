@@ -687,18 +687,13 @@ export async function createDownloadTask(
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
-): Promise<SavedTask> {
+) {
   const taskWithoutPractitionerExtensions: SavedTask = createNewTaskResource(
     previousTask,
     [{ url: extensionUrl }]
   )
 
-  const [downloadedTask] = await withPractitionerDetails(
-    taskWithoutPractitionerExtensions,
-    token
-  )
-
-  return downloadedTask
+  return withPractitionerDetails(taskWithoutPractitionerExtensions, token)
 }
 
 export function createRejectTask(

@@ -325,14 +325,13 @@ export async function toDownloaded(
 }> {
   const previousTask = getTaskFromSavedBundle(record)
 
-  const downloadedTask = await createDownloadTask(
+  const [downloadedTask, practitionerDetailsBundle] = await createDownloadTask(
     previousTask,
     token,
     extensionUrl
   )
 
-  // this is to show the latest action in history
-  // as all histories are read from task history
+  // TaskHistory is added to the bundle to show audit history via gateway type resolvers in frontend
   const taskHistoryEntry = resourceToBundleEntry(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
@@ -347,14 +346,15 @@ export async function toDownloaded(
     resource: downloadedTask
   }
 
-  const updatedEntries = [...filteredEntriesWithoutTask, newTaskEntry].concat(
-    taskHistoryEntry
-  )
-
-  const downloadedRecord = {
+  const updatedBundle = {
     ...record,
-    entry: updatedEntries
-  } as ValidRecord
+    entry: [...filteredEntriesWithoutTask, newTaskEntry, taskHistoryEntry]
+  }
+
+  const downloadedRecord = mergeBundles(
+    updatedBundle,
+    practitionerDetailsBundle
+  ) as ValidRecord
 
   const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',

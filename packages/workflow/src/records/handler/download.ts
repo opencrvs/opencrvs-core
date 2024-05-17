@@ -66,7 +66,7 @@ export async function downloadRecordHandler(
     businessStatus
   )
 
-  const { downloadedRecordWithTaskOnly } = await toDownloaded(
+  const { downloadedRecordWithTaskOnly, downloadedRecord } = await toDownloaded(
     record,
     token,
     extensionUrl
@@ -77,9 +77,6 @@ export async function downloadRecordHandler(
       ? 'downloaded'
       : 'assigned'
 
-  await sendBundleToHearth(downloadedRecordWithTaskOnly)
-  const updatedRecord = await getValidRecordById(payload.id, token, true)
-
   /*
    * Storing the details of the downloaded record in the database(s) is slow.
    * So we return the requested record to the requesting users optimistically immediately.
@@ -88,14 +85,15 @@ export async function downloadRecordHandler(
   process.nextTick(async () => {
     try {
       // Here the sent bundle is saved with task only
-      await auditEvent(auditRecordEvent, updatedRecord, token)
+      await sendBundleToHearth(downloadedRecordWithTaskOnly)
+      await auditEvent(auditRecordEvent, downloadedRecord, token)
 
       if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
-        await indexBundleToRoute(updatedRecord, token, '/events/assigned')
+        await indexBundleToRoute(downloadedRecord, token, '/events/assigned')
     } catch (error) {
       logger.error(error)
     }
   })
 
-  return updatedRecord
+  return downloadedRecord
 }
