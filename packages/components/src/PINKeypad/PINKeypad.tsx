@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 
 interface IProps {
@@ -16,10 +16,6 @@ interface IProps {
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
   pin?: string
-}
-
-interface IState {
-  pin: string
 }
 
 const Container = styled.div`
@@ -57,102 +53,81 @@ const DotsContainer = styled.div`
   flex-direction: column;
   align-items: center;
 `
+const MAX_PIN_LENGTH = 4
 
-export class PINKeypad extends React.Component<IProps, IState> {
-  state = { pin: this.props.pin || '' }
-  pinInput: React.RefObject<HTMLInputElement> = React.createRef()
+export const PINKeypad = ({
+  pin: initialPin,
+  onComplete,
+  forgotPinComponent,
+  ...props
+}: IProps) => {
+  const [pin, setPin] = useState(initialPin || '')
+  const pinInput = useRef<HTMLInputElement>(null)
 
-  componentDidMount() {
-    this.focusKeyInput()
+  const focusKeyInput = () => {
+    pinInput.current?.focus()
   }
 
-  focusKeyInput = () => {
-    this.pinInput?.current?.focus()
-  }
-  componentDidUpdate = () => this.focusKeyInput()
+  useEffect(() => {
+    focusKeyInput()
+  }, [pin])
 
-  keyPress = (key: number) => {
-    const { pin } = this.state
-    const { onComplete } = this.props
-
-    if (key === -1) {
-      this.setState({ pin: pin.slice(0, pin.length - 1) })
-      return
-    }
-
-    if (pin.length === 4) {
-      return
-    }
-
-    const newPIN = pin + key
-    this.setState({ pin: newPIN }, () => {
-      if (newPIN.length === 4) {
-        onComplete(newPIN)
-      }
-    })
-  }
-
-  keyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const { pin } = this.state
-    const { onComplete } = this.props
+  const keyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const kc = e.keyCode
     if (kc === 8 || kc === 46) {
       // delete or backspace
-      this.setState({ pin: pin.length ? pin.slice(0, pin.length - 1) : '' })
+      const newPinValue = pin.length ? pin.slice(0, pin.length - 1) : ''
+      setPin(newPinValue)
     } else if (kc >= 48 && kc <= 57) {
       // '0' <= kc <= '9'
       if (pin.length <= 3) {
         const newPIN = pin + (kc - 48)
-        if (newPIN.length === 4) {
+        if (newPIN.length === MAX_PIN_LENGTH) {
           onComplete(newPIN)
         }
-        this.setState({ pin: newPIN })
+        setPin(newPIN)
       }
     } else if (kc >= 96 && kc <= 105) {
       // numpad
       if (pin.length <= 3) {
         const newPIN = pin + (kc - 96)
-        if (newPIN.length === 4) {
+        if (newPIN.length === MAX_PIN_LENGTH) {
           onComplete(newPIN)
         }
-        this.setState({ pin: newPIN })
+        setPin(newPIN)
       }
     }
   }
 
-  onBlur = () => {
-    this.focusKeyInput()
+  const onBlur = () => {
+    focusKeyInput()
   }
 
-  render() {
-    const { pin } = this.state
-    const { onComplete, ...props } = this.props
-    return (
-      <Container id="pin-keypad-container" tabIndex={0} {...props}>
-        <DotsContainer>
-          <StyledInput
-            type="number"
-            onKeyDown={this.keyDown}
-            id="pin-input"
-            ref={this.pinInput}
-            onBlur={this.onBlur}
-            autoFocus
-          />
-          <div
-            onClick={() => {
-              this.pinInput?.current?.focus()
-            }}
-          >
-            {new Array(pin.length).fill('').map((_, i) => (
-              <DotFilled key={`dot-filled-${i}`} />
-            ))}
-            {new Array(4 - pin.length).fill('').map((_, i) => (
-              <DotUnfilled key={`dot-unfilled-${i}`} />
-            ))}
-          </div>
-          {this.props.forgotPinComponent}
-        </DotsContainer>
-      </Container>
-    )
-  }
+  return (
+    <Container id="pin-keypad-container" tabIndex={0} {...props}>
+      <DotsContainer>
+        <StyledInput
+          type="number"
+          onKeyDown={keyDown}
+          id="pin-input"
+          ref={pinInput}
+          onBlur={onBlur}
+          autoFocus
+        />
+        <div
+          onClick={() => {
+            pinInput?.current?.focus()
+          }}
+        >
+          {new Array(pin.length).fill('').map((_, i) => (
+            <DotFilled key={`dot-filled-${i}`} />
+          ))}
+          {new Array(MAX_PIN_LENGTH - pin.length).fill('').map((_, i) => (
+            <DotUnfilled key={`dot-unfilled-${i}`} />
+          ))}
+        </div>
+        {forgotPinComponent}
+      </DotsContainer>
+    </Container>
+  )
 }

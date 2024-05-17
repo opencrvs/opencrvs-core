@@ -457,3 +457,21 @@ function updateTaskTemplate(
   }
   return task
 }
+
+export function notCorrectedHistory(
+  task: Task,
+  index: number,
+  allTasks: Task[]
+): boolean {
+  const currentAction = getActionFromTask(task)
+  if (currentAction === TaskAction.CORRECTED) {
+    const pastTasks = allTasks
+      .slice(0, index)
+      .filter((task) => getActionFromTask(task) !== TaskAction.ASSIGNED)
+    const lastAction = getActionFromTask(pastTasks[pastTasks.length - 1])
+    if (lastAction === TaskAction.APPROVED_CORRECTION) {
+      return false
+    }
+  }
+  return true
+}
