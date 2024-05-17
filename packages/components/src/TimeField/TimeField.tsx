@@ -33,9 +33,6 @@ const Container = styled.div`
   display: flex;
   gap: 16px;
 `
-const Segment = styled(TextInput)`
-  width: 100%;
-`
 
 export type ITimeFieldProps = IProps &
   Omit<ITextInputProps, 'onChange' | 'value'>
@@ -142,7 +139,7 @@ export function TimeField(props: ITimeFieldProps) {
 
   return (
     <Container id={id}>
-      <Segment
+      <TextInput
         {...otherProps}
         id={`${id}-hh`}
         ref={hh}
@@ -161,7 +158,7 @@ export function TimeField(props: ITimeFieldProps) {
           event.currentTarget.blur()
         }}
       />
-      <Segment
+      <TextInput
         {...otherProps}
         id={`${id}-mm`}
         ref={mm}
