@@ -324,12 +324,12 @@ export async function toDownloaded(
   downloadedRecordWithTaskOnly: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-
-  const [downloadedTask, practitionerDetailsBundle] = await createDownloadTask(
+  const taskWithoutPractitionerDetails = createDownloadTask(
     previousTask,
-    token,
     extensionUrl
   )
+  const [downloadedTask, practitionerDetailsBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerDetails, token)
 
   // TaskHistory is added to the bundle to show audit history via gateway type resolvers in frontend
   const taskHistoryEntry = resourceToBundleEntry(
