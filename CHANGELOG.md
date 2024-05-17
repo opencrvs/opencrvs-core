@@ -24,10 +24,6 @@
 
   We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
 
-- #### Deprecate searching users via `locationId` in gateway's `searchUsers`
-
-  We're internally dropping full location hierarchies in our databases, to only save leaf level id's. This allows us to change the location of a specific office, or the hierarchy structure, without updating every single entry in our databases. Internally we aren't using the user's `locationId` search anymore, in favor of searching with `primaryOfficeId`. That is why we're dropping support for it.
-
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client

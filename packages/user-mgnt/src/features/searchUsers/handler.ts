@@ -12,7 +12,9 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { SortOrder } from 'mongoose'
+import { FilterQuery, SortOrder } from 'mongoose'
+import { resolveLocationChildren } from '@user-mgnt/utils/location'
+import { UUID } from '@opencrvs/commons'
 
 interface IVerifyPayload {
   username?: string
@@ -20,6 +22,7 @@ interface IVerifyPayload {
   systemRole?: string
   status?: string
   primaryOfficeId?: string
+  locationId?: UUID
   count: number
   skip: number
   sortOrder: SortOrder
@@ -35,11 +38,12 @@ export default async function searchUsers(
     systemRole,
     status,
     primaryOfficeId,
+    locationId,
     count,
     skip,
     sortOrder
   } = request.payload as IVerifyPayload
-  let criteria = {}
+  let criteria: FilterQuery<IUserModel> = {}
   if (username) {
     criteria = { ...criteria, username }
   }
@@ -51,6 +55,10 @@ export default async function searchUsers(
   }
   if (primaryOfficeId) {
     criteria = { ...criteria, primaryOfficeId }
+  }
+  if (locationId) {
+    const locationChildren = await resolveLocationChildren(locationId)
+    criteria = { ...criteria, primaryOfficeId: { $in: locationChildren } }
   }
   if (status) {
     criteria = { ...criteria, status }
@@ -75,6 +83,7 @@ export const searchSchema = Joi.object({
   systemRole: Joi.string().optional(),
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
+  locationId: Joi.string().optional(),
   count: Joi.number().min(0).required(),
   skip: Joi.number().min(0).required(),
   sortOrder: Joi.string().valid('asc', 'desc').required()

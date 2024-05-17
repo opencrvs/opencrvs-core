@@ -1899,6 +1899,7 @@ export type QuerySearchFieldAgentsArgs = {
 export type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
   email?: InputMaybe<Scalars['String']>
+  locationId?: InputMaybe<Scalars['String']>
   mobile?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
   skip?: InputMaybe<Scalars['Int']>

@@ -155,6 +155,7 @@ type Query {
     status: String
     systemRole: String
     primaryOfficeId: String
+    locationId: String
     count: Int
     skip: Int
     sort: String
