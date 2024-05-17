@@ -59,7 +59,7 @@ async function renderAppWithConfig() {
 
 function withRetry(render: () => Promise<void>) {
   render().catch(() => {
-    delay(() => withRetry(renderAppWithConfig), RETRY_TIMEOUT)
+    delay(() => withRetry(render), RETRY_TIMEOUT)
   })
 }
 
