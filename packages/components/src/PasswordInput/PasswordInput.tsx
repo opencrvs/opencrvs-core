@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Button } from '../Button'
 import { TextInput } from '../TextInput'
 import { Icon } from '../Icon'
+import { CircleButton } from '../buttons'
 
 export interface PasswordInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -17,7 +17,6 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   const [isVisible, setIsVisible] = useState(false)
 
   const toggleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
     setIsVisible(!isVisible)
   }
 
@@ -27,9 +26,9 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       type={isVisible ? 'text' : 'password'}
       postfix={
         !ignoreVisibility && (
-          <Button size="small" onClick={toggleVisibility} type="icon">
+          <CircleButton onClick={toggleVisibility} type="button">
             <Icon name={isVisible ? 'Eye' : 'EyeSlash'} size="small" />
-          </Button>
+          </CircleButton>
         )
       }
     />
