@@ -80,6 +80,7 @@ function getInformantType(record: InProgressRecord | ReadyForReviewRecord) {
     'informant-details',
     getComposition(record)
   )
+  if (!compositionSection) return undefined
   const personSectionEntry = compositionSection.entry[0]
   const personEntry = findEntryFromBundle<RelatedPerson>(
     record,
@@ -105,7 +106,7 @@ export const updateRoute = createRoute({
     // by removing the composition section from the bundle.
     // If the section is not found, the builders from updateFhirBundle
     // create a new patient resource from scratch.
-    if (informantTypeOfBundle !== payloadInformantType)
+    if (informantTypeOfBundle && informantTypeOfBundle !== payloadInformantType)
       record = filterInformantSectionFromComposition(record)
 
     const { details, event } = payload
