@@ -104,7 +104,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
   const intl = useIntl()
   const [errorMessage, setErrorMessage] = useState(EMPTY_STRING)
   const [previewImage, setPreviewImage] = useState<IFileValue | null>(null)
-  const [dropDownOptions, setDropDownOptions] = useState<ISelectOption[]>(
+  const [dropdownOptions, setDropdownOptions] = useState<ISelectOption[]>(
     initializeDropDownOption(props.options, props.files)
   )
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
@@ -167,7 +167,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     }
 
     // If there is only one option available then it would stay selected
-    const documentType = fields.documentType || dropDownOptions[0].value
+    const documentType = fields.documentType || dropdownOptions[0].value
 
     let fileAsBase64: string
     const optionValues: [IFormFieldValue, string] = [
@@ -212,7 +212,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       return
     }
 
-    const tempOptions = dropDownOptions
+    const tempOptions = dropdownOptions
 
     remove(
       tempOptions,
@@ -236,7 +236,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       documentType: EMPTY_STRING,
       documentData: EMPTY_STRING
     })
-    setDropDownOptions(tempOptions)
+    setDropdownOptions(tempOptions)
     setFilesBeingProcessed((filesCurrentlyBeingProcessed) =>
       filesCurrentlyBeingProcessed.filter(
         ({ label }) => label !== optionValues[1]
@@ -249,7 +249,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     const addableOption = props.options.find(
       (item: ISelectOption) => item.value === previewImage.optionValues[1]
     ) as ISelectOption
-    setDropDownOptions((options) => options.concat(addableOption))
+    setDropdownOptions((options) => options.concat(addableOption))
     props.onComplete(props.files.filter((file) => file !== previewImage))
     closePreviewSection()
   }
@@ -289,7 +289,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         dropdownOptions={props.options}
         onDelete={onDelete}
       />
-      {props.hideOnEmptyOption && dropDownOptions.length === 0 ? null : props
+      {props.hideOnEmptyOption && dropdownOptions.length === 0 ? null : props
           .options.length === 1 ? (
         <FullWidthImageUploader
           id="upload_document"
@@ -304,7 +304,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
             id={props.name}
             inputId={props.name}
             placeholder={props.placeholder}
-            options={dropDownOptions}
+            options={dropdownOptions}
             value={fields.documentType}
             onChange={onChange}
             isDisabled={filesBeingProcessed.length > 0}
