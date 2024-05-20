@@ -10,7 +10,7 @@
  */
 import * as mongoose from 'mongoose'
 import { MONGO_URL } from '@metrics/constants'
-import { logger } from '@metrics/logger'
+import { logger } from '@opencrvs/commons'
 
 const db = mongoose.connection
 

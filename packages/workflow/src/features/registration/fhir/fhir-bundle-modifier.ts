@@ -42,7 +42,7 @@ import {
   getPractitionerPrimaryLocation,
   getPractitionerRef
 } from '@workflow/features/user/utils'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 

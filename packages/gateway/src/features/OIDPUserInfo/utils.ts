@@ -17,7 +17,7 @@ import {
   OIDP_JWT_AUD_CLAIM
 } from '@gateway/constants'
 
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import { OIDPUserInfo } from './oidp-types'
 import { Bundle, Location } from '@opencrvs/commons/types'
 import { fetchFromHearth } from '@gateway/features/fhir/service'

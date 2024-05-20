@@ -29,7 +29,7 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'

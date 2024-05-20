@@ -11,7 +11,7 @@
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { ICompositionBody } from '@search/elasticsearch/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (

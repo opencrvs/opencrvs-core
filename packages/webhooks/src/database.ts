@@ -10,7 +10,7 @@
  */
 import * as mongoose from 'mongoose'
 import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
-import { logger } from '@webhooks/logger'
+import { logger } from '@opencrvs/commons'
 import Redis, * as IORedis from 'ioredis'
 const db = mongoose.connection
 

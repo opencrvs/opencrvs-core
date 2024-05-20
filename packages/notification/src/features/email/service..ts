@@ -12,7 +12,7 @@
 import NotificationQueue, {
   NotificationQueueRecord
 } from '@notification/model/notificationQueue'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 import { notifyCountryConfig } from '@notification/features/sms/service'
 import { internal, tooManyRequests } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'

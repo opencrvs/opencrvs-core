@@ -11,7 +11,7 @@
 import * as mongoose from 'mongoose'
 
 import { MONGO_URL } from '@notification/constants'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 
 const db = mongoose.connection
 
