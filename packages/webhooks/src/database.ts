@@ -14,6 +14,10 @@ import { logger } from '@opencrvs/commons'
 import Redis, * as IORedis from 'ioredis'
 const db = mongoose.connection
 
+// This prepares code for Mongoose >7 where strictQuery
+// is set to false by default
+mongoose.set('strictQuery', false)
+
 db.on('disconnected', () => {
   logger.info('MongoDB disconnected')
 })
@@ -33,7 +37,10 @@ export function getRedis(): IORedis.Redis {
 
 const connect = async (): Promise<void> => {
   try {
-    redisConnection = new Redis(REDIS_HOST)
+    redisConnection = new Redis({
+      host: REDIS_HOST,
+      maxRetriesPerRequest: null
+    })
 
     redisConnection.on('error', (error) => {
       logger.error('Redis connection error', error)
