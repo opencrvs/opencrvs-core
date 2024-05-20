@@ -22,6 +22,9 @@ import { remove, clone } from 'lodash'
 import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
+import { bytesToMB } from '@client/utils/imageUtils'
+
+const DEFAULT_MAX_SIZE_MB = 5
 
 const defaultOptions = {
   maxSizeMB: 0.4,
@@ -60,6 +63,7 @@ type IFullProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   compressImagesToSizeMB?: number
+  maxSizeMB?: number
 }
 
 type DocumentFields = {
@@ -96,9 +100,6 @@ const initializeDropDownOption = (
   return outputOptions
 }
 
-const bytesToMB = (bytes: number) =>
-  Number(Number(bytes / (1024 * 1024)).toFixed(2))
-
 export const DocumentUploaderWithOption = (props: IFullProps) => {
   const intl = useIntl()
   const [errorMessage, setErrorMessage] = useState(EMPTY_STRING)
@@ -113,6 +114,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     documentType: EMPTY_STRING,
     documentData: EMPTY_STRING
   })
+  const maxSize = props.maxSizeMB ?? DEFAULT_MAX_SIZE_MB
 
   const onChange = (documentType: string) => {
     setFields((currentFields) => ({
@@ -136,13 +138,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
   const processImage = async (uploadedImage: File) => {
     const options = { ...defaultOptions }
     if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
-      setErrorMessage(intl.formatMessage(messages.uploadError))
+      setErrorMessage(intl.formatMessage(messages.uploadError, { maxSize }))
       throw new Error('File type not supported')
     }
 
-    if (uploadedImage.size > 5242880) {
-      setErrorMessage(intl.formatMessage(messages.overSized))
-      throw new Error(intl.formatMessage(messages.overSized))
+    if (bytesToMB(uploadedImage.size) > maxSize) {
+      setErrorMessage(intl.formatMessage(messages.overSized, { maxSize }))
+      throw new Error(intl.formatMessage(messages.overSized, { maxSize }))
     }
 
     if (props.compressImagesToSizeMB !== undefined) {
@@ -199,7 +201,9 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         props.onUploadingStateChanged(true)
       }
 
-      setErrorMessage((msg) => msg || intl.formatMessage(messages.uploadError))
+      setErrorMessage(
+        (msg) => msg || intl.formatMessage(messages.uploadError, { maxSize })
+      )
       setFilesBeingProcessed((filesCurrentlyBeingProcessed) =>
         filesCurrentlyBeingProcessed.filter(
           ({ label }) => label !== optionValues[1]
