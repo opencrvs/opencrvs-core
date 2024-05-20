@@ -23,7 +23,7 @@ import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 
-const options = {
+const defaultOptions = {
   maxSizeMB: 0.4,
   maxWidthOrHeight: 1920,
   useWebWorker: true
@@ -134,6 +134,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
   }
 
   const processImage = async (uploadedImage: File) => {
+    const options = { ...defaultOptions }
     if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
       setErrorMessage(intl.formatMessage(messages.uploadError))
       throw new Error('File type not supported')
