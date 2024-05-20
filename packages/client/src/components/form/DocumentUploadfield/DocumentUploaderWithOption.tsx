@@ -59,6 +59,7 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  compressImagesToSizeMB?: number
 }
 
 type DocumentFields = {
@@ -94,6 +95,9 @@ const initializeDropDownOption = (
 
   return outputOptions
 }
+
+const bytesToMB = (bytes: number) =>
+  Number(Number(bytes / (1024 * 1024)).toFixed(2))
 
 export const DocumentUploaderWithOption = (props: IFullProps) => {
   const intl = useIntl()
@@ -140,8 +144,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       throw new Error(intl.formatMessage(messages.overSized))
     }
 
+    if (props.compressImagesToSizeMB !== undefined) {
+      options.maxSizeMB = props.compressImagesToSizeMB
+    }
+    // disable compression with a falsy value
     const resized =
-      uploadedImage.size > 512000 &&
+      Boolean(options.maxSizeMB) &&
+      bytesToMB(uploadedImage.size) > options.maxSizeMB &&
       (await imageCompression(uploadedImage, options))
 
     const fileAsBase64 = await getBase64String(resized || uploadedImage)
