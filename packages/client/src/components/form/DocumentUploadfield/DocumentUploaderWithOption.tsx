@@ -198,7 +198,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       ])
     } catch (error) {
       if (props.onUploadingStateChanged) {
-        props.onUploadingStateChanged(true)
+        props.onUploadingStateChanged(false)
       }
 
       setErrorMessage(
@@ -228,7 +228,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
 
     props.onComplete([...props.files, newDocument])
     if (props.onUploadingStateChanged) {
-      props.onUploadingStateChanged(true)
+      props.onUploadingStateChanged(false)
     }
 
     setErrorMessage(EMPTY_STRING)
