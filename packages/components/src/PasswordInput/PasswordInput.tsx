@@ -26,7 +26,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       type={isVisible ? 'text' : 'password'}
       postfix={
         !ignoreVisibility && (
-          <CircleButton onClick={toggleVisibility} type="button">
+          <CircleButton onClick={toggleVisibility} type="button" size="medium">
             <Icon name={isVisible ? 'Eye' : 'EyeSlash'} size="small" />
           </CircleButton>
         )
