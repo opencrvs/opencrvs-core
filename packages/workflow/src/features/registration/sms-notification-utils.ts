@@ -17,9 +17,9 @@ export enum InformantNotificationName {
   birthDeclarationSMS = 'birthDeclarationSMS',
   birthRegistrationSMS = 'birthRegistrationSMS',
   birthRejectionSMS = 'birthRejectionSMS',
+  deathRegistrationSMS = 'deathRegistrationSMS',
   deathInProgressSMS = 'deathInProgressSMS',
   deathDeclarationSMS = 'deathDeclarationSMS',
-  deathRegistrationSMS = 'deathRegistrationSMS',
   deathRejectionSMS = 'deathRejectionSMS'
 }
 
@@ -49,14 +49,4 @@ export async function getInformantSMSNotification(token: string) {
     logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
     throw err
   }
-}
-
-export function isInformantSMSNotificationEnabled(
-  informantSMSNotifications: IInformantSMSNotification[],
-  name: InformantNotificationName
-) {
-  const isNotificationEnabled = informantSMSNotifications.find(
-    (notification) => notification.name === name
-  )?.enabled
-  return Boolean(isNotificationEnabled)
 }

@@ -32,10 +32,6 @@ export function hasExtension(taskResource: Task, extensionUrl: string) {
   )
 }
 
-export function taskHasInput(taskResource: Task) {
-  return !!(taskResource.input && taskResource.input.length > 0)
-}
-
 export function getTaskEventType(task: Task) {
   const eventType = task?.code?.coding?.[0].code
   return eventType
