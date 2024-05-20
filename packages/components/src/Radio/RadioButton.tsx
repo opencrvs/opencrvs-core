@@ -84,8 +84,8 @@ const Radio = styled.span<{
       size === 'large'
         ? `height: 38px;
     width: 38px;`
-        : ` height: 14px;
-    width: 14px;`}
+        : ` height: 20px;
+    width: 20px;`}
   }
   svg {
     position: absolute;
@@ -98,37 +98,36 @@ const Radio = styled.span<{
 
 const Input = styled.input`
   position: absolute;
+  margin: 0;
   width: 100%;
   height: 40px;
   opacity: 0;
-  z-index: 2;
+  z-index: 1;
   cursor: pointer;
 
   &:active ~ ${Radio} {
     &::after {
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }
   }
 
   &:checked ~ ${Radio} {
     &::after {
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
     }
   }
 
   &:focus ~ ${Radio} {
     &::after {
       box-sizing: content-box;
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }
   }
 `
