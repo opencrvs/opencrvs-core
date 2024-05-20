@@ -39,8 +39,10 @@ export default async function getForm(
   })
 
   if (response.status !== 200) {
-    logger.error('Country config did not return 200 on forms endpoint')
-    logger.error(response.statusText)
+    logger.error(
+      `Core failed to fetch form definition from ${COUNTRY_CONFIG_URL}/forms. Check country config logs for more details`
+    )
+
     return h.response().code(500)
   }
 
@@ -77,5 +79,5 @@ export default async function getForm(
       return h.response().code(400)
     }
   }
-  return h.response(forms).code(201)
+  return h.response(forms).code(200)
 }
