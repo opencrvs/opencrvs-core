@@ -15,6 +15,8 @@ import { InputLabel } from '../InputField/InputLabel'
 
 const DateWrapper = styled.div`
   width: 100%;
+  display: flex;
+  gap: 8px;
 `
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
