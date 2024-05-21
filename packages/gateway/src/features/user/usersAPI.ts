@@ -45,11 +45,15 @@ export class UsersAPI extends RESTDataSource {
       return cachedResponse
     }
 
-    const response = this.post('getUser', { email })
+    try {
+      const response = this.post('getUser', { email })
 
-    this.memoizedResults.set(cacheKey, response)
+      this.memoizedResults.set(cacheKey, response)
 
-    return response
+      return response
+    } catch (e) {
+      return null
+    }
   }
 
   async getUserByMobile(mobile: string) {
@@ -61,11 +65,15 @@ export class UsersAPI extends RESTDataSource {
       return cachedResponse
     }
 
-    const response = this.post('getUser', { mobile })
+    try {
+      const response = this.post('getUser', { mobile })
 
-    this.memoizedResults.set(cacheKey, response)
+      this.memoizedResults.set(cacheKey, response)
 
-    return response
+      return response
+    } catch (e) {
+      return null
+    }
   }
   async getUserById(id: string) {
     const cacheKey = `${this.baseURL}/getUser:user:${id}`
