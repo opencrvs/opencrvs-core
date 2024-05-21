@@ -21,7 +21,7 @@ const Wrapper = styled.div`
   width: 100%;
   padding: 8px 8px;
   align-items: flex-start;
-
+  isolation: isolate;
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
@@ -102,7 +102,7 @@ const Input = styled.input`
   width: 100%;
   height: 40px;
   opacity: 0;
-  z-index: 1;
+  z-index: 2;
   cursor: pointer;
 
   &:active ~ ${Radio} {
