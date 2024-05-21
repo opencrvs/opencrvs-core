@@ -35,6 +35,7 @@ export {
   MagnifyingGlassPlus,
   Export,
   Eye,
+  EyeSlash,
   Envelope,
   Gear,
   GitBranch,
