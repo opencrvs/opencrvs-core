@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 
-const Wrapper = styled.div`
+const Label = styled.label<{ disabled?: boolean }>`
   list-style-type: none;
   display: flex;
   flex-direction: row;
@@ -20,27 +20,18 @@ const Wrapper = styled.div`
   border-radius: 4px;
   width: 100%;
   padding: 8px 8px;
-  align-items: flex-start;
+  align-items: center;
   isolation: isolate;
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
+  ${({ theme }) => theme.fonts.h4};
+  cursor: pointer;
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
   }
-`
-
-const Label = styled.label<{
-  size?: string
-  disabled?: boolean
-  hasFlexDirection?: boolean
-}>`
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
-  cursor: pointer;
-  align-self: center;
-  ${({ theme }) => theme.fonts.h4};
-  ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
 `
 
 const Radio = styled.span<{
@@ -99,7 +90,6 @@ const Radio = styled.span<{
 const Input = styled.input`
   position: absolute;
   margin: 0;
-  width: 100%;
   height: 40px;
   opacity: 0;
   z-index: 2;
@@ -142,7 +132,6 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
-  hasFlexDirection?: boolean
 
   onChange?: (value: Value) => void
 }
@@ -155,8 +144,7 @@ export const RadioButton = ({
   value,
   size,
   disabled,
-  onChange,
-  hasFlexDirection
+  onChange
 }: IRadioButton) => {
   const handleChange = () => {
     if (onChange) {
@@ -164,7 +152,7 @@ export const RadioButton = ({
     }
   }
   return (
-    <Wrapper>
+    <Label disabled={disabled} htmlFor={id}>
       <Input
         id={id}
         size={size === 'large' ? 40 : 16}
@@ -195,13 +183,7 @@ export const RadioButton = ({
           )
         ) : null}
       </Radio>
-      <Label
-        disabled={disabled}
-        htmlFor={id}
-        hasFlexDirection={hasFlexDirection}
-      >
-        {label}
-      </Label>
-    </Wrapper>
+      {label}
+    </Label>
   )
 }
