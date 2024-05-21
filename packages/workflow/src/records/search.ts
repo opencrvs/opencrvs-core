@@ -39,7 +39,7 @@ export async function indexBundleToRoute(
 ): Promise<void>
 
 export async function indexBundleToRoute(
-  bundle: Bundle<SavedTask>,
+  bundle: ValidRecord,
   authToken: string,
   path: `/events/${'assigned' | 'unassigned'}`
 ): Promise<void>

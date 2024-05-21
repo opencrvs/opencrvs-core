@@ -957,6 +957,7 @@ export type Location = {
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
+  hierarchy?: Maybe<Array<Location>>
   id: Scalars['ID']
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
@@ -1827,7 +1828,7 @@ export type QueryGetUserByMobileArgs = {
 }
 
 export type QueryHasChildLocationArgs = {
-  parentId?: InputMaybe<Scalars['String']>
+  parentId: Scalars['String']
 }
 
 export type QueryListBirthRegistrationsArgs = {
@@ -1846,15 +1847,6 @@ export type QueryListNotificationsArgs = {
   status?: InputMaybe<Scalars['String']>
   to?: InputMaybe<Scalars['Date']>
   userId?: InputMaybe<Scalars['String']>
-}
-
-export type QueryLocationByIdArgs = {
-  locationId?: InputMaybe<Scalars['String']>
-}
-
-export type QueryLocationsByParentArgs = {
-  parentId?: InputMaybe<Scalars['String']>
-  type?: InputMaybe<Scalars['String']>
 }
 
 export type QueryQueryPersonByIdentifierArgs = {
@@ -2392,7 +2384,6 @@ export type UpdatePermissionsInput = {
 export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
-  catchmentArea?: Maybe<Array<Location>>
   creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
@@ -2457,7 +2448,6 @@ export type UserInfo = {
 }
 
 export type UserInput = {
-  catchmentArea?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   device?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
@@ -2924,18 +2914,6 @@ export type FetchUserQuery = {
       firstNames?: string | null
       familyName?: string | null
     }>
-    catchmentArea?: Array<{
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string> | null
-      status?: string | null
-      identifier?: Array<{
-        __typename?: 'Identifier'
-        system?: string | null
-        value?: string | null
-      }> | null
-    }> | null
     primaryOffice?: {
       __typename?: 'Location'
       id: string
@@ -3340,17 +3318,6 @@ export type GetUserQuery = {
       name?: string | null
       alias?: Array<string> | null
     } | null
-    catchmentArea?: Array<{
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string> | null
-      identifier?: Array<{
-        __typename?: 'Identifier'
-        system?: string | null
-        value?: string | null
-      }> | null
-    }> | null
     signature?: {
       __typename?: 'Signature'
       type?: string | null
@@ -8570,6 +8537,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             state?: string | null
             city?: string | null
             country?: string | null
+            line?: Array<string | null> | null
           } | null
         } | null
         registration?: {
@@ -8584,15 +8552,20 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: Array<{
-              __typename?: 'Location'
-              name?: string | null
-            }> | null
           } | null
         } | null> | null
       }
@@ -8640,15 +8613,20 @@ export type FetchRecordDetailsForVerificationQuery = {
           regStatus?: RegStatus | null
           user?: {
             __typename?: 'User'
+            primaryOffice?: {
+              __typename?: 'Location'
+              hierarchy?: Array<{
+                __typename?: 'Location'
+                id: string
+                name?: string | null
+                alias?: Array<string> | null
+              }> | null
+            } | null
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
             }>
-            catchmentArea?: Array<{
-              __typename?: 'Location'
-              name?: string | null
-            }> | null
           } | null
         } | null> | null
       }

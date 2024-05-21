@@ -13,7 +13,10 @@ import { conflict } from '@hapi/boom'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { CorrectionRequestedRecord } from '@opencrvs/commons/types'
 import { uploadBase64ToMinio } from '@workflow/documents'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerOfficeId
+} from '@workflow/features/user/utils'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
@@ -43,6 +46,7 @@ export const requestCorrectionRoute = createRoute({
       )
     }
     const practitioner = await getLoggedInPractitionerResource(token)
+    const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
 
     const paymentAttachmentUrl =
       correctionDetails.payment?.attachmentData &&
@@ -61,6 +65,7 @@ export const requestCorrectionRoute = createRoute({
     const recordInCorrectionRequestedState = await toCorrectionRequested(
       record,
       practitioner,
+      practitionerOfficeId,
       correctionDetails,
       proofOfLegalCorrectionAttachments,
       paymentAttachmentUrl

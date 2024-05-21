@@ -17,10 +17,10 @@ import * as jwt from 'jsonwebtoken'
 import {
   ReadyForReviewRecord,
   RegisteredRecord,
+  TransactionResponse,
   URLReference
 } from '@opencrvs/commons/types'
 import { ARCHIVED_BIRTH_RECORD } from '@test/mocks/records/archive'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
   const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')

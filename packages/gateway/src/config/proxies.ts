@@ -28,7 +28,9 @@ export const catchAllProxy = {
       }
     }
   },
-  locations: {
+  /** @deprecated old naming strategy from Hearth.
+   * These are included for backwards compability but `locationS` should be preferred */
+  location: {
     method: '*',
     path: '/location',
     handler: (req, h) =>
@@ -44,12 +46,46 @@ export const catchAllProxy = {
       }
     }
   },
+  /** @deprecated old naming strategy */
   locationId: {
     method: '*',
     path: '/location/{id}',
-    handler: (req, h) =>
+    handler: (_, h) =>
       h.proxy({
         uri: `${APPLICATION_CONFIG_URL}locations/{id}`,
+        passThrough: true
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  /** Proper REST naming practice */
+  locations: {
+    method: '*',
+    path: '/locations',
+    handler: (req, h) =>
+      h.proxy({
+        uri: `${APPLICATION_CONFIG_URL}locations${req.url.search}`,
+        passThrough: true
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  locationsSuffix: {
+    method: '*',
+    path: '/locations/{suffix}',
+    handler: (_, h) =>
+      h.proxy({
+        uri: `${APPLICATION_CONFIG_URL}locations/{suffix}`,
         passThrough: true
       }),
     options: {

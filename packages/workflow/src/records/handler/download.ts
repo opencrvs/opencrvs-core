@@ -11,8 +11,7 @@
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
-  TaskStatus,
-  ValidRecord
+  TaskStatus
 } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
@@ -67,7 +66,7 @@ export async function downloadRecordHandler(
     businessStatus
   )
 
-  const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
+  const { downloadedRecordWithTaskOnly, downloadedRecord } = await toDownloaded(
     record,
     token,
     extensionUrl
@@ -90,15 +89,11 @@ export async function downloadRecordHandler(
       await auditEvent(auditRecordEvent, downloadedRecord, token)
 
       if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
-        await indexBundleToRoute(
-          downloadedRecordWithTaskOnly,
-          token,
-          '/events/assigned'
-        )
+        await indexBundleToRoute(downloadedRecord, token, '/events/assigned')
     } catch (error) {
       logger.error(error)
     }
   })
 
-  return downloadedRecord as ValidRecord
+  return downloadedRecord
 }

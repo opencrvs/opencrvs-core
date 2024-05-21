@@ -20,7 +20,10 @@ import {
 } from '@opencrvs/commons/types'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getEventType } from '@workflow/features/registration/utils'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerOfficeId
+} from '@workflow/features/user/utils'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
@@ -54,6 +57,7 @@ export const makeCorrectionRoute = createRoute({
       )
     }
     const practitioner = await getLoggedInPractitionerResource(token)
+    const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
 
     const recordInputWithUploadedAttachments =
       await uploadBase64AttachmentsToDocumentsStore(
@@ -72,6 +76,7 @@ export const makeCorrectionRoute = createRoute({
     const recordInCorrectedState = await toCorrected(
       record,
       practitioner,
+      practitionerOfficeId,
       correctionDetails,
       proofOfLegalCorrectionAttachments,
       paymentAttachmentUrl

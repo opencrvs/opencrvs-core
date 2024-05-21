@@ -4668,12 +4668,6 @@ export const dummyUser = {
   },
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  catchmentAreaIds: [
-    'b21ce04e-7ccd-4d65-929f-453bc193a736',
-    '95754572-ab6f-407b-b51a-1636cb3d0683',
-    '7719942b-16a7-474a-8af1-cd0c94c730d2',
-    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-  ],
   securityQuestionAnswers: [
     {
       questionKey: 'BIRTH_TOWN',
@@ -4693,13 +4687,6 @@ export const dummyUser = {
 }
 
 export const mockUserModelResponse = {
-  catchmentAreaIds: [
-    'c93cb3cf-38aa-4f07-b9a0-fe8b865a9fd9',
-    'd5ccd1d1-ca47-435b-93db-36c626ad2dfa',
-    '94429795-0a09-4de8-8e1e-27dab01877d2',
-    '1490d3dd-71a9-47e8-b143-f9fc64f71294',
-    '1490d3dd-71a9-47e8-b143-f9fc64f71294'
-  ],
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   _id: '5ddfdfec61f7c0d1aafe1961',

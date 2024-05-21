@@ -8,11 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { UUID } from '@opencrvs/commons'
 import User from '@user-mgnt/model/user'
+import { resolveLocationChildren } from '@user-mgnt/utils/location'
 
 export async function countUsersByLocation(
   systemRole: string,
-  locationId: string | undefined
+  locationId: UUID | undefined
 ) {
   // For the whole country
   if (!locationId) {
@@ -26,16 +28,26 @@ export async function countUsersByLocation(
     ])
     return resArray[0] ?? { registrars: 0 }
   }
+
+  const locationChildren = await resolveLocationChildren(locationId)
+
   const resArray = await User.aggregate([
     {
       $match: {
-        catchmentAreaIds: locationId,
+        primaryOfficeId: { $in: locationChildren },
         systemRole
       }
     },
-    { $unwind: '$catchmentAreaIds' },
-    { $group: { _id: '$catchmentAreaIds', registrars: { $sum: 1 } } },
-    { $match: { _id: locationId } }
+    {
+      $group: { _id: '$primaryOfficeId', registrars: { $addToSet: '$_id' } }
+    },
+    {
+      $project: {
+        _id: 0,
+        registrars: { $size: '$registrars' } // Count the number of unique user ids collected in registrars
+      }
+    }
   ])
+
   return resArray[0] ?? { registrars: 0 }
 }

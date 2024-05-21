@@ -68,7 +68,9 @@ export async function fetchParentLocationByLocationID(
   authHeader: IAuthHeader
 ) {
   const location = await fetchFHIR(locationID, authHeader)
-  return location && location.partOf && location.partOf.reference
+  return (location && location.partOf && location.partOf.reference) as
+    | string
+    | undefined
 }
 
 export async function fetchTaskIdByCompositionID(

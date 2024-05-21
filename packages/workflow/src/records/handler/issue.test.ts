@@ -17,9 +17,9 @@ import {
   getStatusFromTask,
   getTaskFromSavedBundle,
   URLReference,
-  IssuedRecord
+  IssuedRecord,
+  TransactionResponse
 } from '@opencrvs/commons/types'
-import { TransactionResponse } from '@workflow/records/fhir'
 import { CERTIFIED_BIRTH_RECORD } from '@test/mocks/records/certify'
 
 describe('Issue record endpoint', () => {

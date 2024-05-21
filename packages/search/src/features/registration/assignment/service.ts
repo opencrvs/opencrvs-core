@@ -20,7 +20,11 @@ import { findName, findTaskExtension } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { getTokenPayload, ITokenPayload } from '@search/utils/authUtils'
 import { client } from '@search/elasticsearch/client'
-import { getTaskFromSavedBundle, SavedBundle } from '@opencrvs/commons/types'
+import {
+  findLastOfficeFromSavedBundle,
+  getTaskFromSavedBundle,
+  SavedBundle
+} from '@opencrvs/commons/types'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as SavedBundle
@@ -41,19 +45,12 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
-  const regLastOfficeIdentifier = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastOffice'
-  )
+  const regLastOffice = findLastOfficeFromSavedBundle(bundle)
 
   const body: ICompositionBody = {}
   body.modifiedAt = Date.now().toString()
   body.assignment = {} as IAssignment
-  body.assignment.officeName =
-    (regLastOfficeIdentifier &&
-      regLastOfficeIdentifier.valueString &&
-      regLastOfficeIdentifier.valueString) ||
-    ''
+  body.assignment.officeName = regLastOffice?.name ?? ''
   body.assignment.userId = userId
   body.updatedBy =
     regLastUserIdentifier &&

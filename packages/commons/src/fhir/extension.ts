@@ -131,10 +131,6 @@ export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/regLastOffice': {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'
     valueReference: { reference: ResourceIdentifier<Location> }
-    /**
-     * Human readable office name
-     */
-    valueString?: string
   }
 }
 
@@ -216,12 +212,6 @@ export type KnownExtensionType = StringExtensionType & {
   }
   'http://opencrvs.org/specs/extension/regUnassigned': {
     url: 'http://opencrvs.org/specs/extension/regUnassigned'
-  }
-  'http://opencrvs.org/specs/extension/regLastLocation': {
-    url: 'http://opencrvs.org/specs/extension/regLastLocation'
-    valueReference: {
-      reference: ResourceIdentifier<Location>
-    }
   }
   'http://opencrvs.org/specs/extension/part-of': {
     url: 'http://opencrvs.org/specs/extension/part-of'

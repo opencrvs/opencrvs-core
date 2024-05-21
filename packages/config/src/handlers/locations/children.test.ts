@@ -14,14 +14,20 @@ import * as fixtures from '@opencrvs/commons/fixtures'
 
 describe('resolveLocationChildren', () => {
   test('empty locations', () => {
-    const result = resolveLocationChildren('anyUUID' as UUID, [])
+    const uuid1 = fixtures.savedLocation({
+      id: 'uuid1' as UUID,
+      partOf: undefined
+    })
+    const result = resolveLocationChildren(uuid1, [])
     expect(result).toEqual([])
   })
 
   test('parent with no children', () => {
-    const result = resolveLocationChildren('uuid1' as UUID, [
-      fixtures.savedLocation({ id: 'uuid1' as UUID, partOf: undefined })
-    ])
+    const uuid1 = fixtures.savedLocation({
+      id: 'uuid1' as UUID,
+      partOf: undefined
+    })
+    const result = resolveLocationChildren(uuid1, [uuid1])
     expect(result).toEqual([])
   })
 
@@ -34,7 +40,7 @@ describe('resolveLocationChildren', () => {
       id: 'uuid2' as UUID,
       partOf: { reference: 'Location/uuid1' }
     })
-    const result = resolveLocationChildren('uuid1' as UUID, [uuid1, uuid2])
+    const result = resolveLocationChildren(uuid1, [uuid1, uuid2])
 
     expect(result).toContainEqual(uuid2)
     expect(result).toHaveLength(1)
@@ -54,11 +60,7 @@ describe('resolveLocationChildren', () => {
       partOf: { reference: 'Location/uuid2' }
     })
 
-    const result = resolveLocationChildren('uuid1' as UUID, [
-      uuid1,
-      uuid2,
-      uuid3
-    ])
+    const result = resolveLocationChildren(uuid1, [uuid1, uuid2, uuid3])
     expect(result).toEqual([uuid2, uuid3])
   })
 })

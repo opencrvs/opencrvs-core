@@ -18,6 +18,8 @@
 
 - #### Remove unused GraphQL resolvers locationById and locationsByParent
 
+- #### Remove unused GraphQL type `user.catchmentArea` in favor of `user.primaryOffice`
+
 - #### Move default address generation to country-config
 
   We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
@@ -44,7 +46,6 @@
 - Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
-
 
 ## Refactor
 

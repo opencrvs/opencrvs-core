@@ -62,7 +62,6 @@ interface User {
   role?: string
   email?: string
   primaryOffice?: string
-  catchmentArea?: Array<string | null>
   device?: string
   signature?: Signature
 }

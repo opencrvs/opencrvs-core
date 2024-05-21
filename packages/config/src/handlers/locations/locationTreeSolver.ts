@@ -14,6 +14,7 @@ import {
   SavedLocation
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+import { find } from 'lodash'
 
 /**
  * Creates a new Map<SavedLocation.partOf, SavedLocation[]>
@@ -39,12 +40,12 @@ const resolveParentChildrenMap = (locations: SavedLocation[]) => {
 }
 /** Resolves any given location's children multi-level down to the leaf node */
 export const resolveLocationChildren = (
-  parentId: UUID,
+  location: SavedLocation,
   locations: SavedLocation[]
 ) => {
   const parentChildrenMap = resolveParentChildrenMap(locations)
   const children: SavedLocation[] = []
-  const stack = parentChildrenMap.get(parentId) ?? []
+  const stack = parentChildrenMap.get(location.id) ?? []
 
   while (stack.length) {
     const child = stack.pop()!
@@ -59,18 +60,17 @@ export const resolveLocationChildren = (
 
 /** Resolves any given location's parents multi-level up to the root node */
 export const resolveLocationParents = (
-  childId: UUID,
+  location: SavedLocation,
   locations: SavedLocation[]
-) => {
-  let location = locations.find((location) => location.id === childId)!
-  const hierarchy = [location]
-  let parentLocationId =
-    location.partOf && resourceIdentifierToUUID(location.partOf?.reference)
-  while (parentLocationId && parentLocationId !== '0') {
-    location = locations.find((location) => location.id === parentLocationId)!
-    hierarchy.push(location)
-    parentLocationId =
-      location.partOf && resourceIdentifierToUUID(location.partOf.reference)
+): SavedLocation[] => {
+  const parent =
+    location.partOf &&
+    find(locations, {
+      id: resourceIdentifierToUUID(location.partOf.reference)
+    })
+
+  if (!parent) {
+    return []
   }
-  return hierarchy.reverse()
+  return [...resolveLocationParents(parent, locations), parent]
 }

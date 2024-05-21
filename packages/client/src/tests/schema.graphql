@@ -1359,7 +1359,6 @@ type Query {
     status: String
     systemRole: String
     primaryOfficeId: String
-    locationId: String
     count: Int
     skip: Int
     sort: String
@@ -1919,7 +1918,6 @@ type User {
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -1980,7 +1978,6 @@ input UserInput {
   role: String
   email: String
   primaryOffice: String
-  catchmentArea: [String]
   device: String
   signature: SignatureInput
 }
