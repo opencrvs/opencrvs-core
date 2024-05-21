@@ -58,7 +58,7 @@ type Props = BaseProps &
   RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
   WrappedComponentProps
 
-class PhoneNumberVerificationComponent extends React.Component<Props, State> {
+class AuthDetailsVerificationComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -299,8 +299,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
   }
 }
 
-export const PhoneNumberVerification = connect(null, {
+export const AuthDetailsVerification = connect(null, {
   goToForgottenItemForm,
   goToRecoveryCodeEntryForm,
   goToSecurityQuestionForm
-})(withRouter(injectIntl(PhoneNumberVerificationComponent)))
+})(withRouter(injectIntl(AuthDetailsVerificationComponent)))

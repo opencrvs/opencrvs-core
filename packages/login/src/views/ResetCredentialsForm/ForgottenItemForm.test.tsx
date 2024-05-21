@@ -11,7 +11,7 @@
 import { createTestComponent, wait } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { ForgottenItem } from './forgottenItemForm'
+import { ForgottenItem } from './ForgottenItemForm'
 
 describe('Test forgotten item form', () => {
   let component: ReactWrapper

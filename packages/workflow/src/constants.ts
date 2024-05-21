@@ -13,7 +13,7 @@ export const PORT = process.env.PORT || 5050
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 export const APPLICATION_CONFIG_URL =
   process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
-export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false
+
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 

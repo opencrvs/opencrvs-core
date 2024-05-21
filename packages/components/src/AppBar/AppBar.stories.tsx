@@ -12,14 +12,7 @@ import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AppBar } from './AppBar'
 import { Button } from '../Button'
-import {
-  Hamburger,
-  DeclarationIcon,
-  SearchBlue,
-  Phone,
-  BRN,
-  TrackingID
-} from '../icons'
+import { Hamburger, DeclarationIcon } from '../icons'
 import { Stack } from '../Stack'
 import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
