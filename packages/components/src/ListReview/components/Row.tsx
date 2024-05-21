@@ -12,7 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 export const RowContainer = styled.tr`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
 
   td {
     padding: 14px 0;
