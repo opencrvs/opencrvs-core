@@ -653,7 +653,7 @@ export const validIDNumber =
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
-    const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
+    const valueToCheck = _.get(drafts, fieldToDuplicateCheck.split('.'))
     if (value && valueToCheck && value === valueToCheck) {
       return {
         message: messages.duplicateNationalID
