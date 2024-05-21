@@ -1239,7 +1239,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionData: IFormSectionData,
     originalSectionData?: IFormSectionData
   ) {
-    if (!originalSectionData) return false
+    if (!originalSectionData) {
+      const isCustomSection = sectionData && sectionData[field.name]
+      if (isCustomSection) {
+        this.hasChangesBeenMade = true
+        return true
+      }
+      return false
+    }
     if (
       sectionData[field.name] &&
       (sectionData[field.name] as IFormData).value
