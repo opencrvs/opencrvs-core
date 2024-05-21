@@ -564,28 +564,28 @@ export const renderValue = (
 
 export function hasFieldChanged(
   field: IFormField,
-  data: IFormSectionData,
-  originalData?: IFormSectionData
+  sectionData: IFormSectionData,
+  originalSectionData?: IFormSectionData
 ) {
-  if (!originalData) return false
-  if (data[field.name] && (data[field.name] as IFormData).value) {
+  if (!originalSectionData) return false
+  if (sectionData[field.name] && (sectionData[field.name] as IFormData).value) {
     return hasNestedDataChanged(
-      data[field.name] as IFormData,
-      originalData[field.name] as IFormData
+      sectionData[field.name] as IFormData,
+      originalSectionData[field.name] as IFormData
     )
   }
   /*
    * data section might have some values as empty string
    * whereas original data section have them as undefined
    */
-  if (!originalData[field.name] && data[field.name] === '') {
+  if (!originalSectionData[field.name] && sectionData[field.name] === '') {
     return false
   }
 
-  if (Array.isArray(data[field.name])) {
-    return !isEqual(data[field.name], originalData[field.name])
+  if (Array.isArray(sectionData[field.name])) {
+    return !isEqual(sectionData[field.name], originalSectionData[field.name])
   }
-  return data[field.name] !== originalData[field.name]
+  return sectionData[field.name] !== originalSectionData[field.name]
 }
 
 function hasNestedDataChanged(
