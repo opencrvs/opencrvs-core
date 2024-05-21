@@ -58,7 +58,7 @@ export {
   Star,
   Target,
   TextT,
-  TrashSimple,
+  Trash,
   UploadSimple,
   User,
   UserPlus,
