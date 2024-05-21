@@ -1103,6 +1103,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             intl.formatMessage(activeSection.title))
                         }
                         showTitleOnMobile={true}
+                        bottomActionDirection="column"
                         bottomActionButtons={
                           [
                             nextSectionGroup && (
