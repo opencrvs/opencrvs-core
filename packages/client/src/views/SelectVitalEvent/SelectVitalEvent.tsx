@@ -122,7 +122,6 @@ class SelectVitalEventView extends React.Component<
               onClick={this.handleContinue}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
-              <Icon name="ArrowRight" />
             </Button>
           ]}
         >

@@ -154,6 +154,7 @@ class IDVerifierComponent extends React.Component<
           title={this.props.title}
           size={ContentSize.SMALL}
           showTitleOnMobile
+          bottomActionDirection="column"
           bottomActionButtons={[
             <Button
               key="verifyNegative"

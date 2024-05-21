@@ -205,7 +205,7 @@ export const UnstyledContent = ({
   subtitle,
   children,
   bottomActionButtons,
-  bottomActionDirection = 'column',
+  bottomActionDirection = 'row',
   size = ContentSize.NORMAL,
   className
 }: IProps) => (
