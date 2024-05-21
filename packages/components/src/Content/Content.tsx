@@ -15,12 +15,12 @@ import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
 import { BackArrow } from '../icons'
 
-const Container = styled.div<{ size: string }>`
+const Container = styled.div<{ size: ContentSize }>`
   position: relative;
   border-radius: 4px;
   box-sizing: border-box;
   margin: 24px auto;
-  max-width: ${({ size = 'normal' }) => {
+  max-width: ${({ size }) => {
     switch (size) {
       case 'large':
         return '1140px'
@@ -120,11 +120,11 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   }
 `
 const BottomActionBar = styled.div<{
-  bottomActionDirection?: 'row'
+  bottomActionDirection: 'row' | 'column'
 }>`
   width: 100%;
   display: flex;
-  flex-direction: ${(props) => props.bottomActionDirection || 'column'};
+  flex-direction: ${(props) => props.bottomActionDirection};
   gap: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column;
@@ -186,7 +186,7 @@ interface IProps {
   subtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
-  bottomActionDirection?: 'row'
+  bottomActionDirection?: 'row' | 'column'
   size?: ContentSize
   className?: string
 }
@@ -205,11 +205,11 @@ export const UnstyledContent = ({
   subtitle,
   children,
   bottomActionButtons,
-  bottomActionDirection,
-  size,
+  bottomActionDirection = 'column',
+  size = ContentSize.NORMAL,
   className
 }: IProps) => (
-  <Container size={size as string} className={className}>
+  <Container size={size} className={className}>
     <Header>
       {backButtonLabel && (
         <BackButtonContainer>
