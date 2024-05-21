@@ -102,7 +102,7 @@ function analyticsDataRefreshingRoute<
   // Consider triggering this a task that will be left to be run in the background.
   return (request: Request, response: Response) => {
     if (!PRODUCTION || QA_ENV) {
-      refresh(request.headers.authorization)
+      refresh()
     }
     return handler(request, response)
   }
