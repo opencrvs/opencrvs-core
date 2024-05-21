@@ -63,7 +63,7 @@ const DropDownWrapper = styled.ul`
   padding: 4px;
   top: 100%;
   left: 0px;
-  margin-top: 4px;
+  margin-top: 8px;
   overflow-y: auto;
 `
 const DropDownItem = styled.li`
