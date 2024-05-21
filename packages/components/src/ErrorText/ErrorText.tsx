@@ -21,16 +21,16 @@ interface IErrorTextProps {
 const Container = styled.div`
   flex-direction: row;
   display: flex;
+  gap: 4px;
   align-items: center;
-  margin-top: -20px;
-  margin-bottom: 4px;
+  padding: 0px 8px 8px 4px;
 `
 
 export function ErrorText(props: IErrorTextProps) {
   return (
     <Container id={props.id}>
       <Warning />
-      <Text variant="bold16" element="p" color="negative">
+      <Text variant="bold16" element="span" color="negative">
         {props.children}
       </Text>
     </Container>

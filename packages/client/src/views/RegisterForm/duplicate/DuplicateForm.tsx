@@ -98,6 +98,7 @@ export const DuplicateForm = (props: IProps) => {
     <Button
       id="not-a-duplicate"
       key="btn-not-a-duplicate"
+      fullWidth
       onClick={() => {
         toggleNotDuplicateModal()
       }}
@@ -112,6 +113,7 @@ export const DuplicateForm = (props: IProps) => {
     <Button
       id="mark-as-duplicate"
       key="btn-mark-as-duplicate"
+      fullWidth
       onClick={() => {
         toggleModal()
       }}
@@ -136,6 +138,7 @@ export const DuplicateForm = (props: IProps) => {
             }
           )}
           bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+          bottomActionDirection="row"
         ></SubPageContent>
       </div>
 

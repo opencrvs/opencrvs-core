@@ -11,7 +11,7 @@
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -114,6 +114,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
         >
           <form id="forgotten-item-form" onSubmit={this.handleContinue}>
             <Content
+              size={ContentSize.SMALL}
               title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
               bottomActionButtons={[
                 <Button
@@ -122,6 +123,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
                   onClick={this.handleContinue}
                   type="primary"
                   size="large"
+                  fullWidth
                 >
                   {intl.formatMessage(messages.continueButtonLabel)}
                 </Button>

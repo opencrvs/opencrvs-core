@@ -19,7 +19,7 @@ import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -58,7 +58,7 @@ type Props = BaseProps &
   RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
   WrappedComponentProps
 
-class PhoneNumberVerificationComponent extends React.Component<Props, State> {
+class AuthDetailsVerificationComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -213,6 +213,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
             onSubmit={this.handleContinue}
           >
             <Content
+              size={ContentSize.SMALL}
               title={
                 notificationMethod === 'sms'
                   ? intl.formatMessage(
@@ -298,8 +299,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
   }
 }
 
-export const PhoneNumberVerification = connect(null, {
+export const AuthDetailsVerification = connect(null, {
   goToForgottenItemForm,
   goToRecoveryCodeEntryForm,
   goToSecurityQuestionForm
-})(withRouter(injectIntl(PhoneNumberVerificationComponent)))
+})(withRouter(injectIntl(AuthDetailsVerificationComponent)))

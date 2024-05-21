@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 
-const Wrapper = styled.div`
+const Label = styled.label<{ disabled?: boolean }>`
   list-style-type: none;
   display: flex;
   flex-direction: row;
@@ -20,27 +20,18 @@ const Wrapper = styled.div`
   border-radius: 4px;
   width: 100%;
   padding: 8px 8px;
-  align-items: flex-start;
-
+  align-items: center;
+  isolation: isolate;
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
+  ${({ theme }) => theme.fonts.h4};
+  cursor: pointer;
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
   }
-`
-
-const Label = styled.label<{
-  size?: string
-  disabled?: boolean
-  hasFlexDirection?: boolean
-}>`
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
-  cursor: pointer;
-  align-self: center;
-  ${({ theme }) => theme.fonts.h4};
-  ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
 `
 
 const Radio = styled.span<{
@@ -84,8 +75,8 @@ const Radio = styled.span<{
       size === 'large'
         ? `height: 38px;
     width: 38px;`
-        : ` height: 14px;
-    width: 14px;`}
+        : ` height: 20px;
+    width: 20px;`}
   }
   svg {
     position: absolute;
@@ -98,7 +89,7 @@ const Radio = styled.span<{
 
 const Input = styled.input`
   position: absolute;
-  width: 100%;
+  margin: 0;
   height: 40px;
   opacity: 0;
   z-index: 2;
@@ -106,29 +97,27 @@ const Input = styled.input`
 
   &:active ~ ${Radio} {
     &::after {
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }
   }
 
   &:checked ~ ${Radio} {
     &::after {
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
     }
   }
 
   &:focus ~ ${Radio} {
     &::after {
       box-sizing: content-box;
-      border: 2px solid ${({ theme }) => theme.colors.grey600};
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(20.5px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }
   }
 `
@@ -143,7 +132,6 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
-  hasFlexDirection?: boolean
 
   onChange?: (value: Value) => void
 }
@@ -156,8 +144,7 @@ export const RadioButton = ({
   value,
   size,
   disabled,
-  onChange,
-  hasFlexDirection
+  onChange
 }: IRadioButton) => {
   const handleChange = () => {
     if (onChange) {
@@ -165,7 +152,7 @@ export const RadioButton = ({
     }
   }
   return (
-    <Wrapper>
+    <Label disabled={disabled} htmlFor={id}>
       <Input
         id={id}
         size={size === 'large' ? 40 : 16}
@@ -196,13 +183,7 @@ export const RadioButton = ({
           )
         ) : null}
       </Radio>
-      <Label
-        disabled={disabled}
-        htmlFor={id}
-        hasFlexDirection={hasFlexDirection}
-      >
-        {label}
-      </Label>
-    </Wrapper>
+      {label}
+    </Label>
   )
 }

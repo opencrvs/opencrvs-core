@@ -10,14 +10,8 @@
  */
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -27,7 +21,8 @@ import {
   formatPlainDate,
   isValidPlainDate
 } from '@client/utils/date-formatting'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
 import { identityNameMapper } from '@client/forms/certificate/fieldDefinitions/messages'
 
 interface IVerifierActionProps {
@@ -155,32 +150,35 @@ const IDVerifierComponent = ({
   const { positiveAction, negativeAction } = actionProps
 
   const positiveActionButton = (
-    <SuccessButton
+    <Button
       id="verifyPositive"
       key="verifyPositive"
+      type="positive"
+      size="large"
       onClick={positiveAction.handler}
-      icon={() => <Check />}
-      align={ICON_ALIGNMENT.LEFT}
     >
+      <Icon name="Check" />
       {positiveAction.label}
-    </SuccessButton>
+    </Button>
   )
 
   const negativeActionButton = (
-    <DangerButton
+    <Button
       id="verifyNegative"
       key="verifyNegative"
+      type="negative"
+      size="large"
       onClick={togglePrompt}
-      icon={() => <Cross color="currentColor" />}
-      align={ICON_ALIGNMENT.LEFT}
     >
+      <Icon name="X" />
       {negativeAction.label}
-    </DangerButton>
+    </Button>
   )
 
   return (
     <div id={id}>
       <Content
+        size={ContentSize.SMALL}
         title={title}
         showTitleOnMobile={true}
         bottomActionButtons={[positiveActionButton, negativeActionButton]}

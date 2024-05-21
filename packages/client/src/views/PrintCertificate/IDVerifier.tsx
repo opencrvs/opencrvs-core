@@ -10,15 +10,10 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -68,19 +63,6 @@ interface IIDVerifierProps {
   collectorInformation: ICollectorInfo
   actionProps: IVerifierActionProps
 }
-
-const ActionContainer = styled.div`
-  flex-flow: row wrap;
-  margin-top: 24px;
-
-  & > button {
-    margin: 0 8px 8px 0;
-  }
-
-  & > button:last-child {
-    margin-right: 0;
-  }
-`
 
 interface IIDVerifierState {
   showPrompt: boolean
@@ -168,26 +150,36 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <div id={id}>
-        <Content title={this.props.title} showTitleOnMobile>
-          <Container>{this.renderLabelValue()}</Container>
-          <ActionContainer>
-            <SuccessButton
-              id="verifyPositive"
-              onClick={positiveAction.handler}
-              icon={() => <Check />}
-              align={ICON_ALIGNMENT.LEFT}
-            >
-              {positiveAction.label}
-            </SuccessButton>
-            <DangerButton
+        <Content
+          title={this.props.title}
+          size={ContentSize.SMALL}
+          showTitleOnMobile
+          bottomActionButtons={[
+            <Button
+              key="verifyNegative"
               id="verifyNegative"
+              type="negative"
+              size="large"
+              fullWidth
               onClick={this.togglePrompt}
-              icon={() => <Cross color="currentColor" />}
-              align={ICON_ALIGNMENT.LEFT}
             >
+              <Icon name="X" size="large" />
               {negativeAction.label}
-            </DangerButton>
-          </ActionContainer>
+            </Button>,
+            <Button
+              key="verifyPositive"
+              id="verifyPositive"
+              type="positive"
+              size="large"
+              fullWidth
+              onClick={positiveAction.handler}
+            >
+              <Icon name="Check" size="large" />
+              {positiveAction.label}
+            </Button>
+          ]}
+        >
+          <Container>{this.renderLabelValue()}</Container>
         </Content>
 
         <ResponsiveModal

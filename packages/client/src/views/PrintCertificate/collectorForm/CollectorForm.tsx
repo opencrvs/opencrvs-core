@@ -10,7 +10,8 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
 
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -369,7 +370,31 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             title={
               (formGroup.title && intl.formatMessage(formGroup.title)) || ''
             }
+            size={ContentSize.SMALL}
             showTitleOnMobile
+            bottomActionButtons={[
+              <Button
+                key="confirm_form"
+                id="confirm_form"
+                type="primary"
+                size="large"
+                fullWidth
+                onClick={() => {
+                  this.continueButtonHandler(
+                    declarationToBeCertified.id,
+                    formGroup.id,
+                    nextSectionGroup ? nextSectionGroup.groupId : undefined,
+                    event,
+                    formSection.id,
+                    formGroup.fields,
+                    declarationToBeCertified
+                  )
+                }}
+                disabled={this.state.isFileUploading}
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </Button>
+            ]}
           >
             {showError && (
               <ErrorWrapper>
@@ -395,23 +420,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               draftData={declarationToBeCertified.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
             />
-            <PrimaryButton
-              id="confirm_form"
-              onClick={() => {
-                this.continueButtonHandler(
-                  declarationToBeCertified.id,
-                  formGroup.id,
-                  nextSectionGroup ? nextSectionGroup.groupId : undefined,
-                  event,
-                  formSection.id,
-                  formGroup.fields,
-                  declarationToBeCertified
-                )
-              }}
-              disabled={this.state.isFileUploading}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
           </Content>
         </ActionPageLight>
         {showModalForNoSignedAffidavit && (
