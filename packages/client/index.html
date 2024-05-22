@@ -50,7 +50,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
         align-items: center;
         justify-content: center;
         opacity: 0;
-        animation: progressVisibility 2s forwards;
+        animation: fadeIn 2s forwards;
+        font-family: sans-serif;
       }
       .progress-bar {
         width: 276px;
@@ -62,32 +63,33 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       #progress {
         width: 0;
         height: 8px;
-        gap: 0px;
         border-radius: 100px;
         background: #4972bb;
-        animation: progressAnimation 300s ease;
+        animation: progressAnimation 200s ease-out forwards;
       }
       @keyframes progressAnimation {
-        0% {
-          min-width: 10%;
-        }
+        0%,
         1% {
-          min-width: 20%;
+          min-width: 0%;
         }
-        2% {
-          min-width: 40%;
-        }
-        10% {
-          min-width: 60%;
-        }
-        50% {
+        3% {
           min-width: 80%;
         }
+        6% {
+          min-width: 91%;
+        }
+        10% {
+          min-width: 94%;
+        }
+        30% {
+          min-width: 96%;
+        }
         100% {
-          min-width: 90%;
+          min-width: 99%;
         }
       }
-      @keyframes progressVisibility {
+      @keyframes fadeIn {
+        0%,
         85% {
           opacity: 0;
         }
@@ -101,7 +103,12 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <div id="root">
       <div class="progress-container">
-        <img src="./public/images/logo-90x90.svg" />
+        <img
+          src="./images/logo-90x90.svg"
+          width="90"
+          height="90"
+          alt="OpenCRVS logo"
+        />
         <div class="progress-bar">
           <div id="progress"></div>
         </div>

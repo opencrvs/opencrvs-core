@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Text } from '@opencrvs/components'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
 
@@ -47,16 +48,19 @@ const Progress = styled.div`
   background: ${({ theme }) => theme.colors.blueDark};
   animation: ${ProgressAnimation} 300s ease;
 `
-const LoadingText = styled.p``
-
-export const LoadingBar = () => {
-  return (
-    <ProgressBackground>
-      <img src="images/logo-90x90.svg" alt="logo" />
-      <ProgressBar id="appSpinner">
-        <Progress id="progress" />
-      </ProgressBar>
-      <LoadingText>Loading records...</LoadingText>
-    </ProgressBackground>
-  )
-}
+export const LoadingBar = () => (
+  <ProgressBackground>
+    <img
+      src="images/logo-90x90.svg"
+      alt="OpenCRVS Logo"
+      width={90}
+      height={90}
+    />
+    <ProgressBar id="appSpinner">
+      <Progress id="progress" />
+    </ProgressBar>
+    <Text variant="reg16" element="p">
+      Loading records...
+    </Text>
+  </ProgressBackground>
+)
