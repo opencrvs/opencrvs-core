@@ -10,7 +10,7 @@
  */
 import * as mongoose from 'mongoose'
 import { start, stop } from '@config/config/database'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 
 jest.mock('mongoose', () => ({
   connection: {

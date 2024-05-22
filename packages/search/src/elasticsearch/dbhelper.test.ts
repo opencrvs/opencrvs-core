@@ -14,7 +14,7 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import { client } from '@search/elasticsearch/client'

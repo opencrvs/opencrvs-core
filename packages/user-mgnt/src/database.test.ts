@@ -18,7 +18,7 @@ jest.mock('mongoose', () => ({
 
 import * as mongoose from 'mongoose'
 import { start, stop } from '@user-mgnt/database'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 
 const wait = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time))
