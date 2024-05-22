@@ -13,7 +13,12 @@ export const logger =
   process.env.NODE_ENV === 'production'
     ? pino()
     : pino({
-        prettyPrint: true
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true
+          }
+        }
       })
 
 const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
