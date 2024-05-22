@@ -8,22 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, Story } from '@storybook/react'
-import { EyeOff, EyeOn } from '../icons'
-import { PasswordInput, IPasswordInputProps } from './PasswordInput'
+
 import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { PasswordInput, PasswordInputProps } from './PasswordInput'
 
 export default {
-  title: 'Input/Password input',
-  component: PasswordInput
+  title: 'Input/PasswordInput',
+  component: PasswordInput,
+  argTypes: {}
 } as Meta
 
-const Template: Story<IPasswordInputProps> = (args) => (
+const Template: Story<PasswordInputProps> = (args) => (
   <PasswordInput {...args} />
 )
 
-export const PasswordInputView = Template.bind({})
-PasswordInputView.args = {
-  showIcon: <EyeOn />,
-  hideIcon: <EyeOff />
-}
+export const Default = Template.bind({})
+Default.args = {}

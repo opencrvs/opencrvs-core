@@ -1093,7 +1093,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
-                        size={ContentSize.NORMAL}
+                        size={ContentSize.SMALL}
                         key={activeSectionGroup.id}
                         id="register_form"
                         title={
@@ -1111,6 +1111,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 key="next_section"
                                 type="primary"
                                 size="large"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
@@ -1134,6 +1135,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 type="secondary"
                                 size="large"
                                 className="item"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,

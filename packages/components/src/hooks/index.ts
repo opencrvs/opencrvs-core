@@ -8,16 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { TextArea } from './TextArea'
-
-export default {
-  title: 'Input/Text area',
-  component: TextArea
-} as Meta
-
-const Template: Story = (args) => <TextArea {...args} />
-
-export const TextAreaView = Template.bind({})
-TextAreaView.args = {}
+export * from './useWindowSize'

@@ -30,17 +30,8 @@ interface IState {
 
 const Container = styled.div`
   width: 100%;
-`
-const Segment = styled(TextInput)`
-  width: 58px !important;
-  margin: 0 4px;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
-  &:last-of-type {
-    margin-right: 0;
-  }
+  display: flex;
+  gap: 16px;
 `
 
 export type ITimeFieldProps = IProps &
@@ -148,7 +139,7 @@ export function TimeField(props: ITimeFieldProps) {
 
   return (
     <Container id={id}>
-      <Segment
+      <TextInput
         {...otherProps}
         id={`${id}-hh`}
         ref={hh}
@@ -167,7 +158,7 @@ export function TimeField(props: ITimeFieldProps) {
           event.currentTarget.blur()
         }}
       />
-      <Segment
+      <TextInput
         {...otherProps}
         id={`${id}-mm`}
         ref={mm}
