@@ -11,7 +11,7 @@
 import {
   detectBirthDuplicates,
   createStatusHistory,
-  IBirthCompositionBody
+  BirthDocument
 } from '@search/elasticsearch/utils'
 import {
   mockSearchResponse,
@@ -98,7 +98,7 @@ describe('elastic search utils', () => {
       JSON.stringify(mockUserModelResponse),
       { status: 200 }
     ])
-    const compositionBody: IBirthCompositionBody = {
+    const compositionBody: BirthDocument = {
       ...mockCompositionBody,
       type: 'REQUESTED_CORRECTION',
       operationHistories: [

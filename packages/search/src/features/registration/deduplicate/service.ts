@@ -14,9 +14,9 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
-  IBirthCompositionBody,
-  ICompositionBody,
-  IDeathCompositionBody
+  BirthDocument,
+  SearchDocument,
+  DeathDocument
 } from '@search/elasticsearch/utils'
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
@@ -45,7 +45,7 @@ export const removeDuplicate = async (
   const body = get(
     composition,
     'body.hits.hits[0]._source'
-  ) as unknown as ICompositionBody
+  ) as unknown as SearchDocument
   body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body, client)
 }
@@ -59,7 +59,7 @@ const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
 }
 
 export const searchForBirthDuplicates = async (
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   client: elasticsearch.Client
 ) => {
   // Names of length of 3 or less characters = 0 edits allowed
@@ -145,7 +145,7 @@ export const searchForBirthDuplicates = async (
   }
 
   try {
-    const result = await client.search<ISearchResponse<IBirthCompositionBody>>({
+    const result = await client.search<ISearchResponse<BirthDocument>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
@@ -236,7 +236,7 @@ export const searchForBirthDuplicates = async (
 }
 
 export const searchForDeathDuplicates = async (
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   client: elasticsearch.Client
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
@@ -249,7 +249,7 @@ export const searchForDeathDuplicates = async (
   }
 
   try {
-    const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
+    const result = await client.search<ISearchResponse<DeathDocument>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {

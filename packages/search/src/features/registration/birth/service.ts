@@ -15,9 +15,7 @@ import {
 import {
   createStatusHistory,
   EVENT,
-  getCreatedBy,
-  getStatus,
-  IBirthCompositionBody,
+  BirthDocument,
   NAME_EN,
   IOperationHistory,
   REJECTED_STATUS
@@ -116,9 +114,8 @@ async function indexAndSearchComposition(
 }
 
 async function createIndexBody(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
-  authHeader: string,
   bundle: SavedBundle
 ) {
   createChildIndex(body, composition, bundle)
@@ -132,7 +129,7 @@ async function createIndexBody(
 }
 
 function createChildIndex(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -159,7 +156,7 @@ function createChildIndex(
 }
 
 function createMotherIndex(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -186,7 +183,7 @@ function createMotherIndex(
 }
 
 function createFatherIndex(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -213,7 +210,7 @@ function createFatherIndex(
 }
 
 function createInformantIndex(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -255,7 +252,7 @@ function createInformantIndex(
 }
 
 async function createDeclarationIndex(
-  body: IBirthCompositionBody,
+  body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {

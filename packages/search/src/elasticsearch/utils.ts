@@ -128,7 +128,7 @@ export interface IOperationHistory {
   correction?: ICorrection[]
 }
 
-export interface ICompositionBody {
+export interface SearchDocument {
   compositionId?: string
   compositionType?: string
   event?: EVENT
@@ -164,7 +164,7 @@ export interface ICompositionBody {
   operationHistories?: IOperationHistory[]
 }
 
-export interface IBirthCompositionBody extends ICompositionBody {
+export interface BirthDocument extends SearchDocument {
   childFirstNames?: string
   childMiddleName?: string
   childFamilyName?: string
@@ -200,7 +200,7 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantIdentifier?: string
 }
 
-export interface IDeathCompositionBody extends ICompositionBody {
+export interface DeathDocument extends SearchDocument {
   deceasedFirstNames?: string
   deceasedMiddleName?: string
   deceasedFamilyName?: string
@@ -239,7 +239,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantIdentifier?: string
 }
 
-export interface IMarriageCompositionBody extends ICompositionBody {
+export interface MarriageDocument extends SearchDocument {
   brideFirstNames?: string
   brideMiddleName?: string
   brideFamilyName?: string
@@ -288,7 +288,7 @@ export interface IUserModelData {
 
 export async function detectBirthDuplicates(
   compositionId: string,
-  body: IBirthCompositionBody
+  body: BirthDocument
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
   const duplicates = findDuplicateIds(searchResponse)
@@ -297,7 +297,7 @@ export async function detectBirthDuplicates(
 
 export async function detectDeathDuplicates(
   compositionId: string,
-  body: IDeathCompositionBody
+  body: DeathDocument
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
   const duplicates = findDuplicateIds(searchResponse)
@@ -306,18 +306,17 @@ export async function detectDeathDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
+  const result = results?.body?.hits?.hits[0]?._source as SearchDocument
   return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
   const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
+  const result = results?.body?.hits?.hits[0]?._source as SearchDocument
   return result?.operationHistories as IOperationHistory[]
 }
 
-export const createStatusHistory = async (
-  body: ICompositionBody,
+  body: SearchDocument,
   task: SavedTask,
   authHeader: string,
   bundle: SavedBundle
@@ -387,10 +386,7 @@ export const createStatusHistory = async (
   body.operationHistories.push(operationHistory)
 }
 
-function isDeclarationInStatus(
-  body: ICompositionBody,
-  status: string
-): boolean {
+function isDeclarationInStatus(body: SearchDocument, status: string): boolean {
   return (body.type && body.type === status) || false
 }
 
@@ -403,9 +399,7 @@ function isNotification(body: ICompositionBody): boolean {
 }
 
 export function findDuplicateIds(
-  results: ISearchResponse<
-    IBirthCompositionBody | IDeathCompositionBody
-  >['hits']['hits']
+  results: ISearchResponse<BirthDocument | DeathDocument>['hits']['hits']
 ) {
   return results
     .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
@@ -432,7 +426,7 @@ export async function getUser(
   return await res.json()
 }
 
-function getPreviousStatus(body: IBirthCompositionBody) {
+function getPreviousStatus(body: BirthDocument) {
   if (body.operationHistories && body.operationHistories.length > 0) {
     return body.operationHistories[body.operationHistories.length - 1]
       .operationType
@@ -441,7 +435,7 @@ function getPreviousStatus(body: IBirthCompositionBody) {
   return null
 }
 
-export function isValidOperationHistory(body: IBirthCompositionBody) {
+export function isValidOperationHistory(body: BirthDocument) {
   const previousStatus = getPreviousStatus(body)
   const currentStatus = body.type as keyof typeof validStatusMapping
 

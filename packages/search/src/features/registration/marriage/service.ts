@@ -15,10 +15,8 @@ import {
 import {
   createStatusHistory,
   EVENT,
-  getCreatedBy,
-  getStatus,
-  ICompositionBody,
-  IMarriageCompositionBody,
+  SearchDocument,
+  MarriageDocument,
   IOperationHistory,
   NAME_EN,
   REJECTED_STATUS
@@ -128,7 +126,7 @@ async function createIndexBody(
 }
 
 async function createBrideIndex(
-  body: IMarriageCompositionBody,
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -158,8 +156,8 @@ async function createBrideIndex(
   body.brideDoB = bride && bride.birthDate
 }
 
-async function createGroomIndex(
-  body: IMarriageCompositionBody,
+function createGroomIndex(
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -191,7 +189,7 @@ async function createGroomIndex(
 }
 
 function createWitnessOneIndex(
-  body: IMarriageCompositionBody,
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -228,7 +226,7 @@ function createWitnessOneIndex(
 }
 
 function createWitnessTwoIndex(
-  body: IMarriageCompositionBody,
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -263,8 +261,8 @@ function createWitnessTwoIndex(
     witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
 }
 
-async function createDeclarationIndex(
-  body: IMarriageCompositionBody,
+function createDeclarationIndex(
+  body: MarriageDocument,
   composition: fhir.Composition,
   bundle: SavedBundle
 ) {

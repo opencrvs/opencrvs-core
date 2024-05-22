@@ -10,13 +10,13 @@
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { ISearchResponse } from '@search/elasticsearch/client'
-import { ICompositionBody } from '@search/elasticsearch/utils'
+import { SearchDocument } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
-  body: ICompositionBody,
+  body: SearchDocument,
   client: elasticsearch.Client
 ) => {
   let response: any
@@ -36,7 +36,7 @@ export const indexComposition = async (
 
 export const updateComposition = async (
   id: string,
-  body: ICompositionBody,
+  body: SearchDocument,
   client: elasticsearch.Client
 ) => {
   let response: any
@@ -62,9 +62,8 @@ export const searchByCompositionId = async (
   client: elasticsearch.Client
 ) => {
   try {
-    return await client.search<ISearchResponse<any>>({
+    return await client.search<ISearchResponse<SearchDocument>>({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           match: {

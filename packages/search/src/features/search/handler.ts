@@ -15,10 +15,10 @@ import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
 import {
-  ICompositionBody,
+  SearchDocument,
   EVENT,
-  IBirthCompositionBody,
-  IDeathCompositionBody,
+  BirthDocument,
+  DeathDocument,
   findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
@@ -44,7 +44,7 @@ export async function searchAssignment(
     const results = await searchByCompositionId(payload.compositionId, client)
 
     const result = results?.body?.hits?.hits[0]?._source as
-      | ICompositionBody
+      | SearchDocument
       | undefined
     return h.response({ userId: result?.assignment?.userId }).code(200)
   } catch (error) {
@@ -211,7 +211,7 @@ export async function searchForBirthDeDuplication(
 ) {
   try {
     const result = await searchForBirthDuplicates(
-      request.payload as IBirthCompositionBody,
+      request.payload as BirthDocument,
       client
     )
     const duplicateIds = findDuplicateIds(result)
@@ -228,7 +228,7 @@ export async function searchForDeathDeDuplication(
 ) {
   try {
     const result = await searchForDeathDuplicates(
-      request.payload as IDeathCompositionBody,
+      request.payload as DeathDocument,
       client
     )
     const duplicateIds = findDuplicateIds(result)

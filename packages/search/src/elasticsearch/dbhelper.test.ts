@@ -15,7 +15,7 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
 import { logger } from '@search/logger'
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import { BirthDocument } from '@search/elasticsearch/utils'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import { client } from '@search/elasticsearch/client'
 
@@ -44,7 +44,7 @@ describe('elasticsearch db helper', () => {
     })
 
     it('should update a composition with proper configuration', async () => {
-      const body: IBirthCompositionBody = {
+      const body: BirthDocument = {
         childFirstNames: 'testValue'
       }
       updateSpy = jest.spyOn(client, 'update')

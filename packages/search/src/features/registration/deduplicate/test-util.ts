@@ -13,10 +13,7 @@ import {
   StartedElasticsearchContainer
 } from 'testcontainers'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
-import {
-  IBirthCompositionBody,
-  IDeathCompositionBody
-} from '@search/elasticsearch/utils'
+import { BirthDocument, DeathDocument } from '@search/elasticsearch/utils'
 import * as elasticsearch from '@elastic/elasticsearch'
 import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
 
@@ -47,16 +44,16 @@ type ComparisonObject<T> = {
 type Values<T> = T[keyof T]
 
 export async function compareForBirthDuplication(
-  registrationComparison: ComparisonObject<IBirthCompositionBody>,
+  registrationComparison: ComparisonObject<BirthDocument>,
   client: elasticsearch.Client
 ) {
   const existingComposition = Object.fromEntries(
-    Object.entries<Values<IBirthCompositionBody>[]>(registrationComparison).map(
+    Object.entries<Values<BirthDocument>[]>(registrationComparison).map(
       ([key, values]) => [key, values[0]]
     )
   )
   const newComposition = Object.fromEntries(
-    Object.entries<Values<IBirthCompositionBody>[]>(registrationComparison).map(
+    Object.entries<Values<BirthDocument>[]>(registrationComparison).map(
       ([key, values]) => [key, values[1]]
     )
   )
@@ -67,16 +64,16 @@ export async function compareForBirthDuplication(
 }
 
 export async function compareForDeathDuplication(
-  registrationComparison: ComparisonObject<IDeathCompositionBody>,
+  registrationComparison: ComparisonObject<DeathDocument>,
   client: elasticsearch.Client
 ) {
   const existingComposition = Object.fromEntries(
-    Object.entries<Values<IDeathCompositionBody>[]>(registrationComparison).map(
+    Object.entries<Values<DeathDocument>[]>(registrationComparison).map(
       ([key, values]) => [key, values[0]]
     )
   )
   const newComposition = Object.fromEntries(
-    Object.entries<Values<IDeathCompositionBody>[]>(registrationComparison).map(
+    Object.entries<Values<DeathDocument>[]>(registrationComparison).map(
       ([key, values]) => [key, values[1]]
     )
   )

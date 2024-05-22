@@ -15,10 +15,7 @@ import {
 import {
   createStatusHistory,
   EVENT,
-  getCreatedBy,
-  getStatus,
-  ICompositionBody,
-  IDeathCompositionBody,
+  DeathDocument,
   IOperationHistory,
   NAME_EN,
   REJECTED_STATUS
@@ -102,10 +99,9 @@ async function indexDeclaration(
   await indexComposition(compositionId, body, client)
 }
 
-async function createIndexBody(
-  body: IDeathCompositionBody,
+function createIndexBody(
+  body: DeathDocument,
   composition: SavedComposition,
-  authHeader: string,
   bundle: SavedBundle
 ) {
   await createDeceasedIndex(body, composition, bundle)
@@ -120,7 +116,7 @@ async function createIndexBody(
 }
 
 async function createDeceasedIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -149,7 +145,7 @@ async function createDeceasedIndex(
 }
 
 function createMotherIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -173,7 +169,7 @@ function createMotherIndex(
 }
 
 function createFatherIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -197,7 +193,7 @@ function createFatherIndex(
 }
 
 function createSpouseIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -221,7 +217,7 @@ function createSpouseIndex(
 }
 
 function createInformantIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -262,8 +258,8 @@ function createInformantIndex(
     informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
-async function createDeclarationIndex(
-  body: IDeathCompositionBody,
+function createDeclarationIndex(
+  body: DeathDocument,
   composition: fhir.Composition,
   bundle: SavedBundle
 ) {

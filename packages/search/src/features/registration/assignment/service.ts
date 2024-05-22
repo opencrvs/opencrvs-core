@@ -12,7 +12,7 @@ import { updateComposition } from '@search/elasticsearch/dbhelper'
 import {
   getUser,
   IAssignment,
-  ICompositionBody,
+  SearchDocument,
   IUserModelData,
   NAME_EN
 } from '@search/elasticsearch/utils'
@@ -47,7 +47,9 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   )
   const regLastOffice = findLastOfficeFromSavedBundle(bundle)
 
-  const body: ICompositionBody = {}
+  const body: SearchDocument = {
+    compositionId
+  }
   body.modifiedAt = Date.now().toString()
   body.assignment = {} as IAssignment
   body.assignment.officeName = regLastOffice?.name ?? ''
@@ -90,7 +92,7 @@ export async function updateEventToRemoveAssignment(
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
-  const body: ICompositionBody = {}
+  const body: SearchDocument = { compositionId }
   body.modifiedAt = Date.now().toString()
   body.assignment = null
   body.updatedBy =
