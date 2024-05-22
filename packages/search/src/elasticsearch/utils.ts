@@ -114,18 +114,6 @@ export interface IAssignment {
 export interface IOperationHistory {
   operationType: keyof typeof validStatusMapping
   operatedOn: string
-  operatorRole: string
-  operatorFirstNames: string
-  operatorFamilyName: string
-  operatorFirstNamesLocale: string
-  operatorFamilyNameLocale: string
-  operatorOfficeName: string
-  operatorOfficeAlias: string[]
-  rejectReason?: string
-  rejectComment?: string
-  notificationFacilityName?: string
-  notificationFacilityAlias?: string[]
-  correction?: ICorrection[]
 }
 
 export interface SearchDocument {
@@ -310,92 +298,18 @@ export async function getCreatedBy(compositionId: string) {
   return result?.createdBy
 }
 
-export const getStatus = async (compositionId: string) => {
-  const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as SearchDocument
-  return result?.operationHistories as IOperationHistory[]
-}
-
-  body: SearchDocument,
-  task: SavedTask,
-  authHeader: string,
-  bundle: SavedBundle
-) => {
+export const createStatusHistory = (body: SearchDocument, task: SavedTask) => {
   if (!isValidOperationHistory(body)) {
     return
   }
 
-  const isSystem = hasScope({ Authorization: authHeader }, 'notification-api')
-  const user = !isSystem
-    ? await getUser(body.updatedBy || '', authHeader)
-    : null
-
-  const operatorName = user && findName(NAME_EN, user.name)
-  const operatorNameLocale = user && findNameLocale(user.name)
-
-  const operatorFirstNames = operatorName?.given?.join(' ') || ''
-  const operatorFamilyName = operatorName?.family || ''
-  const operatorFirstNamesLocale = operatorNameLocale?.given?.join(' ') || ''
-  const operatorFamilyNameLocale = operatorNameLocale?.family || ''
-
-  const regLastOfficeExtension = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastOffice'
-  )
-
-  let office: SavedLocation | undefined
-  if (regLastOfficeExtension) {
-    office = getFromBundleById<SavedLocation>(
-      bundle,
-      regLastOfficeExtension.valueReference.reference.split('/')[1]
-    )?.resource
-  }
-
   const operationHistory = {
     operationType: body.type,
-    operatedOn: task?.lastModified,
-    rejectReason: body.rejectReason,
-    rejectComment: body.rejectComment,
-    operatorRole:
-      user?.role?.labels.find((label) => label.lang === 'en')?.label || '',
-    operatorFirstNames,
-    operatorFamilyName,
-    operatorFirstNamesLocale,
-    operatorFamilyNameLocale,
-    operatorOfficeName: office?.name || '',
-    operatorOfficeAlias: office?.alias || []
+    operatedOn: task?.lastModified
   } as IOperationHistory
 
-  if (
-    isDeclarationInStatus(body, IN_PROGRESS_STATUS) &&
-    isNotification(body) &&
-    body.eventLocationId
-  ) {
-    const facility = getFromBundleById<SavedLocation>(
-      bundle,
-      body.eventLocationId
-    ).resource
-    operationHistory.notificationFacilityName = facility?.name || ''
-    operationHistory.notificationFacilityAlias = facility?.alias || []
-  }
-
-  if (isDeclarationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
-    updateOperationHistoryWithCorrection(operationHistory, task)
-  }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
-}
-
-function isDeclarationInStatus(body: SearchDocument, status: string): boolean {
-  return (body.type && body.type === status) || false
-}
-
-function isNotification(body: ICompositionBody): boolean {
-  return (
-    (body.compositionType &&
-      NOTIFICATION_TYPES.includes(body.compositionType)) ||
-    false
-  )
 }
 
 export function findDuplicateIds(
@@ -448,41 +362,4 @@ export function isValidOperationHistory(body: BirthDocument) {
   }
 
   return true
-}
-
-function updateOperationHistoryWithCorrection(
-  operationHistory: IOperationHistory,
-  task: SavedTask
-) {
-  if (
-    task?.input?.length &&
-    task?.output?.length &&
-    task.input.length === task.output.length
-  ) {
-    if (!operationHistory.correction) {
-      operationHistory.correction = []
-    }
-
-    for (let i = 0; i < task.input.length; i += 1) {
-      const section = task.input[i].valueCode || ''
-      const fieldName = task.input[i].valueId || ''
-      const oldValue =
-        task.input[i].valueString ||
-        task.output[i].valueInteger?.toString() ||
-        ''
-      const newValueString = task.output[i].valueString
-      const newValueNumber = task.output[i].valueInteger
-
-      const payload: ICorrection = {
-        section,
-        fieldName,
-        oldValue,
-        newValue: (newValueNumber !== undefined
-          ? newValueNumber
-          : newValueString)! // On of these the values always exist
-      }
-
-      operationHistory.correction?.push(payload)
-    }
-  }
 }

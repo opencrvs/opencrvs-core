@@ -36,18 +36,6 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
     operationHistories {
       operationType
       operatedOn
-      operatorRole
-      operatorName {
-        firstNames
-        familyName
-        use
-      }
-      operatorOfficeName
-      operatorOfficeAlias
-      notificationFacilityName
-      notificationFacilityAlias
-      rejectReason
-      rejectComment
     }
     ... on BirthEventSearchSet {
       dateOfBirth

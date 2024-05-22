@@ -48,18 +48,6 @@ export const SEARCH_EVENTS = gql`
         operationHistories {
           operationType
           operatedOn
-          operatorRole
-          operatorName {
-            firstNames
-            familyName
-            use
-          }
-          operatorOfficeName
-          operatorOfficeAlias
-          notificationFacilityName
-          notificationFacilityAlias
-          rejectReason
-          rejectComment
         }
         ... on BirthEventSearchSet {
           dateOfBirth
