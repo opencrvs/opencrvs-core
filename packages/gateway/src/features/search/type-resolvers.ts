@@ -190,16 +190,16 @@ const getGroomName = (source: ISearchDataTemplate) => {
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
-      if (obj._type === 'compositions' && obj._source.event === 'Birth') {
+      if (obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'
-      } else if (
-        obj._type === 'compositions' &&
-        obj._source.event === 'Death'
-      ) {
+      }
+      if (obj._source.event === 'Death') {
         return 'DeathEventSearchSet'
-      } else {
+      }
+      if (obj._source.event === 'Marriage') {
         return 'MarriageEventSearchSet'
       }
+      return null as never
     }
   },
   BirthEventSearchSet: {
@@ -414,6 +414,7 @@ export const searchTypeResolvers: GQLResolver = {
       if (res._id) return res
       return null
     },
+    // @TODO: Fetch via id
     startedByFacility(searchData: ISearchEventDataTemplate) {
       let facilityName = null
       if (searchData._source.operationHistories) {
