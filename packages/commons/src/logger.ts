@@ -16,7 +16,8 @@ export const logger =
         transport: {
           target: 'pino-pretty',
           options: {
-            colorize: true
+            colorize: true,
+            ignore: 'pid,hostname'
           }
         }
       })
