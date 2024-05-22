@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.0 (TBD)
+
+### New features
+
+- Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
+- Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
+- Supporting document fields can now be made required
+- If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+
 ## 1.5.0 (TBD)
 
 ## Breaking changes
@@ -15,6 +24,14 @@
 - #### Update the certificate preview mechanism
 
   In effort of minimizing JavaScript-bundle size, we have streamlined the way how review certificate -page renders certificates. In case the images in your certificates are previewing blurry, you need to update your SVG-certificates to print QR-codes and other images directly with `<image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>` instead of the more complicated `<rect fill="url(#pattern)"></rect>` -paradigm. This doesn't affect printed certificates as they are still created as previously.
+
+- #### Move default address generation to country-config
+
+  We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
+
+## Bug fixes
+
+- Fix print record page for an unsaved declaration [#6893](https://github.com/opencrvs/opencrvs-core/issues/6893)
 
 ## New features
 
@@ -34,9 +51,12 @@
 - In advance search, any status tag is showing archived after search [#6678](https://github.com/opencrvs/opencrvs-core/issues/6678)
 - Fix first name issues when creating a user [#6631](https://github.com/opencrvs/opencrvs-core/issues/6631)
 - Show correct record option in certificate preview page when trying to print by RA [#6224](https://github.com/opencrvs/opencrvs-core/issues/6224)
+- Fix certificate templates not getting populated for health facility event locations & ADMIN_LEVEL > 2
 - Fix download failure for incomplete (without date of death) death declarations [#6807](https://github.com/opencrvs/opencrvs-core/issues/6807)
 - Fix search result declaration record audit unassign issue [#5781](https://github.com/opencrvs/opencrvs-core/issues/5781)
 - In review page, Eliminating the 'No supporting documents' and 'upload' prompts when documents are already uploaded [#6231] (https://github.com/opencrvs/opencrvs-core/issues/6231)
+- Fix Registrar of any location should be able to review a correction request [#6247](https://github.com/opencrvs/opencrvs-core/issues/6247)
+- Fix issues of invisible inputs when navigating from can't login link in login page [#6163](https://github.com/opencrvs/opencrvs-core/issues/6163)
 
 ## Refactor
 

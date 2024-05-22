@@ -946,34 +946,35 @@ export const eventLocationAddressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
 
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
+    ) {
+      if (!offlineData || !location) {
+        return
+      }
+      const facility =
+        offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
+
+      if (!facility) {
+        return
+      }
+      const locationHierarchy = getLocationHierarchy(
+        facility.partOf.split('/').at(1)!,
+        offlineData.locations
+      )
+      const locationId = locationHierarchy[location]
+      if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
+        transformedData[sectionId][transformedFieldName] =
+          offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
+        transformedData[sectionId][`${transformedFieldName}Id`] = locationId
+      }
+      return
+    }
+
     const addressFromQuery = queryData.eventLocation?.address
 
     if (addressFromQuery?.line) {
-      if (
-        queryData.eventLocation?.type &&
-        queryData.eventLocation?.type === 'HEALTH_FACILITY'
-      ) {
-        if (!offlineData || !location) {
-          return
-        }
-        const facility =
-          offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
-
-        if (!facility) {
-          return
-        }
-        const locationHierarchy = getLocationHierarchy(
-          facility.partOf.split('/').at(1)!,
-          offlineData.locations
-        )
-        const locationId = locationHierarchy[location]
-        if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
-          transformedData[sectionId][transformedFieldName] =
-            offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
-          transformedData[sectionId][`${transformedFieldName}Id`] = locationId
-        }
-        return
-      }
       const idOrValue = addressFromQuery.line[lineNumber] || ''
       if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
         transformedData[sectionId][transformedFieldName] =

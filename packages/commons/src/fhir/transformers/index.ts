@@ -82,7 +82,6 @@ import {
   ResourceIdentifier,
   SPOUSE_CODE,
   SPOUSE_TITLE,
-  StringExtensionType,
   Task,
   TaskIdentifier,
   TaskIdentifierSystemType,
@@ -647,7 +646,8 @@ function createDateOfMarriageBuilder(resource: Patient, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
-  resource.extension.push({
+
+  resource.extension = setExtension(resource.extension, {
     url: `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
     valueDateTime: fieldValue
   })
@@ -668,7 +668,7 @@ function createNationalityBuilder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
-  resource.extension.push({
+  resource.extension = setExtension(resource.extension, {
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
       {
@@ -705,19 +705,10 @@ function createOccupationBulder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
-  const hasOccupation = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-    resource.extension
-  )
-
-  if (hasOccupation) {
-    hasOccupation.valueString = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-      valueString: fieldValue
-    })
-  }
+  resource.extension = setExtension(resource.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
+    valueString: fieldValue
+  })
 }
 
 function createReasonNotApplyingBuilder(resource: Patient, fieldValue: string) {
@@ -725,19 +716,10 @@ function createReasonNotApplyingBuilder(resource: Patient, fieldValue: string) {
     resource.extension = []
   }
 
-  const hasReasonNotApplying = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-    resource.extension
-  )
-
-  if (hasReasonNotApplying) {
-    hasReasonNotApplying.valueString = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-      valueString: fieldValue
-    })
-  }
+  resource.extension = setExtension(resource.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
+    valueString: fieldValue
+  })
 }
 
 function createAgeOfIndividualInYearsBuilder(
@@ -748,19 +730,10 @@ function createAgeOfIndividualInYearsBuilder(
     resource.extension = []
   }
 
-  const hasAgeOfIndividualInYears = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-    resource.extension
-  )
-
-  if (hasAgeOfIndividualInYears) {
-    hasAgeOfIndividualInYears.valueInteger = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-      valueInteger: fieldValue
-    })
-  }
+  resource.extension = setExtension(resource.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+    valueInteger: fieldValue
+  })
 
   const age = parseInt(fieldValue.toString(), 10)
   if (resource.deceasedDateTime) {
@@ -784,52 +757,39 @@ function createEducationalAttainmentBuilder(
     resource.extension = []
   }
 
-  resource.extension.push({
+  resource.extension = setExtension(resource.extension, {
     url: `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
     valueString: fieldValue
   })
 }
 
-function setExtension<T extends keyof StringExtensionType>(
+function setExtension<T extends keyof KnownExtensionType>(
   extensions: Array<Extension>,
-  url: T,
-  value: StringExtensionType[T]['valueString']
+  newExtension: KnownExtensionType[T]
 ) {
-  const existingExtension = findExtension(
-    url as StringExtensionType[keyof StringExtensionType]['url'],
-    extensions
-  )
-
-  if (existingExtension) {
-    existingExtension.valueString = value
-  } else {
-    extensions.push({
-      url: url,
-      valueString: value
-    } as KnownExtensionType[T])
-  }
+  const filteredExtension = extensions.filter((e) => e.url !== newExtension.url)
+  filteredExtension.push(newExtension)
+  return filteredExtension
 }
 
 function createInformantShareContact(task: Task, fieldValue: string) {
   if (!task.extension) {
     task.extension = []
   }
-  setExtension(
-    task.extension,
-    `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
-    fieldValue
-  )
+  task.extension = setExtension(task.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+    valueString: fieldValue
+  })
 }
 
 function createInformantRelationship(task: Task, fieldValue: string) {
   if (!task.extension) {
     task.extension = []
   }
-  setExtension(
-    task.extension,
-    `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
-    fieldValue
-  )
+  task.extension = setExtension(task.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
+    valueString: fieldValue
+  })
 }
 
 function createOrUpdateSignatureExtension(
@@ -842,10 +802,8 @@ function createOrUpdateSignatureExtension(
   }
   const signatureUrl =
     `http://opencrvs.org/specs/extension/${extensionPostfix}` as const
-  resource.extension = resource.extension.filter(
-    (ext) => ext.url !== signatureUrl
-  )
-  resource.extension.push({
+
+  resource.extension = setExtension(resource.extension, {
     url: signatureUrl,
     valueString: fieldValue
   })
@@ -855,8 +813,9 @@ function createInformantShareContactNumber(resource: Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
+
+  resource.extension = setExtension(resource.extension, {
+    url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
     valueString: fieldValue
   })
 }
@@ -985,7 +944,8 @@ function createInformantShareEmail(resource: Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
-  resource.extension.push({
+
+  resource.extension = setExtension(resource.extension, {
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
     valueString: fieldValue
   })
@@ -1945,7 +1905,10 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
           'given',
           context
         )
@@ -2313,7 +2276,27 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
+          'given',
+          context
+        )
+      },
+      middleName: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_ONE_CODE,
+          WITNESS_ONE_TITLE
+        )
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
           'given',
           context
         )
@@ -2406,7 +2389,27 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          fieldValue.split(' '),
+          [
+            fieldValue,
+            (person.name?.[context._index.name]?.given ?? []).at(1) ?? ''
+          ],
+          'given',
+          context
+        )
+      },
+      middleName: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_TWO_CODE,
+          WITNESS_TWO_TITLE
+        )
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [
+            (person.name?.[context._index.name]?.given ?? []).at(0) ?? '',
+            fieldValue
+          ],
           'given',
           context
         )

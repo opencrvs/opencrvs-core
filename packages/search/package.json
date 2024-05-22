@@ -57,7 +57,7 @@
     "cross-env": "^7.0.0",
     "jest": "26.6.3",
     "jest-fetch-mock": "^2.1.2",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.0.0",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
     "testcontainers": "^9.1.1",
@@ -93,7 +93,7 @@
     ],
     "moduleNameMapper": {
       "@search/(.*)": "<rootDir>/src/$1",
-      "@opencrvs/commons/types": "@opencrvs/commons/build/dist/types"
+      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
     },
     "coverageReporters": [
       "json",

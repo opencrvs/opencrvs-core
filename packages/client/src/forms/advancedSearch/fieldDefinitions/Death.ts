@@ -221,8 +221,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'eventCountry',
-        initialValue: 'agentDefault'
+        dependency: 'eventCountry'
       },
       conditionals: [
         {
@@ -257,8 +256,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'eventLocationLevel1',
-        initialValue: 'agentDefault'
+        dependency: 'eventLocationLevel1'
       },
       conditionals: [
         {

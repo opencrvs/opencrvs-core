@@ -21,7 +21,7 @@ on:
 
 jobs:
   base:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: trstringer/manual-approval@v1
         with:
@@ -63,7 +63,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
@@ -92,7 +92,7 @@ jobs:
       fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

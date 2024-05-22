@@ -44,7 +44,6 @@ import {
 } from '@client/declarations'
 import {
   FormFieldGenerator,
-  getInitialValueForSelectDynamicValue,
   ITouchedNestedFields
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
@@ -57,7 +56,6 @@ import {
   IFormData,
   CorrectionSection,
   IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -1095,7 +1093,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
-                        size={ContentSize.NORMAL}
+                        size={ContentSize.SMALL}
                         key={activeSectionGroup.id}
                         id="register_form"
                         title={
@@ -1105,6 +1103,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             intl.formatMessage(activeSection.title))
                         }
                         showTitleOnMobile={true}
+                        bottomActionDirection="column"
                         bottomActionButtons={
                           [
                             nextSectionGroup && (
@@ -1113,6 +1112,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 key="next_section"
                                 type="primary"
                                 size="large"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
@@ -1136,6 +1136,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 type="secondary"
                                 size="large"
                                 className="item"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
@@ -1368,14 +1369,6 @@ function getInitialValue(
       getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
   }
 
-  if (
-    field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-    !field.initialValue &&
-    field.dynamicOptions.initialValue === 'agentDefault' &&
-    userDetails !== undefined
-  ) {
-    fieldInitialValue = getInitialValueForSelectDynamicValue(field, userDetails)
-  }
   return fieldInitialValue
 }
 

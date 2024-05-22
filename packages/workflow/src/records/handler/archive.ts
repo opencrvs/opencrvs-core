@@ -22,29 +22,27 @@ const requestSchema = z.object({
   duplicateTrackingId: z.string().optional()
 })
 
-export const archiveRoute = [
-  createRoute({
-    method: 'POST',
-    path: '/records/{recordId}/archive',
-    allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
-    action: 'ARCHIVE',
-    handler: async (request, record) => {
-      const token = getToken(request)
-      const payload = validateRequest(requestSchema, request.payload)
+export const archiveRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/archive',
+  allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
+  action: 'ARCHIVE',
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(requestSchema, request.payload)
 
-      const { reason, comment, duplicateTrackingId } = payload
+    const { reason, comment, duplicateTrackingId } = payload
 
-      const archivedRecord = await toArchived(
-        record,
-        token,
-        reason,
-        comment,
-        duplicateTrackingId
-      )
+    const archivedRecord = await toArchived(
+      record,
+      token,
+      reason,
+      comment,
+      duplicateTrackingId
+    )
 
-      await indexBundle(archivedRecord, token)
-      await auditEvent('archived', archivedRecord, token)
-      return archivedRecord
-    }
-  })
-]
+    await indexBundle(archivedRecord, token)
+    await auditEvent('archived', archivedRecord, token)
+    return archivedRecord
+  }
+})

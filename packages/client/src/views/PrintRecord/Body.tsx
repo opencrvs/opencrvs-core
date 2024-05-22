@@ -272,8 +272,7 @@ function renderValue(
 
     if (sectionData.countryPrimary === window.config.COUNTRY) {
       const dynamicOption: IDynamicOptions = {
-        resource: 'locations',
-        initialValue: 'agentDefault'
+        resource: 'locations'
       }
       dynamicOption.dependency = [
         'internationalStatePrimary',
@@ -294,8 +293,7 @@ function renderValue(
 
     if (sectionData.countrySecondary === window.config.COUNTRY) {
       const dynamicOption: IDynamicOptions = {
-        resource: 'locations',
-        initialValue: 'agentDefault'
+        resource: 'locations'
       }
       dynamicOption.dependency = [
         'internationalStateSecondary',

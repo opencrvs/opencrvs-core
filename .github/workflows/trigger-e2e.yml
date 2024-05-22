@@ -1,0 +1,32 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Trigger E2E
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+jobs:
+  e2e:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'opencrvs-farajaland',
+              event_type: 'run_e2e',
+              client_payload: {
+                actor: '${{ github.actor }}'
+              }
+            })
+            console.log(result);

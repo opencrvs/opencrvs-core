@@ -9,36 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  COUNTRY_CONFIG_URL,
-  FHIR_URL,
-  MOSIP_TOKEN_SEEDER_URL
-} from '@workflow/constants'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
-import { logger } from '@workflow/logger'
-import fetch from 'node-fetch'
-import * as ShortUIDGen from 'short-uid'
-import {
   Bundle,
   BundleEntry,
   Composition,
-  DocumentReference,
   Patient,
   Resource,
   Saved,
   Task,
   TrackingID
 } from '@opencrvs/commons/types'
-import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { COUNTRY_CONFIG_URL, MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-
-export enum FHIR_RESOURCE_TYPE {
-  COMPOSITION = 'Composition',
-  TASK = 'Task',
-  ENCOUNTER = 'Encounter',
-  PAYMENT_RECONCILIATION = 'PaymentReconciliation',
-  PATIENT = 'Patient'
-}
+import { logger } from '@workflow/logger'
+import fetch from 'node-fetch'
+import * as ShortUIDGen from 'short-uid'
 
 export async function generateTrackingIdForEvents(
   eventType: EVENT_TYPE,
@@ -58,7 +44,7 @@ export async function generateTrackingIdForEvents(
   }
 }
 
-export async function getTrackingIdFromCountryConfig(
+async function getTrackingIdFromCountryConfig(
   bundle: Bundle,
   token: string
 ): Promise<string | null> {
@@ -95,7 +81,7 @@ const DETECT_EVENT: Record<string, EVENT_TYPE> = {
   'marriage-declaration': EVENT_TYPE.MARRIAGE
 }
 
-export function getCompositionEventType(compoition: Composition) {
+function getCompositionEventType(compoition: Composition) {
   const eventType = compoition?.type?.coding?.[0].code
   return eventType && DETECT_EVENT[eventType]
 }
@@ -112,38 +98,6 @@ export function getEventType(fhirBundle: Bundle) {
   throw new Error('Invalid FHIR bundle found')
 }
 
-export function taskHasInput(taskResource: Task) {
-  return !!(taskResource.input && taskResource.input.length > 0)
-}
-
-export function hasCorrectionExtension(taskResource: Task) {
-  return taskResource.extension.some(
-    (extension) => extension.url === MAKE_CORRECTION_EXTENSION_URL
-  )
-}
-
-export function hasCertificateDataInDocRef(fhirBundle: Bundle) {
-  const firstEntry = fhirBundle?.entry?.[0].resource as Composition
-
-  const certificateSection = firstEntry.section?.find((sec) => {
-    if (sec.code?.coding?.[0]?.code == 'certificates') {
-      return true
-    }
-    return false
-  })
-  const docRefId = certificateSection?.entry?.[0].reference
-
-  return fhirBundle.entry?.some((item) => {
-    if (
-      item.fullUrl === docRefId &&
-      (item.resource as DocumentReference)?.content?.length > 0
-    ) {
-      return true
-    }
-    return false
-  })
-}
-
 export function isInProgressDeclaration(fhirBundle: Bundle) {
   const taskEntry =
     fhirBundle &&
@@ -157,29 +111,6 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
     (taskEntry &&
       taskEntry.resource &&
       taskEntry.resource.status === 'draft') ||
-    false
-  )
-}
-
-export function isHospitalNotification(fhirBundle: Bundle) {
-  const compositionEntry =
-    fhirBundle &&
-    fhirBundle.entry &&
-    fhirBundle.entry.find(
-      (entry) => entry.resource && entry.resource.resourceType === 'Composition'
-    )
-  const composition =
-    compositionEntry && (compositionEntry.resource as Composition)
-  const compositionDocTypeCode =
-    composition &&
-    composition.type.coding &&
-    composition.type.coding.find(
-      (coding) => coding.system === 'http://opencrvs.org/doc-types'
-    )
-  return (
-    (compositionDocTypeCode &&
-      compositionDocTypeCode.code &&
-      compositionDocTypeCode.code.endsWith('-notification')) ||
     false
   )
 }
@@ -201,7 +132,7 @@ interface IMosipRequest {
   authdata: IMosipAuthData
 }
 
-export interface IMosipSeederPayload {
+interface IMosipSeederPayload {
   id: string | ''
   version: string | ''
   metadata: string | ''
@@ -209,18 +140,18 @@ export interface IMosipSeederPayload {
   request: IMosipRequest
 }
 
-export interface IMosipErrors {
+interface IMosipErrors {
   errorCode: string
   errorMessage: string
   actionMessage: string
 }
 
-export interface IMosipSeederResponseContent {
+interface IMosipSeederResponseContent {
   authStatus: boolean
   authToken: string
 }
 
-export interface IMosipSeederResponse {
+interface IMosipSeederResponse {
   id: 'mosip.identity.auth'
   version: 'v1'
   responseTime: string
@@ -278,7 +209,7 @@ export async function getMosipUINToken(
   return body
 }
 
-export function getResourceByType<T = Resource>(
+function getResourceByType<T = Resource>(
   bundle: Bundle,
   type: string
 ): T | undefined {
@@ -293,6 +224,14 @@ export function getResourceByType<T = Resource>(
       }
     })
   return bundleEntry && (bundleEntry.resource as T)
+}
+
+enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task',
+  ENCOUNTER = 'Encounter',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation',
+  PATIENT = 'Patient'
 }
 
 export function getComposition<T extends Bundle>(bundle: T) {
@@ -316,29 +255,4 @@ export function getPatientBySection(bundle: Bundle, section: fhir3.Reference) {
       }
     })?.resource as fhir3.Patient)
   )
-}
-export const fetchHearth = async <T = any>(
-  suffix: string,
-  method = 'GET',
-  body: string | undefined = undefined
-): Promise<T> => {
-  const res = await fetch(`${FHIR_URL}${suffix}`, {
-    method: method,
-    body,
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-
-  if (!res.ok) {
-    throw new Error(
-      `FHIR get to /fhir failed with [${res.status}] body: ${await res.text()}`
-    )
-  }
-  return res.json()
-}
-
-export async function fetchTaskByCompositionIdFromHearth(id: string) {
-  const taskBundle: Bundle = await fetchHearth(`/Task?focus=Composition/${id}`)
-  return taskBundle.entry?.[0]?.resource as Task
 }

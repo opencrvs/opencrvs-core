@@ -240,7 +240,7 @@ export async function toUpdated(
   record: InProgressRecord | ReadyForReviewRecord,
   token: string,
   updatedDetails: ChangedValuesInput
-): Promise<InProgressRecord | ReadyForReviewRecord> {
+): Promise<ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
 
   const updatedTaskWithoutPractitionerExtensions = createUpdatedTask(
@@ -275,7 +275,7 @@ export async function toUpdated(
       recordWithUpdatedTask,
       practitionerResourcesBundle
     ),
-    ['IN_PROGRESS', 'READY_FOR_REVIEW']
+    'READY_FOR_REVIEW'
   )
 }
 
@@ -845,9 +845,13 @@ export async function toCorrectionRejected(
     reason: {
       text: rejectionDetails.reason
     },
-    extension: extensionsWithoutAssignment(
-      currentCorrectionRequestedTask.extension
-    )
+    extension: extensionsWithoutAssignment([
+      ...currentCorrectionRequestedTask.extension,
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: rejectionDetails.timeLoggedMS ?? 0
+      }
+    ])
   }
 
   const correctionRejectionTaskWithPractitionerExtensions = setupLastRegUser(

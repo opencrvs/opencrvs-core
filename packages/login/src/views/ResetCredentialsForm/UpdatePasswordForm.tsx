@@ -19,7 +19,7 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -202,6 +202,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
         >
           <form id="password-update-form" onSubmit={this.whatNext}>
             <Content
+              size={ContentSize.SMALL}
               title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
               showTitleOnMobile
               subtitle={intl.formatMessage(

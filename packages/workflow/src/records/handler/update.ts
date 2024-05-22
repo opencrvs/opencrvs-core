@@ -16,12 +16,18 @@ import {
   MarriageRegistration as GQLMarriageRegistration,
   EVENT_TYPE,
   updateFHIRBundle,
-  Registration
+  Registration,
+  InProgressRecord,
+  ReadyForReviewRecord,
+  getComposition,
+  findCompositionSection,
+  findEntryFromBundle,
+  RelatedPerson
 } from '@opencrvs/commons/types'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
 import { toUpdated } from '@workflow/records/state-transitions'
-import { validateRequest } from '@workflow/features/correction/routes'
+import { validateRequest } from '@workflow/utils/index'
 import { ChangedValuesInput } from '@workflow/records/validations'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
@@ -43,46 +49,91 @@ const requestSchema = z.object({
   >()
 })
 
-export const updateRoute = [
-  createRoute({
-    method: 'POST',
-    path: '/records/{recordId}/update',
-    allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
-    action: 'UPDATE_DECLARATION',
-    handler: async (request, record) => {
-      const token = getToken(request)
-      const payload = validateRequest(requestSchema, request.payload)
+function filterInformantSectionFromComposition<
+  T extends InProgressRecord | ReadyForReviewRecord
+>(record: T): T {
+  const composition = getComposition(record)
 
-      const { details, event } = payload
-      const {
-        registration: registrationWithChangedValues,
-        ...detailsWithoutReg
-      } = details
-      const { changedValues, ...registration } = registrationWithChangedValues
-      const payloadRecordDetails = {
-        ...detailsWithoutReg,
-        registration
-      }
-      const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
-      const recordInputWithUploadedAttachments =
-        await uploadBase64AttachmentsToDocumentsStore(
-          payloadRecordDetails,
-          getAuthHeader(request)
-        )
+  const filteredComposition = composition.section.filter(
+    (sec) => sec.code.coding[0].code !== 'informant-details'
+  )
 
-      const updatedBundle = updateFHIRBundle(
-        record,
-        recordInputWithUploadedAttachments,
-        event
-      )
-      const updatedRecord = await toUpdated(
-        updatedBundle,
-        token,
-        updatedDetails
-      )
+  return {
+    ...record,
+    entry: [
+      {
+        fullUrl: record.entry.find(
+          (e) => e.resource.resourceType === 'Composition'
+        )!.fullUrl,
+        resource: {
+          ...composition,
+          section: filteredComposition
+        }
+      },
+      ...record.entry.filter((e) => e.resource.resourceType !== 'Composition')
+    ]
+  }
+}
 
-      await indexBundle(updatedRecord, token)
-      return updatedRecord
+function getInformantType(record: InProgressRecord | ReadyForReviewRecord) {
+  const compositionSection = findCompositionSection(
+    'informant-details',
+    getComposition(record)
+  )
+  if (!compositionSection) return undefined
+  const personSectionEntry = compositionSection.entry[0]
+  const personEntry = findEntryFromBundle<RelatedPerson>(
+    record,
+    personSectionEntry.reference
+  )
+
+  return personEntry?.resource.relationship?.coding?.[0].code
+}
+
+export const updateRoute = createRoute({
+  method: 'POST',
+  path: '/records/{recordId}/update',
+  allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
+  action: 'UPDATE_DECLARATION',
+  handler: async (request, record) => {
+    const token = getToken(request)
+    const payload = validateRequest(requestSchema, request.payload)
+
+    const informantTypeOfBundle = getInformantType(record)
+    const payloadInformantType = payload.details.registration.informantType
+
+    // When new informant details are provided, we should create a patient entry
+    // by removing the composition section from the bundle.
+    // If the section is not found, the builders from updateFhirBundle
+    // create a new patient resource from scratch.
+    if (informantTypeOfBundle && informantTypeOfBundle !== payloadInformantType)
+      record = filterInformantSectionFromComposition(record)
+
+    const { details, event } = payload
+    const {
+      registration: registrationWithChangedValues,
+      ...detailsWithoutReg
+    } = details
+    const { changedValues, ...registration } = registrationWithChangedValues
+    const payloadRecordDetails = {
+      ...detailsWithoutReg,
+      registration
     }
-  })
-]
+    const updatedDetails = validateRequest(ChangedValuesInput, changedValues)
+    const recordInputWithUploadedAttachments =
+      await uploadBase64AttachmentsToDocumentsStore(
+        payloadRecordDetails,
+        getAuthHeader(request)
+      )
+
+    const updatedBundle = updateFHIRBundle(
+      record,
+      recordInputWithUploadedAttachments,
+      event
+    )
+    const updatedRecord = await toUpdated(updatedBundle, token, updatedDetails)
+
+    await indexBundle(updatedRecord, token)
+    return updatedRecord
+  }
+})

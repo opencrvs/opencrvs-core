@@ -18,26 +18,25 @@ import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 
 const Wrapper = styled.div`
-  margin: 8px 0px;
   max-width: 100%;
+  & > *:last-child {
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid ${({ theme }) => theme.colors.grey100};
+  }
 `
-
 const Container = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  height: 40px;
-  padding: 0px 8px;
+  border-top: 1.5px solid ${({ theme }) => theme.colors.grey100};
+  height: 48px;
+  padding: 0px 10px;
 `
 
 const SpinnerContainer = styled(Spinner)`
   margin-right: 6px;
-`
-
-const DeleteContainer = styled(Button)`
-  min-width: 32px;
 `
 
 const Label = styled.div`
@@ -89,7 +88,7 @@ export const DocumentListPreview = ({
         documents.map((document: IFileValue, key: number) => (
           <Container key={`preview_${key}`}>
             <Label>
-              <Icon color="currentColor" name="Paperclip" size="medium" />
+              <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 id={`document_${(document.optionValues[1] as string).replace(
                   /\s/g,
@@ -110,15 +109,15 @@ export const DocumentListPreview = ({
               </Link>
             </Label>
             {onDelete && (
-              <DeleteContainer
+              <Button
                 id="preview_delete"
                 type="icon"
                 size="small"
                 aria-label="Delete attachment"
                 onClick={() => onDelete(document)}
               >
-                <Icon color="red" name="TrashSimple" size="small" />
-              </DeleteContainer>
+                <Icon color="red" name="Trash" size="small" />
+              </Button>
             )}
           </Container>
         ))}
@@ -126,7 +125,7 @@ export const DocumentListPreview = ({
         processingDocuments.map(({ label }) => (
           <Container key={label}>
             <Label>
-              <Icon color="disabled" name="Paperclip" size="medium" />
+              <Icon color="grey400" name="Paperclip" size="large" />
               <Link disabled={true} key={label}>
                 <span>{getFormattedLabelForDocType(label) || label}</span>
               </Link>
@@ -142,15 +141,15 @@ export const DocumentListPreview = ({
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
-          <DeleteContainer
+          <Button
             id="preview_delete"
             type="icon"
             size="small"
             aria-label="Delete attachment"
             onClick={() => onDelete && onDelete(attachment)}
           >
-            <Icon color="red" name="TrashSimple" size="small" />
-          </DeleteContainer>
+            <Icon color="red" name="Trash" size="small" />
+          </Button>
         </Container>
       )}
     </Wrapper>

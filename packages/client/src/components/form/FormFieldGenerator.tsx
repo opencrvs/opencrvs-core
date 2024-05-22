@@ -141,13 +141,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const LocationSearchFormField = styled(LocationSearch)`
-  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 344px;
-  }`}
+    ignoreBottomMargin ? '0px' : '22px'};
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -215,9 +209,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       hideAsterisk: fieldDefinition.hideAsterisk,
       hideInputHeader: fieldDefinition.hideHeader,
       error,
-      touched,
-      mode: fieldDefinition.mode,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      touched
     }
 
     const intl = useIntl()
@@ -235,8 +227,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      placeholder: fieldDefinition.placeholder
     }
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
@@ -262,22 +253,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
-        <DocumentUploaderWithOption
-          {...inputProps}
-          name={fieldDefinition.name}
-          label={fieldDefinition.label}
-          options={fieldDefinition.options}
-          splitView={fieldDefinition.splitView}
-          files={value as IFileValue[]}
-          extraValue={fieldDefinition.extraValue || ''}
-          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-          onComplete={(files: IFileValue[]) => {
-            onSetFieldValue(fieldDefinition.name, files)
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-          }}
-          onUploadingStateChanged={onUploadingStateChanged}
-          requiredErrorMessage={requiredErrorMessage}
-        />
+        <InputField {...inputFieldProps}>
+          <DocumentUploaderWithOption
+            {...inputProps}
+            name={fieldDefinition.name}
+            options={fieldDefinition.options}
+            files={value as IFileValue[]}
+            extraValue={fieldDefinition.extraValue || ''}
+            hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+            onComplete={(files: IFileValue[]) => {
+              onSetFieldValue(fieldDefinition.name, files)
+              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            }}
+            onUploadingStateChanged={onUploadingStateChanged}
+            requiredErrorMessage={requiredErrorMessage}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
@@ -444,8 +435,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps}>
           <TextArea
-            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
             {...inputProps}
+            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            value={value.toString()}
           />
         </InputField>
       )
@@ -578,7 +570,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       return (
         <InputField {...inputFieldProps}>
-          <LocationSearchFormField
+          <LocationSearch
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             {...inputProps}
             selectedLocation={selectedLocation}
@@ -627,8 +619,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
-        inputProps
+      const { error, touched, ...allowedInputProps } = inputProps
 
       return (
         <input
@@ -673,52 +664,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export function getInitialValueForSelectDynamicValue(
-  field: IFormField,
-  userDetails: UserDetails | null
-) {
-  let fieldInitialValue = field.initialValue as IFormFieldValue
-  const catchmentAreas = userDetails?.catchmentArea
-  let district = ''
-  let state = ''
-  let locationLevel3 = ''
-
-  if (catchmentAreas) {
-    catchmentAreas.forEach((catchmentArea) => {
-      if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
-        )
-      ) {
-        locationLevel3 = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'DISTRICT'
-        )
-      ) {
-        district = catchmentArea.id
-      } else if (
-        catchmentArea?.identifier?.find(
-          (identifier) => identifier?.value === 'STATE'
-        )
-      ) {
-        state = catchmentArea.id
-      }
-    })
-  }
-
-  if (field.name.includes('district') && !field.initialValue && district) {
-    fieldInitialValue = district as IFormFieldValue
-  }
-  if (field.name.includes('state') && !field.initialValue && state) {
-    fieldInitialValue = state as IFormFieldValue
-  }
-  if (!field.initialValue && locationLevel3) {
-    fieldInitialValue = locationLevel3 as IFormFieldValue
-  }
-  return fieldInitialValue
-}
-
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: UserDetails | null
@@ -743,16 +688,6 @@ const mapFieldsToValues = (
       }
     }
 
-    if (
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-      !field.initialValue &&
-      field.dynamicOptions.initialValue === 'agentDefault'
-    ) {
-      fieldInitialValue = getInitialValueForSelectDynamicValue(
-        field,
-        userDetails
-      )
-    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 

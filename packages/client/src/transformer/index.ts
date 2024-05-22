@@ -125,18 +125,17 @@ const toCorrectionValue = (
       }
     }
   } else {
-    if (newSerializedFieldValue)
-      changedValues.push({
-        section: section.id,
-        fieldName: fieldDef.name,
-        newValue: newSerializedFieldValue,
-        oldValue:
-          serializeFieldValue(
-            fieldDef,
-            originalDraftData[section.id][fieldDef.name],
-            originalDraftData[section.id]
-          ) ?? ''
-      })
+    changedValues.push({
+      section: section.id,
+      fieldName: fieldDef.name,
+      newValue: newSerializedFieldValue ?? '',
+      oldValue:
+        serializeFieldValue(
+          fieldDef,
+          originalDraftData[section.id][fieldDef.name],
+          originalDraftData[section.id]
+        ) ?? ''
+    })
   }
   return changedValues
 }
