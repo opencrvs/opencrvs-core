@@ -24,17 +24,18 @@ import {
   SavedBundle,
   SavedComposition,
   SavedLocation,
-  SavedTask
+  SavedTask,
+  TaskHistory
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@search/constants'
-import { ICompositionBody } from '@search/elasticsearch/utils'
+import { SearchDocument } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 import fetch from 'node-fetch'
 
-export function findTaskExtension<T extends keyof KnownExtensionType>(
-  task: SavedTask,
-  extensionUrl: T
-) {
+export function findTaskExtension<
+  T extends keyof KnownExtensionType,
+  Task extends TaskHistory | SavedTask
+>(task: Task, extensionUrl: T) {
   return task.extension.find(
     (ext): ext is KnownExtensionType[T] => ext.url === extensionUrl
   )

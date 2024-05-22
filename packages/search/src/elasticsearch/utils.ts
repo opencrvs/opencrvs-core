@@ -10,11 +10,6 @@
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import {
-  findName,
-  findNameLocale,
-  findTaskExtension
-} from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
 import fetch from 'node-fetch'
@@ -23,12 +18,11 @@ import {
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
 import {
-  getFromBundleById,
+  findTaskHistories,
+  getBusinessStatus,
   SavedBundle,
-  SavedLocation,
   SavedTask
 } from '@opencrvs/commons/types'
-import { hasScope } from '@opencrvs/commons/authentication'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -117,7 +111,7 @@ export interface IOperationHistory {
 }
 
 export interface SearchDocument {
-  compositionId?: string
+  compositionId: string
   compositionType?: string
   event?: EVENT
   type?: string
@@ -296,6 +290,14 @@ export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as SearchDocument
   return result?.createdBy
+}
+
+export const composeOperationHistories = (bundle: SavedBundle) => {
+  const taskHistories = findTaskHistories(bundle)
+  return taskHistories.map((taskHistory) => ({
+    operationType: getBusinessStatus(taskHistory),
+    operatedOn: taskHistory.lastModified
+  }))
 }
 
 export const createStatusHistory = (body: SearchDocument, task: SavedTask) => {

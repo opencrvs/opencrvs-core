@@ -19,7 +19,8 @@ import {
   MarriageDocument,
   IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  composeOperationHistories
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -30,7 +31,6 @@ import {
   addEventLocation,
   findExtension
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
@@ -43,7 +43,8 @@ import {
   Patient,
   SavedBundle,
   resourceIdentifierToUUID,
-  SavedRelatedPerson
+  SavedRelatedPerson,
+  findFirstTaskHistory
 } from '@opencrvs/commons/types'
 
 const BRIDE_CODE = 'bride-details'
@@ -52,31 +53,21 @@ const WITNESS_ONE_CODE = 'witness-one-details'
 const WITNESS_TWO_CODE = 'witness-two-details'
 const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
-export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as ValidRecord
-  const authHeader = requestBundle.headers.authorization
-
-  const composition = getComposition(bundle)
-
-  await indexDeclaration(composition, authHeader, bundle)
-}
-
-async function indexDeclaration(
-  composition: SavedComposition,
-  authHeader: string,
-  bundle: SavedBundle
-) {
-  const compositionId = composition.id
-  const result = await searchByCompositionId(compositionId, client)
-  const task = getTaskFromSavedBundle(bundle)
-  const body: ICompositionBody = {
+export const composeDocument = (
+  record: ValidRecord,
+  existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
+) => {
+  const task = getTaskFromSavedBundle(record)
+  const composition = getComposition(record)
+  const body: SearchDocument = {
+    compositionId: composition.id,
     event: EVENT.MARRIAGE,
     createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
+      (existingDocument &&
+        existingDocument.body.hits.hits.length > 0 &&
+        existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+    operationHistories: composeOperationHistories(record) as IOperationHistory[]
   }
 
   body.type =
@@ -105,27 +96,33 @@ async function indexDeclaration(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  await createIndexBody(body, composition, authHeader, bundle)
-  await indexComposition(compositionId, body, client)
+  createIndexBody(body, composition, record)
+  return body
 }
 
-async function createIndexBody(
-  body: IMarriageCompositionBody,
+export async function indexRecord(record: ValidRecord) {
+  const { id: compositionId } = getComposition(record)
+  const existingDocument = await searchByCompositionId(compositionId, client)
+  const document = composeDocument(record, existingDocument)
+  await indexComposition(compositionId, document, client)
+}
+
+function createIndexBody(
+  body: MarriageDocument,
   composition: SavedComposition,
-  authHeader: string,
   bundle: SavedBundle
 ) {
-  await createBrideIndex(body, composition, bundle)
-  await createGroomIndex(body, composition, bundle)
+  createBrideIndex(body, composition, bundle)
+  createGroomIndex(body, composition, bundle)
   createWitnessOneIndex(body, composition, bundle)
   createWitnessTwoIndex(body, composition, bundle)
   addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
-  await createDeclarationIndex(body, composition, bundle)
+  createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
-  await createStatusHistory(body, task, authHeader, bundle)
+  createStatusHistory(body, task)
 }
 
-async function createBrideIndex(
+function createBrideIndex(
   body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
@@ -342,8 +339,17 @@ function createDeclarationIndex(
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'marriage-declaration'
 
-  const createdBy = await getCreatedBy(composition.id as string)
+  const firstTaskHistory = findFirstTaskHistory(bundle)
+  const firstRegLastUserExtension =
+    firstTaskHistory &&
+    findTaskExtension(
+      firstTaskHistory,
+      'http://opencrvs.org/specs/extension/regLastUser'
+    )
+  const firstRegLastUser =
+    firstRegLastUserExtension &&
+    resourceIdentifierToUUID(firstRegLastUserExtension.valueReference.reference)
 
-  body.createdBy = createdBy || regLastUser
+  body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
 }

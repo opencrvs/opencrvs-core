@@ -13,12 +13,13 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
-  createStatusHistory,
   EVENT,
   BirthDocument,
   NAME_EN,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  composeOperationHistories,
+  createStatusHistory
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -29,20 +30,20 @@ import {
   addEventLocation,
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   SavedBundle,
   Patient,
   getFromBundleById,
   getTaskFromSavedBundle,
-  SavedTask,
   resourceIdentifierToUUID,
-  SavedRelatedPerson
+  SavedRelatedPerson,
+  findFirstTaskHistory,
+  ValidRecord,
+  getBusinessStatus
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -51,38 +52,33 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
-function getTypeFromTask(task: SavedTask) {
-  return task?.businessStatus?.coding?.[0]?.code
+export async function indexRecord(record: ValidRecord) {
+  const { id: compositionId } = getComposition(record)
+  const existingDocument = await searchByCompositionId(compositionId, client)
+  const document = composeDocument(record, existingDocument)
+  await indexComposition(compositionId, document, client)
 }
 
-export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as ValidRecord
-  const authHeader = requestBundle.headers.authorization
+export const composeDocument = (
+  record: ValidRecord,
+  existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
+) => {
+  const task = getTaskFromSavedBundle(record)
+  const composition = getComposition(record)
 
-  await indexAndSearchComposition(getComposition(bundle), authHeader, bundle)
-}
-
-async function indexAndSearchComposition(
-  composition: SavedComposition,
-  authHeader: string,
-  bundle: SavedBundle
-) {
-  const compositionId = composition.id
-  const result = await searchByCompositionId(compositionId, client)
-  const task = getTaskFromSavedBundle(bundle)
-
-  const body: IBirthCompositionBody = {
+  const body: BirthDocument = {
+    compositionId: composition.id,
     event: EVENT.BIRTH,
     createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
+      (existingDocument &&
+        existingDocument.body.hits.hits.length > 0 &&
+        existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
     modifiedAt: Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+    operationHistories: composeOperationHistories(record) as IOperationHistory[]
   }
 
-  body.type = getTypeFromTask(task)
+  body.type = getBusinessStatus(task)
   body.modifiedAt = Date.now().toString()
 
   if (body.type === REJECTED_STATUS) {
@@ -104,16 +100,14 @@ async function indexAndSearchComposition(
 
   body.updatedBy =
     regLastUserIdentifier &&
-    regLastUserIdentifier.valueReference &&
-    regLastUserIdentifier.valueReference.reference &&
-    regLastUserIdentifier.valueReference.reference.split('/')[1]
+    resourceIdentifierToUUID(regLastUserIdentifier.valueReference.reference)
 
-  await createIndexBody(body, composition, authHeader, bundle)
+  createIndexBody(body, composition, record)
   updateCompositionBodyWithDuplicateIds(composition, body)
-  await indexComposition(compositionId, body, client)
+  return body
 }
 
-async function createIndexBody(
+function createIndexBody(
   body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
@@ -123,9 +117,9 @@ async function createIndexBody(
   createMotherIndex(body, composition, bundle)
   createFatherIndex(body, composition, bundle)
   createInformantIndex(body, composition, bundle)
-  await createDeclarationIndex(body, composition, bundle)
+  createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
-  await createStatusHistory(body, task, authHeader, bundle)
+  createStatusHistory(body, task)
 }
 
 function createChildIndex(
@@ -133,12 +127,7 @@ function createChildIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)
-
-  if (!child) {
-    return
-  }
-
+  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)!
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
@@ -251,7 +240,7 @@ function createInformantIndex(
     informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
-async function createDeclarationIndex(
+function createDeclarationIndex(
   body: BirthDocument,
   composition: SavedComposition,
   bundle: SavedBundle
@@ -295,9 +284,7 @@ async function createDeclarationIndex(
 
   const regLastUser =
     regLastUserIdentifier &&
-    regLastUserIdentifier.valueReference &&
-    regLastUserIdentifier.valueReference.reference &&
-    regLastUserIdentifier.valueReference.reference.split('/')[1]
+    resourceIdentifierToUUID(regLastUserIdentifier.valueReference.reference)
 
   const compositionTypeCode =
     composition.type.coding &&
@@ -312,7 +299,7 @@ async function createDeclarationIndex(
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.contactEmail = emailExtension && emailExtension.valueString
-  body.type = task && getTypeFromTask(task)
+  body.type = task && getBusinessStatus(task)
   body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =
@@ -328,8 +315,17 @@ async function createDeclarationIndex(
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 
-  const createdBy = await getCreatedBy(composition.id || '')
+  const firstTaskHistory = findFirstTaskHistory(bundle)
+  const firstRegLastUserExtension =
+    firstTaskHistory &&
+    findTaskExtension(
+      firstTaskHistory,
+      'http://opencrvs.org/specs/extension/regLastUser'
+    )
+  const firstRegLastUser =
+    firstRegLastUserExtension &&
+    resourceIdentifierToUUID(firstRegLastUserExtension.valueReference.reference)
 
-  body.createdBy = createdBy || regLastUser
+  body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
 }

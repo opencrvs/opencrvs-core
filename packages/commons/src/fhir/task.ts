@@ -139,8 +139,13 @@ export type SavedTask = Omit<Task, 'focus' | 'id'> & {
   }
 }
 
-export type TaskHistory = Saved<Task> & {
+// @TODO: Can TaskHistory ever be not saved?
+export type TaskHistory = Omit<Saved<Task>, 'resourceType' | 'focus' | 'id'> & {
   resourceType: 'TaskHistory'
+  id: UUID
+  focus: {
+    reference: ResourceIdentifier
+  }
 }
 
 export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
@@ -160,7 +165,7 @@ export function isCorrectionRequestedTask(
   )
 }
 
-export function getBusinessStatus(task: Task) {
+export function getBusinessStatus<T extends Task | TaskHistory>(task: T) {
   const code = task.businessStatus.coding.find(({ code }) => code)
   if (!code) {
     throw new Error('No business status code found')
@@ -200,20 +205,36 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
   return task
 }
 
-export function sortTasksAscending(tasks: Task[]) {
+export function sortTasksAscending<T extends { lastModified: string }>(
+  tasks: T[]
+) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
     )
   })
 }
-export function sortTasksDescending(tasks: Task[]) {
+export function sortTasksDescending<T extends { lastModified: string }>(
+  tasks: T[]
+) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
     )
   })
 }
+export const findTaskHistories = (bundle: Bundle) => {
+  return sortTasksAscending(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<TaskHistory> =>
+        isTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
+}
+
+export const findFirstTaskHistory = (bundle: Bundle) =>
+  findTaskHistories(bundle).at(0)
 
 export function addTaskToRecord<T extends Bundle>(
   bundle: T,
