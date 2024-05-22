@@ -75,7 +75,7 @@ export function findEntry<T extends Resource = Resource>(
 
 export function addEventLocation(
   bundle: SavedBundle,
-  body: ICompositionBody,
+  body: SearchDocument,
   code: Extract<
     CompositionSectionCode,
     'birth-encounter' | 'death-encounter' | 'marriage-encounter'
@@ -188,7 +188,7 @@ export async function fetchParentLocationByLocationID(locationID: string) {
 
 export function updateCompositionBodyWithDuplicateIds(
   composition: SavedComposition,
-  body: ICompositionBody
+  body: SearchDocument
 ) {
   const duplicates =
     composition.relatesTo?.filter((rel) => rel.code === 'duplicate') || []
