@@ -33,7 +33,8 @@ function getDownloadedOrAssignedExtension(
 ) {
   if (
     inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') && status === 'VALIDATED')
+    (hasScope(authHeader, 'validate') &&
+      ['CORRECTION_REQUESTED', 'VALIDATED'].includes(status))
   ) {
     return `http://opencrvs.org/specs/extension/regDownloaded` as const
   }

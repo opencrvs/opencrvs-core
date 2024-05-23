@@ -24,7 +24,9 @@ import {
   Accordion,
   DocumentViewer,
   IDocumentViewerOptions,
-  ResponsiveModal
+  ResponsiveModal,
+  Icon,
+  Stack
 } from '@opencrvs/components'
 import {
   IDeclaration,
@@ -145,6 +147,15 @@ import { UserDetails } from '@client/utils/userUtils'
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
+
+const RequiredDocument = styled(Stack)`
+  padding-left: 8px;
+  height: 40px;
+  :not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  }
+`
+
 export const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
@@ -665,8 +676,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   getViewableSection = (registerForm: IForm): IFormSection[] => {
     const sections = registerForm.sections.filter(
-      ({ id, viewType }) =>
-        id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+      ({ viewType }) => viewType === 'form' || viewType === 'hidden'
     )
 
     return this.getVisibleSections(sections)
@@ -702,7 +712,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
     const options = this.prepSectionDocOptions(declaration)
 
-    return (
+    return options.uploadedDocuments.length > 0 ? (
       <DocumentListPreviewContainer>
         <DocumentListPreview
           id="all_attachment_list"
@@ -712,7 +722,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           inReviewSection={true}
         />
       </DocumentListPreviewContainer>
-    )
+    ) : null
   }
 
   prepSectionDocOptions = (
@@ -1678,7 +1688,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         if (event === Event.Birth || event === Event.Death) {
           return (
-            offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+            offlineCountryConfiguration.config.FEATURES
+              .INFORMANT_SIGNATURE_REQUIRED &&
             !declaration.data.registration?.informantsSignature
           )
         } else if (event === Event.Marriage) {
@@ -1703,18 +1714,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const textAreaProps = {
       id: 'additional_comments',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
           declaration
         )
       },
-      value:
-        (declaration.data.registration &&
-          declaration.data.registration.commentsOrNotes) ||
-        '',
-      ignoreMediaQuery: true
+      value: ((declaration.data.registration &&
+        declaration.data.registration.commentsOrNotes) ||
+        '') as string
     }
 
     const informantName = getDeclarationFullName(
@@ -1724,7 +1733,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
-      formSections,
+      formSections.filter(({ id }) => id !== 'documents'),
       errorsOnFields,
       offlineCountryConfiguration,
       declaration
@@ -1767,7 +1776,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'informants_signature',
           declaration.data.registration?.informantsSignature as string,
           intl.formatMessage(messages.informantsSignature),
-          window.config.INFORMANT_SIGNATURE_REQUIRED
+          window.config.FEATURES.INFORMANT_SIGNATURE_REQUIRED
         )
         return (
           <>
@@ -1863,7 +1872,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <ReviewContainter>
                   {transformedSectionData
                     .filter((sec) => sec.items.length > 0)
-                    .map((sec, index) => {
+                    .map((sec) => {
                       return (
                         <DeclarationDataContainer key={'Section_' + sec.id}>
                           <Accordion
@@ -1942,6 +1951,34 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     }
                     expand={true}
                   >
+                    {errorsOnFields.documents &&
+                      Object.entries(errorsOnFields.documents)
+                        .map(
+                          ([fieldName, { errors }]) =>
+                            [
+                              documentsSection.groups[0].fields.find(
+                                ({ name }) => name === fieldName
+                              )!,
+                              errors
+                            ] as const
+                        )
+                        .filter(([_, errors]) => errors.length > 0)
+                        .map(([field, errors]) => (
+                          <RequiredDocument key={field.name}>
+                            <Icon
+                              color="currentColor"
+                              name="Paperclip"
+                              size="medium"
+                            />
+                            <Text variant="reg16" element="span">
+                              {intl.formatMessage(field.label)}
+                            </Text>
+
+                            <Text variant="reg16" element="span" color="red">
+                              ({intl.formatMessage(errors[0].message)})
+                            </Text>
+                          </RequiredDocument>
+                        ))}
                     {this.getAllAttachmentInPreviewList(declaration)}
                   </Accordion>
 
@@ -1963,10 +2000,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         required={false}
                       >
                         <TextArea
-                          {...{
-                            ...textAreaProps,
-                            disabled: viewRecord || isDuplicate
-                          }}
+                          {...textAreaProps}
+                          disabled={viewRecord || isDuplicate}
                         />
                       </InputField>
                     </Accordion>
@@ -2039,7 +2074,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer id="document_section" options={options}>
-                {options.uploadedDocuments.length == 0 && (
+                {options.uploadedDocuments.length === 0 && (
                   <ZeroDocument id={`zero_document`}>
                     {intl.formatMessage(
                       messages.zeroDocumentsTextForAnySection

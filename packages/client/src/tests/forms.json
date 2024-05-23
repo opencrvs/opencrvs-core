@@ -975,7 +975,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2372,7 +2372,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -2903,7 +2903,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -3737,7 +3737,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN"
                     }
                   ],
                   "mapping": {
@@ -4714,7 +4714,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6588,7 +6588,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -7958,7 +7958,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -9211,7 +9211,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
                     }
                   ],
                   "mapping": {

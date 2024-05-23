@@ -14,7 +14,9 @@ import { useIntl } from 'react-intl'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { buttonMessages } from '@client/i18n/messages'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData
@@ -22,7 +24,7 @@ import {
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Box } from '@opencrvs/components/lib/Box'
 import { useSelector } from 'react-redux'
 
 export const Page = styled.div`
@@ -49,16 +51,17 @@ export const LogoContainer = styled.div`
     }
   }
 `
+
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
-  padding-top: 40px;
+  text-align: center;
+  padding-top: 20px;
 `
 const InstructionHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  padding: 40px 65px 30px 65px;
-`
-const NextButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
+  margin: 0;
+  text-align: center;
+  padding: 20px 8px 40px 8px;
 `
 
 interface IOwnProps {
@@ -77,9 +80,12 @@ export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
   )
 
   return (
-    <Page>
-      <Container id="user-setup-landing-page">
-        <Content size={ContentSize.LARGE}>
+    <Frame
+      header={<AppBar title="OpenCRVS" />}
+      skipToContentText="Skip to main content"
+    >
+      <Frame.LayoutCentered id="user-setup-landing-page">
+        <Box>
           <LogoContainer>
             <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
           </LogoContainer>
@@ -91,8 +97,11 @@ export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
           <InstructionHolder>
             {intl.formatMessage(messages.userSetupIntroduction)}
           </InstructionHolder>
-          <NextButton
+          <Button
             id="user-setup-start-button"
+            type="primary"
+            size="large"
+            fullWidth
             onClick={() =>
               goToStep(ProtectedAccoutStep.PASSWORD, {
                 ...setupData,
@@ -101,9 +110,9 @@ export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
             }
           >
             {intl.formatMessage(buttonMessages.start)}
-          </NextButton>
-        </Content>
-      </Container>
-    </Page>
+          </Button>
+        </Box>
+      </Frame.LayoutCentered>
+    </Frame>
   )
 }

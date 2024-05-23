@@ -18,7 +18,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs } from '@opencrvs/components'
+import { Content, ContentSize, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -277,6 +277,7 @@ const BirthSection = () => {
         id="search"
         key="search"
         type="primary"
+        fullWidth
         size="large"
         disabled={isDisabled}
         onClick={() => {
@@ -436,6 +437,7 @@ const DeathSection = () => {
         key="search"
         type="primary"
         size="large"
+        fullWidth
         disabled={isDisable}
         onClick={() => {
           dispatch(
@@ -483,6 +485,7 @@ const AdvancedSearch = () => {
         <Content
           title={intl.formatMessage(messages.advancedSearch)}
           titleColor={'copy'}
+          size={ContentSize.SMALL}
           tabBarContent={
             <FormTabs
               sections={tabSections}
