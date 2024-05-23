@@ -15,8 +15,7 @@ import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  margin-top: 8px;
-  margin-bottom: 0px;
+  width: 100%;
 `
 
 const List = styled.ul<{ flexDirection?: string }>`
@@ -24,7 +23,7 @@ const List = styled.ul<{ flexDirection?: string }>`
   margin: 0;
   padding: 0;
   & > div {
-    margin-bottom: 16px;
+    margin-bottom: 4px;
   }
   ${({ flexDirection }) =>
     flexDirection &&
@@ -38,7 +37,7 @@ const LargeList = styled.ul<{ flexDirection?: string }>`
   margin: 0;
   padding: 0;
   & > div {
-    margin-bottom: 16px;
+    margin-bottom: 4px;
   }
   ${({ flexDirection }) =>
     flexDirection &&
@@ -119,7 +118,6 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={props.onChange}
-                hasFlexDirection={flexDirection ? true : false}
               />
               {nestedFields &&
                 value === option.value &&
@@ -151,7 +149,6 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={props.onChange}
-                hasFlexDirection={flexDirection ? true : false}
               />
             </div>
           )

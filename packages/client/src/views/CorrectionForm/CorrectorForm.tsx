@@ -35,10 +35,10 @@ import {
 import { Event } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
@@ -127,14 +127,17 @@ function CorrectorFormComponent(props: IFullProps) {
   }
 
   const continueButton = (
-    <PrimaryButton
+    <Button
       id="confirm_form"
       key="confirm_form"
+      type="primary"
+      size="large"
+      fullWidth
       onClick={continueButtonHandler}
       disabled={groupHasError(group, declaration.data[section.id])}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
-    </PrimaryButton>
+    </Button>
   )
 
   return (
@@ -147,6 +150,7 @@ function CorrectorFormComponent(props: IFullProps) {
         goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
+          size={ContentSize.SMALL}
           title={group.title && intl.formatMessage(group.title)}
           subtitle={
             declaration.event === Event.Birth

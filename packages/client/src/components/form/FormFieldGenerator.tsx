@@ -141,13 +141,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const LocationSearchFormField = styled(LocationSearch)`
-  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 344px;
-  }`}
+    ignoreBottomMargin ? '0px' : '22px'};
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -215,9 +209,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       hideAsterisk: fieldDefinition.hideAsterisk,
       hideInputHeader: fieldDefinition.hideHeader,
       error,
-      touched,
-      mode: fieldDefinition.mode,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      touched
     }
 
     const intl = useIntl()
@@ -235,8 +227,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      placeholder: fieldDefinition.placeholder
     }
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
@@ -262,22 +253,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
-        <DocumentUploaderWithOption
-          {...inputProps}
-          name={fieldDefinition.name}
-          label={fieldDefinition.label}
-          options={fieldDefinition.options}
-          splitView={fieldDefinition.splitView}
-          files={value as IFileValue[]}
-          extraValue={fieldDefinition.extraValue || ''}
-          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-          onComplete={(files: IFileValue[]) => {
-            onSetFieldValue(fieldDefinition.name, files)
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-          }}
-          onUploadingStateChanged={onUploadingStateChanged}
-          requiredErrorMessage={requiredErrorMessage}
-        />
+        <InputField {...inputFieldProps}>
+          <DocumentUploaderWithOption
+            {...inputProps}
+            name={fieldDefinition.name}
+            options={fieldDefinition.options}
+            files={value as IFileValue[]}
+            extraValue={fieldDefinition.extraValue || ''}
+            hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+            onComplete={(files: IFileValue[]) => {
+              onSetFieldValue(fieldDefinition.name, files)
+              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            }}
+            onUploadingStateChanged={onUploadingStateChanged}
+            requiredErrorMessage={requiredErrorMessage}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
@@ -444,8 +435,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps}>
           <TextArea
-            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
             {...inputProps}
+            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            value={value.toString()}
           />
         </InputField>
       )
@@ -578,7 +570,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       return (
         <InputField {...inputFieldProps}>
-          <LocationSearchFormField
+          <LocationSearch
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             {...inputProps}
             selectedLocation={selectedLocation}
@@ -627,8 +619,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
-        inputProps
+      const { error, touched, ...allowedInputProps } = inputProps
 
       return (
         <input

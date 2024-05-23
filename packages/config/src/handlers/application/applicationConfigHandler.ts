@@ -281,10 +281,10 @@ const applicationConfigResponseValidation = Joi.object({
     MARRIAGE_REGISTRATION: Joi.boolean().required(),
     EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
     INFORMANT_SIGNATURE: Joi.boolean().required(),
-    PRINT_DECLARATION: Joi.boolean().required()
+    PRINT_DECLARATION: Joi.boolean().required(),
+    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
+    INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required()
   },
-  DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
-  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required(),
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   SIGNATURE_REQUIRED_FOR_ROLES: Joi.array().items(

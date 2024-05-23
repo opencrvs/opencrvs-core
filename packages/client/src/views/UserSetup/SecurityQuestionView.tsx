@@ -22,13 +22,13 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { Select } from '@opencrvs/components/lib/Select'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
@@ -264,10 +264,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     touched={this.state.showError}
                   />
                   {this.state.showError && !questionnaire.selectedQuestion && (
-                    <InputError
-                      id={`question-${index}-validation-message`}
-                      centred={false}
-                    >
+                    <InputError id={`question-${index}-validation-message`}>
                       {intl.formatMessage(messages.selectSecurityQuestion)}
                     </InputError>
                   )}
@@ -291,10 +288,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   />
                   {this.state.showError &&
                     !this.state.questionnaire[index].answer && (
-                      <InputError
-                        id={`answer-${index}-validation-message`}
-                        centred={false}
-                      >
+                      <InputError id={`answer-${index}-validation-message`}>
                         {intl.formatMessage(messages.enterResponse)}
                       </InputError>
                     )}
@@ -304,9 +298,15 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
           }
         )}
 
-        <PrimaryButton id="submit-security-question" onClick={this.onsubmit}>
+        <Button
+          id="submit-security-question"
+          type="primary"
+          size="large"
+          fullWidth
+          onClick={this.onsubmit}
+        >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       </form>
     )
   }
@@ -325,6 +325,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
       >
         <Content
+          size={ContentSize.SMALL}
           title={intl.formatMessage(messages.userFormSecurityQuestionsHeading)}
           subtitle={intl.formatMessage(
             messages.userFormSecurityQuestionsDescription

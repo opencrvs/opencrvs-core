@@ -85,7 +85,8 @@ import {
   resourceIdentifierToUUID,
   Address,
   findLastOfficeFromSavedBundle,
-  findLastOfficeLocationFromSavedBundle
+  findLastOfficeLocationFromSavedBundle,
+  notCorrectedHistory
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1820,6 +1821,7 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
+        .filter(notCorrectedHistory)
         .sort(sortDescending)
     }
   },
@@ -1979,6 +1981,7 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
+        .filter(notCorrectedHistory)
         .sort(sortDescending)
     }
   },
@@ -2116,6 +2119,7 @@ export const typeResolvers: GQLResolver = {
       return record.entry
         .map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
+        .filter(notCorrectedHistory)
         .sort(sortDescending)
     }
   }
