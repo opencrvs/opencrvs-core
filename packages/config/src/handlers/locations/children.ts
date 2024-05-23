@@ -24,5 +24,5 @@ export const resolveChildren: ServerRoute['handler'] = async (req) => {
     return notFound()
   }
 
-  return resolveLocationChildren(location, locations)
+  return [location, ...resolveLocationChildren(location, locations)]
 }
