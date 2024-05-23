@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
-import { colors } from '../colors'
+
 const InputHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -20,38 +20,10 @@ const InputHeader = styled.div`
 const ComponentWrapper = styled.span`
   display: flex;
 `
-
-const Padding = styled.span`
-  padding: 0 4px;
-  display: inline-flex;
-  align-items: center;
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.secondary};
-`
-
-const PostFixPadding = styled.span`
-  padding: 0 8px;
-  display: inline-flex;
-  align-items: center;
+const InputDescription = styled.p`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
-
-const InputDescription = styled.p<{
-  ignoreMediaQuery?: boolean
-}>`
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.copy};
-
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 344px;
-      }`
-      : ''
-  }}
-`
-
 export interface IInputFieldProps {
   id: string
   label?: string
@@ -69,15 +41,9 @@ export interface IInputFieldProps {
   unit?: string | JSX.Element
   optionalLabel?: string
   children: React.ReactNode
-  ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
   hideErrorLabel?: boolean
   hideInputHeader?: boolean
-  mode?: THEME_MODE
-}
-
-export enum THEME_MODE {
-  DARK = 'dark'
 }
 
 export const InputField = (props: IInputFieldProps) => {
@@ -90,11 +56,9 @@ export const InputField = (props: IInputFieldProps) => {
     description,
     error,
     touched,
-    ignoreMediaQuery,
     hideAsterisk,
     hideErrorLabel,
     hideInputHeader = false,
-    mode,
     prefix
   } = props
 
@@ -102,12 +66,6 @@ export const InputField = (props: IInputFieldProps) => {
   const unit = props.unit as React.ReactNode | string
 
   let color: string | undefined
-  let hideBorder: boolean
-
-  if (mode && mode === THEME_MODE.DARK) {
-    color = colors.white
-    hideBorder = true
-  }
 
   const isDomElement = (
     nodeType: string | React.JSXElementConstructor<any>
@@ -121,7 +79,7 @@ export const InputField = (props: IInputFieldProps) => {
       if (!node) return
       return isDomElement(node.type)
         ? node
-        : React.cloneElement(node, { hideBorder })
+        : React.cloneElement(node, { prefix, postfix, unit })
     }
   )
 
@@ -134,7 +92,6 @@ export const InputField = (props: IInputFieldProps) => {
               id={`${id}_label`}
               inputDescriptor={helperText}
               disabled={props.disabled}
-              ignoreMediaQuery={ignoreMediaQuery}
               color={color}
               required={required}
               hideAsterisk={hideAsterisk}
@@ -146,27 +103,14 @@ export const InputField = (props: IInputFieldProps) => {
         </InputHeader>
       )}
 
-      <ComponentWrapper>
-        {prefix && <Padding>{prefix}</Padding>}
-        {children}
-        {!unit && postfix && <PostFixPadding>{postfix}</PostFixPadding>}
-        {unit && !postfix && <PostFixPadding>{unit}</PostFixPadding>}
-      </ComponentWrapper>
+      <ComponentWrapper>{children}</ComponentWrapper>
 
       {error && touched && !hideErrorLabel && (
-        <InputError
-          id={props.id + '_error'}
-          ignoreMediaQuery={ignoreMediaQuery}
-          color={color}
-        >
-          {error}
-        </InputError>
+        <InputError id={props.id + '_error'}>{error}</InputError>
       )}
 
       {description && (
-        <InputDescription ignoreMediaQuery={ignoreMediaQuery} color={color}>
-          {description}
-        </InputDescription>
+        <InputDescription color={color}>{description}</InputDescription>
       )}
     </div>
   )

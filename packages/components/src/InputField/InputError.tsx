@@ -13,9 +13,6 @@ import styled from 'styled-components'
 
 export interface IInputError {
   id: string
-  centred?: boolean
-  ignoreMediaQuery?: boolean
-  color?: string
   children?: React.ReactNode
 }
 
@@ -25,13 +22,9 @@ const InputErrorWrapper = styled.div<IInputError>`
   padding-top: 4px;
   display: inline-block;
   ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme, color }) => (color ? color : theme.colors.negative)};
-  text-align: ${({ centred }) => (centred ? 'center' : 'left')};
-  max-width: 535px;
+  color: ${({ theme }) => theme.colors.negative};
 `
 
-export const InputError = ({ children, centred, ...rest }: IInputError) => (
-  <InputErrorWrapper centred={centred} {...rest}>
-    {children}
-  </InputErrorWrapper>
+export const InputError = ({ children, ...rest }: IInputError) => (
+  <InputErrorWrapper {...rest}>{children}</InputErrorWrapper>
 )

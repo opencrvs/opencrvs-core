@@ -43,7 +43,7 @@ import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 
 const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;

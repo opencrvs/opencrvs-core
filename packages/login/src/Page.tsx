@@ -10,10 +10,7 @@
  */
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  applicationConfigLoadAction,
-  storeClientRedirectRoute
-} from './login/actions'
+import { storeClientRedirectRoute } from './login/actions'
 import { changeLanguage, loadLanguages } from './i18n/actions'
 import {
   getDefaultLanguage,
@@ -39,7 +36,6 @@ function useLoadConfigurations() {
   const dispatch = useDispatch()
   React.useEffect(() => {
     dispatch(loadLanguages())
-    dispatch(applicationConfigLoadAction())
   }, [dispatch])
 }
 
@@ -50,7 +46,7 @@ function useStoreClientRedirectRoute() {
     if (!!paramRedirectTo) {
       dispatch(storeClientRedirectRoute(paramRedirectTo))
     }
-  }, [dispatch])
+  }, [dispatch, paramRedirectTo])
 }
 
 function useSyncLanguage() {
