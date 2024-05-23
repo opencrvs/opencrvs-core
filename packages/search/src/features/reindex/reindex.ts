@@ -48,6 +48,16 @@ export const reindex = async (timestamp: string) => {
     }
   })
 
+  await client.indices.create({
+    index,
+    body: {
+      settings: {
+        number_of_shards: 1,
+        number_of_replicas: 1
+      }
+    }
+  })
+
   await client.helpers.bulk({
     retries: 3,
     wait: 3000,

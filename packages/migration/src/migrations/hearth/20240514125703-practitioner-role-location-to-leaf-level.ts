@@ -43,14 +43,6 @@ export const createEmptyIndex = async () => {
  * In case the application still uses a single index instead of pointing an single alias to any index, let's migrate.
  */
 export const migrateIndexToAlias = async (timestamp: string) => {
-  const { body: doesOcrvsIndexExist } = await client.indices.exists({
-    index: ELASTICSEARCH_INDEX_NAME
-  })
-
-  if (doesOcrvsIndexExist) {
-    return
-  }
-
   // set the index read-only to prevent writes while cloning
   await client.indices.putSettings({
     index: ELASTICSEARCH_INDEX_NAME,
@@ -81,7 +73,7 @@ export const up = async (db: Db, client: MongoClient) => {
   ])
 
   await createEmptyIndex()
-  await migrateIndexToAlias('20240514125703-old-format')
+  await migrateIndexToAlias('20240514125702-old-format')
   await reindex('20240514125703')
 }
 
