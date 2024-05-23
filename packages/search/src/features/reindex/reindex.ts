@@ -19,8 +19,8 @@ import { composeDocument as composeDeathDocument } from '@search/features/regist
 import { composeDocument as composeMarriageDocument } from '@search/features/registration/marriage/service'
 import { logger } from '@search/logger'
 import { getEventType } from '@search/utils/event'
-import { format, startOfDay } from 'date-fns'
 import { Transform } from 'node:stream'
+import { orderBy } from 'lodash'
 
 const eventTransformers = {
   [EVENT_TYPE.BIRTH]: composeBirthDocument,
@@ -28,13 +28,14 @@ const eventTransformers = {
   [EVENT_TYPE.MARRIAGE]: composeMarriageDocument
 } satisfies Record<EVENT_TYPE, (record: ValidRecord) => SearchDocument>
 
-export const timestampedIndex = (date: Date, suffix = '') =>
-  `${OPENCRVS_INDEX_NAME}-${format(date, 'RRRRMMddHHmmss')}${suffix}`
+export const formatIndexName = (timestamp: string, suffix = '') =>
+  `${OPENCRVS_INDEX_NAME}-${timestamp}${suffix}`
 
 /** Streams the MongoDB records to ElasticSearch */
-export const reindex = async (newIndexName = timestampedIndex(new Date())) => {
+export const reindex = async (timestamp: string) => {
   const t1 = performance.now()
-  logger.info(`Reindexing to ${newIndexName}`)
+  const index = formatIndexName(timestamp)
+  logger.info(`Reindexing to ${index}`)
 
   const stream = await streamAllRecords(true)
 
@@ -53,7 +54,7 @@ export const reindex = async (newIndexName = timestampedIndex(new Date())) => {
     datasource: stream.pipe(transformedStreamData),
     onDocument: (doc: BirthDocument) => ({
       index: {
-        _index: newIndexName,
+        _index: index,
         _id: doc.compositionId
       }
     }),
@@ -65,29 +66,37 @@ export const reindex = async (newIndexName = timestampedIndex(new Date())) => {
   })
   const t2 = performance.now()
   logger.info(
-    `Finished reindexing to ${newIndexName} in ${((t2 - t1) / 1000).toFixed(
+    `Finished reindexing to ${index} in ${((t2 - t1) / 1000).toFixed(
       2
     )} seconds`
   )
+
+  return { index }
 }
 
-export const migrate = async () => {
-  const newIndexName = timestampedIndex(startOfDay(new Date()), '-old-format')
-  logger.info(`Migrating ${OPENCRVS_INDEX_NAME} to index ${newIndexName}.`)
+/**
+ * Points the latest index (for example: ocrvs-20240523000000) - to an alias (example: ocrvs)
+ */
+export async function updateAliases() {
+  const { body: indices } = await client.cat.indices<Array<{ index: string }>>({
+    format: 'json',
+    index: `${OPENCRVS_INDEX_NAME}-*`
+  })
 
-  // set the index read-only to prevent writes while cloning
-  await client.indices.putSettings({
-    index: OPENCRVS_INDEX_NAME,
+  const sortedIndices = orderBy(indices, 'index')
+  const { index: latestIndex } = sortedIndices.at(-1)!
+
+  await client.indices.updateAliases({
     body: {
-      settings: {
-        'index.blocks.write': true
-      }
+      actions: [
+        {
+          remove: {
+            alias: OPENCRVS_INDEX_NAME,
+            index: `${OPENCRVS_INDEX_NAME}-*`
+          }
+        },
+        { add: { alias: OPENCRVS_INDEX_NAME, index: latestIndex } }
+      ]
     }
   })
-  await client.indices.clone({
-    index: OPENCRVS_INDEX_NAME,
-    target: newIndexName
-  })
-  await client.indices.delete({ index: OPENCRVS_INDEX_NAME })
-  logger.info(`Migrating done`)
 }

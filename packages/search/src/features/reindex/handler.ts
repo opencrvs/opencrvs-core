@@ -9,26 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { updateAliases } from '@search/features/reindex/alias-indices'
-import { reindex } from './reindex'
+import { reindex, updateAliases } from './reindex'
 
 export async function reindexHandler(
-  _request: Hapi.Request,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  /*
-   * Don't wait for reindex & updateAliases as it can take a while
-   */
-  process.nextTick(async () => {
-    await reindex()
-    await updateAliases()
-  })
+  const { timestamp } = request.payload as { timestamp: string }
+
+  const { index } = await reindex(timestamp)
+  await updateAliases()
 
   return h
     .response({
-      status: 'accepted',
-      message:
-        'ElasticSearch reindexing process has been initiated and is running in the background. See the search service logs.'
+      status: 'completed',
+      message: `ElasticSearch reindexing completed for ${index}`,
+      index
     })
-    .code(202)
+    .code(200)
 }
