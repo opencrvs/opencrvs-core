@@ -27,6 +27,7 @@ import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { recordHandler } from '@search/features/registration/record/handler'
 import { getRecordByIdHandler } from '@search/features/records/handler'
+import { reindex } from '@search/features/reindex/reindex'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -276,6 +277,15 @@ export const getRoutes = () => {
           ]
         },
         description: 'Handle searching from death declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/reindex',
+      handler: reindex,
+      config: {
+        tags: ['api'],
+        auth: false
       }
     }
   ]

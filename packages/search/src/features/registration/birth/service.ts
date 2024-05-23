@@ -121,7 +121,7 @@ async function createIndexBody(
   authHeader: string,
   bundle: SavedBundle
 ) {
-  await createChildIndex(body, composition, bundle)
+  createChildIndex(body, composition, bundle)
   addEventLocation(bundle, body, BIRTH_ENCOUNTER_CODE)
   createMotherIndex(body, composition, bundle)
   createFatherIndex(body, composition, bundle)
@@ -131,7 +131,7 @@ async function createIndexBody(
   await createStatusHistory(body, task, authHeader, bundle)
 }
 
-async function createChildIndex(
+function createChildIndex(
   body: IBirthCompositionBody,
   composition: SavedComposition,
   bundle: SavedBundle
