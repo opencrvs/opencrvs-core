@@ -10,95 +10,116 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { Icon } from '../Icon'
 
-const Wrapper = styled.div`
+const Label = styled.label<{ disabled?: boolean }>`
   list-style-type: none;
   display: flex;
   flex-direction: row;
-  width: auto;
-  align-items: flex-start;
-`
-
-const Label = styled.label<{
-  size?: string
-  disabled?: boolean
-  marginLeft?: number
-  hasFlexDirection?: boolean
-}>`
+  gap: 16px;
+  border-radius: 4px;
+  width: 100%;
+  padding: 8px 8px;
+  align-items: center;
+  isolation: isolate;
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
+  ${({ theme }) => theme.fonts.h4};
   cursor: pointer;
-  align-self: center;
-  ${({ size, theme }) =>
-    size === 'large'
-      ? `
-    ${theme.fonts.reg18};
-    margin-left: 14px`
-      : `
-    ${theme.fonts.reg16};
-    margin-left: 16px;`}
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+  }
+`
 
-  ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
-`
-const CheckOuter = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: 50%;
-  position: relative;
-`
-const Check = styled.span<{ size?: string; disabled?: boolean }>`
-  display: flex;
-  justify-content: center;
-  border: 2px solid
-    ${({ theme, disabled }) =>
-      disabled ? theme.colors.disabled : theme.colors.copy};
+const Radio = styled.span<{
+  size?: string
+  disabled?: boolean
+}>`
+  display: inline-block;
+  border-radius: 100%;
+  background: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
-  width: 40px;`
-      : `height: 24px;
-  width: 24px;`}
-  border-radius: 50%;
-  align-items: center;
-  ${({ disabled }) => (disabled ? `&:focus { box-shadow:none}` : '')}
-
-  & > span {
-    display: flex;
+    min-width: 40px;`
+      : ` height: 24px;
+    min-width: 24px;`}
+  transition: border 0.25s linear;
+  -webkit-transition: border 0.25s linear;
+  position: relative;
+  &::after {
+    position: absolute;
+    content: '';
+    background: ${({ theme }) => theme.colors.white};
     ${({ size }) =>
       size === 'large'
-        ? `height: 20px;
-    width: 20px;`
-        : ` height: 12px;
-    width: 12px;`}
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.white};
-    align-self: center;
+        ? `height: 37px;
+    width: 37px;`
+        : ` height: 21px;
+    width: 21px;`}
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
+    border-radius: 100%;
+  }
+  &:focus {
+    ${({ size }) =>
+      size === 'large'
+        ? `height: 38px;
+    width: 38px;`
+        : ` height: 20px;
+    width: 20px;`}
+  }
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
   }
 `
 
-const Input = styled.input<{ buttonSize?: string; disabled?: boolean }>`
+const Input = styled.input`
   position: absolute;
-  opacity: 0;
   margin: 0;
+  height: 40px;
+  opacity: 0;
   z-index: 2;
-  ${({ buttonSize }) =>
-    buttonSize === 'large'
-      ? `height: 40px; width: 40px;`
-      : `height: 24px; width: 24px;`}
   cursor: pointer;
-  &:focus ~ ${Check} {
-    box-shadow: ${({ theme, disabled }) =>
-        disabled ? theme.colors.white : theme.colors.yellow}
-      0 0 0 4px;
-  }
-  /* stylelint-disable */
-  &:checked ~ ${Check} > span {
-    /* stylelint-enable */
 
-    background: ${({ theme }) => theme.colors.copy};
+  &:active ~ ${Radio} {
+    &::after {
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+    }
   }
-  -webkit-tap-highlight-color: transparent;
+
+  &:checked ~ ${Radio} {
+    &::after {
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 3}px)`};
+    }
+  }
+
+  &:focus ~ ${Radio} {
+    &::after {
+      box-sizing: content-box;
+      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
+    }
+  }
 `
 
 type Value = string | number | boolean
@@ -111,7 +132,7 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
-  hasFlexDirection?: boolean
+
   onChange?: (value: Value) => void
 }
 
@@ -123,8 +144,7 @@ export const RadioButton = ({
   value,
   size,
   disabled,
-  onChange,
-  hasFlexDirection
+  onChange
 }: IRadioButton) => {
   const handleChange = () => {
     if (onChange) {
@@ -132,31 +152,38 @@ export const RadioButton = ({
     }
   }
   return (
-    <Wrapper>
-      <CheckOuter>
-        <Input
-          id={id}
-          buttonSize={size}
-          disabled={disabled}
-          role="radio"
-          checked={value === selected}
-          type="radio"
-          name={name}
-          value={value.toString()}
-          onChange={disabled ? () => null : handleChange}
-        />
-        <Check disabled={disabled} size={size}>
-          {disabled ? '' : <span />}
-        </Check>
-      </CheckOuter>
-      <Label
+    <Label disabled={disabled} htmlFor={id}>
+      <Input
+        id={id}
+        size={size === 'large' ? 40 : 16}
         disabled={disabled}
-        size={size}
-        htmlFor={id}
-        hasFlexDirection={hasFlexDirection}
-      >
-        {label}
-      </Label>
-    </Wrapper>
+        role="radio"
+        checked={value === selected}
+        type="radio"
+        name={name}
+        value={value.toString()}
+        onChange={disabled ? () => null : handleChange}
+      />
+      <Radio size={size} disabled={disabled}>
+        {value === selected ? (
+          size === 'large' ? (
+            <Icon
+              name="Circle"
+              size="large"
+              color="currentColor"
+              weight="fill"
+            />
+          ) : (
+            <Icon
+              name="Circle"
+              size="small"
+              color="currentColor"
+              weight="fill"
+            />
+          )
+        ) : null}
+      </Radio>
+      {label}
+    </Label>
   )
 }

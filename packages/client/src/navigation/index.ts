@@ -58,7 +58,8 @@ import {
   ISSUE_CERTIFICATE_PAYMENT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_MARRIAGE_FORM,
-  ALL_USER_EMAIL
+  ALL_USER_EMAIL,
+  PRINT_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -691,7 +692,11 @@ export function goToOrganisationView(userDetails: UserDetails) {
 }
 
 export function goToPrintRecordView(declarationId: string) {
-  window.open(`/print-record/${declarationId}`, '_blank')
+  return push(
+    formatUrl(PRINT_RECORD, {
+      declarationId
+    })
+  )
 }
 export type INavigationState = undefined
 

@@ -24,7 +24,7 @@ import { BrowserTracing } from '@sentry/tracing'
 
 WebFont.load({
   google: {
-    families: ['Noto+Sans:600', 'Noto+Sans:400']
+    families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
   }
 })
 
