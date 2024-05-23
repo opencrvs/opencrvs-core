@@ -28,8 +28,8 @@ const eventTransformers = {
   [EVENT_TYPE.MARRIAGE]: composeMarriageDocument
 } satisfies Record<EVENT_TYPE, (record: ValidRecord) => SearchDocument>
 
-export const formatIndexName = (timestamp: string, suffix = '') =>
-  `${OPENCRVS_INDEX_NAME}-${timestamp}${suffix}`
+export const formatIndexName = (timestamp: string) =>
+  `${OPENCRVS_INDEX_NAME}-${timestamp}`
 
 /** Streams the MongoDB records to ElasticSearch */
 export const reindex = async (timestamp: string) => {
