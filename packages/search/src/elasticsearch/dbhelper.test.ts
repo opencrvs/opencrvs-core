@@ -44,6 +44,7 @@ describe('elasticsearch db helper', () => {
 
     it('should update a composition with proper configuration', async () => {
       const body: BirthDocument = {
+        compositionId: '11111111-1111-1111-1111-111111111111',
         childFirstNames: 'testValue'
       }
       updateSpy = jest.spyOn(client, 'update')
