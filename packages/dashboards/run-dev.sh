@@ -54,6 +54,7 @@ export OPENCRVS_METABASE_MAP_NAME=${OPENCRVS_METABASE_MAP_NAME:-"Farajaland"}
 export OPENCRVS_METABASE_MAP_URL=${OPENCRVS_METABASE_MAP_URL:-"http://localhost:3040/content/farajaland-map.geojson"}
 export OPENCRVS_METABASE_MAP_REGION_KEY=${OPENCRVS_METABASE_MAP_REGION_KEY:-"State"}
 export OPENCRVS_METABASE_MAP_REGION_NAME=${OPENCRVS_METABASE_MAP_REGION_NAME:-"State"}
+export OPENCRVS_METABASE_SUPERUSER_EMAIL=${OPENCRVS_METABASE_SUPERUSER_EMAIL:-"superuser@opencrvs.org"}
 
 metabase_db_path=${MB_DB_FILE:-'/data/metabase/metabase.mv.db'}
 metabase_db_path="${metabase_db_path}"
