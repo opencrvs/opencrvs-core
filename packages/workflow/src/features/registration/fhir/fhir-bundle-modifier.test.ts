@@ -305,43 +305,6 @@ describe('Verify fhir bundle modifier functions', () => {
     beforeEach(() => {
       fetch.resetMocks()
     })
-    it('set regLastLocation properly', async () => {
-      mswServer.use(
-        rest.get(
-          'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
-          (_, res, ctx) => {
-            return res(
-              ctx.json([
-                // 2 level hierarchy
-                fixtures.savedLocation({
-                  id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
-                  partOf: {
-                    reference: 'Location/0'
-                  }
-                }),
-                fixtures.savedLocation({
-                  id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
-                  partOf: {
-                    reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-                  }
-                })
-              ])
-            )
-          }
-        )
-      )
-
-      const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as Task,
-        JSON.parse(fieldAgentPractitionerMock)
-      )
-      expect(taskResource.extension[3]).toEqual({
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-        }
-      })
-    })
     it('set regLastOffice properly', async () => {
       mswServer.use(
         rest.get(

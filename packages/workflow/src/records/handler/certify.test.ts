@@ -57,7 +57,7 @@ describe('Certify record endpoint', () => {
       )
     )
 
-    // Gets the location hierarchy to find the regLastOffice / regLastLocation
+    // Gets the location hierarchy to find the regLastOffice
     mswServer.use(
       rest.get(
         'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
@@ -175,7 +175,7 @@ describe('Certify record endpoint', () => {
       )
     )
 
-    // Gets the location hierarchy to find the regLastOffice / regLastLocation
+    // Gets the location hierarchy to find the regLastOffice
     mswServer.use(
       rest.get(
         'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',

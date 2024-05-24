@@ -513,14 +513,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
             }
@@ -754,12 +747,6 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         location: [
           {
             reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
-          },
-          {
-            reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
-          },
-          {
-            reference: 'Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706'
           }
         ],
         meta: {

@@ -206,12 +206,6 @@
             "valueString": "MOTHER"
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d"

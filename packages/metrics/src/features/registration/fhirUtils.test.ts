@@ -118,12 +118,6 @@ describe('fhirUtils', () => {
             },
             extension: [
               {
-                url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                valueReference: {
-                  reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-                }
-              },
-              {
                 url: 'http://opencrvs.org/specs/extension/regLastOffice',
                 valueReference: {
                   reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -866,12 +860,6 @@ describe('fhirUtils', () => {
           }
         },
         {
-          url: 'http://opencrvs.org/specs/extension/regLastLocation',
-          valueReference: {
-            reference: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
-          }
-        },
-        {
           url: 'http://opencrvs.org/specs/extension/regLastOffice',
           valueReference: {
             reference: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
@@ -963,12 +951,6 @@ describe('fhirUtils', () => {
           url: 'http://opencrvs.org/specs/extension/regLastUser',
           valueReference: {
             reference: 'Practitioner/ec1f4476-182f-408f-9da2-aff0c9bd1f26'
-          }
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/regLastLocation',
-          valueReference: {
-            reference: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
           }
         },
         {
