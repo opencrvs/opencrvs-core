@@ -74,6 +74,16 @@ if [ -z "${OPENCRVS_METABASE_MAP_REGION_NAME}" ]; then
   exit 1
 fi
 
+if [ -z "${OPENCRVS_METABASE_SUPERUSER_EMAIL}" ]; then
+  echo "Error: OPENCRVS_METABASE_SUPERUSER_EMAIL environment variable is not defined"
+  exit 1
+fi
+
+# if [ -z "${OPENCRVS_METABASE_SUPERUSER_PASSWORD}" ]; then
+#   echo "Error: OPENCRVS_METABASE_SUPERUSER_PASSWORD environment variable is not defined"
+#   exit 1
+# fi
+
 export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
 export MB_DB_FILE=/data/metabase/metabase.mv.db
 
