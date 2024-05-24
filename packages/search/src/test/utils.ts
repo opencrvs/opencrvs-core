@@ -379,14 +379,7 @@ export const mockBirthFhirBundle: SavedBundle<
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
             }
@@ -618,12 +611,6 @@ export const mockBirthFhirBundle: SavedBundle<
         location: [
           {
             reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-          },
-          {
-            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
-          },
-          {
-            reference: 'Location/ed6195ff-0f83-4852-832e-dc9db07151ff'
           }
         ],
         meta: {
@@ -802,12 +789,6 @@ export const mockBirthFhirBundleWithoutCompositionId = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
@@ -1471,14 +1452,7 @@ export const mockDeathFhirBundle: SavedBundle<
             valueInteger: 986665
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }
@@ -2096,12 +2070,6 @@ export const mockDeathFhirBundle: SavedBundle<
         location: [
           {
             reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
-          },
-          {
-            reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
-          },
-          {
-            reference: 'Location/1cfe40fa-7b43-4c1e-aa05-4281e5122d9b'
           }
         ],
         meta: {
@@ -2566,12 +2534,6 @@ export const mockDeathFhirBundleWithoutCompositionId = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -2869,6 +2831,7 @@ export const mockSearchResponseWithoutCreatedBy = {
 }
 
 export const mockCompositionBody = {
+  compositionId: '11111111-1111-1111-1111-111111111111',
   childFirstNames: 'hasan',
   childFamilyName: 'sarkar',
   childFirstNamesLocal: 'test',
@@ -3055,12 +3018,6 @@ export const mockBirthRejectionTaskBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -3134,12 +3091,6 @@ export const mockBirthRejectionTaskBundleWithoutCompositionReference = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
@@ -3228,12 +3179,6 @@ export const mockDeathRejectionTaskBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -3305,12 +3250,6 @@ export const mockMarriageRejectionTaskBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -3376,12 +3315,6 @@ export const mockDeathRejectionTaskBundleWithoutCompositionReference = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
@@ -3581,12 +3514,6 @@ export const mockBirthFhirBundleWithoutParents = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
@@ -4347,12 +4274,6 @@ export const mockMinimalDeathFhirBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -4613,12 +4534,6 @@ export const mockMinimalMarriageFhirBundle = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
@@ -5336,12 +5251,6 @@ export const mockMarriageFhirBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
@@ -5661,12 +5570,6 @@ export const mockMarriageFhirBundleWithoutCompositionId = {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
-            }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
             }
           },
           {
