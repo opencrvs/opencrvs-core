@@ -310,7 +310,7 @@ export function getStatusFromTask(task: Task) {
   return statusType.code
 }
 
-export function getActionFromTask(task: Task) {
+export function getActionFromTask(task: Task | TaskHistory) {
   const extensions = task.extension || []
 
   if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
@@ -480,9 +480,9 @@ function updateTaskTemplate(
 }
 
 export function notCorrectedHistory(
-  task: Task,
+  task: TaskHistory,
   index: number,
-  allTasks: Task[]
+  allTasks: TaskHistory[]
 ): boolean {
   const currentAction = getActionFromTask(task)
   if (currentAction === TaskAction.CORRECTED) {
