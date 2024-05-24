@@ -398,7 +398,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           >
             {showError && (
               <ErrorWrapper>
-                <ErrorText id="form_error" ignoreMediaQuery={true}>
+                <ErrorText id="form_error">
                   {(formGroup.error && intl.formatMessage(formGroup.error)) ||
                     ''}
                 </ErrorText>

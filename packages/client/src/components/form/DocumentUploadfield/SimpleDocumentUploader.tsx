@@ -146,9 +146,7 @@ const SimpleDocumentUploaderComponent = ({
     <>
       {description && <FieldDescription>{description}</FieldDescription>}
       {errorMessage && (touched || error) && (
-        <ErrorText ignoreMediaQuery id="field-error">
-          {errorMessage}
-        </ErrorText>
+        <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
       <DocumentListPreview
         attachment={files}

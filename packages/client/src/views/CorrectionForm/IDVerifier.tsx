@@ -181,6 +181,7 @@ const IDVerifierComponent = ({
         size={ContentSize.SMALL}
         title={title}
         showTitleOnMobile={true}
+        bottomActionDirection="column"
         bottomActionButtons={[positiveActionButton, negativeActionButton]}
       >
         {correctorInformation && (

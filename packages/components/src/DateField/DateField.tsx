@@ -15,6 +15,8 @@ import { InputLabel } from '../InputField/InputLabel'
 
 const DateWrapper = styled.div`
   width: 100%;
+  display: flex;
+  gap: 8px;
 `
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
@@ -36,19 +38,6 @@ interface IState {
 }
 
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
-
-const DateSegment = styled(TextInput)`
-  width: 58px !important;
-  margin: 0 4px;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
-  &:last-of-type {
-    margin-right: 0;
-    width: 80px !important;
-  }
-`
 
 const MAX_DAY_NUMBER = 31
 const MAX_YEAR_NUMBER = 2100
@@ -133,7 +122,7 @@ export const DateField = ({
             <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
           </NoticeWrapper>
         )}
-        <DateSegment
+        <TextInput
           {...props}
           id={`${id}-dd`}
           ref={ddRef}
@@ -151,7 +140,7 @@ export const DateField = ({
             event.currentTarget.blur()
           }}
         />
-        <DateSegment
+        <TextInput
           {...props}
           id={`${id}-mm`}
           ref={mmRef}
@@ -170,7 +159,7 @@ export const DateField = ({
             event.currentTarget.blur()
           }}
         />
-        <DateSegment
+        <TextInput
           {...props}
           id={`${id}-yyyy`}
           ref={yyyyRef}

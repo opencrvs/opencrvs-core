@@ -264,10 +264,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     touched={this.state.showError}
                   />
                   {this.state.showError && !questionnaire.selectedQuestion && (
-                    <InputError
-                      id={`question-${index}-validation-message`}
-                      centred={false}
-                    >
+                    <InputError id={`question-${index}-validation-message`}>
                       {intl.formatMessage(messages.selectSecurityQuestion)}
                     </InputError>
                   )}
@@ -291,10 +288,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   />
                   {this.state.showError &&
                     !this.state.questionnaire[index].answer && (
-                      <InputError
-                        id={`answer-${index}-validation-message`}
-                        centred={false}
-                      >
+                      <InputError id={`answer-${index}-validation-message`}>
                         {intl.formatMessage(messages.enterResponse)}
                       </InputError>
                     )}

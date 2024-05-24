@@ -19,7 +19,7 @@ import {
   ICertificate
 } from '@client/declarations'
 import { useDispatch } from 'react-redux'
-import { PrimaryButton } from '@client/../../components/lib/buttons'
+import { Button } from '@client/../../components/lib/Button'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
   formatUrl,
@@ -97,9 +97,12 @@ export function IssueCollectorForm({
       title={intl.formatMessage(issueMessages.issueCertificate)}
       size={ContentSize.SMALL}
       bottomActionButtons={[
-        <PrimaryButton
+        <Button
           key="continue-button"
           id="continue-button"
+          type="primary"
+          size="large"
+          fullWidth
           onClick={continueButtonHandler}
           disabled={groupHasError(
             { id: 'collector', fields },
@@ -107,7 +110,7 @@ export function IssueCollectorForm({
           )}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       showTitleOnMobile
     >
