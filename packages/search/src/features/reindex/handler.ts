@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { prune } from './prune'
 import { reindex, updateAliases } from './reindex'
 
 export async function reindexHandler(
@@ -19,6 +20,8 @@ export async function reindexHandler(
 
   const { index } = await reindex(timestamp)
   await updateAliases()
+
+  prune()
 
   return h
     .response({
