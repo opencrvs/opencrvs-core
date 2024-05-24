@@ -25,6 +25,7 @@ import { NotificationEvent } from '@client/profile/serviceApi'
 import { getLanguage } from '@client/i18n/selectors'
 import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { errorMessages } from '@client/i18n/messages/errors'
 
 interface IProps {
   show: boolean
@@ -35,6 +36,7 @@ interface IProps {
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
+  const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidEmailAddress, setIsInvalidEmailAddress] =
     React.useState(false)
   const [
@@ -56,13 +58,23 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   const restoreState = () => {
     setEmailAddress(EMPTY_STRING)
     setIsInvalidEmailAddress(false)
+    setUnknownError(false)
   }
   const toggleDuplicateEmailErrorNotification = () => {
     setShowDuplicateEmailErrorNotification((prevValue) => !prevValue)
   }
+  const toggleUnknownErrorNotification = () => {
+    setUnknownError((prevValue) => !prevValue)
+  }
   const continueButtonHandler = async (emailAddress: string) => {
-    const userData = await queriesForUser.fetchUserDetailsByEmail(emailAddress)
-    const emailExists = userData.data.getUserByEmail
+    let userData
+    try {
+      userData = await queriesForUser.fetchUserDetailsByEmail(emailAddress)
+    } catch {
+      setUnknownError(true)
+      return
+    }
+    const emailExists = userData?.data.getUserByEmail
 
     if (!emailExists) {
       const notificationEvent = NotificationEvent.CHANGE_EMAIL_ADDRESS
@@ -145,6 +157,15 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(messages.duplicateUserEmailErrorMessege, {
             email: emailAddress
           })}
+        </Toast>
+      )}
+      {unknownError && (
+        <Toast
+          id="unknown-error-notification"
+          type="warning"
+          onClose={() => toggleUnknownErrorNotification()}
+        >
+          {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
     </ResponsiveModal>

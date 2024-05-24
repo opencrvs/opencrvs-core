@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { NotificationEvent } from '@client/profile/serviceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { errorMessages } from '@client/i18n/messages/errors'
 import { getLanguage } from '@client/i18n/selectors'
 
 interface IProps {
@@ -35,6 +36,7 @@ interface IProps {
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
+  const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
@@ -54,15 +56,25 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const restoreState = () => {
     setPhoneNumber(EMPTY_STRING)
     setIsInvalidPhoneNumber(false)
+    setUnknownError(false)
   }
   const toggleDuplicateMobileErrorNotification = () => {
     setShowDuplicateMobileErrorNotification((prevValue) => !prevValue)
   }
+  const toggleUnknownErrorNotification = () => {
+    setUnknownError((prevValue) => !prevValue)
+  }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const userData = await queriesForUser.fetchUserDetailsByMobile(
-      convertToMSISDN(phoneNumber, window.config.COUNTRY)
-    )
-    const mobileNumberExist = userData.data.getUserByMobile
+    let userData
+    try {
+      userData = await queriesForUser.fetchUserDetailsByMobile(
+        convertToMSISDN(phoneNumber, window.config.COUNTRY)
+      )
+    } catch {
+      setUnknownError(true)
+      return
+    }
+    const mobileNumberExist = userData?.data.getUserByMobile
 
     if (!mobileNumberExist) {
       const notificationEvent = NotificationEvent.CHANGE_PHONE_NUMBER
@@ -155,6 +167,15 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
             number: phoneNumber
           })}
+        </Toast>
+      )}
+      {unknownError && (
+        <Toast
+          id="unknown-error-notification"
+          type="warning"
+          onClose={() => toggleUnknownErrorNotification()}
+        >
+          {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
     </ResponsiveModal>

@@ -11,6 +11,7 @@
 
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { AuthenticationError } from 'apollo-server-errors'
 
 type IAvatarResponse = {
   userName: string
@@ -50,9 +51,11 @@ export class UsersAPI extends RESTDataSource {
 
       this.memoizedResults.set(cacheKey, response)
 
-      return response
+      return await response
     } catch (e) {
-      return null
+      // Don't need to throw errors if unauthorized error is found for no user with this email
+      if (e instanceof AuthenticationError) return null
+      else throw new Error('Unknown error')
     }
   }
 
@@ -70,9 +73,11 @@ export class UsersAPI extends RESTDataSource {
 
       this.memoizedResults.set(cacheKey, response)
 
-      return response
+      return await response
     } catch (e) {
-      return null
+      // Don't need to throw errors if unauthorized error is found for no user with this mobile
+      if (e instanceof AuthenticationError) return null
+      else throw new Error('Unknown error')
     }
   }
   async getUserById(id: string) {
