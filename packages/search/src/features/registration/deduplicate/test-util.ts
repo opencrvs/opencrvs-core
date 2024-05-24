@@ -44,7 +44,9 @@ type ComparisonObject<T> = {
 type Values<T> = T[keyof T]
 
 export async function compareForBirthDuplication(
-  registrationComparison: ComparisonObject<BirthDocument>,
+  registrationComparison: ComparisonObject<
+    Omit<BirthDocument, 'compositionId'>
+  >,
   client: elasticsearch.Client
 ) {
   const existingComposition = Object.fromEntries(
@@ -58,13 +60,22 @@ export async function compareForBirthDuplication(
     )
   )
 
-  await indexComposition('123-123-123-123', existingComposition, client)
-  const results = await searchForBirthDuplicates(newComposition, client)
+  await indexComposition(
+    '123-123-123-123',
+    { compositionId: '123-123-123-123', ...existingComposition },
+    client
+  )
+  const results = await searchForBirthDuplicates(
+    { compositionId: '123-123-123-123', ...newComposition },
+    client
+  )
   return results
 }
 
 export async function compareForDeathDuplication(
-  registrationComparison: ComparisonObject<DeathDocument>,
+  registrationComparison: ComparisonObject<
+    Omit<DeathDocument, 'compositionId'>
+  >,
   client: elasticsearch.Client
 ) {
   const existingComposition = Object.fromEntries(
@@ -78,7 +89,14 @@ export async function compareForDeathDuplication(
     )
   )
 
-  await indexComposition('123-123-123-123', existingComposition, client)
-  const results = await searchForDeathDuplicates(newComposition, client)
+  await indexComposition(
+    '123-123-123-123',
+    { compositionId: '123-123-123-123', ...existingComposition },
+    client
+  )
+  const results = await searchForDeathDuplicates(
+    { compositionId: '123-123-123-123', ...newComposition },
+    client
+  )
   return results
 }
