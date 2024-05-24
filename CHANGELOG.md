@@ -8,6 +8,11 @@
 - Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
 - Supporting document fields can now be made required
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+- Allow reindexing ElasticSearch via new search-service endpoint `reindex` [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033)
+
+## Breaking changes
+
+- Gateways searchEvents `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
 
 ## 1.5.0 (TBD)
 
