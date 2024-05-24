@@ -2540,7 +2540,8 @@ export const mockDeathFhirBundleWithoutCompositionId = {
             }
           }
         ],
-        lastModified: '2019-03-19T13:05:19.260Z'
+        lastModified: '2019-03-19T13:05:19.260Z',
+        id: '11111111-1111-1111-1111-111111111111'
       }
     }
   ],
@@ -4280,7 +4281,8 @@ export const mockMinimalDeathFhirBundle = {
             }
           }
         ],
-        lastModified: '2019-03-19T13:05:19.260Z'
+        lastModified: '2019-03-19T13:05:19.260Z',
+        id: '11111111-1111-1111-1111-111111111111'
       }
     }
   ],
@@ -4543,7 +4545,8 @@ export const mockMinimalMarriageFhirBundle = {
             }
           }
         ],
-        lastModified: '2019-03-19T13:05:19.260Z'
+        lastModified: '2019-03-19T13:05:19.260Z',
+        id: '11111111-1111-1111-1111-111111111111'
       }
     }
   ]
@@ -4830,6 +4833,12 @@ export const mockTaskBundleWithExtensions = {
             valueReference: {
               reference: 'Practitioner/2d11389d-f58e-4d47-a562-b934f1b85936'
             }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/146251e9-df90-4068-82b0-27d8f979e8e2'
+            }
           }
         ],
         lastModified: '2018-11-28T15:13:57.492Z',
@@ -4862,6 +4871,135 @@ export const mockTaskBundleWithExtensions = {
           versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
         },
         id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/Location/0f7684aa-8c65-4901-8318-bf1e22c247cb/_history/2a913694-3217-4981-9689-a9d4e020a2d5' as URLReference,
+      resource: {
+        resourceType: 'Location',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/statistical-code',
+            value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+            value: 'DISTRICT'
+          }
+        ],
+        name: 'Ibombo',
+        alias: ['Ibombo'],
+        description: 'oEBf29y8JP8',
+        status: 'active',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/ed6195ff-0f83-4852-832e-dc9db07151ff'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'ADMIN_STRUCTURE'
+            }
+          ]
+        },
+        physicalType: {
+          coding: [
+            {
+              code: 'jdn',
+              display: 'Jurisdiction'
+            }
+          ]
+        },
+        extension: [],
+        meta: {
+          lastUpdated: '2023-11-29T07:02:38.392+00:00',
+          versionId: '2a913694-3217-4981-9689-a9d4e020a2d5'
+        },
+        id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/Location/ce73938d-a188-4a78-9d19-35dfd4ca6957/_history/f3012375-dbd1-4615-a1ef-e9982fa9a2ba' as URLReference,
+      resource: {
+        resourceType: 'Location',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/internal-id',
+            value: 'CRVS_OFFICE_JWMRGwDBXK'
+          }
+        ],
+        name: 'Ibombo District Office',
+        alias: ['Ibombo District Office'],
+        status: 'active',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'CRVS_OFFICE'
+            }
+          ]
+        },
+        physicalType: {
+          coding: [
+            {
+              code: 'bu',
+              display: 'Building'
+            }
+          ]
+        },
+        meta: {
+          lastUpdated: '2023-11-29T07:02:38.868+00:00',
+          versionId: 'f3012375-dbd1-4615-a1ef-e9982fa9a2ba'
+        },
+        id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/95c12c54-4060-4acc-ae47-94b1639e2c3f' as URLReference,
+      resource: {
+        resourceType: 'Location',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/internal-id',
+            value: 'HEALTH_FACILITY_FgM7TeHrSiJ'
+          }
+        ],
+        name: 'Water FallsRural Health Centre',
+        alias: ['Water FallsRural Health Centre'],
+        status: 'active',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/af050fc6-5866-455a-9cd2-6437e34a3fbe'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'HEALTH_FACILITY'
+            }
+          ]
+        },
+        physicalType: {
+          coding: [
+            {
+              code: 'bu',
+              display: 'Building'
+            }
+          ]
+        },
+        meta: {
+          lastUpdated: '2023-11-29T07:02:38.742+00:00',
+          versionId: '95c12c54-4060-4acc-ae47-94b1639e2c3f'
+        },
+        id: '146251e9-df90-4068-82b0-27d8f979e8e2' as UUID
       }
     }
   ]
@@ -5257,7 +5395,8 @@ export const mockMarriageFhirBundle = {
             }
           }
         ],
-        lastModified: '2019-03-19T13:05:19.260Z'
+        lastModified: '2019-03-19T13:05:19.260Z',
+        id: '11111111-1111-1111-1111-111111111111'
       }
     }
   ]
@@ -5579,7 +5718,8 @@ export const mockMarriageFhirBundleWithoutCompositionId = {
             }
           }
         ],
-        lastModified: '2019-03-19T13:05:19.260Z'
+        lastModified: '2019-03-19T13:05:19.260Z',
+        id: '11111111-1111-1111-1111-111111111111'
       }
     }
   ]
