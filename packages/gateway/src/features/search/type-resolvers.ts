@@ -414,16 +414,15 @@ export const searchTypeResolvers: GQLResolver = {
       if (res._id) return res
       return null
     },
-    // @TODO: Fetch via id
-    startedByFacility(searchData: ISearchEventDataTemplate) {
-      let facilityName = null
-      if (searchData._source.operationHistories) {
-        facilityName = (
-          searchData._source
-            .operationHistories as GQLOperationHistorySearchSet[]
-        )[0].notificationFacilityName
-      }
-      return facilityName
+    async startedByFacility(
+      searchData: ISearchEventDataTemplate,
+      _,
+      { dataSources }
+    ) {
+      const location = await dataSources.locationsAPI.getLocation(
+        searchData._source.eventLocationId
+      )
+      return location.name
     },
     progressReport: async (
       searchData: ISearchEventDataTemplate,
