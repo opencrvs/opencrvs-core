@@ -19,6 +19,7 @@ import {
   SavedBundleEntry,
   Task
 } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 import { toCorrectionRequested } from './state-transitions'
 
 const practitioner = REGISTERED_RECORD.entry.find(
@@ -68,6 +69,7 @@ describe('functions that take record from one state to another', () => {
       const correctionRequested = await toCorrectionRequested(
         REGISTERED_RECORD,
         practitioner,
+        '61e07903-bf3c-4bd9-9b20-6cf0e3bb982c' as UUID,
         {
           requester: 'MOTHER',
           hasShowedVerifiedDocument: true,
