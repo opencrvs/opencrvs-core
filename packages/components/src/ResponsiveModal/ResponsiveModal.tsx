@@ -110,7 +110,7 @@ const Body = styled.div<{
     height ? `${height}px` : autoHeight ? `auto` : `250px`};
   max-height: calc(100vh - 180px);
   color: ${({ theme }) => theme.colors.supportingCopy};
-  overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
+  overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'scroll')};
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
@@ -193,7 +193,7 @@ export const ResponsiveModal = ({
     }
     return body.style.removeProperty('overflow')
   }
-
+  
   useEffect(() => {
     toggleScroll()
 
