@@ -94,6 +94,9 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     overflow-y: scroll;
   }
+  #root {
+    display: block;
+  }
 `
 
 export function App(props: IAppProps) {
