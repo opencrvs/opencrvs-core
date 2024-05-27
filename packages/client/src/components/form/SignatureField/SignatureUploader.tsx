@@ -94,10 +94,8 @@ export function SignatureUploader({
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
             <ImageUploader
-              id="signature-file-upload"
-              title={intl.formatMessage(buttonMessages.upload)}
-              icon={() => <Icon name="UploadSimple" />}
-              handleFileChange={async (file) => {
+              id={id}
+              onChange={async (file) => {
                 const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
                 if (fileSizeMB > 2) {
                   setSignatureError(
@@ -121,7 +119,9 @@ export function SignatureUploader({
                 setSignatureError('')
               }}
               disabled={disabled}
-            />
+            >
+              {intl.formatMessage(buttonMessages.upload)}
+            </ImageUploader>
           </Stack>
         </>
       )}

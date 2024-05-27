@@ -312,11 +312,12 @@ class DocumentUploaderWithOptionComp extends React.Component<
             .length === 1 ? (
           <FullWidthImageUploader
             id="upload_document"
-            title={intl.formatMessage(formMessages.addFile)}
             onClick={(e) => !this.isValid() && e.preventDefault()}
-            handleFileChange={this.handleFileChange}
+            onChange={this.handleFileChange}
             disabled={this.state.filesBeingProcessed.length > 0}
-          />
+          >
+            {intl.formatMessage(formMessages.addFile)}
+          </FullWidthImageUploader>
         ) : (
           <Flex>
             <Select
@@ -331,11 +332,12 @@ class DocumentUploaderWithOptionComp extends React.Component<
             />
             <DocumentUploadButton
               id="upload_document"
-              title={intl.formatMessage(formMessages.addFile)}
               onClick={(e) => !this.isValid() && e.preventDefault()}
-              handleFileChange={this.handleFileChange}
+              onChange={this.handleFileChange}
               disabled={this.state.filesBeingProcessed.length > 0}
-            />
+            >
+              {intl.formatMessage(formMessages.addFile)}
+            </DocumentUploadButton>
           </Flex>
         )}
 

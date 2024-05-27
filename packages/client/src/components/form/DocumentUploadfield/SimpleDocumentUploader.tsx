@@ -165,11 +165,10 @@ const SimpleDocumentUploaderComponent = ({
         />
       )}
       {(!files || !files.data) && (
-        <DocumentUploader
-          id="upload_document"
-          title={intl.formatMessage(messages.uploadFile)}
-          handleFileChange={handleFileChange}
-        />
+        <DocumentUploader id="upload_document" onChange={handleFileChange}>
+          {' '}
+          {intl.formatMessage(messages.uploadFile)}
+        </DocumentUploader>
       )}
     </>
   )

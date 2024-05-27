@@ -23,8 +23,8 @@ const Template: ComponentStory<typeof ImageUploader> = (args) => (
 
 export const Default = Template.bind({})
 Default.args = {
-  title: 'Upload',
-  handleFileChange: () => {
+  children: 'Upload',
+  onChange: () => {
     alert('Uploaded!')
   }
 }
