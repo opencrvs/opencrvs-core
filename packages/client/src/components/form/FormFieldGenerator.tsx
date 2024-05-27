@@ -59,7 +59,6 @@ import {
   ISelectFormFieldWithOptions,
   ITextFormField,
   Ii18nTextFormField,
-  Ii18nNumberFormField,
   LINK,
   BULLET_LIST,
   NUMBER,
@@ -128,8 +127,14 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import { BulletList, Divider } from '@opencrvs/components'
+import {
+  BulletList,
+  Divider,
+  InputError,
+  InputLabel
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
+import { SignatureUploader } from './SignatureField/SignatureUploader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -629,7 +634,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === SIGNATURE) {
-      return null
+      return (
+        <>
+          <InputLabel></InputLabel>
+          <SignatureUploader
+            id=""
+            alt=""
+            value={inputProps.value as string}
+            onChange={(_file) => {}}
+          />
+          <InputError id=""></InputError>
+        </>
+      )
     }
     return (
       <InputField {...inputFieldProps}>
@@ -666,10 +682,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-const mapFieldsToValues = (
-  fields: IFormField[],
-  userDetails: UserDetails | null
-) =>
+const mapFieldsToValues = (fields: IFormField[]) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -1186,9 +1199,7 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
 
   return (
     <Formik<IFormSectionData>
-      initialValues={
-        props.initialValues ?? mapFieldsToValues(props.fields, userDetails)
-      }
+      initialValues={props.initialValues ?? mapFieldsToValues(props.fields)}
       onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(
