@@ -12,7 +12,6 @@ import { ApolloQueryResult } from '@apollo/client'
 import { ValidationInitializer } from '@client/utils/validate'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'
 import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
-import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
   IRadioOption as RadioComponentOption,
   RadioSize
@@ -488,7 +487,6 @@ export interface IFormFieldBase {
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
   hideHeader?: boolean
-  mode?: THEME_MODE
   hidden?: boolean
   previewGroup?: string
   nestedFields?: { [key: string]: IFormField[] }
@@ -512,7 +510,6 @@ export interface IFormFieldBase {
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
   customQuestionMappingId?: string
-  ignoreMediaQuery?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -1011,12 +1008,10 @@ export interface Ii18nFormFieldBase {
   conditionals?: Conditional[]
   hideAsterisk?: boolean
   hideHeader?: boolean
-  mode?: THEME_MODE
   placeholder?: string
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
   ignoreBottomMargin?: boolean
-  ignoreMediaQuery?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

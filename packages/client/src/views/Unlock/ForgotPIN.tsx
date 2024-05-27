@@ -73,7 +73,6 @@ const Password = injectIntl(
         id={id}
         touched={meta.touched}
         label={intl.formatMessage(constantsMessages.labelPassword)}
-        ignoreMediaQuery
         hideAsterisk
       >
         <PasswordInput
@@ -81,7 +80,6 @@ const Password = injectIntl(
           {...input}
           touched={meta.touched}
           error={Boolean(meta.error)}
-          ignoreMediaQuery
         />
       </InputField>
     )

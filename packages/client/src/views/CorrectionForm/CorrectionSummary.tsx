@@ -49,13 +49,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Text } from '@opencrvs/components/lib/Text'
-import {
-  SuccessButton,
-  SecondaryButton,
-  LinkButton,
-  ICON_ALIGNMENT,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
+import { SecondaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
@@ -199,9 +193,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
 
     const continueButton = (
-      <SuccessButton
+      <Button
         id="make_correction"
         key="make_correction"
+        type="positive"
+        size="large"
         onClick={() => {
           userRole === ROLE_REGISTRATION_AGENT
             ? this.togglePrompt()
@@ -211,13 +207,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           sectionHasError(this.group, this.section, declaration) ||
           this.state.isFileUploading
         }
-        icon={() => <Check />}
-        align={ICON_ALIGNMENT.LEFT}
       >
+        <Check />
         {userRole === ROLE_REGISTRATION_AGENT
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
-      </SuccessButton>
+      </Button>
     )
 
     return (

@@ -27,7 +27,6 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   opacity: 1;
   margin: 0;
   background: transparent;
-  flex-shrink: 0;
 
   ${fullWidth &&
   css`

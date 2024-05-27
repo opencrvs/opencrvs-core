@@ -50,6 +50,7 @@ const Flex = styled.div`
 
 const DocumentUploadButton = styled(ImageUploader)`
   height: 46px;
+  flex-shrink: 0;
 `
 
 type IFullProps = {

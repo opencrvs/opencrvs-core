@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
@@ -29,7 +29,7 @@ import React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import styled, { withTheme } from 'styled-components'
+import { withTheme } from 'styled-components'
 import {
   calculatePrice,
   getEventDate,
@@ -42,10 +42,6 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { UserDetails } from '@client/utils/userUtils'
-
-const Action = styled.div`
-  margin-top: 32px;
-`
 
 interface IProps {
   event: Event
@@ -141,7 +137,23 @@ const PaymentComponent = ({
         hideBackground
         goHome={() => goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
-        <Content title={intl.formatMessage(messages.payment)} showTitleOnMobile>
+        <Content
+          title={intl.formatMessage(messages.payment)}
+          size={ContentSize.SMALL}
+          showTitleOnMobile
+          bottomActionButtons={[
+            <Button
+              key="Continue"
+              id="Continue"
+              type="primary"
+              size="large"
+              fullWidth
+              onClick={() => handleContinue(paymentAmount.toString())}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </Button>
+          ]}
+        >
           <Summary id="summary">
             <Summary.Row
               id="service"
@@ -162,14 +174,6 @@ const PaymentComponent = ({
               }
             />
           </Summary>
-          <Action>
-            <PrimaryButton
-              id="Continue"
-              onClick={() => handleContinue(paymentAmount.toString())}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </Action>
         </Content>
       </ActionPageLight>
     </>
