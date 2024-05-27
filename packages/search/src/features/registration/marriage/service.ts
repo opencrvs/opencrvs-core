@@ -20,7 +20,8 @@ import {
   IOperationHistory,
   NAME_EN,
   REJECTED_STATUS,
-  composeOperationHistories
+  composeOperationHistories,
+  assign
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -120,6 +121,7 @@ function createIndexBody(
   createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
+  assign(body, bundle)
 }
 
 function createBrideIndex(

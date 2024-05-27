@@ -18,11 +18,19 @@ import {
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
 import {
+  ASSIGNED_EXTENSION_URL,
+  findExtension,
+  findLastOfficeFromSavedBundle,
   findTaskHistories,
   getBusinessStatus,
+  getPractitioner,
+  getTaskFromSavedBundle,
+  LAST_USER_EXTENSION_URL,
+  resourceIdentifierToUUID,
   SavedBundle,
   SavedTask
 } from '@opencrvs/commons/types'
+import { findName } from '@search/features/fhir/fhir-utils'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -312,6 +320,37 @@ export const createStatusHistory = (body: SearchDocument, task: SavedTask) => {
 
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
+}
+
+export const assign = (body: SearchDocument, bundle: SavedBundle) => {
+  const task = getTaskFromSavedBundle(bundle)
+
+  const assignedExtension = findExtension(
+    ASSIGNED_EXTENSION_URL,
+    task.extension
+  )
+  const regLastUserExtension = findExtension(
+    LAST_USER_EXTENSION_URL,
+    task.extension
+  )
+  const regLastOffice = findLastOfficeFromSavedBundle(bundle)
+  if (assignedExtension) {
+    const userId = resourceIdentifierToUUID(
+      regLastUserExtension!.valueReference.reference
+    )
+    const user = getPractitioner(userId, bundle)
+
+    const userName = user && findName(NAME_EN, user.name)
+    const userFirstNames = userName?.given?.join(' ') || ''
+    const userFamilyName = userName?.family || ''
+
+    body.assignment = {
+      userId,
+      officeName: regLastOffice.name!,
+      firstName: userFirstNames,
+      lastName: userFamilyName
+    }
+  }
 }
 
 export function findDuplicateIds(

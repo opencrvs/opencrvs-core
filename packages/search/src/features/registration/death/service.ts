@@ -19,7 +19,8 @@ import {
   DeathDocument,
   IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  assign
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
@@ -112,6 +113,7 @@ function createIndexBody(
   createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
+  assign(body, bundle)
 }
 
 function createDeceasedIndex(
