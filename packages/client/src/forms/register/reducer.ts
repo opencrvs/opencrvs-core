@@ -71,7 +71,12 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         registerForm: {
           birth: {
             ...birth,
-            sections: [...birth.sections, { ...preview, id: 'preview' }]
+            sections: [
+              ...birth.sections,
+              ...(birth.sections.find((s) => s.id === 'preview')
+                ? []
+                : [{ ...preview, id: 'preview' }])
+            ]
           },
           death: {
             ...death,
