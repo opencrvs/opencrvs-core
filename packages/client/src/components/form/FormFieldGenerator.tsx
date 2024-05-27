@@ -78,7 +78,6 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
@@ -88,7 +87,8 @@ import {
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
-  HIDDEN
+  HIDDEN,
+  SIGNATURE
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -436,7 +436,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <TextArea
             {...inputProps}
-            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            maxLength={fieldDefinition.maxLength}
             value={value.toString()}
           />
         </InputField>
@@ -512,14 +512,13 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
                 e.preventDefault()
               }
-              const maxLength = (fieldDefinition as Ii18nNumberFormField)
-                .maxLength
+              const maxLength = fieldDefinition.maxLength
               if (maxLength && e.currentTarget.value.length >= maxLength) {
                 e.preventDefault()
               }
             }}
             value={inputProps.value as string}
-            maxLength={(fieldDefinition as Ii18nNumberFormField).maxLength}
+            maxLength={fieldDefinition.maxLength}
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
@@ -628,6 +627,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           value={inputProps.value as string}
         />
       )
+    }
+    if (fieldDefinition.type === SIGNATURE) {
+      return null
     }
     return (
       <InputField {...inputFieldProps}>

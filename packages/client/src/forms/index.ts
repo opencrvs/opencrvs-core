@@ -71,6 +71,7 @@ export const TIME = 'TIME'
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
 export const HEADING3 = 'HEADING3'
+export const SIGNATURE = 'SIGNATURE'
 
 export enum Sort {
   ASC = 'asc',
@@ -709,6 +710,10 @@ export interface INidVerificationButton extends IFormFieldBase {
   labelForOffline: MessageDescriptor
 }
 
+export interface ISignatureFormField extends IFormFieldBase {
+  type: typeof SIGNATURE
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -742,6 +747,7 @@ export type IFormField =
   | ITimeFormFIeld
   | INidVerificationButton
   | IDividerFormField
+  | ISignatureFormField
 
 export interface IPreviewGroup {
   id: string
@@ -992,7 +998,7 @@ export interface Ii18nSelectOption {
 
 export interface Ii18nFormFieldBase {
   name: string
-  type: string
+  type: Ii18nFormField['type']
   label: string
   helperText?: string
   tooltip?: string
@@ -1194,6 +1200,11 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
 }
+
+export interface Ii18nSignatureField extends Ii18nFormFieldBase {
+  type: typeof SIGNATURE
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1225,6 +1236,7 @@ export type Ii18nFormField =
   | Ii18nNidVerificationButtonField
   | I18nDividerField
   | I18nHeading3Field
+  | Ii18nSignatureField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
