@@ -20,6 +20,8 @@ import {
   TransactionResponse,
   URLReference
 } from '@opencrvs/commons/types'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -118,6 +120,31 @@ describe('Create record endpoint', () => {
         }
         return res(ctx.json(responseBundle))
       })
+    )
+
+    // mock fetching the practitioner's location hierarchy, derived from regLastOffice
+    mswServer.use(
+      rest.get(
+        'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+        (_, res, ctx) => {
+          return res(
+            ctx.json([
+              fixtures.savedAdministrativeLocation({
+                id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+                name: 'Ibombo',
+                partOf: { reference: 'Location/0' }
+              }),
+              fixtures.savedAdministrativeLocation({
+                id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
+                name: 'Ibombo District Office',
+                partOf: {
+                  reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+                }
+              })
+            ])
+          )
+        }
+      )
     )
 
     // mock tracking-id generation from country confgi
