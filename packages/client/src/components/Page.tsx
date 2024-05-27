@@ -31,7 +31,7 @@ import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
-import { LoadingBar } from './LoadingBar'
+import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};

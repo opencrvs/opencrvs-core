@@ -30,7 +30,7 @@ import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { LoadingBar } from './LoadingBar'
+import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Text } from '@opencrvs/components'
+import { Text } from '../Text'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
 
