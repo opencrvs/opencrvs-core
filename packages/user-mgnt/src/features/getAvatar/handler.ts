@@ -15,8 +15,8 @@ export default async function getUserAvatar(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = request.params.userId
-  const user: IUserModel | null = await User.findById(userId)
+  const practitionerId = request.params.practitionerId
+  const user: IUserModel | null = await User.findOne({ practitionerId })
 
   if (!user) {
     return h.response().code(400)

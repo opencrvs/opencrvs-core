@@ -340,11 +340,11 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
     },
     {
       method: 'GET',
-      path: '/users/{userId}/avatar',
+      path: '/practitioners/{practitionerId}/avatar',
       handler: getUserAvatar,
       config: {
         tags: ['api'],
-        description: 'Retrieves a user avatar',
+        description: 'Retrieves a practitioner avatar',
         auth: false
       }
     },

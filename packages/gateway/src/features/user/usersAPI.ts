@@ -33,7 +33,7 @@ export class UsersAPI extends RESTDataSource {
   }
 
   async getUserAvatar(id: string): Promise<IAvatarResponse> {
-    return this.get(`users/${id}/avatar`)
+    return this.get(`practitioners/${id}/avatar`)
   }
 
   async getUserByEmail(email: string) {
