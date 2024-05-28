@@ -1704,7 +1704,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
-      formSections.filter(({ id }) => id !== 'documents'),
+      formSections.filter(({ id }) => id !== 'documents' && id !== 'preview'),
       errorsOnFields,
       offlineCountryConfiguration,
       declaration
@@ -1916,7 +1916,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )!.groups[0].fields
                     }
                     draftData={declaration.data}
-                    onUploadingStateChanged={() => {}}
                   />
 
                   {totalFileSizeExceeded && (
