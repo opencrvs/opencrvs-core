@@ -58,13 +58,13 @@ export type SignatureUploaderProps = Omit<
   name: string
   value: string
   onChange: (value: string) => void
+  required?: boolean
   modalTitle: string
 }
 
 export function SignatureUploader({
   value,
   onChange,
-  disabled,
   modalTitle,
   ...props
 }: SignatureUploaderProps) {
@@ -90,7 +90,7 @@ export function SignatureUploader({
               type="secondary"
               size="medium"
               onClick={() => setSignatureDialogOpen(true)}
-              disabled={disabled}
+              disabled={props.disabled}
             >
               <Icon name="Pen" />
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
@@ -120,7 +120,6 @@ export function SignatureUploader({
                 onChange((await getBase64String(file)).toString())
                 setSignatureError('')
               }}
-              disabled={disabled}
             >
               {intl.formatMessage(buttonMessages.upload)}
             </ImageUploader>

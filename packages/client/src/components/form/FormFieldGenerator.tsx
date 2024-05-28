@@ -127,15 +127,13 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import {
-  BulletList,
-  Divider,
-  InputError,
-  InputLabel
-} from '@opencrvs/components'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 
+const SignatureField = styled(Stack)`
+  margin-top: 8px;
+`
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -634,17 +632,25 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === SIGNATURE) {
+      const { name, helperText, required, label } = fieldDefinition
       return (
-        <>
-          <InputLabel></InputLabel>
+        <SignatureField direction="column" gap={8} alignItems="start">
+          <InputLabel
+            {...inputFieldProps}
+            htmlFor={name}
+            inputDescriptor={helperText}
+          >
+            {label}
+          </InputLabel>
           <SignatureUploader
-            id=""
-            alt=""
-            value={inputProps.value as string}
-            onChange={(_file) => {}}
+            {...inputProps}
+            name={name}
+            modalTitle={label}
+            value={value as string}
+            required={required}
+            onChange={(sig) => onSetFieldValue(name, sig)}
           />
-          <InputError id=""></InputError>
-        </>
+        </SignatureField>
       )
     }
     return (
