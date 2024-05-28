@@ -73,7 +73,7 @@ const MOCK_USER: IUserModelData = {
 }
 
 const MOCK_RESPONSES = {
-  'practitioners/511ab59f-54df-4331-8c22-97062a602154/avatar': {
+  'practitioners/48455871-1636-46a1-8279-aaa76dec03d4/avatar': {
     userName: 'e.test',
     avatarURI: '/mock-avatar-url'
   },
