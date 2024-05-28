@@ -12,8 +12,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
-import { ErrorText, ImageUploader, ResponsiveModal } from '@opencrvs/components'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import {
+  ImageUploader,
+  InputError,
+  ResponsiveModal
+} from '@opencrvs/components'
+import {
+  buttonMessages,
+  formMessages,
+  validationMessages
+} from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
 import {
   ApplyButton,
@@ -41,9 +49,6 @@ const SignaturePreview = styled.img`
   max-width: 50%;
   display: block;
 `
-const ErrorMessage = styled.div`
-  margin-top: 16px;
-`
 
 const SignatureDescription = styled.p`
   margin-top: 0;
@@ -53,7 +58,7 @@ const SignatureDescription = styled.p`
 
 export type SignatureUploaderProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'onChange'
+  'onChange' | 'value'
 > & {
   name: string
   value: string
@@ -63,7 +68,7 @@ export type SignatureUploaderProps = Omit<
 }
 
 export function SignatureUploader({
-  value,
+  value: signatureData,
   onChange,
   modalTitle,
   ...props
@@ -74,7 +79,13 @@ export function SignatureUploader({
   const intl = useIntl()
   const allowedSignatureFormat = ['image/png']
 
-  const signatureData = value
+  const requiredError =
+    props.required &&
+    !Boolean(signatureData) &&
+    intl.formatMessage(validationMessages.required)
+
+  const error = signatureError || requiredError
+
   function apply() {
     setSignatureDialogOpen(false)
     setSignatureError('')
@@ -141,9 +152,7 @@ export function SignatureUploader({
           {intl.formatMessage(messages.signatureDelete)}
         </Button>
       )}
-      <ErrorMessage id="signature-upload-error">
-        {signatureError.length !== 0 && <ErrorText>{signatureError}</ErrorText>}
-      </ErrorMessage>
+      {error && <InputError id={`${props.name}_error`}>{error}</InputError>}
       <ResponsiveModal
         id={`${props.id}_modal`}
         title={modalTitle}
@@ -173,7 +182,7 @@ export function SignatureUploader({
         <SignatureDescription>
           {intl.formatMessage(messages.signatureInputDescription)}
         </SignatureDescription>
-        <SignCanvas value={value} onChange={setSignatureValue} />
+        <SignCanvas value={signatureData} onChange={setSignatureValue} />
       </ResponsiveModal>
     </>
   )
