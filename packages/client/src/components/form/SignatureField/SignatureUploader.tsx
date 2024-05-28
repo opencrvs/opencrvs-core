@@ -51,21 +51,23 @@ const SignatureDescription = styled.p`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-export interface SignatureInputProps {
-  id: string
-  value?: string
+export type SignatureUploaderProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onChange'
+> & {
+  name: string
+  value: string
   onChange: (value: string) => void
-  disabled?: boolean
-  alt: string
+  modalTitle: string
 }
 
 export function SignatureUploader({
-  id,
   value,
   onChange,
   disabled,
-  alt
-}: SignatureInputProps) {
+  modalTitle,
+  ...props
+}: SignatureUploaderProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
   const [signatureValue, setSignatureValue] = useState(EMPTY_STRING)
   const [signatureError, setSignatureError] = useState(EMPTY_STRING)
@@ -94,7 +96,7 @@ export function SignatureUploader({
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
             <ImageUploader
-              id={id}
+              {...props}
               onChange={async (file) => {
                 const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
                 if (fileSizeMB > 2) {
@@ -125,7 +127,9 @@ export function SignatureUploader({
           </Stack>
         </>
       )}
-      {signatureData && <SignaturePreview alt={alt} src={signatureData} />}
+      {signatureData && (
+        <SignaturePreview alt={modalTitle} src={signatureData} />
+      )}
       {signatureData && (
         <Button
           type="tertiary"
@@ -142,8 +146,8 @@ export function SignatureUploader({
         {signatureError.length !== 0 && <ErrorText>{signatureError}</ErrorText>}
       </ErrorMessage>
       <ResponsiveModal
-        id={`${id}_modal`}
-        title={alt}
+        id={`${props.id}_modal`}
+        title={modalTitle}
         autoHeight={true}
         titleHeightAuto={true}
         width={600}

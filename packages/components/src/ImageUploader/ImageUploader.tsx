@@ -18,11 +18,10 @@ const HiddenInput = styled.input`
 `
 
 type ImageUploaderProps = Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  'onChange' | 'onClick'
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onChange' | 'type'
 > & {
   onChange?: (file: File) => void
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -44,6 +43,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   return (
     <Button
+      {...props}
       type="secondary"
       size="medium"
       onClick={(event) => {
@@ -52,16 +52,15 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         }
         fileUploader.current!.click()
       }}
-      disabled={props.disabled}
     >
       <Icon name="UploadSimple" />
       {children}
       <HiddenInput
+        name={props.name}
         ref={fileUploader}
         type="file"
         accept="image/*"
         onChange={handleFileChange}
-        {...props}
       />
     </Button>
   )
