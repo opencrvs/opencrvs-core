@@ -58,5 +58,5 @@ export async function unassignRecordHandler(
   )
   await auditEvent('unassigned', unassignedRecord, token)
 
-  return unassignedRecord
+  return unassignedRecordWithTaskOnly
 }
