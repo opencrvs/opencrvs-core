@@ -42,15 +42,14 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
         background-color: #f8f8f8;
         margin: 0;
       }
-      #root {
+      .progress-container {
         height: 100vh;
+        width: 100vw;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         opacity: 0;
-        margin: 0;
-        padding: 0;
         animation: fadeIn 2s forwards;
         font-family: sans-serif;
       }
@@ -103,16 +102,18 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <div id="root">
-      <img
-        src="./images/logo-90x90.svg"
-        width="90"
-        height="90"
-        alt="OpenCRVS logo"
-      />
-      <div class="progress-bar">
-        <div id="progress"></div>
+      <div class="progress-container">
+        <img
+          src="./images/logo-90x90.svg"
+          width="90"
+          height="90"
+          alt="OpenCRVS logo"
+        />
+        <div class="progress-bar">
+          <div id="progress"></div>
+        </div>
+        <p>Installing application...</p>
       </div>
-      <p>Installing application...</p>
     </div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
