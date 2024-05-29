@@ -15,7 +15,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "yarn check:license && lerna run precommit"
+      "pre-commit": "yarn check:license && lerna run --parallel precommit"
     }
   },
   "scripts": {
