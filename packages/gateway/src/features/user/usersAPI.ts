@@ -55,7 +55,7 @@ export class UsersAPI extends RESTDataSource {
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this email
       if (e instanceof AuthenticationError) return null
-      else throw new Error('Unknown error')
+      else throw e
     }
   }
 
@@ -77,7 +77,7 @@ export class UsersAPI extends RESTDataSource {
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this mobile
       if (e instanceof AuthenticationError) return null
-      else throw new Error('Unknown error')
+      else throw e
     }
   }
   async getUserById(id: string) {

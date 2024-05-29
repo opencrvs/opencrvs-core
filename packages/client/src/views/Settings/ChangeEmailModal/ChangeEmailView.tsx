@@ -36,7 +36,7 @@ interface IProps {
 }
 
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByeEmail] =
+  const [fetchUserDetailsByEmail] =
     useLazyQuery<GetUserByEmailQuery>(GET_USER_BY_EMAIL)
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
@@ -71,7 +71,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (emailAddress: string) => {
-    const { data: userData, error } = await fetchUserDetailsByeEmail({
+    const { data: userData, error } = await fetchUserDetailsByEmail({
       variables: { email: emailAddress }
     })
     if (error) {
