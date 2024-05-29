@@ -34,6 +34,7 @@
 - Add loading spinners before JavaScript bundle has loaded for both login and client
 - Support for landscape certificate templates
 - Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
+- Metabase default credentials now must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start [#6578](https://github.com/opencrvs/opencrvs-core/issues/6578)
 
 ## Bug fixes
 
