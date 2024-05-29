@@ -73,10 +73,6 @@ const MOCK_USER: IUserModelData = {
 }
 
 const MOCK_RESPONSES = {
-  'practitioners/48455871-1636-46a1-8279-aaa76dec03d4/avatar': {
-    userName: 'e.test',
-    avatarURI: '/mock-avatar-url'
-  },
   getUser: MOCK_USER,
   // User's primary office's parent location
   '/Location/c1ddb556-8b22-4182-9a6c-64358c0e96c9': {
