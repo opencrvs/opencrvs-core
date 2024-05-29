@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
 const Label = styled.label<{ disabled?: boolean }>`
-  list-style-type: none;
   display: flex;
   flex-direction: row;
   gap: 12px;
