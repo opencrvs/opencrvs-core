@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { Icon } from '../Icon'
 
 const Label = styled.label<{ disabled?: boolean }>`
-  list-style-type: none;
   display: flex;
   flex-direction: row;
   gap: 16px;
