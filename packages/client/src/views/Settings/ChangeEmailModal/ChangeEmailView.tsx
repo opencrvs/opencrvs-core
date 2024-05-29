@@ -17,7 +17,7 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { queriesForUser } from '@client/views/Settings/queries'
+import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
@@ -26,6 +26,8 @@ import { getLanguage } from '@client/i18n/selectors'
 import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { useLazyQuery } from '@apollo/client'
+import { GetUserByEmailQuery } from '@client/utils/gateway'
 
 interface IProps {
   show: boolean
@@ -34,6 +36,8 @@ interface IProps {
 }
 
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
+  const [fetchUserDetailsByeEmail] =
+    useLazyQuery<GetUserByEmailQuery>(GET_USER_BY_EMAIL)
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
@@ -67,14 +71,14 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (emailAddress: string) => {
-    let userData
-    try {
-      userData = await queriesForUser.fetchUserDetailsByEmail(emailAddress)
-    } catch {
+    const { data: userData, error } = await fetchUserDetailsByeEmail({
+      variables: { email: emailAddress }
+    })
+    if (error) {
       setUnknownError(true)
       return
     }
-    const emailExists = userData?.data.getUserByEmail
+    const emailExists = userData?.getUserByEmail
 
     if (!emailExists) {
       const notificationEvent = NotificationEvent.CHANGE_EMAIL_ADDRESS
@@ -97,6 +101,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
       onSuccess(emailAddress)
     } else {
       toggleDuplicateEmailErrorNotification()
+      setUnknownError(false)
     }
   }
   React.useEffect(() => {

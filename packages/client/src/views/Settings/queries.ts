@@ -11,7 +11,7 @@
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 
-const GET_USER_BY_MOBILE = gql`
+export const GET_USER_BY_MOBILE = gql`
   query getUserByMobile($mobile: String) {
     getUserByMobile(mobile: $mobile) {
       id
@@ -27,7 +27,7 @@ const GET_USER_BY_MOBILE = gql`
   }
 `
 
-const GET_USER_BY_EMAIL = gql`
+export const GET_USER_BY_EMAIL = gql`
   query getUserByEmail($email: String) {
     getUserByEmail(email: $email) {
       id

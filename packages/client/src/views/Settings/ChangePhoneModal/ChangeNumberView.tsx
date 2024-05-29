@@ -19,13 +19,15 @@ import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { convertToMSISDN } from '@client/forms/utils'
-import { queriesForUser } from '@client/views/Settings/queries'
+import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { NotificationEvent } from '@client/profile/serviceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { getLanguage } from '@client/i18n/selectors'
+import { useLazyQuery } from '@apollo/client'
+import { GetUserByMobileQuery } from '@client/utils/gateway'
 
 interface IProps {
   show: boolean
@@ -34,6 +36,8 @@ interface IProps {
 }
 
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
+  const [fetchUserDetailsByMobile] =
+    useLazyQuery<GetUserByMobileQuery>(GET_USER_BY_MOBILE)
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
@@ -65,16 +69,15 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    let userData
-    try {
-      userData = await queriesForUser.fetchUserDetailsByMobile(
-        convertToMSISDN(phoneNumber, window.config.COUNTRY)
-      )
-    } catch {
+    const formattedNumber = convertToMSISDN(phoneNumber, window.config.COUNTRY)
+    const { data: userData, error } = await fetchUserDetailsByMobile({
+      variables: { mobile: formattedNumber }
+    })
+    if (error) {
       setUnknownError(true)
       return
     }
-    const mobileNumberExist = userData?.data.getUserByMobile
+    const mobileNumberExist = userData?.getUserByMobile
 
     if (!mobileNumberExist) {
       const notificationEvent = NotificationEvent.CHANGE_PHONE_NUMBER
@@ -96,6 +99,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       onSuccess(phoneNumber)
     } else {
       toggleDuplicateMobileErrorNotification()
+      setUnknownError(false)
     }
   }
   React.useEffect(() => {
