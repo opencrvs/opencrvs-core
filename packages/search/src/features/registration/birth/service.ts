@@ -129,7 +129,12 @@ function createChildIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)!
+  const child = findEntry<Patient>(CHILD_CODE, composition, bundle)
+
+  if (!child) {
+    return
+  }
+
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
