@@ -65,10 +65,7 @@ export async function compareForBirthDuplication(
     { compositionId: '123-123-123-123', ...existingComposition },
     client
   )
-  const results = await searchForBirthDuplicates(
-    { compositionId: '123-123-123-123', ...newComposition },
-    client
-  )
+  const results = await searchForBirthDuplicates(newComposition, client)
   return results
 }
 
@@ -94,9 +91,6 @@ export async function compareForDeathDuplication(
     { compositionId: '123-123-123-123', ...existingComposition },
     client
   )
-  const results = await searchForDeathDuplicates(
-    { compositionId: '123-123-123-123', ...newComposition },
-    client
-  )
+  const results = await searchForDeathDuplicates(newComposition, client)
   return results
 }
