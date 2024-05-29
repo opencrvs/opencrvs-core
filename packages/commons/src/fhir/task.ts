@@ -139,7 +139,7 @@ export type SavedTask = Omit<Task, 'focus' | 'id'> & {
   }
 }
 
-export type TaskHistory = Omit<SavedTask, 'resourceType' | 'focus' | 'id'> & {
+export type TaskHistory = Omit<Saved<Task>, 'resourceType'> & {
   resourceType: 'TaskHistory'
 }
 
