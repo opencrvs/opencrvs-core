@@ -107,7 +107,7 @@ export interface ICorrection {
 }
 
 export interface IAssignment {
-  userId: string
+  practitionerId: string
   firstName: string
   lastName: string
   officeName: string
@@ -335,17 +335,17 @@ export const assign = (body: SearchDocument, bundle: SavedBundle) => {
   )
   const regLastOffice = findLastOfficeFromSavedBundle(bundle)
   if (assignedExtension) {
-    const userId = resourceIdentifierToUUID(
+    const practitionerId = resourceIdentifierToUUID(
       regLastUserExtension!.valueReference.reference
     )
-    const user = getPractitioner(userId, bundle)
+    const user = getPractitioner(practitionerId, bundle)
 
     const userName = user && findName(NAME_EN, user.name)
     const userFirstNames = userName?.given?.join(' ') || ''
     const userFamilyName = userName?.family || ''
 
     body.assignment = {
-      userId,
+      practitionerId,
       officeName: regLastOffice.name!,
       firstName: userFirstNames,
       lastName: userFamilyName

@@ -26,7 +26,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       createdAt
       modifiedAt
       assignment {
-        userId
+        practitionerId
         firstName
         lastName
         officeName

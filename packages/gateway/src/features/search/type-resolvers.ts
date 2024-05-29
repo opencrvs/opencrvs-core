@@ -18,6 +18,7 @@ import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
+import { getFullName } from '@gateway/features/user/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -32,7 +33,7 @@ interface IAssignment {
   officeName: string
   firstName: string
   lastName: string
-  userId: string
+  practitionerId: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -461,17 +462,23 @@ export const searchTypeResolvers: GQLResolver = {
       _,
       { dataSources, headers: authHeader, presignDocumentUrls }
     ) {
-      const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
-        assignmentData.userId
+      const user = await dataSources.usersAPI.getUserByPractitionerId(
+        assignmentData.practitionerId
       )
 
-      if (avatarURI) {
+      if (user.avatar?.data) {
         if (!presignDocumentUrls) {
-          return avatarURI
+          return user.avatar.data
         }
-        const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
+        const avatarURL = await getPresignedUrlFromUri(
+          user.avatar.data,
+          authHeader
+        )
         return avatarURL
       }
+
+      const userName = getFullName(user, 'en')
+
       return `${AVATAR_API}${userName}`
     }
   }

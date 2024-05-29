@@ -36,7 +36,7 @@ export const SEARCH_EVENTS = gql`
           registeredLocationId
           duplicates
           assignment {
-            userId
+            practitionerId
             firstName
             lastName
             officeName
