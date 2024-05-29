@@ -34,7 +34,7 @@ export async function performanceDataRefreshHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  refresh(request.headers.authorization).catch((error) => {
+  refresh().catch((error) => {
     logger.error(`Error on performance data refresh triggered: ${error}`)
   })
   return h.response({
@@ -43,7 +43,7 @@ export async function performanceDataRefreshHandler(
   })
 }
 
-export async function refresh(authorization: string) {
+export async function refresh() {
   if (updateInProgress) {
     logger.info('Performance materialised views already being refreshed')
     nextUpdateRequested = true
@@ -54,7 +54,7 @@ export async function refresh(authorization: string) {
   try {
     updateInProgress = true
     const connectedClient = await client.connect()
-    await refreshPerformanceMaterialisedViews(connectedClient, authorization)
+    await refreshPerformanceMaterialisedViews(connectedClient)
     logger.info('Performance materialised views refreshed')
   } catch (error) {
     logger.error(`Error refreshing performances materialised views ${error}`)
@@ -64,17 +64,14 @@ export async function refresh(authorization: string) {
     updateInProgress = false
     if (nextUpdateRequested) {
       nextUpdateRequested = false
-      refresh(authorization)
+      refresh()
     }
   }
 }
 
-async function refreshPerformanceMaterialisedViews(
-  client: MongoClient,
-  authorization: string
-) {
+async function refreshPerformanceMaterialisedViews(client: MongoClient) {
   const db = client.db()
-  const queries = await getDashboardQueries(authorization)
+  const queries = await getDashboardQueries()
 
   for (const { collection, aggregate } of queries) {
     await db
