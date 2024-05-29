@@ -285,7 +285,6 @@ export const getRoutes = () => {
       handler: reindexHandler,
       config: {
         tags: ['api'],
-        // @TODO: Auth?
         auth: false,
         validate: {
           payload: Joi.object({
