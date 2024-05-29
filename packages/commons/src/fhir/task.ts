@@ -139,13 +139,8 @@ export type SavedTask = Omit<Task, 'focus' | 'id'> & {
   }
 }
 
-// @TODO: Can TaskHistory ever be not saved?
-export type TaskHistory = Omit<Saved<Task>, 'resourceType' | 'focus' | 'id'> & {
+export type TaskHistory = Omit<SavedTask, 'resourceType' | 'focus' | 'id'> & {
   resourceType: 'TaskHistory'
-  id: UUID
-  focus: {
-    reference: ResourceIdentifier
-  }
 }
 
 export type CorrectionRequestedTask = Omit<Task, 'encounter' | 'requester'> & {
