@@ -268,12 +268,12 @@ export const formMessageDescriptors = {
     id: 'form.field.label.informantsRelationWithDeceased'
   },
   brideName: {
-    defaultMessage: 'Print and issue to bride',
+    defaultMessage: 'Bride',
     description: 'Form section name for Bride',
     id: 'form.section.bride.name'
   },
   groomName: {
-    defaultMessage: 'Print and issue to groom',
+    defaultMessage: 'Groom',
     description: 'Form section name for Groom',
     id: 'form.section.groom.name'
   },
