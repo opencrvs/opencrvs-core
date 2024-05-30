@@ -34,10 +34,10 @@ const defaultOptions = {
 
 const FullWidthImageUploader = styled(ImageUploader)`
   width: 100%;
+  height: 46px;
 `
 
 const UploadWrapper = styled.div`
-  max-width: 461px;
   width: 100%;
 `
 
@@ -46,8 +46,10 @@ const Flex = styled.div`
   flex-wrap: nowrap;
   gap: 8px;
 `
-export const ErrorMessage = styled.div`
-  margin-bottom: 16px;
+
+const DocumentUploadButton = styled(ImageUploader)`
+  height: 46px;
+  flex-shrink: 0;
 `
 
 type IFullProps = {
@@ -310,7 +312,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
             isDisabled={filesBeingProcessed.length > 0}
             onBlur={props.onBlur}
           />
-          <ImageUploader
+          <DocumentUploadButton
             id="upload_document"
             title={intl.formatMessage(formMessages.addFile)}
             onClick={(e) => !isValid() && e.preventDefault()}

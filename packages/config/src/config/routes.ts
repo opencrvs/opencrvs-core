@@ -279,6 +279,7 @@ export default function getRoutes(): ServerRoute[] {
       handler: getDashboardQueries,
       options: {
         tags: ['api'],
+        auth: false,
         description: 'Fetch dashboard queries from country config'
       }
     }

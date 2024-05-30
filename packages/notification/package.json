@@ -42,7 +42,7 @@
     "@types/handlebars": "^4.1.0",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
-    "@types/jsonwebtoken": "^8.3.0",
+    "@types/jsonwebtoken": "^9.0.0",
     "@types/node-fetch": "^2.5.12",
     "chalk": "^4.1.0",
     "copyfiles": "^2.1.1",

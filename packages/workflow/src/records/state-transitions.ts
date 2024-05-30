@@ -240,7 +240,7 @@ export async function toUpdated(
   record: InProgressRecord | ReadyForReviewRecord,
   token: string,
   updatedDetails: ChangedValuesInput
-): Promise<InProgressRecord | ReadyForReviewRecord> {
+): Promise<ReadyForReviewRecord> {
   const previousTask = getTaskFromSavedBundle(record)
 
   const updatedTaskWithoutPractitionerExtensions = createUpdatedTask(
@@ -275,7 +275,7 @@ export async function toUpdated(
       recordWithUpdatedTask,
       practitionerResourcesBundle
     ),
-    ['IN_PROGRESS', 'READY_FOR_REVIEW']
+    'READY_FOR_REVIEW'
   )
 }
 

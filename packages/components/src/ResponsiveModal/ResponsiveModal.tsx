@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
@@ -110,7 +110,7 @@ const Body = styled.div<{
     height ? `${height}px` : autoHeight ? `auto` : `250px`};
   max-height: calc(100vh - 180px);
   color: ${({ theme }) => theme.colors.supportingCopy};
-  overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
+  overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'scroll')};
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
@@ -186,13 +186,13 @@ export const ResponsiveModal = ({
   showHeaderBorder,
   children
 }: IProps) => {
-  const toggleScroll = () => {
+  const toggleScroll = useCallback(() => {
     const body = document.querySelector('body') as HTMLBodyElement
     if (show) {
       return (body.style.overflow = 'hidden')
     }
     return body.style.removeProperty('overflow')
-  }
+  }, [show])
 
   useEffect(() => {
     toggleScroll()
@@ -201,7 +201,7 @@ export const ResponsiveModal = ({
       const body = document.querySelector('body') as HTMLBodyElement
       body.style.removeProperty('overflow')
     }
-  }, [show])
+  }, [show, toggleScroll])
 
   if (!show) {
     return null

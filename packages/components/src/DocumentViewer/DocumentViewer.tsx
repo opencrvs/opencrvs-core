@@ -35,6 +35,7 @@ const ViewerContainer = styled.div`
 const ViewerHeader = styled.div`
   height: 64px;
   display: flex;
+  gap: 8px;
   align-items: center;
   padding: 0 16px;
   z-index: 99;
