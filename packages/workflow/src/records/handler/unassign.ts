@@ -17,6 +17,21 @@ import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
+import {
+  findExtension,
+  isTaskOrTaskHistory,
+  Resource,
+  resourceIdentifierToUUID
+} from '@opencrvs/commons/types'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
+import { getUserOrSystemByCriteria } from '@workflow/records/user'
+
+function sortDescending(
+  a: Resource & { lastModified: string },
+  b: Resource & { lastModified: string }
+) {
+  return new Date(b.lastModified).valueOf() - new Date(a.lastModified).valueOf()
+}
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
@@ -30,6 +45,7 @@ export async function unassignRecordHandler(
   )
 
   const token = getToken(request)
+  const tokenPayload = getTokenPayload(token)
   const record = await getRecordById(
     // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
@@ -44,6 +60,37 @@ export async function unassignRecordHandler(
       'CORRECTION_REQUESTED'
     ]
   )
+
+  const allTasks = record.entry
+    .map(({ resource }) => resource)
+    .filter(isTaskOrTaskHistory)
+    .sort(sortDescending)
+
+  const task = allTasks.find((entry) =>
+    entry.extension.find(
+      (ext) => ext.url === 'http://opencrvs.org/specs/extension/regAssigned'
+    )
+  )
+
+  if (!task) throw new Error('No task found with assignment')
+
+  const regLastUser = findExtension(
+    'http://opencrvs.org/specs/extension/regLastUser',
+    task.extension
+  )
+
+  if (!regLastUser) throw new Error('No user is found assigned to this record')
+
+  const practitionerId = resourceIdentifierToUUID(
+    regLastUser.valueReference.reference
+  )
+
+  const lastUser = await getUserOrSystemByCriteria({ practitionerId }, token)
+
+  if (!tokenPayload.scope.includes('register')) {
+    if (lastUser.scope?.includes('register'))
+      throw new Error('The declaration can not assigned by this type of user')
+  }
 
   const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
     record,
