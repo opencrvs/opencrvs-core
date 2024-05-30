@@ -44,7 +44,6 @@ import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -153,7 +152,7 @@ const requesterLabelMapper = (
   // informant info added for corrector being informant
   return requesterIndividual?.label
     ? intl.formatMessage(requesterIndividual.label, {
-        informant: labelFormatterForInformant(informant)
+        informant
       })
     : ''
 }
