@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getTokenPayload } from '@opencrvs/commons/authentication'
-import { getSystem, getUser } from '@workflow/features/user/utils'
+import { getTokenPayload, Scope } from '@opencrvs/commons/authentication'
+import {
+  getSystem,
+  getSystemByCriteria,
+  getUser,
+  getUserByCriteria,
+  SearchCriteria
+} from '@workflow/features/user/utils'
 
 type Label = {
   lang: string
@@ -46,8 +52,8 @@ export interface IUserModelData {
   device: string
 }
 
-export interface ISystemModelData {
-  scope?: string[]
+interface ISystemModelData {
+  scope?: Scope[]
   name: string
   createdBy: string
   client_id: string
@@ -82,4 +88,27 @@ export async function getUserOrSystem(
   return await getUser(tokenPayload.sub, {
     Authorization: `Bearer ${token}`
   })
+}
+
+export async function getUserOrSystemByCriteria(
+  criteria: SearchCriteria,
+  token: string
+) {
+  const user = await getUserByCriteria(
+    {
+      Authorization: `Bearer ${token}`
+    },
+    criteria
+  )
+
+  if (user) return user as IUserModelData
+
+  const system = await getSystemByCriteria(
+    {
+      Authorization: `Bearer ${token}`
+    },
+    criteria
+  )
+
+  return system as ISystemModelData
 }
