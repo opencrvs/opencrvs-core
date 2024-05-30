@@ -89,8 +89,11 @@ export async function downloadRecordHandler(
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
       await auditEvent(auditRecordEvent, downloadedRecord, token)
 
-      if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
+      if (
+        extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded'
+      ) {
         await indexBundleToRoute(downloadedRecord, token, '/events/assigned')
+      }
     } catch (error) {
       logger.error(error)
     }

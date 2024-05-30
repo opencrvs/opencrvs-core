@@ -40,6 +40,7 @@ export const rejectCorrectionRoute = createRoute({
   path: '/records/{recordId}/reject-correction',
   allowedStartStates: ['CORRECTION_REQUESTED'],
   action: 'REJECT_CORRECTION',
+  includeHistoryResources: true,
   handler: async (
     request,
     record

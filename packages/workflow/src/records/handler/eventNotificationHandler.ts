@@ -116,7 +116,7 @@ export async function eventNotificationHandler(
   )
   const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
 
-  const updatedBundle = await getValidRecordById(compositionId!, token)
+  const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
   await indexBundle(updatedBundle, token)
   await auditEvent('sent-notification', updatedBundle, token)

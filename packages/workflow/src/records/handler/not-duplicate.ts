@@ -22,7 +22,12 @@ export async function markAsNotDuplicateHandler(
 ) {
   const recordId = request.params.id
   const token = getToken(request)
-  const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
+  const record = await getRecordById(
+    recordId,
+    token,
+    ['READY_FOR_REVIEW'],
+    true
+  )
 
   const notDuplicateBundle = await toNotDuplicated(record, token)
 
