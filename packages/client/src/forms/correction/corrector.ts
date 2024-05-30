@@ -22,7 +22,6 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { getFilteredRadioOptions } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 export enum CorrectorRelationship {
   //death
@@ -108,13 +107,12 @@ export const getCorrectorSection = (
 ): IFormSection => {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
-
   const initialOptions: IRadioOption[] = [
     {
       value: CorrectorRelationship.INFORMANT,
       label: messages.informant,
       param: {
-        informant: labelFormatterForInformant(informant)
+        informant: informant
       }
     },
     {
