@@ -1118,7 +1118,7 @@ export const typeResolvers: GQLResolver = {
         )!
 
         return {
-          userId: user.id,
+          practitionerId: user.id,
           firstName: user.name[0].given?.join(' '),
           lastName: user.name[0].family,
           officeName: office?.name || ''
