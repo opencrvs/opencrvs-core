@@ -12,15 +12,19 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
-const Wrapper = styled.li`
-  width: 100%;
-  height: 40px;
-  border-radius: 4px;
-  padding: 8px 8px;
+const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
+  flex-direction: row;
+  gap: 12px;
+  border-radius: 4px;
+  width: 100%;
+  padding: 8px 8px;
   align-items: center;
-  position: relative;
-
+  isolation: isolate;
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
+  ${({ theme }) => theme.fonts.h4};
+  cursor: pointer;
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
@@ -29,18 +33,10 @@ const Wrapper = styled.li`
   }
 `
 
-const Label = styled.label`
-  position: relative;
-  cursor: pointer;
-  padding-left: 12px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h4};
-`
-
-const Check = styled.span<{ size?: string }>`
+const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
-  background: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.grey600};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -50,7 +46,8 @@ const Check = styled.span<{ size?: string }>`
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.grey600};
   &::after {
     position: absolute;
     content: '';
@@ -134,7 +131,7 @@ export const Checkbox = ({
   size = 'small'
 }: CheckboxProps) => {
   return (
-    <Wrapper>
+    <Label htmlFor={id}>
       <Input
         id={id}
         role="checkbox"
@@ -148,7 +145,7 @@ export const Checkbox = ({
       <Check size={size}>
         {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
       </Check>
-      <Label htmlFor={id}>{label}</Label>
-    </Wrapper>
+      {label}
+    </Label>
   )
 }
