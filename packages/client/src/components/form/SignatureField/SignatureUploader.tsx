@@ -34,6 +34,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import SignatureCanvas from 'react-signature-canvas'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { ISignatureFormField } from '@client/forms'
 
 const SignatureContainer = styled.div`
   border: 2px solid ${({ theme }) => theme.colors.grey600};
@@ -64,6 +65,8 @@ export type SignatureUploaderProps = Omit<
   value: string
   onChange: (value: string) => void
   required?: boolean
+  maxSizeMb?: number
+  allowedFileFormats?: ISignatureFormField['allowedFileFormats']
   modalTitle: string
 }
 
@@ -71,13 +74,14 @@ export function SignatureUploader({
   value: signatureData,
   onChange,
   modalTitle,
+  maxSizeMb = 2,
+  allowedFileFormats = ['png'],
   ...props
 }: SignatureUploaderProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
   const [signatureValue, setSignatureValue] = useState(EMPTY_STRING)
   const [signatureError, setSignatureError] = useState(EMPTY_STRING)
   const intl = useIntl()
-  const allowedSignatureFormat = ['image/png']
 
   const requiredError =
     props.required &&
@@ -110,20 +114,20 @@ export function SignatureUploader({
               {...props}
               onChange={async (file) => {
                 const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
-                if (fileSizeMB > 2) {
+                if (fileSizeMB > maxSizeMb) {
                   setSignatureError(
                     intl.formatMessage(formMessages.fileSizeError)
                   )
                   return
                 }
-                if (!allowedSignatureFormat.includes(file.type)) {
+                if (
+                  !allowedFileFormats.includes(
+                    file.type as (typeof allowedFileFormats)[0]
+                  )
+                ) {
                   setSignatureError(
                     intl.formatMessage(formMessages.fileUploadError, {
-                      type: allowedSignatureFormat
-                        .map((signatureFormat) =>
-                          signatureFormat.split('/').pop()
-                        )
-                        .join(', ')
+                      type: allowedFileFormats.join(', ')
                     })
                   )
                   return

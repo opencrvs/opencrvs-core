@@ -632,7 +632,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === SIGNATURE) {
-      const { name, helperText, required, label } = fieldDefinition
+      const {
+        name,
+        helperText,
+        required,
+        label,
+        maxSizeMb,
+        allowedFileFormats
+      } = fieldDefinition
       return (
         <SignatureField direction="column" gap={8} alignItems="start">
           <InputLabel
@@ -647,6 +654,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             name={name}
             modalTitle={label}
             value={value as string}
+            maxSizeMb={maxSizeMb}
+            allowedFileFormats={allowedFileFormats}
             required={required}
             onChange={(sig) => onSetFieldValue(name, sig)}
           />
