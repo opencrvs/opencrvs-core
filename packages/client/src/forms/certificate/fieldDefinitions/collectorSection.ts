@@ -623,8 +623,8 @@ export const collectMarriageCertificateFormSection: IFormSection = {
             )
           ],
           options: [
-            { value: 'BRIDE', label: formMessages.brideName },
-            { value: 'GROOM', label: formMessages.groomName },
+            { value: 'BRIDE', label: formMessages.certifyRecordToBride },
+            { value: 'GROOM', label: formMessages.certifyRecordToGroom },
             { value: 'OTHER', label: formMessages.someoneElseCollector },
             {
               value: 'PRINT_IN_ADVANCE',
@@ -997,8 +997,8 @@ const birthCertCollectorOptions = [
 ]
 
 const marriageCertCollectorOptions = [
-  { value: 'BRIDE', label: formMessages.brideName },
-  { value: 'GROOM', label: formMessages.groomName }
+  { value: 'BRIDE', label: formMessages.certifyRecordToBride },
+  { value: 'GROOM', label: formMessages.certifyRecordToGroom }
 ]
 
 const birthIssueCollectorFormOptions = [
