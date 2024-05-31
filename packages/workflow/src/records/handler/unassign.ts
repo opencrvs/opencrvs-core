@@ -87,9 +87,12 @@ export async function unassignRecordHandler(
 
   const lastUser = await getUserOrSystemByCriteria({ practitionerId }, token)
 
-  if (!tokenPayload.scope.includes('register')) {
-    if (lastUser.scope?.includes('register'))
-      throw new Error('The declaration can not assigned by this type of user')
+  // Non-registrars can't unassign declarations from registrars
+  if (
+    !tokenPayload.scope.includes('register') &&
+    lastUser.scope?.includes('register')
+  ) {
+    throw new Error('The declaration cannot be unassigned by this type of user')
   }
 
   const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
