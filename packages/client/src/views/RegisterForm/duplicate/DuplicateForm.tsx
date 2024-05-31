@@ -178,7 +178,7 @@ export const DuplicateForm = (props: IProps) => {
                 dispatch(goToHome())
               }
             }}
-            disabled={!Boolean(selectedTrackingId)}
+            disabled={!Boolean(selectedTrackingId) || !Boolean(comment)}
           >
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
