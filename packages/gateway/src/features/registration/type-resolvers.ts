@@ -854,13 +854,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    informantsSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     groomSignature: async (
       task,
       _,

@@ -813,7 +813,6 @@ export interface GQLRegistration {
   brideSignature?: string
   witnessOneSignature?: string
   witnessTwoSignature?: string
-  informantsSignatureURI?: string
   groomSignatureURI?: string
   brideSignatureURI?: string
   witnessOneSignatureURI?: string
@@ -5372,7 +5371,6 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   brideSignature?: RegistrationToBrideSignatureResolver<TParent>
   witnessOneSignature?: RegistrationToWitnessOneSignatureResolver<TParent>
   witnessTwoSignature?: RegistrationToWitnessTwoSignatureResolver<TParent>
-  informantsSignatureURI?: RegistrationToInformantsSignatureURIResolver<TParent>
   groomSignatureURI?: RegistrationToGroomSignatureURIResolver<TParent>
   brideSignatureURI?: RegistrationToBrideSignatureURIResolver<TParent>
   witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>

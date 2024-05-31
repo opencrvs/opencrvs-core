@@ -2018,7 +2018,6 @@ export type Registration = {
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<Scalars['String']>
   informantsSignature?: Maybe<Scalars['String']>
-  informantsSignatureURI?: Maybe<Scalars['String']>
   mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
@@ -3651,7 +3650,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4000,7 +3998,6 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
@@ -4454,7 +4451,6 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4784,7 +4780,6 @@ export type FetchDeathRegistrationForCertificationQuery = {
       contactEmail?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
