@@ -10,6 +10,7 @@
  */
 
 import { Client } from '@elastic/elasticsearch'
+import { fetch, Agent } from 'undici'
 
 const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
@@ -115,7 +116,10 @@ export const reindex = async (timestamp: string) => {
   const response = await fetch(new URL('reindex', SEARCH_URL), {
     method: 'POST',
     body: JSON.stringify({ timestamp }),
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
+    dispatcher: new Agent({
+      bodyTimeout: 2 * 60 * 60 * 1000 // 2 hours
+    })
   })
 
   if (!response.ok) {
