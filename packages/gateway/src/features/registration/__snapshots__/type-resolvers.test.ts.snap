@@ -415,11 +415,11 @@ Object {
     "registration": Object {
       "_fhirID": null,
       "assignment": Object {
-        "avatarURL": "/mock-presigned-url",
+        "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
         "officeName": "Ibombo District Office",
-        "userId": "48455871-1636-46a1-8279-aaa76dec03d4",
+        "practitionerId": "48455871-1636-46a1-8279-aaa76dec03d4",
       },
       "attachments": null,
       "book": null,
@@ -1373,11 +1373,11 @@ Object {
     "registration": Object {
       "_fhirID": null,
       "assignment": Object {
-        "avatarURL": "/mock-presigned-url",
+        "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
         "officeName": "Ibombo District Office",
-        "userId": "48455871-1636-46a1-8279-aaa76dec03d4",
+        "practitionerId": "48455871-1636-46a1-8279-aaa76dec03d4",
       },
       "attachments": null,
       "book": null,

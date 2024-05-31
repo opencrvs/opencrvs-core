@@ -42,8 +42,8 @@ const MOCK_USER: IUserModelData = {
   name: [
     {
       use: 'en',
-      given: ['Derrick'],
-      family: 'Bulaya'
+      given: ['Kennedy'],
+      family: 'Mweene'
     }
   ],
   username: 'd.bulaya',
@@ -65,7 +65,7 @@ const MOCK_USER: IUserModelData = {
       }
     ]
   },
-  practitionerId: '511ab59f-54df-4331-8c22-97062a602154',
+  practitionerId: '48455871-1636-46a1-8279-aaa76dec03d4',
   primaryOfficeId: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
