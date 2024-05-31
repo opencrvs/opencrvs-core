@@ -46,7 +46,9 @@ export async function searchAssignment(
     const result = results?.body?.hits?.hits[0]?._source as
       | SearchDocument
       | undefined
-    return h.response({ userId: result?.assignment?.userId }).code(200)
+    return h
+      .response({ practitionerId: result?.assignment?.practitionerId })
+      .code(200)
   } catch (error) {
     logger.error(`Search/searchAssginment: ${error}`)
     return internal(error)
