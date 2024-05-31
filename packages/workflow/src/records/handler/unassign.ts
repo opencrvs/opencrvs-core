@@ -21,13 +21,20 @@ import {
   Extension,
   findExtension,
   isTaskOrTaskHistory,
+  Resource,
   resourceIdentifierToUUID,
-  sortTasksDescending,
   Task
 } from '@opencrvs/commons/types'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getUserOrSystemByCriteria } from '@workflow/records/user'
 import { getTaskBusinessStatus } from '@workflow/features/task/fhir/utils'
+
+function sortDescending(
+  a: Resource & { lastModified: string },
+  b: Resource & { lastModified: string }
+) {
+  return new Date(b.lastModified).valueOf() - new Date(a.lastModified).valueOf()
+}
 
 function findTaskIndexByExtension(
   tasks: Task[],
@@ -72,9 +79,10 @@ export async function unassignRecordHandler(
     ]
   )
 
-  const allTasks = sortTasksDescending(
-    record.entry.map(({ resource }) => resource).filter(isTaskOrTaskHistory)
-  )
+  const allTasks = record.entry
+    .map(({ resource }) => resource)
+    .filter(isTaskOrTaskHistory)
+    .sort(sortDescending)
 
   // declaration is unassigned when status changes
   const latestChangedStatusIndex = allTasks.findIndex(
