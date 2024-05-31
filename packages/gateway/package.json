@@ -106,7 +106,10 @@
     "typescript": "4.9.5"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
+    "src/**/*.{graphql}": [
+      "prettier --write"
+    ],
+    "src/**/*.{ts}": [
       "prettier --write",
       "eslint -c .eslintrc.js --fix"
     ]
