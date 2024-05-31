@@ -21,7 +21,6 @@ export async function birthEventHandler(
   const record = request.payload as ValidRecord
   try {
     await indexRecord(record)
-    // @TODO: Is this try catch needed?
   } catch (error) {
     logger.error(`Search/birthEventHandler: error: ${error}`)
     return internal(error)

@@ -218,8 +218,11 @@ export function sortTasksDescending<T extends { lastModified: string }>(
     )
   })
 }
-export const findTaskHistories = (bundle: Bundle) => {
-  return sortTasksAscending(
+export const findTaskHistories = (
+  bundle: Bundle,
+  sort = sortTasksAscending
+) => {
+  return sort(
     bundle.entry
       .filter((entry): entry is BundleEntry<TaskHistory> =>
         isTaskHistory(entry.resource)
@@ -292,7 +295,7 @@ export type TaskStatus =
   | 'REJECTED'
   | 'ISSUED'
 
-export function getStatusFromTask(task: Task) {
+export function getStatusFromTask(task: Task | TaskHistory) {
   const statusType = task.businessStatus.coding.find(
     (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`

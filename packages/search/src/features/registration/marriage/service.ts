@@ -21,7 +21,7 @@ import {
   NAME_EN,
   REJECTED_STATUS,
   composeOperationHistories,
-  assign
+  composeAssignment
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -38,7 +38,6 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
@@ -47,6 +46,7 @@ import {
   SavedRelatedPerson,
   findFirstTaskHistory
 } from '@opencrvs/commons/types'
+import { findAssignment } from '@opencrvs/commons/assignment'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -55,11 +55,11 @@ const WITNESS_TWO_CODE = 'witness-two-details'
 const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
 export const composeDocument = (
-  record: ValidRecord,
+  bundle: SavedBundle,
   existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
 ) => {
-  const task = getTaskFromSavedBundle(record)
-  const composition = getComposition(record)
+  const task = getTaskFromSavedBundle(bundle)
+  const composition = getComposition(bundle)
   const body: SearchDocument = {
     compositionId: composition.id,
     event: EVENT.MARRIAGE,
@@ -68,7 +68,7 @@ export const composeDocument = (
         existingDocument.body.hits.hits.length > 0 &&
         existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
-    operationHistories: composeOperationHistories(record) as IOperationHistory[]
+    operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
 
   body.type =
@@ -97,14 +97,14 @@ export const composeDocument = (
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  createIndexBody(body, composition, record)
+  createIndexBody(body, composition, bundle)
   return body
 }
 
-export async function indexRecord(record: ValidRecord) {
-  const { id: compositionId } = getComposition(record)
+export async function indexRecord(bundle: SavedBundle) {
+  const { id: compositionId } = getComposition(bundle)
   const existingDocument = await searchByCompositionId(compositionId, client)
-  const document = composeDocument(record, existingDocument)
+  const document = composeDocument(bundle, existingDocument)
   await indexComposition(compositionId, document, client)
 }
 
@@ -121,7 +121,10 @@ function createIndexBody(
   createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
-  assign(body, bundle)
+
+  const assignment = findAssignment(bundle)
+  body.assignment =
+    assignment && composeAssignment(assignment.office, assignment.practitioner)
 }
 
 function createBrideIndex(

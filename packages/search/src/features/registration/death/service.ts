@@ -20,7 +20,7 @@ import {
   IOperationHistory,
   NAME_EN,
   REJECTED_STATUS,
-  assign
+  composeAssignment
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
@@ -36,7 +36,6 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
@@ -45,6 +44,7 @@ import {
   resourceIdentifierToUUID,
   findFirstTaskHistory
 } from '@opencrvs/commons/types'
+import { findAssignment } from '@opencrvs/commons/assignment'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -54,11 +54,11 @@ const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
 export const composeDocument = (
-  record: ValidRecord,
+  bundle: SavedBundle,
   existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
 ) => {
-  const task = getTaskFromSavedBundle(record)
-  const composition = getComposition(record)
+  const task = getTaskFromSavedBundle(bundle)
+  const composition = getComposition(bundle)
 
   const body: DeathDocument = {
     compositionId: composition.id,
@@ -68,7 +68,7 @@ export const composeDocument = (
         existingDocument.body.hits.hits.length > 0 &&
         existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
-    operationHistories: composeOperationHistories(record) as IOperationHistory[]
+    operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
 
   body.type =
@@ -86,12 +86,12 @@ export const composeDocument = (
     body.rejectComment = nodeText
   }
 
-  createIndexBody(body, composition, record)
+  createIndexBody(body, composition, bundle)
   updateCompositionBodyWithDuplicateIds(composition, body)
   return body
 }
 
-export async function indexRecord(record: ValidRecord) {
+export async function indexRecord(record: SavedBundle) {
   const composition = getComposition(record)
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)
@@ -113,7 +113,10 @@ function createIndexBody(
   createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
-  assign(body, bundle)
+
+  const assignment = findAssignment(bundle)
+  body.assignment =
+    assignment && composeAssignment(assignment.office, assignment.practitioner)
 }
 
 function createDeceasedIndex(

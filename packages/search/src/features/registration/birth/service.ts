@@ -20,7 +20,7 @@ import {
   REJECTED_STATUS,
   composeOperationHistories,
   createStatusHistory,
-  assign
+  composeAssignment
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -36,16 +36,16 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  SavedBundle,
   Patient,
   getFromBundleById,
   getTaskFromSavedBundle,
   resourceIdentifierToUUID,
   SavedRelatedPerson,
   findFirstTaskHistory,
-  ValidRecord,
+  SavedBundle,
   getBusinessStatus
 } from '@opencrvs/commons/types'
+import { findAssignment } from '@opencrvs/commons/assignment'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -53,7 +53,7 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
-export async function indexRecord(record: ValidRecord) {
+export async function indexRecord(record: SavedBundle) {
   const { id: compositionId } = getComposition(record)
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(record, existingDocument)
@@ -61,7 +61,7 @@ export async function indexRecord(record: ValidRecord) {
 }
 
 export const composeDocument = (
-  record: ValidRecord,
+  record: SavedBundle,
   existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
 ) => {
   const task = getTaskFromSavedBundle(record)
@@ -121,7 +121,10 @@ function createIndexBody(
   createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
-  assign(body, bundle)
+
+  const assignment = findAssignment(bundle)
+  body.assignment =
+    assignment && composeAssignment(assignment.office, assignment.practitioner)
 }
 
 function createChildIndex(
