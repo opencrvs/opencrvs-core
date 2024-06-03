@@ -106,7 +106,8 @@ function prepareComments(
   if (
     !draft ||
     (actionDetailsData.action &&
-      actionDetailsData.action !== RegAction.RequestedCorrection)
+      actionDetailsData.action !== RegAction.RequestedCorrection &&
+      actionDetailsData.action !== RegAction.Corrected)
   ) {
     return []
   }
@@ -446,7 +447,8 @@ const ActionDetailsModalListTable = ({
 
       {/* Correction Requester */}
       {actionDetailsData.requester &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={requesterColumn}
@@ -464,7 +466,8 @@ const ActionDetailsModalListTable = ({
         )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.action === RegAction.RequestedCorrection &&
+      {(actionDetailsData.action === RegAction.RequestedCorrection ||
+        actionDetailsData.action === RegAction.Corrected) &&
         actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
@@ -489,7 +492,8 @@ const ActionDetailsModalListTable = ({
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={correctionReasonColumn}
