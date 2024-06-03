@@ -1916,6 +1916,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )!.groups[0].fields
                     }
                     draftData={declaration.data}
+                    initialValues={declaration.data.preview}
                   />
 
                   {totalFileSizeExceeded && (
