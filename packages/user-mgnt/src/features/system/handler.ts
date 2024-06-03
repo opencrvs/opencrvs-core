@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { unauthorized } from '@hapi/boom'
+import { conflict, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { systemRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
@@ -59,6 +59,12 @@ export async function registerSystem(
     request.payload as IRegisterSystemPayload
   let { settings } = request.payload as IRegisterSystemPayload
   try {
+    const systems: ISystemModel | null = await System.findOne({
+      name: name
+    })
+
+    if (systems) throw new Error('Duplicate client name')
+
     if (type === types.WEBHOOK && !settings) {
       logger.error('Webhook payloads are required !')
       return h.response('Webhook payloads are required !').code(400)
@@ -179,6 +185,9 @@ export async function registerSystem(
       })
       .code(201)
   } catch (err) {
+    if (err.message === 'Duplicate client name')
+      throw conflict('Duplicate client name')
+
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)

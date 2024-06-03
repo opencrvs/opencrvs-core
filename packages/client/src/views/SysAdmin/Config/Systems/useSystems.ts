@@ -34,6 +34,7 @@ import {
 
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { HttpError } from './httpError'
 import * as mutations from './mutations'
 
 /** Handles the user input when creating a new system in a modal */
@@ -193,6 +194,9 @@ export function useSystems() {
     {
       onCompleted: ({ registerSystem }) => {
         if (registerSystem) dispatchNewSystem(registerSystem.system)
+      },
+      onError: (error) => {
+        if (error instanceof HttpError) console.log('trueeeeeeeeeeeeeeee')
       }
     }
   )

@@ -51,6 +51,7 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
+import { HttpError } from './httpError'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -481,6 +482,7 @@ export function SystemList() {
                   }
                   onClick={() => {
                     registerSystem()
+                    toggleModal()
                   }}
                   type="primary"
                 >
@@ -930,9 +932,18 @@ export function SystemList() {
         </Toast>
       )}
 
+      {registerSystemError instanceof HttpError && (
+        <Toast
+          type="error"
+          id="registerSystemErrorToast"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.uniqueNameError)}
+        </Toast>
+      )}
+
       {(activateSystemError ||
         deactivateSystemError ||
-        registerSystemError ||
         refreshTokenError ||
         updatePermissionsError ||
         systemToDeleteError) && (

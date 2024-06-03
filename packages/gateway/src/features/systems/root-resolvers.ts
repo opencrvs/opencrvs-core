@@ -12,6 +12,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from '@gateway/fetch'
 import { USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
 import { getSystem, hasScope } from '@gateway/features/user/utils'
+import { HttpError } from '@gateway/utils/httpError'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -76,6 +77,7 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
+      if (res.status === 409) throw new HttpError('Duplicate name found', 409)
 
       if (res.status !== 201) {
         return await Promise.reject(

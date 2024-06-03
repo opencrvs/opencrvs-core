@@ -49,6 +49,11 @@ const messagesToDefine = {
       'These unique keys will be required by the client integrating',
     description: 'Label for the unique key description'
   },
+  uniqueNameError: {
+    id: 'integrations.uniqueNameError',
+    defaultMessage: 'Client name has already been used',
+    description: 'Label for the unique name description'
+  },
 
   revealKeys: {
     id: 'integrations.revealKeys',
