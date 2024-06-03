@@ -475,3 +475,28 @@ export function notCorrectedHistory(
   }
   return true
 }
+
+export function filterConsecutiveAssignment(
+  task: Task,
+  index: number,
+  allTasks: Task[]
+) {
+  const currentAction = getActionFromTask(task)
+
+  if (index === 0) {
+    return true
+  }
+
+  const previousTask = allTasks[index - 1]
+  const previousAction = getActionFromTask(previousTask)
+
+  // Only keep the task if it is not a consecutive ASSIGNED action
+  if (
+    currentAction === TaskAction.ASSIGNED &&
+    previousAction === TaskAction.ASSIGNED
+  ) {
+    return false
+  }
+
+  return true
+}
