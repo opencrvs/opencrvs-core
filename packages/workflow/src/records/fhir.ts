@@ -840,12 +840,10 @@ export function createDuplicateTask(
   duplicateTrackingId?: string
 ): SavedTask {
   const newExtensions: Extension[] = []
-  if (duplicateTrackingId) {
-    newExtensions.push({
-      url: 'http://opencrvs.org/specs/extension/markedAsDuplicate',
-      valueString: duplicateTrackingId
-    })
-  }
+  newExtensions.push({
+    url: 'http://opencrvs.org/specs/extension/markedAsDuplicate',
+    valueString: duplicateTrackingId
+  })
 
   const duplicateTask = createNewTaskResource(previousTask, newExtensions)
 
