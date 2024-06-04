@@ -74,10 +74,7 @@ import {
   HIDDEN
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import {
-  getBirthSection,
-  getRegisterForm
-} from '@client/forms/register/declaration-selectors'
+import { getBirthSection } from '@client/forms/register/declaration-selectors'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -271,7 +268,7 @@ type onChangeReviewForm = (
 
 interface IProps {
   draft: IDeclaration
-  registerForm: { [key: string]: IForm }
+  form: IForm
   pageRoute: string
   rejectDeclarationClickEvent?: () => void
   goToPageGroup: typeof goToPageGroup
@@ -675,9 +672,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   getLabelForDoc = (docForWhom: string, docType: string) => {
     const { intl } = this.props
-    const documentSection = this.props.registerForm[
-      this.props.draft.event
-    ].sections.find((section) => section.id === 'documents')
+    const documentSection = this.props.form.sections.find(
+      (section) => section.id === 'documents'
+    )
     const docSectionFields = documentSection && documentSection.groups[0].fields
     const docFieldsWithOptions =
       docSectionFields &&
@@ -1420,7 +1417,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       overriddenField,
       'reviewOverrides.residingSection'
     )
-    const residingSection = this.props.registerForm.death.sections.find(
+    const residingSection = this.props.form.sections.find(
       (section) => section.id === residingSectionId
     ) as IFormSection
 
@@ -1522,8 +1519,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isLastNameFirst = () => {
-    const { registerForm, draft: declaration } = this.props
-    const fields = registerForm[declaration.event].sections.find((section) =>
+    const { form, draft: declaration } = this.props
+    const fields = form.sections.find((section) =>
       declaration.event === Event.Birth
         ? section.id === 'child'
         : section.id === 'deceased'
@@ -1635,7 +1632,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const {
       intl,
       draft: declaration,
-      registerForm,
+      form,
       rejectDeclarationClickEvent,
       submitClickEvent,
       registrationSection,
@@ -1649,7 +1646,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const isDuplicate = Boolean(declaration.duplicates?.length)
     const formSections =
       viewRecord || isDuplicate
-        ? this.getViewableSection(registerForm[event]).map((section) => {
+        ? this.getViewableSection(form).map((section) => {
             return {
               ...section,
               groups: section.groups.map((group) => {
@@ -1660,7 +1657,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })
             }
           })
-        : this.getViewableSection(registerForm[event])
+        : this.getViewableSection(form)
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -2086,7 +2083,6 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
     registrationSection: getBirthSection(state, 'registration'),
     documentsSection: getBirthSection(state, 'documents'),
     scope: getScope(state),

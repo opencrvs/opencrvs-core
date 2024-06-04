@@ -1039,6 +1039,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={declaration}
+                  form={this.props.registerForm}
                   submitClickEvent={this.confirmSubmission}
                   onChangeReviewForm={this.modifyDeclaration}
                   userDetails={userDetails}
@@ -1058,6 +1059,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <ReviewSection
                       pageRoute={this.props.pageRoute}
                       draft={declaration}
+                      form={this.props.registerForm}
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
