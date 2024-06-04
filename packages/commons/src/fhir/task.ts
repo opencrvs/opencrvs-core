@@ -104,7 +104,13 @@ export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
   fhir3.Task,
-  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier' | 'status'
+  | 'lastModified'
+  | 'status'
+  | 'extension'
+  | 'businessStatus'
+  | 'intent'
+  | 'identifier'
+  | 'code'
 > & {
   lastModified: string
   status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'

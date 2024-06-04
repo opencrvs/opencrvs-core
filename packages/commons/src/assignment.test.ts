@@ -10,20 +10,48 @@
  */
 
 import { findAssignment } from './assignment'
-import { SavedBundle, SavedTask, TaskHistory, URLReference } from './fhir'
+import {
+  Extension,
+  SavedBundle,
+  SavedLocation,
+  SavedPractitioner,
+  SavedTask,
+  TaskHistory,
+  TrackingID,
+  URLReference
+} from './fhir'
 import { UUID } from './uuid'
 import * as fixtures from './fixtures'
 
 it('finds assignment from the latest task', () => {
-  const bundle: SavedBundle = {
+  const bundle: SavedBundle<
+    SavedTask | TaskHistory | SavedPractitioner | SavedLocation
+  > = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [
       {
-        fullUrl: '' as URLReference,
+        fullUrl:
+          '/fhir/Task/00000000-0000-4000-8000-000000000000/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
-          id: '' as UUID,
+          lastModified: new Date(2024, 0, 1).toISOString(),
           resourceType: 'Task',
+          id: '00000000-0000-4000-8000-000000000000' as UUID,
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regAssigned'
@@ -40,7 +68,7 @@ it('finds assignment from the latest task', () => {
                 reference: 'Location/347ef736-2359-48cc-a513-5b9fae487fb7'
               }
             }
-          ],
+          ] as Array<Extension>,
           businessStatus: {
             coding: [
               {
@@ -49,7 +77,7 @@ it('finds assignment from the latest task', () => {
               }
             ]
           }
-        } as SavedTask
+        }
       },
       {
         fullUrl:
@@ -63,7 +91,7 @@ it('finds assignment from the latest task', () => {
           '/fhir/Location/347ef736-2359-48cc-a513-5b9fae487fb7/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: fixtures.savedLocation({
           id: '347ef736-2359-48cc-a513-5b9fae487fb7' as UUID
-        }) as any
+        })
       }
     ]
   }
@@ -74,7 +102,9 @@ it('finds assignment from the latest task', () => {
 })
 
 it("finds assignment when it's in TaskHistory and status HAS NOT changed", () => {
-  const bundle: SavedBundle = {
+  const bundle: SavedBundle<
+    SavedTask | TaskHistory | SavedPractitioner | SavedLocation
+  > = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [
@@ -82,8 +112,24 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000000/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
-          id: '00000000-0000-4000-8000-000000000000' as UUID,
+          lastModified: new Date(2024, 0, 1).toISOString(),
           resourceType: 'Task',
+          id: '00000000-0000-4000-8000-000000000000' as UUID,
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regViewed'
@@ -108,14 +154,14 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
                 code: 'REGISTERED' // Note: status 'REGISTERED'
               }
             ]
-          },
-          lastModified: '2024-01-01T01:01:01.000Z'
-        } as SavedTask
+          }
+        }
       },
       {
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000001/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
+          lastModified: new Date(2024, 0, 2).toISOString(),
           id: '00000000-0000-4000-8000-000000000001' as UUID,
           resourceType: 'TaskHistory',
           extension: [
@@ -149,6 +195,7 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000002/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
+          lastModified: new Date(2024, 0, 3).toISOString(),
           id: '00000000-0000-4000-8000-000000000002' as UUID,
           resourceType: 'TaskHistory',
           extension: [
@@ -190,7 +237,7 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
           '/fhir/Location/347ef736-2359-48cc-a513-5b9fae487fb7/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: fixtures.savedLocation({
           id: '347ef736-2359-48cc-a513-5b9fae487fb7' as UUID
-        }) as any
+        })
       }
     ]
   }
@@ -201,7 +248,9 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
 })
 
 it("does not find assignment when it's in TaskHistory and status HAS changed", () => {
-  const bundle: SavedBundle = {
+  const bundle: SavedBundle<
+    SavedTask | TaskHistory | SavedPractitioner | SavedLocation
+  > = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [
@@ -209,8 +258,24 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000000/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
+          lastModified: new Date(2024, 0, 1).toISOString(),
           id: '00000000-0000-4000-8000-000000000000' as UUID,
           resourceType: 'Task',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regViewed'
@@ -235,16 +300,31 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
                 code: 'CERTIFIED' // Note: status 'CERTIFIED'
               }
             ]
-          },
-          lastModified: '2024-01-01T01:01:01.000Z'
-        } as SavedTask
+          }
+        }
       },
       {
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000001/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
+          lastModified: new Date(2024, 0, 2).toISOString(),
           id: '00000000-0000-4000-8000-000000000001' as UUID,
           resourceType: 'TaskHistory',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regViewed'
@@ -270,14 +350,30 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
               }
             ]
           }
-        } as TaskHistory
+        }
       },
       {
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000002/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
+          lastModified: new Date(2024, 0, 3).toISOString(),
           id: '00000000-0000-4000-8000-000000000002' as UUID,
           resourceType: 'Task',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regAssigned'
@@ -303,7 +399,7 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
               }
             ]
           }
-        } as SavedTask
+        }
       },
       {
         fullUrl:
@@ -317,7 +413,7 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
           '/fhir/Location/347ef736-2359-48cc-a513-5b9fae487fb7/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: fixtures.savedLocation({
           id: '347ef736-2359-48cc-a513-5b9fae487fb7' as UUID
-        }) as any
+        })
       }
     ]
   }
@@ -328,7 +424,9 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
 })
 
 it("does not find assignment when it's in TaskHistory and status has afterwards changed to regUnassigned", () => {
-  const bundle: SavedBundle = {
+  const bundle: SavedBundle<
+    SavedTask | TaskHistory | SavedPractitioner | SavedLocation
+  > = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [
@@ -336,8 +434,24 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000000/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
-          id: '00000000-0000-4000-8000-000000000000' as UUID,
+          lastModified: new Date(2024, 0, 1).toISOString(),
           resourceType: 'Task',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
+          id: '00000000-0000-4000-8000-000000000000' as UUID,
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regViewed'
@@ -362,16 +476,31 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
                 code: 'REGISTERED' // Note: status 'CERTIFIED'
               }
             ]
-          },
-          lastModified: '2024-01-01T01:01:01.000Z'
-        } as SavedTask
+          }
+        }
       },
       {
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000001/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
-          id: '00000000-0000-4000-8000-000000000001' as UUID,
+          lastModified: new Date(2024, 0, 1).toISOString(),
           resourceType: 'TaskHistory',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
+          id: '00000000-0000-4000-8000-000000000001' as UUID,
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regUnassigned'
@@ -397,14 +526,30 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
               }
             ]
           }
-        } as TaskHistory
+        }
       },
       {
         fullUrl:
           '/fhir/Task/00000000-0000-4000-8000-000000000002/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: {
           id: '00000000-0000-4000-8000-000000000002' as UUID,
-          resourceType: 'Task',
+          lastModified: new Date(2024, 0, 1).toISOString(),
+          resourceType: 'TaskHistory',
+          status: 'ready',
+          code: {
+            coding: [
+              { system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }
+            ]
+          },
+          focus: {
+            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+          },
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+              value: 'asdf' as TrackingID
+            }
+          ],
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/regAssigned'
@@ -430,7 +575,7 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
               }
             ]
           }
-        } as SavedTask
+        }
       },
       {
         fullUrl:
@@ -444,7 +589,7 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
           '/fhir/Location/347ef736-2359-48cc-a513-5b9fae487fb7/_history/dd7a0728-575e-4592-bb87-28996f498ef8' as URLReference,
         resource: fixtures.savedLocation({
           id: '347ef736-2359-48cc-a513-5b9fae487fb7' as UUID
-        }) as any
+        })
       }
     ]
   }
