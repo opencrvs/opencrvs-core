@@ -666,9 +666,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getViewableSection = (registerForm: IForm): IFormSection[] => {
-    const sections = registerForm.sections.filter(
-      ({ viewType }) =>
-        viewType === 'form' || viewType === 'preview' || viewType === 'hidden'
+    const sections = registerForm.sections.filter(({ viewType }) =>
+      ['form', 'hidden', 'preview', 'review'].includes(viewType)
     )
 
     return this.getVisibleSections(sections)
@@ -1704,7 +1703,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
-      formSections.filter(({ id }) => id !== 'documents' && id !== 'preview'),
+      formSections.filter(
+        ({ id, viewType }) =>
+          id !== 'documents' && !['preview', 'review'].includes(viewType)
+      ),
       errorsOnFields,
       offlineCountryConfiguration,
       declaration
@@ -1734,6 +1736,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         this.isVisibleField(field, documentsSection)
       ).length
     )
+
+    const reviewSection = formSections.find(({ viewType }) =>
+      ['preview', 'review'].includes(viewType)
+    )
+
+    if (!reviewSection) {
+      throw new Error(
+        'The form definition should always contain a review or preview section'
+      )
+    }
 
     return (
       <Wrapper>
@@ -1901,22 +1913,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   )}
 
                   <FormFieldGenerator
-                    id={'preview'}
-                    key={'preview'}
+                    id={reviewSection.id}
+                    key={reviewSection.id}
                     onChange={(values) => {
-                      const section = registerForm.birth.sections.find(
-                        (section) => section.id === 'preview'
-                      )!
-                      modifyDeclaration(values, section, declaration)
+                      modifyDeclaration(values, reviewSection, declaration)
                     }}
                     setAllFieldsDirty={false}
-                    fields={
-                      registerForm.birth.sections.find(
-                        (section) => section.id === 'preview'
-                      )!.groups[0].fields
-                    }
+                    fields={reviewSection.groups[0].fields}
                     draftData={declaration.data}
-                    initialValues={declaration.data.preview}
+                    initialValues={
+                      declaration.data.preview ?? declaration.data.review
+                    }
                   />
 
                   {totalFileSizeExceeded && (
