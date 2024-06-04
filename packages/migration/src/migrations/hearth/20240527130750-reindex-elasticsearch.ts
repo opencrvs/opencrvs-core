@@ -101,5 +101,14 @@ export const down = async (db: Db, _client: MongoClient) => {
     target: ELASTICSEARCH_INDEX_NAME
   })
 
+  await client.indices.putSettings({
+    index: BACKUP_INDEX,
+    body: {
+      settings: {
+        'index.blocks.write': false
+      }
+    }
+  })
+
   await client.indices.delete({ index: `${ELASTICSEARCH_INDEX_NAME}-*` })
 }
