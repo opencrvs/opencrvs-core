@@ -42,8 +42,8 @@ const MOCK_USER: IUserModelData = {
   name: [
     {
       use: 'en',
-      given: ['Derrick'],
-      family: 'Bulaya'
+      given: ['Kennedy'],
+      family: 'Mweene'
     }
   ],
   username: 'd.bulaya',
@@ -65,7 +65,7 @@ const MOCK_USER: IUserModelData = {
       }
     ]
   },
-  practitionerId: '511ab59f-54df-4331-8c22-97062a602154',
+  practitionerId: '48455871-1636-46a1-8279-aaa76dec03d4',
   primaryOfficeId: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
@@ -73,10 +73,6 @@ const MOCK_USER: IUserModelData = {
 }
 
 const MOCK_RESPONSES = {
-  'users/6501acbe81245ece9e627bf7/avatar': {
-    userName: 'e.test',
-    avatarURI: '/mock-avatar-url'
-  },
   getUser: MOCK_USER,
   // User's primary office's parent location
   '/Location/c1ddb556-8b22-4182-9a6c-64358c0e96c9': {

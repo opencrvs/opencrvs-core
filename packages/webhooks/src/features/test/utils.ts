@@ -155,12 +155,6 @@ export const testBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/43f37076-bf0e-46c6-97cb-4c2bd12dbdac'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/531e9275-40e4-4ab5-a12c-6fa74d7b5b61'

@@ -9,22 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import { prune } from './prune'
+import { reindex, updateAliases } from './reindex'
 
-export default async function getUserAvatar(
+export async function reindexHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = request.params.userId
-  const user: IUserModel | null = await User.findById(userId)
+  const { timestamp } = request.payload as { timestamp: string }
 
-  if (!user) {
-    return h.response().code(400)
-  }
+  const { index } = await reindex(timestamp)
+  await updateAliases()
 
-  const avatarURI = user.avatar?.data
-  const name = user.name[0]
-  const userName = `${String(name.given[0])} ${String(name.family)}`
+  prune()
 
-  return h.response({ userName, avatarURI }).code(200)
+  return h
+    .response({
+      status: 'completed',
+      message: `ElasticSearch reindexing completed for ${index}`,
+      index
+    })
+    .code(200)
 }

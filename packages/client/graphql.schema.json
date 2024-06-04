@@ -2479,7 +2479,7 @@
             "deprecationReason": null
           },
           {
-            "name": "userId",
+            "name": "practitionerId",
             "description": null,
             "args": [],
             "type": {

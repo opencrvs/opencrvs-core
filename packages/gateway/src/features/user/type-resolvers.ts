@@ -253,12 +253,12 @@ export const userTypeResolvers: GQLResolver = {
   },
 
   Avatar: {
-    data(avatar: IAvatar, _, { dataSources }) {
+    async data(avatar: IAvatar, _, { dataSources }) {
       if (avatar.data) {
-        const staticData = dataSources.minioAPI.getStaticData(avatar.data)
-        return staticData.then((data) => {
-          return data.presignedURL
-        })
+        const { presignedURL } = await dataSources.minioAPI.getStaticData(
+          avatar.data
+        )
+        return presignedURL
       }
       return null
     }

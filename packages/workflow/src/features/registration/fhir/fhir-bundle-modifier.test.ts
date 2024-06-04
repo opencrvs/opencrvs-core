@@ -11,20 +11,13 @@
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import {
-  setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
-  setupLastRegLocation,
-  setupAuthorOnNotes,
   validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import {
   testFhirBundle,
-  fieldAgentPractitionerMock,
   mosipSuccessMock,
   mosipConfigMock,
   mosipDeceasedPatientMock,
@@ -37,51 +30,10 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
-import * as fixtures from '@opencrvs/commons/fixtures'
-import { UUID } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
-  describe('SetupRegistrationType', () => {
-    it('Will push the proper event type on fhirDoc', () => {
-      const taskResource = setupRegistrationType(
-        testFhirBundle.entry[1].resource as Task,
-        EVENT_TYPE.BIRTH
-      )
-      if (
-        taskResource &&
-        taskResource.code &&
-        taskResource.code.coding &&
-        taskResource.code.coding[0] &&
-        taskResource.code.coding[0].code
-      ) {
-        expect(taskResource.code.coding[0].code).toBeDefined()
-        expect(taskResource.code.coding[0].code).toEqual(
-          EVENT_TYPE.BIRTH.toString()
-        )
-      }
-    })
-
-    it('Will push code section with proper event type on fhirDoc if it is missing', () => {
-      const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[1].resource.code = undefined as any
-      const taskResource = setupRegistrationType(
-        fhirBundle.entry[1].resource as Task,
-        EVENT_TYPE.BIRTH
-      )
-
-      expect(taskResource.code).toBeDefined()
-      expect(taskResource.code).toEqual({
-        coding: [
-          {
-            system: `${OPENCRVS_SPECIFICATION_URL}types`,
-            code: EVENT_TYPE.BIRTH.toString()
-          }
-        ]
-      })
-    })
-  })
   describe('SetupRegistrationWorkflow', () => {
     it('Will push the registration status on fhirDoc', async () => {
       const tokenPayload = {
@@ -263,134 +215,6 @@ describe('Verify fhir bundle modifier functions', () => {
         }
       }
     })
-  })
-  it('setupAuthorOnNotes will update the author name on notes', () => {
-    const practitioner: Practitioner = {
-      resourceType: 'Practitioner',
-      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
-      telecom: [{ system: 'phone', value: '01711111111' }],
-      name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
-      ],
-      gender: 'male',
-      meta: {
-        lastUpdated: '2018-11-25T17:31:08.062+00:00',
-        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-    }
-    const fhirBundle = cloneDeep(testFhirBundle)
-
-    fhirBundle.entry[1].resource['note'] = [
-      {
-        text: 'this is a test note',
-        time: '2018-10-31T09:45:05+10:00'
-      }
-    ]
-    const taskResource = setupAuthorOnNotes(
-      fhirBundle.entry[1].resource as Task,
-      practitioner
-    )
-    if (taskResource && taskResource.note && taskResource.note[0]) {
-      expect(taskResource.note.length).toBe(1)
-      expect(taskResource.note[0]).toEqual({
-        authorString: 'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf',
-        text: 'this is a test note',
-        time: '2018-10-31T09:45:05+10:00'
-      })
-    }
-  })
-  describe('setupLastRegLocation', () => {
-    beforeEach(() => {
-      fetch.resetMocks()
-    })
-    it('set regLastLocation properly', async () => {
-      mswServer.use(
-        rest.get(
-          'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
-          (_, res, ctx) => {
-            return res(
-              ctx.json([
-                // 2 level hierarchy
-                fixtures.savedLocation({
-                  id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
-                  partOf: {
-                    reference: 'Location/0'
-                  }
-                }),
-                fixtures.savedLocation({
-                  id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
-                  partOf: {
-                    reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-                  }
-                })
-              ])
-            )
-          }
-        )
-      )
-
-      const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as Task,
-        JSON.parse(fieldAgentPractitionerMock)
-      )
-      expect(taskResource.extension[3]).toEqual({
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-        }
-      })
-    })
-    it('set regLastOffice properly', async () => {
-      mswServer.use(
-        rest.get(
-          'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
-          (_, res, ctx) => {
-            return res(
-              ctx.json([
-                // 2 level hierarchy
-                fixtures.savedLocation({
-                  id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
-                  partOf: {
-                    reference: 'Location/0'
-                  }
-                }),
-                fixtures.savedLocation({
-                  id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
-                  partOf: {
-                    reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
-                  }
-                })
-              ])
-            )
-          }
-        )
-      )
-      const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as Task,
-        JSON.parse(fieldAgentPractitionerMock)
-      )
-      expect(taskResource.extension[2]).toEqual({
-        url: 'http://opencrvs.org/specs/extension/regLastOffice',
-        valueReference: {
-          reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
-        }
-      })
-    })
-    it('throws error if invalid practitioner is provided', async () => {
-      const practitioner = JSON.parse(fieldAgentPractitionerMock)
-      practitioner.id = undefined
-      expect(
-        setupLastRegLocation(
-          testFhirBundle.entry[1].resource as Task,
-          practitioner
-        )
-      ).rejects.toThrowError('Invalid practitioner data found')
-    })
-  })
-  afterAll(async () => {
-    jest.clearAllMocks()
   })
 })
 

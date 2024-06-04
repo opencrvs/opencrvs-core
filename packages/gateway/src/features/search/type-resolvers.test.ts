@@ -21,7 +21,6 @@ beforeEach(() => {
 describe('Search type resolvers', () => {
   it('return BirthEventSearchSet type', () => {
     const mock = {
-      _type: 'compositions',
       _source: {
         event: 'Birth'
       }
@@ -31,7 +30,6 @@ describe('Search type resolvers', () => {
   })
   it('return DeathEventSearchSet type', () => {
     const mock = {
-      _type: 'compositions',
       _source: {
         event: 'Death'
       }
@@ -42,14 +40,12 @@ describe('Search type resolvers', () => {
   describe('type resolvers for birth event', () => {
     it('returns id from birth event search set', () => {
       const id = searchTypeResolvers.BirthEventSearchSet!.id({
-        _type: 'compositions',
         _id: '123'
       })
       expect(id).toBe('123')
     })
     it('returns type from birth event search set', () => {
       const type = searchTypeResolvers.BirthEventSearchSet!.type({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Birth'
@@ -59,7 +55,6 @@ describe('Search type resolvers', () => {
     })
     it('returns childName from birth event search set', () => {
       const name = searchTypeResolvers.BirthEventSearchSet!.childName({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Birth',
@@ -90,7 +85,6 @@ describe('Search type resolvers', () => {
     })
     it('returns null as given and family name in-case of missing required data', () => {
       const name = searchTypeResolvers.BirthEventSearchSet!.childName({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Birth'
@@ -111,7 +105,6 @@ describe('Search type resolvers', () => {
     })
     it('returns date of birth from birth event search set', () => {
       const dob = searchTypeResolvers.BirthEventSearchSet!.dateOfBirth({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Birth',
@@ -126,7 +119,6 @@ describe('Search type resolvers', () => {
     })
     it('returns null as date of birth in case of missing required data', () => {
       const dob = searchTypeResolvers.BirthEventSearchSet!.dateOfBirth({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Birth',
@@ -141,7 +133,6 @@ describe('Search type resolvers', () => {
     it('returns _source info as registration from birth event search set', () => {
       const registration =
         searchTypeResolvers.BirthEventSearchSet!.registration({
-          _type: 'compositions',
           _id: '123',
           _source: {
             event: 'Birth',
@@ -164,7 +155,6 @@ describe('Search type resolvers', () => {
     it('returns _source.operationHistories as operationHistories from birth event search set', () => {
       const operationHistories =
         searchTypeResolvers.BirthEventSearchSet!.registration({
-          _type: 'compositions',
           _id: '123',
           _source: {
             operationHistories: [
@@ -238,14 +228,12 @@ describe('Search type resolvers', () => {
   describe('type resolvers for death event', () => {
     it('returns id from death event search set', () => {
       const id = searchTypeResolvers.DeathEventSearchSet!.id({
-        _type: 'compositions',
         _id: '123'
       })
       expect(id).toBe('123')
     })
     it('returns type from death event search set', () => {
       const type = searchTypeResolvers.DeathEventSearchSet!.type({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Death'
@@ -255,7 +243,6 @@ describe('Search type resolvers', () => {
     })
     it('returns deceassedName from Death event search set', () => {
       const name = searchTypeResolvers.DeathEventSearchSet!.deceasedName({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Death',
@@ -286,7 +273,6 @@ describe('Search type resolvers', () => {
     })
     it('returns null as given and family name in-case of missing required data', () => {
       const name = searchTypeResolvers.DeathEventSearchSet!.deceasedName({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Death'
@@ -307,7 +293,6 @@ describe('Search type resolvers', () => {
     })
     it('returns date of Death from Death event search set', () => {
       const dod = searchTypeResolvers.DeathEventSearchSet!.dateOfDeath({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Death',
@@ -322,7 +307,6 @@ describe('Search type resolvers', () => {
     })
     it('returns null as date of death in case of missing required data', () => {
       const dod = searchTypeResolvers.DeathEventSearchSet!.dateOfDeath({
-        _type: 'compositions',
         _id: '123',
         _source: {
           event: 'Death',
@@ -337,7 +321,6 @@ describe('Search type resolvers', () => {
     it('returns _source info as registration from Death event search set', () => {
       const registration =
         searchTypeResolvers.DeathEventSearchSet!.registration({
-          _type: 'compositions',
           _id: '123',
           _source: {
             event: 'Death',
@@ -360,7 +343,6 @@ describe('Search type resolvers', () => {
     it('returns _source.operationHistories as operationHistories from death event search set', () => {
       const operationHistories =
         searchTypeResolvers.DeathEventSearchSet!.registration({
-          _type: 'compositions',
           _id: '123',
           _source: {
             operationHistories: [

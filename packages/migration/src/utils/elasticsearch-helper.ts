@@ -10,7 +10,9 @@
  */
 
 import { Client } from '@elastic/elasticsearch'
+import { fetch, Agent } from 'undici'
 
+const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
 const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
 
@@ -104,5 +106,25 @@ export const searchCompositionByCriteria = async (
   } catch (err) {
     console.error(`searchCompositionByCriteria: error: ${err}`)
     return null
+  }
+}
+
+/**
+ * Streams MongoDB collections to ElasticSearch documents. Useful when the ElasticSearch schema changes.
+ */
+export const reindex = async (timestamp: string) => {
+  const response = await fetch(new URL('reindex', SEARCH_URL), {
+    method: 'POST',
+    body: JSON.stringify({ timestamp }),
+    headers: { 'Content-Type': 'application/json' },
+    dispatcher: new Agent({
+      bodyTimeout: 2 * 60 * 60 * 1000 // 2 hours
+    })
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Problem reindexing ElasticSearch. Response: ${await response.text()}`
+    )
   }
 }

@@ -32,6 +32,7 @@ export const requestCorrectionRoute = createRoute({
   path: '/records/{recordId}/request-correction',
   allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
   action: 'REQUEST_CORRECTION',
+  includeHistoryResources: true,
   handler: async (request, record): Promise<CorrectionRequestedRecord> => {
     const correctionDetails = validateRequest(
       CorrectionRequestInput,

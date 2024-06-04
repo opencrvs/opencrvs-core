@@ -269,7 +269,7 @@ export type AssignmentData = {
   firstName?: Maybe<Scalars['String']>
   lastName?: Maybe<Scalars['String']>
   officeName?: Maybe<Scalars['String']>
-  userId?: Maybe<Scalars['String']>
+  practitionerId?: Maybe<Scalars['String']>
 }
 
 export type Attachment = {
@@ -3040,7 +3040,7 @@ export type SearchEventsQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -3051,19 +3051,6 @@ export type SearchEventsQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -3091,7 +3078,7 @@ export type SearchEventsQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -3102,19 +3089,6 @@ export type SearchEventsQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -3149,7 +3123,7 @@ export type SearchEventsQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -3160,19 +3134,6 @@ export type SearchEventsQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -5752,7 +5713,7 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
     modifiedAt?: string | null
     assignment?: {
       __typename?: 'AssignmentData'
-      userId?: string | null
+      practitionerId?: string | null
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
@@ -5763,19 +5724,6 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
     __typename?: 'OperationHistorySearchSet'
     operationType?: string | null
     operatedOn?: any | null
-    operatorRole?: string | null
-    operatorOfficeName?: string | null
-    operatorOfficeAlias?: Array<string | null> | null
-    notificationFacilityName?: string | null
-    notificationFacilityAlias?: Array<string | null> | null
-    rejectReason?: string | null
-    rejectComment?: string | null
-    operatorName?: Array<{
-      __typename?: 'HumanName'
-      firstNames?: string | null
-      familyName?: string | null
-      use?: string | null
-    } | null> | null
   } | null> | null
 }
 
@@ -5805,7 +5753,7 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
     modifiedAt?: string | null
     assignment?: {
       __typename?: 'AssignmentData'
-      userId?: string | null
+      practitionerId?: string | null
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
@@ -5816,19 +5764,6 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
     __typename?: 'OperationHistorySearchSet'
     operationType?: string | null
     operatedOn?: any | null
-    operatorRole?: string | null
-    operatorOfficeName?: string | null
-    operatorOfficeAlias?: Array<string | null> | null
-    notificationFacilityName?: string | null
-    notificationFacilityAlias?: Array<string | null> | null
-    rejectReason?: string | null
-    rejectComment?: string | null
-    operatorName?: Array<{
-      __typename?: 'HumanName'
-      firstNames?: string | null
-      familyName?: string | null
-      use?: string | null
-    } | null> | null
   } | null> | null
 }
 
@@ -5865,7 +5800,7 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
     modifiedAt?: string | null
     assignment?: {
       __typename?: 'AssignmentData'
-      userId?: string | null
+      practitionerId?: string | null
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
@@ -5876,19 +5811,6 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
     __typename?: 'OperationHistorySearchSet'
     operationType?: string | null
     operatedOn?: any | null
-    operatorRole?: string | null
-    operatorOfficeName?: string | null
-    operatorOfficeAlias?: Array<string | null> | null
-    notificationFacilityName?: string | null
-    notificationFacilityAlias?: Array<string | null> | null
-    rejectReason?: string | null
-    rejectComment?: string | null
-    operatorName?: Array<{
-      __typename?: 'HumanName'
-      firstNames?: string | null
-      familyName?: string | null
-      use?: string | null
-    } | null> | null
   } | null> | null
 }
 
@@ -5945,7 +5867,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -5956,19 +5878,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -5997,7 +5906,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6008,19 +5917,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6056,7 +5952,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6067,19 +5963,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6115,7 +5998,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6126,19 +6009,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6167,7 +6037,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6178,19 +6048,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6226,7 +6083,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6237,19 +6094,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6285,7 +6129,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6296,19 +6140,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6337,7 +6168,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6348,19 +6179,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6396,7 +6214,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6407,19 +6225,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6455,7 +6260,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6466,19 +6271,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6507,7 +6299,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6518,19 +6310,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6566,7 +6345,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6577,19 +6356,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6625,7 +6391,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6636,19 +6402,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6677,7 +6430,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6688,19 +6441,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6736,7 +6476,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6747,19 +6487,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6795,7 +6522,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6806,19 +6533,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6847,7 +6561,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6858,19 +6572,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -6906,7 +6607,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6917,19 +6618,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -6965,7 +6653,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -6976,19 +6664,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7017,7 +6692,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7028,19 +6703,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7076,7 +6738,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7087,19 +6749,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -7135,7 +6784,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7146,19 +6795,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7187,7 +6823,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7198,19 +6834,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7246,7 +6869,7 @@ export type RegistrationHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7257,19 +6880,6 @@ export type RegistrationHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -7317,7 +6927,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7328,19 +6938,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7369,7 +6966,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7380,19 +6977,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7428,7 +7012,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7439,19 +7023,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -7487,7 +7058,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7498,19 +7069,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7539,7 +7097,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7550,19 +7108,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | {
@@ -7598,7 +7143,7 @@ export type FieldAgentHomeQuery = {
             modifiedAt?: string | null
             assignment?: {
               __typename?: 'AssignmentData'
-              userId?: string | null
+              practitionerId?: string | null
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
@@ -7609,19 +7154,6 @@ export type FieldAgentHomeQuery = {
             __typename?: 'OperationHistorySearchSet'
             operationType?: string | null
             operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
           } | null> | null
         }
       | null
@@ -7679,7 +7211,7 @@ export type FetchDeclarationShortInfoQuery = {
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
-            userId?: string | null
+            practitionerId?: string | null
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null
@@ -7717,7 +7249,7 @@ export type FetchDeclarationShortInfoQuery = {
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
-            userId?: string | null
+            practitionerId?: string | null
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null
@@ -7766,7 +7298,7 @@ export type FetchDeclarationShortInfoQuery = {
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
-            userId?: string | null
+            practitionerId?: string | null
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null

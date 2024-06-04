@@ -60,12 +60,6 @@ export const bundleWithAssignedTask = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/8673967b-b884-432f-a4d3-5ab632884499'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
               reference: 'Location/6a867503-23c1-4961-85b0-d0cb60e8d7d7'

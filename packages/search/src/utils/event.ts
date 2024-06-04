@@ -9,8 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './fixtures/birth-bundle'
-export * from './fixtures/death-bundle'
-export * from './fixtures/marriage-bundle'
-export * from './fixtures/location'
-export * from './fixtures/practitioner'
+import {
+  EVENT_TYPE,
+  getTaskFromSavedBundle,
+  SavedBundle
+} from '@opencrvs/commons/types'
+
+export function getEventType(bundle: SavedBundle) {
+  const task = getTaskFromSavedBundle(bundle)
+  if (!task) {
+    throw new Error('No task found')
+  }
+  const type = task.code!.coding![0].code as EVENT_TYPE
+  return type
+}

@@ -372,7 +372,8 @@ export const mockUserResponse = {
           }
         ]
       },
-      systemRole: 'LOCAL_REGISTRAR'
+      systemRole: 'LOCAL_REGISTRAR',
+      practitionerId: '9202fa3c-7eb7-4898-bea5-5895f7f99534'
     }
   }
 }

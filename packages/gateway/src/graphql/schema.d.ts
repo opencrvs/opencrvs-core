@@ -1432,7 +1432,7 @@ export interface GQLWebhookInput {
 }
 
 export interface GQLAssignmentData {
-  userId?: string
+  practitionerId?: string
   firstName?: string
   lastName?: string
   officeName?: string
@@ -9268,14 +9268,17 @@ export interface LoginBackgroundToImageFitResolver<
 }
 
 export interface GQLAssignmentDataTypeResolver<TParent = any> {
-  userId?: AssignmentDataToUserIdResolver<TParent>
+  practitionerId?: AssignmentDataToPractitionerIdResolver<TParent>
   firstName?: AssignmentDataToFirstNameResolver<TParent>
   lastName?: AssignmentDataToLastNameResolver<TParent>
   officeName?: AssignmentDataToOfficeNameResolver<TParent>
   avatarURL?: AssignmentDataToAvatarURLResolver<TParent>
 }
 
-export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
+export interface AssignmentDataToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

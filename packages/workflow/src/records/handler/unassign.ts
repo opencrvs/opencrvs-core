@@ -42,7 +42,8 @@ export async function unassignRecordHandler(
       'REGISTERED',
       'ISSUED',
       'CORRECTION_REQUESTED'
-    ]
+    ],
+    true
   )
 
   const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
