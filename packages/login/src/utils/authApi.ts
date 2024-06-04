@@ -117,7 +117,7 @@ const resendAuthenticationCode = (
 ) => {
   return request({
     url: new URL(
-      '/resendAuthenticationCode',
+      'resendAuthenticationCode',
       window.config.AUTH_API_URL
     ).toString(),
     method: 'POST',
