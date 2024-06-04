@@ -876,13 +876,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    groomSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/groom-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     brideSignature: async (
       task,
       _,
@@ -904,13 +897,6 @@ export const typeResolvers: GQLResolver = {
         )
       }
       return null
-    },
-    brideSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/bride-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
     },
     witnessOneSignature: async (
       task,
@@ -934,13 +920,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    witnessOneSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/witness-one-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     witnessTwoSignature: async (
       task,
       _,
@@ -962,13 +941,6 @@ export const typeResolvers: GQLResolver = {
         )
       }
       return null
-    },
-    witnessTwoSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/witness-two-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
     },
     contactRelationship: (task) => {
       const contact = findExtension(

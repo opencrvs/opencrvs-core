@@ -814,10 +814,6 @@ export interface GQLRegistration {
   brideSignature?: string
   witnessOneSignature?: string
   witnessTwoSignature?: string
-  groomSignatureURI?: string
-  brideSignatureURI?: string
-  witnessOneSignatureURI?: string
-  witnessTwoSignatureURI?: string
   contactPhoneNumber?: string
   contactEmail?: string
   status?: Array<GQLRegWorkflow | null>
@@ -6543,10 +6539,6 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   brideSignature?: RegistrationToBrideSignatureResolver<TParent>
   witnessOneSignature?: RegistrationToWitnessOneSignatureResolver<TParent>
   witnessTwoSignature?: RegistrationToWitnessTwoSignatureResolver<TParent>
-  groomSignatureURI?: RegistrationToGroomSignatureURIResolver<TParent>
-  brideSignatureURI?: RegistrationToBrideSignatureURIResolver<TParent>
-  witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>
-  witnessTwoSignatureURI?: RegistrationToWitnessTwoSignatureURIResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   contactEmail?: RegistrationToContactEmailResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>

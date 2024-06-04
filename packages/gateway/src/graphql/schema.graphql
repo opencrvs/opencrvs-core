@@ -952,10 +952,6 @@ type Registration {
   brideSignature: String
   witnessOneSignature: String
   witnessTwoSignature: String
-  groomSignatureURI: String
-  brideSignatureURI: String
-  witnessOneSignatureURI: String
-  witnessTwoSignatureURI: String
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflow]
