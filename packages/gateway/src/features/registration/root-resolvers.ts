@@ -21,7 +21,8 @@ import {
   Saved,
   Task,
   buildFHIRBundle,
-  getComposition
+  getComposition,
+  getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
 import {
   GQLBirthRegistrationInput,
@@ -616,10 +617,12 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-      const task = (await unassignRegistration(id, authHeader)).entry[0]
+      const task = getTaskFromSavedBundle(
+        await unassignRegistration(id, authHeader)
+      )
 
       // return the taskId
-      return task.resource.id
+      return task.id
     },
     async markEventAsDuplicate(
       _,
