@@ -27,7 +27,10 @@ import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { recordHandler } from '@search/features/registration/record/handler'
 import { getRecordByIdHandler } from '@search/features/records/handler'
-import { reindexHandler } from '@search/features/reindex/handler'
+import {
+  reindexHandler,
+  reindexStatusHandler
+} from '@search/features/reindex/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -289,6 +292,20 @@ export const getRoutes = () => {
         validate: {
           payload: Joi.object({
             timestamp: Joi.string()
+          })
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/reindex/status/{jobId}',
+      handler: reindexStatusHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        validate: {
+          params: Joi.object({
+            jobId: Joi.string().uuid()
           })
         }
       }

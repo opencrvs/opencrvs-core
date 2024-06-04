@@ -10,7 +10,6 @@
  */
 
 import { Client } from '@elastic/elasticsearch'
-import { fetch, Agent } from 'undici'
 
 const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
@@ -112,14 +111,11 @@ export const searchCompositionByCriteria = async (
 /**
  * Streams MongoDB collections to ElasticSearch documents. Useful when the ElasticSearch schema changes.
  */
-export const reindex = async (timestamp: string) => {
+export const triggerReindex = async (timestamp: string) => {
   const response = await fetch(new URL('reindex', SEARCH_URL), {
     method: 'POST',
     body: JSON.stringify({ timestamp }),
-    headers: { 'Content-Type': 'application/json' },
-    dispatcher: new Agent({
-      bodyTimeout: 2 * 60 * 60 * 1000 // 2 hours
-    })
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (!response.ok) {
@@ -127,4 +123,45 @@ export const reindex = async (timestamp: string) => {
       `Problem reindexing ElasticSearch. Response: ${await response.text()}`
     )
   }
+
+  const data = await response.json()
+  return data.jobId
+}
+
+/**
+ * Checks the status of the reindex, as it can take a while
+ */
+export const checkReindexStatus = async (jobId: string) => {
+  const response = await fetch(new URL(`reindex/status/${jobId}`, SEARCH_URL), {
+    method: 'GET'
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Problem checking reindex status from ElasticSearch. Response: ${await response.text()}`
+    )
+  }
+
+  const data = await response.json()
+  return data.status === 'completed'
+}
+
+export const reindex = async (timestamp: string) => {
+  console.info(`Reindexing ${timestamp}...`)
+  const jobId = await triggerReindex(timestamp)
+  await new Promise<void>((resolve, reject) => {
+    const intervalId = setInterval(async () => {
+      try {
+        const isCompleted = await checkReindexStatus(jobId)
+        if (isCompleted) {
+          clearInterval(intervalId)
+          resolve()
+        }
+      } catch (error) {
+        clearInterval(intervalId)
+        reject(error)
+      }
+    }, 1000)
+  })
+  console.info(`...done reindexing ${timestamp} (job id ${jobId})`)
 }
