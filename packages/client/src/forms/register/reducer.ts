@@ -72,7 +72,9 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
           birth: {
             ...birth,
             sections: [
-              ...birth.sections,
+              ...birth.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'preview'].includes(viewType)
+              ),
               ...(birth.sections.find((s) => s.id === 'preview')
                 ? []
                 : [{ ...preview, id: 'preview' }])

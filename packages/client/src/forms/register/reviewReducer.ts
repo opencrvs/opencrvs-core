@@ -72,7 +72,12 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
         reviewForm: {
           birth: {
             ...birth,
-            sections: [...birth.sections, review]
+            sections: [
+              ...birth.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'review'].includes(viewType)
+              ),
+              ...(birth.sections.find((s) => s.id === 'review') ? [] : [review])
+            ]
           },
           death: {
             ...death,

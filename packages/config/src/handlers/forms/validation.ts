@@ -65,7 +65,7 @@ const group = z.object({
 
 const section = z.object({
   id: z.string(),
-  viewType: z.enum(['form', 'hidden', 'preview']),
+  viewType: z.enum(['form', 'hidden', 'preview', 'review']),
   name: messageDescriptor,
   title: messageDescriptor.optional(),
   groups: z.array(group),
