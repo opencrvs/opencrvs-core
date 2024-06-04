@@ -61,6 +61,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setPhoneNumber(EMPTY_STRING)
     setIsInvalidPhoneNumber(false)
     setUnknownError(false)
+    setShowDuplicateMobileErrorNotification(false)
   }
   const toggleDuplicateMobileErrorNotification = () => {
     setShowDuplicateMobileErrorNotification((prevValue) => !prevValue)

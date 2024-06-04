@@ -63,6 +63,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setEmailAddress(EMPTY_STRING)
     setIsInvalidEmailAddress(false)
     setUnknownError(false)
+    setShowDuplicateEmailErrorNotification(false)
   }
   const toggleDuplicateEmailErrorNotification = () => {
     setShowDuplicateEmailErrorNotification((prevValue) => !prevValue)
