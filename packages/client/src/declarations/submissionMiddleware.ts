@@ -187,6 +187,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       graphqlPayload.registration.correction =
         declaration.data.registration.correction ?? {}
       graphqlPayload.registration.correction.values = changedValues
+      // Delete certificate properties during print record corrections.
       delete graphqlPayload.registration.certificates
     }
 
