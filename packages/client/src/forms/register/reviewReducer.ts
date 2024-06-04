@@ -81,11 +81,23 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
           },
           death: {
             ...death,
-            sections: [...death.sections, review]
+            sections: [
+              ...death.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'review'].includes(viewType)
+              ),
+              ...(death.sections.find((s) => s.id === 'review') ? [] : [review])
+            ]
           },
           marriage: {
             ...marriage,
-            sections: [...marriage.sections, review]
+            sections: [
+              ...marriage.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'review'].includes(viewType)
+              ),
+              ...(marriage.sections.find((s) => s.id === 'review')
+                ? []
+                : [review])
+            ]
           }
         }
       }

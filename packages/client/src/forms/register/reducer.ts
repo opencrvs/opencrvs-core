@@ -54,6 +54,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const marriage = deserializeForm(forms.marriage, validators)
 
       const preview = {
+        id: 'preview',
         viewType: 'preview' as const,
         name: messages.previewName,
         title: messages.previewTitle,
@@ -77,16 +78,30 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
               ),
               ...(birth.sections.find((s) => s.id === 'preview')
                 ? []
-                : [{ ...preview, id: 'preview' }])
+                : [preview])
             ]
           },
           death: {
             ...death,
-            sections: [...death.sections, { ...preview, id: 'preview' }]
+            sections: [
+              ...death.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'preview'].includes(viewType)
+              ),
+              ...(death.sections.find((s) => s.id === 'preview')
+                ? []
+                : [preview])
+            ]
           },
           marriage: {
             ...marriage,
-            sections: [...marriage.sections, { ...preview, id: 'preview' }]
+            sections: [
+              ...marriage.sections.filter(({ viewType }) =>
+                ['form', 'hidden', 'preview'].includes(viewType)
+              ),
+              ...(marriage.sections.find((s) => s.id === 'preview')
+                ? []
+                : [preview])
+            ]
           }
         }
       }
