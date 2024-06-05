@@ -9,6 +9,10 @@
 - Supporting document fields can now be made required
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
 
+## Bug fixes
+
+- Fix unassign action not appearing in audit history [#7035](https://github.com/opencrvs/opencrvs-core/pull/7072)
+
 ## 1.5.0 (TBD)
 
 ## Breaking changes
