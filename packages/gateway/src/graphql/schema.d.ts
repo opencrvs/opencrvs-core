@@ -6756,54 +6756,6 @@ export interface RegistrationToWitnessTwoSignatureResolver<
   ): TResult
 }
 
-export interface RegistrationToGroomSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToBrideSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToWitnessOneSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToWitnessTwoSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface RegistrationToContactPhoneNumberResolver<
   TParent = any,
   TResult = any
