@@ -228,7 +228,9 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'familyNameEng',
     'relationship',
     'otherRelationship'
-  ]
+  ],
+  review: [],
+  preview: []
 }
 
 const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
@@ -341,7 +343,21 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
   witnessOne: ['middleNameEng'],
-  witnessTwo: ['middleNameEng']
+  witnessTwo: ['middleNameEng'],
+  review: [
+    'informantSignature',
+    'groomSignature',
+    'brideSignature',
+    'witnessOneSignature',
+    'witnessTwoSignature'
+  ],
+  preview: [
+    'informantSignature',
+    'groomSignature',
+    'brideSignature',
+    'witnessOneSignature',
+    'witnessTwoSignature'
+  ]
 }
 
 const form = z.object({
@@ -432,6 +448,20 @@ const form = z.object({
             }
           }
         )
+    )
+    .refine(
+      (sections) =>
+        sections
+          .find(({ id }) => id === 'review')
+          ?.groups.some(({ id }) => id === 'review-view-group'),
+      `A "review" section is required in form configuration. It can optionally include SIGNATURE fields. An example configuration can be found in our Farajaland reference implementation.`
+    )
+    .refine(
+      (sections) =>
+        sections
+          .find(({ id }) => id === 'preview')
+          ?.groups.some(({ id }) => id === 'preview-view-group'),
+      `A "preview" section is required in form configuration. It can optionally include SIGNATURE fields. An example configuration can be found in our Farajaland reference implementation.`
     )
     .refine(
       (sections) =>
