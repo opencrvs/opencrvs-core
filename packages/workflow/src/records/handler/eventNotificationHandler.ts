@@ -12,21 +12,16 @@ import * as Hapi from '@hapi/hapi'
 import {
   addExtensionsToTask,
   Bundle,
-  changeState,
   EVENT_TYPE,
-  KnownExtensionType,
+  findCompositionIdFromTransactionResponse,
   Resource,
-  resourceToSavedBundleEntry,
   StringExtensionType,
   Task
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
-import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
-import {
-  getLocationOrOfficeById,
-  getSystem
-} from '@workflow/features/user/utils'
+import { sendBundleToHearth } from '@workflow/records/fhir'
+import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 import { auditEvent } from '@workflow/records/audit'
@@ -35,6 +30,7 @@ import {
   getEventType
 } from '@workflow/features/registration/utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { getValidRecordById } from '@workflow/records'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -101,24 +97,7 @@ export async function eventNotificationHandler(
     | StringExtensionType['http://opencrvs.org/specs/extension/regLastOffice']
     | undefined
 
-  const officeId = officeExtension?.valueReference.reference.split('/')[1]
-
-  if (!officeId) throw internal('Office id not found in bundle')
-
-  const officeLocationExtension = taskWithRegLastUserAndStatus.extension.find(
-    (e) => e.url === 'http://opencrvs.org/specs/extension/regLastLocation'
-  ) as
-    | KnownExtensionType['http://opencrvs.org/specs/extension/regLastLocation']
-    | undefined
-
-  const officeLocationId =
-    officeLocationExtension?.valueReference.reference.split('/')[1]
-
-  if (!officeLocationId)
-    throw internal('Office location id not found in bundle')
-
-  const office = await getLocationOrOfficeById(officeId)
-  const officeLocation = await getLocationOrOfficeById(officeLocationId)
+  if (!officeExtension) throw internal('Office id not found in bundle')
 
   const savedBundleWithRegLastUserAndBusinessStatus = {
     ...bundle,
@@ -128,25 +107,19 @@ export async function eventNotificationHandler(
         fullUrl: bundle.entry.find((e) => e.resource.resourceType === 'Task')
           ?.fullUrl,
         resource: taskWithRegLastUserAndStatus
-      },
-      ...[office, officeLocation, practitioner].map((r) =>
-        resourceToSavedBundleEntry(r)
-      )
+      }
     ]
   }
 
   const responseBundle = await sendBundleToHearth(
     savedBundleWithRegLastUserAndBusinessStatus
   )
-  const savedBundle = toSavedBundle(
-    savedBundleWithRegLastUserAndBusinessStatus,
-    responseBundle
-  )
+  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
 
-  const record = changeState(savedBundle, ['IN_PROGRESS', 'READY_FOR_REVIEW'])
+  const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
-  await indexBundle(record, token)
-  await auditEvent('sent-notification', record, token)
+  await indexBundle(updatedBundle, token)
+  await auditEvent('sent-notification', updatedBundle, token)
 
-  return h.response(responseBundle).code(200)
+  return h.response(updatedBundle).code(200)
 }

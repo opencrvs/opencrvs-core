@@ -8,31 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SavedLocation } from '@opencrvs/commons/types'
 import { ServerRoute } from '@hapi/hapi'
-import { FHIR_URL } from '@config/config/constants'
-
-async function fetchLocation(locationId: string) {
-  const res = await fetch(`${FHIR_URL}/Location/${locationId}`, {
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-  if (!res.ok) {
-    throw new Error('Failed to get location')
-  }
-  return (await res.json()) as SavedLocation
-}
+import { fetchLocations } from '@config/services/hearth'
+import { resolveLocationParents } from './locationTreeSolver'
+import { UUID } from '@opencrvs/commons'
+import { find } from 'lodash'
+import { notFound } from '@hapi/boom'
 
 export const locationHierarchyHandler: ServerRoute['handler'] = async (req) => {
-  const { locationId } = req.params as { locationId: string }
-  let location = await fetchLocation(locationId)
-  const hierarchy = [location]
-  let parentLocationId = location.partOf?.reference.split('/').at(1)
-  while (parentLocationId && parentLocationId !== '0') {
-    location = await fetchLocation(parentLocationId)
-    hierarchy.push(location)
-    parentLocationId = location.partOf?.reference.split('/').at(1)
+  const { locationId } = req.params as { locationId: UUID }
+  const locations = await fetchLocations()
+  const location = find(locations, { id: locationId })
+
+  if (!location) {
+    return notFound()
   }
-  return hierarchy.reverse()
+
+  return [...resolveLocationParents(location, locations), location]
 }

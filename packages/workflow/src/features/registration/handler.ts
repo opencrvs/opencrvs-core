@@ -47,7 +47,8 @@ export async function markEventAsRegisteredCallbackHandler(
   const savedRecord = await getRecordById(
     compositionId,
     request.headers.authorization,
-    ['WAITING_VALIDATION']
+    ['WAITING_VALIDATION'],
+    true
   )
   if (!savedRecord) {
     throw new Error('Could not find record in elastic search!')

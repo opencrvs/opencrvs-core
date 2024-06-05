@@ -17,7 +17,6 @@ import {
   Practitioner,
   Task,
   URNReference,
-  URLReference,
   SavedTask,
   Composition,
   SavedComposition,
@@ -50,7 +49,8 @@ import {
   isTask,
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
-  getResourceFromBundleById
+  getResourceFromBundleById,
+  TransactionResponse
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -67,9 +67,10 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerLocations
+  getPractitionerOfficeId
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
+import { fetchLocationHierarchy } from '@workflow/utils/location'
 
 function getFHIRValueField(value: unknown) {
   if (typeof value === 'string') {
@@ -140,22 +141,9 @@ export async function withPractitionerDetails<T extends Task>(
   }
   const user = userOrSystem
   const practitioner = await getLoggedInPractitionerResource(token)
-  const relatedLocations = (await getPractitionerLocations(
-    user.practitionerId
-  )) as [SavedLocation]
-  const office = relatedLocations.find((l) =>
-    l.type?.coding?.some(({ code }) => code === 'CRVS_OFFICE')
-  )
-  if (!office) {
-    throw internal('Office not found for the requesting user')
-  }
-  const officeLocationId = office.partOf?.reference.split('/').at(1)
-  const officeLocation = relatedLocations.find((l) => l.id === officeLocationId)
-  if (!officeLocation) {
-    throw internal(
-      'Parent location of office not found for the requesting user'
-    )
-  }
+  const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
+  const hierarchy = await fetchLocationHierarchy(practitionerOfficeId)
+
   newTask.extension.push(
     ...([
       {
@@ -165,19 +153,9 @@ export async function withPractitionerDetails<T extends Task>(
         }
       },
       {
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: `Location/${resourceIdentifierToUUID(
-            office.partOf!.reference
-          )}`
-        }
-      },
-      {
         url: 'http://opencrvs.org/specs/extension/regLastOffice',
-        //@todo: make this field required
-        valueString: office.name,
         valueReference: {
-          reference: `Location/${office.id}`
+          reference: `Location/${practitionerOfficeId}`
         }
       }
     ] satisfies Task['extension'])
@@ -187,7 +165,7 @@ export async function withPractitionerDetails<T extends Task>(
     {
       type: 'document',
       resourceType: 'Bundle',
-      entry: [practitioner, office, officeLocation].map((r) =>
+      entry: [practitioner, ...hierarchy].map((r) =>
         resourceToSavedBundleEntry(r)
       )
     }
@@ -703,24 +681,13 @@ export async function createViewTask(
   return viewedTask
 }
 
-export async function createDownloadTask(
+export function createDownloadTask(
   previousTask: SavedTask,
-  token: string,
   extensionUrl:
     | 'http://opencrvs.org/specs/extension/regDownloaded'
     | 'http://opencrvs.org/specs/extension/regAssigned'
-): Promise<SavedTask> {
-  const taskWithoutPractitionerExtensions: SavedTask = createNewTaskResource(
-    previousTask,
-    [{ url: extensionUrl }]
-  )
-
-  const [downloadedTask] = await withPractitionerDetails(
-    taskWithoutPractitionerExtensions,
-    token
-  )
-
-  return downloadedTask
+) {
+  return createNewTaskResource(previousTask, [{ url: extensionUrl }])
 }
 
 export function createRejectTask(
@@ -1113,16 +1080,6 @@ function createNewTaskResource(
       lastUpdated: new Date().toISOString()
     }
   }
-}
-
-export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
-  entry: Array<
-    Omit<fhir3.BundleEntry, 'response'> & {
-      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
-        location: URLReference
-      }
-    }
-  >
 }
 
 export async function sendBundleToHearth(

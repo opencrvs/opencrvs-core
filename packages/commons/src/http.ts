@@ -26,3 +26,8 @@ export function getAuthHeader(request: Hapi.Request) {
     'x-real-user-agent': request.headers['user-agent']
   }
 }
+
+export function joinURL(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return new URL(path, baseWithSlash)
+}
