@@ -56,3 +56,32 @@ export const user = {
   searches: [],
   __v: 0
 }
+
+export const registrar = {
+  _id: '66619331a6a4a835aa689dfd',
+  name: [
+    {
+      use: 'en',
+      given: ['Kennedy'],
+      family: 'Mweene'
+    }
+  ],
+  username: 'k.mweene',
+  identifiers: [],
+  email: '',
+  emailForNotification: 'kalushabwalya1.7@gmail.com',
+  mobile: '0933333333',
+  passwordHash: '$2a$10$Ss1IOh7BmD6wje96VMppheEpHywYjfQgvAy6BRB.ISwM79TvjfnN6',
+  salt: '$2a$10$Ss1IOh7BmD6wje96VMpphe',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: '66619330a6a4a835aa689ddb',
+  practitionerId: '648c914d-de38-4c24-bdc9-ce8ee8cacd4c',
+  primaryOfficeId: '435e5301-063d-4f22-958e-24176cfb4e54',
+  scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
+  securityQuestionAnswers: [],
+  creationDate: 1717670705858,
+  auditHistory: [],
+  searches: [],
+  __v: 0
+}
