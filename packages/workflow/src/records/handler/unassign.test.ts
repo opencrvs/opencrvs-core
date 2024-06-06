@@ -16,6 +16,7 @@ import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { bundleWithAssignedTask } from '@test/mocks/unassignedTask'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
+import { registrar } from '@test/mocks/user'
 
 function checkForUnassignExtenstion(task: Task) {
   return task.extension.find(
@@ -60,6 +61,12 @@ describe('unassign record endpoint', () => {
     mswServer.use(
       rest.post('http://localhost:9090/events/unassigned', (_, res, ctx) => {
         return res(ctx.json({}))
+      })
+    )
+
+    mswServer.use(
+      rest.post('http://localhost:3030/getUser', (_, res, ctx) => {
+        return res(ctx.json(registrar))
       })
     )
 
