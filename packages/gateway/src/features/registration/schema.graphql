@@ -125,7 +125,7 @@ type RegWorkflow { # Task
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
   reason: String # -> .reason.text
-  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference.partOf
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
   timeLogged: Int # -> from metrics
 }
@@ -164,7 +164,7 @@ type History {
   #This doesn't resolve to the System model properly rather
   #uses the getSystem endpoint in user-mgnt
   system: IntegratedSystem # -> identitifier(system='http://opencrvs.org/specs/extension/system_identifier')
-  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference.partOf
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
   dhis2Notification: Boolean # -> identitifier(system='http://opencrvs.org/specs/extension/dhis2_event_identifier')
   comments: [Comment]

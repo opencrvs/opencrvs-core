@@ -179,12 +179,6 @@
             "valueString": "01700000222"
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"

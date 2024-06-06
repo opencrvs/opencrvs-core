@@ -11,15 +11,9 @@
 import { FHIR_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
-import {
-  Bundle,
-  Composition,
-  EVENT_TYPE,
-  Saved,
-  Task,
-  findCompositionSection
-} from '@opencrvs/commons/types'
+import { Bundle, EVENT_TYPE, Task } from '@opencrvs/commons/types'
 
+/** @deprecated */
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
@@ -42,6 +36,7 @@ export const fetchFHIR = <T = any>(
     })
 }
 
+/** @deprecated */
 export const fetchFromHearth = <T = any>(
   suffix: string,
   method = 'GET',
@@ -116,38 +111,6 @@ export async function fetchTaskByCompositionIdFromHearth(id: string) {
     `/Task?focus=Composition/${id}`
   )
   return task
-}
-
-export async function getCertificatesFromTask(
-  task: Task,
-  _: any,
-  authHeader: IAuthHeader
-) {
-  if (!task.focus) {
-    throw new Error(
-      'Task resource does not have a focus property necessary to lookup the composition'
-    )
-  }
-
-  const compositionBundle = await fetchFHIR<Saved<Bundle<Composition>>>(
-    `/${task.focus.reference}/_history`,
-    authHeader
-  )
-
-  if (!compositionBundle || !compositionBundle.entry) {
-    return null
-  }
-
-  return compositionBundle.entry.map(async (compositionEntry) => {
-    const certSection = findCompositionSection(
-      'certificates',
-      compositionEntry.resource
-    )
-    if (!certSection || !certSection.entry || !(certSection.entry.length > 0)) {
-      return null
-    }
-    return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
-  })
 }
 
 export const sendToFhir = async (

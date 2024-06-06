@@ -23,13 +23,13 @@
     "build": "rimraf build && tsc"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "7.17.13",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",
     "@types/uuid": "^3.4.3",
-    "@elastic/elasticsearch": "7.17.13",
     "bcryptjs": "^2.4.3",
-    "file-type": "^16.5.3",
     "date-fns": "^2.28.0",
+    "file-type": "^16.5.3",
     "influx": "^5.0.7",
     "is-svg": "^4.3.2",
     "lodash-es": "^4.17.21",

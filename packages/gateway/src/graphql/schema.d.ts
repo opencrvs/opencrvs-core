@@ -29,8 +29,6 @@ export interface GQLQuery {
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
-  locationsByParent?: Array<GQLLocation | null>
-  locationById?: GQLLocation
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
   getUserByMobile?: GQLUser
@@ -291,6 +289,7 @@ export interface GQLLocation {
   latitude?: number
   altitude?: number
   geoData?: string
+  hierarchy?: Array<GQLLocation>
 }
 
 export interface GQLUser {
@@ -306,7 +305,6 @@ export interface GQLUser {
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
@@ -676,7 +674,6 @@ export interface GQLUserInput {
   role?: string
   email?: string
   primaryOffice?: string
-  catchmentArea?: Array<string | null>
   device?: string
   signature?: GQLSignatureInput
 }
@@ -1435,7 +1432,7 @@ export interface GQLWebhookInput {
 }
 
 export interface GQLAssignmentData {
-  userId?: string
+  practitionerId?: string
   firstName?: string
   lastName?: string
   officeName?: string
@@ -2090,8 +2087,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
-  locationsByParent?: QueryToLocationsByParentResolver<TParent>
-  locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
@@ -2379,36 +2374,8 @@ export interface QueryToFetchRecordDetailsForVerificationResolver<
   ): TResult
 }
 
-export interface QueryToLocationsByParentArgs {
-  parentId?: string
-  type?: string
-}
-export interface QueryToLocationsByParentResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToLocationsByParentArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToLocationByIdArgs {
-  locationId?: string
-}
-export interface QueryToLocationByIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: QueryToLocationByIdArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface QueryToHasChildLocationArgs {
-  parentId?: string
+  parentId: string
 }
 export interface QueryToHasChildLocationResolver<TParent = any, TResult = any> {
   (
@@ -4886,6 +4853,7 @@ export interface GQLLocationTypeResolver<TParent = any> {
   latitude?: LocationToLatitudeResolver<TParent>
   altitude?: LocationToAltitudeResolver<TParent>
   geoData?: LocationToGeoDataResolver<TParent>
+  hierarchy?: LocationToHierarchyResolver<TParent>
 }
 
 export interface LocationToIdResolver<TParent = any, TResult = any> {
@@ -5023,6 +4991,15 @@ export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface LocationToHierarchyResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
   userMgntUserID?: UserToUserMgntUserIDResolver<TParent>
@@ -5036,7 +5013,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
-  catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
@@ -5149,15 +5125,6 @@ export interface UserToUnderInvestigationResolver<
 }
 
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9301,14 +9268,17 @@ export interface LoginBackgroundToImageFitResolver<
 }
 
 export interface GQLAssignmentDataTypeResolver<TParent = any> {
-  userId?: AssignmentDataToUserIdResolver<TParent>
+  practitionerId?: AssignmentDataToPractitionerIdResolver<TParent>
   firstName?: AssignmentDataToFirstNameResolver<TParent>
   lastName?: AssignmentDataToLastNameResolver<TParent>
   officeName?: AssignmentDataToOfficeNameResolver<TParent>
   avatarURL?: AssignmentDataToAvatarURLResolver<TParent>
 }
 
-export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
+export interface AssignmentDataToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
