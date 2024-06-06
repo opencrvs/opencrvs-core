@@ -477,9 +477,9 @@ export function notCorrectedHistory(
 }
 
 export function filterConsecutiveAssignment(
-  task: Task,
+  task: TaskHistory,
   index: number,
-  allTasks: Task[]
+  allTasks: TaskHistory[]
 ) {
   const currentAction = getActionFromTask(task)
 
