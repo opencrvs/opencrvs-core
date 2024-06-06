@@ -22,7 +22,8 @@ import {
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IForm
   // MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
@@ -33,6 +34,7 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
+  getRegisterFormFromStore,
   mockOfflineData,
   resizeWindow
 } from '@client/tests/util'
@@ -97,8 +99,10 @@ const rejectedDraftMarriage = createReviewDeclaration(
 
 describe('when in device of large viewport', () => {
   let userAgentMock: SpyInstance
+  let form: Awaited<ReturnType<typeof getRegisterFormFromStore>>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
 
@@ -114,6 +118,7 @@ describe('when in device of large viewport', () => {
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          form={form}
           draft={draft}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
@@ -229,6 +234,7 @@ describe('when in device of large viewport', () => {
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          form={form}
           draft={rejectedDraftBirth}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
@@ -251,6 +257,7 @@ describe('when in device of large viewport', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <ReviewSection
+          form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={rejectedDraftDeath}
           rejectDeclarationClickEvent={mockHandler}
@@ -274,6 +281,7 @@ describe('when in device of large viewport', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <ReviewSection
+          form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={rejectedDraftMarriage}
           rejectDeclarationClickEvent={mockHandler}
@@ -298,6 +306,7 @@ describe('when in device of large viewport', () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
       const testComponent = await createTestComponent(
         <ReviewSection
+          form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={declaredBirthDeclaration}
           rejectDeclarationClickEvent={mockHandler}
@@ -516,6 +525,7 @@ describe('when in device of large viewport', () => {
 
       const testComponent = await createTestComponent(
         <ReviewSection
+          form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={simpleDraft}
           rejectDeclarationClickEvent={mockHandler}
@@ -623,6 +633,7 @@ describe('when in device of large viewport', () => {
 
       const testComponent = await createTestComponent(
         <ReviewSection
+          form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={simpleDraft}
           rejectDeclarationClickEvent={mockHandler}
@@ -653,82 +664,58 @@ describe('when in device of small viewport', () => {
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     userAgentMock.mockReturnValue('Android')
     vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
-      birth: {
-        sections: [
-          {
-            id: 'mother',
-            name: formMessages.motherTitle,
-            title: formMessages.motherTitle,
-            viewType: 'form' as ViewType,
-            groups: [
-              {
-                id: 'mother-view-group',
-                fields: [
-                  {
-                    name: 'motherBirthDate',
-                    type: DATE,
-                    label: formMessages.dateOfBirth,
-                    required: true,
-                    validator: [],
-                    initialValue: ''
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: 'documents',
-            name: formMessages.documentsName,
-            title: formMessages.documentsTitle,
-            viewType: 'form' as ViewType,
-            groups: [
-              {
-                id: 'documents-view-group',
-                fields: [
-                  {
-                    name: 'uploadDocForMother',
-                    extraValue: 'MOTHER',
-                    type: DOCUMENT_UPLOADER_WITH_OPTION,
-                    label: formMessages.uploadDocForMother,
-                    required: true,
-                    validator: [],
-                    options: [
-                      {
-                        label: formMessages.docTypeBirthCert,
-                        value: 'BIRTH_CERTIFICATE'
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      death: {
-        sections: [
-          {
-            id: 'deceased',
-            name: formMessages.deceasedTitle,
-            title: formMessages.deceasedTitle,
-            viewType: 'form' as ViewType,
-            groups: []
-          }
-        ]
-      },
-      marriage: {
-        sections: [
-          {
-            id: 'groom',
-            name: formMessages.groomName,
-            title: formMessages.groomTitle,
-            viewType: 'form' as ViewType,
-            groups: []
-          }
-        ]
-      }
-    })
+    const form = {
+      sections: [
+        {
+          id: 'mother',
+          name: formMessages.motherTitle,
+          title: formMessages.motherTitle,
+          viewType: 'form' as ViewType,
+          groups: [
+            {
+              id: 'mother-view-group',
+              fields: [
+                {
+                  name: 'motherBirthDate',
+                  type: DATE,
+                  label: formMessages.dateOfBirth,
+                  required: true,
+                  validator: [],
+                  initialValue: ''
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'documents',
+          name: formMessages.documentsName,
+          title: formMessages.documentsTitle,
+          viewType: 'form' as ViewType,
+          groups: [
+            {
+              id: 'documents-view-group',
+              fields: [
+                {
+                  name: 'uploadDocForMother',
+                  extraValue: 'MOTHER',
+                  type: DOCUMENT_UPLOADER_WITH_OPTION,
+                  label: formMessages.uploadDocForMother,
+                  required: true,
+                  validator: [],
+                  options: [
+                    {
+                      label: formMessages.docTypeBirthCert,
+                      value: 'BIRTH_CERTIFICATE'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    } satisfies IForm
     ;(isMobileDevice as Mock).mockRestore()
 
     const data = {
@@ -758,6 +745,7 @@ describe('when in device of small viewport', () => {
 
     const testComponent = await createTestComponent(
       <ReviewSection
+        form={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={simpleDraft}
         rejectDeclarationClickEvent={mockHandler}
