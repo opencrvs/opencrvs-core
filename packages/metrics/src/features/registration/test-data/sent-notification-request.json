@@ -101,12 +101,6 @@
             "valueString": "child/child-view-group/placeOfBirth,mother/mother-view-group/iDType,mother/mother-view-group/iD,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePrimary"
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/308c35b4-04f8-4664-83f5-9790e790cde1"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/b49503bf-531d-4642-ae1b-13f647b88ec6"

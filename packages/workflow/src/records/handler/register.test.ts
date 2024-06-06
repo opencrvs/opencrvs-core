@@ -16,12 +16,12 @@ import { server as mswServer } from '@test/setupServer'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  TransactionResponse,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('Register record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>

@@ -95,6 +95,7 @@ export const updateRoute = createRoute({
   path: '/records/{recordId}/update',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'UPDATE_DECLARATION',
+  includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)

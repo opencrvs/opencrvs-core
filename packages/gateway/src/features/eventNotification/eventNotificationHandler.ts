@@ -12,7 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
 import { fetchFromHearth } from '@gateway/features/fhir/service'
-import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
 
@@ -29,6 +28,13 @@ import {
 } from '@opencrvs/commons/types'
 import { createHospitalNotification } from '@gateway/workflow/index'
 import { getAuthHeader } from '@opencrvs/commons/http'
+
+export enum Code {
+  CRVS_OFFICE = 'CRVS_OFFICE',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  HEALTH_FACILITY = 'HEALTH_FACILITY'
+}
+
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
@@ -112,49 +118,21 @@ async function validateTask(bundle: Bundle) {
     task.extension
   )?.valueReference?.reference
 
-  const regLastOfficeLocationRef = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-    task.extension
-  )?.valueReference?.reference
-
-  if (!regLastOfficeLocationRef) {
-    throw BoomErrorWithCustomMessage(
-      `Could not process the Event Notification, as office's location was not provided`
-    )
-  }
   if (!regLastOfficeIdRef) {
     throw BoomErrorWithCustomMessage(
       `Could not process the Event Notification, as office id was not provided`
     )
   }
 
-  // check if the office location is valid
-  const officeLocation = await fetchFromHearth(`/${regLastOfficeLocationRef}`)
-  if (
-    !officeLocation ||
-    !officeLocation.type ||
-    officeLocation.type.coding?.[0]?.code !== Code.ADMIN_STRUCTURE
-  ) {
-    throw BoomErrorWithCustomMessage(
-      `Could not process the Event Notification, as the provided office location with id ${regLastOfficeLocationRef} was not found`
-    )
-  }
-
   // check if the office id is valid and it is part of the provided office location
-
   const office = await fetchFromHearth(`/${regLastOfficeIdRef}`)
   if (
     !office ||
-    !officeLocation.type ||
+    !office.type ||
     office.type.coding?.[0]?.code !== Code.CRVS_OFFICE
   ) {
     throw BoomErrorWithCustomMessage(
       `Could not process the Event Notification, as the provided office with id ${regLastOfficeIdRef} was not found`
-    )
-  }
-  if (!office.partOf || office.partOf.reference !== regLastOfficeLocationRef) {
-    throw BoomErrorWithCustomMessage(
-      `Could not process the Event Notification, as the provided office isn't part of the provided office location`
     )
   }
 }

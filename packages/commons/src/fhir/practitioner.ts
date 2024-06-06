@@ -14,14 +14,17 @@ import {
   Task,
   WithStrictExtensions,
   findExtension,
-  WithUUID
+  WithUUID,
+  SavedReference
 } from '.'
 
 export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
   use: string
 }
 
-export type PractitionerRole = fhir3.PractitionerRole
+export type PractitionerRole = Omit<fhir3.PractitionerRole, 'location'> & {
+  location: [SavedReference]
+}
 export type PractitionerRoleHistory = PractitionerRole
 
 export type Practitioner = WithStrictExtensions<

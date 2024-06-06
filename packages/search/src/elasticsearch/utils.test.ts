@@ -11,7 +11,7 @@
 import {
   detectBirthDuplicates,
   createStatusHistory,
-  IBirthCompositionBody
+  BirthDocument
 } from '@search/elasticsearch/utils'
 import {
   mockSearchResponse,
@@ -53,11 +53,9 @@ describe('elastic search utils', () => {
       eventLocationId: '146251e9-df90-4068-82b0-27d8f979e8e2',
       operationHistories: []
     }
-    await createStatusHistory(
+    createStatusHistory(
       mockNotificationBody,
-      getTaskFromSavedBundle(mockBirthFhirBundle),
-      'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNzE0MTI1NjI4LCJleHAiOjE3MTQ3MzA0MjgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NjEzOWNjY2IyMTAwOTI3ZjY4OTJhNGYifQ.gQcNbMtCd3V96LRbw7buTSgk_wPkNYEepGhAaE0Z5fH4c1jNG4dn6Jm2J0QgvmEkm6cgPp240e9imT4pG3md7_gO9iwqXg84gn5cU9nhfF7Xi_pxbqDAbprBIB-1smxGOPGYy4LhgSydAa47XwaPLwtQRBoHQtsys13TH_ypw2SY0KQFJVm7OuAJiyvtJsQ6JA2a4oddRTPpbwqc3l-IEEESUktduMMFoHA4DmwHgIylVRKOB58NlxruV-YQRS78X99VBHCnq9f8aecW91dtvw9P_rcTihW8K1x5ua3GYw69sxn-KuJcBzydynp8IKEqCKaeNrtFu8TxMvamIOZTXg',
-      mockBirthFhirBundle
+      getTaskFromSavedBundle(mockBirthFhirBundle)
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
@@ -72,23 +70,14 @@ describe('elastic search utils', () => {
       operationHistories: [
         {
           operatedOn: '2020-11-23T12:01:15.600Z',
-          operatorFirstNames: 'Mohammad',
-          operatorFamilyNameLocale: '',
-          operatorFamilyName: 'Ashraful',
-          operatorFirstNamesLocale: '',
-          operatorOfficeName: 'Baniajan Union Parishad',
-          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
-          operationType: 'REGISTERED' as const,
-          operatorRole: 'LOCAL_REGISTRAR'
+          operationType: 'REGISTERED' as const
         }
       ]
     }
 
-    await createStatusHistory(
+    createStatusHistory(
       mockNotificationBody,
-      getTaskFromSavedBundle(mockBirthFhirBundle),
-      'Bearer abc',
-      mockBirthFhirBundle
+      getTaskFromSavedBundle(mockBirthFhirBundle)
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
@@ -98,22 +87,13 @@ describe('elastic search utils', () => {
       JSON.stringify(mockUserModelResponse),
       { status: 200 }
     ])
-    const compositionBody: IBirthCompositionBody = {
+    const compositionBody: BirthDocument = {
       ...mockCompositionBody,
       type: 'REQUESTED_CORRECTION',
       operationHistories: [
         {
           operatedOn: '2022-01-26T10:59:00.588Z',
-          operatorFirstNames: 'Kennedy',
-          rejectReason: '',
-          operatorFamilyNameLocale: '',
-          operatorFamilyName: 'Mweene',
-          operatorFirstNamesLocale: '',
-          rejectComment: '',
-          operatorOfficeName: 'Lusaka DNRPC District Office',
-          operatorOfficeAlias: ['Lusaka DNRPC District Office'],
-          operationType: 'REGISTERED',
-          operatorRole: 'LOCAL_REGISTRAR'
+          operationType: 'REGISTERED'
         }
       ]
     }
@@ -158,16 +138,9 @@ describe('elastic search utils', () => {
         }
       ]
     }
-    await createStatusHistory(
-      compositionBody,
-      correctionTask,
-      'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNzE0MTI1NjI4LCJleHAiOjE3MTQ3MzA0MjgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NjEzOWNjY2IyMTAwOTI3ZjY4OTJhNGYifQ.gQcNbMtCd3V96LRbw7buTSgk_wPkNYEepGhAaE0Z5fH4c1jNG4dn6Jm2J0QgvmEkm6cgPp240e9imT4pG3md7_gO9iwqXg84gn5cU9nhfF7Xi_pxbqDAbprBIB-1smxGOPGYy4LhgSydAa47XwaPLwtQRBoHQtsys13TH_ypw2SY0KQFJVm7OuAJiyvtJsQ6JA2a4oddRTPpbwqc3l-IEEESUktduMMFoHA4DmwHgIylVRKOB58NlxruV-YQRS78X99VBHCnq9f8aecW91dtvw9P_rcTihW8K1x5ua3GYw69sxn-KuJcBzydynp8IKEqCKaeNrtFu8TxMvamIOZTXg',
-      mockBirthFhirBundle
-    )
+    createStatusHistory(compositionBody, correctionTask)
 
     expect(compositionBody).toHaveProperty('operationHistories')
     expect(compositionBody.operationHistories).toHaveLength(2)
-    expect(compositionBody.operationHistories?.[1]).toHaveProperty('correction')
-    expect(compositionBody.operationHistories?.[1]?.correction).toHaveLength(1)
   })
 })

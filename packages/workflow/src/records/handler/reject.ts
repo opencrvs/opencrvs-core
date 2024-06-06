@@ -27,6 +27,7 @@ export const rejectRoute = createRoute({
   path: '/records/{recordId}/reject',
   allowedStartStates: ['READY_FOR_REVIEW', 'IN_PROGRESS', 'VALIDATED'],
   action: 'REJECT',
+  includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)

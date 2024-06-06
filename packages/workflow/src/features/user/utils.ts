@@ -14,6 +14,8 @@ import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   Practitioner,
+  PractitionerRole,
+  resourceIdentifierToUUID,
   SavedLocation,
   SavedPractitioner
 } from '@opencrvs/commons/types'
@@ -67,63 +69,13 @@ export async function getSystem(
   return body
 }
 
-export async function getPractitionerPrimaryLocation(
-  practitionerId: string
-): Promise<fhir3.Location> {
-  return getPrimaryLocationFromLocationList(
-    await getPractitionerLocations(practitionerId)
+/** Find the office location of a given practitioner */
+export const getPractitionerOfficeId = async (practitionerId: string) => {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
   )
-}
-
-export async function getPractitionerOffice(
-  practitionerId: string
-): Promise<fhir3.Location> {
-  return getOfficeLocationFromLocationList(
-    await getPractitionerLocations(practitionerId)
-  )
-}
-
-function getPrimaryLocationFromLocationList(
-  locations: [fhir3.Location]
-): fhir3.Location {
-  const primaryOffice = getOfficeLocationFromLocationList(locations)
-  const primaryLocationId =
-    primaryOffice &&
-    primaryOffice.partOf &&
-    primaryOffice.partOf.reference &&
-    primaryOffice.partOf.reference.split('/')[1]
-
-  if (!primaryLocationId) {
-    throw new Error('No primary location found')
-  }
-
-  const location = locations.find((loc) => loc.id === primaryLocationId)
-  if (!location) {
-    throw new Error(
-      `No primary location not found for office: ${primaryLocationId}`
-    )
-  }
-  return location
-}
-
-function getOfficeLocationFromLocationList(
-  locations: fhir3.Location[]
-): fhir3.Location {
-  let office: fhir3.Location | undefined
-  locations.forEach((location: fhir3.Location) => {
-    if (location.type && location.type.coding) {
-      location.type.coding.forEach((code) => {
-        if (code.code === 'CRVS_OFFICE') {
-          office = location
-        }
-      })
-    }
-  })
-
-  if (!office) {
-    throw new Error('No CRVS office found')
-  }
-  return office
+  const roleEntry = roleResponse.entry[0].resource as PractitionerRole
+  return resourceIdentifierToUUID(roleEntry.location[0].reference)
 }
 
 export async function getLoggedInPractitionerResource(
@@ -152,30 +104,6 @@ export async function getLocationOrOfficeById(
   locationId: string
 ): Promise<SavedLocation> {
   return await getFromFhir(`/Location/${locationId}`)
-}
-
-export async function getPractitionerLocations(
-  practitionerId: string
-): Promise<[fhir3.Location]> {
-  const roleResponse = await getFromFhir(
-    `/PractitionerRole?practitioner=${practitionerId}`
-  )
-  const roleEntry = roleResponse.entry[0].resource
-  if (!roleEntry || !roleEntry.location) {
-    throw new Error('PractitionerRole has no locations associated')
-  }
-  const locList = []
-  for (const location of roleEntry.location) {
-    const splitRef = location.reference.split('/')
-    const locationResponse: fhir3.Location = await getFromFhir(
-      `/Location/${splitRef[1]}`
-    )
-    if (!locationResponse) {
-      throw new Error(`Location not found for ${location}`)
-    }
-    locList.push(locationResponse)
-  }
-  return locList as [fhir3.Location]
 }
 
 export function getPractitionerRef(practitioner: Practitioner) {

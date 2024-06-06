@@ -24,6 +24,7 @@ export const certifyRoute = createRoute({
   path: '/records/{recordId}/certify-record',
   allowedStartStates: ['REGISTERED'],
   action: 'CERTIFY',
+  includeHistoryResources: true,
   handler: async (request, record): Promise<CertifiedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
