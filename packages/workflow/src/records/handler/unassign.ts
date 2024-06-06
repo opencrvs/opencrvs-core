@@ -23,7 +23,8 @@ import {
   isTaskOrTaskHistory,
   Resource,
   resourceIdentifierToUUID,
-  Task
+  Task,
+  TaskHistory
 } from '@opencrvs/commons/types'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getUserOrSystemByCriteria } from '@workflow/records/user'
@@ -36,8 +37,8 @@ function sortDescending(
   return new Date(b.lastModified).valueOf() - new Date(a.lastModified).valueOf()
 }
 
-function findTaskIndexByExtension(
-  tasks: Task[],
+function findTaskIndexByExtension<T extends Task | TaskHistory>(
+  tasks: T[],
   extensionUrl: Extension['url']
 ) {
   return tasks.findIndex((entry) =>
