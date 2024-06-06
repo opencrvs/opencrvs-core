@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/service'
 import * as Hapi from '@hapi/hapi'
 import { badRequest, conflict } from '@hapi/boom'
 import * as Joi from 'joi'
@@ -26,6 +25,7 @@ import {
   URLReference,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
+import { fetchFromHearth, sendToFhir } from '@config/services/hearth'
 
 export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -158,19 +158,14 @@ export const requestParamsSchema = Joi.object({
 
 const LOCATION_CHUNK_SIZE = 400
 
-export async function fetchLocationHandler(
+export async function fetchLocationsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const searchParam = request.url.search
-  const locationId = request.params.locationId
-  let response
-
-  if (locationId) {
-    response = await fetchFromHearth<Saved<Bundle>>(`/Location/${locationId}`)
-  } else {
-    response = await fetchFromHearth<Saved<Bundle>>(`/Location${searchParam}`)
-  }
+  const response = await fetchFromHearth<Saved<Bundle>>(
+    `Location${searchParam}`
+  )
 
   response.link = response.link?.map((link) => ({
     ...link,
@@ -297,7 +292,7 @@ export async function createLocationHandler(
   }
 
   if (partOfLocation !== '0' && Boolean(partOfLocation)) {
-    const response = await fetchFromHearth(`/Location?_id=${partOfLocation}`)
+    const response = await fetchFromHearth(`Location?_id=${partOfLocation}`)
 
     if (response.total === 0) {
       throw badRequest(
@@ -331,7 +326,7 @@ export async function updateLocationHandler(
 ) {
   const locationId = request.params.locationId
   const location = request.payload as UpdateLocation
-  const existingLocation = await fetchFromHearth(`/Location?_id=${locationId}`)
+  const existingLocation = await fetchFromHearth(`Location?_id=${locationId}`)
   const newLocation = existingLocation.entry[0].resource
 
   if (existingLocation.total === 0) {

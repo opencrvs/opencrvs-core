@@ -50,12 +50,6 @@
             "valueString": "01700000105"
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
@@ -120,12 +114,6 @@
             "url": "http://opencrvs.org/specs/extension/regLastUser",
             "valueReference": {
               "reference": "Practitioner/4bb03541-116e-4ce2-8ea4-407f307f7579"
-            }
-          },
-          {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
             }
           },
           {

@@ -33,7 +33,6 @@ import {
   BundleEntry,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   CodeableConcept,
-  CompositionSection,
   CompositionSectionCode,
   CompositionSectionEncounterReference,
   DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -73,11 +72,6 @@ import {
   FHIR_OBSERVATION_CATEGORY_URL,
   MAKE_CORRECTION_EXTENSION_URL
 } from './constants'
-
-export function findCompositionSectionInBundle<T extends Bundle>(
-  code: CompositionSectionCode,
-  fhirBundle: T
-): CompositionSection | undefined
 
 export function findCompositionSectionInBundle<T extends Bundle>(
   code: CompositionSectionCode,

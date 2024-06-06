@@ -55,6 +55,7 @@ import {
   INFORMANT_CODE,
   Identifier,
   Location,
+  SavedLocation,
   MOTHER_CODE,
   OPENCRVS_SPECIFICATION_URL,
   Patient,
@@ -83,8 +84,11 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
+  findLastOfficeFromSavedBundle,
+  findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
-  filterConsecutiveAssignment
+  filterConsecutiveAssignment,
+  findResourceFromBundleById
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1096,35 +1100,32 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
       )
-      const regLastOfficeExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        task.extension
-      )
+      const office =
+        context.record && findLastOfficeFromSavedBundle(context.record)
 
-      if (assignmentExtension) {
+      if (assignmentExtension && context.record) {
         const regLastUserExtension = findExtension(
           `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
           task.extension
+        )!
+
+        const practitionerId = resourceIdentifierToUUID(
+          regLastUserExtension.valueReference.reference
         )
 
-        const practitionerId =
-          regLastUserExtension?.valueReference?.reference?.split('/')?.[1]
+        const user = findResourceFromBundleById<Practitioner>(
+          context.record,
+          practitionerId
+        )!
 
-        if (practitionerId) {
-          const user =
-            await context.dataSources.usersAPI.getUserByPractitionerId(
-              practitionerId
-            )
-          if (user) {
-            return {
-              userId: user._id,
-              firstName: user.name[0].given.join(' '),
-              lastName: user.name[0].family,
-              officeName: regLastOfficeExtension?.valueString || ''
-            }
-          }
+        return {
+          practitionerId: user.id,
+          firstName: user.name[0].given?.join(' '),
+          lastName: user.name[0].family,
+          officeName: office?.name || ''
         }
       }
+
       return null
     }
   },
@@ -1147,19 +1148,15 @@ export const typeResolvers: GQLResolver = {
     reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
-    location: async (task, _, { dataSources }) => {
+    location: async (task, _, { dataSources, record }) => {
       const taskLocation = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-        task.extension
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension as Extension[]
       )
-      if (!taskLocation || !taskLocation.valueReference) {
+      if (!taskLocation || !record) {
         return null
       }
-      const found = await dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
-      )
-
-      return found
+      return findLastOfficeLocationFromSavedBundle(record)
     },
     office: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
@@ -1170,7 +1167,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
+        resourceIdentifierToUUID(taskLocation.valueReference.reference)
       )
     },
     timeLogged: async (task, _, { dataSources }) => {
@@ -1306,7 +1303,10 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    address: (location) => location.address
+    address: (location: Location) => location.address,
+    hierarchy: (location: SavedLocation, _, { dataSources }) => {
+      return dataSources.locationsAPI.getHierarchy(location.id)
+    }
   },
   MedicalPractitioner: {
     name: async (encounterParticipant: EncounterParticipant, _, context) => {
@@ -1568,17 +1568,15 @@ export const typeResolvers: GQLResolver = {
       }
       return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: Task, _: any, { dataSources }) => {
+    location: async (task: Task, _: any, { dataSources, record }) => {
       const taskLocation = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
       )
-      if (!taskLocation || !taskLocation.valueReference) {
+      if (!taskLocation || !record) {
         return null
       }
-      return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1] as string
-      )
+      return findLastOfficeLocationFromSavedBundle(record)
     },
     office: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(

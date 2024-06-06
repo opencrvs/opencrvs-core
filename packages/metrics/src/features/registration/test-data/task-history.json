@@ -59,12 +59,6 @@
             }
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155"
@@ -146,12 +140,6 @@
             "url": "http://opencrvs.org/specs/extension/regLastUser",
             "valueReference": {
               "reference": "Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df"
-            }
-          },
-          {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8"
             }
           },
           {

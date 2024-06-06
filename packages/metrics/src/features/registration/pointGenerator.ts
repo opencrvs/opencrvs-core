@@ -38,7 +38,6 @@ import {
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
-  getRegLastLocation,
   getTask,
   getPreviousTask,
   getComposition,
@@ -327,12 +326,19 @@ const generatePointLocations = async (
   authHeader: IAuthHeader
 ): Promise<IPointLocation> => {
   const locations: IPointLocation = {}
-  const locationLevel5 = getRegLastLocation(payload)
+  const office = getRegLastOffice(payload)
+  if (!office) {
+    return locations
+  }
+  const locationLevel5 = await fetchParentLocationByLocationID(
+    office,
+    authHeader
+  )
   if (!locationLevel5) {
     return locations
   }
   locations.locationLevel5 = locationLevel5
-  let locationID: string = locations.locationLevel5
+  let locationID: string | undefined = locations.locationLevel5
 
   for (let index = 4; index > 0; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)

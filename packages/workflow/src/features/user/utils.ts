@@ -14,6 +14,8 @@ import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   Practitioner,
+  PractitionerRole,
+  resourceIdentifierToUUID,
   SavedLocation,
   SavedPractitioner
 } from '@opencrvs/commons/types'
@@ -137,7 +139,7 @@ export async function getPractitionerOffice(
 }
 
 function getPrimaryLocationFromLocationList(
-  locations: [fhir3.Location]
+  locations: fhir3.Location[]
 ): fhir3.Location {
   const primaryOffice = getOfficeLocationFromLocationList(locations)
   const primaryLocationId =
@@ -177,6 +179,15 @@ function getOfficeLocationFromLocationList(
     throw new Error('No CRVS office found')
   }
   return office
+}
+
+/** Find the office location of a given practitioner */
+export const getPractitionerOfficeId = async (practitionerId: string) => {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
+  )
+  const roleEntry = roleResponse.entry[0].resource as PractitionerRole
+  return resourceIdentifierToUUID(roleEntry.location[0].reference)
 }
 
 export async function getLoggedInPractitionerResource(

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { UUID } from '@opencrvs/commons'
 export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
@@ -28,15 +29,21 @@ export interface IAdvancedSearchParam {
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationId?: string
+  declarationLocationId?: UUID
+  declarationJurisdictionId?: UUID
+  eventLocationId?: UUID
+  eventJurisdictionId?: UUID
   eventCountry?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel1?: UUID
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel2?: UUID
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel3?: UUID
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel4?: UUID
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel5?: UUID
   childFirstNames?: string
   childLastName?: string
   childDoB?: string

@@ -44,7 +44,6 @@ interface IUserModelData {
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
-  catchmentAreaIds: string[]
   identifiers: {
     system?: string
     value?: string

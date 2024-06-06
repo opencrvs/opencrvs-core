@@ -8,6 +8,11 @@
 - Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
 - Supporting document fields can now be made required
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+- Allow reindexing ElasticSearch via new search-service endpoint `reindex` [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033)
+
+## Breaking changes
+
+- Gateways searchEvents `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
 
 ## 1.5.0 (TBD)
 
@@ -24,6 +29,10 @@
 - #### Update the certificate preview mechanism
 
   In effort of minimizing JavaScript-bundle size, we have streamlined the way how review certificate -page renders certificates. In case the images in your certificates are previewing blurry, you need to update your SVG-certificates to print QR-codes and other images directly with `<image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>` instead of the more complicated `<rect fill="url(#pattern)"></rect>` -paradigm. This doesn't affect printed certificates as they are still created as previously.
+
+- #### Remove unused GraphQL resolvers locationById and locationsByParent
+
+- #### Remove unused GraphQL type `user.catchmentArea` in favor of `user.primaryOffice`
 
 - #### Move default address generation to country-config
 

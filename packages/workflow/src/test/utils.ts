@@ -185,11 +185,7 @@ export const testFhirBundle: StrictBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: { reference: '123' as `Location/${UUID}` }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: { reference: 'Location/123' as `Location/${UUID}` }
+            valueReference: { reference: 'Location/123' }
           }
         ]
       }

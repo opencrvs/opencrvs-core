@@ -69,7 +69,8 @@ export async function unassignRecordHandler(
       'REGISTERED',
       'ISSUED',
       'CORRECTION_REQUESTED'
-    ]
+    ],
+    true
   )
 
   const allTasks = sortTasksDescending(
@@ -136,11 +137,7 @@ export async function unassignRecordHandler(
   )
 
   await sendBundleToHearth(unassignedRecordWithTaskOnly)
-  await indexBundleToRoute(
-    unassignedRecordWithTaskOnly,
-    token,
-    '/events/unassigned'
-  )
+  await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
   await auditEvent('unassigned', unassignedRecord, token)
 
   return unassignedRecord
