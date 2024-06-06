@@ -17,33 +17,9 @@ import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
-import {
-  Extension,
-  findExtension,
-  isTaskOrTaskHistory,
-  resourceIdentifierToUUID,
-  sortTasksDescending,
-  Task,
-  TaskHistory
-} from '@opencrvs/commons/types'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getUserOrSystemByCriteria } from '@workflow/records/user'
-import { getTaskBusinessStatus } from '@workflow/features/task/fhir/utils'
-
-function findTaskIndexByExtension<T extends Task | TaskHistory>(
-  tasks: T[],
-  extensionUrl: Extension['url']
-) {
-  return tasks.findIndex((entry) =>
-    entry.extension.some((ext) => ext.url === extensionUrl)
-  )
-}
-
-const getLastUnassignedTaskIndex = (index1: number, index2: number) => {
-  if (index1 === -1) return index2
-  if (index2 === -1) return index1
-  return Math.min(index1, index2)
-}
+import { findAssignment } from '@opencrvs/commons/assignment'
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
@@ -74,54 +50,10 @@ export async function unassignRecordHandler(
     true
   )
 
-  const allTasks = sortTasksDescending(
-    record.entry.map(({ resource }) => resource).filter(isTaskOrTaskHistory)
-  )
+  const assignment = findAssignment(record)
+  if (!assignment) throw new Error('The declaration is not assigned')
 
-  // declaration is unassigned when status changes
-  const latestChangedStatusIndex = allTasks.findIndex(
-    (entry, index, array) =>
-      index < array.length - 1 &&
-      getTaskBusinessStatus(entry) !== getTaskBusinessStatus(array[index + 1])
-  )
-
-  const unassignIndex = findTaskIndexByExtension(
-    allTasks,
-    'http://opencrvs.org/specs/extension/regUnassigned'
-  )
-
-  const lastUnassignedTaskIndex = getLastUnassignedTaskIndex(
-    latestChangedStatusIndex,
-    unassignIndex
-  )
-
-  const lastAssignedTaskIndex = findTaskIndexByExtension(
-    allTasks,
-    'http://opencrvs.org/specs/extension/regAssigned'
-  )
-
-  if (lastAssignedTaskIndex === -1) throw new Error('Not assigned yet')
-
-  // check for unassigned task and status change
-  if (
-    lastUnassignedTaskIndex !== -1 &&
-    lastAssignedTaskIndex > lastUnassignedTaskIndex
-  )
-    throw new Error('Declaration is found unassigned already')
-
-  const task = allTasks[lastAssignedTaskIndex]
-
-  const regLastUser = findExtension(
-    'http://opencrvs.org/specs/extension/regLastUser',
-    task.extension
-  )
-
-  if (!regLastUser) throw new Error('No user is found assigned to this record')
-
-  const practitionerId = resourceIdentifierToUUID(
-    regLastUser.valueReference.reference
-  )
-
+  const practitionerId = assignment.practitioner.id
   const lastUser = await getUserOrSystemByCriteria({ practitionerId }, token)
 
   // Non-registrars can't unassign declarations from registrars
