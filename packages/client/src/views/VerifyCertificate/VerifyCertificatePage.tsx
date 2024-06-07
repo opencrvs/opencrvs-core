@@ -49,6 +49,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
 import { useVerificationRecordDetails } from './useVerificationRecordDetails'
 import { generateFullAddress } from '@client/utils/locationUtils'
+import { SUBMISSION_STATUS } from '@client/declarations'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -242,6 +243,20 @@ export function VerifyCertificatePage() {
   const getGender = (data: RecordDetails) => {
     if (isBirthRegistration(data)) return data.child?.gender
     if (isDeathRegistration(data)) return data.deceased?.gender
+  }
+
+  const getLastCertifiedDate = (data: RecordDetails) => {
+    return (
+      data.history &&
+      data.history.find(
+        (h, index, allHistory) =>
+          index - 1 &&
+          allHistory[index]?.regStatus?.toString() ===
+            SUBMISSION_STATUS.CERTIFIED &&
+          allHistory[index + 1]?.regStatus?.toString() !==
+            SUBMISSION_STATUS.CERTIFIED
+      )
+    )?.date
   }
 
   // This function currently supports upto two location levels
@@ -466,12 +481,15 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {intl.formatMessage(messageToDefine.createdAt)}
+                          {intl.formatMessage(messageToDefine.certifiedAt)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {formatDate(new Date(data.createdAt), 'dd MMMM yyyy')}
+                          {formatDate(
+                            new Date(getLastCertifiedDate(data)),
+                            'dd MMMM yyyy'
+                          )}
                         </Text>
                       }
                     />
