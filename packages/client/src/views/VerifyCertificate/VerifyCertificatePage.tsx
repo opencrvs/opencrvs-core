@@ -477,14 +477,12 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {intl.formatMessage(
-                            messageToDefine.dateOfCertification
-                          )}
+                          {intl.formatMessage(messageToDefine.createdAt)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {formatDate(new Date(), 'dd MMMM yyyy')}
+                          {formatDate(new Date(data.createdAt), 'dd MMMM yyyy')}
                         </Text>
                       }
                     />

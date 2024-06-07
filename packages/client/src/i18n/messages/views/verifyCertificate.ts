@@ -29,7 +29,7 @@ interface IVerifyCertificateMessages
   registar: MessageDescriptor
   brn: MessageDescriptor
   drn: MessageDescriptor
-  dateOfCertification: MessageDescriptor
+  createdAt: MessageDescriptor
   toastMessage: MessageDescriptor
 }
 
@@ -110,7 +110,7 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage: 'Name of registar',
     description: 'Label for name of registar center'
   },
-  dateOfCertification: {
+  createdAt: {
     id: 'verifyCertificate.createdAt',
     defaultMessage: 'Date of certification',
     description: 'Label for date of certification'
