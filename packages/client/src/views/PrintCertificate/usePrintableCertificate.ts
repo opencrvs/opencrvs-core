@@ -50,7 +50,8 @@ import {
 import { Event } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { IOfflineData } from '@client/offline/reducer'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -69,6 +70,22 @@ const withEnhancedTemplateVariables = (
     registeredDate,
     offlineData
   )
+
+  const locationKey = userDetails?.primaryOffice?.id
+    ? offlineData.offices[userDetails.primaryOffice.id].partOf.split('/')[1]
+    : ''
+  const { country, ...locationHierarchyIds } = getLocationHierarchy(
+    locationKey,
+    offlineData.locations
+  )
+
+  const locationHierarchy: Record<string, string | AdminStructure | undefined> =
+    { country }
+
+  for (const [key, value] of Object.entries(locationHierarchyIds)) {
+    locationHierarchy[`${key}Id`] = value
+  }
+
   return {
     ...declaration,
     data: {
@@ -82,7 +99,8 @@ const withEnhancedTemplateVariables = (
           loggedInUser: {
             name: getUserName(userDetails),
             officeId: userDetails.primaryOffice?.id,
-            signature: userDetails.localRegistrar?.signature
+            signature: userDetails.localRegistrar?.signature,
+            ...locationHierarchy
           }
         })
       } as IFormSectionData

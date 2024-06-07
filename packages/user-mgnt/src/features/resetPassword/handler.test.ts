@@ -61,7 +61,6 @@ const mockUser: IUser & { _id: string } = {
       data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
     }
   },
-  catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
   passwordHash:

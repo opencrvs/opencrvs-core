@@ -14,8 +14,12 @@ import { readFileSync } from 'fs'
 import { createBirthRegistrationPayload } from '@test/mocks/createBirthRecord'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
-import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
-import { TransactionResponse } from '@workflow/records/fhir'
+import {
+  SavedBundle,
+  SavedTask,
+  TransactionResponse,
+  URLReference
+} from '@opencrvs/commons/types'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',

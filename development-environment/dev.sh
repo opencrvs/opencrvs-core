@@ -50,7 +50,7 @@ do
 done
 
 if $dependencies; then
-  concurrently "yarn run compose:deps" "bash setup-elastic-index.sh"
+  concurrently "yarn run compose:deps"
   exit 0
 elif $services; then
   yarn dev:secrets:gen
@@ -117,4 +117,4 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
-concurrently "yarn run start" "yarn run compose:deps" "bash setup-elastic-index.sh"
+concurrently "yarn run start" "yarn run compose:deps"

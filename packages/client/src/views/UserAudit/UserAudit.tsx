@@ -26,7 +26,6 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
@@ -100,8 +99,6 @@ const transformUserQueryResult = (
         ? userData.identifier.value
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
-    locationId:
-      getJurisdictionLocationIdFromUserDetails(userData as UserDetails) || '0',
     avatar: userData.avatar || undefined,
     device: userData.device
   }

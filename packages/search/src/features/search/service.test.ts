@@ -14,6 +14,7 @@ import {
 } from '@search/features/search/service'
 import { client } from '@search/elasticsearch/client'
 import { SortOrder } from '@search/features/search/types'
+import { UUID } from '@opencrvs/commons'
 
 describe('elasticsearch db helper', () => {
   it('should index a composition with proper configuration', async () => {
@@ -26,7 +27,7 @@ describe('elasticsearch db helper', () => {
         event: 'birth',
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration'],
-        declarationLocationId: ''
+        declarationLocationId: '00000000-0000-0000-0000-000000000001' as UUID
       },
       from: 0,
       size: 10
@@ -63,8 +64,8 @@ describe('elasticsearch db helper', () => {
 })
 
 describe('elasticsearch params formatter', () => {
-  it('should prepare search params to search birth declarations using a single name against all fields', () => {
-    const params = formatSearchParams(
+  it('should prepare search params to search birth declarations using a single name against all fields', async () => {
+    const params = await formatSearchParams(
       {
         parameters: {
           trackingId: 'myTrackingId',
@@ -73,8 +74,8 @@ describe('elasticsearch params formatter', () => {
           event: 'birth',
           registrationStatuses: ['DECLARED'],
           compositionType: ['birth-declaration'],
-          declarationLocationId: '123',
-          eventLocationId: '456'
+          declarationLocationId: '00000000-0000-0000-0000-000000000002' as UUID,
+          eventLocationId: '00000000-0000-0000-0000-000000000003' as UUID
         },
         createdBy: 'EMPTY_STRING',
         from: 0,
@@ -85,7 +86,6 @@ describe('elasticsearch params formatter', () => {
     )
 
     expect(params).toEqual({
-      type: 'compositions',
       from: 0,
       index: 'ocrvs',
       size: 10,
@@ -108,13 +108,13 @@ describe('elasticsearch params formatter', () => {
                 match: {
                   declarationLocationId: {
                     boost: 2,
-                    query: '123'
+                    query: '00000000-0000-0000-0000-000000000002'
                   }
                 }
               },
               {
                 match: {
-                  eventLocationId: '456'
+                  eventLocationId: '00000000-0000-0000-0000-000000000003'
                 }
               },
               {
@@ -144,8 +144,7 @@ describe('elasticsearch params formatter', () => {
                   'compositionType.keyword': ['birth-declaration']
                 }
               }
-            ],
-            should: []
+            ]
           }
         },
         sort: [{ dateOfDeclaration: 'asc' }]
@@ -153,8 +152,8 @@ describe('elasticsearch params formatter', () => {
     })
   })
 
-  it('should prepare search params to search birth declarations using names against all name fields', () => {
-    const params = formatSearchParams(
+  it('should prepare search params to search birth declarations using names against all name fields', async () => {
+    const params = await formatSearchParams(
       {
         parameters: {
           name: 'sadman anik'
@@ -168,7 +167,6 @@ describe('elasticsearch params formatter', () => {
     )
 
     expect(params).toEqual({
-      type: 'compositions',
       from: 0,
       index: 'ocrvs',
       size: 10,
@@ -204,8 +202,7 @@ describe('elasticsearch params formatter', () => {
                   fuzziness: 'AUTO'
                 }
               }
-            ],
-            should: []
+            ]
           }
         },
         sort: [{ dateOfDeclaration: 'asc' }]
