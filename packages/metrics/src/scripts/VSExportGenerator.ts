@@ -351,9 +351,9 @@ async function setLocationInComposition(
     const districtLocationDoc = locations.find(
       ({ id }) => id === districtLocationId
     )
-    const stateLocationId = resourceIdentifierToUUID(
-      districtLocationDoc?.partOf?.reference
-    )
+    const stateLocationId =
+      districtLocationDoc?.partOf?.reference &&
+      resourceIdentifierToUUID(districtLocationDoc.partOf.reference)
     const stateLocationDoc = locations.find(({ id }) => id === stateLocationId)
     fullComposition['healthCenter'] = locationDoc.name ?? ''
     fullComposition['eventDistrict'] = districtLocationDoc?.name ?? ''
