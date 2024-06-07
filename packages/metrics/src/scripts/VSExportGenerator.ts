@@ -15,6 +15,11 @@ import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 import * as fs from 'fs'
 // eslint-disable-next-line import/no-relative-parent-imports
 import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '../constants'
+import {
+  isHealthFacility,
+  Location,
+  resourceIdentifierToUUID
+} from '@opencrvs/commons/types'
 
 const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
@@ -263,7 +268,7 @@ function makePatientObject(patient: fhir.Patient) {
 
 async function setPatientsAddress(
   patients: fhir.Patient[],
-  locations: fhir.Location[]
+  locations: Location[]
 ) {
   patients.forEach((patient) => {
     if (patient.address) {
@@ -286,7 +291,7 @@ async function setPatientsAddress(
 async function setPatientsDetailsInComposition(
   composition: fhir.Composition,
   fullComposition: Partial<IFullComposition>,
-  locations: fhir.Location[]
+  locations: Location[]
 ) {
   const patientList = composition.section?.filter((section) =>
     section.entry?.[0].reference?.startsWith('Patient/')
@@ -317,7 +322,7 @@ async function setPatientsDetailsInComposition(
 async function setLocationInComposition(
   composition: fhir.Composition,
   fullComposition: Partial<IFullComposition>,
-  locations: fhir.Location[],
+  locations: Location[],
   task: fhir.Task
 ) {
   const encounter = composition.section?.find(
@@ -337,18 +342,17 @@ async function setLocationInComposition(
   )
   const locationDoc = locations.find(({ id }) => id === locationId)
 
-  const isLocationHealthFacility =
-    locationDoc?.type?.coding?.[0].code === 'HEALTH_FACILITY'
+  const isLocationHealthFacility = locationDoc && isHealthFacility(locationDoc)
 
   if (isLocationHealthFacility) {
-    const districtLocationId = String(
-      locationDoc.partOf?.reference?.replace('Location/', '')
+    const districtLocationId = resourceIdentifierToUUID(
+      locationDoc.partOf.reference
     )
     const districtLocationDoc = locations.find(
       ({ id }) => id === districtLocationId
     )
-    const stateLocationId = String(
-      districtLocationDoc?.partOf?.reference?.replace('Location/', '')
+    const stateLocationId = resourceIdentifierToUUID(
+      districtLocationDoc?.partOf?.reference
     )
     const stateLocationDoc = locations.find(({ id }) => id === stateLocationId)
     fullComposition['healthCenter'] = locationDoc.name ?? ''
@@ -463,7 +467,7 @@ async function setObservationDetailsInComposition(
 async function setInformantDetailsInComposition(
   composition: fhir.Composition,
   fullComposition: Partial<IFullComposition>,
-  locations: fhir.Location[]
+  locations: Location[]
 ) {
   const informant = composition.section?.find(
     (section) =>
@@ -633,7 +637,7 @@ async function createDeathDeclarationCSVWriter() {
 
 async function makeCompositionAndExportCSVReport(
   compositionsCursor: FindCursor<Document>,
-  locations: fhir.Location[],
+  locations: Location[],
   birthCSVWriter: CsvWriter<any>,
   deathCSVWriter: CsvWriter<any>,
   startDate: string,
@@ -905,7 +909,7 @@ const startScript = async () => {
     const locations = (await getCollectionDocuments(
       COLLECTION_NAMES.LOCATION,
       []
-    )) as unknown as fhir.Location[]
+    )) as unknown as Location[]
 
     await makeCompositionAndExportCSVReport(
       compositionsCursor,
