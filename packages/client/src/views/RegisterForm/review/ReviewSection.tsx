@@ -1834,6 +1834,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const options = this.prepSectionDocOptions(declaration)
+    const isUploadButtonVisible = Boolean(
+      documentsSection.groups[0].fields.filter((field) =>
+        this.isVisibleField(field, documentsSection)
+      ).length
+    )
+
     return (
       <Wrapper>
         <Row>
@@ -2047,6 +2053,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )}
                     {viewRecord ||
                     isDuplicate ||
+                    !isUploadButtonVisible ||
                     declaration.registrationStatus ===
                       SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
                       <LinkButton
