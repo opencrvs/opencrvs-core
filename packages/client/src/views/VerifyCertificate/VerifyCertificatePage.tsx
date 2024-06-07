@@ -248,6 +248,7 @@ export function VerifyCertificatePage() {
   }
 
   const getLastCertifiedDate = (data: RecordDetails) => {
+    // find when declaration was certified
     return (
       data.history &&
       data.history.find(
