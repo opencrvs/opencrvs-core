@@ -174,7 +174,7 @@ export function GovtLogo() {
             <SimpleDocumentUploader
               label={logoFile.name ? logoFile.name : ''}
               disableDeleteInPreview={false}
-              name={intl.formatMessage(messages.govermentLogoLabel)}
+              name="country-logo"
               allowedDocType={['image/png', 'image/svg']}
               onComplete={(file) => {
                 setErrorOccured(false)

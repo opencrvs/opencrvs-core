@@ -290,15 +290,15 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
     return (
       <UploadWrapper>
-        <div id="upload-error">
-          {this.state.errorMessage && (
+        {this.state.errorMessage && (
+          <div id="upload-error">
             <ErrorText>
               {(requiredErrorMessage &&
                 intl.formatMessage(requiredErrorMessage)) ||
                 this.state.errorMessage}
             </ErrorText>
-          )}
-        </div>
+          </div>
+        )}
 
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
@@ -312,6 +312,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             .length === 1 ? (
           <FullWidthImageUploader
             id="upload_document"
+            name={this.props.name}
             onClick={(e) => !this.isValid() && e.preventDefault()}
             onChange={this.handleFileChange}
             disabled={this.state.filesBeingProcessed.length > 0}
@@ -332,6 +333,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             />
             <DocumentUploadButton
               id="upload_document"
+              name={this.props.name}
               onClick={(e) => !this.isValid() && e.preventDefault()}
               onChange={this.handleFileChange}
               disabled={this.state.filesBeingProcessed.length > 0}

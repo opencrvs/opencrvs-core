@@ -62,8 +62,8 @@ async function clickOnMenuItem(
 }
 
 describe('ConfigHome page when already has uploaded certificate template', async () => {
-  const { store, history } = createStore()
-  await loginAsFieldAgent(store)
+  const { store } = createStore()
+  loginAsFieldAgent(store)
   let testComponent: ReactWrapper
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
 
@@ -199,8 +199,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       ).toHaveLength(1)
       testComponent.find('#upload_document').hostNodes().simulate('click')
       testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
+        .find('input[name="Simple"][type="file"]')
         .simulate('change', {
           target: {
             files: [

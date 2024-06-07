@@ -60,6 +60,7 @@ type IFullProps = {
 
 const SimpleDocumentUploaderComponent = ({
   allowedDocType,
+  name,
   onUploadingStateChanged,
   intl,
   previewTransformer,
@@ -165,8 +166,11 @@ const SimpleDocumentUploaderComponent = ({
         />
       )}
       {(!files || !files.data) && (
-        <DocumentUploader id="upload_document" onChange={handleFileChange}>
-          {' '}
+        <DocumentUploader
+          id="upload_document"
+          name={name}
+          onChange={handleFileChange}
+        >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
       )}
