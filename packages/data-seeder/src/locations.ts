@@ -21,12 +21,13 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import chalk from 'chalk'
+import { UUID } from '@opencrvs/commons'
 
 const LocationSchema = z.object({
   id: z.string(),
   name: z.string(),
   alias: z.string().optional(),
-  partOf: z.string(),
+  partOf: z.string().transform((partOf) => partOf as `Location/${UUID}`),
   locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
   jurisdictionType: z
     .enum([
@@ -318,10 +319,11 @@ const diffLocations = (
 
     const countryConfigLocationPartOfReference = countryConfigLocationsMap.get(
       savedLocationStatisticalId
-    )?.partOf
+    )!.partOf
 
+    // The partOf can also be Location/0 which is not in our locations, therefore this can be undefined
     const oldReferenceUuid = savedLocationsMap.get(
-      countryConfigLocationPartOfReference!.split('/')[1]
+      resourceIdentifierToUUID(countryConfigLocationPartOfReference)
     )?.id
 
     const newReferenceUuid =
@@ -340,8 +342,6 @@ const diffLocations = (
       )
 
       throw new Error('Updating partOf not supported yet.')
-
-      //locationsToUpdate.set(savedLocationStatisticalId, countryConfigLocation)
     }
   }
 
