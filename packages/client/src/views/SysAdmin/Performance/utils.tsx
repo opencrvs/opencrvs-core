@@ -215,28 +215,6 @@ export function getPrimaryLocationIdOfOffice(
   return location.id
 }
 
-export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: UserDetails
-) {
-  const location =
-    userDetails.catchmentArea &&
-    userDetails.catchmentArea.find((location) => {
-      const jurisdictionTypeIdentifier =
-        location?.identifier &&
-        location?.identifier.find(
-          (identifier) =>
-            identifier?.system ===
-            'http://opencrvs.org/specs/id/jurisdiction-type'
-        )
-      return (
-        // Needs to be an administrative location with jurisdiction
-        jurisdictionTypeIdentifier && jurisdictionTypeIdentifier.value
-      )
-    })
-
-  return location && location.id
-}
-
 export enum CompletenessRateTime {
   WithinTarget = 'withinTarget',
   Within1Year = 'within1Year',

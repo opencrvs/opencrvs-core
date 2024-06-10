@@ -9,9 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_MANAGEMENT_URL } from '@config/config/constants'
-import { Integration } from '@config/models/config'
-import { getToken } from '@config/utils/auth'
-import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 
 interface AuthHeader {
@@ -32,12 +29,4 @@ export const fetchUserManagement = async <T = any>(
     }
   })
   return response.json()
-}
-
-export const fetchSystems = async (request: Hapi.Request) => {
-  const authHeader = getToken(request)
-
-  return fetchUserManagement<Integration[]>('/getAllSystems', {
-    Authorization: authHeader
-  })
 }

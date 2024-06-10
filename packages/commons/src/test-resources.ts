@@ -630,14 +630,7 @@ export const REGISTERED_RECORD = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/d8d16138-1d3a-42e7-bf85-d7f3f657c5d3'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/61e07903-bf3c-4bd9-9b20-6cf0e3bb982c'
             }

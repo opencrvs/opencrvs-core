@@ -14,8 +14,7 @@ import {
   generateUsername,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification,
-  getCatchmentAreaIdsByPrimaryOfficeId
+  sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -50,10 +49,6 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-      user.primaryOfficeId,
-      token
-    )
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)

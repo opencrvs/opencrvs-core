@@ -13,14 +13,17 @@ import {
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
+import { transformDeprecatedParamsToSupported } from './deprecation-support'
+import { resolveLocationChildren } from './location'
 
-export function advancedQueryBuilder(
+export async function advancedQueryBuilder(
   params: IAdvancedSearchParam,
   createdBy: string,
   isExternalSearch: boolean
 ) {
+  params = transformDeprecatedParamsToSupported(params)
+
   const must: any[] = []
-  const should: any[] = []
 
   if (params.event) {
     must.push({
@@ -156,12 +159,12 @@ export function advancedQueryBuilder(
   }
 
   if (params.declarationJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
+      params.declarationJurisdictionId
+    )
     must.push({
-      match: {
-        declarationJurisdictionIds: {
-          query: params.declarationJurisdictionId,
-          boost: 2.0
-        }
+      terms: {
+        'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
       }
     })
   }
@@ -182,21 +185,14 @@ export function advancedQueryBuilder(
     })
   }
 
-  const eventJurisdictionIds = [
-    params.eventLocationLevel1,
-    params.eventLocationLevel2,
-    params.eventLocationLevel3,
-    params.eventLocationLevel4,
-    params.eventLocationLevel5
-  ].filter((id) => Boolean(id))
-
-  if (eventJurisdictionIds.length > 0) {
-    eventJurisdictionIds.forEach((locationId) => {
-      must.push({
-        match: {
-          eventJurisdictionIds: locationId
-        }
-      })
+  if (params.eventJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
+      params.eventJurisdictionId
+    )
+    must.push({
+      terms: {
+        'eventJurisdictionIds.keyword': leafLevelJurisdictionIds
+      }
     })
   }
 
@@ -723,8 +719,7 @@ export function advancedQueryBuilder(
 
   return {
     bool: {
-      must,
-      should
+      must
     }
   }
 }

@@ -231,6 +231,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             showTitleOnMobile={true}
           >
             <Table
+              id="diff"
               isLoading={false}
               noPagination
               content={this.getChanges(formSections)}
@@ -260,6 +261,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <Table
+              id="requestedBy"
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -281,6 +283,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             ></Table>
             {noIdCheck && (
               <Table
+                id="idCheck"
                 hideTableBottomBorder={true}
                 isLoading={false}
                 content={[
@@ -303,6 +306,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             )}
 
             <Table
+              id="reason"
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -323,6 +327,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <Table
+              id="comments"
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -341,6 +346,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <Table
+              id="supportingDocuments"
               isLoading={false}
               content={[
                 {

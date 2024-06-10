@@ -46,7 +46,6 @@ import {
   PERFORMANCE_MANAGEMENT_ROLES,
   EMAIL
 } from '@client/utils/constants'
-import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
 
@@ -59,7 +58,6 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
@@ -395,27 +393,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       } else {
         return goToTeamUserListAction(
           (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-        )
-      }
-    }
-  }
-
-  goToPerformanceView(props: IFullProps) {
-    const { userDetails, goToPerformanceHomeAction } = props
-    if (userDetails && userDetails.systemRole) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
-        return goToPerformanceHomeAction()
-      } else {
-        const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
-        return (
-          (locationId &&
-            goToPerformanceHomeAction(
-              undefined,
-              undefined,
-              Event.Birth,
-              locationId
-            )) ||
-          goToPerformanceHomeAction()
         )
       }
     }
