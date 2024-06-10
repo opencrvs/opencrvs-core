@@ -47,7 +47,8 @@ const LocationSchema = z.object({
         crude_birth_rate: z.number()
       })
     )
-    .optional()
+    .optional(),
+  status: z.enum(['active', 'inactive']).optional()
 })
 
 type CountryConfigLocation = z.infer<typeof LocationSchema>
@@ -245,18 +246,10 @@ const postNewLocations = async (
   })
 }
 
-const formatUpdateCountryConfigLocation = ({
-  name,
-  alias
-}: CountryConfigLocation) => ({
-  name,
-  alias
-})
-
 const updateLocation = async (
   /** @type UUID */
   locationId: string,
-  location: CountryConfigLocation,
+  location: Partial<CountryConfigLocation>,
   { token }: { token: string }
 ) => {
   const res = await fetch(`${GATEWAY_HOST}/locations/${locationId}`, {
@@ -265,7 +258,7 @@ const updateLocation = async (
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/fhir+json'
     },
-    body: JSON.stringify(formatUpdateCountryConfigLocation(location))
+    body: JSON.stringify(location)
   })
 
   if (!res.ok) {
@@ -278,18 +271,32 @@ const diffLocations = (
   countryConfigLocationsMap: Map<string, CountryConfigLocation>,
   savedLocationsMap: Map<string, SavedLocation>
 ) => {
-  const locationsToUpdate: Map<string, CountryConfigLocation> = new Map()
+  const locationsToUpdate: Map<
+    string,
+    Partial<CountryConfigLocation>
+  > = new Map()
 
   for (const [savedLocationStatisticalId, savedLocation] of savedLocationsMap) {
     const countryConfigLocation = countryConfigLocationsMap.get(
       savedLocationStatisticalId
     )
 
-    if (!countryConfigLocation) {
-      throw new Error(
-        "Saved locations contain locations that are removed from country config. OpenCRVS doesn't support removing locations."
+    if (!countryConfigLocation && savedLocation.status === 'active') {
+      console.info(
+        `> ${chalk.whiteBright(
+          `${savedLocation.name}:`
+        )} setting the status to inactive`
       )
+
+      locationsToUpdate.set(savedLocation.id, {
+        status: 'inactive'
+      })
+
+      continue
     }
+
+    // Already set to inactive, ignoring...
+    if (!countryConfigLocation) continue
 
     if (countryConfigLocation.name !== savedLocation.name) {
       console.info(
@@ -321,7 +328,6 @@ const diffLocations = (
       savedLocation.partOf &&
       resourceIdentifierToUUID(savedLocation.partOf.reference)
 
-    // The partOf's are UUID's. Need to figure out the partOf UUID via child's statisticalId
     if (
       oldReferenceUuid &&
       newReferenceUuid &&
@@ -375,13 +381,15 @@ export async function seedLocations(token: string) {
   /*
    * Update saved locations
    */
-  const changedLocations = diffLocations(
+  const updatedLocations = diffLocations(
     countryConfigLocationsMap,
     savedLocationsMap
   )
-  console.info(`> updating ${changedLocations.size} locations`)
+  console.info(`> updating ${updatedLocations.size} locations`)
 
-  for (const [locationId, location] of changedLocations) {
+  for (const [locationId, location] of updatedLocations) {
     await updateLocation(locationId, location, { token })
   }
+
+  console.info(`> ...done`)
 }
