@@ -9,46 +9,49 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import {
-  COUNTRY_CONFIG_HOST,
-  GATEWAY_HOST,
-  OPENCRVS_SPECIFICATION_URL
-} from './constants'
-import { TypeOf, z } from 'zod'
+import { COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
+import { z } from 'zod'
 import { raise } from './utils'
 import { inspect } from 'util'
+import {
+  SavedBundle,
+  Location,
+  findStatisticalId,
+  SavedLocation
+} from '@opencrvs/commons/types'
+import chalk from 'chalk'
 
-const LocationSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    alias: z.string().optional(),
-    partOf: z.string(),
-    locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
-    jurisdictionType: z
-      .enum([
-        'STATE',
-        'DISTRICT',
-        'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_4',
-        'LOCATION_LEVEL_5'
-      ])
-      .optional(),
-    statistics: z
-      .array(
-        z.object({
-          year: z.number(),
-          male_population: z.number(),
-          female_population: z.number(),
-          population: z.number(),
-          crude_birth_rate: z.number()
-        })
-      )
-      .optional()
-  })
-)
+const LocationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  alias: z.string().optional(),
+  partOf: z.string(),
+  locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
+  jurisdictionType: z
+    .enum([
+      'STATE',
+      'DISTRICT',
+      'LOCATION_LEVEL_3',
+      'LOCATION_LEVEL_4',
+      'LOCATION_LEVEL_5'
+    ])
+    .optional(),
+  statistics: z
+    .array(
+      z.object({
+        year: z.number(),
+        male_population: z.number(),
+        female_population: z.number(),
+        population: z.number(),
+        crude_birth_rate: z.number()
+      })
+    )
+    .optional()
+})
 
-function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
+type CountryConfigLocation = z.infer<typeof LocationSchema>
+
+function validateAdminStructure(locations: Array<CountryConfigLocation>) {
   const statisticsErrors = new Array<Error>()
   const locationsMap = new Map(
     locations.map(({ statistics, ...loc }) => {
@@ -155,13 +158,14 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
   return locationsMap
 }
 
-async function getLocations() {
+export async function fetchLocationsFromCountryConfig() {
   const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
   }
-  const parsedLocations = LocationSchema.safeParse(await res.json())
+  const parsedLocations = z.array(LocationSchema).safeParse(await res.json())
+
   if (!parsedLocations.success) {
     raise(
       `Error when getting locations from country-config: ${inspect(
@@ -186,47 +190,36 @@ async function getLocations() {
   return parsedLocations.data
 }
 
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return (bundle.entry ?? [])
-    .map((bundleEntry) => bundleEntry.resource)
-    .filter((maybeLocation): maybeLocation is fhir3.Location =>
-      Boolean(maybeLocation)
+export const fetchAllSavedLocations = async () => {
+  const allBundles = await Promise.all<SavedBundle<Location>>(
+    ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
+      fetch(`${GATEWAY_HOST}/locations?type=${type}&_count=0`, {
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        }
+      }).then((res) => res.json())
     )
-    .map((location) =>
-      location.identifier
-        ?.find(
-          ({ system }) =>
-            system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
-            system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-        )
-        ?.value?.split('_')
-        .pop()
-    )
-    .filter((maybeId): maybeId is string => Boolean(maybeId))
+  )
+
+  return allBundles.flatMap(({ entry }) =>
+    entry.map(({ resource }) => resource)
+  )
 }
 
-export async function seedLocations(token: string) {
-  const savedLocations = (
-    await Promise.all(
-      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        })
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            locationBundleToIdentifier(bundle)
-          )
-      )
-    )
-  ).flat()
-  const savedLocationsSet = new Set(savedLocations)
-  const locations = (await getLocations()).filter((location) => {
-    return !savedLocationsSet.has(location.id)
-  })
+const formatCreateCountryConfigLocation = ({
+  id,
+  locationType,
+  ...loc
+}: CountryConfigLocation) => ({
+  statisticalID: id,
+  code: locationType,
+  ...loc
+})
+
+const postNewLocations = async (
+  locations: Array<CountryConfigLocation>,
+  { token }: { token: string }
+) => {
   const res = await fetch(`${GATEWAY_HOST}/locations?`, {
     method: 'POST',
     headers: {
@@ -234,15 +227,10 @@ export async function seedLocations(token: string) {
       'Content-Type': 'application/fhir+json'
     },
     body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
+      locations.map((location) => formatCreateCountryConfigLocation(location))
     )
   })
+
   if (!res.ok) {
     raise(await res.json())
   }
@@ -254,4 +242,126 @@ export async function seedLocations(token: string) {
       )
     }
   })
+}
+
+const formatUpdateCountryConfigLocation = ({
+  name,
+  alias
+}: CountryConfigLocation) => ({
+  name,
+  alias
+})
+
+const updateLocation = async (
+  /** @type UUID */
+  locationId: string,
+  location: CountryConfigLocation,
+  { token }: { token: string }
+) => {
+  const res = await fetch(`${GATEWAY_HOST}/locations/${locationId}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/fhir+json'
+    },
+    body: JSON.stringify(formatUpdateCountryConfigLocation(location))
+  })
+
+  if (!res.ok) {
+    raise(await res.text())
+  }
+
+  return { status: 'ok' }
+}
+const diffLocations = (
+  countryConfigLocationsMap: Map<string, CountryConfigLocation>,
+  savedLocationsMap: Map<string, SavedLocation>
+) => {
+  const locationsToUpdate: Map<string, CountryConfigLocation> = new Map()
+
+  for (const [savedLocationStatisticalId, savedLocation] of savedLocationsMap) {
+    const countryConfigLocation = countryConfigLocationsMap.get(
+      savedLocationStatisticalId
+    )
+
+    if (!countryConfigLocation) {
+      throw new Error(
+        "Saved locations contain locations that are removed from country config. OpenCRVS doesn't support removing locations."
+      )
+    }
+
+    if (countryConfigLocation.name !== savedLocation.name) {
+      console.info(
+        `> ${chalk.whiteBright(`${savedLocation.name}:`)} updating name "${
+          savedLocation.name
+        }" to "${countryConfigLocation.name}"`
+      )
+      locationsToUpdate.set(savedLocation.id, countryConfigLocation)
+    }
+
+    if (countryConfigLocation.alias !== savedLocation.alias?.[0]) {
+      console.info(
+        `> ${chalk.whiteBright(`${savedLocation.alias}:`)} updating alias "${
+          savedLocation.alias
+        }" to "${countryConfigLocation.alias}"`
+      )
+      locationsToUpdate.set(savedLocation.id, countryConfigLocation)
+    }
+
+    // The partOf's are UUID's. Need to figure out the partOf UUID via child's statisticalId
+    // if (countryConfigLocation.partOf !== savedLocation.partOf?.reference) {
+    //   console.info(
+    //     `> ${chalk.whiteBright(savedLocation.name)} updating "${
+    //       countryConfigLocation.partOf
+    //     }" to "${savedLocation.partOf?.reference}"`
+    //   )
+    //   locationsToUpdate.set(savedLocationStatisticalId, countryConfigLocation)
+    // }
+  }
+
+  return locationsToUpdate
+}
+
+export async function seedLocations(token: string) {
+  const savedLocations = await fetchAllSavedLocations()
+  const countryConfigLocations = await fetchLocationsFromCountryConfig()
+  const countryConfigLocationsMap = new Map(
+    countryConfigLocations.map((location) => [location.id, location])
+  )
+  const savedLocationsMap = new Map(
+    savedLocations.map((location) => [findStatisticalId(location)!, location])
+  )
+
+  /*
+   * New locations found
+   */
+  const unsavedLocations = countryConfigLocations.filter(
+    (location) => !savedLocationsMap.has(location.id)
+  )
+
+  if (unsavedLocations.length > 0) {
+    console.info(`> inserting ${unsavedLocations.length} new locations...`)
+    await postNewLocations(unsavedLocations, { token })
+  }
+
+  /*
+   * Installing for first time, nothing could have changed
+   */
+  if (savedLocations.length === 0) {
+    console.info(`> ...done`)
+    return
+  }
+
+  /*
+   * Update saved locations
+   */
+  const changedLocations = diffLocations(
+    countryConfigLocationsMap,
+    savedLocationsMap
+  )
+  console.info(`> updating ${changedLocations.size} locations`)
+
+  for (const [locationId, location] of changedLocations) {
+    await updateLocation(locationId, location, { token })
+  }
 }

@@ -99,3 +99,14 @@ export function findLastOfficeLocationFromSavedBundle<T extends SavedBundle>(
   }
   return officeLocation
 }
+
+export function findStatisticalId(location: SavedLocation) {
+  return location.identifier
+    ?.find(
+      ({ system }) =>
+        system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
+        system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+    )
+    ?.value?.split('_')
+    .pop()
+}
