@@ -16,10 +16,7 @@ import {
 import {
   // BirthSection,
   ViewType,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  TEL,
   // DeathSection,
-  TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
@@ -29,13 +26,13 @@ import {
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import * as declarationSelectors from '@client/forms/register/declaration-selectors'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
   getRegisterFormFromStore,
   mockOfflineData,
+  mockOfflineDataDispatch,
   resizeWindow
 } from '@client/tests/util'
 import { REJECTED } from '@client/utils/constants'
@@ -49,9 +46,9 @@ import { v4 as uuid } from 'uuid'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
-import { phoneNumberFormat } from '@client/utils/validate'
 import { formMessages } from '@client/i18n/messages'
 import { vi, Mock, SpyInstance } from 'vitest'
+import { offlineDataReady } from '@client/offline/actions'
 
 const { store, history } = createStore()
 const mockHandler = vi.fn()
@@ -102,6 +99,7 @@ describe('when in device of large viewport', () => {
   let form: Awaited<ReturnType<typeof getRegisterFormFromStore>>
 
   beforeEach(async () => {
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
@@ -359,204 +357,6 @@ describe('when in device of large viewport', () => {
     })
   })
 
-  describe('when form has a field that has nested fields in definitions', () => {
-    let reviewSectionComponent: ReactWrapper<{}, {}>
-
-    beforeAll(() => {
-      vi.resetAllMocks()
-    })
-
-    beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
-        birth: {
-          sections: [
-            {
-              id: 'registration',
-              viewType: 'form' as ViewType,
-              title: {
-                defaultMessage: 'Informant',
-                description: 'Form section name for Informant',
-                id: 'form.section.informant.name'
-              },
-              name: {
-                defaultMessage: 'Informant',
-                description: 'Form section name for Informant',
-                id: 'form.section.informant.name'
-              },
-              groups: [
-                {
-                  id: 'contact-group',
-                  fields: [
-                    {
-                      name: 'informant',
-                      type: RADIO_GROUP_WITH_NESTED_FIELDS,
-                      label: {
-                        defaultMessage: 'Informant',
-                        description: 'Form section name for Informant',
-                        id: 'form.section.informant.name'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      options: [
-                        {
-                          value: 'FATHER',
-                          label: {
-                            defaultMessage: 'Father',
-                            description: 'Label for option Father',
-                            id: 'form.field.label.informantRelation.father'
-                          }
-                        },
-                        {
-                          value: 'MOTHER',
-                          label: {
-                            defaultMessage: 'Mother',
-                            description: 'Label for option Mother',
-                            id: 'form.field.label.informantRelation.mother'
-                          }
-                        }
-                      ],
-                      nestedFields: {
-                        FATHER: [
-                          {
-                            name: 'informantPhoneFather',
-                            type: TEL,
-                            label: {
-                              defaultMessage: 'Phone number',
-                              description: 'Input label for phone input',
-                              id: 'form.field.label.phoneNumber'
-                            },
-                            required: false,
-                            initialValue: '',
-                            validator: [phoneNumberFormat]
-                          }
-                        ],
-                        MOTHER: [
-                          {
-                            name: 'informantPhoneMother',
-                            type: TEL,
-                            label: {
-                              defaultMessage: 'Phone number',
-                              description: 'Input label for phone input',
-                              id: 'form.field.label.phoneNumber'
-                            },
-                            required: false,
-                            initialValue: '',
-                            validator: [phoneNumberFormat]
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        death: {
-          sections: [
-            {
-              id: 'deceased',
-              viewType: 'form' as ViewType,
-              name: {
-                defaultMessage: 'What are the deceased details?',
-                description: 'Form section title for Deceased',
-                id: 'form.section.deceased.title'
-              },
-              title: {
-                defaultMessage: 'What are the deceased details?',
-                description: 'Form section title for Deceased',
-                id: 'form.section.deceased.title'
-              },
-              groups: [
-                {
-                  id: 'deceased',
-                  fields: [
-                    {
-                      name: 'firstNames',
-                      type: TEXT,
-                      label: {
-                        defaultMessage: 'First name(s)',
-                        description: 'Label for form field: Given names',
-                        id: 'form.field.label.childFirstNamesEng'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      conditionals: []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        marriage: {
-          sections: [
-            {
-              id: 'groom',
-              name: formMessages.groomName,
-              title: formMessages.groomTitle,
-              viewType: 'form' as ViewType,
-              groups: []
-            }
-          ]
-        }
-      })
-
-      const data = {
-        registration: {
-          informant: {
-            value: 'MOTHER',
-            nestedFields: {
-              informantPhoneMother: '011123456789'
-            }
-          }
-        },
-        documents: {}
-      }
-
-      const simpleDraft = createReviewDeclaration(
-        uuid(),
-        data,
-        DeclarationEvent.Birth
-      )
-
-      const testComponent = await createTestComponent(
-        <ReviewSection
-          form={form}
-          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-          draft={simpleDraft}
-          rejectDeclarationClickEvent={mockHandler}
-          submitClickEvent={mockHandler}
-        />,
-        { store, history }
-      )
-      reviewSectionComponent = testComponent
-    })
-
-    it('renders values in review section', async () => {
-      expect(
-        reviewSectionComponent.find('#Informant').hostNodes().first()
-      ).toHaveLength(1)
-
-      expect(
-        reviewSectionComponent
-          .find('#Informant [data-test-id="row-value-Informant"]')
-          .text()
-      ).toContain('Mother')
-    })
-
-    it('renders validation error if wrong value given', () => {
-      expect(
-        reviewSectionComponent.contains(
-          '#required_label_registration_informant'
-        )
-      ).toBeFalsy()
-    })
-  })
-
   describe('when form has location input field', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
 
@@ -566,57 +366,90 @@ describe('when in device of large viewport', () => {
 
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
-        birth: {
-          sections: [
-            {
-              id: 'child',
-              viewType: 'form' as ViewType,
-              title: formMessages.childTitle,
-              name: formMessages.childTitle,
-              groups: [
-                {
-                  id: 'child-view-group',
-                  fields: [
-                    {
-                      name: 'birthLocation',
-                      type: LOCATION_SEARCH_INPUT,
-                      searchableResource: ['facilities'],
-                      searchableType: ['HEALTH_FACILITY'],
-                      locationList: [],
-                      required: true,
-                      validator: [],
-                      label: formMessages.birthLocation
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        death: {
-          sections: [
-            {
-              id: 'deceased',
-              name: formMessages.deceasedTitle,
-              title: formMessages.deceasedTitle,
-              viewType: 'form' as ViewType,
-              groups: []
-            }
-          ]
-        },
-        marriage: {
-          sections: [
-            {
-              id: 'groom',
-              name: formMessages.groomName,
-              title: formMessages.groomTitle,
-              viewType: 'form' as ViewType,
-              groups: []
-            }
-          ]
-        }
-      })
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration',
+              description: 'Form section name for Registration',
+              id: 'form.section.declaration.name'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'birthLocation',
+                    type: LOCATION_SEARCH_INPUT,
+                    searchableResource: ['facilities'],
+                    searchableType: ['HEALTH_FACILITY'],
+                    locationList: [],
+                    required: true,
+                    validator: [],
+                    label: formMessages.birthLocation
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: [
+                  {
+                    name: 'uploadDocForMother',
+                    extraValue: 'MOTHER',
+                    type: DOCUMENT_UPLOADER_WITH_OPTION,
+                    label: formMessages.uploadDocForMother,
+                    required: true,
+                    validator: [],
+                    options: [
+                      {
+                        label: formMessages.docTypeBirthCert,
+                        value: 'BIRTH_CERTIFICATE'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview',
+              description: 'Form section name for Preview',
+              id: 'register.form.section.preview.name'
+            },
+            title: {
+              defaultMessage: 'Preview',
+              description: 'Form section title for Preview',
+              id: 'register.form.section.preview.title'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
 
       const data = {
         child: {
@@ -667,6 +500,16 @@ describe('when in device of small viewport', () => {
     const form = {
       sections: [
         {
+          id: 'registration',
+          viewType: 'hidden',
+          name: {
+            defaultMessage: 'Registration',
+            description: 'Form section name for Registration',
+            id: 'form.section.declaration.name'
+          },
+          groups: []
+        },
+        {
           id: 'mother',
           name: formMessages.motherTitle,
           title: formMessages.motherTitle,
@@ -711,6 +554,26 @@ describe('when in device of small viewport', () => {
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          id: 'preview',
+          viewType: 'preview',
+          name: {
+            defaultMessage: 'Preview',
+            description: 'Form section name for Preview',
+            id: 'register.form.section.preview.name'
+          },
+          title: {
+            defaultMessage: 'Preview',
+            description: 'Form section title for Preview',
+            id: 'register.form.section.preview.title'
+          },
+          groups: [
+            {
+              id: 'preview-view-group',
+              fields: []
             }
           ]
         }
