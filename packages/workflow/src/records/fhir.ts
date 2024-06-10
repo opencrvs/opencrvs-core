@@ -1100,7 +1100,17 @@ export async function sendBundleToHearth(
 ): Promise<TransactionResponse> {
   const res = await fetch(FHIR_URL, {
     method: 'POST',
-    body: JSON.stringify(bundle),
+    /*
+     * History resources e.g. TaskHistory, PractitionerRoleHistory
+     * are internal OpenCRVS representation which hearth won't
+     * recognize
+     */
+    body: JSON.stringify({
+      ...bundle,
+      entry: bundle.entry.filter(
+        ({ resource: { resourceType } }) => !resourceType.endsWith('History')
+      )
+    }),
     headers: {
       'Content-Type': 'application/fhir+json'
     }

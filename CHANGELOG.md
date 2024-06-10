@@ -44,6 +44,9 @@
 - Add loading bar before javaScript bundle has loaded for client and when fetching records [#6641](https://github.com/opencrvs/opencrvs-core/issues/6641)
 - Support for landscape certificate templates
 - Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
+- Introduce two new properties to the form field `DOCUMENT_UPLOADER_WITH_OPTION`
+  - `compressImagesToSizeMB` : An optional prop of number type to define a compressed size. Compression is ignored when the input file is already smaller or equal of the given value or a falsy given value.
+  - `maxSizeMB`: An optional validation prop to prevent input of a file bigger than a defined value.
 - Metabase default credentials now must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start [#6578](https://github.com/opencrvs/opencrvs-core/issues/6578)
 
 ## Bug fixes
