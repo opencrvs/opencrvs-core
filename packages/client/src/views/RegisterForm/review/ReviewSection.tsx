@@ -74,7 +74,6 @@ import {
   HIDDEN
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { getBirthSection } from '@client/forms/register/declaration-selectors'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -2080,14 +2079,22 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   }
   return readyOnlyField
 }
-
 export const ReviewSection = connect(
-  (state: IStoreState) => ({
-    registrationSection: getBirthSection(state, 'registration'),
-    documentsSection: getBirthSection(state, 'documents'),
-    scope: getScope(state),
-    offlineCountryConfiguration: getOfflineData(state),
-    language: getLanguage(state)
-  }),
+  (state: IStoreState, { form }: { form: IForm }) => {
+    const registrationSection = form.sections.find(
+      ({ id }) => id === 'registration'
+    )
+    const documentsSection = form.sections.find(({ id }) => id === 'documents')
+    if (!registrationSection || !documentsSection) {
+      throw new Error('"registration" & "documents" are required sections')
+    }
+    return {
+      registrationSection,
+      documentsSection,
+      scope: getScope(state),
+      offlineCountryConfiguration: getOfflineData(state),
+      language: getLanguage(state)
+    }
+  },
   { goToPageGroup, writeDeclaration, modifyDeclaration }
 )(injectIntl(ReviewSectionComp))
