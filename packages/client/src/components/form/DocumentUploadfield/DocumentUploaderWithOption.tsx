@@ -14,20 +14,19 @@ import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
-import * as React from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  MessageDescriptor
-} from 'react-intl'
+import React, { useState } from 'react'
+import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
+import { bytesToMB } from '@client/utils/imageUtils'
 
-const options = {
+const DEFAULT_MAX_SIZE_MB = 5
+
+const defaultOptions = {
   maxSizeMB: 0.4,
   maxWidthOrHeight: 1920,
   useWebWorker: true
@@ -67,19 +66,13 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-} & IntlShapeProps
+  compressImagesToSizeMB?: number
+  maxSizeMB?: number
+}
 
 type DocumentFields = {
   documentType: string
   documentData: string
-}
-
-type IState = {
-  errorMessage: string
-  fields: DocumentFields
-  previewImage: IFileValue | null
-  filesBeingProcessed: Array<{ label: string }>
-  dropDownOptions: ISelectOption[]
 }
 
 export const getBase64String = (file: File) => {
@@ -95,72 +88,74 @@ export const getBase64String = (file: File) => {
   })
 }
 
-class DocumentUploaderWithOptionComp extends React.Component<
-  IFullProps,
-  IState
-> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      errorMessage: EMPTY_STRING,
-      previewImage: null,
-      dropDownOptions: this.initializeDropDownOption(),
-      filesBeingProcessed: [],
-      fields: {
-        documentType: EMPTY_STRING,
-        documentData: EMPTY_STRING
-      }
-    }
-  }
-
-  initializeDropDownOption = (): ISelectOption[] => {
-    const options = clone(this.props.options)
-    this.props.files &&
-      this.props.files.forEach((element: IFileValue) => {
-        remove(
-          options,
-          (option: ISelectOption) => option.value === element.optionValues[1]
-        )
-      })
-
-    return options
-  }
-
-  onChange = (documentType: string) => {
-    const currentState = this.state
-    currentState.fields.documentType = documentType
-    this.setState(currentState)
-  }
-
-  isValid = (): boolean => {
-    const isValid = !!this.state.fields.documentType
-
-    this.setState({
-      errorMessage: isValid
-        ? EMPTY_STRING
-        : this.props.intl.formatMessage(messages.documentTypeRequired)
+const initializeDropDownOption = (
+  options: ISelectOption[],
+  files: IFileValue[]
+): ISelectOption[] => {
+  const outputOptions = clone(options)
+  files &&
+    files.forEach((element: IFileValue) => {
+      remove(
+        outputOptions,
+        (option: ISelectOption) => option.value === element.optionValues[1]
+      )
     })
+
+  return outputOptions
+}
+
+export const DocumentUploaderWithOption = (props: IFullProps) => {
+  const intl = useIntl()
+  const [errorMessage, setErrorMessage] = useState(EMPTY_STRING)
+  const [previewImage, setPreviewImage] = useState<IFileValue | null>(null)
+  const [dropdownOptions, setDropdownOptions] = useState<ISelectOption[]>(
+    initializeDropDownOption(props.options, props.files)
+  )
+  const [filesBeingProcessed, setFilesBeingProcessed] = useState<
+    Array<{ label: string }>
+  >([])
+  const [fields, setFields] = useState<DocumentFields>({
+    documentType: EMPTY_STRING,
+    documentData: EMPTY_STRING
+  })
+  const maxSize = props.maxSizeMB ?? DEFAULT_MAX_SIZE_MB
+
+  const onChange = (documentType: string) => {
+    setFields((currentFields) => ({
+      ...currentFields,
+      documentType
+    }))
+  }
+
+  const isValid = (): boolean => {
+    const isValid = !!fields.documentType
+
+    setErrorMessage(
+      isValid ? EMPTY_STRING : intl.formatMessage(messages.documentTypeRequired)
+    )
 
     return isValid
   }
 
-  processImage = async (uploadedImage: File) => {
+  const processImage = async (uploadedImage: File) => {
+    const options = { ...defaultOptions }
     if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
-      this.setState({
-        errorMessage: this.props.intl.formatMessage(messages.uploadError)
-      })
+      setErrorMessage(intl.formatMessage(messages.uploadError, { maxSize }))
       throw new Error('File type not supported')
     }
 
-    if (uploadedImage.size > 5242880) {
-      this.setState({
-        errorMessage: this.props.intl.formatMessage(messages.overSized)
-      })
-      throw new Error(this.props.intl.formatMessage(messages.overSized))
+    if (bytesToMB(uploadedImage.size) > maxSize) {
+      setErrorMessage(intl.formatMessage(messages.overSized, { maxSize }))
+      throw new Error(intl.formatMessage(messages.overSized, { maxSize }))
     }
 
+    if (props.compressImagesToSizeMB !== undefined) {
+      options.maxSizeMB = props.compressImagesToSizeMB
+    }
+    // disable compression with a falsy value
     const resized =
-      uploadedImage.size > 512000 &&
+      Boolean(options.maxSizeMB) &&
+      bytesToMB(uploadedImage.size) > options.maxSizeMB &&
       (await imageCompression(uploadedImage, options))
 
     const fileAsBase64 = await getBase64String(resized || uploadedImage)
@@ -168,28 +163,27 @@ class DocumentUploaderWithOptionComp extends React.Component<
     return fileAsBase64.toString()
   }
 
-  handleFileChange = async (uploadedImage: File) => {
+  const handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
 
     let fileAsBase64: string
     const optionValues: [IFormFieldValue, string] = [
-      this.props.extraValue,
-      this.state.fields.documentType
+      props.extraValue,
+      fields.documentType
     ]
 
-    this.setState((state) => ({
-      filesBeingProcessed: [
-        ...state.filesBeingProcessed,
-        {
-          label: optionValues[1]
-        }
-      ]
-    }))
+    setFilesBeingProcessed((filesCurrentlyBeingProcessed) => [
+      ...filesCurrentlyBeingProcessed,
+      {
+        label: optionValues[1]
+      }
+    ])
 
-    this.props.onUploadingStateChanged &&
-      this.props.onUploadingStateChanged(true)
+    if (props.onUploadingStateChanged) {
+      props.onUploadingStateChanged(true)
+    }
 
     const minimumProcessingTime = new Promise<void>((resolve) =>
       setTimeout(resolve, 2000)
@@ -198,30 +192,30 @@ class DocumentUploaderWithOptionComp extends React.Component<
     try {
       // Start processing
       ;[fileAsBase64] = await Promise.all([
-        this.processImage(uploadedImage),
+        processImage(uploadedImage),
         minimumProcessingTime
       ])
     } catch (error) {
-      this.props.onUploadingStateChanged &&
-        this.props.onUploadingStateChanged(false)
+      if (props.onUploadingStateChanged) {
+        props.onUploadingStateChanged(false)
+      }
 
-      this.setState({
-        errorMessage:
-          this.state.errorMessage ||
-          this.props.intl.formatMessage(messages.uploadError),
-        // Remove from processing files
-        filesBeingProcessed: this.state.filesBeingProcessed.filter(
+      setErrorMessage(
+        (msg) => msg || intl.formatMessage(messages.uploadError, { maxSize })
+      )
+      setFilesBeingProcessed((filesCurrentlyBeingProcessed) =>
+        filesCurrentlyBeingProcessed.filter(
           ({ label }) => label !== optionValues[1]
         )
-      })
+      )
       return
     }
 
-    const tempOptions = this.state.dropDownOptions
+    const tempOptions = dropdownOptions
 
     remove(
       tempOptions,
-      (option: ISelectOption) => option.value === this.state.fields.documentType
+      (option: ISelectOption) => option.value === fields.documentType
     )
 
     const newDocument: IFileValue = {
@@ -231,77 +225,70 @@ class DocumentUploaderWithOptionComp extends React.Component<
       fileSize: uploadedImage.size
     }
 
-    this.props.onComplete([...this.props.files, newDocument])
-    this.props.onUploadingStateChanged &&
-      this.props.onUploadingStateChanged(false)
+    props.onComplete([...props.files, newDocument])
+    if (props.onUploadingStateChanged) {
+      props.onUploadingStateChanged(false)
+    }
 
-    this.setState((prevState) => {
-      return {
-        ...prevState,
-        errorMessage: EMPTY_STRING,
-        fields: {
-          documentType: EMPTY_STRING,
-          documentData: EMPTY_STRING
-        },
-        dropDownOptions: tempOptions,
-        // Remove from processing files
-        filesBeingProcessed: this.state.filesBeingProcessed.filter(
-          ({ label }) => label !== optionValues[1]
-        )
-      }
+    setErrorMessage(EMPTY_STRING)
+    setFields({
+      documentType: EMPTY_STRING,
+      documentData: EMPTY_STRING
     })
+    setDropdownOptions(tempOptions)
+    setFilesBeingProcessed((filesCurrentlyBeingProcessed) =>
+      filesCurrentlyBeingProcessed.filter(
+        ({ label }) => label !== optionValues[1]
+      )
+    )
   }
 
-  onDelete = (image: IFileValue | IAttachmentValue) => {
+  const onDelete = (image: IFileValue | IAttachmentValue) => {
     const previewImage = image as IFileValue
-    const addableOption = this.props.options.find(
+    const addableOption = props.options.find(
       (item: ISelectOption) => item.value === previewImage.optionValues[1]
     ) as ISelectOption
-    const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
-    this.setState(() => ({ dropDownOptions }))
-    this.props.onComplete(
-      this.props.files.filter((file) => file !== previewImage)
-    )
-    this.closePreviewSection()
+    setDropdownOptions((options) => options.concat(addableOption))
+    props.onComplete(props.files.filter((file) => file !== previewImage))
+    closePreviewSection()
   }
 
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
+  const closePreviewSection = () => {
+    setPreviewImage(null)
   }
 
-  selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+  const selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
+    setPreviewImage(previewImage as IFileValue)
   }
 
-  getFormattedLabelForDocType = (docType: string) => {
+  const getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
-      this.props.options &&
-      this.props.options.find((option) => option.value === docType)
+      props.options && props.options.find((option) => option.value === docType)
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
 
-  renderDocumentUploaderWithDocumentTypeBlock = () => {
-    const { name, intl, placeholder } = this.props
-    return this.props.splitView ? (
-      this.state.dropDownOptions.map((opt, idx) => (
+  const renderDocumentUploaderWithDocumentTypeBlock = () => {
+    const { name, placeholder } = props
+    return props.splitView ? (
+      dropdownOptions.map((opt, idx) => (
         <Flex splitView key={idx}>
           <Select
             id={`${name}${idx}`}
             placeholder={placeholder}
             options={[opt]}
             value={opt.value}
-            onChange={this.onChange}
+            onChange={onChange}
           />
 
           <ImageUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
             onClick={(e) => {
-              this.onChange(opt.value)
-              return !this.isValid() && e.preventDefault()
+              onChange(opt.value)
+              return !isValid() && e.preventDefault()
             }}
-            handleFileChange={this.handleFileChange}
-            disabled={this.state.filesBeingProcessed.length > 0}
+            handleFileChange={handleFileChange}
+            disabled={filesBeingProcessed.length > 0}
           />
         </Flex>
       ))
@@ -310,65 +297,59 @@ class DocumentUploaderWithOptionComp extends React.Component<
         <Select
           id={name}
           placeholder={placeholder}
-          options={this.state.dropDownOptions}
-          value={this.state.fields.documentType}
-          onChange={this.onChange}
-          isDisabled={this.state.filesBeingProcessed.length > 0}
+          options={dropdownOptions}
+          value={fields.documentType}
+          onChange={onChange}
+          isDisabled={filesBeingProcessed.length > 0}
         />
 
         <ImageUploader
           id="upload_document"
           title={intl.formatMessage(formMessages.addFile)}
-          onClick={(e) => !this.isValid() && e.preventDefault()}
-          handleFileChange={this.handleFileChange}
-          disabled={this.state.filesBeingProcessed.length > 0}
+          onClick={(e) => !isValid() && e.preventDefault()}
+          handleFileChange={handleFileChange}
+          disabled={filesBeingProcessed.length > 0}
         />
       </Flex>
     )
   }
 
-  render() {
-    const { label, intl, requiredErrorMessage } = this.props
+  const { requiredErrorMessage, label } = props
 
-    return (
-      <UploaderWrapper>
-        <ErrorMessage id="upload-error">
-          {this.state.errorMessage && (
-            <ErrorText>
-              {(requiredErrorMessage &&
-                intl.formatMessage(requiredErrorMessage)) ||
-                this.state.errorMessage}
-            </ErrorText>
-          )}
-        </ErrorMessage>
-
-        <Label>{label}</Label>
-        <DocumentListPreview
-          processingDocuments={this.state.filesBeingProcessed}
-          documents={this.props.files}
-          onSelect={this.selectForPreview}
-          dropdownOptions={this.props.options}
-          onDelete={this.onDelete}
-        />
-        {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
-          ? null
-          : this.renderDocumentUploaderWithDocumentTypeBlock()}
-
-        {this.state.previewImage && (
-          <DocumentPreview
-            previewImage={this.state.previewImage}
-            title={this.getFormattedLabelForDocType(
-              this.state.previewImage.optionValues[1] as string
-            )}
-            goBack={this.closePreviewSection}
-            onDelete={this.onDelete}
-          />
+  return (
+    <UploaderWrapper>
+      <ErrorMessage id="upload-error">
+        {errorMessage && (
+          <ErrorText>
+            {(requiredErrorMessage &&
+              intl.formatMessage(requiredErrorMessage)) ||
+              errorMessage}
+          </ErrorText>
         )}
-      </UploaderWrapper>
-    )
-  }
-}
+      </ErrorMessage>
 
-export const DocumentUploaderWithOption = injectIntl<'intl', IFullProps>(
-  DocumentUploaderWithOptionComp
-)
+      <Label>{label}</Label>
+      <DocumentListPreview
+        processingDocuments={filesBeingProcessed}
+        documents={props.files}
+        onSelect={selectForPreview}
+        dropdownOptions={props.options}
+        onDelete={onDelete}
+      />
+      {props.hideOnEmptyOption && dropdownOptions.length === 0
+        ? null
+        : renderDocumentUploaderWithDocumentTypeBlock()}
+
+      {previewImage && (
+        <DocumentPreview
+          previewImage={previewImage}
+          title={getFormattedLabelForDocType(
+            previewImage.optionValues[1] as string
+          )}
+          goBack={closePreviewSection}
+          onDelete={onDelete}
+        />
+      )}
+    </UploaderWrapper>
+  )
+}

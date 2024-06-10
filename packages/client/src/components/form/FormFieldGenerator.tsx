@@ -270,6 +270,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           splitView={fieldDefinition.splitView}
           files={value as IFileValue[]}
           extraValue={fieldDefinition.extraValue || ''}
+          compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
+          maxSizeMB={fieldDefinition.maxSizeMB}
           hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
           onComplete={(files: IFileValue[]) => {
             onSetFieldValue(fieldDefinition.name, files)

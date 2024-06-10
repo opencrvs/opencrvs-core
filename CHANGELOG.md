@@ -27,6 +27,9 @@
 - Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
 - Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
 - Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
+- Introduce two new properties to the form field `DOCUMENT_UPLOADER_WITH_OPTION`
+  - `compressImagesToSizeMB` : An optional prop of number type to define a compressed size. Compression is ignored when the input file is already smaller or equal of the given value or a falsy given value.
+  - `maxSizeMB`: An optional validation prop to prevent input of a file bigger than a defined value.
 
 ## Bug fixes
 
