@@ -382,8 +382,10 @@ function joinFromResourcesIdToResourceIdentifier(
     {
       $lookup: {
         from: collectionToJoin,
-        localField: `resourceIds`,
-        foreignField,
+        let: { resourceIds: '$resourceIds' },
+        pipeline: [
+          { $match: { $expr: { $in: [`$${foreignField}`, '$$resourceIds'] } } }
+        ],
         as: 'joinResult'
       }
     },
@@ -1016,7 +1018,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   const query = aggregateRecords({ recordId, includeHistoryResources })
   const result = await db
     .collection('Composition')
-    .aggregate<Bundle>(query)
+    .aggregate<Bundle>(query, { allowDiskUse: true })
     .toArray()
 
   const bundle = result[0]
