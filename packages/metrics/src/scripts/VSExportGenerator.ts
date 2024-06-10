@@ -669,7 +669,11 @@ async function makeCompositionAndExportCSVReport(
 
         const businessStatus = task.businessStatus?.coding?.[0].code
 
-        if (businessStatus === 'CERTIFIED' || 'REGISTERED' || 'ISSUED') {
+        if (
+          businessStatus === 'CERTIFIED' ||
+          businessStatus === 'REGISTERED' ||
+          businessStatus === 'ISSUED'
+        ) {
           composition.section = composition.section?.filter(
             (sec) =>
               sec.title &&
