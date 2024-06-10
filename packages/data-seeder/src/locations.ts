@@ -17,7 +17,8 @@ import {
   SavedBundle,
   Location,
   findStatisticalId,
-  SavedLocation
+  SavedLocation,
+  resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import chalk from 'chalk'
 
@@ -301,22 +302,41 @@ const diffLocations = (
 
     if (countryConfigLocation.alias !== savedLocation.alias?.[0]) {
       console.info(
-        `> ${chalk.whiteBright(`${savedLocation.alias}:`)} updating alias "${
+        `> ${chalk.whiteBright(`${savedLocation.name}:`)} updating alias "${
           savedLocation.alias
         }" to "${countryConfigLocation.alias}"`
       )
       locationsToUpdate.set(savedLocation.id, countryConfigLocation)
     }
 
+    const countryConfigLocationPartOfReference = countryConfigLocationsMap.get(
+      savedLocationStatisticalId
+    )?.partOf
+
+    const oldReferenceUuid = savedLocationsMap.get(
+      countryConfigLocationPartOfReference!.split('/')[1]
+    )?.id
+
+    const newReferenceUuid =
+      savedLocation.partOf &&
+      resourceIdentifierToUUID(savedLocation.partOf.reference)
+
     // The partOf's are UUID's. Need to figure out the partOf UUID via child's statisticalId
-    // if (countryConfigLocation.partOf !== savedLocation.partOf?.reference) {
-    //   console.info(
-    //     `> ${chalk.whiteBright(savedLocation.name)} updating "${
-    //       countryConfigLocation.partOf
-    //     }" to "${savedLocation.partOf?.reference}"`
-    //   )
-    //   locationsToUpdate.set(savedLocationStatisticalId, countryConfigLocation)
-    // }
+    if (
+      oldReferenceUuid &&
+      newReferenceUuid &&
+      oldReferenceUuid !== newReferenceUuid
+    ) {
+      console.info(
+        `> ${chalk.whiteBright(
+          `${savedLocation.name}:`
+        )} updating partOf "${oldReferenceUuid}" to "${newReferenceUuid}"`
+      )
+
+      throw new Error('Updating partOf not supported yet.')
+
+      //locationsToUpdate.set(savedLocationStatisticalId, countryConfigLocation)
+    }
   }
 
   return locationsToUpdate

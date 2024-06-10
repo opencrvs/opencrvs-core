@@ -41,10 +41,12 @@ import {
   locationQuerySchema,
   requestParamsSchema,
   createLocationHandler,
-  updateLocationHandler,
-  updateSchema,
   requestSchema as createLocationReqSchema
 } from '@config/handlers/locations/handler'
+import {
+  updateLocationHandler,
+  updateSchema
+} from '@config/handlers/locations/update'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
 

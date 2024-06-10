@@ -14,8 +14,7 @@ import * as Joi from 'joi'
 import {
   composeFhirLocation,
   generateStatisticalExtensions,
-  getLocationsByIdentifier,
-  updateStatisticalExtensions
+  getLocationsByIdentifier
 } from './utils'
 import { v4 as uuid } from 'uuid'
 import {
@@ -43,7 +42,7 @@ export enum JurisdictionType {
   LOCATION_LEVEL_5 = 'LOCATION_LEVEL_5'
 }
 
-enum Status {
+export enum Status {
   ACTIVE = 'active',
   INACTIVE = 'inactive'
 }
@@ -84,14 +83,7 @@ export type Facility = {
   jurisdictionType?: string
 }
 
-type UpdateLocation = {
-  name?: string
-  alias?: string
-  status?: string
-  statistics?: LocationStatistic
-}
-
-const locationStatisticSchema = Joi.object({
+export const locationStatisticSchema = Joi.object({
   year: Joi.number().required(),
   male_population: Joi.number().required(),
   female_population: Joi.number().required(),
@@ -144,13 +136,6 @@ export const locationQuerySchema = Joi.object({
   status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE),
   _count: Joi.number()
 }).or('type', 'identifier')
-
-export const updateSchema = Joi.object({
-  name: Joi.string().optional(),
-  alias: Joi.string().optional(),
-  status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE).optional(),
-  statistics: locationStatisticSchema.optional()
-}).label('UpdateLocationPayload')
 
 export const requestParamsSchema = Joi.object({
   locationId: Joi.string().uuid()
@@ -315,48 +300,6 @@ export async function createLocationHandler(
     request.headers.authorization
   ).catch((err) => {
     throw Error('Cannot create location to FHIR')
-  })
-
-  return h.response(response.statusText)
-}
-
-export async function updateLocationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const locationId = request.params.locationId
-  const location = request.payload as UpdateLocation
-  const existingLocation = await fetchFromHearth(`Location?_id=${locationId}`)
-  const newLocation = existingLocation.entry[0].resource
-
-  if (existingLocation.total === 0) {
-    throw badRequest(`${locationId} is not a valid location`)
-  }
-
-  if (location.name) {
-    newLocation.name = location.name
-  }
-  if (location.alias) {
-    newLocation.alias = [location.alias]
-  }
-  if (location.status) {
-    newLocation.status = location.status
-  }
-  if (location.statistics) {
-    const statisticalExtensions = updateStatisticalExtensions(
-      location.statistics,
-      newLocation.extension
-    )
-    newLocation.extension = statisticalExtensions
-  }
-
-  const response = await sendToFhir(
-    JSON.stringify(newLocation),
-    `/Location/${locationId}`,
-    'PUT',
-    request.headers.authorization
-  ).catch((err) => {
-    throw Error('Cannot update location to FHIR')
   })
 
   return h.response(response.statusText)
