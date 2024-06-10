@@ -274,10 +274,9 @@ export class SearchTool extends React.Component<IProps, IState> {
           })}
           {this.props.navigationList?.map((item) => {
             return (
-              <AdvancedSearchWrapper>
+              <AdvancedSearchWrapper key={item.id}>
                 <Button
                   id={item.id}
-                  key={item.id}
                   type="tertiary"
                   size="small"
                   onClick={() => item.onClick()}

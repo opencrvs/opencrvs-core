@@ -80,7 +80,9 @@ const dateFieldTypes = [
 export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
   const validNonDateFields = Object.keys(value).filter(
     (key) =>
-      !['event', 'eventLocationType'].includes(key) &&
+      !['event', 'eventLocationType', 'declarationJurisdictionId'].includes(
+        key
+      ) &&
       !dateFieldTypes.includes(key) &&
       Boolean(value[key as keyof IBaseAdvancedSearchState])
   )
