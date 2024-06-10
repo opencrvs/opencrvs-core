@@ -13,8 +13,10 @@ import { practitioner } from './mocks/practitioner'
 import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
 import { office, district, state } from './mocks/locations'
-import { TransactionResponse } from '@workflow/records/fhir'
 import { RecordEvent } from '@workflow/records/record-events'
+import { TransactionResponse } from '@opencrvs/commons/types'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 
 const userHandler = rest.post(
   'http://localhost:3030/getUser',
@@ -34,6 +36,28 @@ const practitionerRoleHandler = rest.get(
   'http://localhost:3447/fhir/PractitionerRole',
   (_, res, ctx) => {
     return res(ctx.json(practitionerRoleBundle))
+  }
+)
+
+const hierarchyHandler = rest.get(
+  'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
+  (_req, res, ctx) => {
+    return res(
+      ctx.json([
+        fixtures.savedAdministrativeLocation({
+          id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+          name: 'Ibombo',
+          partOf: { reference: 'Location/0' }
+        }),
+        fixtures.savedAdministrativeLocation({
+          id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
+          name: 'Ibombo District Office',
+          partOf: {
+            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+          }
+        })
+      ])
+    )
   }
 )
 
@@ -130,6 +154,7 @@ const handlers = [
   userHandler,
   practitionerHandler,
   practitionerRoleHandler,
+  hierarchyHandler,
   locationHandler,
   notificationFlagsHandler,
   duplicatesHandler,

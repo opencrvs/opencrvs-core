@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
-import { fetchFHIR } from '@gateway/features/fhir/service'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import { fetchLocation } from '@gateway/location'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
 export const typeResolvers: GQLResolver = {
   UserAuditLogResultItem: {
@@ -38,7 +39,8 @@ export const typeResolvers: GQLResolver = {
   },
   EventMetricsByLocation: {
     async location({ location }, _, { headers: authHeader }) {
-      return await fetchFHIR(`/${location}`, authHeader)
+      // @TODO: For simplicity, metrics shouldn't pass the `Location/` prefix here.
+      return await fetchLocation(resourceIdentifierToUUID(location))
     }
   },
   VSExport: {

@@ -1348,9 +1348,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  locationsByParent(parentId: String, type: String): [Location]
-  locationById(locationId: String): Location
-  hasChildLocation(parentId: String): Location
+  hasChildLocation(parentId: String!): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -1361,7 +1359,6 @@ type Query {
     status: String
     systemRole: String
     primaryOfficeId: String
-    locationId: String
     count: Int
     skip: Int
     sort: String
@@ -1916,7 +1913,6 @@ type User {
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -1977,7 +1973,6 @@ input UserInput {
   role: String
   email: String
   primaryOffice: String
-  catchmentArea: [String]
   device: String
   signature: SignatureInput
 }

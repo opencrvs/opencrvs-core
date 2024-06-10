@@ -84,7 +84,6 @@ import changePhoneHandler, {
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
 import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
-import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
 import {
   createSearchHandler,
   removeSearchHandler,
@@ -336,16 +335,6 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
         response: {
           schema: resMobileSchema
         }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/users/{userId}/avatar',
-      handler: getUserAvatar,
-      config: {
-        tags: ['api'],
-        description: 'Retrieves a user avatar',
-        auth: false
       }
     },
     {

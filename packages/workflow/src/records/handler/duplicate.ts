@@ -32,7 +32,12 @@ export async function duplicateRecordHandler(
   const token = getToken(request)
   const payload = validateRequest(requestSchema, request.payload)
 
-  const record = await getRecordById(recordId, token, ['READY_FOR_REVIEW'])
+  const record = await getRecordById(
+    recordId,
+    token,
+    ['READY_FOR_REVIEW'],
+    false
+  )
   const { reason, comment, duplicateTrackingId } = payload
 
   const duplicatedRecord = await toDuplicated(

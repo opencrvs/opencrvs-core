@@ -13,7 +13,6 @@ import InformantSMSNotification, {
 } from '@config/models/informantSMSNotifications'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { internal } from '@hapi/boom'
 import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
 
 export default async function createInformantSMSNotification(
@@ -22,15 +21,10 @@ export default async function createInformantSMSNotification(
 ) {
   const informantSMSNotificationPayload =
     request.payload as IInformantSMSNotificationsModel[]
-  try {
-    await InformantSMSNotification.insertMany(informantSMSNotificationPayload)
-  } catch (e) {
-    throw internal(e.message)
-  }
-  const informantSMSNotifications = await getInformantSMSNotificationsHandler(
-    request,
-    h
-  )
+
+  await InformantSMSNotification.insertMany(informantSMSNotificationPayload)
+
+  const informantSMSNotifications = await getInformantSMSNotificationsHandler()
 
   return h.response(informantSMSNotifications).code(201)
 }

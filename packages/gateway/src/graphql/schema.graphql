@@ -38,9 +38,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  locationsByParent(parentId: String, type: String): [Location]
-  locationById(locationId: String): Location
-  hasChildLocation(parentId: String): Location
+  hasChildLocation(parentId: String!): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -442,6 +440,7 @@ type Location {
   latitude: Float
   altitude: Float
   geoData: String
+  hierarchy: [Location!]
 }
 
 type User {
@@ -457,7 +456,6 @@ type User {
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -814,7 +812,6 @@ input UserInput {
   role: String
   email: String
   primaryOffice: String
-  catchmentArea: [String]
   device: String
   signature: SignatureInput
 }
@@ -1544,7 +1541,7 @@ input WebhookInput {
 }
 
 type AssignmentData {
-  userId: String
+  practitionerId: String
   firstName: String
   lastName: String
   officeName: String

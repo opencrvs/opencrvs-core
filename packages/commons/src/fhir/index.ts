@@ -13,7 +13,7 @@ import { RegistrationStatus, ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
-import { Extension, KnownExtensionType } from './extension'
+import { Extension } from './extension'
 import { Patient } from './patient'
 import {
   CompositionSection,
@@ -22,6 +22,7 @@ import {
 } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
 import { Practitioner, SavedPractitioner } from './practitioner'
+import { Location, SavedLocation, Office, SavedOffice } from './location'
 
 export * from './practitioner'
 export * from './task'
@@ -32,6 +33,7 @@ export * from './encounter'
 export * from './patient'
 export * from './composition'
 export * from './constants'
+export * from './location'
 
 export type Resource = fhir3.Resource
 
@@ -106,6 +108,8 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedCompositionHistory
   : T extends Reference
   ? SavedReference
+  : T extends Office
+  ? SavedOffice
   : T extends Location
   ? SavedLocation
   : T extends Task
@@ -173,13 +177,6 @@ export type StrictBundle<T extends Resource[]> = Omit<Bundle, 'entry'> & {
   entry: { [Property in keyof T]: BundleEntry<T[Property]> }
 }
 
-export type Address = Omit<fhir3.Address, 'type' | 'extension'> & {
-  type?: fhir3.Address['type'] | 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
-  extension?: Array<
-    KnownExtensionType['http://opencrvs.org/specs/extension/part-of']
-  >
-}
-
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
   coding: Array<
     Omit<fhir3.Coding, 'code' | 'system'> & {
@@ -221,22 +218,6 @@ export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   patient: SavedReference
 }
 
-export type Location = WithStrictExtensions<
-  Omit<fhir3.Location, 'address' | 'partOf'> & {
-    address?: Address
-    partOf?: {
-      reference: ResourceIdentifier
-    }
-  }
->
-export type SavedLocation = Omit<Location, 'partOf' | 'id'> & {
-  id: UUID
-  address?: Address
-  partOf?: {
-    reference: ResourceIdentifier
-  }
-}
-
 export type SavedQuestionnaireResponse = Omit<
   QuestionnaireResponse,
   'status' | 'id'
@@ -251,6 +232,16 @@ export type CompositionHistory = Saved<Composition> & {
 
 export type SavedCompositionHistory = SavedComposition & {
   resourceType: 'CompositionHistory'
+}
+
+export type TransactionResponse = Omit<fhir3.Bundle, 'entry'> & {
+  entry: Array<
+    Omit<fhir3.BundleEntry, 'response'> & {
+      response: Omit<fhir3.BundleEntryResponse, 'location'> & {
+        location: URLReference
+      }
+    }
+  >
 }
 
 export function isComposition<T extends Resource>(
@@ -391,29 +382,13 @@ export function findEntryFromBundle<T extends Resource = Resource>(
       )
 }
 
-export function findCompositionSection<T extends SavedComposition>(
-  code: CompositionSectionCode,
-  composition: T
-): SavedCompositionSection
-
 export function findCompositionSection<T extends Composition>(
   code: CompositionSectionCode,
   composition: T
-): CompositionSection
-
-export function findCompositionSection<T extends Composition>(
-  code: CompositionSectionCode,
-  composition: T
-) {
-  return (composition.section &&
-    composition.section.find((section) => {
-      if (!section.code || !section.code.coding || !section.code.coding.some) {
-        return false
-      }
-      return section.code.coding.some((coding) => coding.code === code)
-    })) as T extends SavedComposition
-    ? SavedCompositionSection
-    : CompositionSection
+): T['section'][number] | undefined {
+  return composition.section.find((section) =>
+    section.code.coding.some((coding) => coding.code === code)
+  )
 }
 
 export function resourceToBundleEntry<T extends Resource>(

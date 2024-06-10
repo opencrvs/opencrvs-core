@@ -92,9 +92,7 @@ export const createFhirPractitionerRole = async (
           ]
         }
       ],
-      location: (user.catchmentAreaIds || []).map((id) => ({
-        reference: `Location/${id}`
-      }))
+      location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   } else {
     const role = await UserRole.findOne({
@@ -123,28 +121,9 @@ export const createFhirPractitionerRole = async (
           ]
         }
       ],
-      location: (user.catchmentAreaIds || []).map((id) => ({
-        reference: `Location/${id}`
-      }))
+      location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   }
-}
-
-export const getCatchmentAreaIdsByPrimaryOfficeId = async (
-  primaryOfficeId: string,
-  token: string
-): Promise<string[]> => {
-  const catchmentAreaIds: string[] = []
-  let locationRef = `Location/${primaryOfficeId}`
-  let parentLocation: fhir.Location = {}
-  while (locationRef !== 'Location/0') {
-    parentLocation = await getFromFhir(token, `/${locationRef}`)
-    if (parentLocation.id && parentLocation.partOf) {
-      catchmentAreaIds.push(parentLocation.id)
-      locationRef = parentLocation.partOf.reference || 'Location/0'
-    }
-  }
-  return catchmentAreaIds
 }
 
 export const postFhir = async (token: string, resource: fhir.Resource) => {
