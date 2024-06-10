@@ -222,6 +222,16 @@ export const formMessageDescriptors = {
     description: 'Label for father select option to certify record',
     id: 'form.field.label.app.certifyRecordTo.father'
   },
+  certifyRecordToGroom: {
+    defaultMessage: 'Print and issue to groom',
+    description: 'Label for groom select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.groom'
+  },
+  certifyRecordToBride: {
+    defaultMessage: 'Print and issue to bride',
+    description: 'Label for bride select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.bride'
+  },
   typeOfId: {
     defaultMessage: 'Type of ID',
     description: "Input label for certificate collector's id type options",
@@ -258,12 +268,12 @@ export const formMessageDescriptors = {
     id: 'form.field.label.informantsRelationWithDeceased'
   },
   brideName: {
-    defaultMessage: 'Print and issue to bride',
+    defaultMessage: 'Bride',
     description: 'Form section name for Bride',
     id: 'form.section.bride.name'
   },
   groomName: {
-    defaultMessage: 'Print and issue to groom',
+    defaultMessage: 'Groom',
     description: 'Form section name for Groom',
     id: 'form.section.groom.name'
   },

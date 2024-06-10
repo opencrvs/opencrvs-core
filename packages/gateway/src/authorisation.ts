@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader } from '@opencrvs/commons'
-import { getTokenPayload } from './features/user/utils'
+import { getTokenPayload, getUser } from './features/user/utils'
 import { SEARCH_URL } from './constants'
 
 import fetch from '@gateway/fetch'
@@ -45,7 +45,11 @@ export async function checkUserAssignment(
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
-  const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+  const user = await getUser({ userId }, authHeader)
+  const res: { practitionerId?: string } = await postAssignmentSearch(
+    authHeader,
+    id
+  )
 
-  return userId === res?.userId
+  return user.practitionerId === res?.practitionerId
 }

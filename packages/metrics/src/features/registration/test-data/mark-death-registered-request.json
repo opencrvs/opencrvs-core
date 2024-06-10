@@ -138,12 +138,6 @@
             "valueInteger": 4333
           },
           {
-            "url": "http://opencrvs.org/specs/extension/regLastLocation",
-            "valueReference": {
-              "reference": "Location/2711a485-edfb-48bb-8c2a-9ce8753e3488"
-            }
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/regLastOffice",
             "valueReference": {
               "reference": "Location/d8cfd240-4b5a-4557-9df7-b1591a11d843"

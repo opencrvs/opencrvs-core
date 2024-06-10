@@ -51,3 +51,7 @@ export const DUPLICATE_TRACKING_ID =
   `${OPENCRVS_SPECIFICATION_URL}extension/duplicateTrackingId` as const
 export const FLAGGED_AS_POTENTIAL_DUPLICATE =
   `${OPENCRVS_SPECIFICATION_URL}extension/flaggedAsPotentialDuplicate` as const
+export const LAST_USER_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser` as const
+export const LAST_OFFICE_EXTENSION_URL =
+  `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice` as const

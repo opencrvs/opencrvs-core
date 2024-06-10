@@ -12,7 +12,7 @@
 import { getToken } from '@workflow/utils/auth-utils'
 import { toReinstated } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
-import { SavedBundleEntry, Task } from '@opencrvs/commons/types'
+import { findTaskHistories } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { auditEvent } from '@workflow/records/audit'
 
@@ -25,16 +25,14 @@ export const reinstateRoute = createRoute({
   handler: async (request, record) => {
     const token = getToken(request)
 
-    const taskHistoryEntries = record.entry.filter(
-      (e) => e.resource.resourceType === 'TaskHistory'
-    ) as SavedBundleEntry<Task>[]
+    const taskHistoryEntries = findTaskHistories(record)
 
     if (taskHistoryEntries.length <= 0) {
       return await Promise.reject(new Error('Task history is empty'))
     }
 
     const prevBusinessStatuses = taskHistoryEntries.map(
-      (e) => e.resource.businessStatus.coding[0].code
+      (resource) => resource.businessStatus.coding[0].code
     )
 
     const filteredStatuses = prevBusinessStatuses.filter(
