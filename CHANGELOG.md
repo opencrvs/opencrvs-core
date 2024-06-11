@@ -8,7 +8,10 @@
 - Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
 - Supporting document fields can now be made required
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
-- Allow reindexing ElasticSearch via new search-service endpoint `reindex` [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033)
+
+- #### ElasticSearch reindexing
+
+  Allows reindexing ElasticSearch via a new search-service endpoint `reindex`. We're replacing the original `ocrvs` index with timestamped ones. This is done automatically when upgrading and migrating, but this is an important architectural change that should be noted. More details in [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033).
 
 ## Breaking changes
 
