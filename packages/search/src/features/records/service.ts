@@ -382,8 +382,10 @@ function joinFromResourcesIdToResourceIdentifier(
     {
       $lookup: {
         from: collectionToJoin,
-        localField: `resourceIds`,
-        foreignField,
+        let: { resourceIds: '$resourceIds' },
+        pipeline: [
+          { $match: { $expr: { $in: [`$${foreignField}`, '$$resourceIds'] } } }
+        ],
         as: 'joinResult'
       }
     },
