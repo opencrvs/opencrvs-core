@@ -27,6 +27,7 @@ interface ISearchEventDataTemplate {
 }
 interface ISearchDataTemplate {
   [key: string]: any
+  eventLocationId?: string
 }
 
 interface IAssignment {
@@ -420,7 +421,6 @@ export const searchTypeResolvers: GQLResolver = {
       _,
       { dataSources }
     ) {
-      // eventLocationId is not present for a record created by users
       if (!searchData._source.eventLocationId) return null
 
       const location = await dataSources.locationsAPI.getLocation(
