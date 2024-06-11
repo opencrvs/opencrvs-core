@@ -95,7 +95,7 @@ function instanceOfJurisdiction(object: any): object is Location {
   return 'statistics' in object
 }
 
-const locationRequestSchema = Joi.object({
+export const locationRequestSchema = Joi.object({
   statisticalID: Joi.string().required(),
   name: Joi.string().required(),
   alias: Joi.string().optional(),
@@ -247,6 +247,17 @@ async function batchLocationsHandler(
   return cumulativeResponse
 }
 
+export const formatNewLocation = (payload: Location | Facility) => {
+  const newLocation = composeFhirLocation(payload)
+  if (instanceOfJurisdiction(payload) && payload.statistics) {
+    const statisticalExtensions = generateStatisticalExtensions(
+      payload.statistics
+    )
+    newLocation.extension = statisticalExtensions
+  }
+  return newLocation
+}
+
 export async function createLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -255,7 +266,6 @@ export async function createLocationHandler(
     return batchLocationsHandler(request.payload as Location[])
   }
   const payload = request.payload as Location | Facility
-  const newLocation = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
   const locations = [
@@ -286,19 +296,12 @@ export async function createLocationHandler(
     }
   }
 
-  if (instanceOfJurisdiction(payload) && payload.statistics) {
-    const statisticalExtensions = generateStatisticalExtensions(
-      payload.statistics
-    )
-    newLocation.extension = statisticalExtensions
-  }
-
-  const response = await sendToFhir(
-    JSON.stringify(newLocation),
-    '/Location',
-    'POST',
-    request.headers.authorization
-  ).catch((err) => {
+  const newLocation = formatNewLocation(payload)
+  const response = await sendToFhir(newLocation, {
+    suffix: '/Location',
+    method: 'POST',
+    token: request.headers.authorization
+  }).catch((err) => {
     throw Error('Cannot create location to FHIR')
   })
 

@@ -16,11 +16,8 @@ import { inspect } from 'util'
 import {
   SavedBundle,
   Location,
-  findStatisticalId,
-  SavedLocation,
-  resourceIdentifierToUUID
+  findStatisticalId
 } from '@opencrvs/commons/types'
-import chalk from 'chalk'
 import { UUID } from '@opencrvs/commons'
 
 const LocationSchema = z.object({
@@ -247,113 +244,9 @@ const postNewLocations = async (
   })
 }
 
-const updateLocation = async (
-  /** @type UUID */
-  locationId: string,
-  location: Partial<CountryConfigLocation>,
-  { token }: { token: string }
-) => {
-  const res = await fetch(`${GATEWAY_HOST}/locations/${locationId}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(location)
-  })
-
-  if (!res.ok) {
-    raise(await res.text())
-  }
-
-  return { status: 'ok' }
-}
-const diffLocations = (
-  countryConfigLocationsMap: Map<string, CountryConfigLocation>,
-  savedLocationsMap: Map<string, SavedLocation>
-) => {
-  const locationsToUpdate: Map<
-    string,
-    Partial<CountryConfigLocation>
-  > = new Map()
-
-  for (const [savedLocationStatisticalId, savedLocation] of savedLocationsMap) {
-    const countryConfigLocation = countryConfigLocationsMap.get(
-      savedLocationStatisticalId
-    )
-
-    if (!countryConfigLocation && savedLocation.status === 'active') {
-      console.info(
-        `> ${chalk.whiteBright(
-          `${savedLocation.name}:`
-        )} setting the status to inactive`
-      )
-
-      locationsToUpdate.set(savedLocation.id, {
-        status: 'inactive'
-      })
-
-      continue
-    }
-
-    // Already set to inactive, ignoring...
-    if (!countryConfigLocation) continue
-
-    if (countryConfigLocation.name !== savedLocation.name) {
-      console.info(
-        `> ${chalk.whiteBright(`${savedLocation.name}:`)} updating name "${
-          savedLocation.name
-        }" to "${countryConfigLocation.name}"`
-      )
-      locationsToUpdate.set(savedLocation.id, countryConfigLocation)
-    }
-
-    if (countryConfigLocation.alias !== savedLocation.alias?.[0]) {
-      console.info(
-        `> ${chalk.whiteBright(`${savedLocation.name}:`)} updating alias "${
-          savedLocation.alias
-        }" to "${countryConfigLocation.alias}"`
-      )
-      locationsToUpdate.set(savedLocation.id, countryConfigLocation)
-    }
-
-    const countryConfigLocationPartOfReference = countryConfigLocationsMap.get(
-      savedLocationStatisticalId
-    )!.partOf
-
-    // The partOf can also be Location/0 which is not in our locations, therefore this can be undefined
-    const oldReferenceUuid = savedLocationsMap.get(
-      resourceIdentifierToUUID(countryConfigLocationPartOfReference)
-    )?.id
-
-    const newReferenceUuid =
-      savedLocation.partOf &&
-      resourceIdentifierToUUID(savedLocation.partOf.reference)
-
-    if (
-      oldReferenceUuid &&
-      newReferenceUuid &&
-      oldReferenceUuid !== newReferenceUuid
-    ) {
-      console.info(
-        `> ${chalk.whiteBright(
-          `${savedLocation.name}:`
-        )} updating partOf "${oldReferenceUuid}" to "${newReferenceUuid}"`
-      )
-
-      throw new Error('Updating partOf not supported yet.')
-    }
-  }
-
-  return locationsToUpdate
-}
-
 export async function seedLocations(token: string) {
   const savedLocations = await fetchAllSavedLocations()
   const countryConfigLocations = await fetchLocationsFromCountryConfig()
-  const countryConfigLocationsMap = new Map(
-    countryConfigLocations.map((location) => [location.id, location])
-  )
   const savedLocationsMap = new Map(
     savedLocations.map((location) => [findStatisticalId(location)!, location])
   )
@@ -368,27 +261,6 @@ export async function seedLocations(token: string) {
   if (unsavedLocations.length > 0) {
     console.info(`> inserting ${unsavedLocations.length} new locations...`)
     await postNewLocations(unsavedLocations, { token })
-  }
-
-  /*
-   * Installing for first time, nothing could have changed
-   */
-  if (savedLocations.length === 0) {
-    console.info(`> ...done`)
-    return
-  }
-
-  /*
-   * Update saved locations
-   */
-  const updatedLocations = diffLocations(
-    countryConfigLocationsMap,
-    savedLocationsMap
-  )
-  console.info(`> updating ${updatedLocations.size} locations`)
-
-  for (const [locationId, location] of updatedLocations) {
-    await updateLocation(locationId, location, { token })
   }
 
   console.info(`> ...done`)

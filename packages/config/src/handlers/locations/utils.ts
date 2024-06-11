@@ -18,11 +18,11 @@ import {
   Statistics
 } from './handler'
 import {
-  Location,
   Extension,
   Bundle,
   ResourceIdentifier,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  Location
 } from '@opencrvs/commons/types'
 import { fetchFromHearth } from '@config/services/hearth'
 

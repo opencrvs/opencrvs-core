@@ -49,6 +49,10 @@ import {
 } from '@config/handlers/locations/update'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
+import {
+  batchUpdateLocationHandler,
+  batchUpsertSchema
+} from '@config/handlers/locations/batch-update'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -307,6 +311,21 @@ export default function getRoutes(): ServerRoute[] {
         description: 'Create a location',
         validate: {
           payload: createLocationReqSchema
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/locations',
+      handler: batchUpdateLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Batch update locations',
+        validate: {
+          payload: batchUpsertSchema
         }
       }
     },

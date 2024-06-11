@@ -60,12 +60,11 @@ export async function updateLocationHandler(
     newLocation.extension = statisticalExtensions
   }
 
-  const response = await sendToFhir(
-    JSON.stringify(newLocation),
-    `/Location/${locationId}`,
-    'PUT',
-    request.headers.authorization
-  ).catch((err) => {
+  const response = await sendToFhir(newLocation, {
+    suffix: `/Location/${locationId}`,
+    method: 'PUT',
+    token: request.headers.authorization
+  }).catch((err) => {
     throw Error('Cannot update location to FHIR')
   })
 

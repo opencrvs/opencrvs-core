@@ -11,7 +11,6 @@
 import * as Hapi from '@hapi/hapi'
 import {
   Bundle,
-  BundleEntry,
   Composition,
   OpenCRVSPatientName,
   Patient,
@@ -416,30 +415,4 @@ export async function mergePatientIdentifier(bundle: Bundle) {
       }
     })
   )
-}
-
-export async function forwardEntriesToHearth(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  logger.info(
-    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
-  )
-
-  const payload = request.payload as Bundle & { entry: BundleEntry[] }
-  const res = await Promise.all(
-    payload.entry.map((entry) => {
-      return fetch(
-        `${FHIR_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify(entry.resource),
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
-      )
-    })
-  )
-  return res[res.length - 1]
 }
