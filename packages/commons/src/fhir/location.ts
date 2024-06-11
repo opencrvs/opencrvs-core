@@ -56,6 +56,21 @@ export type Office = Omit<Location, 'partOf' | 'type'> & {
     reference: ResourceIdentifier
   }
 }
+
+export type HealthFacility = Omit<Location, 'partOf' | 'type'> & {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type'
+        code: 'HEALTH_FACILITY'
+      }
+    ]
+  }
+  partOf: {
+    reference: ResourceIdentifier
+  }
+}
+
 export type SavedOffice = Omit<Office, 'id'> & {
   id: UUID
 }
@@ -98,4 +113,10 @@ export function findLastOfficeLocationFromSavedBundle<T extends SavedBundle>(
     )
   }
   return officeLocation
+}
+
+export function isHealthFacility(
+  location: Location
+): location is HealthFacility {
+  return location.type?.coding?.[0].code === 'HEALTH_FACILITY'
 }
