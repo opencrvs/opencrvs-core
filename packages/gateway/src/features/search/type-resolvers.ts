@@ -18,6 +18,7 @@ import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
+import { getFullName } from '@gateway/features/user/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -26,13 +27,14 @@ interface ISearchEventDataTemplate {
 }
 interface ISearchDataTemplate {
   [key: string]: any
+  eventLocationId?: string
 }
 
 interface IAssignment {
   officeName: string
   firstName: string
   lastName: string
-  userId: string
+  practitionerId: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -190,16 +192,16 @@ const getGroomName = (source: ISearchDataTemplate) => {
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
-      if (obj._type === 'compositions' && obj._source.event === 'Birth') {
+      if (obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'
-      } else if (
-        obj._type === 'compositions' &&
-        obj._source.event === 'Death'
-      ) {
+      }
+      if (obj._source.event === 'Death') {
         return 'DeathEventSearchSet'
-      } else {
+      }
+      if (obj._source.event === 'Marriage') {
         return 'MarriageEventSearchSet'
       }
+      return null as never
     }
   },
   BirthEventSearchSet: {
@@ -414,15 +416,17 @@ export const searchTypeResolvers: GQLResolver = {
       if (res._id) return res
       return null
     },
-    startedByFacility(searchData: ISearchEventDataTemplate) {
-      let facilityName = null
-      if (searchData._source.operationHistories) {
-        facilityName = (
-          searchData._source
-            .operationHistories as GQLOperationHistorySearchSet[]
-        )[0].notificationFacilityName
-      }
-      return facilityName
+    async startedByFacility(
+      searchData: ISearchEventDataTemplate,
+      _,
+      { dataSources }
+    ) {
+      if (!searchData._source.eventLocationId) return null
+
+      const location = await dataSources.locationsAPI.getLocation(
+        searchData._source.eventLocationId
+      )
+      return location.name
     },
     progressReport: async (
       searchData: ISearchEventDataTemplate,
@@ -461,17 +465,23 @@ export const searchTypeResolvers: GQLResolver = {
       _,
       { dataSources, headers: authHeader, presignDocumentUrls }
     ) {
-      const { userName, avatarURI } = await dataSources.usersAPI.getUserAvatar(
-        assignmentData.userId
+      const user = await dataSources.usersAPI.getUserByPractitionerId(
+        assignmentData.practitionerId
       )
 
-      if (avatarURI) {
+      if (user.avatar?.data) {
         if (!presignDocumentUrls) {
-          return avatarURI
+          return user.avatar.data
         }
-        const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
+        const avatarURL = await getPresignedUrlFromUri(
+          user.avatar.data,
+          authHeader
+        )
         return avatarURL
       }
+
+      const userName = getFullName(user, 'en')
+
       return `${AVATAR_API}${userName}`
     }
   }

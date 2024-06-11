@@ -14,11 +14,13 @@ import {
   CompositionSectionCode,
   findCompositionSection,
   findExtension,
+  findLastOfficeFromSavedBundle,
   getComposition,
+  findLastOfficeLocationFromSavedBundle,
   getResourceFromBundleById,
   getStatusFromTask,
   getTaskFromSavedBundle,
-  Location,
+  InProgressRecord,
   Patient,
   ReadyForReviewRecord,
   RegisteredRecord,
@@ -50,7 +52,7 @@ export function getContactEmail(
 }
 
 function error(
-  record: ReadyForReviewRecord | RegisteredRecord,
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord,
   message: string
 ): never {
   const task = getTaskFromSavedBundle(record)
@@ -58,16 +60,11 @@ function error(
   throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
-export function getOfficeName(record: ReadyForReviewRecord | RegisteredRecord) {
-  const task = getTaskFromSavedBundle(record)
-  const officeExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastOffice',
-    task.extension
-  )
-  if (!officeExtension?.valueString) {
-    error(record, 'Office extension not found')
-  }
-  return officeExtension.valueString
+export function getOfficeName(
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
+) {
+  const office = findLastOfficeFromSavedBundle(record)
+  return office.name
 }
 
 export function getInformantName(
@@ -121,20 +118,9 @@ export function getPersonName(
 }
 
 export function getRegistrationLocation(
-  record: ReadyForReviewRecord | RegisteredRecord
+  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
 ) {
-  const task = getTaskFromSavedBundle(record)
-  const locationExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastLocation',
-    task.extension
-  )
-  if (!locationExtension) {
-    error(record, 'No last registration office found')
-  }
-  const location = getResourceFromBundleById<Location>(
-    record,
-    resourceIdentifierToUUID(locationExtension.valueReference.reference)
-  )
+  const location = findLastOfficeLocationFromSavedBundle(record)
   const language = getDefaultLanguage()
   return (
     (language === 'en'

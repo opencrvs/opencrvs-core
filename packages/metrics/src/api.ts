@@ -68,7 +68,9 @@ export async function fetchParentLocationByLocationID(
   authHeader: IAuthHeader
 ) {
   const location = await fetchFHIR(locationID, authHeader)
-  return location && location.partOf && location.partOf.reference
+  return (location && location.partOf && location.partOf.reference) as
+    | string
+    | undefined
 }
 
 export async function fetchTaskIdByCompositionID(
@@ -99,17 +101,6 @@ export async function fetchChildLocationsByParentId(
 ): Promise<fhir.Location[]> {
   const bundle = await fetchFHIR(
     `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`,
-    authHeader
-  )
-  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
-}
-
-export async function fetchAllChildLocationsByParentId(
-  locationId: string,
-  authHeader: IAuthHeader
-): Promise<(fhir.Location & { id: string })[]> {
-  const bundle = await fetchFHIR(
-    `Location?_count=0&partof=${locationId}`,
     authHeader
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []

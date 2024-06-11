@@ -12,11 +12,7 @@
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { AuthenticationError } from 'apollo-server-errors'
-
-type IAvatarResponse = {
-  userName: string
-  avatarURI?: string
-}
+import { IUserModelData } from './type-resolvers'
 
 export class UsersAPI extends RESTDataSource {
   constructor() {
@@ -33,11 +29,7 @@ export class UsersAPI extends RESTDataSource {
     }
   }
 
-  async getUserAvatar(id: string): Promise<IAvatarResponse> {
-    return this.get(`users/${id}/avatar`)
-  }
-
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:email:${email}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
@@ -59,7 +51,7 @@ export class UsersAPI extends RESTDataSource {
     }
   }
 
-  async getUserByMobile(mobile: string) {
+  async getUserByMobile(mobile: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:mobile:${mobile}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
@@ -80,7 +72,7 @@ export class UsersAPI extends RESTDataSource {
       else throw e
     }
   }
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<IUserModelData> {
     const cacheKey = `${this.baseURL}/getUser:user:${id}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
@@ -96,7 +88,7 @@ export class UsersAPI extends RESTDataSource {
     return response
   }
 
-  async getUserByPractitionerId(id: string) {
+  async getUserByPractitionerId(id: string): Promise<IUserModelData> {
     const cacheKey = `${this.baseURL}/getUser:practitioner:${id}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)

@@ -8,23 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { SavedLocation } from '@opencrvs/commons/types'
+import { fetchFromHearth } from '@config/services/hearth'
 import * as Hapi from '@hapi/hapi'
-import User, { IUserModel } from '@user-mgnt/model/user'
 
-export default async function getUserAvatar(
+export async function fetchLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = request.params.userId
-  const user: IUserModel | null = await User.findById(userId)
+  const locationId = request.params.locationId
+  const response = await fetchFromHearth<SavedLocation>(
+    `Location/${locationId}`
+  )
 
-  if (!user) {
-    return h.response().code(400)
-  }
-
-  const avatarURI = user.avatar?.data
-  const name = user.name[0]
-  const userName = `${String(name.given[0])} ${String(name.family)}`
-
-  return h.response({ userName, avatarURI }).code(200)
+  return response
 }

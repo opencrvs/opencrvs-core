@@ -16,11 +16,11 @@ import * as jwt from 'jsonwebtoken'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  TransactionResponse,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('archive record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>

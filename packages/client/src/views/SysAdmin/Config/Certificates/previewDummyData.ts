@@ -2001,41 +2001,7 @@ const mockUserDetails: UserDetails = {
     name: 'Ibombo District Office',
     alias: ['Ibombo District Office'],
     status: 'active'
-  },
-  catchmentArea: [
-    {
-      id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-      name: 'Ibombo',
-      alias: ['Ibombo'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/statistical-code',
-          value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
-        },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'DISTRICT'
-        }
-      ]
-    },
-    {
-      id: 'df669feb-61a3-4984-ab24-4b28511b472a',
-      name: 'Central',
-      alias: ['Central'],
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/statistical-code',
-          value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
-        },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'STATE'
-        }
-      ]
-    }
-  ]
+  }
 }
 
 export const getDummyDeclarationData = (

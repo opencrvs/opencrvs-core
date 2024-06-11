@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { fetchFromHearth } from '@gateway/features/fhir/service'
 import {
   ExtensionUrl,
   Facility as FacilityInput,
@@ -17,7 +16,7 @@ import {
   JurisdictionType,
   LocationStatistic,
   Statistics
-} from './locationHandler'
+} from './handler'
 import {
   Location,
   Extension,
@@ -25,6 +24,7 @@ import {
   ResourceIdentifier,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
+import { fetchFromHearth } from '@config/services/hearth'
 
 export const composeFhirLocation = (
   location: LocationInput | FacilityInput

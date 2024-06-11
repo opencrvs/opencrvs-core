@@ -24,6 +24,7 @@ export const issueRoute = createRoute({
   path: '/records/{recordId}/issue-record',
   allowedStartStates: ['CERTIFIED'],
   action: 'ISSUE',
+  includeHistoryResources: true,
   handler: async (request, record): Promise<IssuedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =

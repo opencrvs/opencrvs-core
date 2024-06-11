@@ -104,7 +104,13 @@ export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
 
 export type Task = Omit<
   fhir3.Task,
-  'extension' | 'businessStatus' | 'code' | 'intent' | 'identifier' | 'status'
+  | 'lastModified'
+  | 'status'
+  | 'extension'
+  | 'businessStatus'
+  | 'intent'
+  | 'identifier'
+  | 'code'
 > & {
   lastModified: string
   status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
@@ -139,7 +145,7 @@ export type SavedTask = Omit<Task, 'focus' | 'id'> & {
   }
 }
 
-export type TaskHistory = Saved<Task> & {
+export type TaskHistory = Omit<Saved<Task>, 'resourceType'> & {
   resourceType: 'TaskHistory'
 }
 
@@ -160,7 +166,7 @@ export function isCorrectionRequestedTask(
   )
 }
 
-export function getBusinessStatus(task: Task) {
+export function getBusinessStatus<T extends Task | TaskHistory>(task: T) {
   const code = task.businessStatus.coding.find(({ code }) => code)
   if (!code) {
     throw new Error('No business status code found')
@@ -200,20 +206,39 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
   return task
 }
 
-export function sortTasksAscending(tasks: Task[]) {
+export function sortTasksAscending<T extends { lastModified: string }>(
+  tasks: T[]
+) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
     )
   })
 }
-export function sortTasksDescending(tasks: Task[]) {
+export function sortTasksDescending<T extends { lastModified: string }>(
+  tasks: T[]
+) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
     )
   })
 }
+export const findTaskHistories = (
+  bundle: Bundle,
+  sort = sortTasksAscending
+) => {
+  return sort(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<TaskHistory> =>
+        isTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
+}
+
+export const findFirstTaskHistory = (bundle: Bundle) =>
+  findTaskHistories(bundle).at(0)
 
 export function addTaskToRecord<T extends Bundle>(
   bundle: T,
@@ -276,7 +301,7 @@ export type TaskStatus =
   | 'REJECTED'
   | 'ISSUED'
 
-export function getStatusFromTask(task: Task) {
+export function getStatusFromTask(task: Task | TaskHistory) {
   const statusType = task.businessStatus.coding.find(
     (coding: Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
@@ -289,7 +314,7 @@ export function getStatusFromTask(task: Task) {
   return statusType.code
 }
 
-export function getActionFromTask(task: Task) {
+export function getActionFromTask(task: Task | TaskHistory) {
   const extensions = task.extension || []
 
   if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
@@ -459,9 +484,9 @@ function updateTaskTemplate(
 }
 
 export function notCorrectedHistory(
-  task: Task,
+  task: TaskHistory,
   index: number,
-  allTasks: Task[]
+  allTasks: TaskHistory[]
 ): boolean {
   const currentAction = getActionFromTask(task)
   if (currentAction === TaskAction.CORRECTED) {

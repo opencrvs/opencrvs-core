@@ -72,7 +72,9 @@ export async function getUser(
 
   if (!res.ok) {
     throw new Error(
-      `Unable to retrieve user mobile number. Error: ${res.status} status received`
+      `Unable to retrieve user mobile number. Error: ${
+        res.status
+      } status received. ${await res.text()}`
     )
   }
 

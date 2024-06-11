@@ -74,8 +74,21 @@ if [ -z "${OPENCRVS_METABASE_MAP_REGION_NAME}" ]; then
   exit 1
 fi
 
+if [ -z "${OPENCRVS_METABASE_ADMIN_EMAIL}" ]; then
+  echo "Error: OPENCRVS_METABASE_ADMIN_EMAIL environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_ADMIN_PASSWORD}" ]; then
+  echo "Error: OPENCRVS_METABASE_ADMIN_PASSWORD environment variable is not defined"
+  exit 1
+fi
+
 export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
 export MB_DB_FILE=/data/metabase/metabase.mv.db
+export OPENCRVS_METABASE_ADMIN_PASSWORD_SALT=$(uuidgen)
+SALT_AND_PASSWORD=$OPENCRVS_METABASE_ADMIN_PASSWORD_SALT$OPENCRVS_METABASE_ADMIN_PASSWORD
+export OPENCRVS_METABASE_ADMIN_PASSWORD_HASH=$(java -cp $METABASE_JAR clojure.main -e "(require 'metabase.util.password) (println (metabase.util.password/hash-bcrypt \"$SALT_AND_PASSWORD\"))" 2>/dev/null | tail -n 1)
 
 source /initialize-database.sh
 source /update-database.sh
