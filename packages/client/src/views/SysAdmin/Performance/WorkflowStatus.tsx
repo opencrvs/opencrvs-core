@@ -157,6 +157,10 @@ export const StatusMapping: IStatusMapping = {
   ISSUED: {
     labelDescriptor: statusMessages.issued,
     color: colors.blue
+  },
+  CORRECTION_REQUESTED: {
+    labelDescriptor: statusMessages.requestedCorrection, 
+    color: colors.blue
   }
 }
 
@@ -529,7 +533,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             (eventProgress.registration &&
               eventProgress.registration.status &&
               intl.formatMessage(
-                StatusMapping[eventProgress.registration.status].labelDescriptor
+                StatusMapping[eventProgress.registration.status]?.labelDescriptor
               )) ||
             ''
 
