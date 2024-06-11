@@ -379,13 +379,26 @@ function joinFromResourcesIdToResourceIdentifier(
         }
       }
     },
+    /*
+     * If resourceIds is empty, $lookup considers it being a subset of everything and joins the entire `from` collection.
+     * To workaround, set the array to be not-empty to not join anything.
+     */
+    {
+      $addFields: {
+        resourceIds: {
+          $cond: {
+            if: { $eq: ['$resourceIds', []] },
+            then: ['_EMPTY_'],
+            else: '$resourceIds'
+          }
+        }
+      }
+    },
     {
       $lookup: {
         from: collectionToJoin,
-        let: { resourceIds: '$resourceIds' },
-        pipeline: [
-          { $match: { $expr: { $in: [`$${foreignField}`, '$$resourceIds'] } } }
-        ],
+        localField: `resourceIds`,
+        foreignField,
         as: 'joinResult'
       }
     },
