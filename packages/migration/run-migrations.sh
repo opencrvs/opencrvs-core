@@ -16,6 +16,8 @@ PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+export NODE_OPTIONS=--dns-result-order=ipv4first
+
 # hearth migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
