@@ -29,29 +29,23 @@ import {
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
-import { countries } from '@client/utils/countries'
 import { cloneDeep } from 'lodash'
 import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  getPDFTemplateWithSVG,
-  addFontsToSvg,
-  printCertificate
-} from './PDFUtils'
+import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
   isCertificateForPrintInAdvance,
   getRegisteredDate,
   getEventDate,
-  isFreeOfCost,
-  calculatePrice,
-  getCountryTranslations
+  calculatePrice
 } from './utils'
 import { Event } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { printPDF } from '@client/pdfRenderer'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -59,7 +53,7 @@ const withEnhancedTemplateVariables = (
   offlineData: IOfflineData
 ) => {
   if (!declaration) {
-    return declaration
+    return
   }
 
   const registeredDate = getRegisteredDate(declaration.data)
@@ -125,27 +119,36 @@ export const usePrintableCertificate = (declarationId: string) => {
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const intl = useIntl()
   const dispatch = useDispatch()
-  const languages = useSelector((store: IStoreState) =>
-    getCountryTranslations(store.i18n.languages, countries)
-  )
   const scope = useSelector(getScope)
   const canUserEditRecord =
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
   useEffect(() => {
-    if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, state).then((svg) => {
-        const svgWithFonts = addFontsToSvg(
-          svg.svgCode,
-          offlineData.templates.fonts ?? {}
-        )
-        setSvg(svgWithFonts)
-      })
+    const certificateTemplate =
+      declaration &&
+      offlineData.templates.certificates?.[declaration.event].definition
+    if (certificateTemplate)
+      compileSvg(certificateTemplate, declaration.data.template, state).then(
+        (svg) => {
+          const svgWithFonts = addFontsToSvg(
+            svg,
+            offlineData.templates.fonts ?? {}
+          )
+          setSvg(svgWithFonts)
+        }
+      )
   }, [offlineData, declaration, state])
 
-  const handleCertify = () => {
-    const draft = cloneDeep(declaration) as IPrintableDeclaration
+  const handleCertify = async () => {
+    if (
+      !declaration ||
+      !offlineData.templates.certificates?.[declaration.event].definition ||
+      !userDetails
+    ) {
+      return
+    }
+    const draft = cloneDeep(declaration)
 
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = isPrintInAdvance
@@ -156,28 +159,25 @@ export const usePrintableCertificate = (declarationId: string) => {
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
     if (!isPrintInAdvance) {
-      if (isFreeOfCost(draft.event, eventDate, registeredDate, offlineData)) {
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: 0,
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          offlineData
-        )
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: Number(paymentAmount),
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        offlineData
+      )
+      certificate.payments = {
+        type: 'MANUAL' as const,
+        amount: Number(paymentAmount),
+        outcome: 'COMPLETED' as const,
+        date: new Date().toISOString()
       }
     }
+
+    const svg = await compileSvg(
+      offlineData.templates.certificates[draft.event].definition,
+      { ...draft.data.template, print: true },
+      state
+    )
 
     draft.data.registration = {
       ...draft.data.registration,
@@ -189,7 +189,9 @@ export const usePrintableCertificate = (declarationId: string) => {
       ]
     }
 
-    printCertificate(intl, draft, userDetails, offlineData, state, languages)
+    const pdfTemplate = svgToPdfTemplate(svg, offlineData)
+
+    printPDF(pdfTemplate, draft, userDetails, offlineData, intl)
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))

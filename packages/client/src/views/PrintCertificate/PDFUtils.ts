@@ -254,6 +254,62 @@ export async function printCertificate(
   )
 }
 
+export async function compileSvg(
+  svgTemplate: string,
+  templateValues: Record<string, unknown>,
+  state: IStoreState
+) {
+  const resolvedSignatures = await Promise.all(
+    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
+      signatureKey: k,
+      url: templateValues[k]
+    }))
+      .filter(({ url }) => Boolean(url))
+      .map(({ signatureKey, url }) =>
+        fetchImageAsBase64(url as string).then((value) => ({
+          [signatureKey]: value
+        }))
+      )
+  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
+  templateValues = {
+    ...templateValues,
+    ...resolvedSignatures
+  }
+  return executeHandlebarsTemplate(svgTemplate, templateValues, state)
+}
+
+export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
+  const pdfTemplate: IPDFTemplate = {
+    ...certificateBaseTemplate,
+    fonts: {
+      ...certificateBaseTemplate.fonts,
+      ...offlineResource.templates.fonts
+    }
+  }
+
+  const parser = new DOMParser()
+  const svgElement = parser.parseFromString(
+    svg,
+    'image/svg+xml'
+  ).documentElement
+
+  const widthValue = svgElement.getAttribute('width')
+  const heightValue = svgElement.getAttribute('height')
+
+  if (widthValue && heightValue) {
+    const width = Number.parseInt(widthValue)
+    const height = Number.parseInt(heightValue)
+    if (width > height) {
+      pdfTemplate.definition.pageOrientation = 'landscape'
+    }
+  }
+
+  pdfTemplate.definition.content = {
+    svg
+  }
+  return pdfTemplate
+}
+
 export async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
