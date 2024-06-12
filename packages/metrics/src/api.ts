@@ -17,6 +17,7 @@ import {
   USER_MANAGEMENT_URL,
   DOCUMENTS_URL
 } from '@metrics/constants'
+import { logger } from './logger'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -224,7 +225,7 @@ export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
     const res = await result.json()
     return res.refUrl
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     return err
   }
 }
