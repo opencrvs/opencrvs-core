@@ -47,6 +47,7 @@
 - Introduce two new properties to the form field `DOCUMENT_UPLOADER_WITH_OPTION`
   - `compressImagesToSizeMB` : An optional prop of number type to define a compressed size. Compression is ignored when the input file is already smaller or equal of the given value or a falsy given value.
   - `maxSizeMB`: An optional validation prop to prevent input of a file bigger than a defined value.
+- Metabase default credentials now must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start [#6578](https://github.com/opencrvs/opencrvs-core/issues/6578)
 
 ## Bug fixes
 
@@ -72,6 +73,7 @@
 - Fix client modal glitches on integrations page [#7002] (https://github.com/opencrvs/opencrvs-core/issues/7002)
 - Fix 'Place of Certification' is showing wrong in certificate [#7060] (https://github.com/opencrvs/opencrvs-core/issues/7060)
 - Fix Check for valid date to handle incomplete marriage declarations [#7017](https://github.com/opencrvs/opencrvs-core/issues/7017)
+- Fix session expiration when user tries to change phone number [#7003](https://github.com/opencrvs/opencrvs-core/pull/7025)
 - Fix French translation missing for relationship to informant when trying to correct record, print and issue record [#6341] (https://github.com/opencrvs/opencrvs-core/issues/6341)
 - Fix print record page for an unsaved declaration [#6893](https://github.com/opencrvs/opencrvs-core/issues/6893)
 - Fix Reset pagination to default page (1) when location changes in UserList [#6481](https://github.com/opencrvs/opencrvs-core/issues/6481)
