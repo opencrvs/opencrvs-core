@@ -986,6 +986,28 @@ export const aggregateRecords = ({
       }
     },
     {
+      $set: {
+        joinResult: {
+          $map: {
+            input: '$joinResult',
+            as: 'item',
+            in: {
+              $mergeObjects: [
+                '$$item',
+                {
+                  partOf: {
+                    reference: {
+                      $concat: ['Location/', '$$item.partOf.reference']
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
       $addFields: {
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
