@@ -13,12 +13,10 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event } from '@client/utils/gateway'
-import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
-  formMessages,
-  userMessages
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
@@ -66,14 +64,6 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
-
-type IDispatchProps = {
-  goToSearchResult: typeof goToSearchResult
-}
-
-interface IBasePrintTabProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -178,12 +168,13 @@ const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
   INFORMANT: formMessages.contactDetailsInformant,
-  OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
+  OTHER: formMessages.otherFamilyMember,
   LEGAL_GUARDIAN: formMessages.legalGuardian,
   GRANDMOTHER: formMessages.grandmother,
   GRANDFATHER: formMessages.grandfather,
   BROTHER: formMessages.brother,
-  SISTER: formMessages.sister
+  SISTER: formMessages.sister,
+  SPOUSE: formMessages.spouse
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
