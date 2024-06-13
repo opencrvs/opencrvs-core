@@ -128,7 +128,7 @@ type RecordStateChangeRouteHandler<
   action: A
   method: string
   path: string
-  includeHistoryResources?: boolean
+  includeHistoryResources: boolean
   handler: (
     request: Request,
     record: StateIdenfitiers[T[number]]

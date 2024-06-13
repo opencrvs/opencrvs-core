@@ -12,7 +12,7 @@ type EventSearchResultSet {
 }
 
 type AssignmentData {
-  userId: String
+  practitionerId: String
   firstName: String
   lastName: String
   officeName: String

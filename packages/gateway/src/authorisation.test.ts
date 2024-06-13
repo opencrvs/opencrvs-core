@@ -33,7 +33,8 @@ describe('checkUserAssignment()', () => {
     Authorization: `Bearer ${registerCertifyToken}`
   }
   it('should return true if user is assigned on task', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ userId: '121221' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'same-uuid' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'same-uuid' }))
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
       authHeaderRegCert
@@ -42,7 +43,8 @@ describe('checkUserAssignment()', () => {
   })
 
   it('should return false if user is not assigned on task', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ userId: '123456' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'same-uuid' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'different-uuid' }))
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
       authHeaderRegCert
@@ -51,7 +53,8 @@ describe('checkUserAssignment()', () => {
   })
 
   it('should return false if authHeader has no Authorization', async () => {
-    fetch.mockResponse(JSON.stringify({ userId: '121221' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'same-uuid' }))
+    fetch.mockResponseOnce(JSON.stringify({ practitionerId: 'same-uuid' }))
     //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(

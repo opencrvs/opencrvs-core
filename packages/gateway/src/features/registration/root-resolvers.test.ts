@@ -115,12 +115,6 @@ const mockUserDetails = {
   status: 'active',
   practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  catchmentAreaIds: [
-    'b21ce04e-7ccd-4d65-929f-453bc193a736',
-    '95754572-ab6f-407b-b51a-1636cb3d0683',
-    '7719942b-16a7-474a-8af1-cd0c94c730d2',
-    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-  ],
   creationDate: 1559054406433
 }
 
@@ -374,12 +368,6 @@ describe('Registration root resolvers', () => {
                   }
                 },
                 {
-                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                  valueReference: {
-                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
-                  }
-                },
-                {
                   url: 'http://opencrvs.org/specs/extension/regLastOffice',
                   valueReference: {
                     reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
@@ -481,12 +469,6 @@ describe('Registration root resolvers', () => {
                   valueReference: {
                     reference:
                       'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
-                  }
-                },
-                {
-                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                  valueReference: {
-                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
                   }
                 },
                 {
@@ -592,12 +574,6 @@ describe('Registration root resolvers', () => {
                   valueReference: {
                     reference:
                       'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
-                  }
-                },
-                {
-                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                  valueReference: {
-                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
                   }
                 },
                 {
@@ -756,10 +732,10 @@ describe('Registration root resolvers', () => {
   })
   describe('markEventAsVoided()', () => {
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
@@ -775,10 +751,10 @@ describe('Registration root resolvers', () => {
 
   describe('markEventAsArchived()', () => {
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation!.markEventAsArchived(
@@ -792,10 +768,10 @@ describe('Registration root resolvers', () => {
 
   describe('markEventAsReinstated()', () => {
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation!.markEventAsReinstated(
@@ -878,7 +854,8 @@ describe('Registration root resolvers', () => {
         }
       }
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -914,7 +891,8 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -965,13 +943,6 @@ describe('Registration root resolvers', () => {
                       valueReference: {
                         reference:
                           'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                      }
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
                       }
                     },
                     {
@@ -1040,10 +1011,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation!.markBirthAsValidated(
@@ -1162,7 +1133,8 @@ describe('Registration root resolvers', () => {
         _fhirIDMap: { composition: 'd7e273e7-e4d3-4342-905e-f3514fa2c10a' }
       }
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1244,7 +1216,8 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify({ userId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1287,13 +1260,6 @@ describe('Registration root resolvers', () => {
                       valueReference: {
                         reference:
                           'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                      }
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
                       }
                     },
                     {
@@ -1362,10 +1328,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation!.markDeathAsValidated(
@@ -1381,6 +1347,7 @@ describe('Registration root resolvers', () => {
     it('throws error if has no assigned user id', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockTaskBundle), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify({}), { status: 200 }]
       )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
@@ -1395,10 +1362,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation!.markBirthAsRegistered(
@@ -1411,10 +1378,10 @@ describe('Registration root resolvers', () => {
   })
   describe('markDeathAsRegistered', () => {
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userId: '121221' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation!.markDeathAsRegistered(
@@ -1629,7 +1596,8 @@ describe('Registration root resolvers', () => {
   })
   describe('markEventAsNotDuplicate()', () => {
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ userId: '121221' }))
+      fetch.mockResponseOnce(JSON.stringify({ practitionerId: '121221' }))
+      fetch.mockResponseOnce(JSON.stringify({ practitionerId: '121221' }))
 
       await expect(
         resolvers.Mutation!.markEventAsNotDuplicate(

@@ -26,7 +26,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           trackingId
         }
         assignment {
-          userId
+          practitionerId
           firstName
           lastName
           officeName

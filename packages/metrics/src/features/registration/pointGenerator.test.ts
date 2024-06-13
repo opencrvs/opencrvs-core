@@ -120,6 +120,7 @@ describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/308c35b4-04f8-4664-83f5-9790e790cde1')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -147,7 +148,7 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('Only populates level5 and office location data if rest of the tree is missing', async () => {
+  it('Only populates office location if rest of the tree is missing', async () => {
     const payload = cloneDeep(testPayload)
 
     // @ts-ignore
@@ -176,8 +177,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
-        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
@@ -189,6 +189,7 @@ describe('Verify point generation', () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/308c35b4-04f8-4664-83f5-9790e790cde1')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce(null)
     const point = await generateBirthRegPoint(
@@ -229,6 +230,7 @@ describe('Verify point generation', () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -280,8 +282,7 @@ describe('Verify point generation', () => {
       tags: {
         paymentType: 'certification',
         eventType: 'DEATH',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
@@ -307,6 +308,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for field agent', async () => {
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -335,6 +337,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for registration agent', async () => {
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -363,6 +366,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for registrar', async () => {
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -388,6 +392,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for field agent', async () => {
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -420,6 +425,7 @@ describe('Verify point generation', () => {
     payload.entry[0].resource.type?.coding[0].code = 'birth-notification'
 
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
@@ -451,6 +457,7 @@ describe('Verify point generation', () => {
 
     fetchTaskHistory.mockResolvedValueOnce(taskHistory)
     fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8')
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
