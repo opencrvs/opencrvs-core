@@ -164,6 +164,11 @@ const messagesToDefine = {
     description: 'Label for declaration status waiting for connection',
     id: 'regHome.outbox.waitingToRetry'
   },
+  failed: {
+    defaultMessage: 'Retrying',
+    description: 'Label for declaration status failed',
+    id: 'regHome.outbox.failed'
+  },
   downloadDeclarationFailed: {
     defaultMessage: 'Failed to download declaration. Please try again',
     description: 'Label for declaration downloading failed',

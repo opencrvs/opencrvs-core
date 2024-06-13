@@ -78,7 +78,8 @@ const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_ISSUE]: messages.statusWaitingToIssue,
   [SUBMISSION_STATUS.CERTIFYING]: messages.statusCertifying,
   [SUBMISSION_STATUS.ISSUING]: messages.statusIssuing,
-  [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry
+  [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry,
+  [SUBMISSION_STATUS.FAILED]: messages.failed
 } as const
 
 const statusInprogressIconIdMap = {
