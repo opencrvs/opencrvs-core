@@ -64,16 +64,6 @@ export async function fetchLocationsByType(
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
-export async function fetchParentLocationByLocationID(
-  locationID: string,
-  authHeader: IAuthHeader
-) {
-  const location = await fetchFHIR(locationID, authHeader)
-  return (location && location.partOf && location.partOf.reference) as
-    | string
-    | undefined
-}
-
 export async function fetchTaskIdByCompositionID(
   compositionId: string,
   authHeader: IAuthHeader

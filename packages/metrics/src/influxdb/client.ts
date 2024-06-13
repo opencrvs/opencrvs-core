@@ -28,15 +28,7 @@ export const influx = new Influx.InfluxDB({
       fields: {
         compositionId: Influx.FieldType.STRING
       },
-      tags: [
-        'eventType',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
-      ]
+      tags: ['eventType', 'officeLocation']
     },
     {
       measurement: 'birth_registration',
@@ -54,12 +46,7 @@ export const influx = new Influx.InfluxDB({
         'registrarPractitionerId',
         'practitionerRole',
         'eventLocationType',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
+        'officeLocation'
       ]
     },
     {
@@ -81,12 +68,7 @@ export const influx = new Influx.InfluxDB({
         'eventLocationType',
         'mannerOfDeath',
         'causeOfDeath',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
+        'officeLocation'
       ]
     },
     {
@@ -100,11 +82,7 @@ export const influx = new Influx.InfluxDB({
         'missingFieldGroupId',
         'missingFieldId',
         'eventType',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
+        'officeLocation'
       ]
     },
     {
@@ -118,12 +96,7 @@ export const influx = new Influx.InfluxDB({
         'trackingId',
         'eventType',
         'practitionerId',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
+        'officeLocation'
       ]
     },
     {
@@ -141,16 +114,7 @@ export const influx = new Influx.InfluxDB({
       fields: {
         compositionId: Influx.FieldType.STRING
       },
-      tags: [
-        'eventType',
-        'reason',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
-      ]
+      tags: ['eventType', 'reason', 'officeLocation']
     },
     {
       measurement: 'payment',
@@ -158,16 +122,7 @@ export const influx = new Influx.InfluxDB({
         total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
-      tags: [
-        'eventType',
-        'paymentType',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
-      ]
+      tags: ['eventType', 'paymentType', 'officeLocation']
     },
     {
       measurement: 'declarations_started',
@@ -176,32 +131,14 @@ export const influx = new Influx.InfluxDB({
         status: Influx.FieldType.STRING,
         compositionId: Influx.FieldType.STRING
       },
-      tags: [
-        'eventType',
-        'practitionerId',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
-      ]
+      tags: ['eventType', 'practitionerId', 'officeLocation']
     },
     {
       measurement: 'declarations_rejected',
       fields: {
         compositionId: Influx.FieldType.STRING
       },
-      tags: [
-        'eventType',
-        'startedBy',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
-      ]
+      tags: ['eventType', 'startedBy', 'officeLocation']
     },
     {
       measurement: 'search_requests',
@@ -232,12 +169,7 @@ export const influx = new Influx.InfluxDB({
         'dateLabel',
         'registrarPractitionerId',
         'practitionerRole',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2',
-        'locationLevel1'
+        'officeLocation'
       ]
     }
   ]
