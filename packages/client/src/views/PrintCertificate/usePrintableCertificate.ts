@@ -31,7 +31,6 @@ import {
 } from '@client/utils/authUtils'
 import { cloneDeep } from 'lodash'
 import { useState, useEffect } from 'react'
-import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
@@ -117,7 +116,6 @@ export const usePrintableCertificate = (declarationId: string) => {
   const state = useSelector((store: IStoreState) => store)
   const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
-  const intl = useIntl()
   const dispatch = useDispatch()
   const scope = useSelector(getScope)
   const canUserEditRecord =
@@ -143,8 +141,7 @@ export const usePrintableCertificate = (declarationId: string) => {
   const handleCertify = async () => {
     if (
       !declaration ||
-      !offlineData.templates.certificates?.[declaration.event].definition ||
-      !userDetails
+      !offlineData.templates.certificates?.[declaration.event].definition
     ) {
       return
     }
@@ -191,7 +188,7 @@ export const usePrintableCertificate = (declarationId: string) => {
 
     const pdfTemplate = svgToPdfTemplate(svg, offlineData)
 
-    printPDF(pdfTemplate, draft, userDetails, offlineData, intl)
+    printPDF(pdfTemplate, draft.id)
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))

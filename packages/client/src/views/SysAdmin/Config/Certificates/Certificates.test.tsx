@@ -158,7 +158,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('Testing sub menu item on config page', () => {
-    let printCertificateSpy: SpyInstance
+    let printPdfSpy: SpyInstance
     let downloadFileSpy: SpyInstance
     let updateCertificateMutationSpy: SpyInstance
     beforeEach(() => {
@@ -168,7 +168,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
           blob: () => new Blob(['data'])
         } as any)
       )
-      printCertificateSpy = vi.spyOn(PDFUtils, 'printCertificate')
+      printPdfSpy = vi.spyOn(pdfRender, 'printPDF')
       downloadFileSpy = vi.spyOn(PDFUtils, 'downloadFile')
       updateCertificateMutationSpy = vi.spyOn(
         certificateTemplateMutations,
@@ -177,12 +177,12 @@ describe('ConfigHome page when already has uploaded certificate template', async
     })
     afterAll(() => {
       fetch.resetMocks()
-      printCertificateSpy.mockRestore()
+      printPdfSpy.mockRestore()
       downloadFileSpy.mockRestore()
     })
 
     afterEach(() => {
-      printCertificateSpy.mockClear()
+      printPdfSpy.mockClear()
       downloadFileSpy.mockClear()
     })
     it('should show upload modal when clicked on upload', async () => {
@@ -259,7 +259,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
         setTimeout(resolve, 200)
       })
 
-      expect(printCertificateSpy).toBeCalledTimes(1)
+      expect(printPdfSpy).toBeCalledTimes(1)
     })
 
     it('should download preview certificate', async () => {

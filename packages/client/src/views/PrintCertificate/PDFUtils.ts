@@ -19,7 +19,7 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import { IPDFTemplate } from '@client/pdfRenderer'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'

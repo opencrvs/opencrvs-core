@@ -38,10 +38,7 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Event } from '@client/utils/gateway'
 import { IAttachmentValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import {
-  getDummyCertificateTemplateData,
-  getDummyDeclarationData
-} from './previewDummyData'
+import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   executeHandlebarsTemplate,
@@ -57,7 +54,6 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
-import { IDeclaration } from '@client/declarations'
 import {
   ApplyButton,
   Field
@@ -215,16 +211,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           if (!this.props.userDetails) return
           const svg = await compiledSvgPromise
           const pdfTemplate = svgToPdfTemplate(svg, this.props.offlineResources)
-          printPDF(
-            pdfTemplate,
-            {
-              data: getDummyDeclarationData(event, this.props.registerForm),
-              event
-            } as IDeclaration,
-            this.props.userDetails,
-            this.props.offlineResources,
-            intl
-          )
+          printPDF(pdfTemplate, 'dummy-declaration')
         }
       },
       {
