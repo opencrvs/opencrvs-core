@@ -16,7 +16,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   getTotalCertifications,
-  getTotalCertificationsWithLocation
+  getTotalCertificationsByLocation
 } from '@metrics/features/certifications/service'
 
 export async function totalCertificationsHandler(
@@ -30,7 +30,7 @@ export async function totalCertificationsHandler(
     : undefined
 
   if (locationId) {
-    return getTotalCertificationsWithLocation(timeStart, timeEnd, locationId)
+    return getTotalCertificationsByLocation(timeStart, timeEnd, locationId)
   } else {
     return getTotalCertifications(timeStart, timeEnd)
   }

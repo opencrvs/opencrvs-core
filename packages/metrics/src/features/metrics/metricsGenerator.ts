@@ -956,7 +956,7 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
   }
 }
 
-export async function fetchEventsGroupByMonthDatesWithLocation(
+export async function fetchEventsGroupByMonthDatesByLocation(
   timeFrom: string,
   timeTo: string,
   locationId: ResourceIdentifier<FhirLocation>,
@@ -1018,7 +1018,7 @@ export async function fetchEventsGroupByMonthDates(
   return registrationsInTargetDaysPoints
 }
 
-export async function getTotalMetricsWithLocation(
+export async function getTotalMetricsByLocation(
   timeFrom: string,
   timeTo: string,
   locationId: ResourceIdentifier<FhirLocation>,
@@ -1104,7 +1104,7 @@ export async function getTotalMetrics(
   }
 }
 
-export async function fetchRegistrationsGroupByOfficeLocationWithLocation(
+export async function fetchRegistrationsGroupByOfficeLocationByLocation(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,

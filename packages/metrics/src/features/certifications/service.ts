@@ -14,7 +14,7 @@ import { query } from '@metrics/influxdb/client'
 import { helpers } from '@metrics/utils/queryHelper'
 import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 
-export async function getTotalCertificationsWithLocation(
+export async function getTotalCertificationsByLocation(
   timeFrom: string,
   timeTo: string,
   locationId: ResourceIdentifier<Location>

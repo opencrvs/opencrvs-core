@@ -19,10 +19,10 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   fetchRegistrationsGroupByOfficeLocation,
-  fetchRegistrationsGroupByOfficeLocationWithLocation,
+  fetchRegistrationsGroupByOfficeLocationByLocation,
   fetchRegistrationsGroupByTime,
   getTotalMetrics,
-  getTotalMetricsWithLocation
+  getTotalMetricsByLocation
 } from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
 import { format } from 'date-fns'
@@ -50,7 +50,7 @@ export async function totalMetricsHandler(
   }
 
   if (locationId) {
-    return await getTotalMetricsWithLocation(
+    return await getTotalMetricsByLocation(
       timeStart,
       timeEnd,
       locationId,
@@ -81,7 +81,7 @@ export async function totalMetricsByRegistrar(
   }
 
   const totalRegistrations = locationId
-    ? await getTotalMetricsWithLocation(
+    ? await getTotalMetricsByLocation(
         timeStart,
         timeEnd,
         locationId,
@@ -145,7 +145,7 @@ export async function totalMetricsByLocation(
   const size = request.query[SIZE]
 
   const results = locationId
-    ? await fetchRegistrationsGroupByOfficeLocationWithLocation(
+    ? await fetchRegistrationsGroupByOfficeLocationByLocation(
         timeStart,
         timeEnd,
         event,

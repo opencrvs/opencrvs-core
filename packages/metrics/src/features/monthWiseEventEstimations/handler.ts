@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import {
   fetchEventsGroupByMonthDates,
-  fetchEventsGroupByMonthDatesWithLocation
+  fetchEventsGroupByMonthDatesByLocation
 } from '@metrics/features/metrics/metricsGenerator'
 import {
   getMonthRangeFilterListFromTimeRage,
@@ -55,7 +55,7 @@ export async function monthWiseEventEstimationsHandler(
     timeEnd
   )
   const registrationsGroupByMonthDates = locationId
-    ? await fetchEventsGroupByMonthDatesWithLocation(
+    ? await fetchEventsGroupByMonthDatesByLocation(
         timeStart,
         timeEnd,
         locationId,

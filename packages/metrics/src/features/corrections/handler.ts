@@ -17,7 +17,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   getTotalCorrections,
-  getTotalCorrectionsWithLocation
+  getTotalCorrectionsByLocation
 } from '@metrics/features/corrections/service'
 
 export async function totalCorrectionsHandler(
@@ -32,12 +32,7 @@ export async function totalCorrectionsHandler(
   const event = request.query[EVENT]
 
   if (locationId) {
-    return getTotalCorrectionsWithLocation(
-      timeStart,
-      timeEnd,
-      locationId,
-      event
-    )
+    return getTotalCorrectionsByLocation(timeStart, timeEnd, locationId, event)
   } else {
     return getTotalCorrections(timeStart, timeEnd, event)
   }

@@ -42,7 +42,7 @@ export async function getTotalCorrections(
   return totalCorrections
 }
 
-export async function getTotalCorrectionsWithLocation(
+export async function getTotalCorrectionsByLocation(
   timeFrom: string,
   timeTo: string,
   locationId: ResourceIdentifier<Location>,

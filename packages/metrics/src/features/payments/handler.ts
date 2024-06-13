@@ -17,7 +17,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   getTotalPayments,
-  getTotalPaymentsWithLocation
+  getTotalPaymentsByLocation
 } from '@metrics/features/payments/service'
 
 export async function totalPaymentsHandler(
@@ -32,7 +32,7 @@ export async function totalPaymentsHandler(
   const event = request.query[EVENT]
 
   if (locationId) {
-    return getTotalPaymentsWithLocation(timeStart, timeEnd, locationId, event)
+    return getTotalPaymentsByLocation(timeStart, timeEnd, locationId, event)
   } else {
     return getTotalPayments(timeStart, timeEnd, event)
   }

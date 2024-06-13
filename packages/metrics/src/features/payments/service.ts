@@ -41,7 +41,7 @@ export async function getTotalPayments(
   return totalMetrics
 }
 
-export async function getTotalPaymentsWithLocation(
+export async function getTotalPaymentsByLocation(
   timeFrom: string,
   timeTo: string,
   locationId: ResourceIdentifier<Location>,
