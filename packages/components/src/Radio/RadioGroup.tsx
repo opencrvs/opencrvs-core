@@ -118,7 +118,6 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={props.onChange}
-                hasFlexDirection={flexDirection ? true : false}
               />
               {nestedFields &&
                 value === option.value &&
@@ -150,7 +149,6 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={props.onChange}
-                hasFlexDirection={flexDirection ? true : false}
               />
             </div>
           )

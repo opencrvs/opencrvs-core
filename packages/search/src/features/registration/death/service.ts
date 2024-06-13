@@ -13,15 +13,14 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
+  composeOperationHistories,
   createStatusHistory,
   EVENT,
-  getCreatedBy,
-  getStatus,
-  ICompositionBody,
-  IDeathCompositionBody,
+  DeathDocument,
   IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  composeAssignment
 } from '@search/elasticsearch/utils'
 import {
   addEventLocation,
@@ -30,23 +29,22 @@ import {
   findNameLocale,
   findTaskExtension,
   findTaskIdentifier,
-  getdeclarationJurisdictionIds,
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
 import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
   SavedBundle,
   SavedRelatedPerson,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  findFirstTaskHistory
 } from '@opencrvs/commons/types'
+import { findAssignment } from '@opencrvs/commons/assignment'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -55,32 +53,22 @@ const FATHER_CODE = 'father-details'
 const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 
-export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as ValidRecord
-  const authHeader = requestBundle.headers.authorization
-
+export const composeDocument = (
+  bundle: SavedBundle,
+  existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
+) => {
+  const task = getTaskFromSavedBundle(bundle)
   const composition = getComposition(bundle)
 
-  await indexDeclaration(composition, authHeader, bundle)
-}
-
-async function indexDeclaration(
-  composition: SavedComposition,
-  authHeader: string,
-  bundle: SavedBundle
-) {
-  const compositionId = composition.id
-  const result = await searchByCompositionId(compositionId, client)
-  const task = getTaskFromSavedBundle(bundle)
-
-  const body: ICompositionBody = {
+  const body: DeathDocument = {
+    compositionId: composition.id,
     event: EVENT.DEATH,
     createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
+      (existingDocument &&
+        existingDocument.body.hits.hits.length > 0 &&
+        existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+    operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
 
   body.type =
@@ -98,30 +86,41 @@ async function indexDeclaration(
     body.rejectComment = nodeText
   }
 
-  await createIndexBody(body, composition, authHeader, bundle)
+  createIndexBody(body, composition, bundle)
   updateCompositionBodyWithDuplicateIds(composition, body)
+  return body
+}
+
+export async function indexRecord(record: SavedBundle) {
+  const composition = getComposition(record)
+  const compositionId = composition.id
+  const result = await searchByCompositionId(compositionId, client)
+  const body = composeDocument(record, result)
   await indexComposition(compositionId, body, client)
 }
 
-async function createIndexBody(
-  body: IDeathCompositionBody,
+function createIndexBody(
+  body: DeathDocument,
   composition: SavedComposition,
-  authHeader: string,
   bundle: SavedBundle
 ) {
-  await createDeceasedIndex(body, composition, bundle)
-  await addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
+  createDeceasedIndex(body, composition, bundle)
+  addEventLocation(bundle, body, DEATH_ENCOUNTER_CODE)
   createFatherIndex(body, composition, bundle)
   createMotherIndex(body, composition, bundle)
   createSpouseIndex(body, composition, bundle)
   createInformantIndex(body, composition, bundle)
-  await createDeclarationIndex(body, composition, bundle)
+  createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
-  await createStatusHistory(body, task, authHeader, bundle)
+  createStatusHistory(body, task)
+
+  const assignment = findAssignment(bundle)
+  body.assignment =
+    assignment && composeAssignment(assignment.office, assignment.practitioner)
 }
 
-async function createDeceasedIndex(
-  body: IDeathCompositionBody,
+function createDeceasedIndex(
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -150,7 +149,7 @@ async function createDeceasedIndex(
 }
 
 function createMotherIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -174,7 +173,7 @@ function createMotherIndex(
 }
 
 function createFatherIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -198,7 +197,7 @@ function createFatherIndex(
 }
 
 function createSpouseIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -222,7 +221,7 @@ function createSpouseIndex(
 }
 
 function createInformantIndex(
-  body: IDeathCompositionBody,
+  body: DeathDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -263,8 +262,8 @@ function createInformantIndex(
     informant.identifier && getSubmittedIdentifier(informant.identifier)
 }
 
-async function createDeclarationIndex(
-  body: IDeathCompositionBody,
+function createDeclarationIndex(
+  body: DeathDocument,
   composition: fhir.Composition,
   bundle: SavedBundle
 ) {
@@ -337,15 +336,24 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationJurisdictionIds = await getdeclarationJurisdictionIds(
-    body.declarationLocationId
-  )
+  body.declarationJurisdictionIds = body.declarationLocationId
+    ? [body.declarationLocationId]
+    : []
 
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'death-declaration'
 
-  const createdBy = await getCreatedBy(composition.id as string)
+  const firstTaskHistory = findFirstTaskHistory(bundle)
+  const firstRegLastUserExtension =
+    firstTaskHistory &&
+    findTaskExtension(
+      firstTaskHistory,
+      'http://opencrvs.org/specs/extension/regLastUser'
+    )
+  const firstRegLastUser =
+    firstRegLastUserExtension &&
+    resourceIdentifierToUUID(firstRegLastUserExtension.valueReference.reference)
 
-  body.createdBy = createdBy || regLastUser
+  body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
 }

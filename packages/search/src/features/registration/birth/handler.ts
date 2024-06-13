@@ -8,17 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { upsertEvent } from '@search/features/registration/birth/service'
+import { indexRecord } from '@search/features/registration/birth/service'
 import { logger } from '@opencrvs/commons'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { ValidRecord } from '@opencrvs/commons/types'
 
 export async function birthEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const record = request.payload as ValidRecord
   try {
-    await upsertEvent(request)
+    await indexRecord(record)
   } catch (error) {
     logger.error(`Search/birthEventHandler: error: ${error}`)
     return internal(error)

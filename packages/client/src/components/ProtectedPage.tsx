@@ -26,12 +26,11 @@ import {
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
-import styled, { keyframes } from 'styled-components'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
+import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -54,28 +53,6 @@ interface IProtectPageState {
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
 
-const SpinnerBackground = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
-  min-height: 100vh;
-`
-
-const spinnerAppearAnimation = keyframes`
-  85% { opacity: 0; }
-  100% {  opacity: 1; }
-`
-
-const StyledSpinner = styled(Spinner)`
-  opacity: 0;
-  position: absolute;
-  margin-left: -24px;
-  margin-top: -24px;
-  top: calc(50% - 20px);
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  /** Show spinner after 2 seconds */
-  animation: ${spinnerAppearAnimation} 2s forwards;
-`
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
     super(props)
@@ -93,6 +70,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   async componentDidMount() {
+    const mountedOn = Date.now()
     const newState = { ...this.state }
 
     if (await storage.getItem(SCREEN_LOCK)) {
@@ -113,7 +91,15 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     }
 
     newState.loading = false
-    this.setState(newState)
+    const timeSinceMount = Date.now() - mountedOn
+    const progress = document.getElementById('progress')
+    if (progress != null) progress.style.width = '100%'
+    setTimeout(
+      () => {
+        this.setState(newState)
+      },
+      import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
+    )
 
     setInterval(async () => {
       if (!(await refreshToken())) this.props.redirectToAuthentication()
@@ -180,11 +166,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   renderLoadingScreen() {
-    return (
-      <SpinnerBackground>
-        <StyledSpinner id="pin_loading_spinner" />
-      </SpinnerBackground>
-    )
+    return <LoadingBar />
   }
 
   conditionalRenderUponSecuredState() {

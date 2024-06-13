@@ -16,7 +16,8 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
   authorizationToken: string,
   allowedStates: T,
-  includeHistoryResources = false
+  /** Includes TaskHistories in the bundle. Is always required when the bundle is being indexed by ElasticSearch as when searching for records, workqueue views use status histories */
+  includeHistoryResources: boolean
 ): Promise<StateIdenfitiers[T[number]]> {
   const url = new URL(
     `/records/${recordId}${
@@ -39,7 +40,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 export async function getValidRecordById(
   recordId: string,
   token: string,
-  includeHistoryResources = false
+  includeHistoryResources: boolean
 ) {
   return await getRecordById(
     recordId,

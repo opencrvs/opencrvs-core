@@ -17,11 +17,11 @@ import * as jwt from 'jsonwebtoken'
 import {
   getTaskFromSavedBundle,
   SavedTask,
+  TransactionResponse,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 function hasDeduplicateExtension(task: SavedTask) {
   return task.extension.find(

@@ -1688,7 +1688,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         if (event === Event.Birth || event === Event.Death) {
           return (
-            offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+            offlineCountryConfiguration.config.FEATURES
+              .INFORMANT_SIGNATURE_REQUIRED &&
             !declaration.data.registration?.informantsSignature
           )
         } else if (event === Event.Marriage) {
@@ -1713,18 +1714,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const textAreaProps = {
       id: 'additional_comments',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
           declaration
         )
       },
-      value:
-        (declaration.data.registration &&
-          declaration.data.registration.commentsOrNotes) ||
-        '',
-      ignoreMediaQuery: true
+      value: ((declaration.data.registration &&
+        declaration.data.registration.commentsOrNotes) ||
+        '') as string
     }
 
     const informantName = getDeclarationFullName(
@@ -1777,7 +1776,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'informants_signature',
           declaration.data.registration?.informantsSignature as string,
           intl.formatMessage(messages.informantsSignature),
-          window.config.INFORMANT_SIGNATURE_REQUIRED
+          window.config.FEATURES.INFORMANT_SIGNATURE_REQUIRED
         )
         return (
           <>
@@ -1843,6 +1842,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const options = this.prepSectionDocOptions(declaration)
+    const isUploadButtonVisible = Boolean(
+      documentsSection.groups[0].fields.filter((field) =>
+        this.isVisibleField(field, documentsSection)
+      ).length
+    )
+
     return (
       <Wrapper>
         <Row>
@@ -2001,10 +2006,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         required={false}
                       >
                         <TextArea
-                          {...{
-                            ...textAreaProps,
-                            disabled: viewRecord || isDuplicate
-                          }}
+                          {...textAreaProps}
+                          disabled={viewRecord || isDuplicate}
                         />
                       </InputField>
                     </Accordion>
@@ -2084,6 +2087,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )}
                     {viewRecord ||
                     isDuplicate ||
+                    !isUploadButtonVisible ||
                     declaration.registrationStatus ===
                       SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
                       <LinkButton

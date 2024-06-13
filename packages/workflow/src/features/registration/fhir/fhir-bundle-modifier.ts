@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
+
+import { UUID, logger } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -25,7 +26,6 @@ import {
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
-  EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
@@ -37,12 +37,7 @@ import {
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getMosipUINToken } from '@workflow/features/registration/utils'
-import {
-  getPractitionerOffice,
-  getPractitionerPrimaryLocation,
-  getPractitionerRef
-} from '@workflow/features/user/utils'
-import { logger } from '@opencrvs/commons'
+import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
@@ -66,25 +61,6 @@ export async function invokeRegistrationValidation(
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
   return bundle
-}
-
-export function setupRegistrationType(
-  taskResource: Task,
-  eventType: EVENT_TYPE
-): Task {
-  if (!taskResource.code || !taskResource.code.coding) {
-    taskResource.code = {
-      coding: [
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}types`,
-          code: eventType
-        }
-      ]
-    }
-  } else {
-    taskResource.code.coding[0].code = eventType
-  }
-  return taskResource
 }
 
 export async function setupRegistrationWorkflow(
@@ -120,48 +96,20 @@ export async function setupRegistrationWorkflow(
   return taskResource
 }
 
-export async function setupLastRegLocation<T extends Task>(
+export function setupLastRegOffice<T extends Task>(
   taskResource: T,
-  practitioner: Practitioner
-): Promise<T> {
-  if (!practitioner || !practitioner.id) {
-    throw new Error('Invalid practitioner data found')
-  }
-  const location = await getPractitionerPrimaryLocation(practitioner.id)
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  const regUserLastLocationExtension = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-    taskResource.extension
-  )
-  if (
-    regUserLastLocationExtension &&
-    regUserLastLocationExtension.valueReference
-  ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${
-      location.id as UUID
-    }` as const
-  } else {
-    taskResource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: { reference: `Location/${location.id as UUID}` }
-    })
-  }
-
-  const primaryOffice = await getPractitionerOffice(practitioner.id)
-
+  practitionerOfficeId: UUID
+): T {
   const regUserLastOfficeExtension = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
     taskResource.extension
   )
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+    regUserLastOfficeExtension.valueReference.reference = `Location/${practitionerOfficeId}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-      valueString: primaryOffice.name!,
-      valueReference: { reference: `Location/${primaryOffice.id}` }
+      valueReference: { reference: `Location/${practitionerOfficeId}` }
     })
   }
   return taskResource
@@ -188,22 +136,6 @@ export function setupLastRegUser<T extends Task>(
   }
   taskResource.lastModified =
     taskResource.lastModified || new Date().toISOString()
-  return taskResource
-}
-
-export function setupAuthorOnNotes(
-  taskResource: Task,
-  practitioner: Practitioner
-): Task {
-  if (!taskResource.note) {
-    return taskResource
-  }
-  const authorName = getPractitionerRef(practitioner)
-  taskResource.note.forEach((note) => {
-    if (!note.authorString) {
-      note.authorString = authorName
-    }
-  })
   return taskResource
 }
 

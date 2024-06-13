@@ -45,7 +45,6 @@ const mockUser: IUser & { _id: string } = {
   systemRole: 'LOCAL_REGISTRAR',
   status: 'active',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
   passwordHash:

@@ -48,7 +48,6 @@ const mockUser: IUser & { _id: string } = {
   role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   status: 'pending',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
   passwordHash:

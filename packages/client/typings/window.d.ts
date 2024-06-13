@@ -55,6 +55,8 @@ interface Window {
       INFORMANT_SIGNATURE: boolean
       EXTERNAL_VALIDATION_WORKQUEUE: boolean
       PRINT_DECLARATION: boolean
+      DATE_OF_BIRTH_UNKNOWN: boolean
+      INFORMANT_SIGNATURE_REQUIRED: boolean
     }
     LANGUAGES: string
     LOGIN_URL: string
@@ -69,8 +71,6 @@ interface Window {
     NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
     SENTRY: string
-    DATE_OF_BIRTH_UNKNOWN: boolean
-    INFORMANT_SIGNATURE_REQUIRED: boolean
     REGISTRATIONS_DASHBOARD_URL: string
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string
