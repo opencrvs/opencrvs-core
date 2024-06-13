@@ -10,7 +10,7 @@
  */
 
 import { IAuthHeader } from './http'
-import decode from 'jwt-decode'
+import * as decode from 'jwt-decode'
 
 /** All the scopes user can be assigned to */
 export const userScopes = {
