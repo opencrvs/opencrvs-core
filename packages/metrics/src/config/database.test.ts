@@ -16,8 +16,8 @@ jest.mock('mongoose', () => ({
   connection: {
     on: jest.fn()
   },
+  set: () => {},
   connect: () => Promise.reject(),
-  // tslint:disable-next-line no-empty
   disconnect: () => {}
 }))
 const wait = (time: number) =>

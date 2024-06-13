@@ -16,6 +16,7 @@ jest.mock('mongoose', () => ({
   connection: {
     on: jest.fn()
   },
+  set: () => {},
   connect: () => Promise.reject(),
   disconnect: () => {}
 }))
