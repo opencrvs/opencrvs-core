@@ -208,7 +208,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       {
         label: intl.formatMessage(buttonMessages.print),
         handler: async () => {
-          if (!this.props.userDetails) return
           const svg = await compiledSvgPromise
           const pdfTemplate = svgToPdfTemplate(svg, this.props.offlineResources)
           printPDF(pdfTemplate, 'dummy-declaration')
