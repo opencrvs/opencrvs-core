@@ -21,7 +21,7 @@ import {
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import {
   subYears,
   addYears,

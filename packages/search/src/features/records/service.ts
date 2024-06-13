@@ -48,12 +48,13 @@ export class RecordNotFoundError extends Error {
  */
 function checkForUnresolvedReferences(bundle: Bundle) {
   const EXCLUDED_PATHS = [
-    'Location.partOf.reference',
     'Patient.address.extension',
     'RelatedPerson.address.extension.valueReference',
     'Composition.relatesTo.targetReference.reference',
     'CompositionHistory.relatesTo.targetReference.reference'
   ]
+
+  const EXCLUDED_REFERENCES = ['Location/0']
 
   function check(
     object: Record<string, any>,
@@ -68,6 +69,9 @@ function checkForUnresolvedReferences(bundle: Bundle) {
       if (typeof value === 'string') {
         const collectionReference = /^[A-Z][a-z]+\/.*/
         if (collectionReference.test(value)) {
+          if (EXCLUDED_REFERENCES.includes(value)) {
+            continue
+          }
           const id = value.split('/')[1]
           try {
             getFromBundleById(bundle, id)
@@ -375,6 +379,21 @@ function joinFromResourcesIdToResourceIdentifier(
             input: filterByType([resourceType]),
             as: 'resource',
             in: { $concat: [resourceType, '/', '$$resource.id'] }
+          }
+        }
+      }
+    },
+    /*
+     * If resourceIds is empty, $lookup considers it being a subset of everything and joins the entire `from` collection.
+     * To workaround, set the array to be not-empty to not join anything.
+     */
+    {
+      $addFields: {
+        resourceIds: {
+          $cond: {
+            if: { $eq: ['$resourceIds', []] },
+            then: ['_EMPTY_'],
+            else: '$resourceIds'
           }
         }
       }
@@ -968,6 +987,28 @@ export const aggregateRecords = ({
         connectFromField: 'partOf.reference',
         connectToField: 'id',
         as: 'joinResult'
+      }
+    },
+    {
+      $set: {
+        joinResult: {
+          $map: {
+            input: '$joinResult',
+            as: 'item',
+            in: {
+              $mergeObjects: [
+                '$$item',
+                {
+                  partOf: {
+                    reference: {
+                      $concat: ['Location/', '$$item.partOf.reference']
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
     },
     {

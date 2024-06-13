@@ -14,7 +14,7 @@ import {
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
-import { logger } from '@metrics/logger'
+import { logger } from '@opencrvs/commons'
 import { IPoints } from '@metrics/features/registration'
 import fetch from 'node-fetch'
 
