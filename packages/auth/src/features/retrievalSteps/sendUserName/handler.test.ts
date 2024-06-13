@@ -14,7 +14,7 @@ import {
   storeRetrievalStepInformation,
   RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
