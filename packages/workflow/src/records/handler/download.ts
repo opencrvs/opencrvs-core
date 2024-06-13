@@ -25,6 +25,8 @@ import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { logger } from '@workflow/logger'
 import { auditEvent } from '@workflow/records/audit'
+import { findAssignment } from '@opencrvs/commons/assignment'
+import { getUserOrSystem } from '@workflow/records/user'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -54,6 +56,15 @@ export async function downloadRecordHandler(
   const token = getToken(request)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
+  const assignment = findAssignment(record)
+
+  if (assignment) {
+    const userOrSystem = await getUserOrSystem(token)
+    const practitionerId = userOrSystem.practitionerId
+
+    if (assignment.practitioner.id !== practitionerId)
+      throw new Error('Record is assigned to a different user')
+  }
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
