@@ -87,7 +87,6 @@ import {
   findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
-  filterConsecutiveAssignment,
   findResourceFromBundleById
 } from '@opencrvs/commons/types'
 
@@ -1823,7 +1822,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   },
   BirthRegistration: {
@@ -1984,7 +1982,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   },
   MarriageRegistration: {
@@ -2123,7 +2120,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   }
 }
