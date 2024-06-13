@@ -18,10 +18,9 @@ import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
 import { changeEmailMutation } from '@client/views/Settings/mutations'
-import { queriesForUser } from '@client/views/Settings/queries'
+import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
-import { NetworkStatus } from '@apollo/client'
 import { ChangeEmailModal } from './ChangeEmailModal'
 
 const graphqlMocks = [
@@ -33,6 +32,17 @@ const graphqlMocks = [
         email: 'rabiul@gmail.com',
         nonce: '',
         verifyCode: '000000'
+      }
+    },
+    result: {
+      data: []
+    }
+  },
+  {
+    request: {
+      query: GET_USER_BY_EMAIL,
+      variables: {
+        email: 'rabiul@gmail.com'
       }
     },
     result: {
@@ -81,17 +91,8 @@ describe('Change email modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetailsByEmail = vi.fn(() =>
-      Promise.resolve({
-        data: {
-          getUserByEmail: null
-        },
-        loading: false,
-        networkStatus: NetworkStatus.ready
-      })
-    )
     component.find('input').simulate('change', {
-      target: { name: 'emailAddress', value: 'test@test.org' }
+      target: { name: 'emailAddress', value: 'rabiul@gmail.com' }
     })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
@@ -103,15 +104,6 @@ describe('Change email modal tests', () => {
   })
 
   it('should trigger onSuccess callback after change email address', async () => {
-    queriesForUser.fetchUserDetailsByEmail = vi.fn(() =>
-      Promise.resolve({
-        data: {
-          getUserByEmail: null
-        },
-        loading: false,
-        networkStatus: NetworkStatus.ready
-      })
-    )
     component
       .find('#EmailAddressTextInput')
       .hostNodes()
