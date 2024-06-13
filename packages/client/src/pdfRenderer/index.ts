@@ -12,7 +12,6 @@ import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { transformers } from '@client/pdfRenderer/transformer'
 import {
   IPDFTemplate,
-  ISVGTemplate,
   OptionalData
 } from '@client/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
@@ -24,7 +23,7 @@ import { UserDetails } from '@client/utils/userUtils'
 /*
   Converts template definition into actual PDF using defined transformers, declarationData and userDetails
 */
-export function createPDF(
+function createPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
   userDetails: UserDetails,
@@ -65,48 +64,6 @@ export function createPDF(
     undefined,
     template.fonts
   )
-}
-/*
-  Converts template definition into actual SVG using defined transformers, declarationData and userDetails
-*/
-
-export function createSVG(
-  template: ISVGTemplate,
-  declaration: IDeclaration,
-  userDetails: UserDetails,
-  offlineResource: IOfflineData,
-  intl: IntlShape,
-  optionalData?: OptionalData
-): string {
-  pdfMake.vfs = { ...template.vfs }
-  let definitionString = JSON.stringify(template.definition)
-  if (template.transformers && template.transformers.length > 0) {
-    template.transformers.forEach((transformerDef) => {
-      const transformFunction = transformers[transformerDef.operation]
-      if (!transformFunction) {
-        throw new Error(
-          `No transform function found for given name: ${transformerDef.operation}`
-        )
-      }
-      let result = transformFunction(
-        { declaration, userDetails, resource: offlineResource },
-        intl,
-        transformerDef.parameters,
-        optionalData
-      )
-      if (
-        typeof transformerDef.valueIndex !== 'undefined' && // Checking type of the object as it can contain 0
-        typeof result === 'string'
-      ) {
-        result = (result as string).charAt(transformerDef.valueIndex) || ''
-      }
-      definitionString = definitionString.replace(
-        new RegExp(`{${transformerDef.field}}`, 'gi'),
-        result || ''
-      )
-    })
-  }
-  return JSON.parse(definitionString)
 }
 
 export function printPDF(
