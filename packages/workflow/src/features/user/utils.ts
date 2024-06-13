@@ -12,7 +12,11 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
+import {
+  Practitioner,
+  SavedLocation,
+  SavedPractitioner
+} from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
 type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
@@ -136,6 +140,12 @@ export async function getLoggedInPractitionerResource(
   }
 
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
+}
+
+export async function getLocationOrOfficeById(
+  locationId: string
+): Promise<SavedLocation> {
+  return await getFromFhir(`/Location/${locationId}`)
 }
 
 export function getPractitionerRef(practitioner: Practitioner) {
