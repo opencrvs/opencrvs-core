@@ -12,11 +12,7 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  Practitioner,
-  SavedLocation,
-  SavedPractitioner
-} from '@opencrvs/commons/types'
+import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
 type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
@@ -213,10 +209,13 @@ export async function getLoggedInPractitionerResource(
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
 }
 
-export async function getLocationOrOfficeById(
-  locationId: string
-): Promise<SavedLocation> {
-  return await getFromFhir(`/Location/${locationId}`)
+export function getPractitionerRef(practitioner: Practitioner) {
+  if (!practitioner || !practitioner.id) {
+    throw new Error('Invalid practitioner data found')
+  }
+  return `Practitioner/${
+    practitioner.id as UUID /* @todo move to practitioner */
+  }` as const
 }
 
 export async function getPractitionerLocations(
@@ -241,13 +240,4 @@ export async function getPractitionerLocations(
     locList.push(locationResponse)
   }
   return locList as [fhir3.Location]
-}
-
-export function getPractitionerRef(practitioner: Practitioner) {
-  if (!practitioner || !practitioner.id) {
-    throw new Error('Invalid practitioner data found')
-  }
-  return `Practitioner/${
-    practitioner.id as UUID /* @todo move to practitioner */
-  }` as const
 }
