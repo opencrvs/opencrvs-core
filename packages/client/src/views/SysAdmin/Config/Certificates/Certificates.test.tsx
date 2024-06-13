@@ -19,16 +19,14 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
-import createFetchMock from 'vitest-fetch-mock'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+import * as imageUtils from '@client/utils/imageUtils'
 const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-const fetch = createFetchMock(vi)
-fetch.enableMocks()
 
 enum MENU_ITEM {
   PREVIEW,
@@ -69,6 +67,10 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
   beforeEach(async () => {
     vi.resetAllMocks()
+    vi.spyOn(imageUtils, 'fetchImageAsBase64').mockImplementation((_: string) =>
+      Promise.resolve('')
+    )
+
     configApplicationMutations.mutateApplicationConfig = vi.fn(
       () =>
         new Promise((resolve) =>
@@ -86,7 +88,6 @@ describe('ConfigHome page when already has uploaded certificate template', async
           })
         )
     )
-    const { store, history } = createStore()
 
     testComponent = await createTestComponent(
       <CertificatesConfig></CertificatesConfig>,
@@ -158,17 +159,9 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('Testing sub menu item on config page', () => {
-    let printPdfSpy: SpyInstance
     let downloadFileSpy: SpyInstance
     let updateCertificateMutationSpy: SpyInstance
     beforeEach(() => {
-      //Mocking with Response(blob) dosen't work
-      fetch.mockImplementationOnce(() =>
-        Promise.resolve({
-          blob: () => new Blob(['data'])
-        } as any)
-      )
-      printPdfSpy = vi.spyOn(pdfRender, 'printPDF')
       downloadFileSpy = vi.spyOn(PDFUtils, 'downloadFile')
       updateCertificateMutationSpy = vi.spyOn(
         certificateTemplateMutations,
@@ -176,13 +169,11 @@ describe('ConfigHome page when already has uploaded certificate template', async
       )
     })
     afterAll(() => {
-      fetch.resetMocks()
-      printPdfSpy.mockRestore()
       downloadFileSpy.mockRestore()
     })
 
     afterEach(() => {
-      printPdfSpy.mockClear()
+      spy.mockReset()
       downloadFileSpy.mockClear()
     })
     it('should show upload modal when clicked on upload', async () => {
@@ -259,7 +250,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
         setTimeout(resolve, 200)
       })
 
-      expect(printPdfSpy).toBeCalledTimes(1)
+      expect(spy).toBeCalledTimes(1)
     })
 
     it('should download preview certificate', async () => {
