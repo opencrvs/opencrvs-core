@@ -15,10 +15,10 @@ import * as jwt from 'jsonwebtoken'
 import * as service from '@metrics/features/declarationsStarted/service'
 import * as fixtures from '@opencrvs/commons/fixtures'
 import { UUID } from '@opencrvs/commons'
-import * as fetchAny from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
 
 const readPoints = influx.query as jest.Mock
-const fetch = fetchAny as fetchAny.FetchMock
+const fetch = fetchMock as fetchMock.FetchMock
 
 jest.mock('../metrics/utils', () => {
   const originalModule = jest.requireActual('../metrics//utils')
