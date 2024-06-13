@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { UUID } from '@opencrvs/commons'
 import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
 
 type Payload = {
   systemRole: string
-  locationId?: string
+  locationId?: UUID
 }
 
 export async function countUsersByLocationHandler(request: Hapi.Request) {

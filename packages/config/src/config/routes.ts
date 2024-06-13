@@ -35,6 +35,17 @@ import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
 import * as Joi from 'joi'
+import { resolveChildren } from '@config/handlers/locations/children'
+import {
+  fetchLocationsHandler,
+  locationQuerySchema,
+  requestParamsSchema,
+  createLocationHandler,
+  updateLocationHandler,
+  updateSchema,
+  requestSchema as createLocationReqSchema
+} from '@config/handlers/locations/handler'
+import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
 
 export const enum RouteScope {
@@ -258,9 +269,77 @@ export default function getRoutes(): ServerRoute[] {
         }
       }
     },
+
     {
       method: 'GET',
-      path: '/location/{locationId}/hierarchy',
+      path: '/dashboardQueries',
+      handler: getDashboardQueries,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Fetch dashboard queries from country config'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations',
+      handler: fetchLocationsHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get all locations',
+        validate: {
+          query: locationQuerySchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/locations',
+      handler: createLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Create a location',
+        validate: {
+          payload: createLocationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}',
+      handler: fetchLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get a single location',
+        validate: {
+          params: requestParamsSchema
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/locations/{locationId}',
+      handler: updateLocationHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Update a location or facility',
+        validate: {
+          payload: updateSchema,
+          params: requestParamsSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locations/{locationId}/hierarchy',
       handler: locationHierarchyHandler,
       options: {
         tags: ['api'],
@@ -275,11 +354,18 @@ export default function getRoutes(): ServerRoute[] {
     },
     {
       method: 'GET',
-      path: '/dashboardQueries',
-      handler: getDashboardQueries,
+      path: '/locations/{locationId}/children',
+      handler: resolveChildren,
       options: {
+        auth: false,
         tags: ['api'],
-        description: 'Fetch dashboard queries from country config'
+        description:
+          'Retrieve all the children (multi-level) of a particular location',
+        validate: {
+          params: Joi.object({
+            locationId: Joi.string().uuid()
+          })
+        }
       }
     }
   ]

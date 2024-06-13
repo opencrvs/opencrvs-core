@@ -17,10 +17,10 @@ import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForRevie
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
+  TransactionResponse,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>

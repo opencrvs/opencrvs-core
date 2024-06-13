@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Content } from '@opencrvs/components/lib'
+import { Content, ContentSize } from '@opencrvs/components/lib'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { FormFieldGenerator } from '@client/components/form'
@@ -19,7 +19,7 @@ import {
   ICertificate
 } from '@client/declarations'
 import { useDispatch } from 'react-redux'
-import { PrimaryButton } from '@client/../../components/lib/buttons'
+import { Button } from '@client/../../components/lib/Button'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
   formatUrl,
@@ -95,10 +95,14 @@ export function IssueCollectorForm({
   return (
     <Content
       title={intl.formatMessage(issueMessages.issueCertificate)}
+      size={ContentSize.SMALL}
       bottomActionButtons={[
-        <PrimaryButton
+        <Button
           key="continue-button"
           id="continue-button"
+          type="primary"
+          size="large"
+          fullWidth
           onClick={continueButtonHandler}
           disabled={groupHasError(
             { id: 'collector', fields },
@@ -106,7 +110,7 @@ export function IssueCollectorForm({
           )}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       showTitleOnMobile
     >

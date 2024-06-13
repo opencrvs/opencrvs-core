@@ -12,28 +12,31 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
-const Wrapper = styled.li`
-  margin-bottom: 10px;
-  margin-top: 10px;
-  list-style-type: none;
+const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
+  flex-direction: row;
+  gap: 12px;
+  border-radius: 4px;
+  width: 100%;
+  padding: 8px 8px;
   align-items: center;
-  position: relative;
-`
-
-const Label = styled.label`
-  position: relative;
+  isolation: isolate;
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
+  ${({ theme }) => theme.fonts.h4};
   cursor: pointer;
-  padding-left: 20px;
-  margin-left: -5px; /* This is to increase hitbox on the label, to allow clicking the borders of the checkbox */
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+  }
 `
 
-const Check = styled.span<{ size?: string }>`
+const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
-  background: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.grey600};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -43,7 +46,8 @@ const Check = styled.span<{ size?: string }>`
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.grey600};
   &::after {
     position: absolute;
     content: '';
@@ -52,8 +56,8 @@ const Check = styled.span<{ size?: string }>`
       size === 'large'
         ? `height: 36px;
     width: 36px;`
-        : ` height: 20px;
-    width: 20px;`}
+        : ` height: 20.5px;
+    width: 20.5px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -81,32 +85,29 @@ const Check = styled.span<{ size?: string }>`
 
 const Input = styled.input`
   position: absolute;
-  width: ${({ size }) => `${size}px`};
-  height: ${({ size }) => `${size}px`};
+  width: 100%;
+  height: 40px;
   opacity: 0;
   z-index: 2;
   cursor: pointer;
 
   &:active ~ ${Check} {
     &::after {
-      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      border: 2px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
     }
   }
 
   &:focus ~ ${Check} {
     &::after {
       box-sizing: content-box;
-      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      border: 2px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
-      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
-      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
     }
-  }
-  &:hover ~ ${Check} {
-    box-shadow: ${({ theme }) => theme.colors.grey300} 0 0 0 8px;
   }
 `
 type Size = 'large' | 'small'
@@ -130,21 +131,21 @@ export const Checkbox = ({
   size = 'small'
 }: CheckboxProps) => {
   return (
-    <Wrapper>
+    <Label htmlFor={id}>
       <Input
         id={id}
         role="checkbox"
-        checked={selected}
+        size={size === 'large' ? 40 : 16}
         type="checkbox"
+        checked={selected}
         name={name}
         value={value}
         onChange={onChange}
-        size={size === 'large' ? 40 : 16}
       />
       <Check size={size}>
         {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
       </Check>
-      <Label htmlFor={id}>{label}</Label>
-    </Wrapper>
+      {label}
+    </Label>
   )
 }

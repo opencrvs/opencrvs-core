@@ -84,6 +84,8 @@ import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { HOME } from '@client/navigation/routes'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
+const DEFAULT_PAGE_NUMBER = 1
+
 const { useState } = React
 
 const UserTable = styled(BodyContent)`
@@ -269,7 +271,8 @@ function UserListComponent(props: IProps) {
     selectedUser: null
   })
 
-  const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+  const [currentPageNumber, setCurrentPageNumber] =
+    useState<number>(DEFAULT_PAGE_NUMBER)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
@@ -633,6 +636,7 @@ function UserListComponent(props: IProps) {
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
             props.goToTeamUserList(locationId)
+            setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
           requiredLocationTypes={'CRVS_OFFICE'}
         />

@@ -167,24 +167,34 @@ export const ReviewCertificate = () => {
           </Box>
           <Content
             title={intl.formatMessage(certificateMessages.reviewTitle)}
+            bottomActionDirection="row"
             bottomActionButtons={[
+              canUserEditRecord ? (
+                <Button
+                  key="edit-record"
+                  type="negative"
+                  onClick={handleEdit}
+                  size="large"
+                  fullWidth
+                >
+                  <Icon name="X" size="medium" />
+                  {intl.formatMessage(buttonMessages.editRecord)}
+                </Button>
+              ) : (
+                <></>
+              ),
+
               <Button
                 key="confirm-and-print"
                 type="positive"
                 id="confirm-print"
                 onClick={confirmAndPrint}
+                size="large"
+                fullWidth
               >
                 <Icon name="Check" size="medium" />
                 {intl.formatMessage(certificateMessages.confirmAndPrint)}
-              </Button>,
-
-              canUserEditRecord ? (
-                <Button key="edit-record" type="negative" onClick={handleEdit}>
-                  {intl.formatMessage(buttonMessages.editRecord)}
-                </Button>
-              ) : (
-                <></>
-              )
+              </Button>
             ]}
           >
             {intl.formatMessage(certificateMessages.reviewDescription)}

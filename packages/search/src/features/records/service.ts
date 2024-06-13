@@ -21,6 +21,7 @@ import { writeFileSync } from 'fs'
 import * as os from 'os'
 import { join } from 'path'
 import { sortBy, uniqBy } from 'lodash'
+import { UUID } from '@opencrvs/commons'
 
 const client = new MongoClient(HEARTH_MONGO_URL)
 
@@ -394,21 +395,23 @@ function joinFromResourcesIdToResourceIdentifier(
   ]
 }
 
-export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
-  recordId: string,
-  allowedStates: T,
+export const aggregateRecords = ({
+  recordId,
+  includeHistoryResources
+}: {
+  recordId?: UUID
   includeHistoryResources: boolean
-): Promise<StateIdenfitiers[T[number]]> {
-  const connectedClient = await client.connect()
-
-  const db = connectedClient.db()
-
-  const query: Array<Record<string, any>> = [
-    {
-      $match: {
-        id: recordId
-      }
-    },
+}) =>
+  [
+    ...(recordId
+      ? [
+          {
+            $match: {
+              id: recordId
+            }
+          }
+        ]
+      : []),
     {
       $group: {
         _id: null,
@@ -943,6 +946,35 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    /*
+     * Resolve location hierarchies for all locations
+     */
+    {
+      $addFields: {
+        allLocationIds: {
+          $map: {
+            input: filterByType(['Location']),
+            as: 'location',
+            in: '$$location.id'
+          }
+        }
+      }
+    },
+
+    {
+      $graphLookup: {
+        from: 'Location_view_with_plain_ids',
+        startWith: '$allLocationIds',
+        connectFromField: 'partOf.reference',
+        connectToField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
     {
       $addFields: {
         bundle: {
@@ -974,6 +1006,14 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     }
   ].flat()
 
+export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
+  recordId: UUID,
+  _allowedStates: T,
+  includeHistoryResources: boolean
+): Promise<StateIdenfitiers[T[number]]> {
+  const connectedClient = await client.connect()
+  const db = connectedClient.db()
+  const query = aggregateRecords({ recordId, includeHistoryResources })
   const result = await db
     .collection('Composition')
     .aggregate<Bundle>(query)
@@ -1018,4 +1058,11 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   }
 
   return record as StateIdenfitiers[T[number]]
+}
+
+export const streamAllRecords = async (includeHistoryResources: boolean) => {
+  const connectedClient = await client.connect()
+  const db = connectedClient.db()
+  const query = aggregateRecords({ includeHistoryResources })
+  return db.collection('Composition').aggregate<Bundle>(query).stream()
 }

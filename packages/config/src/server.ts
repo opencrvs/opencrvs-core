@@ -27,7 +27,7 @@ import * as database from '@config/config/database'
 import { validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import { logger } from '@config/logger'
-import { Boom, badRequest } from '@hapi/boom'
+import { badRequest } from '@hapi/boom'
 
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -43,14 +43,14 @@ export async function createServer() {
     routes: {
       cors: { origin: whitelist },
       validate: {
-        failAction: async (_, _2, err: Boom) => {
+        failAction: async (_, _2, err) => {
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
-            logger.error(`ValidationError: ${err.message}`)
+            logger.error(`ValidationError: ${err?.message}`)
             throw badRequest(`Invalid request payload input`)
           } else {
             // During development, log and respond with the full error.
-            logger.error(err.message)
+            logger.error(err?.message)
             throw err
           }
         }
