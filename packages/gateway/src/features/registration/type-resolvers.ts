@@ -83,8 +83,7 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  notCorrectedHistory,
-  filterConsecutiveAssignment
+  notCorrectedHistory
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1825,7 +1824,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   },
   BirthRegistration: {
@@ -1986,7 +1984,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   },
   MarriageRegistration: {
@@ -2125,7 +2122,6 @@ export const typeResolvers: GQLResolver = {
         .filter(isTaskOrTaskHistory)
         .filter(notCorrectedHistory)
         .sort(sortDescending)
-        .filter(filterConsecutiveAssignment)
     }
   }
 }
