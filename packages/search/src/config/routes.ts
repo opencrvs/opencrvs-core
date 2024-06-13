@@ -24,7 +24,7 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 import { client } from '@search/elasticsearch/client'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { recordHandler } from '@search/features/registration/record/handler'
 import { getRecordByIdHandler } from '@search/features/records/handler'
 

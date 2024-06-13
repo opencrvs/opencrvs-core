@@ -29,7 +29,6 @@ import {
   getPatientBySection
 } from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@workflow/logger'
 import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
@@ -45,6 +44,7 @@ import {
   findExtension,
   isSaved
 } from '@opencrvs/commons/types'
+import { logger } from '@opencrvs/commons'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {

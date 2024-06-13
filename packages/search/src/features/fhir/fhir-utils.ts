@@ -32,7 +32,7 @@ import {
   ICompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 
 export interface ITemplatedComposition extends fhir.Composition {

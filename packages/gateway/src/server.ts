@@ -32,7 +32,7 @@ import {
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/utils/redis'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import { badRequest, Boom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 

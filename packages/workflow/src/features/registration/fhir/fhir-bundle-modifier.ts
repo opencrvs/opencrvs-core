@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { UUID } from '@opencrvs/commons'
+import { UUID, logger } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
   Patient,
   Practitioner,
   RegistrationNumber,
+  RegistrationStatus,
+  ResourceIdentifier,
   Saved,
   Task,
-  findExtension,
-  RegistrationStatus,
   WaitingForValidationRecord,
+  findExtension,
   getResourceFromBundleById,
-  ResourceIdentifier,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
@@ -49,7 +49,6 @@ import {
   getPractitionerRef,
   getSystem
 } from '@workflow/features/user/utils'
-import { logger } from '@workflow/logger'
 import {
   ITokenPayload,
   USER_SCOPE,

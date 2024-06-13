@@ -12,7 +12,7 @@
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
 import { Queue, QueueEvents, Worker, Job } from 'bullmq'
 import { EventEmitter } from 'events'
-import { logger } from '@webhooks/logger'
+import { logger } from '@opencrvs/commons'
 import { getRedis } from '@webhooks/database'
 import { initWorker } from '@webhooks/processor'
 

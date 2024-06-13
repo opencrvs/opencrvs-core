@@ -10,7 +10,7 @@
  */
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 
 export enum InformantNotificationName {
   birthInProgressSMS = 'birthInProgressSMS',

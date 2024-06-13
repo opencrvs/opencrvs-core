@@ -14,7 +14,7 @@ import Certificate, {
   Status,
   Event
 } from '@config/models/certificate' //   IDeclarationConfigurationModel
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import * as Joi from 'joi'
 import { badRequest, notFound } from '@hapi/boom'
 import { verifyToken } from '@config/utils/verifyToken'

@@ -17,7 +17,7 @@ import {
   sendCredentialsNotification,
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
   generateSaltedHash,

@@ -15,9 +15,7 @@ import {
 } from '@workflow/constants'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
-import { logger } from '@workflow/logger'
-import fetch from 'node-fetch'
-import * as ShortUIDGen from 'short-uid'
+
 import {
   Bundle,
   BundleEntry,
@@ -31,6 +29,10 @@ import {
 } from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+
+import { logger } from '@opencrvs/commons'
+import fetch from 'node-fetch'
+import * as ShortUIDGen from 'short-uid'
 
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',

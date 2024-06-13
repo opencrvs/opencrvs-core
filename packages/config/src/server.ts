@@ -24,11 +24,9 @@ import {
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
 import * as database from '@config/config/database'
-import { validateFunc } from '@opencrvs/commons'
+import { validateFunc, logger } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
-import { logger } from '@config/logger'
 import { Boom, badRequest } from '@hapi/boom'
-
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {

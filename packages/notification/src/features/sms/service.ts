@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 
 import { COUNTRY_CONFIG_URL } from '@notification/constants'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 
 export async function notifyCountryConfig(
   templateName: {

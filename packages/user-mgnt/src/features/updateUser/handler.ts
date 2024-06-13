@@ -18,7 +18,7 @@ import {
   getCatchmentAreaIdsByPrimaryOfficeId,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
