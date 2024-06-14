@@ -130,7 +130,7 @@ const messagesToDefine = {
     id: 'regHome.outbox.statusWaitingToSubmit'
   },
   retry: {
-    id: 'regHome.outbox.statusRejecting',
+    id: 'regHome.outbox.retry',
     defaultMessage: 'Retry',
     description:
       'Copy for "Retry" button in Outbox shown for records that failed to send'
