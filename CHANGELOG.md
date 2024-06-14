@@ -41,7 +41,7 @@
 
   We are dropping support for 'agentDefault' to be used as initial value for SELECT_WITH_DYNAMIC_OPTIONS type of fields. The country config package now must return the form with prepopulated initial values to show default addresses. [#6871](https://github.com/opencrvs/opencrvs-core/issues/6871)
 
-- #### Remove system admin UI items: Application, Certificates, User roles, Communications / Informant notifications
+- #### Remove system admin UI items: Application, Certificates, User roles, Informant notifications
 
   We have now moved to configuring these items directly from country configuration repository.
 
