@@ -111,7 +111,7 @@ const messagesToDefine: IVerifyCertificateMessages = {
     description: 'Label for name of registar center'
   },
   certifiedAt: {
-    id: 'verifyCertificate.createdAt',
+    id: 'verifyCertificate.certifiedAt',
     defaultMessage: 'Date of certification',
     description: 'Label for date of certification'
   },
