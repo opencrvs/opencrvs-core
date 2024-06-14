@@ -38,7 +38,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadField/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/Link'

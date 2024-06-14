@@ -121,8 +121,8 @@ import {
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
 import { IValidationResult } from '@client/utils/validate'
-import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
   addressFieldNames,

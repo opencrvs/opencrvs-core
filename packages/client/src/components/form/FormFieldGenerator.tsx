@@ -94,7 +94,7 @@ import { InputField } from '@client/components/form/InputField'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
-import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
+import { DocumentUploaderWithOption } from './DocumentUploadField/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -111,7 +111,7 @@ import {
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
 import { isEqual, flatten } from 'lodash'
-import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
+import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
 import { useDispatch, useSelector } from 'react-redux'
