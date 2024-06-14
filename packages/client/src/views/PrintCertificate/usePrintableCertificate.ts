@@ -200,10 +200,19 @@ export const usePrintableCertificate = (declarationId: string) => {
     // Delete certificate properties during print record corrections
     // since correction flow doesn't handle certificates
     if (declaration?.data?.registration.certificates) {
-      delete (declaration?.data?.registration as { certificates: any })
-        ?.certificates
-      dispatch(modifyDeclaration(declaration))
-      dispatch(writeDeclaration(declaration))
+      const { certificates, ...rest } = declaration.data.registration
+      const updatedDeclaration = {
+        ...declaration,
+        data: {
+          ...declaration.data,
+          registration: {
+            ...rest
+          }
+        }
+      }
+
+      dispatch(modifyDeclaration(updatedDeclaration))
+      dispatch(writeDeclaration(updatedDeclaration))
     }
 
     dispatch(
