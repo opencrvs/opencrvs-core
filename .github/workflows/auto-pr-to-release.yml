@@ -40,7 +40,7 @@ jobs:
           RELEASE_BRANCH="release-${{ env.MILESTONE }}"
 
           # Check if the release branch exists
-          if git ls-remote --heads origin $RELEASE_BRANCH | grep -q $RELEASE_BRANCH; then
+          if git ls-remote --heads origin $RELEASE_BRANCH | grep -q "refs/heads/$RELEASE_BRANCH"; then
             echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
           else
             echo "Release branch $RELEASE_BRANCH does not exist. Exiting."
@@ -50,20 +50,39 @@ jobs:
       - name: Create and push the new branch for the PR
         run: |
           PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+          PR_BODY="Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}"
 
           # Configure git
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          # Checkout the merged commit of the triggering PR
-          git checkout ${{ github.event.pull_request.merge_commit_sha }}
+          # Fetch and checkout the release branch
+          git fetch origin
+          git checkout ${{ env.RELEASE_BRANCH }}
 
-          # Create and push the new branch for the PR
-          git checkout -b auto-pr-${{ env.RELEASE_BRANCH }}
-          git merge develop
-          git push origin auto-pr-${{ env.RELEASE_BRANCH }}
+          # Create a new branch for the PR
+          NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}"
+          git checkout -b $NEW_BRANCH
+
+          # Attempt to cherry-pick the commits from the original PR
+          git cherry-pick ${{ github.event.pull_request.merge_commit_sha }} || {
+            # If cherry-pick fails, create a placeholder commit
+            git reset --hard
+            echo "" >> CHANGELOG.md
+            git add CHANGELOG.md
+            git commit -m "Placeholder commit for PR #${{ env.PR_ID }}"
+
+            # Add manual cherry-pick commands to the PR body
+            PR_BODY="${PR_BODY}\n\nManual cherry-pick commands:\n"
+            PR_BODY="${PR_BODY}git fetch origin pull/${{ env.PR_ID }}/head:pr-${{ env.PR_ID }}-branch\n"
+            PR_BODY="${PR_BODY}git checkout $NEW_BRANCH\n"
+            PR_BODY="${PR_BODY}git cherry-pick pr-${{ env.PR_ID }}-branch"
+          }
+
+          # Push the new branch
+          git push origin $NEW_BRANCH
 
           # Create a pull request and assign the original PR author as the reviewer
-          gh pr create --title "$PR_TITLE" --body "Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}" --head auto-pr-${{ env.RELEASE_BRANCH }} --base ${{ env.RELEASE_BRANCH }} --reviewer ${{ env.PR_AUTHOR }}
+          gh pr create --title "$PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer ${{ env.PR_AUTHOR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
