@@ -35,7 +35,7 @@ import { usePrintableCertificate } from './usePrintableCertificate'
 
 const CertificateContainer = styled.div`
   svg {
-    // limits the certificate overflowing on small screens
+    /* limits the certificate overflowing on small screens */
     max-width: 100%;
   }
 `
