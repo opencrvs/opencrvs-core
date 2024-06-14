@@ -199,8 +199,8 @@ async function loadForms(): Promise<LoadFormsResponse> {
     throw err
   }
 
-  if (res && res.status !== 201) {
-    throw Error(res.statusText)
+  if (res && !res.ok) {
+    throw new Error(res.statusText)
   }
 
   const response = await res.json()
