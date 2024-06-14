@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ../../node_modules/graphql-schema-typescript/**/* || npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/* || true; fi",
-    "start": "yarn gen:schema && yarn gen:types && concurrently \"NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
+    "start": "yarn gen:schema && yarn gen:types && concurrently \"NODE_OPTIONS=--dns-result-order=ipv4first nodemon --quiet --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest && yarn test:compilation",
     "test:watch": "jest --watch",
@@ -14,8 +14,8 @@
     "build:clean": "rm -rf build",
     "gen:schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\" > src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.graphql",
     "gen:types": "graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts --importStatements 'import {Context} from \"./context\"' --contextType Context && yarn prettier --write src/graphql/schema.d.ts",
-    "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
-    "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
+    "gen:schema:watch": "nodemon --quiet --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
+    "gen:types:watch": "nodemon --quiet --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
     "precommit": "lint-staged"
@@ -97,7 +97,7 @@
     "jest-fetch-mock": "^2.1.2",
     "lab-transform-typescript": "^3.0.1",
     "lint-staged": "^7.1.0",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.0",
     "opener": "^1.5.1",
     "prettier": "2.8.8",
     "testcontainers": "^9.1.1",

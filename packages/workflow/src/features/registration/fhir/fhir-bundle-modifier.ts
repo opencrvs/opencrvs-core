@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID } from '@opencrvs/commons'
+import { UUID, logger } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -38,7 +38,6 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getMosipUINToken } from '@workflow/features/registration/utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
-import { logger } from '@workflow/logger'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 

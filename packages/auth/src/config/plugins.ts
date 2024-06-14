@@ -8,27 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { SENTRY_DSN } from '@auth/constants'
+import { ServerRegisterPluginObject } from '@hapi/hapi'
+import { logger } from '@opencrvs/commons'
 import * as Pino from 'hapi-pino'
 import * as Sentry from 'hapi-sentry'
-import { SENTRY_DSN } from '@auth/constants'
-import { logger } from '@auth/logger'
 
-interface IHapiPlugin {
-  plugin: typeof Sentry | typeof Pino
-  options: Record<string, unknown>
-}
+type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
 export default function getPlugins() {
-  const plugins: IHapiPlugin[] = [
-    {
+  const plugins: IHapiPlugin[] = []
+
+  if (process.env.NODE_ENV === 'production') {
+    plugins.push({
       plugin: Pino,
       options: {
         prettyPrint: false,
         logPayload: false,
         instance: logger
       }
-    }
-  ]
+    })
+  }
 
   if (SENTRY_DSN) {
     plugins.push({

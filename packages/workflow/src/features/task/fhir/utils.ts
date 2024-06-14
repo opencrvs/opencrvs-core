@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Composition, Task } from '@opencrvs/commons/types'
+import { Composition, Task, TaskHistory } from '@opencrvs/commons/types'
 import { RegStatus } from '@workflow/features/registration/fhir/constants'
 
 export function isRejectedTask(taskResource: Task) {
@@ -21,7 +21,7 @@ export function isArchiveTask(taskResource: Task) {
 }
 
 export function getTaskBusinessStatus(
-  taskResource: Task
+  taskResource: Task | TaskHistory
 ): RegStatus | undefined {
   return taskResource.businessStatus?.coding?.[0]?.code as RegStatus | undefined
 }

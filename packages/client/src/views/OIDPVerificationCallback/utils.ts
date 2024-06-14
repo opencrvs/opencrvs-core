@@ -22,8 +22,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useRouteMatch } from 'react-router'
 import { v4 as uuid } from 'uuid'
 
-const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY = 'oidp-verification-nonce'
-
 interface OIDPUserAddress {
   formatted?: string | null
   street_address?: string | null
@@ -183,10 +181,6 @@ export function addNidUserInfoToDeclaration(
   declarationDataSection[`${section}NidVerification`] = oidpUserInfo.sub
 }
 
-function generateNonce() {
-  return uuid()
-}
-
 function splitName(name: string | undefined | null = '') {
   if (!name) {
     return { firstName: '', lastName: '' }
@@ -231,8 +225,6 @@ export function redirectToNidIntegration(
   currentSection: string,
   currentPathname: string
 ) {
-  const nonce = generateNonce()
-  window.localStorage.setItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY, nonce)
   const nidSystemSetting = offlineCountryConfig.systems.find(
     (s) => s.type === 'NATIONAL_ID'
   )?.settings
@@ -242,7 +234,6 @@ export function redirectToNidIntegration(
   }
   const url = new URL(`${nidSystemSetting?.openIdProviderBaseUrl}authorize`)
 
-  url.searchParams.append('nonce', nonce)
   url.searchParams.append(
     'client_id',
     nidSystemSetting?.openIdProviderClientId || ''
@@ -262,32 +253,6 @@ export function redirectToNidIntegration(
   url.searchParams.append('state', JSON.stringify(stateToBeSent))
   url.searchParams.append('claims', nidSystemSetting.openIdProviderClaims || '')
   window.location.href = url.toString()
-}
-
-export const useCheckNonce = () => {
-  const params = useQueryParams()
-  const [nonceOk, setNonceOk] = useState(false)
-
-  useEffect(() => {
-    if (!params.get('nonce')) {
-      throw new Error('No nonce provided from OIDP callback.')
-    }
-
-    const nonceMatches =
-      window.localStorage.getItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY) ===
-      params.get('nonce')
-
-    if (nonceMatches) {
-      window.localStorage.removeItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY)
-      setNonceOk(true)
-    } else {
-      throw new Error(
-        'Nonce did not match the one sent to the integration before callback'
-      )
-    }
-  }, [params])
-
-  return nonceOk
 }
 
 export const useExtractCallBackState = () => {
