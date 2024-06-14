@@ -407,7 +407,8 @@ const NavigationView = (props: IFullProps) => {
       (
         [
           ...ALLOWED_STATUS_FOR_RETRY,
-          ...INPROGRESS_STATUS
+          ...INPROGRESS_STATUS,
+          SUBMISSION_STATUS.FAILED
         ] as SUBMISSION_STATUS[]
       ).includes(draft.submissionStatus as SUBMISSION_STATUS)
     ).length

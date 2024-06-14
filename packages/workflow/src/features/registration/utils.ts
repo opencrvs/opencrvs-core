@@ -22,7 +22,7 @@ import { COUNTRY_CONFIG_URL, MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
 

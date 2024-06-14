@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 import { notifyCountryConfig } from '@notification/features/sms/service'
 import * as fetchAny from 'jest-fetch-mock'
 
