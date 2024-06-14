@@ -28,6 +28,9 @@ jobs:
           echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
           echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "MERGE_COMMIT_SHA=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_ENV
 
       - name: Check for milestone and if release branch exists
         id: check_release_branch
@@ -64,8 +67,12 @@ jobs:
           NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}"
           git checkout -b $NEW_BRANCH
 
+          # Get the commit range
+          BASE_COMMIT=$(git merge-base origin/${{ env.BASE_BRANCH }} origin/${{ env.HEAD_BRANCH }})
+          COMMIT_RANGE="${BASE_COMMIT}..${{ env.MERGE_COMMIT_SHA }}"
+
           # Attempt to cherry-pick the commits from the original PR
-          git cherry-pick ${{ github.event.pull_request.merge_commit_sha }} || {
+          git cherry-pick $COMMIT_RANGE || {
             # If cherry-pick fails, create a placeholder commit
             git reset --hard
             echo "" >> CHANGELOG.md
@@ -74,9 +81,11 @@ jobs:
 
             # Add manual cherry-pick commands to the PR body
             PR_BODY="${PR_BODY}\n\nManual cherry-pick commands:\n"
+            PR_BODY="${PR_BODY}\`\`\`\n"
             PR_BODY="${PR_BODY}git fetch origin pull/${{ env.PR_ID }}/head:pr-${{ env.PR_ID }}-branch\n"
             PR_BODY="${PR_BODY}git checkout $NEW_BRANCH\n"
-            PR_BODY="${PR_BODY}git cherry-pick pr-${{ env.PR_ID }}-branch"
+            PR_BODY="${PR_BODY}git cherry-pick $COMMIT_RANGE\n"
+            PR_BODY="${PR_BODY}\`\`\`"
           }
 
           # Push the new branch
