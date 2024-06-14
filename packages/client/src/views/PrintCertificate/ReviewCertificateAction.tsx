@@ -77,6 +77,22 @@ const ReviewCertificateFrame = ({
               <Icon name="X" size="large" />
             </Button>
           }
+          mobileTitle={intl.formatMessage(
+            certificateMessages.certificateCollectionTitle
+          )}
+          mobileLeft={
+            <Button type="icon" onClick={back} id="action_page_back_button">
+              <Icon name="ArrowLeft" size="large" />
+            </Button>
+          }
+          mobileRight={
+            <Button
+              type="icon"
+              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+            >
+              <Icon name="X" size="large" />
+            </Button>
+          }
         />
       }
       skipToContentText={intl.formatMessage(
