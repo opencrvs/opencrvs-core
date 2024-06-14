@@ -11,7 +11,6 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
-import { messages } from '@client/i18n/messages/views/review'
 import { deserializeForm } from '@client/forms/deserializer/deserializer'
 import { validators } from '@client/forms/validators'
 
@@ -53,19 +52,6 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const death = deserializeForm(forms.death, validators)
       const marriage = deserializeForm(forms.marriage, validators)
 
-      const preview = {
-        id: 'preview',
-        viewType: 'preview' as const,
-        name: messages.previewName,
-        title: messages.previewTitle,
-        groups: [
-          {
-            id: 'preview-view-group',
-            fields: []
-          }
-        ]
-      }
-
       return {
         ...state,
         state: 'READY',
@@ -75,10 +61,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             sections: [
               ...birth.sections.filter(({ viewType }) =>
                 ['form', 'hidden', 'preview'].includes(viewType)
-              ),
-              ...(birth.sections.find((s) => s.id === 'preview')
-                ? []
-                : [preview])
+              )
             ]
           },
           death: {
@@ -86,10 +69,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             sections: [
               ...death.sections.filter(({ viewType }) =>
                 ['form', 'hidden', 'preview'].includes(viewType)
-              ),
-              ...(death.sections.find((s) => s.id === 'preview')
-                ? []
-                : [preview])
+              )
             ]
           },
           marriage: {
@@ -97,10 +77,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             sections: [
               ...marriage.sections.filter(({ viewType }) =>
                 ['form', 'hidden', 'preview'].includes(viewType)
-              ),
-              ...(marriage.sections.find((s) => s.id === 'preview')
-                ? []
-                : [preview])
+              )
             ]
           }
         }
