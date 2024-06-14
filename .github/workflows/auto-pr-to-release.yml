@@ -20,29 +20,38 @@ jobs:
           echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
           echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
 
-      - name: Check for milestone
-        if: env.MILESTONE != ''
+      - name: Check for milestone and if release branch exists
+        id: check_release_branch
         run: |
-          RELEASE_BRANCH="release-${MILESTONE}"
-          PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${RELEASE_BRANCH}"
+          if [ -z "${{ env.MILESTONE }}" ]; then
+            echo "No milestone set. Exiting."
+            exit 0
+          fi
+
+          RELEASE_BRANCH="release-${{ env.MILESTONE }}"
+
+          # Check if the release branch exists
+          if git ls-remote --heads origin $RELEASE_BRANCH | grep -q $RELEASE_BRANCH; then
+            echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
+          else
+            echo "Release branch $RELEASE_BRANCH does not exist. Exiting."
+            exit 0
+          fi
+
+      - name: Create and push the new branch for the PR
+        run: |
+          PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
 
           # Configure git
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          # Create the new release branch if it does not exist
-          git fetch origin
-          if ! git show-ref --quiet refs/heads/$RELEASE_BRANCH; then
-            git checkout -b $RELEASE_BRANCH
-            git push origin $RELEASE_BRANCH
-          fi
-
           # Create and push the new branch for the PR
-          git checkout -b auto-pr-$RELEASE_BRANCH
+          git checkout -b auto-pr-${{ env.RELEASE_BRANCH }}
           git merge develop
-          git push origin auto-pr-$RELEASE_BRANCH
+          git push origin auto-pr-${{ env.RELEASE_BRANCH }}
 
           # Create a pull request and assign the original PR author as the reviewer
-          gh pr create --title "$PR_TITLE" --body "Automated PR to merge changes from develop to $RELEASE_BRANCH" --head auto-pr-$RELEASE_BRANCH --base $RELEASE_BRANCH --reviewer $PR_AUTHOR
+          gh pr create --title "$PR_TITLE" --body "Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}" --head auto-pr-${{ env.RELEASE_BRANCH }} --base ${{ env.RELEASE_BRANCH }} --reviewer ${{ env.PR_AUTHOR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
