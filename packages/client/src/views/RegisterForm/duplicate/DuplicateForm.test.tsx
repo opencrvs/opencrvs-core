@@ -116,13 +116,19 @@ describe('when in device of large viewport', () => {
             .props().disabled
         ).toBeTruthy()
       })
-      it('enable the duplicate button on modal when select duplicate Id', async () => {
+      it('enable the duplicate button on modal when select duplicate Id and describe-reason has valu', async () => {
         duplicateFormComponent
           .find('#mark-as-duplicate')
           .hostNodes()
           .first()
           .simulate('click')
         selectOption(duplicateFormComponent, '#selectTrackingId', 'BK7VQ0U')
+        duplicateFormComponent
+          .find(`#describe-reason`)
+          .hostNodes()
+          .simulate('change', {
+            target: { id: `#describe-reason`, value: 'Duplicate' }
+          })
         expect(
           duplicateFormComponent
             .find('#mark-as-duplicate-button')

@@ -221,9 +221,8 @@ describe('get user info from OIDP national id integration', () => {
         redirectUri: 'http://localhost:3000/mosip-callback'
       }
     )
-
-    expect(fetch.mock.calls[0][0]).toMatch(/oauth\/token$/)
-    expect(fetch.mock.calls[1][0]).toMatch(/oidc\/userinfo$/)
+    expect(fetch.mock.calls[0][0]).toMatch(/oauth\/v2\/token$/)
+    expect(fetch.mock.calls[1][0]).toMatch(/oidc\/v2\/userinfo$/)
     expect(fetch.mock.calls[2][0]).toMatch(
       /Location\?name=Farajaland&type=ADMIN_STRUCTURE$/
     )

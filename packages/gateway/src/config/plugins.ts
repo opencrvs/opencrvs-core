@@ -13,7 +13,7 @@ import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@gateway/constants'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import * as HapiSwagger from 'hapi-swagger'
 import { ServerRegisterPluginObject } from '@hapi/hapi'
 import * as H2o2 from '@hapi/h2o2'
@@ -34,19 +34,22 @@ export const getPlugins = () => {
   const plugins = [
     JWT,
     {
-      plugin: Pino,
-      options: {
-        prettyPrint: true,
-        logPayload: false,
-        instance: logger
-      }
-    },
-    {
       plugin: HapiSwagger,
       options: swaggerOptions
     },
     H2o2
   ] as Array<ServerRegisterPluginObject<any>>
+
+  if (process.env.NODE_ENV === 'production') {
+    plugins.push({
+      plugin: Pino,
+      options: {
+        prettyPrint: false,
+        logPayload: false,
+        instance: logger
+      }
+    })
+  }
 
   if (SENTRY_DSN) {
     plugins.push({

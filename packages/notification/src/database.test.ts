@@ -12,13 +12,14 @@ jest.mock('mongoose', () => ({
   connection: {
     on: jest.fn()
   },
+  set: () => {},
   connect: () => Promise.reject(),
   disconnect: () => {}
 }))
 
 import * as mongoose from 'mongoose'
 import { start, stop } from '@notification/database'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 
 const wait = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time))

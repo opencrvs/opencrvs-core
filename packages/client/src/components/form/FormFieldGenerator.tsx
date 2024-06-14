@@ -268,6 +268,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               onSetFieldValue(fieldDefinition.name, files)
               setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
+            compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
+            maxSizeMB={fieldDefinition.maxSizeMB}
             onUploadingStateChanged={onUploadingStateChanged}
             requiredErrorMessage={requiredErrorMessage}
           />

@@ -19,10 +19,9 @@ import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profi
 import { ReactWrapper } from 'enzyme'
 import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
 import { changePhoneMutation } from '@client/views/Settings/mutations'
-import { queriesForUser } from '@client/views/Settings/queries'
+import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
-import { NetworkStatus } from '@apollo/client'
 
 const graphqlMocks = [
   {
@@ -33,6 +32,17 @@ const graphqlMocks = [
         phoneNumber: '+8801741234567',
         nonce: '',
         verifyCode: '000000'
+      }
+    },
+    result: {
+      data: []
+    }
+  },
+  {
+    request: {
+      query: GET_USER_BY_MOBILE,
+      variables: {
+        mobile: '+8801741234567'
       }
     },
     result: {
@@ -81,15 +91,6 @@ describe('Change phone modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
-      Promise.resolve({
-        data: {
-          getUserByMobile: null
-        },
-        loading: false,
-        networkStatus: NetworkStatus.ready
-      })
-    )
     component.find('input').simulate('change', {
       target: { name: 'PhoneNumber', value: '01741234567' }
     })
@@ -103,21 +104,9 @@ describe('Change phone modal tests', () => {
   })
 
   it('should trigger onSuccess callback after change phone number', async () => {
-    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
-      Promise.resolve({
-        data: {
-          getUserByMobile: null
-        },
-        loading: false,
-        networkStatus: NetworkStatus.ready
-      })
-    )
-    component
-      .find('#PhoneNumber')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: '01741234567' }
-      })
+    component.find('input').simulate('change', {
+      target: { name: 'PhoneNumber', value: '01741234567' }
+    })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
     await waitForElement(component, '#VerifyCode')

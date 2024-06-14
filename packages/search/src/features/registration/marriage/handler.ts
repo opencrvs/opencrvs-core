@@ -8,8 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { indexRecord } from '@search/features/registration/marriage/service'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
+
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { ValidRecord } from '@opencrvs/commons/types'

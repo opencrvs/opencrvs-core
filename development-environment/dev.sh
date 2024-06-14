@@ -10,7 +10,6 @@ set -e
 DIR=$(cd "$(dirname "$0")"; pwd)
 
 export LANGUAGES="en,fr"
-export LOG_LEVEL="error"
 
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   OS="UBUNTU"
