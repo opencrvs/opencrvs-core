@@ -165,7 +165,7 @@ const messagesToDefine = {
     id: 'regHome.outbox.waitingToRetry'
   },
   failed: {
-    defaultMessage: 'Retrying',
+    defaultMessage: 'Failed to send',
     description: 'Label for declaration status failed',
     id: 'regHome.outbox.failed'
   },
