@@ -9,10 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { READY_FOR_REVIEW_BIRTH_RECORD } from './records/readyForReview'
+
 export const bundleWithAssignedTask = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
+    // mock composition
+    READY_FOR_REVIEW_BIRTH_RECORD.entry[0],
     {
       resource: {
         resourceType: 'Task',
@@ -79,6 +83,44 @@ export const bundleWithAssignedTask = {
           lastUpdated: '2023-12-19T06:38:53.213Z',
           versionId: '757f0e0e-2df4-4f8f-b4a4-065047bb35c0'
         }
+      }
+    },
+    {
+      fullUrl:
+        '/fhir/Practitioner/f20ad76d-87c3-46ab-8fbc-0d104a5b3e69/_history/d98a5727-eb9b-41b8-9851-f9be7b8d0eec',
+      resource: {
+        resourceType: 'Practitioner',
+        identifier: [],
+        telecom: [
+          {
+            system: 'phone',
+            value: '0933333333'
+          },
+          {
+            system: 'email',
+            value: ''
+          }
+        ],
+        name: [
+          {
+            use: 'en',
+            family: 'Mweene',
+            given: ['Kennedy']
+          }
+        ],
+        meta: {
+          lastUpdated: '2024-06-06T10:45:05.773+00:00',
+          versionId: 'd98a5727-eb9b-41b8-9851-f9be7b8d0eec'
+        },
+        _transforms: {
+          meta: {
+            lastUpdated: '2024-06-06T10:45:05.773Z'
+          }
+        },
+        _request: {
+          method: 'POST'
+        },
+        id: 'f20ad76d-87c3-46ab-8fbc-0d104a5b3e69'
       }
     }
   ]

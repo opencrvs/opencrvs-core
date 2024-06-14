@@ -8,6 +8,7 @@
     ".": "./build/dist/index.js",
     "./monitoring": "./build/dist/monitoring.js",
     "./types": "./build/dist/types.js",
+    "./logger": "./build/dist/logger.js",
     "./authentication": "./build/dist/authentication.js",
     "./http": "./build/dist/http.js",
     "./fixtures": "./build/dist/fixtures.js",
@@ -20,7 +21,7 @@
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
     "build": "tsc --project tsconfig.build.json",
-    "build:watch": "tsc --watch",
+    "build:watch": "tsc --watch --preserveWatchOutput",
     "build:clean": "rm -rf build"
   },
   "private": true,
@@ -41,7 +42,8 @@
     "node-fetch": "^2.6.7",
     "pkg-up": "^3.1.0",
     "typescript": "4.9.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "pino": "^7.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.5.0",
@@ -51,6 +53,7 @@
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^4.0.0",
     "jest-fetch-mock": "^2.1.2",
+    "pino-pretty": "^11.0.0",
     "ts-jest": "^26.4.4"
   },
   "lint-staged": {

@@ -17,7 +17,7 @@ import {
   USER_MANAGEMENT_URL,
   DOCUMENTS_URL
 } from '@metrics/constants'
-import { logger } from './logger'
+import { logger } from '@opencrvs/commons'
 
 export function fetchFHIR<T = any>(
   suffix: string,

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 import * as Joi from 'joi'
 import { sendAllUserEmails } from './service.'
 
