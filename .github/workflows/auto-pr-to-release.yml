@@ -1,0 +1,48 @@
+name: Auto PR to Release Branch
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  create-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get PR details from event
+        id: get_pr_details
+        run: |
+          echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
+
+      - name: Check for milestone
+        if: env.MILESTONE != ''
+        run: |
+          RELEASE_BRANCH="release-${MILESTONE}"
+          PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${RELEASE_BRANCH}"
+
+          # Configure git
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # Create the new release branch if it does not exist
+          git fetch origin
+          if ! git show-ref --quiet refs/heads/$RELEASE_BRANCH; then
+            git checkout -b $RELEASE_BRANCH
+            git push origin $RELEASE_BRANCH
+          fi
+
+          # Create and push the new branch for the PR
+          git checkout -b auto-pr-$RELEASE_BRANCH
+          git merge develop
+          git push origin auto-pr-$RELEASE_BRANCH
+
+          # Create a pull request and assign the original PR author as the reviewer
+          gh pr create --title "$PR_TITLE" --body "Automated PR to merge changes from develop to $RELEASE_BRANCH" --head auto-pr-$RELEASE_BRANCH --base $RELEASE_BRANCH --reviewer $PR_AUTHOR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
