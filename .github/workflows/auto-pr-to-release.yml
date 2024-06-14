@@ -151,7 +151,7 @@ jobs:
           # Create a pull request and assign the original PR author as the reviewer
           AUTHOR=${{ env.PR_AUTHOR }}
 
-          if [[ $AUTHOR == app/* ]]; then
+          if [[ $AUTHOR == *renovate* ]]; then
             if [ -z "${{ env.PR_MERGER }}" ]; then
               AUTHOR=""
             else
