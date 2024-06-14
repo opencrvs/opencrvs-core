@@ -12,25 +12,41 @@ name: Auto PR to Release Branch
 on:
   pull_request:
     types: [closed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to process'
+        required: true
+        default: ''
 
 jobs:
   create-pr:
-    if: github.event.pull_request.merged == true
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get PR details from event
+      - name: Get PR details from event or input
         id: get_pr_details
         run: |
-          echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-          echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
-          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
-          echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
-          echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-          echo "MERGE_COMMIT_SHA=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PR_NUMBER=${{ github.event.inputs.pr_number }}
+            PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefName,baseRefName,mergeCommit,author,headRepository,milestone --jq '{number: .number, headRefName: .headRefName, baseRefName: .baseRefName, mergeCommit: .mergeCommit.oid, author: .author.login, milestone: .milestone.title}')
+            echo "PR_ID=$(echo $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
+            echo "PR_AUTHOR=$(echo $PR_DATA | jq -r '.author')" >> $GITHUB_ENV
+            echo "MILESTONE=$(echo $PR_DATA | jq -r '.milestone')" >> $GITHUB_ENV
+            echo "BASE_BRANCH=$(echo $PR_DATA | jq -r '.baseRefName')" >> $GITHUB_ENV
+            echo "HEAD_BRANCH=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_ENV
+            echo "MERGE_COMMIT_SHA=$(echo $PR_DATA | jq -r '.mergeCommit')" >> $GITHUB_ENV
+          else
+            echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+            echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+            echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
+            echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+            echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+            echo "MERGE_COMMIT_SHA=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_ENV
 
       - name: Check for milestone and if release branch exists
         id: check_release_branch
@@ -69,11 +85,14 @@ jobs:
 
           # Get the commit range
           BASE_COMMIT=$(git merge-base origin/${{ env.BASE_BRANCH }} origin/${{ env.HEAD_BRANCH }})
+          echo "Base commit: $BASE_COMMIT"
           COMMIT_RANGE="${BASE_COMMIT}..${{ env.MERGE_COMMIT_SHA }}"
+          echo "Commit range: $COMMIT_RANGE"
 
           # Attempt to cherry-pick the commits from the original PR
           git cherry-pick $COMMIT_RANGE || {
             # If cherry-pick fails, create a placeholder commit
+            echo "Cherry-pick failed. Creating placeholder commit."
             git reset --hard
             echo "" >> CHANGELOG.md
             git add CHANGELOG.md
