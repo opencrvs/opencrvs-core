@@ -67,6 +67,8 @@ jobs:
           PR_DETAILS=$(gh pr view $PR_NUMBER --json mergedBy)
           MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
           echo "PR_MERGER=$MERGED_BY_LOGIN" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for milestone and if release branch exists
         id: check_release_branch
