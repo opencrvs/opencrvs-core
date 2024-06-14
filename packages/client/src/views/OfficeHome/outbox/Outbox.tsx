@@ -17,7 +17,6 @@ import {
 } from '@client/SubmissionController'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { declarationReadyForStatusChange } from '@client/declarations/submissionMiddleware'
-import { SubmissionAction } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -223,7 +222,7 @@ export function Outbox() {
           declaration.submissionStatus === SUBMISSION_STATUS.FAILED
             ? [
                 {
-                  label: 'Retry',
+                  label: intl.formatMessage(messages.retry),
                   disabled: false,
                   handler: (
                     e:

@@ -129,6 +129,12 @@ const messagesToDefine = {
     description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToSubmit'
   },
+  retry: {
+    id: 'regHome.outbox.statusRejecting',
+    defaultMessage: 'Retry',
+    description:
+      'Copy for "Retry" button in Outbox shown for records that failed to send'
+  },
   userAuditSuccess: {
     defaultMessage:
       '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated} other {deactivated}}',
