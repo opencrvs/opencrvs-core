@@ -589,11 +589,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             nameLocal,
             informant:
               (eventProgress.registration &&
-                ((eventProgress.registration.contactRelationship &&
-                  conditioanllyFormatContactRelationship(
-                    eventProgress.registration.contactRelationship
-                  ) + ' ') ||
-                  '') + (eventProgress.registration.contactNumber || '')) ||
+                [
+                  eventProgress.registration.contactRelationship &&
+                    conditioanllyFormatContactRelationship(
+                      eventProgress.registration.contactRelationship
+                    ),
+                  eventProgress.registration.contactNumber,
+                  eventProgress.registration.contactEmail
+                ]
+                  .filter(Boolean)
+                  .join('\n')) ||
               '',
             declarationStartedOn: formateDateWithRelationalText(
               eventProgress.startedAt
