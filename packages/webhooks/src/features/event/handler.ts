@@ -17,7 +17,7 @@ import {
   transformDeathBundle
 } from '@webhooks/features/event/service'
 import { EventType, ISystem } from '@webhooks/features/manage/service'
-import { logger } from '@webhooks/logger'
+import { logger } from '@opencrvs/commons'
 import Webhook, { IWebhookModel, TRIGGERS } from '@webhooks/model/webhook'
 import { getQueue } from '@webhooks/queue'
 import { Queue } from 'bullmq'

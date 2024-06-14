@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import { badData, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
