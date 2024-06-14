@@ -12,12 +12,13 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  Practitioner,
-  SavedLocation,
-  SavedPractitioner
-} from '@opencrvs/commons/types'
+import { Practitioner, SavedPractitioner } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+
+type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
+export type SearchCriteria = {
+  [K in UserSearchCriteria]?: string
+}
 
 export async function getUser(
   userId: string,
@@ -50,6 +51,54 @@ export async function getSystem(
   const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
     method: 'POST',
     body: JSON.stringify({ systemId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
+export async function getUserByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
+export async function getSystemByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader
@@ -158,12 +207,6 @@ export async function getLoggedInPractitionerResource(
   }
 
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
-}
-
-export async function getLocationOrOfficeById(
-  locationId: string
-): Promise<SavedLocation> {
-  return await getFromFhir(`/Location/${locationId}`)
 }
 
 export async function getPractitionerLocations(
