@@ -246,16 +246,11 @@ export function VerifyCertificatePage() {
   }
 
   const getLastCertifiedDate = (data: RecordDetails) => {
-    // find when declaration was certified
+    // find first certified action from history sorted in ascending order by time
     return (
       data.history &&
       data.history.find(
-        (h, index, allHistory) =>
-          index - 1 &&
-          allHistory[index]?.regStatus?.toString() ===
-            SUBMISSION_STATUS.CERTIFIED &&
-          allHistory[index + 1]?.regStatus?.toString() !==
-            SUBMISSION_STATUS.CERTIFIED
+        (item) => item?.regStatus?.toString() === SUBMISSION_STATUS.CERTIFIED
       )
     )?.date
   }
