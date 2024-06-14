@@ -54,7 +54,7 @@
 
 ## Improvements
 
-- Development time logs are now much tidier and errors easier to point out
+- Development time logs are now much tidier and errors easier to point out. Production logging will still remain as is.
 
 ## Bug fixes
 
