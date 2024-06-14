@@ -33,7 +33,12 @@ import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
 
-const CertificateContainer = styled.div``
+const CertificateContainer = styled.div`
+  svg {
+    /* limits the certificate overflowing on small screens */
+    max-width: 100%;
+  }
+`
 
 const ReviewCertificateFrame = ({
   children
