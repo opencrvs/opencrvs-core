@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended",
     "monorepo:lerna",
-    ":semanticCommitsDisabled"
+    ":semanticCommits"
   ],
   "lockFileMaintenance": {
     "enabled": true
