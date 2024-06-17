@@ -122,9 +122,7 @@ jobs:
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
             git reset --hard
-            echo "" >> CHANGELOG.md
-            git add CHANGELOG.md
-            git commit -m "Placeholder commit for PR #${{ env.PR_ID }}"
+            git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
 
             # Add manual cherry-pick commands to the PR body
             PR_BODY="${PR_BODY}
