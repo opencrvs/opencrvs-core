@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Location, ResourceIdentifier } from '@opencrvs/commons/types'
+import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { query } from '@metrics/influxdb/client'
+import { helpers } from '@metrics/utils/queryHelper'
 
 export interface ITimeLoggedData {
   status?: string
@@ -60,21 +63,22 @@ export async function getTimeLoggedForPractitioner(
   timeFrom: string,
   timeTo: string,
   practitionerId: string,
-  locationId: string,
+  locationId: ResourceIdentifier<Location>,
   count?: number
 ): Promise<ITimeLoggedData[]> {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
   const countLimit = count ? 'LIMIT ' + count : ''
   const timeLoggedData: ITimeLoggedData[] = await query(
-    `SELECT currentStatus as status, trackingId, 
+    `SELECT currentStatus as status, trackingId,
           eventType, timeSpentEditing, time
           FROM declaration_time_logged
             WHERE time > $timeFrom AND time <= $timeTo
             AND practitionerId = $practitionerId
-            AND ( locationLevel1 = $locationId 
-            OR locationLevel2 = $locationId 
-            OR locationLevel3 = $locationId 
-            OR locationLevel4 = $locationId 
-            OR locationLevel5 = $locationId)
+            AND (${officeLocationInChildren})
               ORDER BY time DESC
               $countLimit`,
     {
@@ -82,8 +86,8 @@ export async function getTimeLoggedForPractitioner(
         timeFrom,
         timeTo,
         practitionerId,
-        locationId,
-        countLimit
+        countLimit,
+        ...locationPlaceholders
       }
     }
   )
@@ -95,7 +99,7 @@ export async function countTimeLoggedForPractitioner(
   timeFrom: string,
   timeTo: string,
   practitionerId: string,
-  locationId: string
+  locationId: ResourceIdentifier<Location>
 ): Promise<number> {
   const timeLoggedData = await getTimeLoggedForPractitioner(
     timeFrom,
