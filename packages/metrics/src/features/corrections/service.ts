@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
-
+import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 import { query } from '@metrics/influxdb/client'
+import { fetchLocationChildrenIds } from '@metrics/configApi'
+import { helpers } from '@metrics/utils/queryHelper'
 
 interface ICorrectionTotalGroup {
   total: number
@@ -20,7 +22,6 @@ interface ICorrectionTotalGroup {
 export async function getTotalCorrections(
   timeFrom: string,
   timeTo: string,
-  locationId: string | undefined,
   event: EVENT_TYPE
 ) {
   const q = `SELECT COUNT(compositionId) AS total
@@ -28,24 +29,45 @@ export async function getTotalCorrections(
     WHERE time > $timeFrom
       AND time <= $timeTo
       AND eventType = $event
-      ${
-        locationId
-          ? `AND ( locationLevel1 = $locationId
-      OR locationLevel2 = $locationId
-      OR locationLevel3 = $locationId
-      OR locationLevel4 = $locationId
-      OR locationLevel5 = $locationId
-      OR officeLocation = $locationId)`
-          : ``
-      }
     GROUP BY reason`
 
   const totalCorrections: ICorrectionTotalGroup[] = await query(q, {
     placeholders: {
       timeFrom,
       timeTo,
-      locationId,
       event
+    }
+  })
+
+  return totalCorrections
+}
+
+export async function getTotalCorrectionsByLocation(
+  timeFrom: string,
+  timeTo: string,
+  locationId: ResourceIdentifier<Location>,
+  event: EVENT_TYPE
+) {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
+  const q = `SELECT COUNT(compositionId) AS total
+      FROM correction
+    WHERE time > $timeFrom
+      AND time <= $timeTo
+      AND eventType = $event
+      AND (${officeLocationInChildren})
+    GROUP BY reason`
+
+  const totalCorrections: ICorrectionTotalGroup[] = await query(q, {
+    placeholders: {
+      timeFrom,
+      timeTo,
+      event,
+      ...locationPlaceholders
     }
   })
 

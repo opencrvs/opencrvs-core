@@ -31,6 +31,12 @@ import { query } from '@metrics/influxdb/client'
 import { csvToJSON } from '@metrics/utils/csvHelper'
 import { format } from 'date-fns'
 import fetch from 'node-fetch'
+import { fetchLocationChildrenIds } from '@metrics/configApi'
+import { helpers } from '@metrics/utils/queryHelper'
+import {
+  ResourceIdentifier,
+  Location as FhirLocation
+} from '@opencrvs/commons/types'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -321,25 +327,25 @@ export async function fetchRegWithinTimeFrames(
 export async function getCurrentAndLowerLocationLevels(
   timeStart: string,
   timeEnd: string,
-  locationId: string,
+  locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE
 ): Promise<ICurrentAndLowerLocationLevels> {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const allPointsContainingLocationId = await query(
     `SELECT LAST(*) FROM ${measurement} WHERE time > $timeStart AND time <= $timeEnd
-      AND ( officeLocation = $locationId
-        OR locationLevel1 = $locationId
-        OR locationLevel2 = $locationId
-        OR locationLevel3 = $locationId
-        OR locationLevel4 = $locationId
-        OR locationLevel5 = $locationId )
-      GROUP BY officeLocation,locationLevel2,locationLevel3,locationLevel4,locationLevel5`,
+      AND (${officeLocationInChildren})
+      GROUP BY officeLocation`, // TODO: Test this grouping, as it had locationLevel1-N before
     {
       placeholders: {
         timeStart,
         timeEnd,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -426,7 +432,13 @@ export async function fetchKeyFigures(
   )
 
   const keyFigures: IBirthKeyFigures[] = []
-  const queryLocationId = `Location/${estimatedFigureForTargetDays.locationId}`
+  const queryLocationId =
+    `Location/${estimatedFigureForTargetDays.locationId}` as const
+  const locationIds = await fetchLocationChildrenIds(queryLocationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
 
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
     EVENT_TYPE.BIRTH,
@@ -439,16 +451,12 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel1 = $queryLocationId
-          OR locationLevel2 = $queryLocationId
-          OR locationLevel3 = $queryLocationId
-          OR locationLevel4 = $queryLocationId
-          OR locationLevel5 = $queryLocationId )
+      AND (${officeLocationInChildren})
       AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`,
     {
       placeholders: {
-        queryLocationId
+        ...locationPlaceholders
       }
     }
   )
@@ -476,17 +484,13 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel1 = $queryLocationId
-          OR locationLevel2 = $queryLocationId
-          OR locationLevel3 = $queryLocationId
-          OR locationLevel4 = $queryLocationId
-          OR locationLevel5 = $queryLocationId )
+      AND (${officeLocationInChildren})
       AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
       AND ageInDays <= 365
     GROUP BY gender`,
     {
       placeholders: {
-        queryLocationId
+        ...locationPlaceholders
       }
     }
   )
@@ -789,9 +793,14 @@ type Registration = {
 export async function getTotalNumberOfRegistrations(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE
 ) {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const totalRegistrationPoint: Registration[] = await query(
@@ -799,16 +808,12 @@ export async function getTotalNumberOfRegistrations(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel1 = $locationId
-          OR locationLevel2 = $locationId
-          OR locationLevel3 = $locationId
-          OR locationLevel4 = $locationId
-          OR locationLevel5 = $locationId )`,
+      AND (${officeLocationInChildren})`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -818,10 +823,15 @@ export async function getTotalNumberOfRegistrations(
 export async function fetchLocationWiseEventEstimations(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
@@ -834,18 +844,14 @@ export async function fetchLocationWiseEventEstimations(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel1 = $locationId
-          OR locationLevel2 = $locationId
-          OR locationLevel3 = $locationId
-          OR locationLevel4 = $locationId
-          OR locationLevel5 = $locationId )
+      AND (${officeLocationInChildren})
       AND ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -925,11 +931,7 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel1 = $locationId
-          OR locationLevel2 = $locationId
-          OR locationLevel3 = $locationId
-          OR locationLevel4 = $locationId
-          OR locationLevel5 = $locationId )
+      AND officeLocation = $locationId
     GROUP BY timeLabel`,
     {
       placeholders: {
@@ -953,6 +955,41 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
     results: registrations
   }
 }
+
+export async function fetchEventsGroupByMonthDatesByLocation(
+  timeFrom: string,
+  timeTo: string,
+  locationId: ResourceIdentifier<FhirLocation>,
+  event: EVENT_TYPE
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
+  const registrationsInTargetDaysPoints: IGroupByEventDate[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > $timeFrom
+      AND time <= $timeTo
+      AND (${officeLocationInChildren})
+    GROUP BY dateLabel, timeLabel`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        ...locationPlaceholders
+      }
+    }
+  )
+
+  return registrationsInTargetDaysPoints
+}
+
 export async function fetchEventsGroupByMonthDates(
   timeFrom: string,
   timeTo: string,
@@ -968,15 +1005,6 @@ export async function fetchEventsGroupByMonthDates(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      ${
-        locationId
-          ? `AND ( locationLevel1 = $locationId
-      OR locationLevel2 = $locationId
-      OR locationLevel3 = $locationId
-      OR locationLevel4 = $locationId
-      OR locationLevel5 = $locationId )`
-          : ``
-      }
     GROUP BY dateLabel, timeLabel`,
     {
       placeholders: {
@@ -989,38 +1017,35 @@ export async function fetchEventsGroupByMonthDates(
 
   return registrationsInTargetDaysPoints
 }
-export async function getTotalMetrics(
+
+export async function getTotalMetricsByLocation(
   timeFrom: string,
   timeTo: string,
-  locationId: string | undefined,
+  locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
 
   const totalMetrics: IMetricsTotalGroup[] = await query(
     `SELECT COUNT(${column}) AS total
-      FROM ${measurement}
-    WHERE time > $timeFrom
-      AND time <= $timeTo
-      ${
-        locationId
-          ? `AND ( locationLevel1 = $locationId
-      OR locationLevel2 = $locationId
-      OR locationLevel3 = $locationId
-      OR locationLevel4 = $locationId
-      OR locationLevel5 = $locationId
-      OR officeLocation = $locationId)`
-          : ``
-      }
-    GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
+    FROM ${measurement}
+  WHERE time > $timeFrom
+    AND time <= $timeTo
+    AND (${officeLocationInChildren})
+  GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -1040,11 +1065,77 @@ export async function getTotalMetrics(
   }
 }
 
-export async function fetchRegistrationsGroupByOfficeLocation(
+export async function getTotalMetrics(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,
-  locationId: string | undefined
+  authHeader: IAuthHeader
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const totalMetrics: IMetricsTotalGroup[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > $timeFrom
+      AND time <= $timeTo
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo
+      }
+    }
+  )
+
+  const estimationOfTimeRange: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
+      undefined,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+
+  return {
+    estimated: estimationOfTimeRange,
+    results: totalMetrics || []
+  }
+}
+
+export async function fetchRegistrationsGroupByOfficeLocationByLocation(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: ResourceIdentifier<FhirLocation>
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
+  const result: IMetricsTotalGroupByLocation[] = await query(
+    `SELECT COUNT(${column}) AS total
+    FROM ${measurement}
+  WHERE time > '${timeFrom}'
+    AND time <= '${timeTo}'
+    AND (${officeLocationInChildren})
+  GROUP BY officeLocation, eventLocationType, timeLabel`,
+    { placeholders: { ...locationPlaceholders } }
+  )
+
+  return result
+}
+
+export async function fetchRegistrationsGroupByOfficeLocation(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
@@ -1055,16 +1146,6 @@ export async function fetchRegistrationsGroupByOfficeLocation(
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
-      ${
-        locationId
-          ? `AND ( locationLevel1 = '${locationId}'
-      OR locationLevel2 = '${locationId}'
-      OR locationLevel3 = '${locationId}'
-      OR locationLevel4 = '${locationId}'
-      OR locationLevel5 = '${locationId}'
-      OR officeLocation = '${locationId}')`
-          : ``
-      }
     GROUP BY officeLocation, eventLocationType, timeLabel`
   )
 
@@ -1075,32 +1156,29 @@ export async function fetchRegistrationsGroupByTime(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,
-  locationId: string | undefined
+  locationId: ResourceIdentifier<FhirLocation> | undefined
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const locationIds = locationId && (await fetchLocationChildrenIds(locationId))
 
   const fluxQuery = `
    from(bucket: "${INFLUX_DB}")
    |> range(start: ${timeFrom}, stop: ${timeTo})
-   |> filter(fn: (r) => r._measurement == "${measurement}") 
+   |> filter(fn: (r) => r._measurement == "${measurement}")
    ${
-     locationId
-       ? `|> filter(fn: (r) => 
-   (r.locationLevel1 == "${locationId}" or
-    r.locationLevel2 == "${locationId}" or
-    r.locationLevel3 == "${locationId}" or 
-    r.locationLevel4 == "${locationId}" or
-    r.locationLevel5 == "${locationId}" or
-    r.officeLocation == "${locationId}"))`
+     locationIds
+       ? `|> filter(fn: (r) => (${locationIds
+           .map((locationId) => `r.officeLocation == "${locationId}"`)
+           .join(' or ')}))`
        : ``
    }
-    |> filter(fn: (r) => r._field == "${column}")
-    |> group(columns: ["timeLabel", "eventLocationType"])
-    |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
-    |> sort(columns: ["_time"], desc: true)
-    |> rename(columns: {_value: "total"})
+   |> filter(fn: (r) => r._field == "${column}")
+   |> group(columns: ["timeLabel", "eventLocationType"])
+   |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
+   |> sort(columns: ["_time"], desc: true)
+   |> rename(columns: {_value: "total"})
    `
 
   const res = await fetch(`${INFLUXDB_URL}/api/v2/query`, {
