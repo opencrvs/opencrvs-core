@@ -32,7 +32,6 @@ import {
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
 import { client } from '@search/elasticsearch/client'
-import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
@@ -45,6 +44,7 @@ import {
   findFirstTaskHistory
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
+import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -143,8 +143,7 @@ function createDeceasedIndex(
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased.deceasedDateTime
   body.gender = deceased.gender
-  body.deceasedIdentifier =
-    deceased.identifier && getSubmittedIdentifier(deceased.identifier)
+  body.deceasedIdentifier = findPatientPrimaryIdentifier(deceased)?.value
   body.deceasedDoB = deceased.birthDate
 }
 
@@ -218,6 +217,7 @@ function createSpouseIndex(
   body.spouseMiddleNameLocal = spouseNameLocal?.given?.at(1)
   body.spouseFamilyNameLocal =
     spouseNameLocal && spouseNameLocal.family && spouseNameLocal.family[0]
+  body.spouseIdentifier = findPatientPrimaryIdentifier(spouse)?.value
 }
 
 function createInformantIndex(
@@ -258,8 +258,7 @@ function createInformantIndex(
     informantNameLocal.family &&
     informantNameLocal.family[0]
   body.informantDoB = informant.birthDate
-  body.informantIdentifier =
-    informant.identifier && getSubmittedIdentifier(informant.identifier)
+  body.informantIdentifier = findPatientPrimaryIdentifier(informant)?.value
 }
 
 function createDeclarationIndex(
