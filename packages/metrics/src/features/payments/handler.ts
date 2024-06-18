@@ -15,7 +15,10 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import { getTotalPayments } from '@metrics/features/payments/service'
+import {
+  getTotalPayments,
+  getTotalPaymentsByLocation
+} from '@metrics/features/payments/service'
 
 export async function totalPaymentsHandler(
   request: Hapi.Request,
@@ -24,9 +27,13 @@ export async function totalPaymentsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
 
-  return getTotalPayments(timeStart, timeEnd, locationId, event)
+  if (locationId) {
+    return getTotalPaymentsByLocation(timeStart, timeEnd, locationId, event)
+  } else {
+    return getTotalPayments(timeStart, timeEnd, event)
+  }
 }

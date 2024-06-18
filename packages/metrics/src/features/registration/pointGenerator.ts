@@ -17,14 +17,12 @@ import {
   IRejectedFields,
   IDurationFields,
   IPaymentFields,
-  IPointLocation,
   IAuthHeader,
   IBirthRegistrationTags,
   IDeathRegistrationTags,
   IInProgressDeclarationTags,
   ITimeLoggedTags,
   IDurationTags,
-  ILocationTags,
   IPoints,
   IPaymentPoints,
   IDeclarationsStartedPoints,
@@ -71,7 +69,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Events
 } from '@metrics/features/metrics/constants'
-import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
+import { fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
@@ -108,10 +106,7 @@ export const generateInCompleteFieldPoints = async (
   const fields: IInProgressDeclarationFields = {
     compositionId: composition.id!
   }
-  const locationTags: ILocationTags = await generatePointLocations(
-    payload,
-    authHeader
-  )
+  const office = getRegLastOffice(payload)
 
   return inCompleteFieldExtension.valueString
     .split(',')
@@ -123,7 +118,7 @@ export const generateInCompleteFieldPoints = async (
         missingFieldId: missingFieldIds[2],
         eventType: getDeclarationType(task),
         regStatus: 'IN_PROGRESS',
-        ...locationTags
+        officeLocation: office
       }
       return {
         measurement: 'in_complete_fields',
@@ -163,8 +158,7 @@ export const generateCertificationPoint = async (
 
   const tags = {
     eventType: getDeclarationType(task),
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   const point = {
@@ -224,8 +218,7 @@ export const generateBirthRegPoint = async (
           authHeader.Authorization
         ))) ||
       undefined,
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   const point = {
@@ -307,8 +300,7 @@ export const generateDeathRegPoint = async (
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   const point = {
@@ -319,36 +311,6 @@ export const generateDeathRegPoint = async (
   }
 
   return point
-}
-
-const generatePointLocations = async (
-  payload: fhir.Bundle,
-  authHeader: IAuthHeader
-): Promise<IPointLocation> => {
-  const locations: IPointLocation = {}
-  const office = getRegLastOffice(payload)
-  if (!office) {
-    return locations
-  }
-  const locationLevel5 = await fetchParentLocationByLocationID(
-    office,
-    authHeader
-  )
-  if (!locationLevel5) {
-    return locations
-  }
-  locations.locationLevel5 = locationLevel5
-  let locationID: string | undefined = locations.locationLevel5
-
-  for (let index = 4; index > 0; index--) {
-    locationID = await fetchParentLocationByLocationID(locationID, authHeader)
-    if (!locationID || locationID === 'Location/0') {
-      break
-    }
-    locations[`locationLevel${index}`] = locationID
-  }
-
-  return locations
 }
 
 export async function generateCorrectionReasonPoint(
@@ -376,8 +338,7 @@ export async function generateCorrectionReasonPoint(
   const tags = {
     eventType: getDeclarationType(task),
     officeLocation: getRegLastOffice(payload),
-    reason: reason || 'UNKNOWN',
-    ...(await generatePointLocations(payload, authHeader))
+    reason: reason || 'UNKNOWN'
   }
 
   return {
@@ -415,8 +376,7 @@ export async function generatePaymentPoint(
   const tags = {
     eventType: getDeclarationType(task),
     officeLocation: getRegLastOffice(payload),
-    paymentType,
-    ...(await generatePointLocations(payload, authHeader))
+    paymentType
   }
 
   return {
@@ -530,8 +490,7 @@ export async function generateTimeLoggedPoint(
     trackingId: getTrackingId(currentTask) as string,
     eventType: getDeclarationType(currentTask),
     practitionerId: getPractionerIdFromTask(currentTask),
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   return {
@@ -585,8 +544,7 @@ export async function generateDeclarationStartedPoint(
   const tags = {
     eventType: getDeclarationType(task),
     practitionerId: getPractionerIdFromTask(task),
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   return {
@@ -621,8 +579,7 @@ export async function generateRejectedPoints(
   const tags = {
     eventType: getDeclarationType(task),
     startedBy: getRecordInitiator(taskHistory),
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   return {
@@ -690,8 +647,7 @@ export async function generateMarriageRegPoint(
           authHeader.Authorization
         ))) ||
       undefined,
-    officeLocation: getRegLastOffice(payload),
-    ...(await generatePointLocations(payload, authHeader))
+    officeLocation: getRegLastOffice(payload)
   }
 
   const point = {

@@ -52,6 +52,10 @@
   - `maxSizeMB`: An optional validation prop to prevent input of a file bigger than a defined value.
 - Metabase default credentials now must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start [#6578](https://github.com/opencrvs/opencrvs-core/issues/6578)
 
+## Improvements
+
+- Development time logs are now much tidier and errors easier to point out. Production logging will still remain as is.
+
 ## Bug fixes
 
 - Handle back button click after issuing a declaration [#6424](https://github.com/opencrvs/opencrvs-core/issues/6424)
@@ -85,6 +89,7 @@
 - Fix "Print and issue to groom|bride" is added to a different variable [#7066](https://github.com/opencrvs/opencrvs-core/pull/7066)
 - Fix Removed duplicateTrackingId check in createDuplicateTask method [#7081](https://github.com/opencrvs/opencrvs-core/pull/7081)
 - Fix Disabling 'Mark as duplicate' button when duplicate reason is empty too [#7083](https://github.com/opencrvs/opencrvs-core/pull/7083)
+- Fix records going completely missing when an unexpected error happens in the backend [#7021](https://github.com/opencrvs/opencrvs-core/pull/7021)
 
 ## Refactor
 
