@@ -343,7 +343,7 @@ export async function validateDeceasedDetails(
                   }
                 ]
               },
-              value: birthPatient.id
+              value: birthPatient.id!
             })
           }
         }
