@@ -52,4 +52,4 @@ vulnerabilities:
   - id: CVE-2024-4068
     statement: Transitive dependency of lint-staged, jest and msw. Not running in production. Likely fixed by upgrading.
   - id: CVE-2024-37890
-    statement: "ws" vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.
+    statement: ws vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.
