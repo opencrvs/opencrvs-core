@@ -99,7 +99,7 @@ jobs:
           git config advice.mergeConflict false
 
           # Fetch and checkout the release branch
-          git fetch origin
+          git fetch --all
           git checkout ${{ env.RELEASE_BRANCH }}
 
           # Create a new branch for the PR
@@ -135,7 +135,9 @@ jobs:
 
             **To continue manually you can use these commands:**
             \`\`\`
-            git fetch origin pull/${{ env.PR_ID }}/head:pr-${{ env.PR_ID }}-branch
+            git fetch origin $NEW_BRANCH:$NEW_BRANCH
+            git fetch origin ${{ env.HEAD_BRANCH }}:${{ env.HEAD_BRANCH }}
+
             git checkout $NEW_BRANCH
             git reset --hard HEAD~1  # Remove placeholder commit
             git cherry-pick $COMMIT_RANGE
