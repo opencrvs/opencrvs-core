@@ -54,7 +54,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "jest-fetch-mock": "^2.1.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "^26.4.4"
+    "ts-jest": "27.1.4"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
