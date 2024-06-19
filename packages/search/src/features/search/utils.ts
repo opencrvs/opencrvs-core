@@ -746,8 +746,13 @@ export const findPatientPrimaryIdentifier = (patient: Patient) =>
     patient,
     SUPPORTED_PATIENT_IDENTIFIER_CODES.filter(
       (code) =>
-        !['BIRTH_REGISTRATION_NUMBER', 'DEATH_REGISTRATION_NUMBER'].includes(
-          code
-        )
+        ![
+          'BIRTH_REGISTRATION_NUMBER',
+          'DEATH_REGISTRATION_NUMBER',
+          'MARRIAGE_REGISTRATION_NUMBER',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+        ].includes(code)
     )
   )
