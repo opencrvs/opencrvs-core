@@ -12,8 +12,13 @@ import { createServer } from '@metrics/server'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import * as fetchMock from 'jest-fetch-mock'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 
 const readPoints = influx.query as jest.Mock
+const fetch = fetchMock as fetchMock.FetchMock
+
 jest.mock('../metrics/utils', () => {
   const originalModule = jest.requireActual('../metrics//utils')
   return {
@@ -42,6 +47,20 @@ describe('verify monthWiseEventEstimations handler', () => {
   it('returns ok for valid request', async () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const utilService = require('../metrics/utils')
+    fetch.mockResponseOnce(
+      JSON.stringify([
+        fixtures.savedLocation({
+          id: '1490d3dd-71a9-47e8-b143-f9fc64f71294' as UUID,
+          partOf: undefined
+        }),
+        fixtures.savedLocation({
+          id: 'uuid2' as UUID,
+          partOf: {
+            reference: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
+          }
+        })
+      ])
+    )
     readPoints.mockResolvedValueOnce([
       {
         gender: 'male',
