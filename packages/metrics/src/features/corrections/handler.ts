@@ -15,7 +15,10 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import { getTotalCorrections } from '@metrics/features/corrections/service'
+import {
+  getTotalCorrections,
+  getTotalCorrectionsByLocation
+} from '@metrics/features/corrections/service'
 
 export async function totalCorrectionsHandler(
   request: Hapi.Request,
@@ -24,9 +27,13 @@ export async function totalCorrectionsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
 
-  return getTotalCorrections(timeStart, timeEnd, locationId, event)
+  if (locationId) {
+    return getTotalCorrectionsByLocation(timeStart, timeEnd, locationId, event)
+  } else {
+    return getTotalCorrections(timeStart, timeEnd, event)
+  }
 }

@@ -47,7 +47,7 @@ export const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.REQUESTING_CORRECTION
 ] as const
 
-function isSubmissionAction(action: Action): action is SubmissionAction {
+export function isSubmissionAction(action: Action): action is SubmissionAction {
   return Object.values(SubmissionAction).includes(action as SubmissionAction)
 }
 
@@ -104,6 +104,7 @@ export class SubmissionController {
   /* eslint-disable no-console */
 
   public sync = () => {
+    const firstSync = this.syncCount === 0
     this.syncCount++
     console.debug(`[${this.syncCount}] Starting sync...`)
     if (!isNavigatorOnline() || this.syncRunning) {
@@ -116,11 +117,24 @@ export class SubmissionController {
     this.syncRunning = true
 
     this.requeueHangingDeclarations()
-    const declarations = this.getSubmitableDeclarations()
+    const submitableDeclarations = this.getSubmitableDeclarations()
+
+    if (firstSync) {
+      const failedDeclarations = this.getDeclarations().filter(
+        (declaration) =>
+          declaration.submissionStatus === SUBMISSION_STATUS.FAILED
+      )
+
+      submitableDeclarations.push(...failedDeclarations)
+      console.debug(
+        `[${this.syncCount}] First sync, adding ${failedDeclarations.length} failed declarations`
+      )
+    }
+
     console.debug(
-      `[${this.syncCount}] Syncing ${declarations.length} declarations`
+      `[${this.syncCount}] Syncing ${submitableDeclarations.length} declarations`
     )
-    for (const declaration of declarations) {
+    for (const declaration of submitableDeclarations) {
       const action = declaration.action
       if (action && isSubmissionAction(action)) {
         this.store.dispatch(

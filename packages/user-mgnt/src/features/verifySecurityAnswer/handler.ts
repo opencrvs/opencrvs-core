@@ -13,7 +13,7 @@ import * as Joi from 'joi'
 import { unauthorized, conflict } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
 import { isNonEmptyArray } from '@user-mgnt/utils/non-empty-array'
 

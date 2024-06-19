@@ -13,8 +13,12 @@ import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as service from '@metrics/features/declarationsStarted/service'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
+import * as fetchMock from 'jest-fetch-mock'
 
 const readPoints = influx.query as jest.Mock
+const fetch = fetchMock as fetchMock.FetchMock
 
 jest.mock('../metrics/utils', () => {
   const originalModule = jest.requireActual('../metrics//utils')
@@ -84,6 +88,20 @@ describe('verify declarationsStarted', () => {
     })
 
     it('returns counts', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          fixtures.savedLocation({
+            id: '1490d3dd-71a9-47e8-b143-f9fc64f71294' as UUID,
+            partOf: undefined
+          }),
+          fixtures.savedLocation({
+            id: 'uuid2' as UUID,
+            partOf: {
+              reference: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
+            }
+          })
+        ])
+      )
       readPoints
         .mockResolvedValueOnce([
           {
@@ -104,7 +122,7 @@ describe('verify declarationsStarted', () => {
       const res = await service.fetchLocationWiseDeclarationsStarted(
         '1552469068679',
         '1554814894419',
-        '1490d3dd-71a9-47e8-b143-f9fc64f71294'
+        'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
       )
 
       expect(res).toEqual({
