@@ -27,6 +27,7 @@ interface ISearchEventDataTemplate {
 }
 interface ISearchDataTemplate {
   [key: string]: any
+  eventLocationId?: string
 }
 
 interface IAssignment {
@@ -420,6 +421,8 @@ export const searchTypeResolvers: GQLResolver = {
       _,
       { dataSources }
     ) {
+      if (!searchData._source.eventLocationId) return null
+
       const location = await dataSources.locationsAPI.getLocation(
         searchData._source.eventLocationId
       )

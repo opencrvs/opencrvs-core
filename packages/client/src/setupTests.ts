@@ -291,6 +291,5 @@ vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
     '@client/views/OIDPVerificationCallback/utils'
   )) as any),
   useExtractCallBackState: vi.fn(),
-  useQueryParams: vi.fn(),
-  useCheckNonce: vi.fn()
+  useQueryParams: vi.fn()
 }))
