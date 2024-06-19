@@ -14,7 +14,7 @@ import {
   ISystemModelData,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'

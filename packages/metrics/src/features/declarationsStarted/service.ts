@@ -10,6 +10,9 @@
  */
 import { query } from '@metrics/influxdb/client'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import { fetchLocationChildrenIds } from '@metrics/configApi'
+import { helpers } from '@metrics/utils/queryHelper'
+import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 
 export interface IPractitionerMetrics {
   practitionerId: string
@@ -19,25 +22,25 @@ export interface IPractitionerMetrics {
 export async function fetchLocationWiseDeclarationsStarted(
   timeFrom: string,
   timeTo: string,
-  locationId: string
+  locationId: ResourceIdentifier<Location>
 ) {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
   const fieldAgent = await query(
     `SELECT COUNT(role)
           FROM declarations_started
         WHERE time > $timeFrom
           AND time <= $timeTo
-          AND ( officeLocation = $locationId'
-              OR locationLevel1 = $locationId
-              OR locationLevel2 = $locationId
-              OR locationLevel3 = $locationId
-              OR locationLevel4 = $locationId
-              OR locationLevel5 = $locationId )
+          AND (${officeLocationInChildren})
           AND role = 'FIELD_AGENT'`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -47,18 +50,13 @@ export async function fetchLocationWiseDeclarationsStarted(
           FROM declarations_started
         WHERE time > $timeFrom
           AND time <= $timeTo
-          AND ( officeLocation = $locationId
-              OR locationLevel1 = $locationId
-              OR locationLevel2 = $locationId
-              OR locationLevel3 = $locationId
-              OR locationLevel4 = $locationId
-              OR locationLevel5 = $locationId )
+          AND (${officeLocationInChildren})
           AND ( role = 'REGISTRAR' OR role = 'REGISTRATION_AGENT' )`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId
+        ...locationPlaceholders
       }
     }
   )
@@ -68,12 +66,7 @@ export async function fetchLocationWiseDeclarationsStarted(
           FROM declarations_started
         WHERE time > $timeFrom
           AND time <= $timeTo
-          AND ( officeLocation = $locationId
-              OR locationLevel1 = $locationId
-              OR locationLevel2 = $locationId
-              OR locationLevel3 = $locationId
-              OR locationLevel4 = $locationId
-              OR locationLevel5 = $locationId )
+          AND (${officeLocationInChildren})
           AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`,
     {
       placeholders: {
@@ -96,7 +89,7 @@ export async function fetchLocationWiseDeclarationsStarted(
 export async function getNumberOfAppStartedByPractitioners(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: ResourceIdentifier<Location>,
   event?: EVENT_TYPE,
   status?: string
 ): Promise<
@@ -105,6 +98,12 @@ export async function getNumberOfAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
   const eventClause = (event && `AND eventType = $event`) || ''
   const statusClause = (status && `AND status = $status`) || ''
   const totalDeclarationStarted: {
@@ -115,22 +114,17 @@ export async function getNumberOfAppStartedByPractitioners(
             FROM declarations_started
             WHERE time > $timeFrom
               AND time <= $timeTo
-              AND ( officeLocation = $locationId
-                  OR locationLevel1 = $locationId
-                  OR locationLevel2 = $locationId
-                  OR locationLevel3 = $locationId
-                  OR locationLevel4 = $locationId
-                  OR locationLevel5 = $locationId ) 
+              AND (${officeLocationInChildren})
               ${eventClause}
-              ${statusClause}    
+              ${statusClause}
               GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId,
         event,
-        status
+        status,
+        ...locationPlaceholders
       }
     }
   )
@@ -140,7 +134,7 @@ export async function getNumberOfAppStartedByPractitioners(
 export async function getNumberOfRejectedAppStartedByPractitioners(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: ResourceIdentifier<Location>,
   event?: EVENT_TYPE
 ): Promise<
   {
@@ -148,6 +142,12 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
   const eventClause = (event && `AND eventType = $event`) || ''
   const totalRejectedAppStarted: {
     startedBy: string
@@ -157,20 +157,15 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
               FROM declarations_rejected
               WHERE time > $timeFrom
                 AND time <= $timeTo
-                AND ( officeLocation = $locationId
-                    OR locationLevel1 = $locationId
-                    OR locationLevel2 = $locationId
-                    OR locationLevel3 = $locationId
-                    OR locationLevel4 = $locationId
-                    OR locationLevel5 = $locationId ) 
+                AND (${officeLocationInChildren})
                 ${eventClause}
                 GROUP BY startedBy`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId,
-        event
+        event,
+        ...locationPlaceholders
       }
     }
   )
@@ -180,7 +175,7 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
 export async function getAvgTimeSpentOnAppByPractitioners(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: ResourceIdentifier<Location>,
   status: string,
   event?: EVENT_TYPE
 ): Promise<
@@ -190,33 +185,34 @@ export async function getAvgTimeSpentOnAppByPractitioners(
     totalTimeSpent: number
   }[]
 > {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
   const eventClause = (event && `AND eventType = '${event}'`) || ''
   const averageTimeForDeclarations: {
     practitionerId: string
     totalDeclarations: number
     totalTimeSpent: number
   }[] = await query(
-    `SELECT SUM(timeSpentEditing) as totalTimeSpent, 
+    `SELECT SUM(timeSpentEditing) as totalTimeSpent,
                 COUNT(compositionId) as totalDeclarations
                 FROM declaration_time_logged
                 WHERE time > $timeFrom
                     AND time <= $timeTo
                     AND currentStatus = $status
-                    AND ( officeLocation = $locationId
-                        OR locationLevel1 = $locationId
-                        OR locationLevel2 = $locationId
-                        OR locationLevel3 = $locationId
-                        OR locationLevel4 = $locationId
-                        OR locationLevel5 = $locationId ) 
+                    AND (${officeLocationInChildren})
                     ${eventClause}
                     GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
-        locationId,
         event,
-        status
+        status,
+        ...locationPlaceholders
       }
     }
   )

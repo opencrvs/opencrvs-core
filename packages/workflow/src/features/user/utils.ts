@@ -16,10 +16,14 @@ import {
   Practitioner,
   PractitionerRole,
   resourceIdentifierToUUID,
-  SavedLocation,
   SavedPractitioner
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+
+type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
+export type SearchCriteria = {
+  [K in UserSearchCriteria]?: string
+}
 
 export async function getUser(
   userId: string,
@@ -69,6 +73,54 @@ export async function getSystem(
   return body
 }
 
+export async function getUserByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
+export async function getSystemByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
 /** Find the office location of a given practitioner */
 export const getPractitionerOfficeId = async (practitionerId: string) => {
   const roleResponse = await getFromFhir(
@@ -98,12 +150,6 @@ export async function getLoggedInPractitionerResource(
   }
 
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
-}
-
-export async function getLocationOrOfficeById(
-  locationId: string
-): Promise<SavedLocation> {
-  return await getFromFhir(`/Location/${locationId}`)
 }
 
 export function getPractitionerRef(practitioner: Practitioner) {

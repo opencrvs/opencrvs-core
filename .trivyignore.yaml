@@ -49,3 +49,7 @@ vulnerabilities:
     statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
   - id: CVE-2024-21634
     statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
+  - id: CVE-2024-4068
+    statement: Transitive dependency of lint-staged, jest and msw. Not running in production. Likely fixed by upgrading.
+  - id: CVE-2024-37890
+    statement: ws vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.
