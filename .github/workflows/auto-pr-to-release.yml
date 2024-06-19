@@ -92,11 +92,13 @@ jobs:
 
       - name: Create and push the new branch for the PR
         run: |
-          SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+          SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
 
           # Check for semantic prefix
           if [[ $SEMANTIC_PR_TITLE =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert|wip|merge)\: ]]; then
             SEMANTIC_PR_TITLE="${BASH_REMATCH[1]}(${MILESTONE}): ${SEMANTIC_PR_TITLE#*: }"
+          else
+            SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
           fi
 
           PR_BODY="Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}"
