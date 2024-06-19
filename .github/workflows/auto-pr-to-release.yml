@@ -33,13 +33,14 @@ jobs:
         id: get_pr_details_dispatch
         run: |
           PR_NUMBER=${{ github.event.inputs.pr_number }}
-          PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefName,baseRefName,mergedBy,mergeCommit,author,milestone --jq '{number: .number, headRefName: .headRefName, baseRefName: .baseRefName, merger: .mergedBy.login, author: .author.login, milestone: .milestone.title}')
+          PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefName,baseRefName,mergedBy,mergeCommit,author,milestone,title --jq '{number: .number, headRefName: .headRefName, baseRefName: .baseRefName, merger: .mergedBy.login, author: .author.login, milestone: .milestone.title, title: .title}')
           echo "PR_ID=$(echo $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
           echo "PR_AUTHOR=$(echo $PR_DATA | jq -r '.author')" >> $GITHUB_ENV
           echo "PR_MERGER=$(echo $PR_DATA | jq -r '.merger')" >> $GITHUB_ENV
           echo "MILESTONE=$(echo $PR_DATA | jq -r '.milestone')" >> $GITHUB_ENV
           echo "BASE_BRANCH=$(echo $PR_DATA | jq -r '.baseRefName')" >> $GITHUB_ENV
           echo "HEAD_BRANCH=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_ENV
+          echo "PR_TITLE=$(echo $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
 
           LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
           FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
@@ -58,6 +59,7 @@ jobs:
           echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
 
           LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
           FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
@@ -90,7 +92,15 @@ jobs:
 
       - name: Create and push the new branch for the PR
         run: |
-          PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+          SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
+
+          # Check for semantic prefix
+          if [[ $SEMANTIC_PR_TITLE =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert|wip|merge)\: ]]; then
+            SEMANTIC_PR_TITLE="${BASH_REMATCH[1]}(${MILESTONE}): ${SEMANTIC_PR_TITLE#*: }"
+          else
+            SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+          fi
+
           PR_BODY="Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}"
 
           # Configure git
@@ -158,6 +168,6 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer $AUTHOR
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer $AUTHOR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
