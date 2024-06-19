@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 import {
   EVENT_TYPE,
   CHILD_SECTION_CODE,
@@ -26,7 +27,10 @@ export const SECTION_CODE: Record<EVENT_TYPE, string[]> = {
   [EVENT_TYPE.MARRIAGE]: [GROOM_SECTION_CODE, BRIDE_SECTION_CODE]
 }
 
-export const REG_NUMBER_SYSTEM: Record<EVENT_TYPE, string> = {
+export const REG_NUMBER_SYSTEM: Record<
+  EVENT_TYPE,
+  SupportedPatientIdentifierCode
+> = {
   [EVENT_TYPE.BIRTH]: BIRTH_REG_NUMBER_SYSTEM,
   [EVENT_TYPE.DEATH]: DEATH_REG_NUMBER_SYSTEM,
   [EVENT_TYPE.MARRIAGE]: MARRIAGE_REG_NUMBER_SYSTEM
