@@ -16,7 +16,7 @@ const client = axios.create({
   baseURL: window.config.AUTH_URL
 })
 
-function request<T = any>(options: AxiosRequestConfig) {
+function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }

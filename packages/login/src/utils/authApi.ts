@@ -74,7 +74,7 @@ export interface ITokenResponse {
   token: string
 }
 
-export function request<T = any>(options: AxiosRequestConfig) {
+export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }

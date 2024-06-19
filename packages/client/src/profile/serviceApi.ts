@@ -44,7 +44,7 @@ const client = axios.create({
   }
 })
 
-function request<T = any>(options: AxiosRequestConfig) {
+function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }
