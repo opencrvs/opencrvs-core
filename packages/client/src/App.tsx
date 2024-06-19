@@ -47,8 +47,6 @@ import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { ApplicationConfig } from './views/SysAdmin/Config/Application'
-import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
@@ -62,11 +60,9 @@ import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import InformantNotification from '@client/views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
@@ -262,24 +258,6 @@ export function App(props: IAppProps) {
                                               roles={[
                                                 SystemRoleType.NationalSystemAdmin
                                               ]}
-                                              path={routes.CERTIFICATE_CONFIG}
-                                              component={CertificatesConfig}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={
-                                                routes.INFORMANT_NOTIFICATION
-                                              }
-                                              component={InformantNotification}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
                                               path={routes.ALL_USER_EMAIL}
                                               component={AllUserEmail}
                                             />
@@ -304,22 +282,6 @@ export function App(props: IAppProps) {
                                                 routes.ADVANCED_SEARCH_RESULT
                                               }
                                               component={AdvancedSearchResult}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={routes.APPLICATION_CONFIG}
-                                              component={ApplicationConfig}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={routes.USER_ROLES_CONFIG}
-                                              component={UserRoles}
                                             />
                                             <ProtectedRoute
                                               path={
