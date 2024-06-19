@@ -3486,6 +3486,46 @@
               ]
             }
           ]
+        },
+        {
+          "id": "preview",
+          "viewType": "preview",
+          "name": {
+            "defaultMessage": "Preview",
+            "description": "Form section name for Preview",
+            "id": "register.form.section.preview.name"
+          },
+          "title": {
+            "defaultMessage": "Preview",
+            "description": "Form section title for Preview",
+            "id": "register.form.section.preview.title"
+          },
+          "groups": [
+            {
+              "id": "preview-view-group",
+              "fields": []
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "viewType": "review",
+          "name": {
+            "defaultMessage": "Review",
+            "description": "Form section name for Review",
+            "id": "register.form.section.review.name"
+          },
+          "title": {
+            "defaultMessage": "Review",
+            "description": "Form section title for Review",
+            "id": "register.form.section.review.title"
+          },
+          "groups": [
+            {
+              "id": "review-view-group",
+              "fields": []
+            }
+          ]
         }
       ]
     },
@@ -6248,6 +6288,46 @@
                   }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "id": "preview",
+          "viewType": "preview",
+          "name": {
+            "defaultMessage": "Preview",
+            "description": "Form section name for Preview",
+            "id": "register.form.section.preview.name"
+          },
+          "title": {
+            "defaultMessage": "Preview",
+            "description": "Form section title for Preview",
+            "id": "register.form.section.preview.title"
+          },
+          "groups": [
+            {
+              "id": "preview-view-group",
+              "fields": []
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "viewType": "review",
+          "name": {
+            "defaultMessage": "Review",
+            "description": "Form section name for Review",
+            "id": "register.form.section.review.name"
+          },
+          "title": {
+            "defaultMessage": "Review",
+            "description": "Form section title for Review",
+            "id": "register.form.section.review.title"
+          },
+          "groups": [
+            {
+              "id": "review-view-group",
+              "fields": []
             }
           ]
         }
@@ -11972,6 +12052,46 @@
                   }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "id": "preview",
+          "viewType": "preview",
+          "name": {
+            "defaultMessage": "Preview",
+            "description": "Form section name for Preview",
+            "id": "register.form.section.preview.name"
+          },
+          "title": {
+            "defaultMessage": "Preview",
+            "description": "Form section title for Preview",
+            "id": "register.form.section.preview.title"
+          },
+          "groups": [
+            {
+              "id": "preview-view-group",
+              "fields": []
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "viewType": "review",
+          "name": {
+            "defaultMessage": "Review",
+            "description": "Form section name for Review",
+            "id": "register.form.section.review.name"
+          },
+          "title": {
+            "defaultMessage": "Review",
+            "description": "Form section title for Review",
+            "id": "register.form.section.review.title"
+          },
+          "groups": [
+            {
+              "id": "review-view-group",
+              "fields": []
             }
           ]
         }
