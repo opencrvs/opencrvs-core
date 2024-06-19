@@ -33,7 +33,12 @@ import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
 
-const CertificateContainer = styled.div``
+const CertificateContainer = styled.div`
+  svg {
+    /* limits the certificate overflowing on small screens */
+    max-width: 100%;
+  }
+`
 
 const ReviewCertificateFrame = ({
   children
@@ -70,6 +75,22 @@ const ReviewCertificateFrame = ({
             </Button>
           }
           desktopRight={
+            <Button
+              type="icon"
+              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+            >
+              <Icon name="X" size="large" />
+            </Button>
+          }
+          mobileTitle={intl.formatMessage(
+            certificateMessages.certificateCollectionTitle
+          )}
+          mobileLeft={
+            <Button type="icon" onClick={back} id="action_page_back_button">
+              <Icon name="ArrowLeft" size="large" />
+            </Button>
+          }
+          mobileRight={
             <Button
               type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
