@@ -127,15 +127,17 @@ export const usePrintableCertificate = (declarationId: string) => {
       declaration &&
       offlineData.templates.certificates?.[declaration.event].definition
     if (certificateTemplate)
-      compileSvg(certificateTemplate, declaration.data.template, state).then(
-        (svg) => {
-          const svgWithFonts = addFontsToSvg(
-            svg,
-            offlineData.templates.fonts ?? {}
-          )
-          setSvg(svgWithFonts)
-        }
-      )
+      compileSvg(
+        certificateTemplate,
+        { ...declaration.data.template, preview: true },
+        state
+      ).then((svg) => {
+        const svgWithFonts = addFontsToSvg(
+          svg,
+          offlineData.templates.fonts ?? {}
+        )
+        setSvg(svgWithFonts)
+      })
   }, [offlineData, declaration, state])
 
   const handleCertify = async () => {
@@ -172,7 +174,7 @@ export const usePrintableCertificate = (declarationId: string) => {
 
     const svg = await compileSvg(
       offlineData.templates.certificates[draft.event].definition,
-      { ...draft.data.template, print: true },
+      draft.data.template,
       state
     )
 
