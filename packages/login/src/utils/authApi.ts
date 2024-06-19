@@ -74,7 +74,7 @@ export interface ITokenResponse {
   token: string
 }
 
-export function request<T>(options: AxiosRequestConfig) {
+export function request<T = any>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }
@@ -85,6 +85,7 @@ export function request<T>(options: AxiosRequestConfig) {
       // other than 2xx
     } else {
       // Something else happened while setting up the request
+      // eslint-disable-next-line no-console
       console.error('Error Message:', error.message)
       Sentry.captureException(error)
     }
