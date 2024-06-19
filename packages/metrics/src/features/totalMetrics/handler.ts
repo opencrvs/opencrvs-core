@@ -19,8 +19,10 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   fetchRegistrationsGroupByOfficeLocation,
+  fetchRegistrationsGroupByOfficeLocationByLocation,
   fetchRegistrationsGroupByTime,
-  getTotalMetrics
+  getTotalMetrics,
+  getTotalMetricsByLocation
 } from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
 import { format } from 'date-fns'
@@ -39,7 +41,7 @@ export async function totalMetricsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
@@ -47,13 +49,17 @@ export async function totalMetricsHandler(
     'x-correlation-id': request.headers['x-correlation-id']
   }
 
-  return await getTotalMetrics(
-    timeStart,
-    timeEnd,
-    locationId,
-    event,
-    authHeader
-  )
+  if (locationId) {
+    return await getTotalMetricsByLocation(
+      timeStart,
+      timeEnd,
+      locationId,
+      event,
+      authHeader
+    )
+  } else {
+    return await getTotalMetrics(timeStart, timeEnd, event, authHeader)
+  }
 }
 
 export async function totalMetricsByRegistrar(
@@ -63,7 +69,7 @@ export async function totalMetricsByRegistrar(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
   const skip = request.query[SKIP]
@@ -74,13 +80,15 @@ export async function totalMetricsByRegistrar(
     'x-correlation-id': request.headers['x-correlation-id']
   }
 
-  const totalRegistrations = await getTotalMetrics(
-    timeStart,
-    timeEnd,
-    locationId,
-    event,
-    authHeader
-  )
+  const totalRegistrations = locationId
+    ? await getTotalMetricsByLocation(
+        timeStart,
+        timeEnd,
+        locationId,
+        event,
+        authHeader
+      )
+    : await getTotalMetrics(timeStart, timeEnd, event, authHeader)
 
   const registrarIDs = uniqBy(
     totalRegistrations.results,
@@ -131,17 +139,19 @@ export async function totalMetricsByLocation(
   const timeEnd = request.query[TIME_TO]
   const event = request.query[EVENT]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const skip = request.query[SKIP]
   const size = request.query[SIZE]
 
-  const results = await fetchRegistrationsGroupByOfficeLocation(
-    timeStart,
-    timeEnd,
-    event,
-    locationId
-  )
+  const results = locationId
+    ? await fetchRegistrationsGroupByOfficeLocationByLocation(
+        timeStart,
+        timeEnd,
+        event,
+        locationId
+      )
+    : await fetchRegistrationsGroupByOfficeLocation(timeStart, timeEnd, event)
 
   const locationIDs = uniqBy(results, 'officeLocation').map(
     (item) => item.officeLocation
@@ -211,7 +221,7 @@ export async function totalMetricsByTime(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
   const skip = request.query[SKIP]

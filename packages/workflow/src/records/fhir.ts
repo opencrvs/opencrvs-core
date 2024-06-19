@@ -1009,6 +1009,19 @@ export function createCorrectionRequestTask(
           }
         ]
       },
+      ...getFHIRValueField(update.oldValue)
+    })),
+    output: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
       ...getFHIRValueField(update.newValue)
     })),
     reason: {
@@ -1087,7 +1100,17 @@ export async function sendBundleToHearth(
 ): Promise<TransactionResponse> {
   const res = await fetch(FHIR_URL, {
     method: 'POST',
-    body: JSON.stringify(bundle),
+    /*
+     * History resources e.g. TaskHistory, PractitionerRoleHistory
+     * are internal OpenCRVS representation which hearth won't
+     * recognize
+     */
+    body: JSON.stringify({
+      ...bundle,
+      entry: bundle.entry.filter(
+        ({ resource: { resourceType } }) => !resourceType.endsWith('History')
+      )
+    }),
     headers: {
       'Content-Type': 'application/fhir+json'
     }

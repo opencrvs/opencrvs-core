@@ -155,6 +155,7 @@ Object {
     "missingFieldGroupId": "child-view-group",
     "missingFieldId": "placeOfBirth",
     "missingFieldSectionId": "child",
+    "officeLocation": "Location/b49503bf-531d-4642-ae1b-13f647b88ec6",
     "regStatus": "IN_PROGRESS",
   },
   "timestamp": 1551785895844000000,
