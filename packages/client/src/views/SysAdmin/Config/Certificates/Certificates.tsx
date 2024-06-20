@@ -190,7 +190,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     )
     const compiledSvgPromise = compileSvg(
       svgTemplate,
-      dummyTemplateData,
+      { ...dummyTemplateData, preview: true },
       this.props.state
     )
     const menuItems = [

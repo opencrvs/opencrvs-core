@@ -174,7 +174,7 @@ export const usePrintableCertificate = (declarationId: string) => {
 
     const svg = await compileSvg(
       offlineData.templates.certificates[draft.event].definition,
-      draft.data.template,
+      { ...draft.data.template, preview: false },
       state
     )
 
