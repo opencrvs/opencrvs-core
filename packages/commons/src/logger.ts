@@ -28,7 +28,8 @@ if (level) {
 }
 
 export function maskEmail(email: string) {
-  if (email.length <= 7) return '*'.repeat(email.length)
+  if (email.length <= 10)
+    return `${email.at(0)}${'*'.repeat(email.length - 2)}${email.at(-1)}`
 
   // The regex matches everything EXCEPT the first 3 and last 4 characters.
   return email.replace(/(?<=.{3}).*(?=.{4})/, (match) =>
@@ -37,7 +38,8 @@ export function maskEmail(email: string) {
 }
 
 export function maskSms(sms: string) {
-  if (sms.length <= 5) return '*'.repeat(sms.length)
+  if (sms.length <= 8)
+    return `${sms.at(0)}${'*'.repeat(sms.length - 2)}${sms.at(-1)}`
 
   // The regex matches everything EXCEPT the first 3 and last 2 characters.
   return sms.replace(/(?<=.{3}).*(?=.{2})/, (match) => '*'.repeat(match.length))
