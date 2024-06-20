@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID } from '@opencrvs/commons'
+import { UUID, logger } from '@opencrvs/commons'
 import {
   Bundle,
   Composition,
@@ -22,7 +22,8 @@ import {
   WaitingForValidationRecord,
   findExtension,
   getResourceFromBundleById,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -38,7 +39,6 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getMosipUINToken } from '@workflow/features/registration/utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
-import { logger } from '@workflow/logger'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
@@ -170,7 +170,7 @@ export function updatePatientIdentifierWithRN(
   record: WaitingForValidationRecord,
   composition: Composition,
   sectionCodes: string[],
-  identifierType: string,
+  identifierType: SupportedPatientIdentifierCode,
   registrationNumber: string
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
@@ -344,7 +344,7 @@ export async function validateDeceasedDetails(
                   }
                 ]
               },
-              value: birthPatient.id
+              value: birthPatient.id!
             })
           }
         }

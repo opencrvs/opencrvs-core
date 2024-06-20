@@ -14,7 +14,7 @@ import * as mockingoose from 'mockingoose'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 
 const fetch = fetchMock as fetchMock.FetchMock
 const mockUser = {

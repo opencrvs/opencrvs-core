@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
@@ -22,7 +22,6 @@ import {
   findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
@@ -30,6 +29,7 @@ import {
   searchForDeathDuplicates,
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
+import { capitalize } from 'lodash'
 
 type IAssignmentPayload = {
   compositionId: string

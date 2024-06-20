@@ -28,7 +28,7 @@ export async function declarationsStartedHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = 'Location/' + request.query[LOCATION_ID]
+  const locationId = `Location/${request.query[LOCATION_ID]}` as const
   let declarationsStartedMetrics
   try {
     declarationsStartedMetrics = await fetchLocationWiseDeclarationsStarted(
@@ -69,7 +69,7 @@ export async function declarationStartedMetricsByPractitionersHandler(
 ) {
   const { timeStart, timeEnd, locationId, practitionerIds, event } =
     request.payload as IDeclarationStartedMetricsPayload
-  const locId = `Location/${locationId}`
+  const locId = `Location/${locationId}` as const
   let declarationStartedMetricsByPractitioners: IDeclarationStartedMetricsByPractitioner[] =
     []
   try {

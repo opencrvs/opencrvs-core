@@ -10,7 +10,7 @@
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { isBefore, parse, subMonths } from 'date-fns'
 
 export const prune = async ({ before = subMonths(new Date(), 3) } = {}) => {

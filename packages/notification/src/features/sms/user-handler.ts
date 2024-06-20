@@ -14,7 +14,7 @@ import {
   IMessageRecipient,
   sendNotification
 } from '@notification/features/sms/utils'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 import { templateNames } from '@notification/i18n/messages'
 
 interface ICredentialsPayload extends IMessageRecipient {

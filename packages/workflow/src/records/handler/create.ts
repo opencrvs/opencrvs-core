@@ -69,7 +69,7 @@ import {
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
