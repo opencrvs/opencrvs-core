@@ -9,32 +9,50 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { query } from '@metrics/influxdb/client'
+import { helpers } from '@metrics/utils/queryHelper'
+import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 
-export async function getTotalCertifications(
+export async function getTotalCertificationsByLocation(
   timeFrom: string,
   timeTo: string,
-  locationId: string | undefined
+  locationId: ResourceIdentifier<Location>
 ) {
+  const locationIds = await fetchLocationChildrenIds(locationId)
+  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+    locationIds,
+    'officeLocation'
+  )
+
   const totalMetrics = await query<Array<{ total: number; eventType: string }>>(
     `SELECT COUNT(DISTINCT(compositionId)) AS total
       FROM certification
     WHERE time > $timeFrom
       AND time <= $timeTo
-      ${
-        locationId
-          ? `AND ( locationLevel1 = $locationId
-      OR locationLevel2 = $locationId      
-      OR locationLevel3 = $locationId
-      OR locationLevel4 = $locationId
-      OR locationLevel5 = $locationId
-      OR officeLocation = $locationId)`
-          : ``
-      }
+      AND (${officeLocationInChildren})
     GROUP BY eventType`,
     {
       placeholders: {
-        locationId,
+        timeFrom,
+        timeTo,
+        ...locationPlaceholders
+      }
+    }
+  )
+
+  return totalMetrics
+}
+
+export async function getTotalCertifications(timeFrom: string, timeTo: string) {
+  const totalMetrics = await query<Array<{ total: number; eventType: string }>>(
+    `SELECT COUNT(DISTINCT(compositionId)) AS total
+      FROM certification
+    WHERE time > $timeFrom
+      AND time <= $timeTo
+    GROUP BY eventType`,
+    {
+      placeholders: {
         timeFrom,
         timeTo
       }

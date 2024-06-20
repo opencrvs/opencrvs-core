@@ -40,7 +40,7 @@ import {
   getPatientBySection
 } from '@workflow/features/registration/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 

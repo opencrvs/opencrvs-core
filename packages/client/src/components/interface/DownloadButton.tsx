@@ -220,8 +220,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     practitionerId,
-    unassignDeclaration,
-    deleteDeclaration
+    unassignDeclaration
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -238,18 +237,9 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    if (assignment) {
-      unassignDeclaration(compositionId, client)
-    } else {
-      deleteDeclaration(compositionId, client)
-    }
-  }, [
-    compositionId,
-    client,
-    unassignDeclaration,
-    assignment,
-    deleteDeclaration
-  ])
+    unassignDeclaration(compositionId, client)
+  }, [compositionId, client, unassignDeclaration])
+
   const isFailed = useMemo(
     () =>
       status === DOWNLOAD_STATUS.FAILED ||

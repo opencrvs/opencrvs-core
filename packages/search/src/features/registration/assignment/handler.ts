@@ -12,7 +12,7 @@ import {
   updateEventToAddAssignment,
   updateEventToRemoveAssignment
 } from '@search/features/registration/assignment/service'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { getTokenPayload } from '@search/utils/authUtils'

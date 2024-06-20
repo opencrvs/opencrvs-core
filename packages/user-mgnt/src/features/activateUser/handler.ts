@@ -13,7 +13,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
 interface ISecurityQNA {

@@ -29,7 +29,7 @@ import {
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@search/constants'
 import { SearchDocument } from '@search/elasticsearch/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 
 export function findTaskExtension<
