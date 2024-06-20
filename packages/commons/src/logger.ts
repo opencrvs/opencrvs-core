@@ -26,3 +26,19 @@ const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
 if (level) {
   logger.level = level
 }
+
+export function maskEmail(email: string) {
+  if (email.length <= 7) return '*'.repeat(email.length)
+
+  // The regex matches everything EXCEPT the first 3 and last 4 characters.
+  return email.replace(/(?<=.{3}).*(?=.{4})/, (match) =>
+    '*'.repeat(match.length)
+  )
+}
+
+export function maskSms(sms: string) {
+  if (sms.length <= 5) return '*'.repeat(sms.length)
+
+  // The regex matches everything EXCEPT the first 3 and last 2 characters.
+  return sms.replace(/(?<=.{3}).*(?=.{2})/, (match) => '*'.repeat(match.length))
+}
