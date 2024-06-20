@@ -77,6 +77,19 @@ const dateFieldTypes = [
   'informantDoB'
 ]
 
+function isInvalidDate(date: string) {
+  const regEx = /^\d{4}-\d{2}-\d{2}$/
+  if (!date.match(regEx)) {
+    return true
+  }
+  const d = new Date(date)
+  const dNum = d.getTime()
+  if (!dNum && dNum !== 0) {
+    return true
+  }
+  return d.toISOString().slice(0, 10) !== date
+}
+
 export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
   const validNonDateFields = Object.keys(value).filter(
     (key) =>
@@ -93,8 +106,17 @@ export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
       )
   )
 
+  const isInvalidDateField = dateFieldTypes
+    .map((key) => {
+      const exactDate = (
+        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
+      )?.exact
+      return exactDate && isInvalidDate(exactDate)
+    })
+    .filter((valid) => valid)
+
   const validCount = validNonDateFields.length + validDateFields.length
-  return validCount >= 2
+  return validCount >= 2 && !(isInvalidDateField.length > 0)
 }
 
 const BirthSection = () => {
