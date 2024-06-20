@@ -214,6 +214,7 @@ export interface DeathDocument extends SearchDocument {
   spouseFirstNamesLocal?: string
   spouseMiddleNameLocal?: string
   spouseFamilyNameLocal?: string
+  spouseIdentifier?: string
   informantFirstNames?: string
   informantMiddleName?: string
   informantFamilyName?: string
