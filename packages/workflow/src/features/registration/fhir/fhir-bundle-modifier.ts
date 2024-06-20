@@ -23,7 +23,8 @@ import {
   WaitingForValidationRecord,
   findExtension,
   getResourceFromBundleById,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -467,7 +468,7 @@ export function updatePatientIdentifierWithRN(
   record: WaitingForValidationRecord,
   composition: Composition,
   sectionCodes: string[],
-  identifierType: string,
+  identifierType: SupportedPatientIdentifierCode,
   registrationNumber: string
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
@@ -641,7 +642,7 @@ export async function validateDeceasedDetails(
                   }
                 ]
               },
-              value: birthPatient.id
+              value: birthPatient.id!
             })
           }
         }

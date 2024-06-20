@@ -20,6 +20,7 @@ import {
   sendNotification
 } from '@workflow/records/notification'
 import { invokeWebhooks } from '@workflow/records/webhooks'
+import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 
 export interface EventRegistrationPayload {
   trackingId: string
@@ -27,7 +28,7 @@ export interface EventRegistrationPayload {
   error: string
   compositionId: string
   childIdentifiers?: {
-    type: string
+    type: SupportedPatientIdentifierCode
     value: string
   }[]
 }

@@ -229,6 +229,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   spouseFirstNamesLocal?: string
   spouseMiddleNameLocal?: string
   spouseFamilyNameLocal?: string
+  spouseIdentifier?: string
   informantFirstNames?: string
   informantMiddleName?: string
   informantFamilyName?: string

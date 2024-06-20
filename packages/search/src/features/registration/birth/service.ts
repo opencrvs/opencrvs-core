@@ -34,7 +34,6 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
-import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
@@ -47,6 +46,7 @@ import {
   resourceIdentifierToUUID,
   SavedRelatedPerson
 } from '@opencrvs/commons/types'
+import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -146,8 +146,7 @@ async function createChildIndex(
   const childName = findName(NAME_EN, child.name)
   const childNameLocal = findNameLocale(child.name)
 
-  body.childIdentifier =
-    child.identifier && getSubmittedIdentifier(child.identifier)
+  body.childIdentifier = findPatientPrimaryIdentifier(child)?.value
   body.childFirstNames = childName?.given?.at(0)
   body.childMiddleName = childName?.given?.at(1)
   body.childFamilyName = childName && childName.family && childName.family[0]
@@ -182,8 +181,7 @@ function createMotherIndex(
   body.motherFamilyNameLocal =
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
-  body.motherIdentifier =
-    mother.identifier && getSubmittedIdentifier(mother.identifier)
+  body.motherIdentifier = findPatientPrimaryIdentifier(mother)?.value
 }
 
 function createFatherIndex(
@@ -209,8 +207,7 @@ function createFatherIndex(
   body.fatherFamilyNameLocal =
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
-  body.fatherIdentifier =
-    father.identifier && getSubmittedIdentifier(father.identifier)
+  body.fatherIdentifier = findPatientPrimaryIdentifier(father)?.value
 }
 
 function createInformantIndex(
@@ -251,8 +248,7 @@ function createInformantIndex(
     informantNameLocal.family &&
     informantNameLocal.family[0]
   body.informantDoB = informant.birthDate
-  body.informantIdentifier =
-    informant.identifier && getSubmittedIdentifier(informant.identifier)
+  body.informantIdentifier = findPatientPrimaryIdentifier(informant)?.value
 }
 
 async function createDeclarationIndex(

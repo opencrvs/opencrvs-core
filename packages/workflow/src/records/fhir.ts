@@ -366,7 +366,7 @@ export function createRelatedPersonEntries(
             })
           ),
           identifier: collectorDetails.identifier.map(({ id, type }) => ({
-            id,
+            value: id,
             type: {
               coding: [
                 {

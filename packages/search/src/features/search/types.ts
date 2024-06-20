@@ -51,6 +51,7 @@ export interface IAdvancedSearchParam {
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
   deceasedIdentifier?: string
+  spouseIdentifier?: string
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
