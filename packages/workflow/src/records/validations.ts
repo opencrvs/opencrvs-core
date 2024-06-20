@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EVENT_TYPE } from '@opencrvs/commons/types'
+import {
+  EVENT_TYPE,
+  SUPPORTED_PATIENT_IDENTIFIER_CODES
+} from '@opencrvs/commons/types'
 import { z } from 'zod'
 
 export const CertifyRequestSchema = z.object({
@@ -38,7 +41,7 @@ export const CertifyRequestSchema = z.object({
         identifier: z.array(
           z.object({
             id: z.string(),
-            type: z.string()
+            type: z.enum(SUPPORTED_PATIENT_IDENTIFIER_CODES)
           })
         )
       })
