@@ -22,7 +22,6 @@ import {
   findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
@@ -30,6 +29,7 @@ import {
   searchForDeathDuplicates,
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
+import { capitalize } from 'lodash'
 
 type IAssignmentPayload = {
   compositionId: string
