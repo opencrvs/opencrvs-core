@@ -35,7 +35,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
 import {
   getAccordionActiveStateMap,
-  IBaseAdvancedSearchState,
+  IAdvancedSearchFormState,
   isValidDateRangePickerValue,
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
@@ -77,19 +77,19 @@ const dateFieldTypes = [
   'informantDoB'
 ]
 
-export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
+export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
   const validNonDateFields = Object.keys(value).filter(
     (key) =>
       !['event', 'eventLocationType'].includes(key) &&
       !dateFieldTypes.includes(key) &&
-      Boolean(value[key as keyof IBaseAdvancedSearchState])
+      Boolean(value[key as keyof IAdvancedSearchFormState])
   )
   //handle date fields separately
   const validDateFields = dateFieldTypes.filter(
     (key) =>
-      value[key as keyof IBaseAdvancedSearchState] &&
+      value[key as keyof IAdvancedSearchFormState] &&
       isValidDateRangePickerValue(
-        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
+        value[key as keyof IAdvancedSearchFormState] as IDateRangePickerValue
       )
   )
 
@@ -101,7 +101,7 @@ const BirthSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,
@@ -305,7 +305,7 @@ const DeathSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,
