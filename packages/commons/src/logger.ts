@@ -8,15 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Bunyan from 'bunyan'
+import pino from 'pino'
+export const logger =
+  process.env.NODE_ENV === 'production'
+    ? pino()
+    : pino({
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            ignore: 'pid,hostname'
+          }
+        }
+      })
 
-export const getLogger = (
-  logLevel: number | undefined,
-  appName: string | undefined
-) => {
-  return Bunyan.createLogger({
-    name: appName ? appName : 'testApp',
-    level: logLevel ? logLevel : 0,
-    serializers: Bunyan.stdSerializers
-  })
+const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
+if (level) {
+  logger.level = level
 }

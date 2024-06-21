@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { IUserModel, Event } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'

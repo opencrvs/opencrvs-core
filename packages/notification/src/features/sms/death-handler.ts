@@ -16,7 +16,7 @@ import {
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
 import { sendNotification } from '@notification/features/sms/utils'
-import { logger } from '@notification/logger'
+import { logger } from '@opencrvs/commons'
 import { messageKeys } from '@notification/i18n/messages'
 
 export async function sendDeathInProgressConfirmation(

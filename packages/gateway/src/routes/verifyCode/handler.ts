@@ -24,7 +24,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
 

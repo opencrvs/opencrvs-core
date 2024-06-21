@@ -20,13 +20,14 @@ export type PatientIdentifier = Omit<fhir3.Identifier, 'type'> & {
   otherType?: string
   fieldsModifiedByIdentity?: string[]
   type: Omit<fhir3.CodeableConcept, 'coding'> & {
-    coding: Array<
+    coding: [
       Omit<fhir3.Coding, 'code' | 'system'> & {
         system: 'http://opencrvs.org/specs/identifier-type'
-        code: string
+        code: SupportedPatientIdentifierCode
       }
-    >
+    ]
   }
+  value: string
 }
 
 export type Patient = WithStrictExtensions<
@@ -41,4 +42,35 @@ export type Patient = WithStrictExtensions<
 export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use' | 'family'> & {
   use: string
   family: string[]
+}
+
+export const SUPPORTED_PATIENT_IDENTIFIER_CODES = [
+  'PASSPORT',
+  'NATIONAL_ID',
+  'MOSIP_PSUT_TOKEN_ID',
+  'DECEASED_PATIENT_ENTRY',
+  'BIRTH_PATIENT_ENTRY',
+  'DRIVING_LICENSE',
+  'REFUGEE_NUMBER',
+  'ALIEN_NUMBER',
+  'OTHER',
+  'SOCIAL_SECURITY_NO',
+  'BIRTH_REGISTRATION_NUMBER',
+  'DEATH_REGISTRATION_NUMBER',
+  'MARRIAGE_REGISTRATION_NUMBER',
+  'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+  'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+  'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+] as const
+
+export type SupportedPatientIdentifierCode =
+  (typeof SUPPORTED_PATIENT_IDENTIFIER_CODES)[number]
+
+export const findPatientIdentifier = (
+  patient: Patient,
+  identifierCodes: Array<SupportedPatientIdentifierCode>
+) => {
+  return patient.identifier?.find((identifier) =>
+    identifierCodes.includes(identifier.type.coding[0].code)
+  )
 }

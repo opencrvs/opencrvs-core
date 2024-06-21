@@ -1,0 +1,173 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Auto PR to Release Branch
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to process'
+        required: true
+        default: ''
+
+jobs:
+  create-pr:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get PR details from workflow dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: get_pr_details_dispatch
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefName,baseRefName,mergedBy,mergeCommit,author,milestone,title --jq '{number: .number, headRefName: .headRefName, baseRefName: .baseRefName, merger: .mergedBy.login, author: .author.login, milestone: .milestone.title, title: .title}')
+          echo "PR_ID=$(echo $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
+          echo "PR_AUTHOR=$(echo $PR_DATA | jq -r '.author')" >> $GITHUB_ENV
+          echo "PR_MERGER=$(echo $PR_DATA | jq -r '.merger')" >> $GITHUB_ENV
+          echo "MILESTONE=$(echo $PR_DATA | jq -r '.milestone')" >> $GITHUB_ENV
+          echo "BASE_BRANCH=$(echo $PR_DATA | jq -r '.baseRefName')" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_ENV
+          echo "PR_TITLE=$(echo $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
+
+          LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
+          FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
+          echo "LATEST_COMMIT_SHA=${LATEST_COMMIT_SHA}" >> $GITHUB_ENV
+          echo "FIRST_COMMIT_SHA=${FIRST_COMMIT_SHA}" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR details from event
+        if: ${{ github.event_name == 'pull_request' }}
+        id: get_pr_details_event
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+
+          LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
+          FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
+          echo "LATEST_COMMIT_SHA=${LATEST_COMMIT_SHA}" >> $GITHUB_ENV
+          echo "FIRST_COMMIT_SHA=${FIRST_COMMIT_SHA}" >> $GITHUB_ENV
+
+          PR_DETAILS=$(gh pr view $PR_NUMBER --json mergedBy)
+          MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
+          echo "PR_MERGER=$MERGED_BY_LOGIN" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for milestone and if release branch exists
+        id: check_release_branch
+        run: |
+          if [ -z "${{ env.MILESTONE }}" ]; then
+            echo "No milestone set. Exiting."
+            exit 0
+          fi
+
+          RELEASE_BRANCH="release-${{ env.MILESTONE }}"
+
+          # Check if the release branch exists
+          if git ls-remote --heads origin $RELEASE_BRANCH | grep -q "refs/heads/$RELEASE_BRANCH"; then
+            echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
+          else
+            echo "Release branch $RELEASE_BRANCH does not exist. Exiting."
+            exit 0
+          fi
+
+      - name: Create and push the new branch for the PR
+        run: |
+          SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
+
+          # Check for semantic prefix
+          if [[ $SEMANTIC_PR_TITLE =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert|wip|merge)\: ]]; then
+            SEMANTIC_PR_TITLE="${BASH_REMATCH[1]}(${MILESTONE}): ${SEMANTIC_PR_TITLE#*: }"
+          else
+            SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+          fi
+
+          PR_BODY="Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}"
+
+          # Configure git
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git config advice.mergeConflict false
+
+          # Fetch and checkout the release branch
+          git fetch --all
+          git checkout ${{ env.RELEASE_BRANCH }}
+
+          # Create a new branch for the PR
+          NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}-$RANDOM"
+          git checkout -b $NEW_BRANCH
+
+          echo "First commit: ${{ env.FIRST_COMMIT_SHA }}"
+          echo "Latest commit: ${{ env.LATEST_COMMIT_SHA }}"
+          COMMIT_RANGE="${{ env.FIRST_COMMIT_SHA }}..${{ env.LATEST_COMMIT_SHA }}"
+
+          if [ "${{ env.FIRST_COMMIT_SHA }}" == "${{ env.LATEST_COMMIT_SHA }}" ]; then
+            COMMIT_RANGE=${{ env.FIRST_COMMIT_SHA }}
+          fi
+
+          echo "Commit range: $COMMIT_RANGE"
+
+          # Attempt to cherry-pick the commits from the original PR
+          CHERRY_PICK_OUTPUT=$(git cherry-pick $COMMIT_RANGE 2>&1) || {
+            git cherry-pick --abort || true
+            # If cherry-pick fails, create a placeholder commit
+            echo "Cherry-pick failed. Creating placeholder commit."
+            git reset --hard
+            git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
+
+            # Add manual cherry-pick commands to the PR body
+            PR_BODY="${PR_BODY}
+
+            **I failed to cherry-pick the changes automatically because of the following:**
+
+            \`\`\`
+            $CHERRY_PICK_OUTPUT
+            \`\`\`
+
+            **To continue manually you can use these commands:**
+            \`\`\`
+            git fetch origin $NEW_BRANCH:$NEW_BRANCH
+            git fetch origin ${{ env.HEAD_BRANCH }}:${{ env.HEAD_BRANCH }}
+
+            git checkout $NEW_BRANCH
+            git reset --hard HEAD~1  # Remove placeholder commit
+            git cherry-pick $COMMIT_RANGE
+            \`\`\`
+            "
+          }
+
+          # Push the new branch
+          git push origin $NEW_BRANCH
+
+          # Create a pull request and assign the original PR author as the reviewer
+          AUTHOR=${{ env.PR_AUTHOR }}
+
+          if [[ $AUTHOR == *renovate* ]]; then
+            if [ -z "${{ env.PR_MERGER }}" ]; then
+              AUTHOR=""
+            else
+              AUTHOR=${{ env.PR_MERGER }}
+            fi
+          fi
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer $AUTHOR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
