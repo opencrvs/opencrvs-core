@@ -48,6 +48,7 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
         history {
           action
           regStatus
+          date
           user {
             primaryOffice {
               hierarchy {
