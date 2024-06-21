@@ -27,6 +27,7 @@
 ## New features
 
 - Add loading spinners before JavaScript bundle has loaded for both login and client
+- Add loading bar before javaScript bundle has loaded for client and when fetching records [#6641](https://github.com/opencrvs/opencrvs-core/issues/6641)
 - Support for landscape certificate templates
 - Allow defining maxLength attribute for number type fields [#6356](https://github.com/opencrvs/opencrvs-core/issues/6356)
 - Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
