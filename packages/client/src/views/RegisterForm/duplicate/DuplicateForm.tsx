@@ -178,7 +178,7 @@ export const DuplicateForm = (props: IProps) => {
                 dispatch(goToHome())
               }
             }}
-            disabled={!Boolean(selectedTrackingId) || !Boolean(comment)}
+            disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
           >
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
@@ -203,11 +203,12 @@ export const DuplicateForm = (props: IProps) => {
                   label: id.trackingId
                 }))}
               />
-              <StyledText id="describe-reason" variant="reg18" element="span">
+              <StyledText variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
               </StyledText>
               <StyledTextArea
                 ignoreMediaQuery
+                id="describe-reason"
                 {...{
                   onChange: handleCommentChange
                 }}
