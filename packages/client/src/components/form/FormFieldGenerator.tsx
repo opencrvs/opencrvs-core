@@ -448,6 +448,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           <TextArea
             maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
             {...inputProps}
+            value={inputProps.value as string}
           />
         </InputField>
       )
