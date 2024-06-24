@@ -43,6 +43,7 @@ export type FontFamilyTypes = {
 export type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
+
 export interface IContentResponse {
   languages: ILanguage[]
 }

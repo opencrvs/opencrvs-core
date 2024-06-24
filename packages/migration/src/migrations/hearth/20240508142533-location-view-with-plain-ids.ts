@@ -17,22 +17,30 @@ export const up = async (db: Db, client: MongoClient) => {
     pipeline: [
       {
         $addFields: {
-          'partOf.reference': {
+          partOf: {
             $cond: {
-              if: {
-                $regexMatch: {
-                  input: '$partOf.reference',
-                  regex: /^Location\//
-                }
-              },
+              if: { $gt: ['$partOf', null] },
               then: {
-                $replaceOne: {
-                  input: '$partOf.reference',
-                  find: 'Location/',
-                  replacement: ''
+                reference: {
+                  $cond: {
+                    if: {
+                      $regexMatch: {
+                        input: '$partOf.reference',
+                        regex: /^Location\//
+                      }
+                    },
+                    then: {
+                      $replaceOne: {
+                        input: '$partOf.reference',
+                        find: 'Location/',
+                        replacement: ''
+                      }
+                    },
+                    else: '$partOf.reference'
+                  }
                 }
               },
-              else: '$partOf.reference'
+              else: '$$REMOVE'
             }
           }
         }

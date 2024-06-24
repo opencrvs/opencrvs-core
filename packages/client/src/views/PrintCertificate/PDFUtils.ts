@@ -14,19 +14,15 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import { IDeclaration } from '@client/declarations'
 import {
   AdminStructure,
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import {
-  IPDFTemplate,
-  OptionalData
-} from '@client/pdfRenderer/transformer/types'
+import { IPDFTemplate } from '@client/pdfRenderer'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
-import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
+import { MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
@@ -34,8 +30,6 @@ import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { FontFamilyTypes } from '@client/utils/referenceApi'
-import { printPDF } from '@client/pdfRenderer'
-import { UserDetails } from '@client/utils/userUtils'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -232,41 +226,15 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-export async function printCertificate(
-  intl: IntlShape,
-  declaration: IDeclaration,
-  userDetails: UserDetails | null,
-  offlineResource: IOfflineData,
-  state: IStoreState,
-  optionalData?: OptionalData
-) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-  printPDF(
-    (await getPDFTemplateWithSVG(offlineResource, declaration, state))
-      .pdfTemplate,
-    declaration,
-    userDetails,
-    offlineResource,
-    intl,
-    optionalData
-  )
-}
-
-export async function getPDFTemplateWithSVG(
-  offlineResource: IOfflineData,
-  declaration: IDeclaration,
+export async function compileSvg(
+  svgTemplate: string,
+  templateValues: Record<string, unknown>,
   state: IStoreState
 ) {
-  const svgTemplate =
-    offlineResource.templates.certificates![declaration.event]?.definition ||
-    EMPTY_STRING
-
   const resolvedSignatures = await Promise.all(
     MARRIAGE_SIGNATURE_KEYS.map((k) => ({
       signatureKey: k,
-      url: declaration.data.template?.[k]
+      url: templateValues[k]
     }))
       .filter(({ url }) => Boolean(url))
       .map(({ signatureKey, url }) =>
@@ -275,17 +243,14 @@ export async function getPDFTemplateWithSVG(
         }))
       )
   ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
-
-  const declarationTemplate = {
-    ...declaration.data.template,
+  templateValues = {
+    ...templateValues,
     ...resolvedSignatures
   }
-  const svgCode = executeHandlebarsTemplate(
-    svgTemplate,
-    declarationTemplate,
-    state
-  )
+  return executeHandlebarsTemplate(svgTemplate, templateValues, state)
+}
 
+export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
   const pdfTemplate: IPDFTemplate = {
     ...certificateBaseTemplate,
     fonts: {
@@ -296,7 +261,7 @@ export async function getPDFTemplateWithSVG(
 
   const parser = new DOMParser()
   const svgElement = parser.parseFromString(
-    svgCode,
+    svg,
     'image/svg+xml'
   ).documentElement
 
@@ -312,10 +277,9 @@ export async function getPDFTemplateWithSVG(
   }
 
   pdfTemplate.definition.content = {
-    svg: svgCode
+    svg
   }
-
-  return { pdfTemplate, svgCode }
+  return pdfTemplate
 }
 
 export function downloadFile(

@@ -437,6 +437,7 @@ export const aggregateRecords = ({
         composition: { $push: '$$ROOT' }
       }
     },
+    { $project: { _id: 0 } },
     { $unwind: '$composition' },
     {
       $addFields: {
@@ -996,16 +997,24 @@ export const aggregateRecords = ({
             input: '$joinResult',
             as: 'item',
             in: {
-              $mergeObjects: [
-                '$$item',
-                {
-                  partOf: {
-                    reference: {
-                      $concat: ['Location/', '$$item.partOf.reference']
+              $cond: {
+                if: {
+                  $gt: ['$$item.partOf', null]
+                },
+                then: {
+                  $mergeObjects: [
+                    '$$item',
+                    {
+                      partOf: {
+                        reference: {
+                          $concat: ['Location/', '$$item.partOf.reference']
+                        }
+                      }
                     }
-                  }
-                }
-              ]
+                  ]
+                },
+                else: '$$item'
+              }
             }
           }
         }

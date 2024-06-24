@@ -38,15 +38,13 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Event } from '@client/utils/gateway'
 import { IAttachmentValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import {
-  getDummyCertificateTemplateData,
-  getDummyDeclarationData
-} from './previewDummyData'
+import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   executeHandlebarsTemplate,
-  printCertificate,
-  downloadFile
+  downloadFile,
+  compileSvg,
+  svgToPdfTemplate
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
 import {
@@ -56,7 +54,6 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
-import { IDeclaration } from '@client/declarations'
 import {
   ApplyButton,
   Field
@@ -72,6 +69,7 @@ import {
   bytesToMB,
   IMAGE_UPLOAD_MAX_SIZE_IN_BYTES
 } from '@client/utils/imageUtils'
+import { printPDF } from '@client/pdfRenderer'
 
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -152,25 +150,6 @@ type CertificationProps = {
   item: ICertification
 }
 
-export const printDummyCertificate = async (
-  event: string,
-  registerForm: { birth: IForm; death: IForm; marriage: IForm },
-  intl: IntlShape,
-  userDetails: UserDetails,
-  offlineData: IOfflineData,
-  state: IStoreState
-) => {
-  const data = getDummyDeclarationData(event, registerForm)
-
-  printCertificate(
-    intl,
-    { data, event } as IDeclaration,
-    userDetails,
-    offlineData,
-    state
-  )
-}
-
 class CertificatesConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -202,26 +181,24 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   getMenuItems(
     intl: IntlShape,
     event: string,
-    svgCode: string,
+    svgTemplate: string,
     svgFilename: string
   ) {
+    const dummyTemplateData = getDummyCertificateTemplateData(
+      event,
+      this.props.registerForm
+    )
+    const compiledSvgPromise = compileSvg(
+      svgTemplate,
+      { ...dummyTemplateData, preview: true },
+      this.props.state
+    )
     const menuItems = [
       {
         label: intl.formatMessage(buttonMessages.preview),
         handler: async () => {
-          const dummyTemplateData = getDummyCertificateTemplateData(
-            event,
-            this.props.registerForm
-          )
-
-          svgCode = executeHandlebarsTemplate(
-            svgCode,
-            dummyTemplateData,
-            this.props.state
-          )
-          const linkSource = `data:${SVGFile.type};base64,${window.btoa(
-            svgCode
-          )}`
+          const svg = await compiledSvgPromise
+          const linkSource = `data:${SVGFile.type};base64,${window.btoa(svg)}`
           this.setState({
             eventName: event,
             previewImage: { type: SVGFile.type, data: linkSource }
@@ -231,20 +208,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       {
         label: intl.formatMessage(buttonMessages.print),
         handler: async () => {
-          await printDummyCertificate(
-            event,
-            this.props.registerForm,
-            intl,
-            this.props.userDetails as UserDetails,
-            this.props.offlineResources,
-            this.props.state
-          )
+          const svg = await compiledSvgPromise
+          const pdfTemplate = svgToPdfTemplate(svg, this.props.offlineResources)
+          printPDF(pdfTemplate, 'dummy-declaration')
         }
       },
       {
         label: intl.formatMessage(messages.downloadTemplate),
         handler: () => {
-          downloadFile(SVGFile.type, svgCode, svgFilename)
+          downloadFile(SVGFile.type, svgTemplate, svgFilename)
         }
       },
       {
