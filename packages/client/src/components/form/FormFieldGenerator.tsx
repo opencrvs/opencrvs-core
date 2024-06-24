@@ -419,8 +419,13 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === DATE_RANGE_PICKER) {
+      const modifiedInputProps = {
+        ...inputFieldProps,
+        touched: inputFieldProps.error ? true : false
+      }
+
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...modifiedInputProps}>
           <DateRangePickerForFormField
             inputProps={{ ...inputProps }}
             notice={fieldDefinition.notice}
@@ -891,6 +896,7 @@ class FormSectionComponent extends React.Component<Props> {
           const isFieldDisabled = conditionalActions.includes('disable')
           const isDateField =
             field.type === DATE ||
+            // field.type === DATE_RANGE_PICKER ||
             (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
               getFieldType(field as IDynamicFormField, values) === DATE)
 

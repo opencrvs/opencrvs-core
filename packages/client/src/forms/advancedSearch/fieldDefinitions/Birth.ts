@@ -12,6 +12,8 @@ import { countries } from '@client/utils/countries'
 import { IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
+import { fieldValidationDescriptorToValidationFunction } from '@client/forms/deserializer/deserializer'
+import { validators } from '@client/forms/validators'
 
 export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
   {
@@ -36,7 +38,14 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validator: []
+        validator: [
+          fieldValidationDescriptorToValidationFunction(
+            {
+              operation: 'isValidDate'
+            },
+            validators
+          )
+        ]
       },
       {
         name: 'registrationStatuses',
@@ -90,7 +99,14 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'isValidDate'
+          },
+          validators
+        )
+      ]
     },
     {
       name: 'childFirstNames',
@@ -292,7 +308,14 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'isValidDate'
+          },
+          validators
+        )
+      ]
     },
     {
       name: 'motherFirstNames',
@@ -327,7 +350,14 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'isValidDate'
+          },
+          validators
+        )
+      ]
     },
     {
       name: 'fatherFirstNames',
@@ -360,7 +390,14 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [
+        fieldValidationDescriptorToValidationFunction(
+          {
+            operation: 'isValidDate'
+          },
+          validators
+        )
+      ]
     },
     {
       name: 'informantFirstNames',
