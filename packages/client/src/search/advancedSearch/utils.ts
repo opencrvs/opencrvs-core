@@ -82,6 +82,16 @@ const baseKeysSameAsStore = [
   'informantFamilyName'
 ] as const
 
+export const dateFieldTypes = [
+  'dateOfRegistration',
+  'dateOfEvent',
+  'childDoB',
+  'motherDoB',
+  'fatherDoB',
+  'deceasedDoB',
+  'informantDoB'
+]
+
 export interface IBaseAdvancedSearchState {
   event?: string
   registrationStatuses?: string

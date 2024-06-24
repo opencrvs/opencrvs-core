@@ -34,6 +34,7 @@ import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
 import {
+  dateFieldTypes,
   getAccordionActiveStateMap,
   IBaseAdvancedSearchState,
   isValidDateRangePickerValue,
@@ -66,16 +67,6 @@ const {
   deathSearchEventSection,
   deathSearchInformantSection
 } = advancedSearchDeathSections
-
-const dateFieldTypes = [
-  'dateOfRegistration',
-  'dateOfEvent',
-  'childDoB',
-  'motherDoB',
-  'fatherDoB',
-  'deceasedDoB',
-  'informantDoB'
-]
 
 function isInvalidDate(date: string) {
   const regEx = /^\d{4}-\d{2}-\d{2}$/
