@@ -201,11 +201,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <SuccessButton
         id="make_correction"
         key="make_correction"
-        onClick={() => {
-          userRole === ROLE_REGISTRATION_AGENT
-            ? this.togglePrompt()
-            : this.makeCorrection(userRole)
-        }}
+        onClick={this.togglePrompt}
         disabled={
           sectionHasError(group, this.section, declaration) ||
           this.state.isFileUploading
@@ -383,7 +379,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <Dialog
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
-          title={intl.formatMessage(messages.correctionForApprovalDialogTitle)}
+          title={intl.formatMessage(
+            this.props.userRole === ROLE_REGISTRATION_AGENT
+              ? messages.correctionForApprovalDialogTitle
+              : messages.correctRecordDialogTitle
+          )}
           onClose={this.togglePrompt}
           actions={[
             <Button
@@ -412,7 +412,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                messages.correctionForApprovalDialogDescription
+                this.props.userRole === ROLE_REGISTRATION_AGENT
+                  ? messages.correctionForApprovalDialogDescription
+                  : messages.correctRecordDialogDescription
               )}
             </Text>
           </p>
