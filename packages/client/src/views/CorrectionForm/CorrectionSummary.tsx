@@ -78,7 +78,6 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
@@ -160,16 +159,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         this.props.declaration.data
       )
     }
-
-    const currency = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
-
-    ;(group.fields[0].nestedFields as any).REQUIRED[0].label.defaultMessage =
-      this.props.intl.formatMessage(
-        messages.correctionSummaryTotalPaymentLabel,
-        { currency }
-      )
 
     const { showPrompt } = this.state
     const formSections = getViewableSection(registerForm[event], declaration)
