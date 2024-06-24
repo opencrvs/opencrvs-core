@@ -29,7 +29,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "clean": "rimraf lib",
-    "start": "concurrently 'storybook dev --ci --quiet -p 6060' 'tsc -w'",
+    "start": "concurrently 'storybook dev --ci  -p 6060' 'tsc -w'",
     "build": "yarn clean && tsc",
     "lint": "yarn lint:css",
     "test": "tsc",
