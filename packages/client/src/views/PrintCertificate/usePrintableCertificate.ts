@@ -197,10 +197,29 @@ export const usePrintableCertificate = (declarationId: string) => {
     dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
   }
 
-  const handleEdit = () =>
+  const handleEdit = () => {
+    // Delete certificate properties during print record corrections
+    // since correction flow doesn't handle certificates
+    if (declaration?.data?.registration.certificates) {
+      const { certificates, ...rest } = declaration.data.registration
+      const updatedDeclaration = {
+        ...declaration,
+        data: {
+          ...declaration.data,
+          registration: {
+            ...rest
+          }
+        }
+      }
+
+      dispatch(modifyDeclaration(updatedDeclaration))
+      dispatch(writeDeclaration(updatedDeclaration))
+    }
+
     dispatch(
       goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
     )
+  }
 
   return {
     svg,
