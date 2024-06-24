@@ -137,27 +137,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     }
   }
 
-  componentDidMount() {
-    this.group = {
-      ...this.group,
-      fields: replaceInitialValues(
-        this.group.fields,
-        this.props.declaration.data[this.section.id] || {},
-        this.props.declaration.data
-      )
-    }
-    const currency = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
-
-    ;(
-      this.group.fields[0].nestedFields as any
-    ).REQUIRED[0].label.defaultMessage = this.props.intl.formatMessage(
-      messages.correctionSummaryTotalPaymentLabel,
-      { currency }
-    )
-  }
-
   onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
       ...this.state,
@@ -178,6 +157,26 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration: { event },
       userRole
     } = this.props
+
+    const group = {
+      ...this.group,
+      fields: replaceInitialValues(
+        this.group.fields,
+        this.props.declaration.data[this.section.id] || {},
+        this.props.declaration.data
+      )
+    }
+
+    const currency = getCurrencySymbol(
+      this.props.offlineResources.config.CURRENCY
+    )
+
+    ;(group.fields[0].nestedFields as any).REQUIRED[0].label.defaultMessage =
+      this.props.intl.formatMessage(
+        messages.correctionSummaryTotalPaymentLabel,
+        { currency }
+      )
+
     const { showPrompt } = this.state
     const formSections = getViewableSection(registerForm[event], declaration)
     const relationShip = (
@@ -208,7 +207,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             : this.makeCorrection(userRole)
         }}
         disabled={
-          sectionHasError(this.group, this.section, declaration) ||
+          sectionHasError(group, this.section, declaration) ||
           this.state.isFileUploading
         }
         icon={() => <Check />}
@@ -365,7 +364,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <FormFieldGenerator
-              id={this.group.id}
+              id={group.id}
               onChange={(values) => {
                 this.modifyDeclaration(
                   values,
@@ -374,7 +373,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 )
               }}
               setAllFieldsDirty={false}
-              fields={this.group.fields}
+              fields={group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
               requiredErrorMessage={messages.correctionRequiredLabel}
