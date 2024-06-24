@@ -269,6 +269,8 @@ class SearchResultView extends React.Component<
         const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
         const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
         const declarationIsIssued = reg.declarationStatus === 'ISSUED'
+        const declarationIsCorrectionRequested =
+          reg.declarationStatus === 'CORRECTION_REQUESTED'
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -313,6 +315,7 @@ class SearchResultView extends React.Component<
               !declarationIsRegistered &&
               !declarationIsCertified &&
               !declarationIsArchived &&
+              !declarationIsCorrectionRequested &&
               this.userHasValidateOrRegistrarScope())
           ) {
             actions.push({
