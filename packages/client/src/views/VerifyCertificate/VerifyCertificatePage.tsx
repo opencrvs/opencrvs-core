@@ -48,7 +48,9 @@ import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
 import { useVerificationRecordDetails } from './useVerificationRecordDetails'
+import { useLocationIntl } from '@client/hooks/useLocationIntl'
 import { generateFullAddress } from '@client/utils/locationUtils'
+import { SUBMISSION_STATUS } from '@client/declarations'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -179,6 +181,7 @@ export function VerifyCertificatePage() {
   const intl = useIntl()
   const dispatch = useDispatch()
   const { declarationId } = useParams<{ declarationId: string }>()
+  const { localizeLocation } = useLocationIntl()
 
   const logo = useSelector(selectCountryLogo)
   const appName = useSelector(selectApplicationName)
@@ -244,6 +247,16 @@ export function VerifyCertificatePage() {
     if (isDeathRegistration(data)) return data.deceased?.gender
   }
 
+  const getLastCertifiedDate = (data: RecordDetails) => {
+    // find first certified action from history sorted in ascending order by time
+    return (
+      data.history &&
+      data.history.find(
+        (item) => item?.regStatus?.toString() === SUBMISSION_STATUS.CERTIFIED
+      )
+    )?.date
+  }
+
   // This function currently supports upto two location levels
   const getLocation = (data: RecordDetails) => {
     const location = data.eventLocation
@@ -290,12 +303,7 @@ export function VerifyCertificatePage() {
         history?.user?.name[0]?.firstNames +
           ' ' +
           history?.user?.name[0]?.familyName,
-      center:
-        history &&
-        history?.user?.catchmentArea?.length &&
-        history?.user?.catchmentArea
-          ?.map((_: { name?: string | null }) => _?.name)
-          .join(', ')
+      officeHierarchy: history?.user?.primaryOffice?.hierarchy
     }
   }
 
@@ -445,9 +453,23 @@ export function VerifyCertificatePage() {
                         </Text>
                       }
                       value={
-                        <Text variant={'reg16'} element={'span'}>
-                          {getRegistarData(data).center}
-                        </Text>
+                        <Stack
+                          direction="column-reverse"
+                          alignItems="flex-start"
+                          gap={0}
+                        >
+                          {getRegistarData(data).officeHierarchy?.map(
+                            (location) => (
+                              <Text
+                                key={location.id}
+                                variant="reg16"
+                                element="span"
+                              >
+                                {localizeLocation(location)}
+                              </Text>
+                            )
+                          )}
+                        </Stack>
                       }
                     />
                     <ListViewItemSimplified
@@ -466,12 +488,15 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {intl.formatMessage(messageToDefine.createdAt)}
+                          {intl.formatMessage(messageToDefine.certifiedAt)}
                         </Text>
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {formatDate(new Date(data.createdAt), 'dd MMMM yyyy')}
+                          {formatDate(
+                            new Date(getLastCertifiedDate(data)),
+                            'dd MMMM yyyy'
+                          )}
                         </Text>
                       }
                     />

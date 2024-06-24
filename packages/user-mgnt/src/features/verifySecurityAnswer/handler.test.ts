@@ -33,7 +33,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
   systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   securityQuestionAnswers: [
     {
       questionKey: 'TEST_QUESTION_1',

@@ -13,7 +13,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import * as mockingoose from 'mockingoose'
 import { cloneDeep } from 'lodash'
 import { Types } from 'mongoose'
@@ -48,7 +48,6 @@ const mockUser: IUser & { _id: string } = {
   role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   status: 'pending',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
   passwordHash:

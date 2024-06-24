@@ -11,6 +11,13 @@
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
 import { Document } from 'mongoose'
+import { UUID } from '@opencrvs/commons'
+import {
+  Location,
+  ResourceIdentifier,
+  SavedLocation
+} from '@opencrvs/commons/types'
+
 interface IBirth {
   REGISTRATION_TARGET: number
   LATE_REGISTRATION_TARGET: number
@@ -91,15 +98,13 @@ export async function getApplicationConfig(
     })
 }
 
-export async function getDashboardQueries(
-  authorization: string
-): Promise<Array<{ collection: string; aggregate: Document[] }>> {
-  const token = authorization.replace('Bearer ', '')
+export async function getDashboardQueries(): Promise<
+  Array<{ collection: string; aggregate: Document[] }>
+> {
   return fetch(`${CONFIG_API_URL}/dashboardQueries`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     }
   })
     .then((response) => {
@@ -110,4 +115,29 @@ export async function getDashboardQueries(
         new Error(`Dashboard queries request failed: ${error.message}`)
       )
     })
+}
+
+const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
+  new URL(`/locations/${id}/children`, CONFIG_API_URL)
+
+export const fetchLocationChildren = async (id: UUID) => {
+  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(id))
+
+  if (!response.ok) {
+    throw new Error(
+      `Couldn't fetch the children of a location from config: ${await response.text()}`
+    )
+  }
+
+  return response.json() as Promise<SavedLocation[]>
+}
+
+export const fetchLocationChildrenIds = async (
+  id: ResourceIdentifier<Location>
+) => {
+  // TODO: Migrate InfluxDB to use UUID's instead of the "Location/" prefix
+  const locations = await fetchLocationChildren(
+    id.replace('Location/', '') as UUID
+  )
+  return locations.map(({ id }) => `Location/${id}`)
 }

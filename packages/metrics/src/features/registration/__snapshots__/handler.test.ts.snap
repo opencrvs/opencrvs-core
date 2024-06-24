@@ -152,10 +152,10 @@ Object {
   "measurement": "in_complete_fields",
   "tags": Object {
     "eventType": "BIRTH",
-    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
     "missingFieldGroupId": "child-view-group",
     "missingFieldId": "placeOfBirth",
     "missingFieldSectionId": "child",
+    "officeLocation": "Location/b49503bf-531d-4642-ae1b-13f647b88ec6",
     "regStatus": "IN_PROGRESS",
   },
   "timestamp": 1551785895844000000,
@@ -170,7 +170,6 @@ Object {
   "measurement": "declarations_rejected",
   "tags": Object {
     "eventType": "BIRTH",
-    "locationLevel5": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8",
     "officeLocation": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155",
     "startedBy": "4bb03541-116e-4ce2-8ea4-407f307f7579",
   },

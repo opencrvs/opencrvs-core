@@ -11,8 +11,7 @@
 import fetch from '@gateway/fetch'
 import { DOCUMENTS_URL } from '@gateway/constants'
 import { internal } from '@hapi/boom'
-import { logger } from '@gateway/logger'
-import { IAuthHeader } from '@opencrvs/commons'
+import { logger, IAuthHeader } from '@opencrvs/commons'
 
 export async function uploadSvg(fileData: string, authHeader: IAuthHeader) {
   const url = new URL('upload-svg', DOCUMENTS_URL).toString()

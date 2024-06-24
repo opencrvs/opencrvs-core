@@ -24,7 +24,7 @@ import {
   LOGIN_URL
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
-import { validateFunc } from '@opencrvs/commons'
+import { validateFunc, logger } from '@opencrvs/commons'
 import {
   ApolloServer,
   ApolloServerPluginStopHapiServer
@@ -32,7 +32,6 @@ import {
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/utils/redis'
-import { logger } from '@gateway/logger'
 import { badRequest, Boom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 

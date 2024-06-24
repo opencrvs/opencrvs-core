@@ -131,6 +131,7 @@ export const DuplicateForm = (props: IProps) => {
             name: getName(),
             trackingId: String(data.registration.trackingId)
           })}
+          showTitleOnMobile={true}
           subtitle={intl.formatMessage(
             duplicateMessages.duplicateContentSubtitle,
             {
@@ -175,7 +176,7 @@ export const DuplicateForm = (props: IProps) => {
                 dispatch(goToHome())
               }
             }}
-            disabled={!Boolean(selectedTrackingId)}
+            disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
           >
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
@@ -200,10 +201,11 @@ export const DuplicateForm = (props: IProps) => {
                   label: id.trackingId
                 }))}
               />
-              <StyledText id="describe-reason" variant="reg18" element="span">
+              <StyledText variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
               </StyledText>
               <StyledTextArea
+                id="describe-reason"
                 {...{
                   onChange: handleCommentChange
                 }}

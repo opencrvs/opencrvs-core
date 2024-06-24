@@ -29,28 +29,22 @@ import {
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
-import { countries } from '@client/utils/countries'
 import { cloneDeep } from 'lodash'
 import { useState, useEffect } from 'react'
-import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  getPDFTemplateWithSVG,
-  addFontsToSvg,
-  printCertificate
-} from './PDFUtils'
+import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
   isCertificateForPrintInAdvance,
   getRegisteredDate,
   getEventDate,
-  isFreeOfCost,
-  calculatePrice,
-  getCountryTranslations
+  calculatePrice
 } from './utils'
 import { Event } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { IOfflineData } from '@client/offline/reducer'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { printPDF } from '@client/pdfRenderer'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -58,7 +52,7 @@ const withEnhancedTemplateVariables = (
   offlineData: IOfflineData
 ) => {
   if (!declaration) {
-    return declaration
+    return
   }
 
   const registeredDate = getRegisteredDate(declaration.data)
@@ -69,6 +63,22 @@ const withEnhancedTemplateVariables = (
     registeredDate,
     offlineData
   )
+
+  const locationKey = userDetails?.primaryOffice?.id
+    ? offlineData.offices[userDetails.primaryOffice.id].partOf.split('/')[1]
+    : ''
+  const { country, ...locationHierarchyIds } = getLocationHierarchy(
+    locationKey,
+    offlineData.locations
+  )
+
+  const locationHierarchy: Record<string, string | AdminStructure | undefined> =
+    { country }
+
+  for (const [key, value] of Object.entries(locationHierarchyIds)) {
+    locationHierarchy[`${key}Id`] = value
+  }
+
   return {
     ...declaration,
     data: {
@@ -82,7 +92,8 @@ const withEnhancedTemplateVariables = (
           loggedInUser: {
             name: getUserName(userDetails),
             officeId: userDetails.primaryOffice?.id,
-            signature: userDetails.localRegistrar?.signature
+            signature: userDetails.localRegistrar?.signature,
+            ...locationHierarchy
           }
         })
       } as IFormSectionData
@@ -105,29 +116,38 @@ export const usePrintableCertificate = (declarationId: string) => {
   const state = useSelector((store: IStoreState) => store)
   const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
-  const intl = useIntl()
   const dispatch = useDispatch()
-  const languages = useSelector((store: IStoreState) =>
-    getCountryTranslations(store.i18n.languages, countries)
-  )
   const scope = useSelector(getScope)
   const canUserEditRecord =
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
   useEffect(() => {
-    if (declaration)
-      getPDFTemplateWithSVG(offlineData, declaration, state).then((svg) => {
+    const certificateTemplate =
+      declaration &&
+      offlineData.templates.certificates?.[declaration.event].definition
+    if (certificateTemplate)
+      compileSvg(
+        certificateTemplate,
+        { ...declaration.data.template, preview: true },
+        state
+      ).then((svg) => {
         const svgWithFonts = addFontsToSvg(
-          svg.svgCode,
+          svg,
           offlineData.templates.fonts ?? {}
         )
         setSvg(svgWithFonts)
       })
   }, [offlineData, declaration, state])
 
-  const handleCertify = () => {
-    const draft = cloneDeep(declaration) as IPrintableDeclaration
+  const handleCertify = async () => {
+    if (
+      !declaration ||
+      !offlineData.templates.certificates?.[declaration.event].definition
+    ) {
+      return
+    }
+    const draft = cloneDeep(declaration)
 
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = isPrintInAdvance
@@ -138,28 +158,25 @@ export const usePrintableCertificate = (declarationId: string) => {
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
     if (!isPrintInAdvance) {
-      if (isFreeOfCost(draft.event, eventDate, registeredDate, offlineData)) {
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: 0,
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          offlineData
-        )
-        certificate.payments = {
-          type: 'MANUAL' as const,
-          amount: Number(paymentAmount),
-          outcome: 'COMPLETED' as const,
-          date: new Date().toISOString()
-        }
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        offlineData
+      )
+      certificate.payments = {
+        type: 'MANUAL' as const,
+        amount: Number(paymentAmount),
+        outcome: 'COMPLETED' as const,
+        date: new Date().toISOString()
       }
     }
+
+    const svg = await compileSvg(
+      offlineData.templates.certificates[draft.event].definition,
+      { ...draft.data.template, preview: false },
+      state
+    )
 
     draft.data.registration = {
       ...draft.data.registration,
@@ -171,17 +188,38 @@ export const usePrintableCertificate = (declarationId: string) => {
       ]
     }
 
-    printCertificate(intl, draft, userDetails, offlineData, state, languages)
+    const pdfTemplate = svgToPdfTemplate(svg, offlineData)
+
+    printPDF(pdfTemplate, draft.id)
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))
     dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
   }
 
-  const handleEdit = () =>
+  const handleEdit = () => {
+    // Delete certificate properties during print record corrections
+    // since correction flow doesn't handle certificates
+    if (declaration?.data?.registration.certificates) {
+      const { certificates, ...rest } = declaration.data.registration
+      const updatedDeclaration = {
+        ...declaration,
+        data: {
+          ...declaration.data,
+          registration: {
+            ...rest
+          }
+        }
+      }
+
+      dispatch(modifyDeclaration(updatedDeclaration))
+      dispatch(writeDeclaration(updatedDeclaration))
+    }
+
     dispatch(
       goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
     )
+  }
 
   return {
     svg,

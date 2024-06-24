@@ -10,26 +10,15 @@
  */
 
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchFHIR } from '@gateway/features/fhir/service'
+import { fetchLocationChildren } from '@gateway/location'
+import { UUID } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async locationsByParent(_, { parentId }, { headers: authHeader }) {
-      const bundle = await fetchFHIR(`/Location?partof=${parentId}`, authHeader)
-      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
-    },
     async hasChildLocation(_, { parentId }, { headers: authHeader }) {
-      const bundle = await fetchFHIR(
-        `/Location?_count=1&partof=${parentId}`,
-        authHeader
-      )
-      const [childLocation] = bundle.entry.map(
-        (entry: { resource: {} }) => entry.resource
-      )
+      const children = await fetchLocationChildren(parentId as UUID)
+      const [childLocation] = children
       return childLocation
-    },
-    async locationById(_, { locationId }, { headers: authHeader }) {
-      return fetchFHIR(`/Location/${locationId}`, authHeader)
     }
   }
 }

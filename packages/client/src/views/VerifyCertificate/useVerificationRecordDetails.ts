@@ -48,13 +48,18 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
         history {
           action
           regStatus
+          date
           user {
+            primaryOffice {
+              hierarchy {
+                id
+                name
+                alias
+              }
+            }
             name {
               firstNames
               familyName
-            }
-            catchmentArea {
-              name
             }
           }
         }
@@ -94,12 +99,16 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           action
           regStatus
           user {
+            primaryOffice {
+              hierarchy {
+                id
+                name
+                alias
+              }
+            }
             name {
               firstNames
               familyName
-            }
-            catchmentArea {
-              name
             }
           }
         }

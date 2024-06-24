@@ -15,10 +15,9 @@ import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   sendUpdateUsernameNotification,
-  getCatchmentAreaIdsByPrimaryOfficeId,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
@@ -89,8 +88,6 @@ export default async function updateUser(
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
     if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
       existingUser.primaryOfficeId = user.primaryOfficeId
-      existingUser.catchmentAreaIds =
-        await getCatchmentAreaIdsByPrimaryOfficeId(user.primaryOfficeId, token)
     } else {
       throw new Error('Location can be changed only by National System Admin')
     }

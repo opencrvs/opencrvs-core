@@ -17,10 +17,10 @@ import {
   getStatusFromTask,
   getTaskFromSavedBundle,
   URLReference,
-  CertifiedRecord
+  CertifiedRecord,
+  TransactionResponse
 } from '@opencrvs/commons/types'
 import { REGISTERED_BIRTH_RECORD } from '@test/mocks/records/register'
-import { TransactionResponse } from '@workflow/records/fhir'
 
 describe('Certify record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>

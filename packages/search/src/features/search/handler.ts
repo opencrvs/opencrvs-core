@@ -9,20 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
 import {
-  ICompositionBody,
+  SearchDocument,
   EVENT,
-  IBirthCompositionBody,
-  IDeathCompositionBody,
+  BirthDocument,
+  DeathDocument,
   findDuplicateIds
 } from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
@@ -30,6 +29,7 @@ import {
   searchForDeathDuplicates,
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
+import { capitalize } from 'lodash'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -44,9 +44,11 @@ export async function searchAssignment(
     const results = await searchByCompositionId(payload.compositionId, client)
 
     const result = results?.body?.hits?.hits[0]?._source as
-      | ICompositionBody
+      | SearchDocument
       | undefined
-    return h.response({ userId: result?.assignment?.userId }).code(200)
+    return h
+      .response({ practitionerId: result?.assignment?.practitionerId })
+      .code(200)
   } catch (error) {
     logger.error(`Search/searchAssginment: ${error}`)
     return internal(error)
@@ -211,7 +213,7 @@ export async function searchForBirthDeDuplication(
 ) {
   try {
     const result = await searchForBirthDuplicates(
-      request.payload as IBirthCompositionBody,
+      request.payload as BirthDocument,
       client
     )
     const duplicateIds = findDuplicateIds(result)
@@ -228,7 +230,7 @@ export async function searchForDeathDeDuplication(
 ) {
   try {
     const result = await searchForDeathDuplicates(
-      request.payload as IDeathCompositionBody,
+      request.payload as DeathDocument,
       client
     )
     const duplicateIds = findDuplicateIds(result)

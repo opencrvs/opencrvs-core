@@ -13,7 +13,6 @@ import {
   Bundle,
   BundleEntry,
   Composition,
-  Location,
   OpenCRVSPatientName,
   Patient,
   Resource,
@@ -41,7 +40,7 @@ import {
   getPatientBySection
 } from '@workflow/features/registration/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { logger } from '@workflow/logger'
+import { logger } from '@opencrvs/commons'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 
@@ -77,31 +76,6 @@ export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   return [...(name.given ?? []), ...(name.family ?? [])]
     .filter(Boolean)
     .join(' ')
-}
-
-export async function getRegistrationLocation(fhirBundle: Bundle) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
-    )
-  }
-  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
-  const regLastLocationExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-    taskResource?.extension || []
-  )
-  if (!regLastLocationExt || !regLastLocationExt.valueReference) {
-    throw new Error('No last registration office found on the bundle')
-  }
-  const location: Location = await getFromFhir(
-    `/${regLastLocationExt.valueReference.reference}`
-  )
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? location.name
-      : (location.alias && location.alias[0]) || location.name) || ''
-  )
 }
 
 export function getTrackingId(fhirBundle: Bundle) {

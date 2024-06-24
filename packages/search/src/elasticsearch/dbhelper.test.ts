@@ -14,8 +14,8 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
-import { logger } from '@search/logger'
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import { logger } from '@opencrvs/commons'
+import { BirthDocument } from '@search/elasticsearch/utils'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import { client } from '@search/elasticsearch/client'
 
@@ -38,13 +38,13 @@ describe('elasticsearch db helper', () => {
         body: mockCompositionBody,
         id: 'testId',
         index: 'ocrvs',
-        type: 'compositions',
         refresh: 'wait_for'
       })
     })
 
     it('should update a composition with proper configuration', async () => {
-      const body: IBirthCompositionBody = {
+      const body: BirthDocument = {
+        compositionId: '11111111-1111-1111-1111-111111111111',
         childFirstNames: 'testValue'
       }
       updateSpy = jest.spyOn(client, 'update')
@@ -52,7 +52,6 @@ describe('elasticsearch db helper', () => {
       expect(updateSpy).toBeCalled()
       expect(updateSpy).toBeCalledWith({
         index: 'ocrvs',
-        type: 'compositions',
         id: 'testId',
         body: {
           doc: body

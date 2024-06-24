@@ -30,7 +30,7 @@ import {
   useApolloClient
 } from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import type { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
+import type { AssignmentData } from '@client/utils/gateway'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
@@ -50,7 +50,7 @@ interface IDownloadConfig {
   event: string
   compositionId: string
   action: Action
-  assignment?: GQLAssignmentData
+  assignment?: AssignmentData
   refetchQueries?: InternalRefetchQueriesInclude
   declarationStatus?: string
 }
@@ -64,7 +64,7 @@ interface DownloadButtonProps {
 
 interface IConnectProps {
   userRole?: SystemRoleType
-  userId?: string
+  practitionerId?: string
 }
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
@@ -104,7 +104,7 @@ interface AssignModalOptions {
 }
 
 function getAssignModalOptions(
-  assignment: GQLAssignmentData | undefined,
+  assignment: AssignmentData | undefined,
   callbacks: {
     onAssign: () => void
     onUnassign: () => void
@@ -219,9 +219,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadConfigs,
     downloadDeclaration,
     userRole,
-    userId,
-    unassignDeclaration,
-    deleteDeclaration
+    practitionerId,
+    unassignDeclaration
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -238,41 +237,34 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    if (assignment) {
-      unassignDeclaration(compositionId, client)
-    } else {
-      deleteDeclaration(compositionId, client)
-    }
-  }, [
-    compositionId,
-    client,
-    unassignDeclaration,
-    assignment,
-    deleteDeclaration
-  ])
+    unassignDeclaration(compositionId, client)
+  }, [compositionId, client, unassignDeclaration])
+
   const isFailed = useMemo(
     () =>
       status === DOWNLOAD_STATUS.FAILED ||
       status === DOWNLOAD_STATUS.FAILED_NETWORK,
     [status]
   )
-  const isSentForApprovalDeclaration =
+
+  // reg agent can only retrieve validated and correction requested declarations
+  const isRetrieveableDeclarationsOfRegAgent =
     downloadConfigs.declarationStatus &&
     ['VALIDATED', 'CORRECTION_REQUESTED'].includes(
       downloadConfigs.declarationStatus
-    )
+    ) &&
+    userRole === ROLE_REGISTRATION_AGENT
 
-  // user roles of users who can not retrieve a declaration
-  const nonRetrievalUserRoles =
-    userRole !== ROLE_REGISTRATION_AGENT &&
-    !FIELD_AGENT_ROLES.includes(String(userRole))
+  // field agents can only retrieve declarations
+  const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        (assignment?.userId !== userId ||
+        (assignment?.practitionerId !== practitionerId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        (!isSentForApprovalDeclaration || nonRetrievalUserRoles)
+        !isRetrieveableDeclarationsOfRegAgent &&
+        isNotFieldAgent
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -293,18 +285,19 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           )
         )
       } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
+        // retrieve declaration
         download()
       }
       e.stopPropagation()
     },
     [
       assignment,
-      userId,
+      practitionerId,
       status,
-      isSentForApprovalDeclaration,
-      nonRetrievalUserRoles,
-      userRole,
+      isRetrieveableDeclarationsOfRegAgent,
+      isNotFieldAgent,
       hideModal,
+      userRole,
       download,
       unassign
     ]
@@ -350,7 +343,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
-        ) : assignment && assignment.userId !== userId ? (
+        ) : assignment && assignment.practitionerId !== practitionerId ? (
           <AvatarSmall
             avatar={{
               data: assignment.avatarURL,
@@ -383,7 +376,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
   userRole: state.profile.userDetails?.systemRole,
-  userId: state.profile.userDetails?.userMgntUserID
+  practitionerId: state.profile.userDetails?.practitionerId
 })
 
 const mapDispatchToProps = (

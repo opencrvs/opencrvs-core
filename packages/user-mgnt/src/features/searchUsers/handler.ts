@@ -12,7 +12,9 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { SortOrder } from 'mongoose'
+import { FilterQuery, SortOrder } from 'mongoose'
+import { resolveLocationChildren } from '@user-mgnt/utils/location'
+import { UUID } from '@opencrvs/commons'
 
 interface IVerifyPayload {
   username?: string
@@ -20,7 +22,7 @@ interface IVerifyPayload {
   systemRole?: string
   status?: string
   primaryOfficeId?: string
-  locationId?: string
+  locationId?: UUID
   count: number
   skip: number
   sortOrder: SortOrder
@@ -41,7 +43,7 @@ export default async function searchUsers(
     skip,
     sortOrder
   } = request.payload as IVerifyPayload
-  let criteria = {}
+  let criteria: FilterQuery<IUserModel> = {}
   if (username) {
     criteria = { ...criteria, username }
   }
@@ -55,7 +57,8 @@ export default async function searchUsers(
     criteria = { ...criteria, primaryOfficeId }
   }
   if (locationId) {
-    criteria = { ...criteria, catchmentAreaIds: locationId }
+    const locationChildren = await resolveLocationChildren(locationId)
+    criteria = { ...criteria, primaryOfficeId: { $in: locationChildren } }
   }
   if (status) {
     criteria = { ...criteria, status }

@@ -10,14 +10,14 @@
  */
 import * as mongoose from 'mongoose'
 import { start, stop } from '@metrics/config/database'
-import { logger } from '@metrics/logger'
+import { logger } from '@opencrvs/commons'
 
 jest.mock('mongoose', () => ({
   connection: {
     on: jest.fn()
   },
+  set: () => {},
   connect: () => Promise.reject(),
-  // tslint:disable-next-line no-empty
   disconnect: () => {}
 }))
 const wait = (time: number) =>

@@ -10,7 +10,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import * as Joi from 'joi'
 import InformantSMSNotification from '@config/models/informantSMSNotifications'
 import { badRequest } from '@hapi/boom'
@@ -63,10 +63,8 @@ export default async function updateInformantSMSNotification(
       return h.response(`Failed to update existing question. ${err}`).code(400)
     }
 
-    const informantSMSNotifications = await getInformantSMSNotificationsHandler(
-      request,
-      h
-    )
+    const informantSMSNotifications =
+      await getInformantSMSNotificationsHandler()
     return h.response(informantSMSNotifications).code(201)
   } catch (err) {
     logger.error(err)

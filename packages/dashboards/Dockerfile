@@ -10,7 +10,7 @@ ENV MB_DB_INIT_SQL_FILE=/metabase.init.db.sql
 ENV MB_DB_FILE=/data/metabase/metabase.mv.db
 ENV OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=/environment-configuration.sql
 
-# Install envsubst
-RUN apk update && apk upgrade && apk add --no-cache gettext
+# Install envsubst, uuidgen
+RUN apk update && apk upgrade && apk add --no-cache gettext && apk add --no-cache util-linux
 
 ENTRYPOINT ["/bin/sh", "/run.sh"]

@@ -11,21 +11,21 @@
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
-  TaskStatus,
-  ValidRecord
+  TaskStatus
 } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, logger } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { hasScope, inScope } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
-import { logger } from '@workflow/logger'
 import { auditEvent } from '@workflow/records/audit'
+import { findAssignment } from '@opencrvs/commons/assignment'
+import { getUserOrSystem } from '@workflow/records/user'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -55,6 +55,15 @@ export async function downloadRecordHandler(
   const token = getToken(request)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
+  const assignment = findAssignment(record)
+
+  if (assignment) {
+    const userOrSystem = await getUserOrSystem(token)
+    const practitionerId = userOrSystem.practitionerId
+
+    if (assignment.practitioner.id !== practitionerId)
+      throw new Error('Record is assigned to a different user')
+  }
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
@@ -68,7 +77,7 @@ export async function downloadRecordHandler(
     businessStatus
   )
 
-  const { downloadedRecord, downloadedRecordWithTaskOnly } = await toDownloaded(
+  const { downloadedRecordWithTaskOnly, downloadedRecord } = await toDownloaded(
     record,
     token,
     extensionUrl
@@ -90,16 +99,15 @@ export async function downloadRecordHandler(
       await sendBundleToHearth(downloadedRecordWithTaskOnly)
       await auditEvent(auditRecordEvent, downloadedRecord, token)
 
-      if (extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded')
-        await indexBundleToRoute(
-          downloadedRecordWithTaskOnly,
-          token,
-          '/events/assigned'
-        )
+      if (
+        extensionUrl !== 'http://opencrvs.org/specs/extension/regDownloaded'
+      ) {
+        await indexBundleToRoute(downloadedRecord, token, '/events/assigned')
+      }
     } catch (error) {
       logger.error(error)
     }
   })
 
-  return downloadedRecord as ValidRecord
+  return downloadedRecord
 }

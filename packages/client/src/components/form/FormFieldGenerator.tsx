@@ -123,7 +123,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
@@ -265,6 +265,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               onSetFieldValue(fieldDefinition.name, files)
               setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
+            compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
+            maxSizeMB={fieldDefinition.maxSizeMB}
             onUploadingStateChanged={onUploadingStateChanged}
             requiredErrorMessage={requiredErrorMessage}
           />
@@ -702,7 +704,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IBaseAdvancedSearchState
+  initialValues?: IAdvancedSearchFormState
 }
 
 interface IStateProps {

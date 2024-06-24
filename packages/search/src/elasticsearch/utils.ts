@@ -10,11 +10,6 @@
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import {
-  findName,
-  findNameLocale,
-  findTaskExtension
-} from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
 import fetch from 'node-fetch'
@@ -23,12 +18,14 @@ import {
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
 import {
-  getFromBundleById,
+  findTaskHistories,
+  getBusinessStatus,
   SavedBundle,
-  SavedLocation,
+  SavedOffice,
+  SavedPractitioner,
   SavedTask
 } from '@opencrvs/commons/types'
-import { hasScope } from '@opencrvs/commons/authentication'
+import { findName } from '@search/features/fhir/fhir-utils'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -105,7 +102,7 @@ export interface ICorrection {
 }
 
 export interface IAssignment {
-  userId: string
+  practitionerId: string
   firstName: string
   lastName: string
   officeName: string
@@ -114,22 +111,10 @@ export interface IAssignment {
 export interface IOperationHistory {
   operationType: keyof typeof validStatusMapping
   operatedOn: string
-  operatorRole: string
-  operatorFirstNames: string
-  operatorFamilyName: string
-  operatorFirstNamesLocale: string
-  operatorFamilyNameLocale: string
-  operatorOfficeName: string
-  operatorOfficeAlias: string[]
-  rejectReason?: string
-  rejectComment?: string
-  notificationFacilityName?: string
-  notificationFacilityAlias?: string[]
-  correction?: ICorrection[]
 }
 
-export interface ICompositionBody {
-  compositionId?: string
+export interface SearchDocument {
+  compositionId: string
   compositionType?: string
   event?: EVENT
   type?: string
@@ -164,7 +149,7 @@ export interface ICompositionBody {
   operationHistories?: IOperationHistory[]
 }
 
-export interface IBirthCompositionBody extends ICompositionBody {
+export interface BirthDocument extends SearchDocument {
   childFirstNames?: string
   childMiddleName?: string
   childFamilyName?: string
@@ -200,7 +185,7 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantIdentifier?: string
 }
 
-export interface IDeathCompositionBody extends ICompositionBody {
+export interface DeathDocument extends SearchDocument {
   deceasedFirstNames?: string
   deceasedMiddleName?: string
   deceasedFamilyName?: string
@@ -229,6 +214,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   spouseFirstNamesLocal?: string
   spouseMiddleNameLocal?: string
   spouseFamilyNameLocal?: string
+  spouseIdentifier?: string
   informantFirstNames?: string
   informantMiddleName?: string
   informantFamilyName?: string
@@ -239,7 +225,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantIdentifier?: string
 }
 
-export interface IMarriageCompositionBody extends ICompositionBody {
+export interface MarriageDocument extends SearchDocument {
   brideFirstNames?: string
   brideMiddleName?: string
   brideFamilyName?: string
@@ -288,7 +274,7 @@ export interface IUserModelData {
 
 export async function detectBirthDuplicates(
   compositionId: string,
-  body: IBirthCompositionBody
+  body: BirthDocument
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
   const duplicates = findDuplicateIds(searchResponse)
@@ -297,7 +283,7 @@ export async function detectBirthDuplicates(
 
 export async function detectDeathDuplicates(
   compositionId: string,
-  body: IDeathCompositionBody
+  body: DeathDocument
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
   const duplicates = findDuplicateIds(searchResponse)
@@ -306,106 +292,50 @@ export async function detectDeathDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
+  const result = results?.body?.hits?.hits[0]?._source as SearchDocument
   return result?.createdBy
 }
 
-export const getStatus = async (compositionId: string) => {
-  const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
-  return result?.operationHistories as IOperationHistory[]
+export const composeOperationHistories = (bundle: SavedBundle) => {
+  const taskHistories = findTaskHistories(bundle)
+  return taskHistories.map((taskHistory) => ({
+    operationType: getBusinessStatus(taskHistory),
+    operatedOn: taskHistory.lastModified
+  }))
 }
 
-export const createStatusHistory = async (
-  body: ICompositionBody,
-  task: SavedTask,
-  authHeader: string,
-  bundle: SavedBundle
+export const composeAssignment = (
+  office: SavedOffice,
+  practitioner: SavedPractitioner
 ) => {
+  const practitionerName = findName(NAME_EN, practitioner.name)
+  const practitionerFirstNames = practitionerName?.given?.join(' ') || ''
+  const practitionerFamilyName = practitionerName?.family || ''
+
+  return {
+    practitionerId: practitioner.id,
+    officeName: office.name!,
+    firstName: practitionerFirstNames,
+    lastName: practitionerFamilyName
+  }
+}
+
+export const createStatusHistory = (body: SearchDocument, task: SavedTask) => {
   if (!isValidOperationHistory(body)) {
     return
   }
 
-  const isSystem = hasScope({ Authorization: authHeader }, 'notification-api')
-  const user = !isSystem
-    ? await getUser(body.updatedBy || '', authHeader)
-    : null
-
-  const operatorName = user && findName(NAME_EN, user.name)
-  const operatorNameLocale = user && findNameLocale(user.name)
-
-  const operatorFirstNames = operatorName?.given?.join(' ') || ''
-  const operatorFamilyName = operatorName?.family || ''
-  const operatorFirstNamesLocale = operatorNameLocale?.given?.join(' ') || ''
-  const operatorFamilyNameLocale = operatorNameLocale?.family || ''
-
-  const regLastOfficeExtension = findTaskExtension(
-    task,
-    'http://opencrvs.org/specs/extension/regLastOffice'
-  )
-
-  let office: SavedLocation | undefined
-  if (regLastOfficeExtension) {
-    office = getFromBundleById<SavedLocation>(
-      bundle,
-      regLastOfficeExtension.valueReference.reference.split('/')[1]
-    )?.resource
-  }
-
   const operationHistory = {
     operationType: body.type,
-    operatedOn: task?.lastModified,
-    rejectReason: body.rejectReason,
-    rejectComment: body.rejectComment,
-    operatorRole:
-      user?.role?.labels.find((label) => label.lang === 'en')?.label || '',
-    operatorFirstNames,
-    operatorFamilyName,
-    operatorFirstNamesLocale,
-    operatorFamilyNameLocale,
-    operatorOfficeName: office?.name || '',
-    operatorOfficeAlias: office?.alias || []
+    operatedOn: task?.lastModified
   } as IOperationHistory
 
-  if (
-    isDeclarationInStatus(body, IN_PROGRESS_STATUS) &&
-    isNotification(body) &&
-    body.eventLocationId
-  ) {
-    const facility = getFromBundleById<SavedLocation>(
-      bundle,
-      body.eventLocationId
-    ).resource
-    operationHistory.notificationFacilityName = facility?.name || ''
-    operationHistory.notificationFacilityAlias = facility?.alias || []
-  }
-
-  if (isDeclarationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
-    updateOperationHistoryWithCorrection(operationHistory, task)
-  }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
 }
 
-function isDeclarationInStatus(
-  body: ICompositionBody,
-  status: string
-): boolean {
-  return (body.type && body.type === status) || false
-}
-
-function isNotification(body: ICompositionBody): boolean {
-  return (
-    (body.compositionType &&
-      NOTIFICATION_TYPES.includes(body.compositionType)) ||
-    false
-  )
-}
-
 export function findDuplicateIds(
-  results: ISearchResponse<
-    IBirthCompositionBody | IDeathCompositionBody
-  >['hits']['hits']
+  results: ISearchResponse<BirthDocument | DeathDocument>['hits']['hits']
 ) {
   return results
     .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
@@ -432,7 +362,7 @@ export async function getUser(
   return await res.json()
 }
 
-function getPreviousStatus(body: IBirthCompositionBody) {
+function getPreviousStatus(body: BirthDocument) {
   if (body.operationHistories && body.operationHistories.length > 0) {
     return body.operationHistories[body.operationHistories.length - 1]
       .operationType
@@ -441,7 +371,7 @@ function getPreviousStatus(body: IBirthCompositionBody) {
   return null
 }
 
-export function isValidOperationHistory(body: IBirthCompositionBody) {
+export function isValidOperationHistory(body: BirthDocument) {
   const previousStatus = getPreviousStatus(body)
   const currentStatus = body.type as keyof typeof validStatusMapping
 
@@ -454,41 +384,4 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
   }
 
   return true
-}
-
-function updateOperationHistoryWithCorrection(
-  operationHistory: IOperationHistory,
-  task: SavedTask
-) {
-  if (
-    task?.input?.length &&
-    task?.output?.length &&
-    task.input.length === task.output.length
-  ) {
-    if (!operationHistory.correction) {
-      operationHistory.correction = []
-    }
-
-    for (let i = 0; i < task.input.length; i += 1) {
-      const section = task.input[i].valueCode || ''
-      const fieldName = task.input[i].valueId || ''
-      const oldValue =
-        task.input[i].valueString ||
-        task.output[i].valueInteger?.toString() ||
-        ''
-      const newValueString = task.output[i].valueString
-      const newValueNumber = task.output[i].valueInteger
-
-      const payload: ICorrection = {
-        section,
-        fieldName,
-        oldValue,
-        newValue: (newValueNumber !== undefined
-          ? newValueNumber
-          : newValueString)! // On of these the values always exist
-      }
-
-      operationHistory.correction?.push(payload)
-    }
-  }
 }

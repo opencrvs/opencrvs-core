@@ -31,7 +31,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import { chainW, tryCatch } from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
@@ -39,11 +39,12 @@ import { pipe } from 'fp-ts/function'
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
-const sign = promisify(jwt.sign) as (
-  payload: string | Buffer | Record<string, unknown>,
-  secretOrPrivateKey: jwt.Secret,
-  options?: jwt.SignOptions
-) => Promise<string>
+const sign = promisify<
+  Record<string, unknown>,
+  jwt.Secret,
+  jwt.SignOptions,
+  string
+>(jwt.sign)
 export interface IUserName {
   use: string
   family: string
