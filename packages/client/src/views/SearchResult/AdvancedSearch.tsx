@@ -99,9 +99,13 @@ export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
 
   const isInvalidDateField = dateFieldTypes
     .map((key) => {
-      const exactDate = (
-        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
-      )?.exact
+      const dateObj = value[
+        key as keyof IBaseAdvancedSearchState
+      ] as IDateRangePickerValue
+
+      if (dateObj?.isDateRangeActive) return undefined
+      const exactDate = dateObj?.exact
+
       return exactDate && isInvalidDate(exactDate)
     })
     .filter((valid) => valid)
