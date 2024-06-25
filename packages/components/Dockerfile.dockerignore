@@ -1,0 +1,23 @@
+# Exclude unused packages
+packages/*
+!packages/components
+
+*.md
+*.yml
+*.yaml
+.vscode
+**/.git
+**/test
+Dockerfile
+packages/components/lib
+
+# From root
+**/node_modules
+**/coverage
+**/.DS_Store
+**/.env
+**/*.log
+.secrets/*
+data
+grafana
+
