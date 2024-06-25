@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const messagesToDefine = {
+const messagesToDefine: { [key: string]: MessageDescriptor } = {
   phoneNumberNotValid: {
     id: 'register.SelectContactPoint.phoneNoError',
     defaultMessage: 'Not a valid mobile number',
@@ -239,6 +239,11 @@ const messagesToDefine = {
     defaultMessage: 'Can not have any decimal point number',
     description:
       'The error message that appeards when any decimal point number is used'
+  },
+  invalidDate: {
+    id: 'validations.invalidDate',
+    defaultMessage: 'Invalid date field',
+    description: 'The error message that appears when a date field is invalid'
   }
 }
 

@@ -631,13 +631,13 @@ function isIDateRangePickerValue(
 
 export const isValidDate: Validation = (value: IFormFieldValue) => {
   if (!isIDateRangePickerValue(value)) {
-    return { message: messages.bengaliOnlyNameFormat }
+    return { message: messages.invalidDate }
   }
 
   const dateString = value.exact
 
   return isInvalidDate(dateString)
-    ? { message: messages.bengaliOnlyNameFormat }
+    ? { message: messages.invalidDate }
     : undefined
 }
 
