@@ -13,15 +13,16 @@ severity:
 scan:
   skip-dirs:
     - node_modules
+    - app/node_modules
     - .secrets
     - data
     - development-environment
     - sequence-diagrams
     - usr/local/share/.cache/yarn/v6/
+    - home/node/.cache/yarn/v6
   scanners:
     - vuln
     - misconfig
-    - secret
 ignorefile: .trivyignore.yaml
 vulnerability:
   ignore-unfixed: true

@@ -1,27 +1,12 @@
-FROM node:hydrogen-alpine
-
-WORKDIR /app
-
-RUN apk update && apk upgrade
-
-COPY . .
-
-RUN rm -rf /app/packages/*
-
-COPY packages/config /app/packages/config
-COPY packages/commons /app/packages/commons
-
-RUN yarn install
-
-WORKDIR /app/packages/commons
-RUN yarn build
-
-WORKDIR /app/packages/config
-RUN yarn build
-
-# FIXME: to be replaced later with whole build running as node
-RUN chown -R node:node /app
+ARG  VERSION=dev
+FROM opencrvs/ocrvs-base:${VERSION}
 
 USER node
 
-CMD yarn start:prod
+WORKDIR /app/packages/config
+COPY --chown=node:node packages/config/*.json /app/packages/config/
+RUN yarn install --frozen-lockfile
+COPY --chown=node:node packages/config /app/packages/config
+RUN yarn build
+
+CMD [ "yarn", "start" ]

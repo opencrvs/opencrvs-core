@@ -21,7 +21,7 @@
     "AUTHORS",
     "LICENSE",
     "license-header.txt",
-    "**/*Dockerfile",
+    "**/*Dockerfile*",
     "**/packages/components/lib",
     "**/packages/*/build",
     "packages/gateway/src/graphql/schema.d.ts",

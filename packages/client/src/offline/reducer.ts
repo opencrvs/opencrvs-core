@@ -35,10 +35,7 @@ import { filterLocations } from '@client/utils/locationUtils'
 import { Event, System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
-import {
-  IPDFTemplate,
-  ISVGTemplate
-} from '@client/pdfRenderer/transformer/types'
+import { ISVGTemplate } from '@client/pdfRenderer'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
@@ -107,7 +104,6 @@ export interface IOfflineData {
   offices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
-    receipt?: IPDFTemplate
     fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
