@@ -37,6 +37,7 @@ import {
   DEATH_REGISTRATION_NUMBER,
   NATIONAL_ID
 } from '@client/utils/constants'
+import { searchDateFieldValidators } from './advancedSearch/fieldDefinitions/validators'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -776,7 +777,7 @@ type ValidationFactoryOperationKeys = FilterType<
 >[keyof typeof validators]
 
 type ValidationDefaultOperationKeys = Exclude<
-  keyof typeof validators,
+  keyof typeof validators | keyof typeof searchDateFieldValidators,
   ValidationFactoryOperationKeys
 >
 

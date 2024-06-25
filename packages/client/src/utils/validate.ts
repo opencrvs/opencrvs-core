@@ -10,11 +10,7 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import {
-  IFormFieldValue,
-  IFormData,
-  IDateRangePickerValue
-} from '@opencrvs/client/src/forms'
+import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -606,42 +602,6 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
   return isValidEnglishName(cast)
     ? undefined
     : { message: messages.englishOnlyNameFormat }
-}
-
-function isInvalidDate(date?: string) {
-  if (!date) return false
-  const regEx = /^\d{4}-\d{2}-\d{2}$/
-  if (!date.match(regEx)) {
-    return true
-  }
-  const d = new Date(date)
-  const dNum = d.getTime()
-  if (!dNum && dNum !== 0) {
-    return true
-  }
-  return d.toISOString().slice(0, 10) !== date
-}
-
-// Type guard to check if the value is IDateRangePickerValue
-function isIDateRangePickerValue(
-  value: IFormFieldValue
-): value is IDateRangePickerValue {
-  return (value as IDateRangePickerValue).exact !== undefined
-}
-
-export const isValidDate: Validation = (value: IFormFieldValue) => {
-  if (!isIDateRangePickerValue(value)) {
-    return undefined
-  }
-
-  // if date range is active date field is not needed to be validated
-  if (value.isDateRangeActive) return undefined
-
-  const dateString = value.exact
-
-  return isInvalidDate(dateString)
-    ? { message: messages.invalidDate }
-    : undefined
 }
 
 export const range: RangeValidation =
