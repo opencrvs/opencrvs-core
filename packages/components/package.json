@@ -75,7 +75,7 @@
     "eslint-plugin-styled-components-a11y": "^2.0.0",
     "lint-staged": "^7.1.0",
     "prettier": "2.8.8",
-    "remark-gfm": "4.0.0",
+    "remark-gfm": "3.0.0",
     "rimraf": "^5.0.0",
     "storybook": "^7.0.2",
     "stylelint": "^14.11.0",

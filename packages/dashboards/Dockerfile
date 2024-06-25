@@ -1,9 +1,10 @@
 FROM metabase/metabase:v0.46.6.4
-ADD run.sh /
-ADD initialize-database.sh /
-ADD update-database.sh /
-ADD environment-configuration.sql /
-ADD metabase.init.db.sql /
+
+ADD packages/dashboards/run.sh /
+ADD packages/dashboards/initialize-database.sh /
+ADD packages/dashboards/update-database.sh /
+ADD packages/dashboards/environment-configuration.sql /
+ADD packages/dashboards/metabase.init.db.sql /
 
 ENV METABASE_JAR=/app/metabase.jar
 ENV MB_DB_INIT_SQL_FILE=/metabase.init.db.sql
