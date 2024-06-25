@@ -419,13 +419,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === DATE_RANGE_PICKER) {
-      const modifiedInputProps = {
-        ...inputFieldProps,
-        touched: inputFieldProps.error ? true : false
-      }
-
       return (
-        <InputField {...modifiedInputProps}>
+        <InputField {...inputFieldProps}>
           <DateRangePickerForFormField
             inputProps={{ ...inputProps }}
             notice={fieldDefinition.notice}
@@ -896,20 +891,34 @@ class FormSectionComponent extends React.Component<Props> {
           const isFieldDisabled = conditionalActions.includes('disable')
           const isDateField =
             field.type === DATE ||
-            // field.type === DATE_RANGE_PICKER ||
             (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
               getFieldType(field as IDynamicFormField, values) === DATE)
 
-          if (
-            isDateField &&
-            touched[`${field.name}-dd`] !== undefined &&
-            touched[`${field.name}-mm`] !== undefined &&
-            touched[`${field.name}-yyyy`] !== undefined
-          ) {
-            touched[field.name] =
-              touched[`${field.name}-dd`] &&
-              touched[`${field.name}-mm`] &&
-              touched[`${field.name}-yyyy`]
+          const isDateRangePickerField = field.type === DATE_RANGE_PICKER
+
+          const dateFields = [
+            `${field.name}-dd`,
+            `${field.name}-mm`,
+            `${field.name}-yyyy`
+          ]
+          const dateRangeFields = [
+            `${field.name}exact-dd`,
+            `${field.name}exact-mm`,
+            `${field.name}exact-yyyy`
+          ]
+
+          const areFieldsTouched = (fields: any[]) =>
+            fields.every((field) => touched[field] !== undefined)
+
+          const areFieldsValid = (fields: any[]) =>
+            fields.every((field) => touched[field])
+
+          if (isDateField && areFieldsTouched(dateFields)) {
+            touched[field.name] = areFieldsValid(dateFields)
+          }
+
+          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
+            touched[field.name] = areFieldsValid(dateRangeFields)
           }
 
           const withDynamicallyGeneratedFields =
