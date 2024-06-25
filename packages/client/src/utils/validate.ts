@@ -631,8 +631,11 @@ function isIDateRangePickerValue(
 
 export const isValidDate: Validation = (value: IFormFieldValue) => {
   if (!isIDateRangePickerValue(value)) {
-    return { message: messages.invalidDate }
+    return undefined
   }
+
+  // if date range is active date field is not needed to be validated
+  if (value.isDateRangeActive) return undefined
 
   const dateString = value.exact
 
