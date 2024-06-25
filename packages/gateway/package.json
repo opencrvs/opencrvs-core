@@ -47,7 +47,7 @@
     "graphql": "^15.0.0",
     "graphql-import": "^0.7.0",
     "graphql-tools": "^4.0.7",
-    "hapi-auth-jwt2": "10.5.1",
+    "hapi-auth-jwt2": "10.6.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
