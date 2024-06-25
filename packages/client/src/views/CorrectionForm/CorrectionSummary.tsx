@@ -78,6 +78,7 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
@@ -120,7 +121,10 @@ type IDispatchProps = {
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
-  section = correctionFeesPaymentSection
+  currencySymbol = getCurrencySymbol(
+    this.props.offlineResources.config.CURRENCY
+  )
+  section = correctionFeesPaymentSection(this.currencySymbol)
   group = this.section.groups[0]
   constructor(props: IFullProps) {
     super(props)
@@ -354,7 +358,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               onChange={(values) => {
                 this.modifyDeclaration(
                   values,
-                  correctionFeesPaymentSection,
+                  correctionFeesPaymentSection(this.currencySymbol),
                   declaration
                 )
               }}

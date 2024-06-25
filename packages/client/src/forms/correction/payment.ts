@@ -17,59 +17,64 @@ import {
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 
-export const correctionFeesPayment: IFormSectionGroup = {
-  id: 'correctionFeesPayment',
-  fields: [
-    {
-      name: 'correctionFees',
-      type: RADIO_GROUP_WITH_NESTED_FIELDS,
-      size: RadioSize.LARGE,
-      label: messages.correctionSummaryFeesRequired,
-      hideAsterisk: true,
-      required: true,
-      initialValue: '',
-      validator: [],
-      options: [
-        {
-          value: 'REQUIRED',
-          label: messages.correctionSummaryFeesRequiredPositive
-        },
-        {
-          value: 'NOT_REQUIRED',
-          label: messages.correctionSummaryFeesRequiredNegative
-        }
-      ],
-      nestedFields: {
-        REQUIRED: [
+export const correctionFeesPayment = (currencySymbol: any) =>
+  ({
+    id: 'correctionFeesPayment',
+    fields: [
+      {
+        name: 'correctionFees',
+        type: RADIO_GROUP_WITH_NESTED_FIELDS,
+        size: RadioSize.LARGE,
+        label: messages.correctionSummaryFeesRequired,
+        hideAsterisk: true,
+        required: true,
+        initialValue: '',
+        validator: [],
+        options: [
           {
-            name: 'totalFees',
-            type: 'NUMBER',
-            label: messages.correctionSummaryFeesAmount,
-            required: true,
-            initialValue: '',
-            validator: [],
-            mapping: {}
+            value: 'REQUIRED',
+            label: messages.correctionSummaryFeesRequiredPositive
           },
           {
-            name: 'proofOfPayment',
-            type: 'SIMPLE_DOCUMENT_UPLOADER',
-            label: messages.correctionSummaryProofOfPayment,
-            description: messages.correctionSummaryProofOfPayment,
-            required: true,
-            initialValue: '',
-            validator: [],
-            mapping: {}
+            value: 'NOT_REQUIRED',
+            label: messages.correctionSummaryFeesRequiredNegative
           }
-        ]
+        ],
+        nestedFields: {
+          REQUIRED: [
+            {
+              name: 'totalFees',
+              type: 'NUMBER',
+              label: messages.correctionSummaryTotalPaymentLabel,
+              labelParam: {
+                currency: '$'
+              },
+              required: true,
+              initialValue: '',
+              validator: [],
+              mapping: {}
+            },
+            {
+              name: 'proofOfPayment',
+              type: 'SIMPLE_DOCUMENT_UPLOADER',
+              label: messages.correctionSummaryProofOfPayment,
+              description: messages.correctionSummaryProofOfPayment,
+              required: true,
+              initialValue: '',
+              validator: [],
+              mapping: {}
+            }
+          ]
+        }
       }
-    }
-  ]
-}
+    ]
+  } as IFormSectionGroup)
 
-export const correctionFeesPaymentSection: IFormSection = {
-  id: CorrectionSection.CorrectionFeesPayment,
-  viewType: 'form',
-  name: messages.name,
-  title: messages.title,
-  groups: [correctionFeesPayment]
-}
+export const correctionFeesPaymentSection = (currencySymbol: any) =>
+  ({
+    id: CorrectionSection.CorrectionFeesPayment,
+    viewType: 'form',
+    name: messages.name,
+    title: messages.title,
+    groups: [correctionFeesPayment(currencySymbol)]
+  } as IFormSection)

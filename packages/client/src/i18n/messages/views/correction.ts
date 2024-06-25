@@ -62,7 +62,6 @@ interface ICorrectionMessages
   correctionSummaryFeesRequired: MessageDescriptor
   correctionSummaryFeesRequiredPositive: MessageDescriptor
   correctionSummaryFeesRequiredNegative: MessageDescriptor
-  correctionSummaryFeesAmount: MessageDescriptor
   correctionSummaryProofOfPaymentRequired: MessageDescriptor
   correctionSummaryProofOfPayment: MessageDescriptor
   correctionSummaryTotalPaymentLabel: MessageDescriptor
@@ -355,11 +354,6 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'No',
     description:
       'Negative label for Fees required for certificate correction summary'
-  },
-  correctionSummaryFeesAmount: {
-    id: 'correction.summary.feesAmount',
-    defaultMessage: 'Total $',
-    description: 'Label for total amount of fees'
   },
   correctionSummaryProofOfPaymentRequired: {
     id: 'correction.summary.proofOfPaymentRequired',
