@@ -132,7 +132,7 @@ const AllUserEmail = () => {
                 ignoreMediaQuery
                 {...{
                   value: body,
-                  onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setBody(e.target.value)
                 }}
               />
