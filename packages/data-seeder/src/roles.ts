@@ -65,7 +65,7 @@ interface GQLSystemRoleInput {
 
 type SystemRole = {
   id: string
-  value: typeof SYSTEM_ROLES[number]
+  value: (typeof SYSTEM_ROLES)[number]
   roles: Array<Role>
   active: boolean
 }
@@ -149,9 +149,15 @@ async function updateRoles(
   return roleIdMap
 }
 
-async function fetchCountryRoles() {
+async function fetchCountryRoles(token: string) {
   const url = new URL('roles', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
   if (!res.ok) {
     raise(`Expected to get the roles from ${url}`)
   }
@@ -189,10 +195,10 @@ export async function seedRoles(token: string) {
     }),
     {}
   )
-  const countryRoles = await fetchCountryRoles()
+  const countryRoles = await fetchCountryRoles(token)
   const usedSystemRoles = Object.keys(
     countryRoles
-  ) as typeof SYSTEM_ROLES[number][]
+  ) as (typeof SYSTEM_ROLES)[number][]
   const updatedRoleIdMap = await updateRoles(
     token,
     systemRoles
