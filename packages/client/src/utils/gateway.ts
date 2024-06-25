@@ -4434,6 +4434,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
@@ -4760,6 +4761,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      requesterOther?: string | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
@@ -5157,6 +5159,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
@@ -5512,6 +5515,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null

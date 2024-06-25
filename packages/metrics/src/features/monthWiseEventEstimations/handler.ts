@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { fetchEventsGroupByMonthDates } from '@metrics/features/metrics/metricsGenerator'
+import {
+  fetchEventsGroupByMonthDates,
+  fetchEventsGroupByMonthDatesByLocation
+} from '@metrics/features/metrics/metricsGenerator'
 import {
   getMonthRangeFilterListFromTimeRage,
   IMonthRangeFilter,
@@ -40,7 +43,7 @@ export async function monthWiseEventEstimationsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = request.query[LOCATION_ID]
-    ? 'Location/' + request.query[LOCATION_ID]
+    ? (`Location/${request.query[LOCATION_ID]}` as const)
     : undefined
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
@@ -51,12 +54,14 @@ export async function monthWiseEventEstimationsHandler(
     timeStart,
     timeEnd
   )
-  const registrationsGroupByMonthDates = await fetchEventsGroupByMonthDates(
-    timeStart,
-    timeEnd,
-    locationId,
-    event
-  )
+  const registrationsGroupByMonthDates = locationId
+    ? await fetchEventsGroupByMonthDatesByLocation(
+        timeStart,
+        timeEnd,
+        locationId,
+        event
+      )
+    : await fetchEventsGroupByMonthDates(timeStart, timeEnd, locationId, event)
   const estimations: IMonthWiseEstimation[] = []
   for (const monthFilter of monthFilters) {
     const estimatedTargetDayMetrics =

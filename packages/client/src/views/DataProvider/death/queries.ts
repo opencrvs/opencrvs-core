@@ -286,6 +286,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         otherReason
         requester
+        requesterOther
         hasShowedVerifiedDocument
         noSupportingDocumentationRequired
         date
@@ -553,6 +554,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       history {
         otherReason
         requester
+        requesterOther
         date
         action
         regStatus

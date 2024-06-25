@@ -19,11 +19,8 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
-  goToApplicationConfig,
-  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
-  goToInformantNotification,
   goToLeaderBoardsView,
   goToOrganisationView,
   goToPerformanceStatistics,
@@ -31,7 +28,6 @@ import {
   goToSettings,
   goToSystemList,
   goToTeamView,
-  goToUserRolesConfig,
   goToVSExport
 } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
@@ -223,10 +219,7 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
-  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
-  goToUserRolesConfigAction: typeof goToUserRolesConfig
-  goToApplicationConfigAction: typeof goToApplicationConfig
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -239,7 +232,6 @@ interface IDispatchProps {
   goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
-  goToInformantNotification: typeof goToInformantNotification
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
@@ -303,11 +295,8 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToCertificateConfigAction,
-    goToUserRolesConfigAction,
     goToVSExportsAction,
     goToSystemViewAction,
-    goToApplicationConfigAction,
     goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
@@ -321,7 +310,6 @@ const NavigationView = (props: IFullProps) => {
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
-    goToInformantNotification,
     goToAllUserEmail,
     className
   } = props
@@ -721,54 +709,17 @@ const NavigationView = (props: IFullProps) => {
                       />
                       {(isConfigExpanded ||
                         configTab.includes(activeMenuItem)) && (
-                        <>
-                          <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.application]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.application}`}
-                            onClick={goToApplicationConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.application
-                            }
-                          />
-                          <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.certificate]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.certificate}`}
-                            onClick={goToCertificateConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.certificate
-                            }
-                          />
-
-                          <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.systems}`}
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.systems]
-                            )}
-                            onClick={goToSystemViewAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.systems
-                            }
-                          />
-
-                          <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.userRoles}`}
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.userRoles]
-                            )}
-                            onClick={goToUserRolesConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.userRoles
-                            }
-                          />
-                        </>
+                        <NavigationSubItem
+                          id={`navigation_${WORKQUEUE_TABS.systems}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.systems]
+                          )}
+                          onClick={goToSystemViewAction}
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === WORKQUEUE_TABS.systems
+                          }
+                        />
                       )}
                     </>
                   )}
@@ -802,33 +753,17 @@ const NavigationView = (props: IFullProps) => {
                       />
                       {(isCommunationExpanded ||
                         conmmunicationTab.includes(activeMenuItem)) && (
-                        <>
-                          <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[
-                                WORKQUEUE_TABS.informantNotification
-                              ]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.informantNotification}`}
-                            onClick={goToInformantNotification}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem ===
-                                WORKQUEUE_TABS.informantNotification
-                            }
-                          />
-                          <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.emailAllUsers]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
-                            onClick={goToAllUserEmail}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.emailAllUsers
-                            }
-                          />
-                        </>
+                        <NavigationSubItem
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.emailAllUsers]
+                          )}
+                          id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
+                          onClick={goToAllUserEmail}
+                          isSelected={
+                            enableMenuSelection &&
+                            activeMenuItem === WORKQUEUE_TABS.emailAllUsers
+                          }
+                        />
                       )}
                     </>
                   )}
@@ -1027,9 +962,6 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
-  goToCertificateConfigAction: goToCertificateConfig,
-  goToUserRolesConfigAction: goToUserRolesConfig,
-  goToApplicationConfigAction: goToApplicationConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
@@ -1043,7 +975,6 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
-  goToInformantNotification,
   goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 

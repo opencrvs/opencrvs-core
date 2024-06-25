@@ -131,6 +131,7 @@ export const DuplicateForm = (props: IProps) => {
             name: getName(),
             trackingId: String(data.registration.trackingId)
           })}
+          showTitleOnMobile={true}
           subtitle={intl.formatMessage(
             duplicateMessages.duplicateContentSubtitle,
             {

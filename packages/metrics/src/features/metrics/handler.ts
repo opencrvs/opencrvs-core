@@ -40,7 +40,7 @@ export async function metricsHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = 'Location/' + request.query[LOCATION_ID]
+  const locationId = `Location/${request.query[LOCATION_ID]}` as const
   const event = request.query[EVENT].toUpperCase() as EVENT_TYPE
   let currentLocationLevel
   let lowerLocationLevel

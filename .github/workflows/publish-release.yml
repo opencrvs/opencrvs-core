@@ -102,7 +102,7 @@ jobs:
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml

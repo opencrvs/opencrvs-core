@@ -34,7 +34,6 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
-import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
@@ -47,6 +46,7 @@ import {
   findFirstTaskHistory
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
+import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -153,8 +153,7 @@ function createBrideIndex(
     body.marriageDate = marriageExtension.valueDateTime
   }
 
-  body.brideIdentifier =
-    bride && bride.identifier && getSubmittedIdentifier(bride.identifier)
+  body.brideIdentifier = bride && findPatientPrimaryIdentifier(bride)?.value
   body.brideDoB = bride && bride.birthDate
 }
 
@@ -185,8 +184,7 @@ function createGroomIndex(
     body.marriageDate = marriageExtension.valueDateTime
   }
 
-  body.groomIdentifier =
-    groom && groom.identifier && getSubmittedIdentifier(groom.identifier)
+  body.groomIdentifier = groom && findPatientPrimaryIdentifier(groom)?.value
   body.groomDoB = groom && groom.birthDate
 }
 

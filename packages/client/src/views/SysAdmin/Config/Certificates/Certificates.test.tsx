@@ -10,25 +10,15 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  flushPromises,
-  getFileFromBase64String,
-  loginAsFieldAgent
-} from '@client/tests/util'
+import { createTestComponent, loginAsFieldAgent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
-import createFetchMock from 'vitest-fetch-mock'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
-import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-const validImageB64String =
-  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-const fetch = createFetchMock(vi)
-fetch.enableMocks()
+import * as imageUtils from '@client/utils/imageUtils'
 
 enum MENU_ITEM {
   PREVIEW,
@@ -57,46 +47,48 @@ async function clickOnMenuItem(
     .find(`#template-birth-action-menuItem${item}`)
     .hostNodes()
     .simulate('click')
-  await flushPromises()
   testComponent.update()
 }
 
 describe('ConfigHome page when already has uploaded certificate template', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   loginAsFieldAgent(store)
+
   let testComponent: ReactWrapper
-  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
+
+  beforeAll(() => {
+    vi.spyOn(imageUtils, 'fetchImageAsBase64').mockImplementation((_: string) =>
+      Promise.resolve('')
+    )
+
+    vi.spyOn(
+      configApplicationMutations,
+      'mutateApplicationConfig'
+    ).mockImplementation(() =>
+      Promise.resolve({
+        data: {
+          updateApplicationConfig: {
+            BIRTH: {
+              PRINT_IN_ADVANCE: true
+            },
+            DEATH: {
+              PRINT_IN_ADVANCE: true
+            }
+          }
+        }
+      })
+    )
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+  })
 
   beforeEach(async () => {
-    vi.resetAllMocks()
-    configApplicationMutations.mutateApplicationConfig = vi.fn(
-      () =>
-        new Promise((resolve) =>
-          resolve({
-            data: {
-              updateApplicationConfig: {
-                BIRTH: {
-                  PRINT_IN_ADVANCE: true
-                },
-                DEATH: {
-                  PRINT_IN_ADVANCE: true
-                }
-              }
-            }
-          })
-        )
-    )
-    const { store, history } = createStore()
-
     testComponent = await createTestComponent(
       <CertificatesConfig></CertificatesConfig>,
       { store, history }
     )
-    testComponent.update()
-  })
-
-  afterEach(() => {
-    spy.mockReset()
   })
 
   describe('certificate page test', () => {
@@ -140,11 +132,6 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
       testComponent.update()
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
       await waitForElement(testComponent, '#allow-printing-notification')
 
       expect(
@@ -158,76 +145,25 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('Testing sub menu item on config page', () => {
-    let printCertificateSpy: SpyInstance
+    let printPdfSpy: SpyInstance
     let downloadFileSpy: SpyInstance
-    let updateCertificateMutationSpy: SpyInstance
-    beforeEach(() => {
-      //Mocking with Response(blob) dosen't work
-      fetch.mockImplementationOnce(() =>
-        Promise.resolve({
-          blob: () => new Blob(['data'])
-        } as any)
-      )
-      printCertificateSpy = vi.spyOn(PDFUtils, 'printCertificate')
+
+    beforeAll(() => {
+      printPdfSpy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
+
       downloadFileSpy = vi.spyOn(PDFUtils, 'downloadFile')
-      updateCertificateMutationSpy = vi.spyOn(
-        certificateTemplateMutations,
-        'updateCertificateTemplate'
-      )
-    })
-    afterAll(() => {
-      fetch.resetMocks()
-      printCertificateSpy.mockRestore()
-      downloadFileSpy.mockRestore()
     })
 
     afterEach(() => {
-      printCertificateSpy.mockClear()
+      printPdfSpy.mockClear()
       downloadFileSpy.mockClear()
     })
+
     it('should show upload modal when clicked on upload', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
-    })
-
-    it('should call update certificate mutation on modal confirmation', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
-      expect(
-        testComponent.find('#withoutVerificationPrompt').hostNodes()
-      ).toHaveLength(1)
-      testComponent.find('#upload_document').hostNodes().simulate('click')
-      testComponent
-        .find('input[name="Simple"][type="file"]')
-        .simulate('change', {
-          target: {
-            files: [
-              getFileFromBase64String(
-                validImageB64String,
-                'certificate.svg',
-                'image/svg+xml'
-              )
-            ]
-          }
-        })
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 50)
-      })
-
-      testComponent.update()
-      expect(
-        testComponent.find('#apply_change').hostNodes().props().disabled
-      ).toBeFalsy()
-
-      testComponent.find('#apply_change').hostNodes().simulate('click')
-      testComponent.update()
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      expect(updateCertificateMutationSpy).toBeCalledTimes(1)
     })
 
     it('should render preview certificate template when clicked on preview', async () => {
@@ -254,18 +190,12 @@ describe('ConfigHome page when already has uploaded certificate template', async
     it('should call print certificate after clicking print', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PRINT)
       testComponent.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
 
-      expect(printCertificateSpy).toBeCalledTimes(1)
+      expect(printPdfSpy).toBeCalledTimes(1)
     })
 
     it('should download preview certificate', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.DOWNLOAD)
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
       expect(downloadFileSpy).toBeCalledTimes(1)
     })
   })

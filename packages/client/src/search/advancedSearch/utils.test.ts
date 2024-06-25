@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  IBaseAdvancedSearchState,
+  IAdvancedSearchFormState,
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
@@ -17,7 +17,7 @@ import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 
 describe('Transforms advancedSearch local state to advancedSearch store state properly', () => {
-  const mockLocalState: IBaseAdvancedSearchState = {
+  const mockLocalState: IAdvancedSearchFormState = {
     event: 'birth',
     registrationStatuses: 'IN_REVIEW',
     eventCountry: 'FAR',

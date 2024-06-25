@@ -101,9 +101,8 @@ function CompletenessDataTableComponent(props: ITableProps) {
             ? item.estimated.toFixed(2)
             : Math.round(item.estimated)
         ),
-        completenessRate: `${Number(
+        completenessRate:
           (item[props.completenessRateTime] / item.estimated) * 100
-        ).toFixed(2)}%`
       }))
 
       return locationContent
@@ -126,9 +125,8 @@ function CompletenessDataTableComponent(props: ITableProps) {
             ? item.estimated.toFixed(2)
             : Math.round(item.estimated)
         ),
-        completenessRate: `${Number(
+        completenessRate:
           (item[props.completenessRateTime] / item.estimated) * 100
-        ).toFixed(2)}%`
       }))
 
       return timeContent
@@ -158,7 +156,12 @@ function CompletenessDataTableComponent(props: ITableProps) {
     content,
     sortOrder.map(({ key }) => key),
     sortOrder.map(({ value }) => value)
-  )
+  ).map((item) => {
+    return {
+      ...item,
+      completenessRate: item.completenessRate.toFixed(2) + '%'
+    }
+  })
 
   const firstColProp =
     base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
