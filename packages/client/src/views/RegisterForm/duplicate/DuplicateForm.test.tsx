@@ -107,7 +107,7 @@ describe('when in device of large viewport', () => {
             .props().disabled
         ).toBeTruthy()
       })
-      it('enable the duplicate button on modal when select duplicate Id and describe-reason has valu', async () => {
+      it('enable the duplicate button on modal when select duplicate Id and describe-reason has value', async () => {
         duplicateFormComponent
           .find('#mark-as-duplicate')
           .hostNodes()
