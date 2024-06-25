@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:3.20
 
 # Install required packages
 RUN apk update && apk upgrade && apk add --update --no-cache bash curl coreutils mongodb-tools
