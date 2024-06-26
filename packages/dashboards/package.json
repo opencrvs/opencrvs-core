@@ -2,6 +2,7 @@
   "name": "@opencrvs/dashboards",
   "version": "1.5.0",
   "description": "OpenCRVS performance dashboards",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "./run-dev.sh",
