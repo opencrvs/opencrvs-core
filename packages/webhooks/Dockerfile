@@ -1,27 +1,10 @@
-FROM node:hydrogen-alpine
-
-WORKDIR /app
-
-RUN apk update && apk upgrade
-
-COPY . .
-
-RUN rm -rf /app/packages/*
-
-COPY packages/webhooks /app/packages/webhooks
-COPY packages/commons /app/packages/commons
-
-RUN yarn install
-
-WORKDIR /app/packages/commons
-RUN yarn build
-
-WORKDIR /app/packages/webhooks
-RUN yarn build
-
-# FIXME: to be replaced later with whole build running as node
-RUN chown -R node:node /app
+ARG  VERSION=dev
+FROM opencrvs/ocrvs-base:${VERSION}
 
 USER node
 
-CMD yarn start:prod
+WORKDIR /app/packages/webhooks
+COPY --chown=node:node packages/webhooks /app/packages/webhooks
+RUN yarn install --frozen-lockfile && yarn build
+
+CMD [ "yarn", "start:prod" ]

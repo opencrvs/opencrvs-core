@@ -831,13 +831,12 @@ const setAddressPropFromFHIRProp = (
   fieldName: string,
   offlineData?: IOfflineData
 ) => {
-  const value =
-    fhirProp === 'country'
-      ? (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
-          ?.label.defaultMessage as string) || ''
-      : addressFromQuery[fhirProp] || ''
+  const value = addressFromQuery[fhirProp] || ''
+
   if (fhirProp === 'country') {
-    transformedData[sectionId][fieldName] = value
+    transformedData[sectionId][fieldName] =
+      (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
+        ?.label as MessageDescriptor as IFormData) || ''
   } else if (
     addressFromQuery?.['country'] === window.config.COUNTRY &&
     !fieldName.includes('international')
