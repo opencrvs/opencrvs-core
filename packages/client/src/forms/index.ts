@@ -23,6 +23,7 @@ import { MessageDescriptor } from 'react-intl'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import * as validators from '@opencrvs/client/src/utils/validate'
+import * as searchValidators from '@client/search/advancedSearch/validators'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import * as mutations from './register/mappings/mutation'
@@ -37,8 +38,6 @@ import {
   DEATH_REGISTRATION_NUMBER,
   NATIONAL_ID
 } from '@client/utils/constants'
-import { advancedSearchFormValidators } from './advancedSearch/fieldDefinitions/validators'
-
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
@@ -769,6 +768,7 @@ type FilterType<Base, Condition> = {
   [Key in keyof Base]: Base[Key] extends Condition ? Key : never
 }
 
+type allValidators = keyof (typeof validators & typeof searchValidators)
 // Validation
 
 type ValidationFactoryOperationKeys = FilterType<
@@ -777,7 +777,7 @@ type ValidationFactoryOperationKeys = FilterType<
 >[keyof typeof validators]
 
 type ValidationDefaultOperationKeys = Exclude<
-  keyof typeof validators | keyof typeof advancedSearchFormValidators,
+  allValidators,
   ValidationFactoryOperationKeys
 >
 

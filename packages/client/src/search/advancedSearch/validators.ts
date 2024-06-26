@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IDateRangePickerValue, IFormFieldValue } from '@client/forms'
-import { Validator } from '@client/forms/validators'
+import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 import { validationMessages as messages } from '@client/i18n/messages'
 
 // Type guard to check if the value is IDateRangePickerValue
@@ -17,20 +17,6 @@ function isIDateRangePickerValue(
   value: IFormFieldValue
 ): value is IDateRangePickerValue {
   return (value as IDateRangePickerValue).exact !== undefined
-}
-
-export function isInvalidDate(date?: string) {
-  if (!date) return false
-  const regEx = /^\d{4}-\d{2}-\d{2}$/
-  if (!date.match(regEx)) {
-    return true
-  }
-  const d = new Date(date)
-  const dNum = d.getTime()
-  if (!dNum && dNum !== 0) {
-    return true
-  }
-  return d.toISOString().slice(0, 10) !== date
 }
 
 export const isValidDate = (value: IFormFieldValue) => {
@@ -47,7 +33,3 @@ export const isValidDate = (value: IFormFieldValue) => {
     ? { message: messages.invalidDate }
     : undefined
 }
-
-export const advancedSearchFormValidators: Record<string, Validator> = {
-  isValidDate
-} as Record<string, any>

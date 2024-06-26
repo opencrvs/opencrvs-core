@@ -43,7 +43,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
-import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/validators'
+import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 enum TabId {
   BIRTH = 'birth',

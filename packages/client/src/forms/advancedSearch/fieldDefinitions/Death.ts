@@ -12,8 +12,7 @@ import { countries } from '@client/utils/countries'
 import { IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import { fieldValidationDescriptorToValidationFunction } from '@client/forms/deserializer/deserializer'
-import { validators } from '@client/forms/validators'
+import { isValidDate } from '@client/search/advancedSearch/validators'
 
 export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
   {
@@ -38,14 +37,7 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validator: [
-          fieldValidationDescriptorToValidationFunction(
-            {
-              operation: 'isValidDate'
-            },
-            validators
-          )
-        ]
+        validator: [isValidDate]
       },
       {
         name: 'registrationStatuses',
@@ -99,14 +91,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: [
-        fieldValidationDescriptorToValidationFunction(
-          {
-            operation: 'isValidDate'
-          },
-          validators
-        )
-      ]
+      validator: [isValidDate]
     },
     {
       name: 'deceasedFirstNames',
@@ -306,14 +291,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: [
-        fieldValidationDescriptorToValidationFunction(
-          {
-            operation: 'isValidDate'
-          },
-          validators
-        )
-      ]
+      validator: [isValidDate]
     },
     {
       name: 'informantFirstNames',

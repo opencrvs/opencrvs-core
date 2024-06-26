@@ -51,7 +51,7 @@ import { countries } from '@client/utils/countries'
 import * as builtInValidators from '@client/utils/validate'
 import { Validator } from '@client/forms/validators'
 import * as labels from '@client/forms/certificate/fieldDefinitions/label'
-import { advancedSearchFormValidators } from '@client/forms/advancedSearch/fieldDefinitions/validators'
+import { advancedSearchFormValidators } from '@client/forms/advancedSearch/fieldDefinitions/index-validators'
 
 /**
  * Some of the exports of mutations, queries and validators are not functions
