@@ -48,6 +48,6 @@ export const isValidDate = (value: IFormFieldValue) => {
     : undefined
 }
 
-export const searchDateFieldValidators: Record<string, Validator> = {
+export const advancedSearchFormValidators: Record<string, Validator> = {
   isValidDate
 } as Record<string, any>

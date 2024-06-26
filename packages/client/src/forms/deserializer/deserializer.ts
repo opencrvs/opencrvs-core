@@ -51,7 +51,7 @@ import { countries } from '@client/utils/countries'
 import * as builtInValidators from '@client/utils/validate'
 import { Validator } from '@client/forms/validators'
 import * as labels from '@client/forms/certificate/fieldDefinitions/label'
-import { searchDateFieldValidators } from '@client/forms/advancedSearch/fieldDefinitions/validators'
+import { advancedSearchFormValidators } from '@client/forms/advancedSearch/fieldDefinitions/validators'
 
 /**
  * Some of the exports of mutations, queries and validators are not functions
@@ -222,7 +222,7 @@ export function fieldValidationDescriptorToValidationFunction(
 ): Validation {
   const validator: Validator =
     validators[descriptor.operation as ValidatorFunctionExports] ??
-    searchDateFieldValidators[descriptor.operation]
+    advancedSearchFormValidators[descriptor.operation]
 
   if (!validator) {
     throw configurationError(descriptor, 'validator')
