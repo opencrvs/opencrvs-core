@@ -18,6 +18,7 @@
     "status:openhim": "migrate-mongo status -f ./src/migrate-mongo-config-openhim.js",
     "status:user-mgnt": "migrate-mongo status -f ./src/migrate-mongo-config-user-mgnt.js",
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
+    "reindex-search": "tsx src/utils/reindex-search.ts",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "rimraf build && tsc"
@@ -36,6 +37,7 @@
     "migrate-mongo": "^10.0.0",
     "minio": "^7.0.33",
     "mongoose": "^6.11.3",
+    "tsx": "^4.15.7",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
