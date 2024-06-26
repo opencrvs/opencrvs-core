@@ -127,11 +127,6 @@ type IDispatchProps = {
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
-  currencySymbol = getCurrencySymbol(
-    this.props.offlineResources.config.CURRENCY
-  )
-  section = correctionFeesPaymentSection(this.currencySymbol)
-  group = this.section.groups[0]
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -161,11 +156,16 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userRole
     } = this.props
 
+    const currencySymbol = getCurrencySymbol(
+      this.props.offlineResources.config.CURRENCY
+    )
+    const section = correctionFeesPaymentSection(currencySymbol)
+
     const group = {
-      ...this.group,
+      ...section.groups[0],
       fields: replaceInitialValues(
-        this.group.fields,
-        this.props.declaration.data[this.section.id] || {},
+        section.groups[0].fields,
+        this.props.declaration.data[section.id] || {},
         this.props.declaration.data
       )
     }
@@ -196,7 +196,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         key="make_correction"
         onClick={this.togglePrompt}
         disabled={
-          sectionHasError(group, this.section, declaration) ||
+          sectionHasError(group, section, declaration) ||
           this.state.isFileUploading
         }
         icon={() => <Check />}
@@ -357,7 +357,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               onChange={(values) => {
                 this.modifyDeclaration(
                   values,
-                  correctionFeesPaymentSection(this.currencySymbol),
+                  correctionFeesPaymentSection(currencySymbol),
                   declaration
                 )
               }}

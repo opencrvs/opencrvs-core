@@ -47,7 +47,7 @@ export const correctionFeesPayment = (currencySymbol: any) =>
               type: 'NUMBER',
               label: messages.correctionSummaryTotalPaymentLabel,
               labelParam: {
-                currency: '$'
+                currency: currencySymbol
               },
               required: true,
               initialValue: '',
@@ -68,7 +68,7 @@ export const correctionFeesPayment = (currencySymbol: any) =>
         }
       }
     ]
-  } as IFormSectionGroup)
+  } satisfies IFormSectionGroup)
 
 export const correctionFeesPaymentSection = (currencySymbol: any) =>
   ({
@@ -77,4 +77,4 @@ export const correctionFeesPaymentSection = (currencySymbol: any) =>
     name: messages.name,
     title: messages.title,
     groups: [correctionFeesPayment(currencySymbol)]
-  } as IFormSection)
+  } satisfies IFormSection)
