@@ -284,6 +284,7 @@ class SearchResultView extends React.Component<
           params.get('searchType')
         ]
         const isDeclarationReviewableByRegistrar =
+          declarationIsRejected ||
           declarationIsValidated ||
           declarationIsCorrectionRequested ||
           isDeclared ||
