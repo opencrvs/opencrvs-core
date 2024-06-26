@@ -102,7 +102,9 @@ export default defineConfig(({ mode }) => {
       globals: true,
       coverage: {
         reporter: ['text', 'json', 'html']
-      }
+      },
+      // fixes tests randomly failing due to a 'tinypool' error https://github.com/opencrvs/opencrvs-core/issues/7254
+      pool: 'forks'
     }
   }
 })
