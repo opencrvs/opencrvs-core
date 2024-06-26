@@ -92,15 +92,9 @@ function CompletenessDataTableComponent(props: ITableProps) {
     if (data && isLocationData(data)) {
       const locationContent = data.map((item) => ({
         location: item.locationName,
-        totalRegistered: String(Math.round(item.total)),
-        registeredWithinTargetd: String(
-          Math.round(item[props.completenessRateTime])
-        ),
-        estimated: String(
-          item.estimated < 10
-            ? item.estimated.toFixed(2)
-            : Math.round(item.estimated)
-        ),
+        totalRegistered: item.total,
+        registeredWithinTargetd: item[props.completenessRateTime],
+        estimated: item.estimated,
         completenessRate:
           (item[props.completenessRateTime] / item.estimated) * 100
       }))
@@ -116,15 +110,9 @@ function CompletenessDataTableComponent(props: ITableProps) {
           intl.locale,
           'MMMM yyyy'
         ),
-        totalRegistered: String(Math.round(item.total)),
-        registeredWithinTargetd: String(
-          Math.round(item[props.completenessRateTime])
-        ),
-        estimated: String(
-          item.estimated < 10
-            ? item.estimated.toFixed(2)
-            : Math.round(item.estimated)
-        ),
+        totalRegistered: item.total,
+        registeredWithinTargetd: item[props.completenessRateTime],
+        estimated: item.estimated,
         completenessRate:
           (item[props.completenessRateTime] / item.estimated) * 100
       }))
@@ -159,6 +147,13 @@ function CompletenessDataTableComponent(props: ITableProps) {
   ).map((item) => {
     return {
       ...item,
+      totalRegistered: String(Math.round(item.totalRegistered)),
+      registeredWithinTargetd: String(Math.round(item.registeredWithinTargetd)),
+      estimated: String(
+        item.estimated < 10
+          ? item.estimated.toFixed(2)
+          : Math.round(item.estimated)
+      ),
       completenessRate: item.completenessRate.toFixed(2) + '%'
     }
   })
