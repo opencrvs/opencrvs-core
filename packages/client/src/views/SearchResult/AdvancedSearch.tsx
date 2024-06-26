@@ -77,29 +77,33 @@ export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
       Boolean(value[key as keyof IBaseAdvancedSearchState])
   )
   //handle date fields separately
-  const validDateFields = dateFieldTypes.filter(
-    (key) =>
-      value[key as keyof IBaseAdvancedSearchState] &&
-      isValidDateRangePickerValue(
-        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
-      )
+  const validationResultsPerDateField = dateFieldTypes.map((key) => {
+    const dateObj = value[
+      key as keyof IBaseAdvancedSearchState
+    ] as IDateRangePickerValue
+
+    if (!dateObj) {
+      return false
+    }
+
+    if (!isValidDateRangePickerValue(dateObj)) {
+      return false
+    }
+
+    if (dateObj.exact && isInvalidDate(dateObj.exact)) {
+      return false
+    }
+
+    return true
+  })
+
+  const validDateFields = validationResultsPerDateField.filter((valid) => valid)
+  const invalidDateFields = validationResultsPerDateField.filter(
+    (valid) => !valid
   )
 
-  const isInvalidDateField = dateFieldTypes
-    .map((key) => {
-      const dateObj = value[
-        key as keyof IBaseAdvancedSearchState
-      ] as IDateRangePickerValue
-
-      if (dateObj?.isDateRangeActive) return undefined
-      const exactDate = dateObj?.exact
-
-      return exactDate && isInvalidDate(exactDate)
-    })
-    .filter((valid) => valid)
-
   const validCount = validNonDateFields.length + validDateFields.length
-  return validCount >= 2 && !(isInvalidDateField.length > 0)
+  return validCount >= 2 && !(invalidDateFields.length > 0)
 }
 
 const BirthSection = () => {
