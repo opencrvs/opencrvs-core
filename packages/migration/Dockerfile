@@ -19,4 +19,4 @@ RUN yarn build
 
 WORKDIR /app/packages/migration
 
-CMD ["/app/wait", "&&", "yarn start:prod"]
+CMD ["/bin/sh", "-c", "/app/wait && yarn start:prod"]
