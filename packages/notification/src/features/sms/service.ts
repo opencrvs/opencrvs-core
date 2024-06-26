@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 
 import { COUNTRY_CONFIG_URL } from '@notification/constants'
-import { logger } from '@opencrvs/commons'
+import { logger, maskEmail, maskSms } from '@opencrvs/commons'
 
 export async function notifyCountryConfig(
   templateName: {
@@ -31,8 +31,14 @@ export async function notifyCountryConfig(
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
     logger.info(
-      `Sending the following message template "${templateName}" from notifyCountryConfig`
+      `Sending notification to countryconfig.
+
+Template: ${JSON.stringify(templateName, null, 4)}
+${recipient.email ? `Email: ${maskEmail(recipient.email)}` : ''}
+${recipient.sms ? `SMS: ${maskSms(recipient.sms)}` : ''}
+${recipient.bcc ? `Amount of recipients: ${recipient.bcc.length}` : ''}`
     )
+
     return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({

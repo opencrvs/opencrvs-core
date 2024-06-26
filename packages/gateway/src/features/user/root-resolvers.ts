@@ -29,14 +29,13 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger } from '@opencrvs/commons'
+import { logger, isBase64FileString } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
-import { isBase64FileString } from '@opencrvs/commons'
 import { rateLimitedResolver } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
