@@ -19,7 +19,7 @@ function isIDateRangePickerValue(
   return (value as IDateRangePickerValue).exact !== undefined
 }
 
-function isInvalidDate(date?: string) {
+export function isInvalidDate(date?: string) {
   if (!date) return false
   const regEx = /^\d{4}-\d{2}-\d{2}$/
   if (!date.match(regEx)) {
