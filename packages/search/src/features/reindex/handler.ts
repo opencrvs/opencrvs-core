@@ -20,16 +20,15 @@ const indexingStatuses: Record<
 > = {}
 
 export async function reindexHandler(
-  request: Hapi.Request,
+  _request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { timestamp } = request.payload as { timestamp: string }
   const jobId = uuid()
 
   process.nextTick(async () => {
     try {
       indexingStatuses[jobId] = 'started'
-      await reindex(timestamp)
+      await reindex()
       await updateAliases()
       await prune()
       indexingStatuses[jobId] = 'completed'
@@ -41,7 +40,7 @@ export async function reindexHandler(
 
   return h
     .response({
-      message: `ElasticSearch reindexing started for timestamp ${timestamp}`,
+      message: `ElasticSearch reindexing started for job ${jobId}`,
       status: indexingStatuses[jobId] ?? 'accepted',
       jobId
     })

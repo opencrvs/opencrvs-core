@@ -8,18 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { format } from 'date-fns'
 
 const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 
 /**
  * Streams MongoDB collections to ElasticSearch documents. Useful when the ElasticSearch schema changes.
  */
-export const triggerReindex = async (timestamp: string) => {
+export const triggerReindex = async () => {
   const response = await fetch(new URL('reindex', SEARCH_URL), {
-    method: 'POST',
-    body: JSON.stringify({ timestamp }),
-    headers: { 'Content-Type': 'application/json' }
+    method: 'POST'
   })
 
   if (!response.ok) {
@@ -51,9 +48,8 @@ export const checkReindexStatus = async (jobId: string) => {
 }
 
 async function main() {
-  const timestamp = format(new Date(), 'yyyyMMddHHmmss')
-  console.info(`Reindexing ${timestamp}...`)
-  const jobId = await triggerReindex(timestamp)
+  console.info(`Reindexing search...`)
+  const jobId = await triggerReindex()
   await new Promise<void>((resolve, reject) => {
     const intervalId = setInterval(async () => {
       try {
@@ -68,7 +64,7 @@ async function main() {
       }
     }, 1000)
   })
-  console.info(`...done reindexing ${timestamp} (job id ${jobId})`)
+  console.info(`...done reindexing search with job id ${jobId}`)
 }
 
 main()
