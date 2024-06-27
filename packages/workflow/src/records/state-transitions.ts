@@ -255,25 +255,35 @@ export async function toUpdated(
       token
     )
 
-  const recordWithUpdatedTask = {
+  /*
+   * Figuring out which resources changes during
+   * update event is difficult so we are forwarding
+   * all the resources but we can be sure that history
+   * resources need not be included
+   */
+  const changedResources = {
     ...record,
     entry: [
-      ...record.entry.map((entry) => {
-        if (entry.resource.id !== previousTask.id) {
-          return entry
-        }
-        return {
-          ...entry,
-          resource: updatedTask
-        }
-      })
+      ...record.entry
+        .filter(
+          ({ resource: { resourceType } }) => !resourceType.endsWith('History')
+        )
+        .map((entry) => {
+          if (entry.resource.id !== previousTask.id) {
+            return entry
+          }
+          return {
+            ...entry,
+            resource: updatedTask
+          }
+        })
     ]
   }
 
   return changeState(
     await mergeChangedResourcesIntoRecord(
       record,
-      recordWithUpdatedTask,
+      changedResources,
       practitionerResourcesBundle
     ),
     'READY_FOR_REVIEW'
