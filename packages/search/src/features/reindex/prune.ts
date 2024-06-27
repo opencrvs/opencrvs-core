@@ -11,22 +11,30 @@
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
-import { orderBy } from 'lodash'
 
-/** Prunes all the indices except the latest one */
+/** Prunes all the indices that don't have an alias pointing to it */
 export const prune = async () => {
-  const { body: indices } = await client.cat.indices<
+  const { body: indicesWithAlias } = await client.cat.aliases<
+    Array<{ index: `${typeof OPENCRVS_INDEX_NAME}-${string}` }>
+  >({
+    format: 'json',
+    name: OPENCRVS_INDEX_NAME
+  })
+  const { body: allIndices } = await client.cat.indices<
     Array<{ index: `${typeof OPENCRVS_INDEX_NAME}-${string}` }>
   >({
     format: 'json',
     index: `${OPENCRVS_INDEX_NAME}-*`
   })
 
-  // ignores the first index and returns the older ones
-  const [, ...oldIndices] = orderBy(indices, 'index', 'desc')
+  for (const { index } of allIndices) {
+    const isAliasPointedToIndex = indicesWithAlias.some(
+      ({ index: aliasIndex }) => aliasIndex === index
+    )
 
-  for (const { index } of oldIndices) {
-    logger.info(`Deleting index: ${index}`)
-    await client.indices.delete({ index })
+    if (!isAliasPointedToIndex) {
+      logger.info(`Deleting index: ${index}`)
+      await client.indices.delete({ index })
+    }
   }
 }
