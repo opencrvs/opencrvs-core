@@ -21,6 +21,7 @@ import { logger } from '@opencrvs/commons'
 import { getEventType } from '@search/utils/event'
 import { Transform } from 'stream'
 import { orderBy } from 'lodash'
+import { format } from 'date-fns'
 
 const eventTransformers = {
   [EVENT_TYPE.BIRTH]: composeBirthDocument,
@@ -28,13 +29,13 @@ const eventTransformers = {
   [EVENT_TYPE.MARRIAGE]: composeMarriageDocument
 } satisfies Record<EVENT_TYPE, (record: ValidRecord) => SearchDocument>
 
-export const formatIndexName = (timestamp: string) =>
-  `${OPENCRVS_INDEX_NAME}-${timestamp}`
+export const formatIndexName = () =>
+  `${OPENCRVS_INDEX_NAME}-${format(new Date(), 'yyyyMMddHHmmss')}`
 
 /** Streams the MongoDB records to ElasticSearch */
-export const reindex = async (timestamp: string) => {
+export const reindex = async () => {
   const t1 = performance.now()
-  const index = formatIndexName(timestamp)
+  const index = formatIndexName()
   logger.info(`Reindexing to ${index}`)
 
   const stream = await streamAllRecords(true)
