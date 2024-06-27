@@ -17,7 +17,7 @@ import {
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 
-export const correctionFeesPayment = (currencySymbol: any) =>
+export const correctionFeesPayment = (currencySymbol: string) =>
   ({
     id: 'correctionFeesPayment',
     fields: [
@@ -70,7 +70,7 @@ export const correctionFeesPayment = (currencySymbol: any) =>
     ]
   } satisfies IFormSectionGroup)
 
-export const correctionFeesPaymentSection = (currencySymbol: any) =>
+export const correctionFeesPaymentSection = (currencySymbol: string) =>
   ({
     id: CorrectionSection.CorrectionFeesPayment,
     viewType: 'form',
