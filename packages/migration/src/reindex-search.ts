@@ -14,7 +14,7 @@ const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 /**
  * Streams MongoDB collections to ElasticSearch documents. Useful when the ElasticSearch schema changes.
  */
-export const triggerReindex = async () => {
+const triggerReindex = async () => {
   const response = await fetch(new URL('reindex', SEARCH_URL), {
     method: 'POST'
   })
@@ -32,7 +32,7 @@ export const triggerReindex = async () => {
 /**
  * Checks the status of the reindex, as it can take a while
  */
-export const checkReindexStatus = async (jobId: string) => {
+const checkReindexStatus = async (jobId: string) => {
   const response = await fetch(new URL(`reindex/status/${jobId}`, SEARCH_URL), {
     method: 'GET'
   })
