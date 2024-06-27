@@ -8,16 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// eslint-disable-next-line no-restricted-imports
+import { isValid, parse } from 'date-fns'
+
+const validateDate = (dateString: string) => {
+  const formats = ['yyyy-M-d', 'yyyy-MM-dd']
+  return formats.some((format) =>
+    isValid(parse(dateString, format, new Date()))
+  )
+}
+
 export function isInvalidDate(date?: string) {
   if (!date) return false
-  const regEx = /^\d{4}-\d{2}-\d{2}$/
+  const regEx = /^\d{4}-\d{1,2}-\d{1,2}$/
   if (!date.match(regEx)) {
     return true
   }
-  const d = new Date(date)
-  const dNum = d.getTime()
-  if (!dNum && dNum !== 0) {
-    return true
-  }
-  return d.toISOString().slice(0, 10) !== date
+  return !validateDate(date)
 }

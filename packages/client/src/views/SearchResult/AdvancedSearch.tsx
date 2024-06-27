@@ -103,7 +103,7 @@ export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
   )
 
   const validCount = validNonDateFields.length + validDateFields.length
-  return validCount >= 2 && !(invalidDateFields.length > 0)
+  return validCount >= 2 && invalidDateFields.length === 0
 }
 
 const BirthSection = () => {
