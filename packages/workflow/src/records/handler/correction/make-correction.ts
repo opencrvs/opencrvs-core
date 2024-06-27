@@ -50,6 +50,12 @@ export const makeCorrectionRoute = createRoute({
       CorrectionRequestInput,
       recordInput.registration?.correction
     )
+
+    if (recordInput.registration?.correction?.note)
+      recordInput.registration?.status?.[0]?.comments?.push({
+        comment: recordInput.registration?.correction?.note
+      })
+
     const token = getToken(request)
 
     if (findActiveCorrectionRequest(record)) {
