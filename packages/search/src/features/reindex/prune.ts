@@ -11,22 +11,22 @@
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
-import { isBefore, parse, subMonths } from 'date-fns'
+import { orderBy } from 'lodash'
 
-export const prune = async ({ before = subMonths(new Date(), 3) } = {}) => {
-  const { body: indices } = await client.cat.indices<Array<{ index: string }>>({
+/** Prunes all the indices except the latest one */
+export const prune = async () => {
+  const { body: indices } = await client.cat.indices<
+    Array<{ index: `${typeof OPENCRVS_INDEX_NAME}-${string}` }>
+  >({
     format: 'json',
     index: `${OPENCRVS_INDEX_NAME}-*`
   })
 
-  for (const index of indices) {
-    const indexName = index.index
-    const timestampStr = indexName.split('-')[1] // Extract the timestamp part
-    const timestamp = parse(timestampStr, 'yyyyMMddHHmmss', new Date())
+  // ignores the first index and returns the older ones
+  const [, ...oldIndices] = orderBy(indices, 'index', 'desc')
 
-    if (isBefore(timestamp, before)) {
-      logger.info(`Deleting index: ${indexName}`)
-      await client.indices.delete({ index: indexName })
-    }
+  for (const { index } of oldIndices) {
+    logger.info(`Deleting index: ${index}`)
+    await client.indices.delete({ index })
   }
 }
