@@ -42,7 +42,7 @@ import { rateLimitedResolver } from '@gateway/rate-limit'
 export const resolvers: GQLResolver = {
   Query: {
     getUser: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (_, { userId }, { dataSources }) => {
         const user = await dataSources.usersAPI.getUserById(userId!)
         return user
@@ -50,21 +50,21 @@ export const resolvers: GQLResolver = {
     ),
 
     getUserByMobile: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {
         return dataSources.usersAPI.getUserByMobile(mobile!)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       (_, { email }, { dataSources }) => {
         return dataSources.usersAPI.getUserByEmail(email!)
       }
     ),
 
     searchUsers: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {
@@ -125,7 +125,7 @@ export const resolvers: GQLResolver = {
     ),
 
     searchFieldAgents: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {
