@@ -123,7 +123,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
@@ -448,6 +448,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           <TextArea
             maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
             {...inputProps}
+            value={inputProps.value as string}
           />
         </InputField>
       )
@@ -713,7 +714,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IBaseAdvancedSearchState
+  initialValues?: IAdvancedSearchFormState
 }
 
 interface IStateProps {
