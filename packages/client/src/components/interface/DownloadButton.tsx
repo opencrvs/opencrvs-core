@@ -256,23 +256,25 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       status === DOWNLOAD_STATUS.FAILED_NETWORK,
     [status]
   )
-  const isSentForApprovalDeclaration =
+
+  // reg agent can only retrieve validated and correction requested declarations
+  const isRetrieveableDeclarationsOfRegAgent =
     downloadConfigs.declarationStatus &&
     ['VALIDATED', 'CORRECTION_REQUESTED'].includes(
       downloadConfigs.declarationStatus
-    )
+    ) &&
+    userRole === ROLE_REGISTRATION_AGENT
 
-  // user roles of users who can not retrieve a declaration
-  const nonRetrievalUserRoles =
-    userRole !== ROLE_REGISTRATION_AGENT &&
-    !FIELD_AGENT_ROLES.includes(String(userRole))
+  // field agents can only retrieve declarations
+  const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
         (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        (!isSentForApprovalDeclaration || nonRetrievalUserRoles)
+        !isRetrieveableDeclarationsOfRegAgent &&
+        isNotFieldAgent
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -293,6 +295,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           )
         )
       } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
+        // retrieve declaration
         download()
       }
       e.stopPropagation()
@@ -301,10 +304,10 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       assignment,
       userId,
       status,
-      isSentForApprovalDeclaration,
-      nonRetrievalUserRoles,
-      userRole,
+      isRetrieveableDeclarationsOfRegAgent,
+      isNotFieldAgent,
       hideModal,
+      userRole,
       download,
       unassign
     ]
