@@ -63,23 +63,9 @@ function retrieveUniqueComments(
     return []
   }
 
-  if (previousHistoryItemIndex === -1) {
-    return actionDetailsData.comments
-      .map((comment) => comment?.comment)
-      .map((comment) => ({ comment }))
-  }
+  const comment = actionDetailsData.comments[1]?.comment
 
-  const comments: IDynamicValues[] = []
-  actionDetailsData.comments.forEach((item, index) => {
-    if (
-      (histories[previousHistoryItemIndex].comments || [])[index]?.comment !==
-      item?.comment
-    ) {
-      comments.push({ comment: item?.comment })
-    }
-  })
-
-  return comments
+  return comment ? [{ comment }] : []
 }
 
 function getHistories(draft: IDeclaration | null) {
