@@ -534,7 +534,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               intl.formatMessage(
                 StatusMapping[
                   eventProgress.registration.status as keyof IStatusMapping
-                ]?.labelDescriptor
+                ].labelDescriptor
               )) ||
             ''
 
