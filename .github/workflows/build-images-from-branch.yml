@@ -64,8 +64,8 @@ jobs:
           file: packages/Dockerfile.base
           context: .
           push: true
-          tags: 'opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}'
-          cache-from: type=registry,ref=opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
+          tags: 'opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}'
+          cache-from: type=registry,ref=opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
           cache-to: type=inline
 
     outputs:
