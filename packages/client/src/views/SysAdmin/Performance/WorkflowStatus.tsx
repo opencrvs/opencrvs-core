@@ -705,6 +705,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     >
       <Content
         title={intl.formatMessage(messages.registrationByStatus)}
+        showTitleOnMobile={true}
         size={ContentSize.LARGE}
         filterContent={
           <>
