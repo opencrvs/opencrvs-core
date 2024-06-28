@@ -288,12 +288,7 @@ export const getRoutes = () => {
       handler: reindexHandler,
       config: {
         tags: ['api'],
-        auth: false,
-        validate: {
-          payload: Joi.object({
-            timestamp: Joi.string()
-          })
-        }
+        auth: false
       }
     },
     {
