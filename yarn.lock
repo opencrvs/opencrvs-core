@@ -750,27 +750,6 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.24.7.tgz#d23bbea508c3883ba8251fb4164982c36ea577ed"
   integrity sha512-qJzAIcv03PyaWqxRgO4mSU3lihncDT296vnyuE2O8uA4w3UHWI4S3hgeZd1L8W1Bft40w9JxJ2b412iDUFFRhw==
 
-"@babel/core@^7.0.0", "@babel/core@^7.24.4":
-  version "7.24.5"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.24.5.tgz#15ab5b98e101972d171aeef92ac70d8d6718f06a"
-  integrity sha512-tVQRucExLQ02Boi4vdPp49svNGcfL2GhdTCT9aldhXgCJVAI21EtRfBettiuLUwce/7r6bFdgs6JFkcdTiFttA==
-  dependencies:
-    "@ampproject/remapping" "^2.2.0"
-    "@babel/code-frame" "^7.24.2"
-    "@babel/generator" "^7.24.5"
-    "@babel/helper-compilation-targets" "^7.23.6"
-    "@babel/helper-module-transforms" "^7.24.5"
-    "@babel/helpers" "^7.24.5"
-    "@babel/parser" "^7.24.5"
-    "@babel/template" "^7.24.0"
-    "@babel/traverse" "^7.24.5"
-    "@babel/types" "^7.24.5"
-    convert-source-map "^2.0.0"
-    debug "^4.1.0"
-    gensync "^1.0.0-beta.2"
-    json5 "^2.2.3"
-    semver "^6.3.1"
-
 "@babel/core@^7.1.0", "@babel/core@^7.11.6", "@babel/core@^7.12.3", "@babel/core@^7.13.16", "@babel/core@^7.14.0", "@babel/core@^7.14.3", "@babel/core@^7.18.9", "@babel/core@^7.19.6", "@babel/core@^7.20.12", "@babel/core@^7.22.9":
   version "7.23.2"
   resolved "https://registry.npmjs.org/@babel/core/-/core-7.23.2.tgz"
@@ -786,6 +765,27 @@
     "@babel/template" "^7.22.15"
     "@babel/traverse" "^7.23.2"
     "@babel/types" "^7.23.0"
+    convert-source-map "^2.0.0"
+    debug "^4.1.0"
+    gensync "^1.0.0-beta.2"
+    json5 "^2.2.3"
+    semver "^6.3.1"
+
+"@babel/core@^7.24.4":
+  version "7.24.5"
+  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.24.5.tgz#15ab5b98e101972d171aeef92ac70d8d6718f06a"
+  integrity sha512-tVQRucExLQ02Boi4vdPp49svNGcfL2GhdTCT9aldhXgCJVAI21EtRfBettiuLUwce/7r6bFdgs6JFkcdTiFttA==
+  dependencies:
+    "@ampproject/remapping" "^2.2.0"
+    "@babel/code-frame" "^7.24.2"
+    "@babel/generator" "^7.24.5"
+    "@babel/helper-compilation-targets" "^7.23.6"
+    "@babel/helper-module-transforms" "^7.24.5"
+    "@babel/helpers" "^7.24.5"
+    "@babel/parser" "^7.24.5"
+    "@babel/template" "^7.24.0"
+    "@babel/traverse" "^7.24.5"
+    "@babel/types" "^7.24.5"
     convert-source-map "^2.0.0"
     debug "^4.1.0"
     gensync "^1.0.0-beta.2"
@@ -10984,7 +10984,7 @@ core-js@^2.4.0:
   resolved "https://registry.npmjs.org/core-js/-/core-js-2.6.12.tgz"
   integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
-core-js@^3.0.0, core-js@^3.16.1, core-js@^3.2.1:
+core-js@^3.16.1, core-js@^3.2.1:
   version "3.37.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.37.0.tgz#d8dde58e91d156b2547c19d8a4efd5c7f6c426bb"
   integrity sha512-fu5vHevQ8ZG4og+LXug8ulUtVxjOcEYvifJr7L5Bfq9GOztVqsKd9/59hUk2ZSbCrS3BqUr3EpaYGIYzq7g3Ug==
@@ -13608,21 +13608,17 @@ fecha@^4.2.0:
   resolved "https://registry.npmjs.org/fecha/-/fecha-4.2.3.tgz"
   integrity sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==
 
-fetch-mock@^9.0.0:
-  version "9.11.0"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.11.0.tgz#371c6fb7d45584d2ae4a18ee6824e7ad4b637a3f"
-  integrity sha512-PG1XUv+x7iag5p/iNHD4/jdpxL9FtVSqRMUQhPab4hVDt80T1MH5ehzVrL2IdXO9Q2iBggArFvPqjUbHFuI58Q==
+fetch-mock@^10.0.0:
+  version "10.0.7"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-10.0.7.tgz#b274aaebe5b59c641f02d836b579bbe9b063f8db"
+  integrity sha512-TFG42kMRJ6dZpUDeVTdXNjh5O4TchHU/UNk41a050TwKzRr5RJQbtckXDjXiQFHPKgXGUG5l2TY3ZZ2gokiXaQ==
   dependencies:
-    "@babel/core" "^7.0.0"
-    "@babel/runtime" "^7.0.0"
-    core-js "^3.0.0"
     debug "^4.1.1"
     glob-to-regexp "^0.4.0"
     is-subset "^0.1.1"
     lodash.isequal "^4.5.0"
     path-to-regexp "^2.2.1"
-    querystring "^0.2.0"
-    whatwg-url "^6.5.0"
+    querystring "^0.2.1"
 
 fetch-retry@^5.0.2:
   version "5.0.6"
@@ -20842,7 +20838,7 @@ query-string@^7.1.3:
     split-on-first "^1.0.0"
     strict-uri-encode "^2.0.0"
 
-querystring@^0.2.0:
+querystring@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.1.tgz#40d77615bb09d16902a85c3e38aa8b5ed761c2dd"
   integrity sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==
@@ -25228,15 +25224,6 @@ whatwg-url@^5.0.0:
   dependencies:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"
-
-whatwg-url@^6.5.0:
-  version "6.5.0"
-  resolved "https://registry.npmjs.org/whatwg-url/-/whatwg-url-6.5.0.tgz"
-  integrity sha512-rhRZRqx/TLJQWUpQ6bmrt2UV4f0HCQ463yQuONJqC6fO2VoEb1pTYddbe59SkYq87aoM5A3bdhMZiUiVws+fzQ==
-  dependencies:
-    lodash.sortby "^4.7.0"
-    tr46 "^1.0.1"
-    webidl-conversions "^4.0.2"
 
 whatwg-url@^7.0.0:
   version "7.1.0"
