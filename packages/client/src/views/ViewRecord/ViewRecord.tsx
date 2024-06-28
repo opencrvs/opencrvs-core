@@ -213,6 +213,7 @@ export const ViewRecord = () => {
       )}
     >
       <ReviewSection
+        form={form[eventType]}
         viewRecord
         submitClickEvent={() => {}}
         pageRoute={''}

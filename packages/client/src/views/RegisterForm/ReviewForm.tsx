@@ -95,6 +95,8 @@ function getEvent(eventType: string) {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
     default:
       return Event.Birth
   }

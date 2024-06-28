@@ -16,7 +16,7 @@ import { transformStatusData } from '@client/forms/register/mappings/query/utils
 export function getDeathRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
-  sectionId: string
+  _sectionId: string
 ) {
   if (!transformedData['registration']) {
     transformedData['registration'] = {}
@@ -48,15 +48,5 @@ export function getDeathRegistrationSectionTransformer(
       queryData['registration'].status as GQLRegWorkflow[],
       'registration'
     )
-  }
-
-  if (queryData[sectionId].informantsSignature) {
-    transformedData[sectionId].informantsSignature =
-      queryData[sectionId].informantsSignature
-  }
-
-  if (queryData[sectionId].informantsSignatureURI) {
-    transformedData[sectionId].informantsSignatureURI =
-      queryData[sectionId].informantsSignatureURI
   }
 }

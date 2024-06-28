@@ -159,13 +159,9 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactPhoneNumber
         contactEmail
         groomSignature
-        groomSignatureURI
         brideSignature
-        brideSignatureURI
         witnessOneSignature
-        witnessOneSignatureURI
         witnessTwoSignature
-        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId
@@ -470,13 +466,9 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contactPhoneNumber
         contactEmail
         groomSignature
-        groomSignatureURI
         brideSignature
-        brideSignatureURI
         witnessOneSignature
-        witnessOneSignatureURI
         witnessTwoSignature
-        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId

@@ -218,7 +218,6 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           trackingId
         }
         informantsSignature
-        informantsSignatureURI
         attachments {
           data
           uri
@@ -500,7 +499,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactEmail
         contactPhoneNumber
         informantsSignature
-        informantsSignatureURI
         duplicates {
           compositionId
           trackingId

@@ -27,8 +27,7 @@ import {
   createReviewDeclaration,
   storeDeclaration,
   setInitialDeclarations,
-  SUBMISSION_STATUS,
-  modifyDeclaration
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
@@ -46,7 +45,6 @@ import { Event } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
-import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'

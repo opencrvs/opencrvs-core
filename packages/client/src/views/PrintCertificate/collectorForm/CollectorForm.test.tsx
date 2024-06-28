@@ -381,7 +381,10 @@ describe('Certificate collector test for a birth registration without father det
             }
           })
         )
-        await waitForElement(component, '#image_file_uploader_field')
+        await waitForElement(
+          component,
+          'input[name="affidavitFile"][type="file"]'
+        )
       })
       it('takes the user to affedavit view', async () => {
         expect(history.location.pathname).toBe(
@@ -399,8 +402,7 @@ describe('Certificate collector test for a birth registration without father det
 
       it('shows form level error when invalid type of file is uploaded as affidavit file', async () => {
         component
-          .find('#image_file_uploader_field')
-          .hostNodes()
+          .find('input[name="affidavitFile"][type="file"]')
           .simulate('change', {
             target: {
               files: [
@@ -472,8 +474,7 @@ describe('Certificate collector test for a birth registration without father det
         $confirm.hostNodes().simulate('click')
         await waitForElement(component, '#form_error')
         component
-          .find('#image_file_uploader_field')
-          .hostNodes()
+          .find('input[name="affidavitFile"][type="file"]')
           .simulate('change', {
             target: {
               files: [

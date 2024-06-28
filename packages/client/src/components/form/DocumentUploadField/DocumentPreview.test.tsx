@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import { createShallowRenderedComponent } from '@client/tests/util'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { vi } from 'vitest'
 
 describe('image upload component', () => {

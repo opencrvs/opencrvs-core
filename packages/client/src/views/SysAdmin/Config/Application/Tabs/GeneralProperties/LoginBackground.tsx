@@ -44,7 +44,7 @@ import {
   Label,
   Message
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadField/SimpleDocumentUploader'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { IAttachmentValue } from '@client/forms'
 

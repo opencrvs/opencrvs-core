@@ -848,7 +848,7 @@ describe('country logo update test', () => {
     testComponent.find('#COUNTRY_LOGO').hostNodes().first().simulate('click')
     testComponent.find('#upload_document').hostNodes().simulate('click')
     testComponent
-      .find('#image_file_uploader_field')
+      .find('input[name="country-logo"][type="file"]')
       .hostNodes()
       .simulate('change', {
         target: {
