@@ -70,6 +70,7 @@
 - Fix records going completely missing when an unexpected error happens in the backend [#7021](https://github.com/opencrvs/opencrvs-core/pull/7021)
 - Fix correction done from a certificate preview page [#7065](https://github.com/opencrvs/opencrvs-core/pull/7093)
 - Fix "Print and issue to groom|bride" is added to a different variable [#7046](https://github.com/opencrvs/opencrvs-core/issues/7046)
+- Fix search query is not being saved in the advanced search results [#7110](https://github.com/opencrvs/opencrvs-core/pull/7117)
 - Fix removed duplicateTrackingId check in createDuplicateTask method [#7024](https://github.com/opencrvs/opencrvs-core/issues/7024)
 - Fix address property handling and corrected country data transformation logic [#6989](https://github.com/opencrvs/opencrvs-core/issues/6989)
 - Fix search indexing BRN's in place of identifiers. Adds spouseIdentifier to search with [#7189](https://github.com/opencrvs/opencrvs-core/pull/7189)
