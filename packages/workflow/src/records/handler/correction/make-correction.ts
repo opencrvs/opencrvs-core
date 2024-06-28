@@ -50,7 +50,9 @@ export const makeCorrectionRoute = createRoute({
       CorrectionRequestInput,
       recordInput.registration?.correction
     )
-
+/* Fhir builders put the comment value provided in `registration.status.comments`
+ * inside `task.note`
+ */
     if (recordInput.registration?.correction?.note)
       recordInput.registration?.status?.[0]?.comments?.push({
         comment: recordInput.registration?.correction?.note
