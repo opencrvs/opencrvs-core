@@ -50,13 +50,26 @@ export const makeCorrectionRoute = createRoute({
       CorrectionRequestInput,
       recordInput.registration?.correction
     )
-/* Fhir builders put the comment value provided in `registration.status.comments`
- * inside `task.note`
- */
-    if (recordInput.registration?.correction?.note)
-      recordInput.registration?.status?.[0]?.comments?.push({
+    /* Fhir builders put the comment value provided in `registration.status.comments`
+     * inside `task.note`
+     */
+    if (
+      recordInput.registration?.correction?.note &&
+      recordInput.registration?.status?.[0]
+    ) {
+      if (
+        !recordInput.registration.status[0].comments ||
+        recordInput.registration.status[0].comments.length == 0
+      )
+        recordInput.registration.status[0].comments = [
+          {
+            comment: ''
+          }
+        ]
+      recordInput.registration.status[0].comments.push({
         comment: recordInput.registration?.correction?.note
       })
+    }
 
     const token = getToken(request)
 
