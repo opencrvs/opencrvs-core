@@ -398,6 +398,7 @@ function FieldAgentListComponent(props: IProps) {
     >
       <Content
         title={intl.formatMessage(messages.declarationsStartedFieldAgents)}
+        showTitleOnMobile={true}
         size={ContentSize.LARGE}
         filterContent={
           <>
