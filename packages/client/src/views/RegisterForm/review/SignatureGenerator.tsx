@@ -180,7 +180,8 @@ export function SignatureGenerator({
                 key="apply"
                 id="apply_change"
                 type="positive"
-                onClick={() => setSignatureDialogOpen(false)}
+                disabled={!Boolean(signatureValue)}
+                onClick={apply}
               >
                 {intl.formatMessage(buttonMessages.apply)}
               </Button>
