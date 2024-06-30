@@ -40,7 +40,6 @@ import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Avatar, Event } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 
 const ToolTipContainer = styled.span`
@@ -343,7 +342,7 @@ function FieldAgentListComponent(props: IProps) {
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          role: (row.role && getUserRole(language, row.role)) || '',
+          role: (row.role && intl.formatMessage(row.role.label)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),

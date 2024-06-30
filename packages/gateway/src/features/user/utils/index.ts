@@ -88,6 +88,7 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
     return false
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 

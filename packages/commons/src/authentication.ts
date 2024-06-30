@@ -13,7 +13,7 @@ import { IAuthHeader } from './http'
 import * as decode from 'jwt-decode'
 
 /** All the scopes user can be assigned to */
-export const userScopes = {
+export const SCOPES = {
   demo: 'demo',
   declare: 'declare',
   register: 'register',
@@ -28,35 +28,8 @@ export const userScopes = {
   config: 'config'
 } as const
 
-export const userRoleScopes = {
-  FIELD_AGENT: [userScopes.declare],
-  REGISTRATION_AGENT: [
-    userScopes.validate,
-    userScopes.performance,
-    userScopes.certify
-  ],
-  LOCAL_REGISTRAR: [
-    userScopes.register,
-    userScopes.performance,
-    userScopes.certify
-  ],
-  LOCAL_SYSTEM_ADMIN: [userScopes.systemAdmin],
-  NATIONAL_SYSTEM_ADMIN: [
-    userScopes.systemAdmin,
-    userScopes.nationalSystemAdmin
-  ],
-  PERFORMANCE_MANAGEMENT: [userScopes.performance],
-  NATIONAL_REGISTRAR: [
-    userScopes.register,
-    userScopes.performance,
-    userScopes.certify,
-    userScopes.config,
-    userScopes.teams
-  ]
-}
-
 /** All the scopes system/integration can be assigned to */
-export const systemScopes = {
+export const SYSTEM_INTEGRATION_SCOPES = {
   recordsearch: 'recordsearch',
   declare: 'declare',
   notificationApi: 'notification-api',
@@ -66,20 +39,62 @@ export const systemScopes = {
   nationalId: 'nationalId'
 } as const
 
-export const systemRoleScopes = {
-  HEALTH: [systemScopes.declare, systemScopes.notificationApi],
-  NATIONAL_ID: [systemScopes.nationalId],
-  EXTERNAL_VALIDATION: [systemScopes.validatorApi],
-  AGE_CHECK: [systemScopes.declare, systemScopes.ageVerificationApi],
-  RECORD_SEARCH: [systemScopes.recordsearch],
-  WEBHOOK: [systemScopes.webhook]
+export const DEFAULT_CORE_ROLE_SCOPES = {
+  FIELD_AGENT: [SCOPES.declare],
+  REGISTRATION_AGENT: [SCOPES.validate, SCOPES.performance, SCOPES.certify],
+  LOCAL_REGISTRAR: [SCOPES.register, SCOPES.performance, SCOPES.certify],
+  LOCAL_SYSTEM_ADMIN: [SCOPES.systemAdmin],
+  NATIONAL_SYSTEM_ADMIN: [SCOPES.systemAdmin, SCOPES.nationalSystemAdmin],
+  PERFORMANCE_MANAGEMENT: [SCOPES.performance],
+  NATIONAL_REGISTRAR: [
+    SCOPES.register,
+    SCOPES.performance,
+    SCOPES.certify,
+    SCOPES.config,
+    SCOPES.teams
+  ],
+  SUPER_ADMIN: [
+    SCOPES.nationalSystemAdmin,
+    SCOPES.bypassRateLimit,
+    SCOPES.systemAdmin
+  ]
 }
 
-export type UserRole = keyof typeof userRoleScopes
-export type UserScope = (typeof userScopes)[keyof typeof userScopes]
-export type SystemRole = keyof typeof systemRoleScopes
-export type SystemScope = (typeof systemScopes)[keyof typeof systemScopes]
+export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
+  HEALTH: [
+    SYSTEM_INTEGRATION_SCOPES.declare,
+    SYSTEM_INTEGRATION_SCOPES.notificationApi
+  ],
+  NATIONAL_ID: [SYSTEM_INTEGRATION_SCOPES.nationalId],
+  EXTERNAL_VALIDATION: [SYSTEM_INTEGRATION_SCOPES.validatorApi],
+  AGE_CHECK: [
+    SYSTEM_INTEGRATION_SCOPES.declare,
+    SYSTEM_INTEGRATION_SCOPES.ageVerificationApi
+  ],
+  RECORD_SEARCH: [SYSTEM_INTEGRATION_SCOPES.recordsearch],
+  WEBHOOK: [SYSTEM_INTEGRATION_SCOPES.webhook]
+}
+
+/*
+ * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
+ * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
+ */
+export type CoreUserRole = keyof typeof DEFAULT_CORE_ROLE_SCOPES
+
+export type SystemIntegrationRole =
+  keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
+
+export type UserScope = (typeof SCOPES)[keyof typeof SCOPES]
+export type SystemScope =
+  (typeof SYSTEM_INTEGRATION_SCOPES)[keyof typeof SYSTEM_INTEGRATION_SCOPES]
 export type Scope = UserScope | SystemScope
+
+export type Roles = Array<{
+  id: string
+  systemRole: CoreUserRole
+  labels: Array<{ language: string; label: string }>
+  scopes: Scope[]
+}>
 
 export interface ITokenPayload {
   sub: string

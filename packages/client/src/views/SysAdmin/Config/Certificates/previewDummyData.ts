@@ -1987,13 +1987,11 @@ const mockUserDetails: UserDetails = {
   mobile: '+260921111111',
   systemRole: SystemRoleType.NationalSystemAdmin,
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'NATIONAL_SYSTEM_ADMIN'
-      }
-    ]
+    label: {
+      id: 'userRoles.nationalSystemAdmin',
+      defaultMessage: 'National System Admin',
+      description: 'National System Admin'
+    }
   },
   status: Status.Active,
   primaryOffice: {

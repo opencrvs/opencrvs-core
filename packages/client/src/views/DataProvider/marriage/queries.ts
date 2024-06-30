@@ -257,10 +257,11 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
           systemRole
@@ -553,10 +554,11 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
           systemRole

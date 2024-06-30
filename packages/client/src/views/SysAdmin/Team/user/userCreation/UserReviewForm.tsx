@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+
 import {
   DIVIDER,
   FIELD_GROUP_TITLE,
@@ -68,8 +68,8 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Link } from '@opencrvs/components'
+import { UserRole } from '@client/utils/gateway'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -78,16 +78,19 @@ interface IUserReviewFormProps {
   client: ApolloClient<unknown>
 }
 
+interface IStateProps {
+  userFormSection: IFormSection
+  offlineCountryConfiguration: IOfflineData
+  userRoles: UserRole[]
+  userDetails: UserDetails | null
+}
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
   goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (userFormSection: IFormSection) => void
-  userFormSection: IFormSection
-  offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
-  userDetails: UserDetails | null
 }
 
 interface ISectionData {
@@ -114,18 +117,12 @@ const Label = styled.span`
   width: 100%;
 `
 
-const DocumentUploaderContainer = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-right: 8px;
-  }
-`
-
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
 class UserReviewFormComponent extends React.Component<
-  IFullProps & IDispatchProps
+  IFullProps & IDispatchProps & IStateProps
 > {
   transformSectionData = () => {
     const { intl, userFormSection } = this.props
@@ -214,7 +211,7 @@ class UserReviewFormComponent extends React.Component<
   }
 
   getValue = (field: IFormField) => {
-    const { intl, formData } = this.props
+    const { intl, formData, userRoles } = this.props
 
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations = field.searchableResource.reduce(
@@ -234,14 +231,15 @@ class UserReviewFormComponent extends React.Component<
       return offlineLocations[locationId] && offlineLocations[locationId].name
     }
 
+    const role = userRoles.find(({ id }) => id === formData.role)
+    console.log({ userRoles })
+
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
         ? field.name === 'systemRole'
           ? intl.formatMessage(userMessages[formData.systemRole as string])
-          : field.name === 'role'
-          ? intl.formatMessage({
-              id: getUserRoleIntlKey(formData.role as string)
-            })
+          : field.name === 'role' && role
+          ? intl.formatMessage(role.label)
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
@@ -314,6 +312,7 @@ class UserReviewFormComponent extends React.Component<
         </Button>
       )
     }
+
     return (
       <ActionPageLight
         title={title}
@@ -398,8 +397,11 @@ export const UserReviewForm = connect((store: IStoreState) => {
   return {
     userFormSection: store.userForm.userForm!.sections[0],
     offlineCountryConfiguration: getOfflineData(store),
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    userRoles: store.userForm.userRoles
   }
 }, mapDispatchToProps)(
-  injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
+  injectIntl<'intl', IFullProps & IDispatchProps & IStateProps>(
+    UserReviewFormComponent
+  )
 )

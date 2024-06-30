@@ -23,10 +23,7 @@ import {
   mockUserGraphqlOperation
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import {
-  modifyUserFormData,
-  rolesMessageAddData
-} from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -133,7 +130,7 @@ describe('signature upload tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      store.dispatch(rolesMessageAddData())
+
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser

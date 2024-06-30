@@ -8,23 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
+import { logger } from '@opencrvs/commons'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
-  generateUsername,
-  rollbackUpdateUser,
-  getFromFhir,
   createFhirPractitioner,
   createFhirPractitionerRole,
-  sendUpdateUsernameNotification,
-  postFhir
+  generateUsername,
+  getFromFhir,
+  postFhir,
+  rollbackUpdateUser,
+  sendUpdateUsernameNotification
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import { userRoleScopes } from '@opencrvs/commons/authentication'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -68,21 +66,8 @@ export default async function updateUser(
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
-  let changingRole = false
-  if (existingUser.systemRole !== user.systemRole) {
-    changingRole = true
-    existingUser.systemRole = user.systemRole
-    // Updating user scope
-    const userScopes: string[] =
-      userRoleScopes[existingUser.systemRole || 'FIELD_AGENT']
-    if (
-      (process.env.NODE_ENV === 'development' || QA_ENV) &&
-      !userScopes.includes('demo')
-    ) {
-      userScopes.push('demo')
-    }
-    existingUser.scope = userScopes
-  }
+
+  existingUser.systemRole = user.systemRole
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
@@ -125,7 +110,7 @@ export default async function updateUser(
       existingUser.username = newUserName
       userNameChanged = true
     }
-    if (changingRole && practitionerId !== existingUser.practitionerId) {
+    if (practitionerId !== existingUser.practitionerId) {
       existingUser.practitionerId = practitionerId
     }
 

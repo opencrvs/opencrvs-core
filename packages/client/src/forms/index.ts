@@ -1256,3 +1256,37 @@ export interface ICertificate {
   payments?: Payment[]
   data?: string
 }
+
+export function modifyFormField(
+  form: IForm,
+  sectionId: string,
+  groupId: string,
+  fieldName: string,
+  modifyFn: (field: IFormField) => IFormField
+) {
+  return {
+    ...form,
+    sections: form.sections.map((section) => {
+      if (section.id === sectionId) {
+        return {
+          ...section,
+          groups: section.groups.map((group) => {
+            if (group.id === groupId) {
+              return {
+                ...group,
+                fields: group.fields.map((field) => {
+                  if (field.name === fieldName) {
+                    return modifyFn(field)
+                  }
+                  return field
+                })
+              }
+            }
+            return group
+          })
+        }
+      }
+      return section
+    })
+  }
+}

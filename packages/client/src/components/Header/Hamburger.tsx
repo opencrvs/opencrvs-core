@@ -8,24 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Avatar } from '@client/components/Avatar'
+import { FixedNavigation } from '@client/components/interface/Navigation'
+import { getLanguage } from '@client/i18n/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj } from '@client/utils/userUtils'
-import { Avatar } from '@client/components/Avatar'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
-import { FixedNavigation } from '@client/components/interface/Navigation'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { Role } from '@client/utils/gateway'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
+  const intl = useIntl()
   const toggleMenu = () => {
     setShowMenu((prevState) => !prevState)
   }
@@ -37,9 +36,8 @@ export function Hamburger() {
       : ''
   }
 
-  // let's remove this type assertion after #4458 merges in
   const role =
-    (userDetails?.role && getUserRole(language, userDetails.role as Role)) ?? ''
+    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
 
   const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 

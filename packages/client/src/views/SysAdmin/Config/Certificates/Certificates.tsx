@@ -70,6 +70,7 @@ import {
   IMAGE_UPLOAD_MAX_SIZE_IN_BYTES
 } from '@client/utils/imageUtils'
 import { printPDF } from '@client/pdfRenderer'
+import { Scope } from '@client/utils/authUtils'
 
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -104,8 +105,6 @@ const StyledHeader = styled(ListViewItemSimplified)`
   color: ${({ theme }) => theme.colors.grey400};
 `
 
-export type Scope = string[]
-
 export enum SVGFile {
   type = 'image/svg+xml'
 }
@@ -113,7 +112,7 @@ export enum SVGFile {
 type Props = WrappedComponentProps & {
   intl: IntlShape
   userDetails: UserDetails | null
-  scope: Scope | null
+  scope: Scope[] | null
   offlineResources: IOfflineData
   registerForm: {
     birth: IForm

@@ -58,7 +58,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getSystemRoles?: Array<GQLSystemRole>
+  getUserRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   fetchSystem?: GQLSystem
@@ -694,13 +694,6 @@ export interface GQLResponse {
   roleIdMap: GQLMap
 }
 
-export interface GQLSystemRoleInput {
-  id: string
-  value?: string
-  active?: boolean
-  roles?: Array<GQLRoleInput>
-}
-
 export interface GQLCertificateSVGInput {
   id?: string
   svgCode: string
@@ -973,8 +966,12 @@ export const enum GQLSystemRoleType {
 }
 
 export interface GQLRole {
-  _id: string
-  labels: Array<GQLRoleLabel>
+  id: string
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
 }
 
 export const enum GQLStatus {
@@ -2081,7 +2078,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
+  getUserRoles?: QueryTogetUserRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
@@ -2680,7 +2677,7 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetSystemRolesArgs {
+export interface QueryTogetUserRolesArgs {
   title?: string
   value?: GQLComparisonInput
   role?: string
@@ -2688,10 +2685,10 @@ export interface QueryToGetSystemRolesArgs {
   sortBy?: string
   sortOrder?: string
 }
-export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
+export interface QueryTogetUserRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetSystemRolesArgs,
+    args: QueryTogetUserRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

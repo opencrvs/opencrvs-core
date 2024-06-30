@@ -29,7 +29,6 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { goToSettings } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -96,14 +95,13 @@ const ProfileMenuComponent = ({
     userDetails: UserDetails | null
   ): JSX.Element => {
     const userName = getUserName(language, userDetails)
-    // let's remove this type assertion after #4458 merges in
-    const userRole =
-      userDetails?.role && getUserRole(language, userDetails.role)
 
     return (
       <>
         <UserName>{userName}</UserName>
-        <UserRole>{userRole}</UserRole>
+        <UserRole>
+          {userDetails && intl.formatMessage(userDetails.role.label)}
+        </UserRole>
       </>
     )
   }

@@ -199,17 +199,6 @@ export function userSectionFormType(): ISerializedFormSection {
             conditionals: []
           },
           {
-            name: 'systemRole',
-            type: TEXT,
-            label: userFormMessages.systemRole,
-            required: false,
-            hidden: true,
-            hideValueInPreview: true,
-            initialValue: '',
-            validator: [],
-            conditionals: []
-          },
-          {
             name: 'device',
             type: TEXT,
             label: userFormMessages.userDevice,

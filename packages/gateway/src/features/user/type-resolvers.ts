@@ -9,24 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader, UUID } from '@opencrvs/commons'
+import {
+  IAuthHeader,
+  UUID,
+  fetchJSON,
+  joinURL,
+  logger
+} from '@opencrvs/commons'
 
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import { fetchFHIR } from '@gateway/features/fhir/service'
 import {
   GQLIdentifier,
   GQLResolver,
   GQLSignatureInput,
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
+import { Roles } from '@opencrvs/commons/authentication'
 import {
   Bundle,
   Extension,
   OPENCRVS_SPECIFICATION_URL,
-  findExtension,
   PractitionerRole,
   ResourceIdentifier,
+  findExtension,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { fetchFHIR } from '@gateway/features/fhir/service'
 
 interface IAuditHistory {
   auditedBy: string
@@ -39,14 +47,6 @@ interface IAuditHistory {
 interface IAvatar {
   type: string
   data: string
-}
-
-type Label = {
-  lang: string
-  label: string
-}
-interface IUserRole {
-  labels: Label[]
 }
 
 export interface IUserModelData {
@@ -63,7 +63,7 @@ export interface IUserModelData {
   mobile?: string
   status: string
   systemRole: string
-  role: IUserRole
+  role: string
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -101,7 +101,6 @@ export interface IUserPayload
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
-  systemRole: string
   status?: string
   username?: string
   password?: string
@@ -164,6 +163,14 @@ export const userTypeResolvers: GQLResolver = {
   User: {
     id(userModel: IUserModelData) {
       return userModel._id
+    },
+    role: async (userModel: IUserModelData) => {
+      const roles = await fetchJSON<Roles>(
+        joinURL(COUNTRY_CONFIG_URL, '/roles')
+      )
+
+      logger.info('Fetching roles from country config')
+      return roles.find((role) => role.id === userModel.role)
     },
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id

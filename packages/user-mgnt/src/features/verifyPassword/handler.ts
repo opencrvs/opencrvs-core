@@ -13,6 +13,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
 import { generateHash, generateOldHash } from '@user-mgnt/utils/hash'
+import { CoreUserRole } from '@opencrvs/commons/authentication'
 
 interface IVerifyPayload {
   username: string
@@ -23,10 +24,11 @@ interface IVerifyResponse {
   name: IUserName[]
   mobile?: string
   email?: string
-  scope: string[]
   status: string
   id: string
+  role: string
   practitionerId: string
+  systemRole: CoreUserRole
 }
 
 export default async function verifyPassHandler(
@@ -54,15 +56,18 @@ export default async function verifyPassHandler(
   } else if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
+
   const response: IVerifyResponse = {
     name: user.name,
     mobile: user.mobile,
     email: user.emailForNotification,
-    scope: user.scope,
     status: user.status,
     id: user.id,
-    practitionerId: user.practitionerId
+    role: user.role,
+    practitionerId: user.practitionerId,
+    systemRole: user.systemRole
   }
+
   return response
 }
 
@@ -81,8 +86,9 @@ export const responseSchema = Joi.object({
   ),
   mobile: Joi.string().optional(),
   email: Joi.string().allow(null, '').optional(),
-  scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
+  role: Joi.string(),
+  systemRole: Joi.string(),
   id: Joi.string(),
   practitionerId: Joi.string()
 })

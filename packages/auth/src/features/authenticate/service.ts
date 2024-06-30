@@ -32,9 +32,12 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger } from '@opencrvs/commons'
+import { CoreUserRole } from '@opencrvs/commons/authentication'
 import { unauthorized } from '@hapi/boom'
-import { chainW, tryCatch } from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
+
+import * as F from 'fp-ts'
+const { chainW, tryCatch } = F.either
+const { pipe } = F.function
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -55,8 +58,9 @@ export interface IAuthentication {
   mobile?: string
   userId: string
   status: string
-  scope: string[]
   email?: string
+  systemRole: CoreUserRole
+  role: string
 }
 
 export interface ISystemAuthentication {
@@ -86,11 +90,14 @@ export async function authenticate(
   if (res.status !== 200) {
     throw Error(res.statusText)
   }
+
   const body = await res.json()
+
   return {
     name: body.name,
     userId: body.id,
-    scope: body.scope,
+    role: body.role,
+    systemRole: body.systemRole,
     status: body.status,
     mobile: body.mobile,
     email: body.email
@@ -174,12 +181,7 @@ export async function generateAndSendVerificationCode(
   email?: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1 || QA_ENV
-  logger.info(
-    `isDemoUser,
-      ${JSON.stringify({
-        isDemoUser: isDemoUser
-      })}`
-  )
+  logger.info(`Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')}`)
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'

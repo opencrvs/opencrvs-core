@@ -506,17 +506,6 @@ export type CommentInput = {
   user?: InputMaybe<UserInput>
 }
 
-export type ComparisonInput = {
-  eq?: InputMaybe<Scalars['String']>
-  gt?: InputMaybe<Scalars['String']>
-  gte?: InputMaybe<Scalars['String']>
-  in?: InputMaybe<Array<Scalars['String']>>
-  lt?: InputMaybe<Scalars['String']>
-  lte?: InputMaybe<Scalars['String']>
-  ne?: InputMaybe<Scalars['String']>
-  nin?: InputMaybe<Array<Scalars['String']>>
-}
-
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -892,6 +881,13 @@ export type HumanNameInput = {
   use?: InputMaybe<Scalars['String']>
 }
 
+export type I18nMessage = {
+  __typename?: 'I18nMessage'
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
+  id: Scalars['String']
+}
+
 export type Identifier = {
   __typename?: 'Identifier'
   system?: Maybe<Scalars['String']>
@@ -935,11 +931,6 @@ export type IntegratedSystem = {
 export enum IntegratingSystemType {
   Mosip = 'MOSIP',
   Other = 'OTHER'
-}
-
-export type LabelInput = {
-  label: Scalars['String']
-  lang: Scalars['String']
 }
 
 export type LocalRegistrar = {
@@ -1172,7 +1163,6 @@ export type Mutation = {
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
-  updateRole: Response
   usernameReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
@@ -1439,10 +1429,6 @@ export type MutationUpdatePermissionsArgs = {
   setting: UpdatePermissionsInput
 }
 
-export type MutationUpdateRoleArgs = {
-  systemRole?: InputMaybe<SystemRoleInput>
-}
-
 export type MutationUsernameReminderArgs = {
   userId: Scalars['String']
 }
@@ -1651,7 +1637,6 @@ export type Query = {
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getOIDPUserInfo?: Maybe<UserInfo>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
-  getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
   getTotalMetrics?: Maybe<TotalMetricsResult>
@@ -1660,6 +1645,7 @@ export type Query = {
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
+  getUserRoles: Array<UserRole>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   informantSMSNotifications?: Maybe<Array<SmsNotification>>
@@ -1769,15 +1755,6 @@ export type QueryGetRegistrationsListByFilterArgs = {
   skip: Scalars['Int']
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
-}
-
-export type QueryGetSystemRolesArgs = {
-  active?: InputMaybe<Scalars['Boolean']>
-  role?: InputMaybe<Scalars['String']>
-  sortBy?: InputMaybe<Scalars['String']>
-  sortOrder?: InputMaybe<Scalars['String']>
-  title?: InputMaybe<Scalars['String']>
-  value?: InputMaybe<ComparisonInput>
 }
 
 export type QueryGetTotalCertificationsArgs = {
@@ -2150,28 +2127,6 @@ export type RemoveBookmarkedSeachInput = {
   userId: Scalars['String']
 }
 
-export type Response = {
-  __typename?: 'Response'
-  roleIdMap: Scalars['Map']
-}
-
-export type Role = {
-  __typename?: 'Role'
-  _id: Scalars['ID']
-  labels: Array<RoleLabel>
-}
-
-export type RoleInput = {
-  _id?: InputMaybe<Scalars['ID']>
-  labels: Array<LabelInput>
-}
-
-export type RoleLabel = {
-  __typename?: 'RoleLabel'
-  label: Scalars['String']
-  lang: Scalars['String']
-}
-
 export type SmsNotification = {
   __typename?: 'SMSNotification'
   createdAt: Scalars['String']
@@ -2195,7 +2150,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  role?: Maybe<Role>
+  role?: Maybe<UserRole>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
@@ -2270,21 +2225,6 @@ export type SystemInput = {
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
-}
-
-export type SystemRole = {
-  __typename?: 'SystemRole'
-  active: Scalars['Boolean']
-  id: Scalars['ID']
-  roles: Array<Role>
-  value: SystemRoleType
-}
-
-export type SystemRoleInput = {
-  active?: InputMaybe<Scalars['Boolean']>
-  id: Scalars['ID']
-  roles?: InputMaybe<Array<RoleInput>>
-  value?: InputMaybe<Scalars['String']>
 }
 
 export enum SystemRoleType {
@@ -2394,7 +2334,7 @@ export type User = {
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
-  role: Role
+  role: UserRole
   searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
   status: Status
@@ -2461,6 +2401,14 @@ export type UserInput = {
   status?: InputMaybe<Status>
   systemRole: SystemRoleType
   username?: InputMaybe<Scalars['String']>
+}
+
+export type UserRole = {
+  __typename?: 'UserRole'
+  id: Scalars['ID']
+  label: I18nMessage
+  scopes: Array<Scalars['String']>
+  systemRole: SystemRoleType
 }
 
 export type VsExport = {
@@ -2655,31 +2603,21 @@ export type CreateOrUpdateUserMutation = {
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetSystemRolesQueryVariables = Exact<{
-  value?: InputMaybe<ComparisonInput>
-}>
+export type GetUserRolesQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetSystemRolesQuery = {
+export type GetUserRolesQuery = {
   __typename?: 'Query'
-  getSystemRoles?: Array<{
-    __typename?: 'SystemRole'
+  getUserRoles: Array<{
+    __typename?: 'UserRole'
     id: string
-    value: SystemRoleType
-    roles: Array<{
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
-    }>
-  }> | null
-}
-
-export type UpdateRoleMutationVariables = Exact<{
-  systemRole?: InputMaybe<SystemRoleInput>
-}>
-
-export type UpdateRoleMutation = {
-  __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; roleIdMap: any }
+    systemRole: SystemRoleType
+    label: {
+      __typename?: 'I18nMessage'
+      id: string
+      defaultMessage: string
+      description: string
+    }
+  }>
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -2904,9 +2842,13 @@ export type FetchUserQuery = {
     systemRole: SystemRoleType
     status: Status
     role: {
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+      __typename?: 'UserRole'
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
     name: Array<{
       __typename?: 'HumanName'
@@ -3194,7 +3136,16 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
-      role: { __typename?: 'Role'; _id: string }
+      role: {
+        __typename?: 'UserRole'
+        id: string
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
+      }
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
@@ -3269,9 +3220,13 @@ export type GetUserQuery = {
       value?: string | null
     } | null
     role: {
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+      __typename?: 'UserRole'
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
     primaryOffice?: {
       __typename?: 'Location'
@@ -3696,13 +3651,14 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4016,13 +3972,14 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4499,13 +4456,14 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4808,13 +4766,14 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -5172,7 +5131,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
-      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
@@ -5221,13 +5179,14 @@ export type FetchMarriageRegistrationForReviewQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -5532,7 +5491,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
-      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null
@@ -5564,13 +5522,14 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         id: string
         systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -7372,7 +7331,7 @@ export type GetUserByMobileQuery = {
     email?: string | null
     systemRole: SystemRoleType
     status: Status
-    role: { __typename?: 'Role'; _id: string }
+    role: { __typename?: 'UserRole'; id: string }
   } | null
 }
 
@@ -7390,7 +7349,7 @@ export type GetUserByEmailQuery = {
     email?: string | null
     systemRole: SystemRoleType
     status: Status
-    role: { __typename?: 'Role'; _id: string }
+    role: { __typename?: 'UserRole'; id: string }
   } | null
 }
 
@@ -7835,13 +7794,14 @@ export type GetEventsWithProgressQuery = {
           familyName?: string | null
         }>
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
       } | null
       progressReport?: {
@@ -7896,13 +7856,14 @@ export type GetRegistrationsListByFilterQuery = {
             id: string
             systemRole: SystemRoleType
             role: {
-              __typename?: 'Role'
-              _id: string
-              labels: Array<{
-                __typename?: 'RoleLabel'
-                lang: string
-                label: string
-              }>
+              __typename?: 'UserRole'
+              id: string
+              label: {
+                __typename?: 'I18nMessage'
+                id: string
+                defaultMessage: string
+                description: string
+              }
             }
             primaryOffice?: {
               __typename?: 'Location'
@@ -7970,8 +7931,13 @@ export type SearchFieldAgentsQuery = {
       totalNumberOfRejectedDeclarations?: number | null
       averageTimeForDeclaredDeclarations?: number | null
       role?: {
-        __typename?: 'Role'
-        labels: Array<{ __typename?: 'RoleLabel'; label: string; lang: string }>
+        __typename?: 'UserRole'
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
       } | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
@@ -8086,6 +8052,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           __typename?: 'History'
           action?: RegAction | null
           regStatus?: RegStatus | null
+          date?: any | null
           user?: {
             __typename?: 'User'
             primaryOffice?: {
@@ -8407,7 +8374,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8793,7 +8760,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -9111,7 +9078,7 @@ export type FetchViewRecordByCompositionQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

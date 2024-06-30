@@ -64,7 +64,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+
 import { getLanguage } from '@client/i18n/selectors'
 
 type IDispatchProps = {
@@ -516,7 +516,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           if (eventProgress.startedBy != null) {
             const user = eventProgress.startedBy
             starterPractitionerRole =
-              (user.role && getUserRole(language, user.role)) || ''
+              (user.role && intl.formatMessage(user.role.label)) || ''
           }
 
           const event =

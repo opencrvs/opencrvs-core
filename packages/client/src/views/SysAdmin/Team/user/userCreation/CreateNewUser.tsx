@@ -99,7 +99,7 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
       this.props.clearUserFormData()
     }
     if (userId) {
-      this.props.fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
+      this.props.fetchAndStoreUserData(client as ApolloClient<any>, {
         userId
       })
     }
@@ -142,6 +142,7 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   render() {
     const { section, submitting, userDetailsStored, loadingRoles, userId } =
       this.props
+
     if (submitting || loadingRoles || (userId && !userDetailsStored)) {
       return this.renderLoadingPage()
     }
@@ -210,6 +211,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 
   let formData = { ...state.userForm.userFormData }
+
   if (props.match.params.locationId) {
     formData = {
       ...gqlToDraftTransformer(

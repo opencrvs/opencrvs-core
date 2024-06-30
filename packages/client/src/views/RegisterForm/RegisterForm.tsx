@@ -177,7 +177,7 @@ type Props = {
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
   userDetails: UserDetails | null
-  scope: Scope | null
+  scope: Scope[] | null
 }
 
 export type FullProps = IFormProps &

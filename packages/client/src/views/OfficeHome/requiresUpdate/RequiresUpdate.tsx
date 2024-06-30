@@ -57,7 +57,7 @@ import { RegStatus } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]

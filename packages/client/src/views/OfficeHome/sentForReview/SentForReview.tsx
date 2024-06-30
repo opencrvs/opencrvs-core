@@ -63,7 +63,7 @@ interface IBaseApprovalTabProps {
   goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
-  scope: Scope | null
+  scope: Scope[] | null
   queryData: {
     data: GQLEventSearchResultSet
   }

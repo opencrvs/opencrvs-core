@@ -114,7 +114,3 @@ export function getUserSystemRole(
       return undefined
   }
 }
-
-export const getUserRoleIntlKey = (_roleId: string) => {
-  return `role.${_roleId}`
-}

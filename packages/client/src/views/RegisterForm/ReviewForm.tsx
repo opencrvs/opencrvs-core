@@ -36,7 +36,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IReviewProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   event: Event
 }
 interface IDeclarationProp {

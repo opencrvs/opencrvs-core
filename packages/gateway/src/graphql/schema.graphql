@@ -145,14 +145,7 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getSystemRoles(
-    title: String
-    value: ComparisonInput
-    role: String
-    active: Boolean
-    sortBy: String
-    sortOrder: String
-  ): [SystemRole!]
+  getUserRoles: [UserRole!]!
   getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
@@ -268,7 +261,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -451,7 +443,7 @@ type User {
   username: String
   mobile: String
   systemRole: SystemRoleType!
-  role: Role!
+  role: UserRole!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -637,22 +629,11 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type SystemRole {
+type UserRole {
   id: ID!
-  value: SystemRoleType!
-  roles: [Role!]!
-  active: Boolean!
-}
-
-input ComparisonInput {
-  eq: String
-  gt: String
-  lt: String
-  gte: String
-  lte: String
-  in: [String!]
-  ne: String
-  nin: [String!]
+  label: I18nMessage!
+  scopes: [String!]!
+  systemRole: SystemRoleType!
 }
 
 type CertificateSVG {
@@ -808,7 +789,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String
@@ -829,17 +809,6 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
-}
-
-type Response {
-  roleIdMap: Map!
-}
-
-input SystemRoleInput {
-  id: ID!
-  value: String
-  active: Boolean
-  roles: [RoleInput!]
 }
 
 input CertificateSVGInput {
@@ -1113,11 +1082,6 @@ enum SystemRoleType {
   NATIONAL_REGISTRAR
 }
 
-type Role {
-  _id: ID!
-  labels: [RoleLabel!]!
-}
-
 enum Status {
   active
   deactivated
@@ -1145,7 +1109,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  role: Role
+  role: UserRole
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -1217,6 +1181,12 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+type I18nMessage {
+  id: String!
+  defaultMessage: String!
+  description: String!
 }
 
 enum SystemStatus {
@@ -1444,11 +1414,6 @@ input SignatureInput {
   type: String
 }
 
-input RoleInput {
-  _id: ID
-  labels: [LabelInput!]!
-}
-
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1629,11 +1594,6 @@ type Payment {
   outcome: PaymentOutcomeType!
   date: Date!
   attachmentURL: String
-}
-
-type RoleLabel {
-  lang: String!
-  label: String!
 }
 
 type AdvancedSeachParameters {
@@ -1925,11 +1885,6 @@ input CertificateInput {
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
   data: String
-}
-
-input LabelInput {
-  lang: String!
-  label: String!
 }
 
 type BirthFee {

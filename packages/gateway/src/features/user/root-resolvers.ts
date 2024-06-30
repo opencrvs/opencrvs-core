@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-
+import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
+import { Roles } from '@opencrvs/commons/authentication'
 import {
   IUserModelData,
   IUserPayload,
@@ -29,7 +29,12 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger, isBase64FileString } from '@opencrvs/commons'
+import {
+  logger,
+  isBase64FileString,
+  joinURL,
+  fetchJSON
+} from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
@@ -40,13 +45,11 @@ import { rateLimitedResolver } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
   Query: {
-    getUser: rateLimitedResolver(
-      { requestsPerMinute: 10 },
-      async (_, { userId }, { dataSources }) => {
-        const user = await dataSources.usersAPI.getUserById(userId!)
-        return user
-      }
-    ),
+    getUser: async (_, { userId }, { dataSources }) => {
+      const user = await dataSources.usersAPI.getUserById(userId!)
+
+      return user
+    },
 
     getUserByMobile: rateLimitedResolver(
       { requestsPerMinute: 10 },
@@ -280,9 +283,13 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      const userPayload: IUserPayload = createOrUpdateUserPayload(user)
-      const action = userPayload.id ? 'update' : 'create'
-      const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
+      const roles = await fetchJSON<Roles>(
+        joinURL(COUNTRY_CONFIG_URL, '/roles')
+      )
+      const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
+      const action = userPayload.id ? 'updateUser' : 'createUser'
+
+      const res = await fetch(joinURL(USER_MANAGEMENT_URL, action), {
         method: 'POST',
         body: JSON.stringify(userPayload),
         headers: {
@@ -629,14 +636,17 @@ export const resolvers: GQLResolver = {
   }
 }
 
-function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
+function createOrUpdateUserPayload(
+  user: GQLUserInput,
+  roles: Roles
+): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName?.trim() as string,
       given: [name.firstNames?.trim() || ''] as string[]
     })),
-    systemRole: user.systemRole as string,
+    systemRole: roles.find(({ id }) => id === user.role)!.systemRole,
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),

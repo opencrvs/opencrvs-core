@@ -251,10 +251,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
           systemRole
@@ -528,10 +529,11 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
           systemRole

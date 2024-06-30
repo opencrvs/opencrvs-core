@@ -45,13 +45,11 @@ const users: UserDetails[] = [
       signature: undefined
     },
     role: {
-      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-      labels: [
-        {
-          lang: 'en',
-          label: 'ENTREPENEUR'
-        }
-      ]
+      label: {
+        id: 'userRoles.entrepreneur',
+        defaultMessage: 'Entrepreneur',
+        description: 'Entrepreneur'
+      }
     },
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
@@ -77,13 +75,11 @@ const users: UserDetails[] = [
     username: 'np.huq',
     systemRole: SystemRoleType.LocalRegistrar,
     role: {
-      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-      labels: [
-        {
-          lang: 'en',
-          label: 'MAYOR'
-        }
-      ]
+      label: {
+        id: 'userRoles.mayor',
+        defaultMessage: 'Mayor',
+        description: 'Mayor'
+      }
     },
     status: Status.Deactivated,
     localRegistrar: {

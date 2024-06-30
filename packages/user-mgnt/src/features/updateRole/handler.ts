@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import { Types } from 'mongoose'
 import { logger } from '@opencrvs/commons'
-import { UserRole } from '@user-mgnt/model/user'
+
 import SystemRole, {
   ISystemRoleModel,
   SYSTEM_ROLE_TYPES
@@ -112,7 +112,9 @@ async function updateParticularRoles(roles: IRoleRequest[]) {
   const updatedRoleIds = await Promise.all(
     roles.map(async (role) => {
       const id = new Types.ObjectId(role._id)
-      await UserRole.updateOne({ _id: id.toString() }, role, { upsert: true })
+      await SystemRole.updateOne({ _id: id.toString() }, role, {
+        upsert: true
+      })
       for (const labelObj of role.labels) {
         roleIdMap[labelObj.label] = id
       }

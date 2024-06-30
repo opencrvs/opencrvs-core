@@ -54,7 +54,7 @@ import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import { getUserRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
@@ -304,13 +304,11 @@ export const userDetails: UserDetails = {
   ],
   systemRole: SystemRoleType.FieldAgent,
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'ENTREPENEUR'
-      }
-    ]
+    label: {
+      id: 'userRoles.entrepreneur',
+      defaultMessage: 'Entrepreneur',
+      description: 'Entrepreneur'
+    }
   },
   mobile: '01677701431',
   primaryOffice: {
@@ -1002,13 +1000,11 @@ export function loginAsFieldAgent(store: AppStore) {
           mobile: '+8801711111111',
           systemRole: SystemRoleType.FieldAgent,
           role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'CHA'
-              }
-            ]
+            label: {
+              id: 'userRoles.CHA',
+              defaultMessage: 'CHA',
+              description: 'CHA'
+            }
           },
           status: Status.Active,
           name: [
@@ -1293,149 +1289,121 @@ export const mockRoles = {
 
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getSystemRolesQuery,
+    query: getUserRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getSystemRoles: [
+      getUserRoles: [
         {
-          value: 'FIELD_AGENT',
-          roles: [
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Healthcare Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Professionnel de Santé'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Police Officer'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Agent de Police'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Social Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Travailleur Social'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Local Leader'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Leader Local'
-                }
-              ]
-            }
-          ],
-          active: true
+          id: 'FIELD_AGENT',
+          label: {
+            defaultMessage: 'Field Agent',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.fieldAgent'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
         },
         {
-          value: 'REGISTRATION_AGENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Registration Agent'
-            },
-            {
-              lang: 'fr',
-              label: "Agent d'enregistrement"
-            }
-          ],
-          active: true
+          id: 'POLICE_OFFICER',
+          label: {
+            defaultMessage: 'Police Officer',
+            description: 'Name for user role Police Officer',
+            id: 'userRole.policeOfficer'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
         },
         {
-          value: 'LOCAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire local'
-            }
-          ],
-          active: true
+          id: 'SOCIAL_WORKER',
+          label: {
+            defaultMessage: 'Social Worker',
+            description: 'Name for user role Social Worker',
+            id: 'userRole.socialWorker'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
         },
         {
-          value: 'LOCAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système local'
-            }
-          ],
-          active: true
+          id: 'HEALTHCARE_WORKER',
+          label: {
+            defaultMessage: 'Healthcare Worker',
+            description: 'Name for user role Healthcare Worker',
+            id: 'userRole.healthcareWorker'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
         },
         {
-          value: 'NATIONAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système national'
-            }
-          ],
-          active: true
+          id: 'LOCAL_LEADER',
+          label: {
+            defaultMessage: 'Local Leader',
+            description: 'Name for user role Local Leader',
+            id: 'userRole.localLeader'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
         },
         {
-          value: 'PERFORMANCE_MANAGEMENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Performance Management'
-            },
-            {
-              lang: 'fr',
-              label: 'Gestion des performances'
-            }
-          ],
-          active: true
+          id: 'REGISTRATION_AGENT',
+          label: {
+            defaultMessage: 'Registration Agent',
+            description: 'Name for user role Registration Agent',
+            id: 'userRole.registrationAgent'
+          },
+          systemRole: 'REGISTRATION_AGENT',
+          scopes: ['validate', 'performance', 'certify']
         },
         {
-          value: 'NATIONAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire national'
-            }
-          ],
-          active: true
+          id: 'LOCAL_REGISTRAR',
+          label: {
+            defaultMessage: 'Local Registrar',
+            description: 'Name for user role Local Registrar',
+            id: 'userRole.localRegistrar'
+          },
+          systemRole: 'LOCAL_REGISTRAR',
+          scopes: ['register', 'performance', 'certify']
+        },
+        {
+          id: 'LOCAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'Local System Admin',
+            description: 'Name for user role Local System Admin',
+            id: 'userRole.localSystemAdmin'
+          },
+          systemRole: 'LOCAL_SYSTEM_ADMIN',
+          scopes: ['sysadmin']
+        },
+        {
+          id: 'NATIONAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'National System Admin',
+            description: 'Name for user role National System Admin',
+            id: 'userRole.nationalSystemAdmin'
+          },
+          systemRole: 'NATIONAL_SYSTEM_ADMIN',
+          scopes: ['sysadmin', 'natlsysadmin']
+        },
+        {
+          id: 'PERFORMANCE_MANAGER',
+          label: {
+            defaultMessage: 'Performance Manager',
+            description: 'Name for user role Performance Manager',
+            id: 'userRole.performanceManager'
+          },
+          systemRole: 'PERFORMANCE_MANAGEMENT',
+          scopes: ['performance']
+        },
+        {
+          id: 'NATIONAL_REGISTRAR',
+          label: {
+            defaultMessage: 'National Registrar',
+            description: 'Name for user role National Registrar',
+            id: 'userRole.nationalRegistrar'
+          },
+          systemRole: 'NATIONAL_REGISTRAR',
+          scopes: ['register', 'performance', 'certify', 'config', 'teams']
         }
       ]
     }

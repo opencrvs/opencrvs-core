@@ -23,30 +23,25 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goBack,
   goToCreateUserSection,
   goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
-import { IStoreState } from '@client/store'
-import styled from 'styled-components'
-import {
-  clearUserFormData,
-  ISystemRolesMap,
-  modifyUserFormData
-} from '@client/user/userReducer'
-import { Button } from '@opencrvs/components/lib/Button'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { FormikTouched, FormikValues } from 'formik'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { selectSystemRoleMap } from '@client/user/selectors'
+import { FormikTouched, FormikValues } from 'formik'
+import * as React from 'react'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -60,7 +55,6 @@ type IProps = {
   nextSectionId: string
   nextGroupId: string
   offlineCountryConfig: IOfflineData
-  systemRoleMap: ISystemRolesMap
 }
 
 type IState = {
@@ -131,10 +125,6 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
     ) {
-      if (values.role) {
-        const getSystemRoles = this.props.systemRoleMap
-        values.systemRole = getSystemRoles[values.role]
-      }
       this.props.modifyUserFormData({ ...formData, ...values })
       this.setState({
         disableContinueOnLocation: false
@@ -200,11 +190,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-const mapStateToProps = (
-  state: IStoreState
-): { offlineCountryConfig: IOfflineData; systemRoleMap: ISystemRolesMap } => {
+const mapStateToProps = (state: IStoreState) => {
   return {
-    systemRoleMap: selectSystemRoleMap(state),
     offlineCountryConfig: getOfflineData(state)
   }
 }

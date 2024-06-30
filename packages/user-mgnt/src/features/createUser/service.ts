@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
+import User, { IUser, IUserName } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 
@@ -95,9 +95,6 @@ export const createFhirPractitionerRole = async (
       location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   } else {
-    const role = await UserRole.findOne({
-      _id: user.role
-    })
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -116,7 +113,7 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: JSON.stringify(role?.labels)
+              code: user.role
             }
           ]
         }

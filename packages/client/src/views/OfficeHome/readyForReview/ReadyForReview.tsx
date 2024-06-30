@@ -69,7 +69,7 @@ const ToolTipContainer = styled.span`
 `
 interface IBaseReviewTabProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]

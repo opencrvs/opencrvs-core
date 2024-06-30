@@ -10,6 +10,7 @@
  */
 import type * as Hapi from '@hapi/hapi'
 import { uniqueId } from 'lodash'
+import nodeFetch from 'node-fetch'
 
 export interface IAuthHeader {
   Authorization: string
@@ -30,4 +31,27 @@ export function getAuthHeader(request: Hapi.Request) {
 export function joinURL(base: string, path: string) {
   const baseWithSlash = base.endsWith('/') ? base : base + '/'
   return new URL(path, baseWithSlash)
+}
+
+export class NotFound extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'NotFound'
+  }
+}
+
+export async function fetchJSON<ResponseType = any>(
+  ...params: Parameters<typeof nodeFetch>
+) {
+  const res = await nodeFetch(...params)
+
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new NotFound(res.statusText)
+    }
+
+    throw new Error(res.statusText)
+  }
+
+  return res.json() as ResponseType
 }

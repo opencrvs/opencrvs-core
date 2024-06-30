@@ -170,7 +170,7 @@ interface IStateProps {
   userDetails: UserDetails | null
   language: string
   resources: IOfflineData
-  scope: Scope | null
+  scope: Scope[] | null
   declarationId: string
   draft: IDeclaration | null
   tab: IRecordAuditTabs
@@ -307,7 +307,7 @@ function RecordAuditBody({
   draft: IDeclaration | null
   duplicates?: string[]
   intl: IntlShape
-  scope: Scope | null
+  scope: Scope[] | null
   userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>

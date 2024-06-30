@@ -16,13 +16,25 @@ import { authApi } from '@client/utils/authApi'
 import { SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from './userUtils'
 
-export type Scope = string[]
-
+export const USER_SCOPES = [
+  'demo',
+  'declare',
+  'register',
+  'certify',
+  'performance',
+  'sysadmin',
+  'validate',
+  'natlsysadmin',
+  'bypassratelimit',
+  'teams',
+  'config'
+]
+export type Scope = (typeof USER_SCOPES)[number]
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope
+  scope: Scope[]
 }
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
@@ -111,21 +123,21 @@ export const enum AuthScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
 
-export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
+export const hasNatlSysAdminScope = (scope: Scope[] | null): boolean => {
   if (scope?.includes(AuthScope.NATLSYSADMIN)) {
     return true
   }
   return false
 }
 
-export const hasRegisterScope = (scope: Scope | null): boolean => {
+export const hasRegisterScope = (scope: Scope[] | null): boolean => {
   if (scope?.includes(AuthScope.REGISTER)) {
     return true
   }
   return false
 }
 
-export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
+export const hasRegistrationClerkScope = (scope: Scope[] | null): boolean => {
   if (scope?.includes(AuthScope.VALIDATE)) {
     return true
   }

@@ -114,10 +114,11 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
           }
           systemRole
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
         }
@@ -166,10 +167,11 @@ export const FETCH_REGISTRATIONS = gql`
             id
             systemRole
             role {
-              _id
-              labels {
-                lang
-                label
+              id
+              label {
+                id
+                defaultMessage
+                description
               }
             }
             primaryOffice {
@@ -247,9 +249,10 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
         practitionerId
         fullName
         role {
-          labels {
-            label
-            lang
+          label {
+            id
+            defaultMessage
+            description
           }
         }
         status

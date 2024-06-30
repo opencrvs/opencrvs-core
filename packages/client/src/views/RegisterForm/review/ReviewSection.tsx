@@ -282,7 +282,7 @@ interface IProps {
     submissionStatus: string,
     action: SubmissionAction
   ) => void
-  scope: Scope | null
+  scope: Scope[] | null
   offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm

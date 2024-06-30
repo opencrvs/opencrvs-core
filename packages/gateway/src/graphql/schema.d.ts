@@ -49,7 +49,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getSystemRoles?: Array<GQLSystemRole>
+  getUserRoles: Array<GQLUserRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   fetchSystem?: GQLSystem
@@ -103,7 +103,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   reactivateSystem?: GQLSystem
@@ -300,7 +299,7 @@ export interface GQLUser {
   username?: string
   mobile?: string
   systemRole: GQLSystemRoleType
-  role: GQLRole
+  role: GQLUserRole
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -499,22 +498,11 @@ export interface GQLEventProgressResultSet {
   totalItems?: number
 }
 
-export interface GQLSystemRole {
+export interface GQLUserRole {
   id: string
-  value: GQLSystemRoleType
-  roles: Array<GQLRole>
-  active: boolean
-}
-
-export interface GQLComparisonInput {
-  eq?: string
-  gt?: string
-  lt?: string
-  gte?: string
-  lte?: string
-  in?: Array<string>
-  ne?: string
-  nin?: Array<string>
+  label: GQLI18nMessage
+  scopes: Array<string>
+  systemRole: GQLSystemRoleType
 }
 
 export interface GQLCertificateSVG {
@@ -670,7 +658,6 @@ export interface GQLUserInput {
   mobile?: string
   password?: string
   status?: GQLStatus
-  systemRole: GQLSystemRoleType
   role?: string
   email?: string
   primaryOffice?: string
@@ -691,17 +678,6 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
-}
-
-export interface GQLResponse {
-  roleIdMap: GQLMap
-}
-
-export interface GQLSystemRoleInput {
-  id: string
-  value?: string
-  active?: boolean
-  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLCertificateSVGInput {
@@ -975,11 +951,6 @@ export const enum GQLSystemRoleType {
   NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
-export interface GQLRole {
-  _id: string
-  labels: Array<GQLRoleLabel>
-}
-
 export const enum GQLStatus {
   active = 'active',
   deactivated = 'deactivated',
@@ -1007,7 +978,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  role?: GQLRole
+  role?: GQLUserRole
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
@@ -1103,6 +1074,12 @@ export interface GQLEventProgressSet {
   startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
+}
+
+export interface GQLI18nMessage {
+  id: string
+  defaultMessage: string
+  description: string
 }
 
 export const enum GQLSystemStatus {
@@ -1330,11 +1307,6 @@ export interface GQLSignatureInput {
   type?: string
 }
 
-export interface GQLRoleInput {
-  _id?: string
-  labels: Array<GQLLabelInput>
-}
-
 export interface GQLBirth {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1515,11 +1487,6 @@ export interface GQLPayment {
   outcome: GQLPaymentOutcomeType
   date: GQLDate
   attachmentURL?: string
-}
-
-export interface GQLRoleLabel {
-  lang: string
-  label: string
 }
 
 export interface GQLAdvancedSeachParameters {
@@ -1814,11 +1781,6 @@ export interface GQLCertificateInput {
   data?: string
 }
 
-export interface GQLLabelInput {
-  lang: string
-  label: string
-}
-
 export interface GQLBirthFee {
   ON_TIME?: number
   LATE?: number
@@ -1980,7 +1942,7 @@ export interface GQLResolver {
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
-  SystemRole?: GQLSystemRoleTypeResolver
+  UserRole?: GQLUserRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   System?: GQLSystemTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
@@ -1988,7 +1950,6 @@ export interface GQLResolver {
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
-  Response?: GQLResponseTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
@@ -2007,7 +1968,6 @@ export interface GQLResolver {
   Deceased?: GQLDeceasedTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   Identifier?: GQLIdentifierTypeResolver
-  Role?: GQLRoleTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
   BookmarkedSeachItem?: GQLBookmarkedSeachItemTypeResolver
@@ -2027,6 +1987,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  I18nMessage?: GQLI18nMessageTypeResolver
   SystemSettings?: GQLSystemSettingsTypeResolver
   OIDPUserInfo?: GQLOIDPUserInfoTypeResolver
   Birth?: GQLBirthTypeResolver
@@ -2045,7 +2006,6 @@ export interface GQLResolver {
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   Payment?: GQLPaymentTypeResolver
-  RoleLabel?: GQLRoleLabelTypeResolver
   AdvancedSeachParameters?: GQLAdvancedSeachParametersTypeResolver
   EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
   EventMetricsByLocation?: GQLEventMetricsByLocationTypeResolver
@@ -2107,7 +2067,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
+  getUserRoles?: QueryToGetUserRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
@@ -2701,18 +2661,10 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetSystemRolesArgs {
-  title?: string
-  value?: GQLComparisonInput
-  role?: string
-  active?: boolean
-  sortBy?: string
-  sortOrder?: string
-}
-export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
+export interface QueryToGetUserRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetSystemRolesArgs,
+    args: {},
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -2831,7 +2783,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
@@ -3543,18 +3494,6 @@ export interface MutationToResetPasswordInviteResolver<
   (
     parent: TParent,
     args: MutationToResetPasswordInviteArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdateRoleArgs {
-  systemRole?: GQLSystemRoleInput
-}
-export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToUpdateRoleArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5815,14 +5754,14 @@ export interface EventProgressResultSetToTotalItemsResolver<
   ): TResult
 }
 
-export interface GQLSystemRoleTypeResolver<TParent = any> {
-  id?: SystemRoleToIdResolver<TParent>
-  value?: SystemRoleToValueResolver<TParent>
-  roles?: SystemRoleToRolesResolver<TParent>
-  active?: SystemRoleToActiveResolver<TParent>
+export interface GQLUserRoleTypeResolver<TParent = any> {
+  id?: UserRoleToIdResolver<TParent>
+  label?: UserRoleToLabelResolver<TParent>
+  scopes?: UserRoleToScopesResolver<TParent>
+  systemRole?: UserRoleToSystemRoleResolver<TParent>
 }
 
-export interface SystemRoleToIdResolver<TParent = any, TResult = any> {
+export interface UserRoleToIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -5831,7 +5770,7 @@ export interface SystemRoleToIdResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface SystemRoleToValueResolver<TParent = any, TResult = any> {
+export interface UserRoleToLabelResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -5840,7 +5779,7 @@ export interface SystemRoleToValueResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
+export interface UserRoleToScopesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -5849,7 +5788,7 @@ export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
+export interface UserRoleToSystemRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -6230,19 +6169,6 @@ export interface AvatarToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AvatarToDataResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLResponseTypeResolver<TParent = any> {
-  roleIdMap?: ResponseToRoleIdMapResolver<TParent>
-}
-
-export interface ResponseToRoleIdMapResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -8022,29 +7948,6 @@ export interface IdentifierToValueResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  _id?: RoleTo_idResolver<TParent>
-  labels?: RoleToLabelsResolver<TParent>
-}
-
-export interface RoleTo_idResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RoleToLabelsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLLocalRegistrarTypeResolver<TParent = any> {
   name?: LocalRegistrarToNameResolver<TParent>
   role?: LocalRegistrarToRoleResolver<TParent>
@@ -8681,6 +8584,45 @@ export interface EventProgressSetToStartedAtResolver<
 }
 
 export interface EventProgressSetToProgressReportResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLI18nMessageTypeResolver<TParent = any> {
+  id?: I18nMessageToIdResolver<TParent>
+  defaultMessage?: I18nMessageToDefaultMessageResolver<TParent>
+  description?: I18nMessageToDescriptionResolver<TParent>
+}
+
+export interface I18nMessageToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface I18nMessageToDefaultMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface I18nMessageToDescriptionResolver<
   TParent = any,
   TResult = any
 > {
@@ -9683,29 +9625,6 @@ export interface PaymentToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToAttachmentURLResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLRoleLabelTypeResolver<TParent = any> {
-  lang?: RoleLabelToLangResolver<TParent>
-  label?: RoleLabelToLabelResolver<TParent>
-}
-
-export interface RoleLabelToLangResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RoleLabelToLabelResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

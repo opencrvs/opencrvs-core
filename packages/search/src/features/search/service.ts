@@ -60,7 +60,7 @@ export const advancedSearch = async (
     })
   } catch (error) {
     if (error.statusCode === 400) {
-      logger.error('Search: bad request')
+      logger.error(`Search: bad request. ${error.message}`)
     } else {
       logger.error('Search error: ', error)
     }

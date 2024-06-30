@@ -124,7 +124,7 @@ export type ISearchInputProps = ISerachInputCustomProps &
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope | null
+  scope: Scope[] | null
   goToEvents: typeof goToEventsAction
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]

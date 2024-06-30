@@ -8,21 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
+  IAuthentication,
   authenticate,
-  storeUserInformation,
   createToken,
   generateAndSendVerificationCode,
-  IAuthentication
+  storeUserInformation
 } from '@auth/features/authenticate/service'
 import {
   NotificationEvent,
   generateNonce
 } from '@auth/features/verifyCode/service'
-import { unauthorized, forbidden } from '@hapi/boom'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import { forbidden, unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { CoreUserRole } from '@opencrvs/commons/authentication'
+import * as Joi from 'joi'
+import { getUserRoleScopeMapping } from '@auth/features/scopes/service'
 
 interface IAuthPayload {
   username: string
@@ -34,6 +36,7 @@ interface IAuthResponse {
   mobile?: string
   email?: string
   status: string
+  systemRole: CoreUserRole
   token?: string
 }
 
@@ -43,6 +46,7 @@ export default async function authenticateHandler(
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
   let result: IAuthentication
+
   const { username, password } = payload
   try {
     result = await authenticate(username.trim(), password)
@@ -58,15 +62,28 @@ export default async function authenticateHandler(
     mobile: result.mobile,
     email: result.email,
     status: result.status,
+    systemRole: result.systemRole,
     nonce
   }
 
   const isPendingUser = response.status && response.status === 'pending'
 
+  const roleScopeMappings = await getUserRoleScopeMapping()
+
+  let scopes = []
+
+  const role = result.role as keyof typeof roleScopeMappings
+
+  if (roleScopeMappings[role]) {
+    scopes = roleScopeMappings[role]
+  } else {
+    scopes = roleScopeMappings[response.systemRole]
+  }
+
   if (isPendingUser) {
     response.token = await createToken(
       result.userId,
-      result.scope,
+      scopes,
       WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
@@ -75,7 +92,7 @@ export default async function authenticateHandler(
       nonce,
       result.name,
       result.userId,
-      result.scope,
+      scopes,
       result.mobile,
       result.email
     )
@@ -84,13 +101,14 @@ export default async function authenticateHandler(
 
     await generateAndSendVerificationCode(
       nonce,
-      result.scope,
+      scopes,
       notificationEvent,
       result.name,
       result.mobile,
       result.email
     )
   }
+
   return response
 }
 
@@ -104,5 +122,7 @@ export const responseSchema = Joi.object({
   mobile: Joi.string().optional(),
   email: Joi.string().optional(),
   status: Joi.string(),
+  role: Joi.string(),
+  systemRole: Joi.string(),
   token: Joi.string().optional()
 })

@@ -49,13 +49,11 @@ describe('ForgotPIN tests', () => {
             mobile: '+8801711111111',
             systemRole: SystemRoleType.FieldAgent,
             role: {
-              _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'CHA'
-                }
-              ]
+              label: {
+                id: 'userRoles.cha',
+                defaultMessage: 'CHA',
+                description: 'CHA'
+              }
             },
             status: Status.Active,
             name: [

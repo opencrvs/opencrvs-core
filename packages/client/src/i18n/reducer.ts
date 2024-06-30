@@ -8,23 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@client/i18n/actions'
 import {
-  getDefaultLanguage,
   getAvailableLanguages,
+  getDefaultLanguage,
   storeLanguage
 } from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
 import {
-  IRoleMessagesLoadedAction,
   IRoleLoadedAction,
-  rolesMessageAddData,
-  ROLES_LOADED
+  IRoleMessagesLoadedAction
 } from '@client/user/userReducer'
-import { SystemRole } from '@client/utils/gateway'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Cmd, Loop, LoopReducer, loop } from 'redux-loop'
 
 export interface IntlMessages {
   [key: string]: string
@@ -85,32 +81,6 @@ const formatLocationLanguageState = (
     }
   })
   return languages
-}
-
-const formatRoleLanguageState = (
-  systemRoles: SystemRole[],
-  languages: ILanguageState
-): ILanguageState => {
-  const transformedLanguages: ILanguageState = {
-    ...languages
-  }
-  systemRoles.forEach((systemRole) => {
-    systemRole.roles.forEach((role) => {
-      role.labels.forEach((label) => {
-        if (transformedLanguages[label.lang]) {
-          const generatedLabel = getUserRoleIntlKey(role._id)
-          transformedLanguages[label.lang] = {
-            ...transformedLanguages[label.lang],
-            messages: {
-              ...transformedLanguages[label.lang].messages,
-              [generatedLabel]: label.label
-            }
-          }
-        }
-      })
-    })
-  })
-  return transformedLanguages
 }
 
 const getNextMessages = (
@@ -187,21 +157,6 @@ export const intlReducer: LoopReducer<IntlState, any> = (
         messages: updatedMessages,
         languages: languagesWithFacilities
       }
-    case ROLES_LOADED:
-      const systemRoles = action.payload.systemRoles
-      const languageWithRoles = formatRoleLanguageState(
-        systemRoles,
-        state.languages
-      )
-      return loop(
-        {
-          ...state,
-          messages: getNextMessages(state.language, languageWithRoles),
-          languages: languageWithRoles
-        },
-
-        Cmd.action(rolesMessageAddData())
-      )
 
     default:
       return state

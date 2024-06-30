@@ -29,10 +29,10 @@ const FETCH_USER = gql`
       email
       systemRole
       role {
-        _id
-        labels {
-          lang
-          label
+        label {
+          id
+          defaultMessage
+          description
         }
       }
       status
