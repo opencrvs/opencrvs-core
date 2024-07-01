@@ -157,6 +157,7 @@ const ValueWrapper = styled.span<{
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding: 0 4px;
   align-self: center;
+  white-space: pre-wrap;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
