@@ -123,9 +123,12 @@ function prepareComments(
   }
 
   const histories = getHistories(draft)
-  const currentHistoryItemIndex = histories.findIndex(
-    (item) => item.date === actionDetailsData.date
-  )
+  const currentHistoryItemIndex = histories
+    .filter(({ regStatus }: Partial<History>) => {
+      return regStatus !== RegStatus.WaitingValidation
+    })
+    .findIndex((item) => item.date === actionDetailsData.date)
+
   const previousHistoryItemIndex =
     currentHistoryItemIndex < 0
       ? currentHistoryItemIndex
