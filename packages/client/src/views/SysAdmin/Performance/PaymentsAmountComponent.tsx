@@ -21,8 +21,8 @@ import {
 import type { GQLPaymentMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
-import { getAmountWithCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ICurrency } from '@client/utils/referenceApi'
+import { getAmountWithCurrencySymbol } from '@client/utils/currencyUtils'
 
 interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>

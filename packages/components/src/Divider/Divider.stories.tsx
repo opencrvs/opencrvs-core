@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Divider, DividerProps } from './Divider'
 
 export default {
-  title: 'Components/Divider',
+  title: 'Input/Divider',
   component: Divider,
   argTypes: {
     ref: { table: { disable: true } },

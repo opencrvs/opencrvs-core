@@ -168,6 +168,6 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer $AUTHOR
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --reviewer "$AUTHOR"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
