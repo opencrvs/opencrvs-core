@@ -259,6 +259,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     >
       <Content
         title={intl.formatMessage(navigationMessages.completenessRates)}
+        showTitleOnMobile={true}
         size={ContentSize.LARGE}
         filterContent={getFilter()}
       >

@@ -19,7 +19,7 @@ import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getUserRole } from '@client/utils/userUtils'
 import { Role } from '@client/utils/gateway'
 
 export function Hamburger() {
