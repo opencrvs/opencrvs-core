@@ -421,3 +421,18 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
     : never
 }
 export { updateFHIRBundle, buildFHIRBundle } from './transformers'
+
+export function getInformantType(record: ValidRecord) {
+  const compositionSection = findCompositionSection(
+    'informant-details',
+    getComposition(record)
+  )
+  if (!compositionSection) return undefined
+  const personSectionEntry = compositionSection.entry[0]
+  const personEntry = findEntryFromBundle<RelatedPerson>(
+    record,
+    personSectionEntry.reference
+  )
+
+  return personEntry?.resource.relationship?.coding?.[0].code
+}

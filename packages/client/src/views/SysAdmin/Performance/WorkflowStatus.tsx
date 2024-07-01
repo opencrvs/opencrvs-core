@@ -12,13 +12,12 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
-  formMessages,
-  userMessages
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
@@ -67,14 +66,6 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getUserRole } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 
-type IDispatchProps = {
-  goToSearchResult: typeof goToSearchResult
-}
-
-interface IBasePrintTabProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
-
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -121,41 +112,44 @@ const INITIAL_SORT_MAP = {
 }
 
 export const StatusMapping: IStatusMapping = {
-  IN_PROGRESS: {
+  [RegStatus.InProgress]: {
     labelDescriptor: statusMessages.inProgress,
     color: colors.purple
   },
-  DECLARED: {
+  [RegStatus.Declared]: {
     labelDescriptor: statusMessages.readyForReview,
     color: colors.orange
   },
-  REJECTED: {
+  [RegStatus.Rejected]: {
     labelDescriptor: statusMessages.sentForUpdates,
     color: colors.red
   },
-  VALIDATED: {
+  [RegStatus.Validated]: {
     labelDescriptor: statusMessages.sentForApprovals,
     color: colors.grey300
   },
-  WAITING_VALIDATION: {
+  [RegStatus.WaitingValidation]: {
     labelDescriptor: statusMessages.sentForExternalValidation,
     color: colors.grey500
   },
-  REGISTERED: {
+  [RegStatus.Registered]: {
     labelDescriptor: statusMessages.readyToPrint,
     color: colors.green
   },
-  CERTIFIED: {
+  [RegStatus.Certified]: {
     labelDescriptor: statusMessages.certified,
     color: colors.blue
   },
-
-  ARCHIVED: {
+  [RegStatus.Archived]: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
   },
-  ISSUED: {
+  [RegStatus.Issued]: {
     labelDescriptor: statusMessages.issued,
+    color: colors.blue
+  },
+  [RegStatus.CorrectionRequested]: {
+    labelDescriptor: statusMessages.requestedCorrection,
     color: colors.blue
   }
 }
@@ -178,12 +172,13 @@ const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
   INFORMANT: formMessages.contactDetailsInformant,
-  OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
+  OTHER: formMessages.otherFamilyMember,
   LEGAL_GUARDIAN: formMessages.legalGuardian,
   GRANDMOTHER: formMessages.grandmother,
   GRANDFATHER: formMessages.grandfather,
   BROTHER: formMessages.brother,
-  SISTER: formMessages.sister
+  SISTER: formMessages.sister,
+  SPOUSE: formMessages.spouse
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
@@ -529,7 +524,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             (eventProgress.registration &&
               eventProgress.registration.status &&
               intl.formatMessage(
-                StatusMapping[eventProgress.registration.status].labelDescriptor
+                StatusMapping[
+                  eventProgress.registration.status as keyof IStatusMapping
+                ].labelDescriptor
               )) ||
             ''
 
@@ -598,11 +595,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             nameLocal,
             informant:
               (eventProgress.registration &&
-                ((eventProgress.registration.contactRelationship &&
-                  conditioanllyFormatContactRelationship(
-                    eventProgress.registration.contactRelationship
-                  ) + ' ') ||
-                  '') + (eventProgress.registration.contactNumber || '')) ||
+                [
+                  eventProgress.registration.contactRelationship &&
+                    conditioanllyFormatContactRelationship(
+                      eventProgress.registration.contactRelationship
+                    ),
+                  eventProgress.registration.contactNumber,
+                  eventProgress.registration.contactEmail
+                ]
+                  .filter(Boolean)
+                  .join('\n')) ||
               '',
             declarationStartedOn: formateDateWithRelationalText(
               eventProgress.startedAt
@@ -759,7 +761,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   locationId,
                   new Date(timeStart),
                   new Date(timeEnd),
-                  value,
+                  value as keyof IStatusMapping,
                   event
                 )
               }}
