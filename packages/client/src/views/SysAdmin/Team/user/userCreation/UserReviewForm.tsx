@@ -371,6 +371,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         { sections: [userFormSection] },
         { user: props.formData }
       )
+
       if (variables.user._fhirID) {
         variables.user.id = variables.user._fhirID
         delete variables.user._fhirID
@@ -380,6 +381,8 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         delete variables.user.signature.name
         delete variables.user.signature.__typename //to fix updating registrar bug
       }
+
+      delete variables.user.systemRole
 
       dispatch(
         submitUserFormData(

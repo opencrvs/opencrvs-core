@@ -34,6 +34,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import { UserRole } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -55,6 +56,7 @@ type IProps = {
   nextSectionId: string
   nextGroupId: string
   offlineCountryConfig: IOfflineData
+  userRoles: UserRole[]
 }
 
 type IState = {
@@ -121,6 +123,15 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
   modifyData = (values: any) => {
     const { formData } = this.props
+
+    if (values.role) {
+      values.systemRole = this.props.userRoles.find(
+        (role) => role.id === values.role
+      )!.systemRole
+
+      this.props.modifyUserFormData({ ...formData, ...values })
+    }
+
     if (
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
@@ -192,7 +203,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (state: IStoreState) => {
   return {
-    offlineCountryConfig: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    userRoles: state.userForm.userRoles
   }
 }
 
