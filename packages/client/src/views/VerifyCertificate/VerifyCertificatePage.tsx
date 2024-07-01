@@ -168,13 +168,13 @@ const TimeOutState = () => {
 const isBirthRegistration = (
   data: RegistrationToBeVerified
 ): data is BirthRegistration => {
-  return data?.registration?.type === RegistrationType.Birth
+  return data.registration?.type === RegistrationType.Birth
 }
 
 const isDeathRegistration = (
   data: RegistrationToBeVerified
 ): data is DeathRegistration => {
-  return data?.registration?.type === RegistrationType.Death
+  return data.registration?.type === RegistrationType.Death
 }
 
 export function VerifyCertificatePage() {
