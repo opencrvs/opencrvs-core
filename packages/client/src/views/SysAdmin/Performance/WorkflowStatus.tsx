@@ -17,8 +17,7 @@ import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
-  formMessages,
-  userMessages
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
@@ -66,14 +65,6 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getUserRole } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-
-type IDispatchProps = {
-  goToSearchResult: typeof goToSearchResult
-}
-
-interface IBasePrintTabProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -181,12 +172,13 @@ const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
   INFORMANT: formMessages.contactDetailsInformant,
-  OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
+  OTHER: formMessages.otherFamilyMember,
   LEGAL_GUARDIAN: formMessages.legalGuardian,
   GRANDMOTHER: formMessages.grandmother,
   GRANDFATHER: formMessages.grandfather,
   BROTHER: formMessages.brother,
-  SISTER: formMessages.sister
+  SISTER: formMessages.sister,
+  SPOUSE: formMessages.spouse
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
@@ -603,11 +595,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             nameLocal,
             informant:
               (eventProgress.registration &&
-                ((eventProgress.registration.contactRelationship &&
-                  conditioanllyFormatContactRelationship(
-                    eventProgress.registration.contactRelationship
-                  ) + ' ') ||
-                  '') + (eventProgress.registration.contactNumber || '')) ||
+                [
+                  eventProgress.registration.contactRelationship &&
+                    conditioanllyFormatContactRelationship(
+                      eventProgress.registration.contactRelationship
+                    ),
+                  eventProgress.registration.contactNumber,
+                  eventProgress.registration.contactEmail
+                ]
+                  .filter(Boolean)
+                  .join('\n')) ||
               '',
             declarationStartedOn: formateDateWithRelationalText(
               eventProgress.startedAt

@@ -24,7 +24,6 @@ interface IFormMessages
   SISTER: MessageDescriptor
   LEGAL_GUARDIAN: MessageDescriptor
   informantError: MessageDescriptor
-  SPOUSE: MessageDescriptor
   SON: MessageDescriptor
   OTHER: MessageDescriptor
   SON_IN_LAW: MessageDescriptor
@@ -135,11 +134,6 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is applying for marriage registration?',
     description: 'Who is applying for marriage registration',
     id: 'register.selectInformant.marriageInformantTitle'
-  },
-  SPOUSE: {
-    defaultMessage: 'Spouse',
-    description: 'Label for option Spouse',
-    id: 'form.field.label.informantRelation.spouse'
   },
   SON: {
     defaultMessage: 'Son',
