@@ -56,7 +56,7 @@
     "cross-env": "^7.0.0",
     "jest": "27.5.1",
     "jest-fetch-mock": "^2.1.2",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.0.0",
     "nodemon": "^3.0.0",
     "prettier": "2.8.8",
     "testcontainers": "^9.1.1",

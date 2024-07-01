@@ -73,7 +73,7 @@
     "dotenv": "^6.1.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-styled-components-a11y": "^2.0.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.0.0",
     "prettier": "2.8.8",
     "rimraf": "^5.0.0",
     "storybook": "^7.0.2",
