@@ -12,7 +12,7 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
@@ -121,41 +121,44 @@ const INITIAL_SORT_MAP = {
 }
 
 export const StatusMapping: IStatusMapping = {
-  IN_PROGRESS: {
+  [RegStatus.InProgress]: {
     labelDescriptor: statusMessages.inProgress,
     color: colors.purple
   },
-  DECLARED: {
+  [RegStatus.Declared]: {
     labelDescriptor: statusMessages.readyForReview,
     color: colors.orange
   },
-  REJECTED: {
+  [RegStatus.Rejected]: {
     labelDescriptor: statusMessages.sentForUpdates,
     color: colors.red
   },
-  VALIDATED: {
+  [RegStatus.Validated]: {
     labelDescriptor: statusMessages.sentForApprovals,
     color: colors.grey300
   },
-  WAITING_VALIDATION: {
+  [RegStatus.WaitingValidation]: {
     labelDescriptor: statusMessages.sentForExternalValidation,
     color: colors.grey500
   },
-  REGISTERED: {
+  [RegStatus.Registered]: {
     labelDescriptor: statusMessages.readyToPrint,
     color: colors.green
   },
-  CERTIFIED: {
+  [RegStatus.Certified]: {
     labelDescriptor: statusMessages.certified,
     color: colors.blue
   },
-
-  ARCHIVED: {
+  [RegStatus.Archived]: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
   },
-  ISSUED: {
+  [RegStatus.Issued]: {
     labelDescriptor: statusMessages.issued,
+    color: colors.blue
+  },
+  [RegStatus.CorrectionRequested]: {
+    labelDescriptor: statusMessages.requestedCorrection,
     color: colors.blue
   }
 }
@@ -529,7 +532,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             (eventProgress.registration &&
               eventProgress.registration.status &&
               intl.formatMessage(
-                StatusMapping[eventProgress.registration.status].labelDescriptor
+                StatusMapping[
+                  eventProgress.registration.status as keyof IStatusMapping
+                ].labelDescriptor
               )) ||
             ''
 
@@ -759,7 +764,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   locationId,
                   new Date(timeStart),
                   new Date(timeEnd),
-                  value,
+                  value as keyof IStatusMapping,
                   event
                 )
               }}
