@@ -78,12 +78,12 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import { SystemRoleType } from '@client/utils/gateway'
+import { getCurrencySymbol } from '@client/utils/currencyUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
