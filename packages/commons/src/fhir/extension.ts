@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Address, FhirResourceType, WithStrictExtensions } from '.'
+import {
+  Address,
+  FhirResourceType,
+  URNReference,
+  WithStrictExtensions
+} from '.'
 import { UUID } from '..'
 
 export type StringExtensionType = {
@@ -275,7 +280,6 @@ export function findExtension<URL extends AllExtensions['url']>(
   )
 }
 
-export type URNReference = `urn:uuid:${UUID}`
 export type Location = WithStrictExtensions<
   Omit<fhir3.Location, 'address' | 'partOf'> & {
     address?: Address
