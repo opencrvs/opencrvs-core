@@ -425,6 +425,11 @@ export const formMessageDescriptors = {
     description: 'Label for option Sister',
     id: 'form.field.label.informantRelation.sister'
   },
+  spouse: {
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse',
+    id: 'form.field.label.informantRelation.spouse'
+  },
   userFormTitle: {
     defaultMessage: 'Create new user',
     description: 'The title of user form',
