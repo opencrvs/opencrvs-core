@@ -123,7 +123,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
@@ -704,7 +704,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IBaseAdvancedSearchState
+  initialValues?: IAdvancedSearchFormState
 }
 
 interface IStateProps {
@@ -907,15 +907,15 @@ class FormSectionComponent extends React.Component<Props> {
             `${field.name}exact-yyyy`
           ]
 
-          const areFieldsValid = (fields: any[]) =>
+          const areFieldsTouched = (fields: any[]) =>
             fields.every((field) => touched[field])
 
-          if (isDateField && areFieldsValid(dateFields)) {
-            touched[field.name] = areFieldsValid(dateFields)
+          if (isDateField && areFieldsTouched(dateFields)) {
+            touched[field.name] = areFieldsTouched(dateFields)
           }
 
-          if (isDateRangePickerField && areFieldsValid(dateFields)) {
-            touched[field.name] = areFieldsValid(dateRangeFields)
+          if (isDateRangePickerField && areFieldsTouched(dateFields)) {
+            touched[field.name] = areFieldsTouched(dateRangeFields)
           }
 
           const withDynamicallyGeneratedFields =

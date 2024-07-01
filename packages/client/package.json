@@ -108,8 +108,8 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "@graphql-codegen/add": "^3.1.1",
-    "@graphql-codegen/cli": "^3.0.0",
+    "@graphql-codegen/add": "^5.0.0",
+    "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/introspection": "^3.0.0",
     "@graphql-codegen/typescript": "^3.0.0",
     "@graphql-codegen/typescript-operations": "^3.0.0",
@@ -150,7 +150,7 @@
     "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-react-hooks": "^4.0.8",
     "express": "^4.17.1",
-    "fetch-mock": "^9.0.0",
+    "fetch-mock": "^10.0.0",
     "glob": "^7.1.2",
     "jsonwebtoken": "^9.0.0",
     "opener": "^1.5.1",

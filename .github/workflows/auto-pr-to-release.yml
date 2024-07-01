@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get PR details from workflow dispatch
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -168,6 +168,6 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head $NEW_BRANCH --base ${{ env.RELEASE_BRANCH }} --reviewer $AUTHOR
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --reviewer "$AUTHOR"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

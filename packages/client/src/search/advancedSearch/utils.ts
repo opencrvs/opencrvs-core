@@ -60,7 +60,6 @@ const baseKeysSameAsStore = [
   'registrationNumber',
   'trackingId',
   'declarationLocationId',
-  'declarationJurisdictionId',
   'eventCountry',
   'eventLocationId',
   'eventLocationLevel1',
@@ -92,7 +91,7 @@ export const dateFieldTypes = [
   'informantDoB'
 ]
 
-export interface IBaseAdvancedSearchState {
+export interface IAdvancedSearchFormState {
   event?: string
   registrationStatuses?: string
   dateOfEvent?: IDateRangePickerValue
@@ -105,7 +104,6 @@ export interface IBaseAdvancedSearchState {
   dateOfRegistrationEnd?: string
   placeOfRegistration?: string
   declarationLocationId?: string
-  declarationJurisdictionId?: string
   eventLocationType?: string
   eventCountry?: string
   eventLocationId?: string
@@ -144,7 +142,7 @@ export interface IBaseAdvancedSearchState {
 }
 
 export const transformAdvancedSearchLocalStateToStoreData = (
-  localState: IBaseAdvancedSearchState,
+  localState: IAdvancedSearchFormState,
   offlineData: IOfflineData
 ): IAdvancedSearchParamState => {
   let transformedStoreState: IAdvancedSearchParamState =
@@ -283,8 +281,8 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   reduxState: IAdvancedSearchParamState,
   offlineData: IOfflineData,
   eventType: string
-): IBaseAdvancedSearchState => {
-  const localState: IBaseAdvancedSearchState = baseKeysSameAsStore.reduce(
+): IAdvancedSearchFormState => {
+  const localState: IAdvancedSearchFormState = baseKeysSameAsStore.reduce(
     (ac, curr) => {
       return { ...ac, [curr]: reduxState[curr] }
     },

@@ -20,9 +20,7 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   getComposition,
-  findCompositionSection,
-  findEntryFromBundle,
-  RelatedPerson
+  getInformantType
 } from '@opencrvs/commons/types'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
@@ -73,21 +71,6 @@ function filterInformantSectionFromComposition<
       ...record.entry.filter((e) => e.resource.resourceType !== 'Composition')
     ]
   }
-}
-
-function getInformantType(record: InProgressRecord | ReadyForReviewRecord) {
-  const compositionSection = findCompositionSection(
-    'informant-details',
-    getComposition(record)
-  )
-  if (!compositionSection) return undefined
-  const personSectionEntry = compositionSection.entry[0]
-  const personEntry = findEntryFromBundle<RelatedPerson>(
-    record,
-    personSectionEntry.reference
-  )
-
-  return personEntry?.resource.relationship?.coding?.[0].code
 }
 
 export const updateRoute = createRoute({

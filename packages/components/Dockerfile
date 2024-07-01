@@ -1,29 +1,18 @@
-# Step 1. Build the javascript bundle
+ARG  VERSION=dev
+FROM opencrvs/ocrvs-base:${VERSION}
 
-FROM node:hydrogen-alpine
-WORKDIR /app
-
-RUN apk update && apk upgrade
-
-COPY . .
-
-# Remove packages we don't need to speed up yarn install
-RUN rm -rf /app/packages/*
+USER node
 
 # Copy packages
-COPY packages/components /app/packages/components
-
-RUN apk update && apk upgrade && apk add --no-cache make python3 g++
-RUN yarn install
-
-# Build components
 WORKDIR /app/packages/components
+COPY --chown=node:node packages/components /app/packages/components
+RUN yarn install --frozen-lockfile 
 RUN yarn build-storybook
 
 
 # Step 2. Build the actual image
 
-FROM nginx
+FROM nginx:1.25
 
 RUN apt-get update && apt-get upgrade -y
 

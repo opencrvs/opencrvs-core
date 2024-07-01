@@ -36,7 +36,7 @@ import { Accordion } from '@client/../../components/lib/Accordion'
 import {
   dateFieldTypes,
   getAccordionActiveStateMap,
-  IBaseAdvancedSearchState,
+  IAdvancedSearchFormState,
   isValidDateRangePickerValue,
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
@@ -69,17 +69,17 @@ const {
   deathSearchInformantSection
 } = advancedSearchDeathSections
 
-export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
+export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
   const validNonDateFields = Object.keys(value).filter(
     (key) =>
       !['event', 'eventLocationType'].includes(key) &&
       !dateFieldTypes.includes(key) &&
-      Boolean(value[key as keyof IBaseAdvancedSearchState])
+      Boolean(value[key as keyof IAdvancedSearchFormState])
   )
   //handle date fields separately
   const validationResultsPerDateField = dateFieldTypes.map((key) => {
     const dateObj = value[
-      key as keyof IBaseAdvancedSearchState
+      key as keyof IAdvancedSearchFormState
     ] as IDateRangePickerValue
 
     if (!dateObj) {
@@ -110,7 +110,7 @@ const BirthSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,
@@ -314,7 +314,7 @@ const DeathSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,

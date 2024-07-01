@@ -568,6 +568,7 @@ function RegistrationListComponent(props: IProps) {
     >
       <Content
         title={intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+        showTitleOnMobile={true}
         size={ContentSize.LARGE}
         filterContent={
           <>

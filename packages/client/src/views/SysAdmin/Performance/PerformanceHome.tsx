@@ -50,13 +50,13 @@ import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
 import {
-  StatusMapping,
   getAdditionalLocations,
   CompletenessRateTime,
   isCountry,
   NATIONAL_ADMINISTRATIVE_LEVEL,
   calculateTotal
 } from '@client/views/SysAdmin/Performance/utils'
+import { StatusMapping } from './WorkflowStatus'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 import { AppSources } from './ApplicationSourcesReport'

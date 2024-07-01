@@ -85,6 +85,7 @@ export function request<T>(options: AxiosRequestConfig) {
       // other than 2xx
     } else {
       // Something else happened while setting up the request
+      // eslint-disable-next-line no-console
       console.error('Error Message:', error.message)
       Sentry.captureException(error)
     }
