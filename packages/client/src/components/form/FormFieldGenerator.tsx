@@ -907,17 +907,14 @@ class FormSectionComponent extends React.Component<Props> {
             `${field.name}exact-yyyy`
           ]
 
-          const areFieldsTouched = (fields: any[]) =>
-            fields.every((field) => touched[field] !== undefined)
-
           const areFieldsValid = (fields: any[]) =>
             fields.every((field) => touched[field])
 
-          if (isDateField && areFieldsTouched(dateFields)) {
+          if (isDateField && areFieldsValid(dateFields)) {
             touched[field.name] = areFieldsValid(dateFields)
           }
 
-          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
+          if (isDateRangePickerField && areFieldsValid(dateFields)) {
             touched[field.name] = areFieldsValid(dateRangeFields)
           }
 

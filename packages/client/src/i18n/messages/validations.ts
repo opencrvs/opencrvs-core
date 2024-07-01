@@ -10,7 +10,50 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const messagesToDefine: { [key: string]: MessageDescriptor } = {
+interface IValidationMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
+  phoneNumberNotValid: MessageDescriptor
+  bengaliOnlyNameFormat: MessageDescriptor
+  blockAlphaNumericDot: MessageDescriptor
+  dateFormat: MessageDescriptor
+  dobEarlierThanDom: MessageDescriptor
+  domLaterThanDob: MessageDescriptor
+  emailAddressFormat: MessageDescriptor
+  englishOnlyNameFormat: MessageDescriptor
+  facilityMustBeSelected: MessageDescriptor
+  officeMustBeSelected: MessageDescriptor
+  greaterThanZero: MessageDescriptor
+  isValidBirthDate: MessageDescriptor
+  isValidDateOfDeath: MessageDescriptor
+  isDateNotBeforeBirth: MessageDescriptor
+  isDateNotAfterDeath: MessageDescriptor
+  isMoVisitBeforeBirth: MessageDescriptor
+  isMoVisitAfterDeath: MessageDescriptor
+  isInformantOfLegalAge: MessageDescriptor
+  illegalMarriageAge: MessageDescriptor
+  maxLength: MessageDescriptor
+  minLength: MessageDescriptor
+  notGreaterThan: MessageDescriptor
+  numberRequired: MessageDescriptor
+  phoneNumberFormat: MessageDescriptor
+  range: MessageDescriptor
+  requiredBasic: MessageDescriptor
+  required: MessageDescriptor
+  requiredForNewUser: MessageDescriptor
+  requiredReasonForCorrection: MessageDescriptor
+  requiredSymbol: MessageDescriptor
+  validBirthRegistrationNumber: MessageDescriptor
+  validDeathRegistrationNumber: MessageDescriptor
+  validNationalId: MessageDescriptor
+  validNationalIDLengths: MessageDescriptor
+  duplicateNationalID: MessageDescriptor
+  validPassportNumber: MessageDescriptor
+  validDrivingLicenseNumber: MessageDescriptor
+  nonDecimalPointNumber: MessageDescriptor
+  invalidDate: MessageDescriptor
+}
+
+const messagesToDefine: IValidationMessages = {
   phoneNumberNotValid: {
     id: 'register.SelectContactPoint.phoneNoError',
     defaultMessage: 'Not a valid mobile number',
