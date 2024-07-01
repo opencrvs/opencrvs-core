@@ -96,7 +96,7 @@
     "jest": "27.5.1",
     "jest-fetch-mock": "^2.1.2",
     "lab-transform-typescript": "^3.0.1",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.0.0",
     "nodemon": "^3.0.0",
     "opener": "^1.5.1",
     "prettier": "2.8.8",
