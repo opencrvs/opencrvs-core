@@ -38,8 +38,6 @@ import formatDate, { formatPlainDate } from '@client/utils/date-formatting'
 import {
   BirthRegistration,
   DeathRegistration,
-  History,
-  RecordDetails,
   RegistrationType,
   RegStatus
 } from '@client/utils/gateway'
@@ -47,9 +45,11 @@ import { useTimeout } from '@client/hooks/useTimeout'
 import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
-import { useVerificationRecordDetails } from './useVerificationRecordDetails'
+import {
+  RegistrationToBeVerified,
+  useVerificationRecordDetails
+} from './useVerificationRecordDetails'
 import { generateFullAddress } from '@client/utils/locationUtils'
-import { SUBMISSION_STATUS } from '@client/declarations'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -165,13 +165,13 @@ const TimeOutState = () => {
 }
 
 const isBirthRegistration = (
-  data: RecordDetails
+  data: RegistrationToBeVerified
 ): data is BirthRegistration => {
   return data.registration?.type === RegistrationType.Birth
 }
 
 const isDeathRegistration = (
-  data: RecordDetails
+  data: RegistrationToBeVerified
 ): data is DeathRegistration => {
   return data.registration?.type === RegistrationType.Death
 }
@@ -212,7 +212,7 @@ export function VerifyCertificatePage() {
     blank?.close()
   }
 
-  const getFullName = (data: RecordDetails) => {
+  const getFullName = (data: RegistrationToBeVerified) => {
     if (isBirthRegistration(data)) {
       return (
         data.child?.name?.[0]?.firstNames +
@@ -221,7 +221,7 @@ export function VerifyCertificatePage() {
       )
     }
 
-    if (data.registration?.type === RegistrationType.Death) {
+    if (isDeathRegistration(data)) {
       return (
         data.deceased?.name?.[0]?.firstNames +
         ' ' +
@@ -230,7 +230,7 @@ export function VerifyCertificatePage() {
     }
   }
 
-  const getDateOfBirthOrOfDeceased = (data: RecordDetails) => {
+  const getDateOfBirthOrOfDeceased = (data: RegistrationToBeVerified) => {
     if (isBirthRegistration(data) && data.child?.birthDate) {
       return formatPlainDate(data.child.birthDate)
     }
@@ -240,23 +240,19 @@ export function VerifyCertificatePage() {
     return undefined
   }
 
-  const getGender = (data: RecordDetails) => {
+  const getGender = (data: RegistrationToBeVerified) => {
     if (isBirthRegistration(data)) return data.child?.gender
     if (isDeathRegistration(data)) return data.deceased?.gender
   }
 
-  const getLastCertifiedDate = (data: RecordDetails) => {
+  const getLastCertifiedDate = (data: RegistrationToBeVerified) => {
     // find first certified action from history sorted in ascending order by time
-    return (
-      data.history &&
-      data.history.find(
-        (item) => item?.regStatus?.toString() === SUBMISSION_STATUS.CERTIFIED
-      )
-    )?.date
+    return data.history?.find((item) => item?.regStatus === RegStatus.Certified)
+      ?.date
   }
 
   // This function currently supports upto two location levels
-  const getLocation = (data: RecordDetails) => {
+  const getLocation = (data: RegistrationToBeVerified) => {
     const location = data.eventLocation
 
     if (location?.type === 'HEALTH_FACILITY') {
@@ -289,10 +285,9 @@ export function VerifyCertificatePage() {
       .join(', ')
   }
 
-  const getRegistarData = (data: RecordDetails) => {
+  const getRegistarData = (data: RegistrationToBeVerified) => {
     const history = compact(data.history).find(
-      ({ action, regStatus }: History) =>
-        !action && regStatus === RegStatus.Registered
+      ({ action, regStatus }) => !action && regStatus === RegStatus.Registered
     )
 
     return {
