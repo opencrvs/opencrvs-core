@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@types/fhir": "^0.0.37",
-    "@types/node": "^16.18.39",
+    "@types/node": "^20.0.0",
     "@types/node-fetch": "^2.5.12",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.12.6",
