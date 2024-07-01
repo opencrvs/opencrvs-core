@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
+import { RegStatus } from '@client/utils/gateway'
 
 import {
   Description,
@@ -28,8 +29,8 @@ import { Event } from '@client/utils/gateway'
 
 type Props = WrappedComponentProps & BaseProps
 
-export interface IStatusMapping {
-  [status: string]: { labelDescriptor: MessageDescriptor; color: string }
+export type IStatusMapping = {
+  [status in Exclude<RegStatus, RegStatus.DeclarationUpdated>]: { labelDescriptor: MessageDescriptor; color: string }
 }
 
 interface BaseProps {
@@ -76,13 +77,13 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
                   <ProgressBar
                     id={`${statusCount.status.toLowerCase()}-${index}`}
                     title={intl.formatMessage(
-                      statusMapping![statusCount.status].labelDescriptor
+                      statusMapping![statusCount.status as keyof IStatusMapping].labelDescriptor
                     )}
-                    color={statusMapping![statusCount.status].color}
+                    color={statusMapping![statusCount?.status as keyof IStatusMapping].color}
                     totalPoints={total}
                     disabled={!isAccessibleOffice}
                     onClick={() =>
-                      this.props.onClickStatusDetails(statusCount.status)
+                      this.props.onClickStatusDetails(statusCount.status as keyof IStatusMapping)
                     }
                     currentPoints={statusCount.count}
                   />
