@@ -29,20 +29,19 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger } from '@gateway/logger'
+import { logger, isBase64FileString } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
-import { isBase64FileString } from '@opencrvs/commons'
 import { rateLimitedResolver } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
   Query: {
     getUser: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (_, { userId }, { dataSources }) => {
         const user = await dataSources.usersAPI.getUserById(userId!)
         return user
@@ -50,21 +49,21 @@ export const resolvers: GQLResolver = {
     ),
 
     getUserByMobile: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {
         return dataSources.usersAPI.getUserByMobile(mobile!)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       (_, { email }, { dataSources }) => {
         return dataSources.usersAPI.getUserByEmail(email!)
       }
     ),
 
     searchUsers: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {
@@ -125,7 +124,7 @@ export const resolvers: GQLResolver = {
     ),
 
     searchFieldAgents: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {

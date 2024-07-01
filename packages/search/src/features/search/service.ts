@@ -12,7 +12,7 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
@@ -30,7 +30,14 @@ export async function formatSearchParams(
     parameters
   } = searchPayload
 
-  const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
+  const sort = sortBy ?? [
+    {
+      [sortColumn]: {
+        order: searchPayload.sort ?? SortOrder.ASC,
+        unmapped_type: 'keyword'
+      }
+    }
+  ]
   const query = await advancedQueryBuilder(
     parameters,
     createdBy,
@@ -60,7 +67,7 @@ export const advancedSearch = async (
     })
   } catch (error) {
     if (error.statusCode === 400) {
-      logger.error('Search: bad request')
+      logger.error(`ElasticSearch: bad request. Error: ${error.message}`)
     } else {
       logger.error('Search error: ', error)
     }

@@ -9,6 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  findPatientIdentifier,
+  Patient,
+  SUPPORTED_PATIENT_IDENTIFIER_CODES
+} from '@opencrvs/commons/types'
+import {
   CERTIFIED_STATUS,
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
@@ -437,6 +442,14 @@ export async function advancedQueryBuilder(
     })
   }
 
+  if (params.spouseIdentifier) {
+    must.push({
+      match: {
+        spouseIdentifier: params.spouseIdentifier
+      }
+    })
+  }
+
   if (params.motherFirstNames) {
     must.push({
       multi_match: {
@@ -693,6 +706,11 @@ export async function advancedQueryBuilder(
             match: {
               groomIdentifier: params.nationalId
             }
+          },
+          {
+            match: {
+              spouseIdentifier: params.nationalId
+            }
           }
         ]
       }
@@ -723,34 +741,18 @@ export async function advancedQueryBuilder(
     }
   }
 }
-
-export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export function getSubmittedIdentifier(identifiers: fhir.Identifier[]) {
-  const supportedIdentifiers = [
-    'PASSPORT',
-    'NATIONAL_ID',
-    'MOSIP_PSUT_TOKEN_ID',
-    'DECEASED_PATIENT_ENTRY',
-    'BIRTH_PATIENT_ENTRY',
-    'DRIVING_LICENSE',
-    'BIRTH_REGISTRATION_NUMBER',
-    'DEATH_REGISTRATION_NUMBER',
-    'REFUGEE_NUMBER',
-    'ALIEN_NUMBER',
-    'OTHER',
-    'SOCIAL_SECURITY_NO'
-  ]
-  let value = ''
-  identifiers.find((item) => {
-    const coding = item.type?.coding || []
-    coding.some((codeObj) => {
-      codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
-        ? (value = `${item.value}`)
-        : (value = '')
-    })
-  })
-  return value
-}
+export const findPatientPrimaryIdentifier = (patient: Patient) =>
+  findPatientIdentifier(
+    patient,
+    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter(
+      (code) =>
+        ![
+          'BIRTH_REGISTRATION_NUMBER',
+          'DEATH_REGISTRATION_NUMBER',
+          'MARRIAGE_REGISTRATION_NUMBER',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+        ].includes(code)
+    )
+  )

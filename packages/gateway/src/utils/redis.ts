@@ -11,7 +11,7 @@
 import * as redis from 'redis'
 import { REDIS_HOST } from '@gateway/constants'
 import { promisify } from 'util'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 
 let redisClient: redis.RedisClient
 

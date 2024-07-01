@@ -19,7 +19,7 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 import { PRODUCTION } from '@auth/constants'
 import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 

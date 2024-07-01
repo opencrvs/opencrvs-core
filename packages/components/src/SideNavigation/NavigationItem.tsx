@@ -31,18 +31,18 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   border-radius: 4px;
   padding: 0 8px;
   background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.grey200 : theme.colors.white};
+    isSelected ? theme.colors.grey100 : theme.colors.white};
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme, isSelected }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${({ theme }) => theme.colors.grey50};
     color: ${({ theme }) => theme.colors.grey600};
   }
 
   &:active {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.grey600};
   }
   &:focus-visible {
