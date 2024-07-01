@@ -10,7 +10,7 @@
  */
 
 import { Db, MongoClient } from 'mongodb'
-import { reindex, client } from '../../utils/elasticsearch-helper.js'
+import { client } from '../../utils/elasticsearch-helper.js'
 
 const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
 
@@ -34,7 +34,7 @@ const createEmptyIndex = async () => {
     body: {
       settings: {
         number_of_shards: 1,
-        number_of_replicas: 1
+        number_of_replicas: 0
       }
     }
   })
@@ -63,7 +63,6 @@ const migrateIndexToAlias = async (timestamp: string) => {
 export const up = async (db: Db, _client: MongoClient) => {
   await createEmptyIndex()
   await migrateIndexToAlias('20240514125702-old-format')
-  await reindex('20240514125703')
 }
 
 export const down = async (db: Db, _client: MongoClient) => {
