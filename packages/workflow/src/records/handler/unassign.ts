@@ -19,7 +19,7 @@ import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getUserOrSystemByCriteria } from '@workflow/records/user'
-import { findAssignment } from '@opencrvs/commons/assignment'
+import { findAssignment } from '@opencrvs/commons'
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
