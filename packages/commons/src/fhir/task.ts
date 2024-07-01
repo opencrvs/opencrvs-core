@@ -215,6 +215,19 @@ export function sortTasksDescending(tasks: Task[]) {
   })
 }
 
+export const findTaskHistories = (
+  bundle: Bundle,
+  sort = sortTasksAscending
+) => {
+  return sort(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<TaskHistory> =>
+        isTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
+}
+
 export function addTaskToRecord<T extends Bundle>(
   bundle: T,
   resource: Resource

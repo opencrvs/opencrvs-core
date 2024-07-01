@@ -8,7 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ResourceIdentifier, URNReference, Location } from '../fhir'
+
+import {
+  Address,
+  FhirResourceType,
+  URNReference,
+  WithStrictExtensions
+} from '.'
+import { UUID } from '..'
 
 export type StringExtensionType = {
   'http://opencrvs.org/specs/extension/makeCorrection': {
@@ -130,7 +137,7 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/regLastOffice': {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'
-    valueReference: { reference: string }
+    valueReference: { reference: ResourceIdentifier }
     /**
      * Human readable office name
      */
@@ -272,3 +279,19 @@ export function findExtension<URL extends AllExtensions['url']>(
       extension.url === url
   )
 }
+
+export type Location = WithStrictExtensions<
+  Omit<fhir3.Location, 'address' | 'partOf'> & {
+    address?: Address
+    partOf?: {
+      reference: ResourceIdentifier
+    }
+  }
+>
+
+// Patient/${UUID}
+export type ResourceIdentifier<
+  Resource extends { resourceType: FhirResourceType } = {
+    resourceType: FhirResourceType
+  }
+> = `${Resource['resourceType']}/${UUID}`

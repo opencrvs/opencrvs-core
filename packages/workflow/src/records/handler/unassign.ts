@@ -17,6 +17,9 @@ import { toUnassigned } from '@workflow/records/state-transitions'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
+import { getUserOrSystemByCriteria } from '@workflow/records/user'
+import { findAssignment } from '@opencrvs/commons'
 
 export async function unassignRecordHandler(
   request: Hapi.Request,
@@ -30,6 +33,7 @@ export async function unassignRecordHandler(
   )
 
   const token = getToken(request)
+  const tokenPayload = getTokenPayload(token)
   const record = await getRecordById(
     // Task history is fetched rather than the task only
     `${payload.id}?includeHistoryResources`,
@@ -44,6 +48,20 @@ export async function unassignRecordHandler(
       'CORRECTION_REQUESTED'
     ]
   )
+
+  const assignment = findAssignment(record)
+  if (!assignment) throw new Error('The declaration is not assigned')
+
+  const practitionerId = assignment.practitioner.id
+  const lastUser = await getUserOrSystemByCriteria({ practitionerId }, token)
+
+  // Non-registrars can't unassign declarations from registrars
+  if (
+    !tokenPayload.scope.includes('register') &&
+    lastUser.scope?.includes('register')
+  ) {
+    throw new Error('The declaration cannot be unassigned by this type of user')
+  }
 
   const { unassignedRecord, unassignedRecordWithTaskOnly } = await toUnassigned(
     record,
