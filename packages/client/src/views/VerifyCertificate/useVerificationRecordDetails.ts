@@ -10,7 +10,7 @@
  */
 
 import { gql, useQuery } from '@apollo/client'
-import { Query } from '@client/utils/gateway'
+import { FetchRecordDetailsForVerificationQuery } from '@client/utils/gateway'
 import { useParams } from 'react-router'
 
 const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
@@ -94,6 +94,7 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
         history {
           action
           regStatus
+          date
           user {
             name {
               firstNames
@@ -115,7 +116,7 @@ export const useVerificationRecordDetails = () => {
     loading,
     error,
     data: queryData
-  } = useQuery<Pick<Query, 'fetchRecordDetailsForVerification'>>(
+  } = useQuery<FetchRecordDetailsForVerificationQuery>(
     FETCH_RECORD_DETAILS_FOR_VERIFICATION,
     {
       variables: { id: declarationId },
@@ -126,3 +127,7 @@ export const useVerificationRecordDetails = () => {
 
   return { loading, error, data }
 }
+
+export type RegistrationToBeVerified = NonNullable<
+  FetchRecordDetailsForVerificationQuery['fetchRecordDetailsForVerification']
+>
