@@ -5246,7 +5246,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
-      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
@@ -5606,7 +5605,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
-      requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null
@@ -8576,6 +8574,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             state?: string | null
             city?: string | null
             country?: string | null
+            line?: Array<string | null> | null
           } | null
         } | null
         registration?: {
@@ -8588,6 +8587,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           __typename?: 'History'
           action?: RegAction | null
           regStatus?: RegStatus | null
+          date?: any | null
           user?: {
             __typename?: 'User'
             name: Array<{
@@ -8644,6 +8644,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           __typename?: 'History'
           action?: RegAction | null
           regStatus?: RegStatus | null
+          date?: any | null
           user?: {
             __typename?: 'User'
             name: Array<{
