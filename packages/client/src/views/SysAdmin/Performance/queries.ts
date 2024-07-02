@@ -100,6 +100,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
           status
           contactNumber
           contactRelationship
+          contactEmail
           dateOfDeclaration
           trackingId
           registrationNumber
