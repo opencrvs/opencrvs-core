@@ -260,7 +260,6 @@ class SearchResultView extends React.Component<
         const downloadStatus =
           (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-        const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
         const declarationIsRequestedCorrection =
           reg.declarationStatus === 'REQUESTED_CORRECTION'
         const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
@@ -269,6 +268,9 @@ class SearchResultView extends React.Component<
         const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
         const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
         const declarationIsIssued = reg.declarationStatus === 'ISSUED'
+        const isDeclared = reg.declarationStatus === 'DECLARED'
+        const declarationIsCorrectionRequested =
+          reg.declarationStatus === 'CORRECTION_REQUESTED'
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -281,6 +283,19 @@ class SearchResultView extends React.Component<
           params.get('searchText'),
           params.get('searchType')
         ]
+        const isDeclarationReviewableByRegistrar =
+          declarationIsRejected ||
+          declarationIsValidated ||
+          declarationIsCorrectionRequested ||
+          isDeclared ||
+          declarationIsInProgress
+
+        const isDeclarationReviewableByRegAgent =
+          isDeclared || declarationIsInProgress || declarationIsRejected
+
+        const shouldShowReviewButton =
+          (this.userHasRegisterScope() && isDeclarationReviewableByRegistrar) ||
+          (this.userHasValidateScope() && isDeclarationReviewableByRegAgent)
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
@@ -307,14 +322,7 @@ class SearchResultView extends React.Component<
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (
-            (declarationIsValidated && this.userHasRegisterScope()) ||
-            (!declarationIsValidated &&
-              !declarationIsRegistered &&
-              !declarationIsCertified &&
-              !declarationIsArchived &&
-              this.userHasValidateOrRegistrarScope())
-          ) {
+          } else if (shouldShowReviewButton) {
             actions.push({
               label:
                 declarationIsRejected || declarationIsInProgress
