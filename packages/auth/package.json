@@ -16,7 +16,8 @@
     "request-token": "NODE_PATH=. ts-node resources/request-token",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "debug": "../../debug-service-in-chrome.sh 4040"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",

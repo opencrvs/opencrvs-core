@@ -14,7 +14,8 @@
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "build:clean": "rm -rf build",
-    "extract:translations": "bash extract-translations.sh"
+    "extract:translations": "bash extract-translations.sh",
+    "debug": "../../debug-service-in-chrome.sh 2021"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",

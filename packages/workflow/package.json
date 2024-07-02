@@ -14,7 +14,8 @@
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "debug": "../../debug-service-in-chrome.sh 5050"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",

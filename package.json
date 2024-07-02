@@ -41,7 +41,8 @@
     "seed:dev": "ACTIVATE_USERS=true lerna run seed --stream --scope @opencrvs/data-seeder",
     "seed:prod": "lerna run seed --stream --scope @opencrvs/data-seeder",
     "add:license": "license-check-and-add add -f license-config.json",
-    "build:components": "lerna run build --scope @opencrvs/components"
+    "build:components": "lerna run build --scope @opencrvs/components",
+    "debug": "./debug-service-in-chrome.sh"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

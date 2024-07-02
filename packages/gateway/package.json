@@ -18,7 +18,8 @@
     "gen:types:watch": "nodemon --quiet --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "debug": "../../debug-service-in-chrome.sh 7070"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.13",
