@@ -29,6 +29,7 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
+import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -80,6 +81,16 @@ const baseKeysSameAsStore = [
   'informantFirstNames',
   'informantFamilyName'
 ] as const
+
+export const dateFieldTypes = [
+  'dateOfRegistration',
+  'dateOfEvent',
+  'childDoB',
+  'motherDoB',
+  'fatherDoB',
+  'deceasedDoB',
+  'informantDoB'
+]
 
 export interface IAdvancedSearchFormState {
   event?: string
@@ -501,15 +512,15 @@ export const isValidDateRangePickerValue = (
   dateRangePickerValue: IDateRangePickerValue
 ): boolean => {
   let isValid = false
-  if (!dateRangePickerValue.isDateRangeActive) {
-    if (dateRangePickerValue.exact) {
-      isValid = true
-    }
-  } else {
-    if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd) {
-      isValid = true
-    }
-  }
+  if (
+    !dateRangePickerValue.isDateRangeActive &&
+    dateRangePickerValue.exact &&
+    !isInvalidDate(dateRangePickerValue.exact)
+  )
+    isValid = true
+  else if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd)
+    isValid = true
+
   return isValid
 }
 
