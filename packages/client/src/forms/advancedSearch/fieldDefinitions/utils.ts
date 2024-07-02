@@ -19,7 +19,7 @@ const validateDate = (dateString: string) => {
 }
 
 export function isInvalidDate(date?: string) {
-  if (!date) return false
+  if (!date) return true
   const regEx = /^\d{4}-\d{1,2}-\d{1,2}$/
   if (!date.match(regEx)) {
     return true

@@ -43,7 +43,6 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
-import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 enum TabId {
   BIRTH = 'birth',
@@ -77,33 +76,33 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
       Boolean(value[key as keyof IAdvancedSearchFormState])
   )
   //handle date fields separately
-  const validationResultsPerDateField = dateFieldTypes.map((key) => {
+  const validationResultsPerDateField: boolean[] = []
+
+  for (const key of dateFieldTypes) {
     const dateObj = value[
       key as keyof IAdvancedSearchFormState
     ] as IDateRangePickerValue
 
-    if (!dateObj) {
-      return false
+    if (!dateObj) continue
+
+    if (isValidDateRangePickerValue(dateObj)) {
+      validationResultsPerDateField.push(true)
+      continue
     }
+    /*
+     * if isValidDateRangePickerValue couldn't validate dateObj
+     * the date field would have an invalid value
+     */
+    if (dateObj.exact) validationResultsPerDateField.push(false)
+  }
 
-    if (!isValidDateRangePickerValue(dateObj)) {
-      return false
-    }
+  const validCount =
+    validNonDateFields.length +
+    validationResultsPerDateField.filter((valid) => valid).length
 
-    if (dateObj.exact && isInvalidDate(dateObj.exact)) {
-      return false
-    }
-
-    return true
-  })
-
-  const validDateFields = validationResultsPerDateField.filter((valid) => valid)
-  const invalidDateFields = validationResultsPerDateField.filter(
-    (valid) => !valid
+  return (
+    validCount >= 2 && validationResultsPerDateField.every((isValid) => isValid)
   )
-
-  const validCount = validNonDateFields.length + validDateFields.length
-  return validCount >= 2 && invalidDateFields.length === 0
 }
 
 const BirthSection = () => {
