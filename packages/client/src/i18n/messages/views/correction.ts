@@ -70,6 +70,8 @@ interface ICorrectionMessages
   correctionSummarySubmitter: MessageDescriptor
   correctionSummaryOffice: MessageDescriptor
   correctionSummaryRequestedOn: MessageDescriptor
+  correctRecordDialogTitle: MessageDescriptor
+  correctRecordDialogDescription: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -398,6 +400,20 @@ const messagesToDefine: ICorrectionMessages = {
     description:
       'The description for the dialog when record correction sent by registration agent for approval',
     id: 'correction.correctionForApprovalDialog.description'
+  },
+  correctRecordDialogTitle: {
+    id: 'correction.correctRecordDialog.title',
+    defaultMessage: 'Correct record ?',
+    description:
+      'The title for the dialog when record correction sent by a registrar'
+  },
+
+  correctRecordDialogDescription: {
+    defaultMessage:
+      'The informant will be notified of this correction and a record of this decision will be recorded',
+    description:
+      'The description for the dialog when record correction sent by a registrar',
+    id: 'correction.correctRecordDialog.description'
   },
   correctionSummarySubmitter: {
     id: 'correction.summary.submitter',
