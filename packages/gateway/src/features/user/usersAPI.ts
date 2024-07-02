@@ -11,6 +11,8 @@
 
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { AuthenticationError } from 'apollo-server-errors'
+import { IUserModelData } from './type-resolvers'
 
 type IAvatarResponse = {
   userName: string
@@ -36,7 +38,7 @@ export class UsersAPI extends RESTDataSource {
     return this.get(`users/${id}/avatar`)
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:email:${email}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
@@ -45,14 +47,20 @@ export class UsersAPI extends RESTDataSource {
       return cachedResponse
     }
 
-    const response = this.post('getUser', { email })
+    try {
+      const response = this.post('getUser', { email })
 
-    this.memoizedResults.set(cacheKey, response)
+      this.memoizedResults.set(cacheKey, response)
 
-    return response
+      return await response
+    } catch (e) {
+      // Don't need to throw errors if unauthorized error is found for no user with this email
+      if (e instanceof AuthenticationError) return null
+      else throw e
+    }
   }
 
-  async getUserByMobile(mobile: string) {
+  async getUserByMobile(mobile: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:mobile:${mobile}`
 
     const cachedResponse = this.memoizedResults.get(cacheKey)
@@ -61,11 +69,17 @@ export class UsersAPI extends RESTDataSource {
       return cachedResponse
     }
 
-    const response = this.post('getUser', { mobile })
+    try {
+      const response = this.post('getUser', { mobile })
 
-    this.memoizedResults.set(cacheKey, response)
+      this.memoizedResults.set(cacheKey, response)
 
-    return response
+      return await response
+    } catch (e) {
+      // Don't need to throw errors if unauthorized error is found for no user with this mobile
+      if (e instanceof AuthenticationError) return null
+      else throw e
+    }
   }
   async getUserById(id: string) {
     const cacheKey = `${this.baseURL}/getUser:user:${id}`
