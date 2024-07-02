@@ -59,7 +59,6 @@ const baseKeysSameAsStore = [
   'registrationStatuses',
   'registrationNumber',
   'trackingId',
-  'declarationLocationId',
   'eventCountry',
   'eventLocationId',
   'eventLocationLevel1',
@@ -93,7 +92,6 @@ export interface IAdvancedSearchFormState {
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
   placeOfRegistration?: string
-  declarationLocationId?: string
   eventLocationType?: string
   eventCountry?: string
   eventLocationId?: string
