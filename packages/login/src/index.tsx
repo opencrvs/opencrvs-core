@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
+
 import { App } from '@login/App'
 import { storage } from '@login/storage'
 import { createStore } from './store'
@@ -19,6 +19,11 @@ import { BrowserTracing } from '@sentry/tracing'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
+import { authApi } from './utils/authApi'
+import { delay } from 'lodash'
+import { applicationConfigLoadedAction } from './login/actions'
+
+const RETRY_TIMEOUT = 5000
 
 WebFont.load({
   google: {
@@ -39,32 +44,23 @@ if (
       tracesSampleRate: 1.0
     })
   }
-
-  // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET)
-  }
-
-  // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
-    Sentry.configureScope((scope) => {
-      scope.addEventProcessor(async (event) => {
-        if (!event.extra) {
-          event.extra = {}
-        }
-        const sessionUrl = await new Promise((resolve) => {
-          LogRocket.getSessionURL((url) => {
-            resolve(url)
-          })
-        })
-        event.extra.sessionURL = sessionUrl
-        return event
-      })
-    })
-  }
 }
 const { store, history } = createStore()
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
-root.render(<App store={store} history={history} />)
+
+async function renderAppWithConfig() {
+  return authApi.getApplicationConfig().then((res) => {
+    store.dispatch(applicationConfigLoadedAction(res))
+    root.render(<App store={store} history={history} />)
+  })
+}
+
+function withRetry(render: () => Promise<void>) {
+  render().catch(() => {
+    delay(() => withRetry(render), RETRY_TIMEOUT)
+  })
+}
+
+withRetry(renderAppWithConfig)

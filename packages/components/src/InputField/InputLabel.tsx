@@ -49,21 +49,23 @@ const Required = styled.span<
   flex-grow: 0;
 `
 
-export class InputLabel extends React.Component<IInputLabel> {
-  render() {
-    const { inputDescriptor, required, hideAsterisk, children, tooltip } =
-      this.props
-    return (
-      <StyledInputLabel data-tip={tooltip} {...this.props}>
-        {tooltip && <ReactTooltip />}
-        {children}
-        {required && !hideAsterisk && (
-          <Required disabled={this.props.disabled}>&nbsp;*</Required>
-        )}
-        {inputDescriptor && (
-          <InputDescriptor>{inputDescriptor}</InputDescriptor>
-        )}
-      </StyledInputLabel>
-    )
-  }
+export const InputLabel = (props: IInputLabel) => {
+  const {
+    inputDescriptor,
+    required,
+    hideAsterisk,
+    children,
+    tooltip,
+    disabled
+  } = props
+  return (
+    <StyledInputLabel data-tip={tooltip} {...props}>
+      {tooltip && <ReactTooltip />}
+      {children}
+      {required && !hideAsterisk && (
+        <Required disabled={disabled}>&nbsp;*</Required>
+      )}
+      {inputDescriptor && <InputDescriptor>{inputDescriptor}</InputDescriptor>}
+    </StyledInputLabel>
+  )
 }

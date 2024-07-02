@@ -1,7 +1,7 @@
 FROM alpine:3.9
 
 # Install required packages
-RUN apk add --update --no-cache bash curl coreutils mongodb mongodb-tools
+RUN apk update && apk upgrade && apk add --update --no-cache bash curl coreutils mongodb mongodb-tools
 
 WORKDIR /usr/scheduler
 

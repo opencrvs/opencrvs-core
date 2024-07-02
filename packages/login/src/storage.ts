@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as localForage from 'localforage'
+import localForage from 'localforage'
 
 function configStorage(dbName: string) {
   localForage.config({

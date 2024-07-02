@@ -78,18 +78,24 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_APPROVE,
   [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.READY_TO_REGISTER,
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
-  [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
+  [SubmissionAction.MAKE_CORRECTION]:
+    SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  [SubmissionAction.REQUEST_CORRECTION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ISSUE,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.READY_TO_CERTIFY,
-  [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
+  [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  [SubmissionAction.APPROVE_CORRECTION]:
+    SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  [SubmissionAction.REJECT_CORRECTION]:
+    SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 } as const
 
 export const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -695,6 +701,7 @@ export function appendStringToKeys(
 }
 
 export const mockDeclarationData = {
+  template: {},
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -787,6 +794,7 @@ export const mockDeclarationData = {
 }
 
 export const mockDeathDeclarationData = {
+  template: {},
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',

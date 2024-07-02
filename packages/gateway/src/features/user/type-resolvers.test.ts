@@ -10,10 +10,15 @@
  */
 import {
   IUserModelData,
-  userTypeResolvers
+  userTypeResolvers as typeResolvers
 } from '@gateway/features/user/type-resolvers'
-import * as fetch from 'jest-fetch-mock'
+
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import { TestResolvers } from '@gateway/utils/testUtils'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
+
+const userTypeResolvers = typeResolvers as unknown as TestResolvers
 
 const mockGet = jest.fn()
 jest.mock('apollo-datasource-rest', () => {
@@ -131,10 +136,20 @@ describe('User type resolvers', () => {
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
     mockGet.mockResolvedValueOnce(mockOffice)
-    const res = await userTypeResolvers.User!.primaryOffice(
+    const locationsAPI = new LocationsAPI()
+    locationsAPI.context = {
+      record: null
+    }
+    const res = await userTypeResolvers.User.primaryOffice(
       mockResponse,
       undefined,
-      { dataSources: { locationsAPI: new LocationsAPI() } }
+      {
+        dataSources: {
+          locationsAPI: {
+            getLocation: () => mockOffice
+          }
+        }
+      }
     )
     expect(res).toEqual(mockOffice)
   })
@@ -310,12 +325,13 @@ describe('User type resolvers', () => {
       .mockResolvedValueOnce(mockLocations[1])
       .mockResolvedValueOnce(mockLocations[2])
       .mockResolvedValueOnce(mockLocations[3])
-
-    const res = await userTypeResolvers.User!.catchmentArea(
+    const locationsAPI = new LocationsAPI()
+    locationsAPI.context = { record: null }
+    const res = await userTypeResolvers.User.catchmentArea(
       mockResponse,
       undefined,
       {
-        dataSources: { locationsAPI: new LocationsAPI() }
+        dataSources: { locationsAPI }
       }
     )
     expect(res).toEqual(mockLocations)
@@ -387,7 +403,14 @@ describe('User type resolvers', () => {
     const response = await userTypeResolvers.User!.localRegistrar(
       mockResponse,
       undefined,
-      { headers: undefined }
+      {
+        headers: undefined,
+        dataSources: {
+          fhirAPI: {
+            getPractitioner: () => practitioner
+          }
+        }
+      }
     )
 
     expect(response).toEqual({
@@ -430,7 +453,14 @@ describe('User type resolvers', () => {
     const response = await userTypeResolvers.User!.localRegistrar(
       userResponse,
       undefined,
-      { headers: undefined }
+      {
+        headers: undefined,
+        dataSources: {
+          fhirAPI: {
+            getPractitioner: () => practitioner
+          }
+        }
+      }
     )
 
     expect(response).toEqual({

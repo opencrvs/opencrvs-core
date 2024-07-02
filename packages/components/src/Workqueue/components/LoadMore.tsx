@@ -19,9 +19,6 @@ interface ILoadMoreCustomProps {
   loadMoreText: string
   usageTableType?: UsageTableType
 }
-interface IState {
-  canNext: boolean
-}
 
 const LoadMoreContainer = styled.div<{ usageTableType?: UsageTableType }>`
   width: 100%;
@@ -43,17 +40,18 @@ const StyledButton = styled(Button)`
   text-decoration: underline;
 `
 
-export class LoadMore extends React.Component<ILoadMoreCustomProps, IState> {
-  render() {
-    return (
-      <LoadMoreContainer usageTableType={this.props.usageTableType}>
-        <StyledButton
-          id="load_more_button"
-          onClick={() => this.props.onLoadMore(this.props.initialPage + 1)}
-        >
-          {this.props.loadMoreText}
-        </StyledButton>
-      </LoadMoreContainer>
-    )
-  }
-}
+export const LoadMore = ({
+  usageTableType,
+  onLoadMore,
+  loadMoreText,
+  initialPage
+}: ILoadMoreCustomProps) => (
+  <LoadMoreContainer usageTableType={usageTableType}>
+    <StyledButton
+      id="load_more_button"
+      onClick={() => onLoadMore(initialPage + 1)}
+    >
+      {loadMoreText}
+    </StyledButton>
+  </LoadMoreContainer>
+)

@@ -30,6 +30,7 @@ interface IAdvancedSearchMessages
   recordStatusRegistered: MessageDescriptor
   recordStatusCertified: MessageDescriptor
   recordStatusAchived: MessageDescriptor
+  recordStatusCorrectionRequested: MessageDescriptor
   show: MessageDescriptor
   hide: MessageDescriptor
 }
@@ -124,6 +125,11 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Archived',
     description: 'Option for form field: status of record',
     id: 'advancedSearch.form.recordStatusAchived'
+  },
+  recordStatusCorrectionRequested: {
+    defaultMessage: 'Correction requested',
+    description: 'Option for form field: status of record',
+    id: 'advancedSearch.form.recordStatusCorrectionRequested'
   },
   hide: {
     defaultMessage: 'Hide',

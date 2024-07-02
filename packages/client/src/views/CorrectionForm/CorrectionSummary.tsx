@@ -16,7 +16,7 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { connect } from 'react-redux'
-import { get, propertyOf } from 'lodash'
+import { get } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -48,12 +48,15 @@ import {
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   SuccessButton,
   SecondaryButton,
   LinkButton,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import styled from 'styled-components'
@@ -84,6 +87,9 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
+import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
+import { SystemRoleType } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -94,6 +100,7 @@ const SupportingDocument = styled.div`
 `
 interface IProps {
   userPrimaryOffice?: UserDetails['primaryOffice']
+  userRole?: UserDetails['systemRole']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -105,6 +112,7 @@ type IStateProps = {
 
 type IState = {
   isFileUploading: boolean
+  showPrompt: boolean
 }
 
 type IDispatchProps = {
@@ -119,34 +127,12 @@ type IDispatchProps = {
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
-  section = correctionFeesPaymentSection
-  group = this.section.groups[0]
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      isFileUploading: false
+      isFileUploading: false,
+      showPrompt: false
     }
-  }
-
-  componentDidMount() {
-    this.group = {
-      ...this.group,
-      fields: replaceInitialValues(
-        this.group.fields,
-        this.props.declaration.data[this.section.id] || {},
-        this.props.declaration.data
-      )
-    }
-    const currency = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
-
-    ;(
-      this.group.fields[0].nestedFields as any
-    ).REQUIRED[0].label.defaultMessage = this.props.intl.formatMessage(
-      messages.correctionSummaryTotalPaymentLabel,
-      { currency }
-    )
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
@@ -156,14 +142,35 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     })
   }
 
+  togglePrompt = () => {
+    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  }
+
   render() {
     const {
       registerForm,
       declaration,
       intl,
       goBack,
-      declaration: { event }
+      declaration: { event },
+      userRole
     } = this.props
+
+    const currencySymbol = getCurrencySymbol(
+      this.props.offlineResources.config.CURRENCY
+    )
+    const section = correctionFeesPaymentSection(currencySymbol)
+
+    const group = {
+      ...section.groups[0],
+      fields: replaceInitialValues(
+        section.groups[0].fields,
+        this.props.declaration.data[section.id] || {},
+        this.props.declaration.data
+      )
+    }
+
+    const { showPrompt } = this.state
     const formSections = getViewableSection(registerForm[event], declaration)
     const relationShip = (
       declaration.data.corrector.relationship as IFormSectionData
@@ -187,15 +194,17 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <SuccessButton
         id="make_correction"
         key="make_correction"
-        onClick={this.makeCorrection}
+        onClick={this.togglePrompt}
         disabled={
-          sectionHasError(this.group, this.section, declaration) ||
+          sectionHasError(group, section, declaration) ||
           this.state.isFileUploading
         }
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
-        {intl.formatMessage(buttonMessages.makeCorrection)}
+        {userRole === ROLE_REGISTRATION_AGENT
+          ? intl.formatMessage(buttonMessages.sendForApproval)
+          : intl.formatMessage(buttonMessages.makeCorrection)}
       </SuccessButton>
     )
 
@@ -344,22 +353,65 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <FormFieldGenerator
-              id={this.group.id}
+              id={group.id}
               onChange={(values) => {
                 this.modifyDeclaration(
                   values,
-                  correctionFeesPaymentSection,
+                  correctionFeesPaymentSection(currencySymbol),
                   declaration
                 )
               }}
               setAllFieldsDirty={false}
-              fields={this.group.fields}
+              fields={group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
               requiredErrorMessage={messages.correctionRequiredLabel}
             />
           </Content>
         </ActionPageLight>
+        <Dialog
+          id="withoutCorrectionForApprovalPrompt"
+          isOpen={showPrompt}
+          title={intl.formatMessage(
+            this.props.userRole === ROLE_REGISTRATION_AGENT
+              ? messages.correctionForApprovalDialogTitle
+              : messages.correctRecordDialogTitle
+          )}
+          onClose={this.togglePrompt}
+          actions={[
+            <Button
+              id="cancel"
+              key="cancel"
+              size="medium"
+              type="tertiary"
+              onClick={this.togglePrompt}
+            >
+              {intl.formatMessage(messages.correctionForApprovalDialogCancel)}
+            </Button>,
+            <Button
+              type="positive"
+              size="medium"
+              id="send"
+              key="continue"
+              onClick={() => {
+                this.makeCorrection(userRole)
+                this.togglePrompt()
+              }}
+            >
+              {intl.formatMessage(messages.correctionForApprovalDialogConfirm)}
+            </Button>
+          ]}
+        >
+          <p>
+            <Text element="p" variant="reg16">
+              {intl.formatMessage(
+                this.props.userRole === ROLE_REGISTRATION_AGENT
+                  ? messages.correctionForApprovalDialogDescription
+                  : messages.correctRecordDialogDescription
+              )}
+            </Text>
+          </p>
+        </Dialog>
       </>
     )
   }
@@ -923,15 +975,36 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
   }
 
-  makeCorrection = () => {
+  makeCorrection = (userRole: SystemRoleType | undefined) => {
     const declaration = this.props.declaration
-    declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
-    declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
-    updateDeclarationRegistrationWithCorrection(declaration, {
-      userPrimaryOffice: this.props.userPrimaryOffice
-    })
+    if (userRole === ROLE_REGISTRATION_AGENT) {
+      declaration.action = SubmissionAction.REQUEST_CORRECTION
+      declaration.submissionStatus =
+        SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    } else {
+      declaration.action = SubmissionAction.MAKE_CORRECTION
+      declaration.submissionStatus =
+        SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    }
+    const correction = updateDeclarationRegistrationWithCorrection(
+      declaration.data,
+      {
+        userPrimaryOffice: this.props.userPrimaryOffice
+      }
+    )
+
+    declaration.data.registration.correction = {
+      ...((declaration.data.registration.correction as IFormSectionData) || {}),
+      ...correction
+    }
+
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+
+    if (userRole === ROLE_REGISTRATION_AGENT) {
+      this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+    } else {
+      this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+    }
   }
 
   gotoReviewPage = () => {
@@ -950,7 +1023,8 @@ export const CorrectionSummary = connect(
     registerForm: getRegisterForm(state),
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
-    userPrimaryOffice: getUserDetails(state)?.primaryOffice
+    userPrimaryOffice: getUserDetails(state)?.primaryOffice,
+    userRole: getUserDetails(state)?.systemRole
   }),
   {
     modifyDeclaration,

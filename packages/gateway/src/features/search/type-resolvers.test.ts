@@ -8,9 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { searchTypeResolvers as resolvers } from '@gateway/features/search/type-resolvers'
+import { TestResolvers } from '@gateway/utils/testUtils'
 import * as fetchAny from 'jest-fetch-mock'
-
+const searchTypeResolvers = resolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
 beforeEach(() => {
@@ -623,29 +624,7 @@ describe('Search type resolvers', () => {
       })
       expect(startedAt).toBe('2019-12-12T15:21:51.355Z')
     })
-    it('return user model data', async () => {
-      fetch.resetMocks()
-      fetch.mockResponse(
-        JSON.stringify({
-          _id: 'dummy_user_id'
-        })
-      )
-      const userModelData =
-        await searchTypeResolvers.EventProgressSet!.startedBy(
-          {
-            _source: {
-              createdBy: 'dummy_practioner_id'
-            }
-          },
-          {},
-          {
-            Authorization: 'dummy_token'
-          }
-        )
-      expect(userModelData).toEqual({
-        _id: 'dummy_user_id'
-      })
-    })
+
     it('return progress report', async () => {
       fetch.resetMocks()
       fetch.mockResponse(

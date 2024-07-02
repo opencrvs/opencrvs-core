@@ -17,15 +17,7 @@ export default async function getDashboardQueries(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const token = request.headers.authorization
-  const response = await fetch(
-    `${COUNTRY_CONFIG_URL}/dashboards/queries.json`,
-    {
-      headers: {
-        Authorization: token
-      }
-    }
-  )
+  const response = await fetch(`${COUNTRY_CONFIG_URL}/dashboards/queries.json`)
 
   if (response.status === 404) {
     return defaultQueries()

@@ -17,7 +17,7 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { checkVerificationCode } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 
 interface IVerifyNumberPayload {
   nonce: string

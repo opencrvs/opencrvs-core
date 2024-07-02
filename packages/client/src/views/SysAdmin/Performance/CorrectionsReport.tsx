@@ -18,7 +18,7 @@ import {
   ReportContainer,
   ListContainer
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLCorrectionMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'

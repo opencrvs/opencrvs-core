@@ -76,31 +76,34 @@ const TopRight = styled.span`
   right: 15px;
 `
 
-export class Modal extends React.Component<IProps> {
-  render() {
-    const { title, actions, show, handleClose, className } = this.props
-
-    if (!show) {
-      return null
-    }
-
-    return (
-      <Backdrop className={className}>
-        <ModalContent>
-          {title && <Heading>{title}</Heading>}
-          {handleClose && (
-            <TopRight onClick={handleClose}>
-              <Cross />
-            </TopRight>
-          )}
-          {this.props.children}
-          <Actions>
-            {actions.map((action, i) => (
-              <ActionItems key={i}>{action}</ActionItems>
-            ))}
-          </Actions>
-        </ModalContent>
-      </Backdrop>
-    )
+export const Modal = ({
+  title,
+  actions,
+  show,
+  handleClose,
+  className,
+  children
+}: IProps) => {
+  if (!show) {
+    return null
   }
+
+  return (
+    <Backdrop className={className}>
+      <ModalContent>
+        {title && <Heading>{title}</Heading>}
+        {handleClose && (
+          <TopRight onClick={handleClose}>
+            <Cross />
+          </TopRight>
+        )}
+        {children}
+        <Actions>
+          {actions.map((action, i) => (
+            <ActionItems key={i}>{action}</ActionItems>
+          ))}
+        </Actions>
+      </ModalContent>
+    </Backdrop>
+  )
 }

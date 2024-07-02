@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { mergeConfig } from 'vite'
-import remarkGfm from 'remark-gfm'
 import type { StorybookConfig } from '@storybook/react-vite'
-import BRAND_BLUE from './theme'
 
 const viteFinal = async (config: Record<string, any>) => {
   // return the customized config
@@ -38,16 +36,7 @@ const config: StorybookConfig = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-a11y',
-    {
-      name: '@storybook/addon-docs',
-      options: {
-        mdxPluginOptions: {
-          mdxCompileOptions: {
-            remarkPlugins: [remarkGfm]
-          }
-        }
-      }
-    }
+    '@storybook/addon-docs'
   ],
   staticDirs: ['../public'],
   framework: {

@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
     "lib": [
       "esnext.asynciterable",

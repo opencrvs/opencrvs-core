@@ -20,7 +20,7 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 import { OIDPVerificationCallback } from './OIDPVerificationCallback'
 import { URLSearchParams } from 'url'
-import { useQueryParams, useExtractCallBackState, useCheckNonce } from './utils'
+import { useQueryParams, useExtractCallBackState } from './utils'
 import { GET_OIDP_USER_INFO } from './queries'
 import { createDeclaration, storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
@@ -131,7 +131,6 @@ beforeEach(async () => {
   ;(useQueryParams as Mock).mockImplementation(
     () => new URLSearchParams({ code: '1234' })
   )
-  ;(useCheckNonce as Mock).mockImplementation(() => true)
 
   await store.dispatch(checkAuth())
   await store.dispatch(storeDeclaration(draft))

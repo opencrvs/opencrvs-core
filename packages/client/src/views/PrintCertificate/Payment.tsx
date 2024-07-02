@@ -82,10 +82,9 @@ class PaymentComponent extends React.Component<IFullProps> {
               ...certificate,
               payments: {
                 type: 'MANUAL' as const,
-                total: Number(paymentAmount),
                 amount: Number(paymentAmount),
                 outcome: 'COMPLETED' as const,
-                date: Date.now()
+                date: new Date().toISOString()
               }
             }
           ]

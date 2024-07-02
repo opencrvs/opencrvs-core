@@ -15,7 +15,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { IForm, IFormSection, IFormField } from '@client/forms'
+import { IForm, IFormSection } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -39,12 +39,11 @@ import {
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { CorrectionReason } from '@client/forms/correction/reason'
-import { Table } from '@client/../../components/lib'
+import { Table } from '@opencrvs/components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -107,7 +106,8 @@ function prepareComments(
   if (
     !draft ||
     (actionDetailsData.action &&
-      actionDetailsData.action !== RegAction.RequestedCorrection)
+      actionDetailsData.action !== RegAction.RequestedCorrection &&
+      actionDetailsData.action !== RegAction.Corrected)
   ) {
     return []
   }
@@ -153,7 +153,7 @@ const requesterLabelMapper = (
   // informant info added for corrector being informant
   return requesterIndividual?.label
     ? intl.formatMessage(requesterIndividual.label, {
-        informant: labelFormatterForInformant(informant)
+        informant
       })
     : ''
 }
@@ -303,10 +303,8 @@ const ActionDetailsModalListTable = ({
       ) as IFormSection
 
       if (section.id === 'documents') {
-        item.valueString = EMPTY_STRING
-        editedValue.valueString = intl.formatMessage(
-          dynamicConstantsMessages.updated
-        )
+        item.value = EMPTY_STRING
+        editedValue.value = intl.formatMessage(dynamicConstantsMessages.updated)
       }
 
       const indexes = item?.valueId?.split('.')
@@ -323,23 +321,19 @@ const ActionDetailsModalListTable = ({
 
         const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
           (field) => field.name === nestedField
-        ) as IFormField
+        )
 
-        result.push({
-          item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
-        })
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
+        if (fieldObj) {
+          result.push({
+            item: getItemName(section.name, fieldObj.label),
+            original: getFieldValue(item.value, fieldObj, offlineData, intl),
+            edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
+          })
+        }
       } else {
         const [parentField] = indexes
 
@@ -347,23 +341,19 @@ const ActionDetailsModalListTable = ({
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name === parentField) as IFormField
+        ).find((field) => field.name === parentField)
 
-        result.push({
-          item: getItemName(section.name, fieldObj.label),
-          original: getFieldValue(
-            item.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          ),
-          edit: getFieldValue(
-            editedValue.valueString,
-            fieldObj,
-            offlineData,
-            intl
-          )
-        })
+        /**
+         *  Adding a check if fieldObj there or not to prevent
+         *  application crash on accessing label from undefined fieldObj
+         */
+        if (fieldObj) {
+          result.push({
+            item: getItemName(section.name, fieldObj.label),
+            original: getFieldValue(item.value, fieldObj, offlineData, intl),
+            edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
+          })
+        }
       }
     })
 
@@ -457,16 +447,26 @@ const ActionDetailsModalListTable = ({
 
       {/* Correction Requester */}
       {actionDetailsData.requester &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={requesterColumn}
             content={[{ requester: requesterLabel }]}
           />
         )}
+      {/* Correction rejected */}
+      {actionDetailsData.action === RegAction.RejectedCorrection && (
+        <Table
+          noResultText=" "
+          columns={reasonColumn}
+          content={[{ text: actionDetailsData.reason }]}
+        />
+      )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.action === RegAction.RequestedCorrection &&
+      {(actionDetailsData.action === RegAction.RequestedCorrection ||
+        actionDetailsData.action === RegAction.Corrected) &&
         actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
@@ -491,7 +491,8 @@ const ActionDetailsModalListTable = ({
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={correctionReasonColumn}
@@ -537,6 +538,7 @@ const ActionDetailsModalListTable = ({
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
         (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected ||
           actionDetailsData.regStatus === RegStatus.DeclarationUpdated) && (
           <Table
             noResultText=" "
@@ -550,28 +552,30 @@ const ActionDetailsModalListTable = ({
         )}
 
       {/* For Certificate */}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollector}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
-      {!isEmpty(collectorData) && (
-        <Table
-          noResultText=" "
-          columns={certificateCollectorVerified}
-          content={[collectorData]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollector}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
+      {!isEmpty(collectorData) &&
+        actionDetailsData.regStatus !== RegStatus.Issued && (
+          <Table
+            noResultText=" "
+            columns={certificateCollectorVerified}
+            content={[collectorData]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&

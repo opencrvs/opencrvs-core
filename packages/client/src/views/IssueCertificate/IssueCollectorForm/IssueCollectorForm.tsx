@@ -22,12 +22,16 @@ import { useDispatch } from 'react-redux'
 import { PrimaryButton } from '@client/../../components/lib/buttons'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
+  formatUrl,
   goToIssueCertificate,
   goToVerifyIssueCollector
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { getIssueCertCollectorGroupForEvent } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { Redirect } from 'react-router'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 export function IssueCollectorForm({
   declaration
@@ -75,6 +79,17 @@ export function IssueCollectorForm({
     } else {
       dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
     }
+  }
+
+  if (!declaration) {
+    return (
+      <Redirect
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToIssue,
+          selectorId: ''
+        })}
+      />
+    )
   }
 
   return (

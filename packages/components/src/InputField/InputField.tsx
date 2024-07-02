@@ -80,94 +80,94 @@ export enum THEME_MODE {
   DARK = 'dark'
 }
 
-export class InputField extends React.Component<IInputFieldProps, {}> {
-  render() {
-    const {
-      id,
-      label,
-      helperText,
-      tooltip,
-      required = true,
-      description,
-      error,
-      touched,
-      ignoreMediaQuery,
-      hideAsterisk,
-      hideErrorLabel,
-      hideInputHeader = false,
-      mode
-    } = this.props
+export const InputField = (props: IInputFieldProps) => {
+  const {
+    id,
+    label,
+    helperText,
+    tooltip,
+    required = true,
+    description,
+    error,
+    touched,
+    ignoreMediaQuery,
+    hideAsterisk,
+    hideErrorLabel,
+    hideInputHeader = false,
+    mode,
+    prefix
+  } = props
 
-    const postfix = this.props.postfix as React.ReactNode | string
-    const unit = this.props.unit as React.ReactNode | string
+  const postfix = props.postfix as React.ReactNode | string
+  const unit = props.unit as React.ReactNode | string
 
-    const { prefix } = this.props
+  let color: string | undefined
+  let hideBorder: boolean
 
-    let color: string | undefined
-    let hideBorder: boolean
-    if (mode && mode === THEME_MODE.DARK) {
-      color = colors.white
-      hideBorder = true
-    }
-    const isDomElement = (
-      nodeType: string | React.JSXElementConstructor<any>
-    ) => {
-      return typeof nodeType === 'string'
-    }
-    const children = React.Children.map(
-      this.props.children,
-      (node: React.ReactElement) => {
-        if (!node) return
-        return isDomElement(node.type)
-          ? node
-          : React.cloneElement(node, { hideBorder })
-      }
-    )
-
-    return (
-      <div id={`${id}-form-input`} className={this.props.className}>
-        {!hideInputHeader && (
-          <InputHeader>
-            {label && (
-              <InputLabel
-                id={`${id}_label`}
-                inputDescriptor={helperText}
-                disabled={this.props.disabled}
-                ignoreMediaQuery={ignoreMediaQuery}
-                color={color}
-                required={required}
-                hideAsterisk={hideAsterisk}
-                tooltip={tooltip}
-              >
-                {label}
-              </InputLabel>
-            )}
-          </InputHeader>
-        )}
-
-        <ComponentWrapper>
-          {prefix && <Padding>{prefix}</Padding>}
-          {children}
-          {!unit && postfix && <PostFixPadding>{postfix}</PostFixPadding>}
-          {unit && !postfix && <PostFixPadding>{unit}</PostFixPadding>}
-        </ComponentWrapper>
-
-        {error && touched && !hideErrorLabel && (
-          <InputError
-            id={this.props.id + '_error'}
-            ignoreMediaQuery={ignoreMediaQuery}
-            color={color}
-          >
-            {error}
-          </InputError>
-        )}
-
-        {description && (
-          <InputDescription ignoreMediaQuery={ignoreMediaQuery} color={color}>
-            {description}
-          </InputDescription>
-        )}
-      </div>
-    )
+  if (mode && mode === THEME_MODE.DARK) {
+    color = colors.white
+    hideBorder = true
   }
+
+  const isDomElement = (
+    nodeType: string | React.JSXElementConstructor<any>
+  ) => {
+    return typeof nodeType === 'string'
+  }
+
+  const children = React.Children.map(
+    props.children,
+    (node: React.ReactElement) => {
+      if (!node) return
+      return isDomElement(node.type)
+        ? node
+        : React.cloneElement(node, { hideBorder })
+    }
+  )
+
+  return (
+    <div id={`${id}-form-input`} className={props.className}>
+      {!hideInputHeader && (
+        <InputHeader>
+          {label && (
+            <InputLabel
+              id={`${id}_label`}
+              inputDescriptor={helperText}
+              disabled={props.disabled}
+              ignoreMediaQuery={ignoreMediaQuery}
+              color={color}
+              required={required}
+              hideAsterisk={hideAsterisk}
+              tooltip={tooltip}
+            >
+              {label}
+            </InputLabel>
+          )}
+        </InputHeader>
+      )}
+
+      <ComponentWrapper>
+        {prefix && <Padding>{prefix}</Padding>}
+        {children}
+        {!unit && postfix && <PostFixPadding>{postfix}</PostFixPadding>}
+        {unit && !postfix && <PostFixPadding>{unit}</PostFixPadding>}
+      </ComponentWrapper>
+
+      {error && touched && !hideErrorLabel && (
+        <InputError
+          id={props.id + '_error'}
+          ignoreMediaQuery={ignoreMediaQuery}
+          color={color}
+        >
+          {error}
+        </InputError>
+      )}
+
+      {description && (
+        <InputDescription ignoreMediaQuery={ignoreMediaQuery} color={color}>
+          {description}
+        </InputDescription>
+      )}
+    </div>
+  )
 }

@@ -65,9 +65,15 @@ const createUserMutation = print(gql`
   }
 `)
 
-async function getUseres() {
+async function getUsers(token: string) {
   const url = new URL('users', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
@@ -147,7 +153,7 @@ export async function seedUsers(
   token: string,
   roleIdMap: Record<string, string | undefined>
 ) {
-  const rawUsers = await getUseres()
+  const rawUsers = await getUsers(token)
   for (const userMetadata of rawUsers) {
     const {
       givenNames,

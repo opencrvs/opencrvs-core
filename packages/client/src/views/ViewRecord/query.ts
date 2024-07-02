@@ -110,12 +110,12 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument

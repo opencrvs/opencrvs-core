@@ -17,12 +17,11 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
-import { formMessages } from '@client/i18n/messages'
+import { formMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Event } from '@client/utils/gateway'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { getFilteredRadioOptions } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 export enum CorrectorRelationship {
   //death
@@ -72,6 +71,10 @@ export const CorrectorRelationLabelArray = [
 ]
 
 export const CollectorRelationLabelArray = [
+  {
+    value: CorrectorRelationship.INFORMANT,
+    label: constantsMessages.declarationInformantLabel
+  },
   { value: CorrectorRelationship.MOTHER, label: messages.mother },
   { value: CorrectorRelationship.FATHER, label: messages.father },
   { value: CorrectorRelationship.CHILD, label: messages.child },
@@ -104,13 +107,12 @@ export const getCorrectorSection = (
 ): IFormSection => {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
-
   const initialOptions: IRadioOption[] = [
     {
       value: CorrectorRelationship.INFORMANT,
       label: messages.informant,
       param: {
-        informant: labelFormatterForInformant(informant)
+        informant: informant
       }
     },
     {

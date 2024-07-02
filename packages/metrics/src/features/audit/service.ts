@@ -28,6 +28,9 @@ type UserAuditAction =
   | 'IN_PROGRESS'
   | 'REJECTED'
   | 'CORRECTED'
+  | 'REQUESTED_CORRECTION'
+  | 'APPROVED_CORRECTION'
+  | 'REJECTED_CORRECTION'
   | 'VALIDATED'
   | 'DECLARATION_UPDATED'
   | 'ASSIGNED'
@@ -71,6 +74,9 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'IN_PROGRESS'>
   | UserAuditDataPointWithComposition<'REJECTED'>
   | UserAuditDataPointWithComposition<'CORRECTED'>
+  | UserAuditDataPointWithComposition<'REQUESTED_CORRECTION'>
+  | UserAuditDataPointWithComposition<'APPROVED_CORRECTION'>
+  | UserAuditDataPointWithComposition<'REJECTED_CORRECTION'>
   | UserAuditDataPointWithComposition<'VALIDATED'>
   | UserAuditDataPointWithComposition<'DECLARATION_UPDATED'>
   | UserAuditDataPointWithComposition<'ASSIGNED'>

@@ -13,7 +13,7 @@ import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
 import { postUserActionToMetrics } from '@auth/features/authenticate/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 
 interface IInvalidateTokenPayload {
   token: string

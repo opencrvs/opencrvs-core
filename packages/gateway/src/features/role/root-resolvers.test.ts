@@ -8,11 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/role/root-resolvers'
+import { resolvers as rootResolvers } from '@gateway/features/role/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { TestResolvers } from '@gateway/utils/testUtils'
 
+const resolvers = rootResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
 beforeEach(() => {
@@ -268,7 +270,7 @@ describe('system role update', () => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
       { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
+      readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
         algorithm: 'RS256',

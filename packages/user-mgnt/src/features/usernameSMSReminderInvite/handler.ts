@@ -14,7 +14,7 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import { sendUserName } from './service'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 
 interface IResendUsernameSMSPayload {

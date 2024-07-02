@@ -11,7 +11,7 @@
 import { IFormData } from '@client/forms'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
 import { Event } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 
 export function getMarriageRegistrationSectionTransformer(
   transformedData: IFormData,

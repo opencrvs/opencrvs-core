@@ -12,7 +12,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { IInformantSMSNotification } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { URL } from 'url'
 
 export const resolvers: GQLResolver = {

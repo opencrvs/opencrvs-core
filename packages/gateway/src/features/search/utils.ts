@@ -8,10 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+
 import { SEARCH_URL } from '@gateway/constants'
 import { GQLAdvancedSearchParametersInput } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import { IAuthHeader } from '@opencrvs/commons'
+import fetch from '@gateway/fetch'
 
 export interface ISearchCriteria {
   parameters: GQLAdvancedSearchParametersInput

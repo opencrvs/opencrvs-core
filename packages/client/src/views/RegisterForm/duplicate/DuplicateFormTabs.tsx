@@ -23,7 +23,7 @@ import {
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { Event, HumanName, RegStatus, History } from '@client/utils/gateway'
+import { Event, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -243,22 +243,6 @@ export const DuplicateFormTabs = (props: IProps) => {
       : value
   }
 
-  const fieldHasErrors = (
-    section: IFormSection,
-    field: IFormField,
-    sectionErrors: IErrorsBySection
-  ) => {
-    if (
-      (
-        get(sectionErrors[section.id][field.name], 'errors') ||
-        getErrorForNestedField(section, field, sectionErrors)
-      ).length > 0
-    ) {
-      return true
-    }
-    return false
-  }
-
   const getRenderableField = (
     fieldLabel: MessageDescriptor,
     value: IFormFieldValue | JSX.Element | undefined
@@ -354,28 +338,6 @@ export const DuplicateFormTabs = (props: IProps) => {
             </>
           ))
       )
-
-      const hasErrors = taggedFields.reduce(
-        (accum, field) =>
-          accum || fieldHasErrors(section, field, errorsOnFields),
-        false
-      )
-
-      const draftOriginalData = draft.originalData
-      if (draftOriginalData && !hasErrors) {
-        const previousValues = taggedFields
-          .map((field, index) =>
-            getValueOrError(
-              section,
-              draftOriginalData,
-              field,
-              errorsOnFields,
-              undefined,
-              !index
-            )
-          )
-          .filter((value) => value)
-      }
 
       return getRenderableField(
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -683,7 +645,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           (eventData.history as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name ?? [],
           language
         )
       }
@@ -706,7 +668,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           (props.declaration.data.history as unknown as History[]).find(
             (data) =>
               data.action === null && data.regStatus === RegStatus.Registered
-          )?.user?.name as HumanName[],
+          )?.user?.name ?? [],
           language
         )
       }

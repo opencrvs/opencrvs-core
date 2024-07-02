@@ -25,7 +25,8 @@
   "include": [
     "src",
     "typings",
-    "codegen.ts"
+    "codegen.ts",
+    "vite.config.ts"
   ],
   "extends": "./tsconfig.paths.json"
 }

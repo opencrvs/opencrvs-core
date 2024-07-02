@@ -56,10 +56,10 @@ import {
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
-  SELECT_DEATH_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_MARRIAGE_FORM,
-  SELECT_MARRIAGE_INFORMANT
+  ALL_USER_EMAIL,
+  PRINT_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -170,6 +170,10 @@ export function goToUserRolesConfig() {
 
 export function goToInformantNotification() {
   return push(INFORMANT_NOTIFICATION)
+}
+
+export function goToAllUserEmail() {
+  return push(ALL_USER_EMAIL)
 }
 
 export function goToVSExport() {
@@ -687,6 +691,13 @@ export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 
+export function goToPrintRecordView(declarationId: string) {
+  return push(
+    formatUrl(PRINT_RECORD, {
+      declarationId
+    })
+  )
+}
 export type INavigationState = undefined
 
 export function navigationReducer(state: INavigationState, action: any) {

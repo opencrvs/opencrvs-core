@@ -34,7 +34,7 @@ import {
 import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
-import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'

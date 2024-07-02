@@ -24,6 +24,8 @@ export const ERROR_TYPES = {
   OVERSIZED: 'overSized'
 }
 
+export const IMAGE_UPLOAD_MAX_SIZE_IN_BYTES = 5242880
+
 export const getBase64String = (file: File) => {
   return new Promise<string | ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader()
@@ -55,7 +57,7 @@ export const validateImage = async (uploadedImage: File) => {
     throw new Error(ERROR_TYPES.IMAGE_TYPE)
   }
 
-  if (uploadedImage.size > 5242880) {
+  if (uploadedImage.size > IMAGE_UPLOAD_MAX_SIZE_IN_BYTES) {
     throw new Error(ERROR_TYPES.OVERSIZED)
   }
 
@@ -120,17 +122,17 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
 export async function fetchImageAsBase64(url: string): Promise<string> {
   const response = await fetch(url)
   const blob = await response.blob()
-  const mimeType =
-    response.headers.get('Content-Type') || 'application/octet-stream'
 
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       const base64 = reader.result as string
-      const dataUrl = `data:${mimeType};base64,${base64}`
-      resolve(dataUrl)
+      resolve(base64)
     }
     reader.onerror = reject
     reader.readAsDataURL(blob)
   })
 }
+
+export const bytesToMB = (bytes: number) =>
+  Number(Number(bytes / (1024 * 1024)).toFixed(2))

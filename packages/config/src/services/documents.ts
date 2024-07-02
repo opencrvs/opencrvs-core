@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 import { DOCUMENTS_URL } from '@config/config/constants'
 import { internal } from '@hapi/boom'
-import { logger } from '@config/logger'
+import { logger } from '@opencrvs/commons'
 
 interface IAuthHeader {
   Authorization: string

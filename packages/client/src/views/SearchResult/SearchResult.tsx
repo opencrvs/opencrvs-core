@@ -34,7 +34,10 @@ import {
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
@@ -257,7 +260,6 @@ class SearchResultView extends React.Component<
         const downloadStatus =
           (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-        const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
         const declarationIsRequestedCorrection =
           reg.declarationStatus === 'REQUESTED_CORRECTION'
         const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
@@ -266,6 +268,9 @@ class SearchResultView extends React.Component<
         const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
         const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
         const declarationIsIssued = reg.declarationStatus === 'ISSUED'
+        const isDeclared = reg.declarationStatus === 'DECLARED'
+        const declarationIsCorrectionRequested =
+          reg.declarationStatus === 'CORRECTION_REQUESTED'
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -278,6 +283,19 @@ class SearchResultView extends React.Component<
           params.get('searchText'),
           params.get('searchType')
         ]
+        const isDeclarationReviewableByRegistrar =
+          declarationIsRejected ||
+          declarationIsValidated ||
+          declarationIsCorrectionRequested ||
+          isDeclared ||
+          declarationIsInProgress
+
+        const isDeclarationReviewableByRegAgent =
+          isDeclared || declarationIsInProgress || declarationIsRejected
+
+        const shouldShowReviewButton =
+          (this.userHasRegisterScope() && isDeclarationReviewableByRegistrar) ||
+          (this.userHasValidateScope() && isDeclarationReviewableByRegAgent)
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
@@ -304,14 +322,7 @@ class SearchResultView extends React.Component<
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (
-            (declarationIsValidated && this.userHasRegisterScope()) ||
-            (!declarationIsValidated &&
-              !declarationIsRegistered &&
-              !declarationIsCertified &&
-              !declarationIsArchived &&
-              this.userHasValidateOrRegistrarScope())
-          ) {
+          } else if (shouldShowReviewButton) {
             actions.push({
               label:
                 declarationIsRejected || declarationIsInProgress
@@ -319,7 +330,9 @@ class SearchResultView extends React.Component<
                   : this.props.intl.formatMessage(constantsMessages.review),
               handler: () =>
                 this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.declarationStatus === 'CORRECTION_REQUESTED'
+                    ? REVIEW_CORRECTION
+                    : REVIEW_EVENT_PARENT_FORM_PAGE,
                   reg.id,
                   'review',
                   reg.event.toLowerCase()

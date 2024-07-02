@@ -17,7 +17,7 @@ import { readFileSync } from 'fs'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

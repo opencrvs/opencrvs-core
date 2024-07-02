@@ -45,14 +45,12 @@ describe('download button tests', () => {
   let store: AppStore
   let history: History<unknown>
   let testComponent: ReactWrapper<{}, {}>
-  let deleteSpy: SpyInstance
   let unassignSpy: SpyInstance
   let client: ApolloClient<{}>
 
   describe('for download status downloaded', () => {
     describe('when assignment object is undefined in props', () => {
       beforeEach(async () => {
-        deleteSpy = vi.spyOn(declarationReducer, 'deleteDeclaration')
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
@@ -79,11 +77,6 @@ describe('download button tests', () => {
       it('clicking download button pops up unassign modal', () => {
         const modal = getAssignmentModal(testComponent)
         expect(modal.text()).toContain('Unassign record?')
-      })
-
-      it('clicking on unassign button triggers deleteDeclaration action', () => {
-        clickOnModalAction(testComponent, '#unassign')
-        expect(deleteSpy).toBeCalledWith('123', client)
       })
     })
     describe('when assignment object is defined in props', () => {

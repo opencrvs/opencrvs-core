@@ -15,7 +15,8 @@ import {
   GQLDeathInput,
   GQLLoginBackgroundInput,
   GQLCountryLogoInput,
-  GQLMarriageInput
+  GQLMarriageInput,
+  GQLFeaturesInput
 } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {
@@ -25,14 +26,13 @@ export interface IApplicationConfigPayload {
   CURRENCY: GQLCurrencyInput
   DEATH: GQLDeathInput
   MARRIAGE: GQLMarriageInput
+  FEATURES: GQLFeaturesInput
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   DATE_OF_BIRTH_UNKNOWN: boolean
-  INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
   LOGIN_BACKGROUND: GQLLoginBackgroundInput
 }

@@ -20,7 +20,7 @@ import {
   createToken,
   postUserActionToMetrics
 } from '@auth/features/authenticate/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 interface IVerifyPayload {
   nonce: string

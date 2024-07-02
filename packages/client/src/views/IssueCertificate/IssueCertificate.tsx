@@ -14,15 +14,16 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { IPrintableDeclaration } from '@client/declarations'
 import { useDispatch } from 'react-redux'
 import { useDeclaration } from '@client/declarations/selectors'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
-import { goToHomeTab } from '@client/navigation'
+import { formatUrl, goToHomeTab } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 export function IssueCertificate() {
   const intl = useIntl()
@@ -32,7 +33,20 @@ export function IssueCertificate() {
     pageId: string
   }>()
 
-  const declaration = useDeclaration<IPrintableDeclaration>(registrationId)
+  const declaration = useDeclaration<IPrintableDeclaration | undefined>(
+    registrationId
+  )
+
+  if (!declaration) {
+    return (
+      <Redirect
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToIssue,
+          selectorId: ''
+        })}
+      />
+    )
+  }
 
   return (
     <Frame

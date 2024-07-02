@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import { OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jose from 'jose'
-
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as fetchAny.FetchMock
 
 beforeEach(() => {
@@ -220,9 +221,8 @@ describe('get user info from OIDP national id integration', () => {
         redirectUri: 'http://localhost:3000/mosip-callback'
       }
     )
-
-    expect(fetch.mock.calls[0][0]).toMatch(/oauth\/token$/)
-    expect(fetch.mock.calls[1][0]).toMatch(/oidc\/userinfo$/)
+    expect(fetch.mock.calls[0][0]).toMatch(/oauth\/v2\/token$/)
+    expect(fetch.mock.calls[1][0]).toMatch(/oidc\/v2\/userinfo$/)
     expect(fetch.mock.calls[2][0]).toMatch(
       /Location\?name=Farajaland&type=ADMIN_STRUCTURE$/
     )

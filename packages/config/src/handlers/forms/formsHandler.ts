@@ -15,7 +15,7 @@ import FormVersions, {
 } from '@config/models/formVersions'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import { badData } from '@hapi/boom'
 import { registrationForms } from './validation'
 import { fromZodError } from 'zod-validation-error'
@@ -39,8 +39,11 @@ export default async function getForm(
   })
 
   if (response.status !== 200) {
-    logger.error('Country config did not return 200 on forms endpoint')
-    return h.response().code(400)
+    logger.error(
+      `Core failed to fetch form definition from ${COUNTRY_CONFIG_URL}/forms. Check country config logs for more details`
+    )
+
+    return h.response().code(500)
   }
 
   const forms: IFormsPayload = await response.json()
@@ -76,5 +79,5 @@ export default async function getForm(
       return h.response().code(400)
     }
   }
-  return h.response(forms).code(201)
+  return h.response(forms).code(200)
 }

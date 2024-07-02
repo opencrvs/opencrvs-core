@@ -13,7 +13,7 @@ import {
   mockDeclarationData,
   mockBirthRegistrationSectionData
 } from '@client/tests/util'
-import { TransformedData, IFormField } from '@client/forms'
+import { TransformedData } from '@client/forms'
 import { cloneDeep } from 'lodash'
 
 describe('Birth registration mutation mapping related tests', () => {
@@ -33,6 +33,8 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.certificates).toEqual([
       {
         collector: {
+          relationship: 'OTHER',
+          otherRelationship: 'Uncle',
           name: [
             {
               use: 'en',

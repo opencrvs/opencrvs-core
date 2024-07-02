@@ -10,7 +10,7 @@
  */
 import { IFormData } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
 
 export function getDeathRegistrationSectionTransformer(

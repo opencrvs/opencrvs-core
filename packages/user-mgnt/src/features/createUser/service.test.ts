@@ -14,22 +14,18 @@ import * as mockingoose from 'mockingoose'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 
 const fetch = fetchMock as fetchMock.FetchMock
 const mockUser = {
   username: 'je.doe'
 }
 
-const token = jwt.sign(
-  { scope: ['system'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:user-mgnt-user'
-  }
-)
+const token = jwt.sign({ scope: ['system'] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:user-mgnt-user'
+})
 
 describe('Username generation', () => {
   it('generates valid username with given and family names', async () => {

@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { roleTypeResolvers as typeResolvers } from '@gateway/features/role/type-resolvers'
+import { TestResolvers } from '@gateway/utils/testUtils'
+
+const roleTypeResolvers = typeResolvers as unknown as TestResolvers
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 beforeEach(() => {
   fetch.resetMocks()

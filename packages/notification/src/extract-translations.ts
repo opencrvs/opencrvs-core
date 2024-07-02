@@ -53,7 +53,7 @@ const COUNTRY_CONFIG_PATH = process.argv[2]
 
 function readTranslations() {
   return readCSVToJSON<CSVRow[]>(
-    `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+    `${COUNTRY_CONFIG_PATH}/src/translations/notification.csv`
   )
 }
 
@@ -74,7 +74,7 @@ async function extractMessages() {
             `No translation key exists for ${messageKey}.  Remember to translate and add for all locales!!!: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+              `${COUNTRY_CONFIG_PATH}/src/translations/notification.csv`
             )}`
           )}`
         )

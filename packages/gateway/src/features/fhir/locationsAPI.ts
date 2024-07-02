@@ -9,13 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { FHIR_URL } from '../../constants'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
+import {
+  Location,
+  Saved,
+  findResourceFromBundleById
+} from '@opencrvs/commons/types'
+import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { FHIR_URL } from '@gateway/constants'
 
 export default class LocationsAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = `${FHIR_URL}/Location`
+    this.baseURL = FHIR_URL
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
@@ -27,7 +32,17 @@ export default class LocationsAPI extends RESTDataSource {
     request.headers.set('Content-Type', 'application/fhir+json')
   }
 
-  getLocation(id: string) {
-    return this.get(`/${id}`)
+  getLocation(id: string): Promise<Saved<Location>> {
+    if (this.context.record) {
+      const inBundle = findResourceFromBundleById<Saved<Location>>(
+        this.context.record,
+        id
+      )
+      if (inBundle) {
+        return Promise.resolve(inBundle)
+      }
+    }
+
+    return this.get(`/Location/${id}`)
   }
 }

@@ -51,27 +51,26 @@ interface IProps {
   isConfigPage?: boolean
 }
 
-export class DataSection extends React.Component<IProps> {
-  render() {
-    const { action, id, title, items, responsiveContents } = this.props
-
-    return (
-      <Container id={id}>
-        <Title>
-          {title}
-          {action && <Link onClick={action.handler}>{action.label}</Link>}
-        </Title>
-        {responsiveContents && (
-          <ResponsiveContainer
-            isConfigPage={this.props.isConfigPage && this.props.isConfigPage}
-          >
-            {responsiveContents}
-          </ResponsiveContainer>
-        )}
-        {items.map((item: IDataProps, index: number) => (
-          <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
-        ))}
-      </Container>
-    )
-  }
-}
+export const DataSection = ({
+  action,
+  id,
+  title,
+  items,
+  responsiveContents,
+  isConfigPage
+}: IProps) => (
+  <Container id={id}>
+    <Title>
+      {title}
+      {action && <Link onClick={action.handler}>{action.label}</Link>}
+    </Title>
+    {responsiveContents && (
+      <ResponsiveContainer isConfigPage={isConfigPage && isConfigPage}>
+        {responsiveContents}
+      </ResponsiveContainer>
+    )}
+    {items.map((item: IDataProps, index: number) => (
+      <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
+    ))}
+  </Container>
+)

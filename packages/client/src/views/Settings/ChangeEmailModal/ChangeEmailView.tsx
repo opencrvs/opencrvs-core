@@ -17,7 +17,7 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { queriesForUser } from '@client/views/Settings/queries'
+import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
@@ -25,6 +25,9 @@ import { NotificationEvent } from '@client/profile/serviceApi'
 import { getLanguage } from '@client/i18n/selectors'
 import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { errorMessages } from '@client/i18n/messages/errors'
+import { useLazyQuery } from '@apollo/client'
+import { GetUserByEmailQuery } from '@client/utils/gateway'
 
 interface IProps {
   show: boolean
@@ -33,8 +36,11 @@ interface IProps {
 }
 
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
+  const [fetchUserDetailsByEmail] =
+    useLazyQuery<GetUserByEmailQuery>(GET_USER_BY_EMAIL)
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
+  const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidEmailAddress, setIsInvalidEmailAddress] =
     React.useState(false)
   const [
@@ -56,13 +62,24 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   const restoreState = () => {
     setEmailAddress(EMPTY_STRING)
     setIsInvalidEmailAddress(false)
+    setUnknownError(false)
+    setShowDuplicateEmailErrorNotification(false)
   }
   const toggleDuplicateEmailErrorNotification = () => {
     setShowDuplicateEmailErrorNotification((prevValue) => !prevValue)
   }
+  const toggleUnknownErrorNotification = () => {
+    setUnknownError((prevValue) => !prevValue)
+  }
   const continueButtonHandler = async (emailAddress: string) => {
-    const userData = await queriesForUser.fetchUserDetailsByEmail(emailAddress)
-    const emailExists = userData.data.getUserByEmail
+    const { data: userData, error } = await fetchUserDetailsByEmail({
+      variables: { email: emailAddress }
+    })
+    if (error) {
+      setUnknownError(true)
+      return
+    }
+    const emailExists = userData?.getUserByEmail
 
     if (!emailExists) {
       const notificationEvent = NotificationEvent.CHANGE_EMAIL_ADDRESS
@@ -85,6 +102,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
       onSuccess(emailAddress)
     } else {
       toggleDuplicateEmailErrorNotification()
+      setUnknownError(false)
     }
   }
   React.useEffect(() => {
@@ -145,6 +163,15 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(messages.duplicateUserEmailErrorMessege, {
             email: emailAddress
           })}
+        </Toast>
+      )}
+      {unknownError && (
+        <Toast
+          id="unknown-error-notification"
+          type="warning"
+          onClose={() => toggleUnknownErrorNotification()}
+        >
+          {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
     </ResponsiveModal>

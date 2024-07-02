@@ -20,7 +20,7 @@ import getPlugins from '@user-mgnt/config/plugins'
 import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
 import { getRoutes } from '@user-mgnt/config/routes'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import { badRequest, Boom } from '@hapi/boom'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)

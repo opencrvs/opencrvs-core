@@ -8,42 +8,41 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Pino from 'hapi-pino'
-import * as JWT from 'hapi-auth-jwt2'
-import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@documents/constants'
-import { logger } from '@documents/logger'
+import { logger } from '@opencrvs/commons'
+import * as JWT from 'hapi-auth-jwt2'
+import * as Pino from 'hapi-pino'
+import * as Sentry from 'hapi-sentry'
+
+import { ServerRegisterPluginObject } from '@hapi/hapi'
+
+type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
 export default function getPlugins() {
-  const plugins: any[] = [
-    JWT,
-    ...(process.env.NODE_ENV === 'test' || process.env.LOG_LEVEL === 'silent'
-      ? []
-      : [
-          {
-            plugin: Pino,
-            options: {
-              prettyPrint: false,
-              logPayload: false,
-              instance: logger
-            }
-          },
-          ...(!SENTRY_DSN
-            ? []
-            : [
-                {
-                  plugin: Sentry,
-                  options: {
-                    client: {
-                      environment: process.env.DOMAIN,
-                      dsn: SENTRY_DSN
-                    },
-                    catchLogErrors: true
-                  }
-                }
-              ])
-        ])
-  ]
+  const plugins: IHapiPlugin[] = [{ plugin: JWT, options: {} }]
 
+  if (process.env.NODE_ENV === 'production') {
+    plugins.push({
+      plugin: Pino,
+      options: {
+        prettyPrint: false,
+        logPayload: false,
+        instance: logger
+      }
+    })
+  }
+
+  if (SENTRY_DSN) {
+    plugins.push({
+      plugin: Sentry,
+      options: {
+        client: {
+          environment: process.env.DOMAIN,
+          dsn: SENTRY_DSN
+        },
+        catchLogErrors: true
+      }
+    })
+  }
   return plugins
 }

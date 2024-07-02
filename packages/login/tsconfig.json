@@ -23,7 +23,8 @@
   },
   "include": [
     "src",
-    "typings"
+    "typings",
+    "vite.config.ts"
   ],
   "exclude": [
     "build",

@@ -33,7 +33,7 @@ export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
 
-type FontFamilyTypes = {
+export type FontFamilyTypes = {
   normal: string
   bold: string
   italics: string
@@ -117,15 +117,19 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
-  MARRIAGE_REGISTRATION: boolean
+  FEATURES: {
+    DEATH_REGISTRATION: boolean
+    MARRIAGE_REGISTRATION: boolean
+    EXTERNAL_VALIDATION_WORKQUEUE: boolean
+    INFORMANT_SIGNATURE: boolean
+    PRINT_DECLARATION: boolean
+    DATE_OF_BIRTH_UNKNOWN: boolean
+    INFORMANT_SIGNATURE_REQUIRED: boolean
+  }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
-  DATE_OF_BIRTH_UNKNOWN: boolean
-  INFORMANT_SIGNATURE: boolean
-  INFORMANT_SIGNATURE_REQUIRED: boolean
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
@@ -195,8 +199,8 @@ async function loadForms(): Promise<LoadFormsResponse> {
     throw err
   }
 
-  if (res && res.status !== 201) {
-    throw Error(res.statusText)
+  if (res && !res.ok) {
+    throw new Error(res.statusText)
   }
 
   const response = await res.json()

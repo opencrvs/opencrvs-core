@@ -10,9 +10,13 @@
  */
 import * as mongoose from 'mongoose'
 import { MONGO_URL } from '@config/config/constants'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 
 const db = mongoose.connection
+
+// This prepares code for Mongoose >7 where strictQuery
+// is set to false by default
+mongoose.set('strictQuery', false)
 
 db.on('disconnected', () => {
   logger.info('MongoDB disconnected')

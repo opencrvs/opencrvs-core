@@ -19,13 +19,13 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19
     restart: unless-stopped
     environment:
       - discovery.type=single-node
 
   influxdb:
-    image: influxdb:1.8.0
+    image: influxdb:1.8.10
     restart: unless-stopped
 
   hearth:
@@ -38,21 +38,6 @@ services:
       - server__fhirVersion=stu3
     depends_on:
       - mongo1
-    restart: unless-stopped
-
-  openhim-core:
-    image: jembi/openhim-core:7
-    environment:
-      - mongo_url=mongodb://mongo1/openhim-dev
-      - mongo_atnaUrl=mongodb://mongo1/openhim-dev
-      - logger_level=error
-      - router_timeout=180000
-    depends_on:
-      - mongo1
-    restart: unless-stopped
-
-  openhim-console:
-    image: jembi/openhim-console:1.13
     restart: unless-stopped
 
   minio:

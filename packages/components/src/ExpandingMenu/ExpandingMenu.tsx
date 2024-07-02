@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 const NavigationMainWrapper = styled.div`
@@ -64,24 +64,21 @@ interface IProps {
   navigation?: () => React.ReactNode
 }
 
-export class ExpandingMenu extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props)
+export const ExpandingMenu = ({
+  showMenu,
+  menuCollapse,
+  navigation
+}: IProps) => {
+  if (!showMenu) {
+    return null
+  }
 
-    this.state = {
-      showMenu: this.props.showMenu
-    }
-  }
-  render() {
-    return (
-      this.props.showMenu && (
-        <NavigationMainWrapper onClick={() => this.props.menuCollapse()}>
-          <Backdrop />
-          <NavigationContainer onClick={(e) => e.stopPropagation()}>
-            {this.props.navigation && this.props.navigation()}
-          </NavigationContainer>
-        </NavigationMainWrapper>
-      )
-    )
-  }
+  return (
+    <NavigationMainWrapper onClick={() => menuCollapse()}>
+      <Backdrop />
+      <NavigationContainer onClick={(e) => e.stopPropagation()}>
+        {navigation && navigation()}
+      </NavigationContainer>
+    </NavigationMainWrapper>
+  )
 }

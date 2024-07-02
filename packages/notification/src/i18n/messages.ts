@@ -56,5 +56,13 @@ export const templateNames = {
   USERNAME_UPDATED: {
     sms: 'updateUserNameNotification',
     email: 'username-updated'
+  },
+  CORRECTION_APPROVED: {
+    sms: 'correctionApproved',
+    email: 'correction-approved'
+  },
+  CORRECTION_REJECTED: {
+    sms: 'correctionRejected',
+    email: 'correction-rejected'
   }
 }

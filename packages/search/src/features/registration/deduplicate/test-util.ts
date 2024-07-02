@@ -20,7 +20,7 @@ import {
 import * as elasticsearch from '@elastic/elasticsearch'
 import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
 
-export const ELASTIC_SEARCH_HTTP_PORT = 9200
+const ELASTIC_SEARCH_HTTP_PORT = 9200
 
 const container: ElasticsearchContainer = new ElasticsearchContainer(
   'elasticsearch:7.17.7'

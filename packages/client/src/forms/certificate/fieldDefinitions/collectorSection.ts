@@ -36,7 +36,6 @@ import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface INameField {
   firstNamesField: string
@@ -624,8 +623,8 @@ export const collectMarriageCertificateFormSection: IFormSection = {
             )
           ],
           options: [
-            { value: 'BRIDE', label: formMessages.brideName },
-            { value: 'GROOM', label: formMessages.groomName },
+            { value: 'BRIDE', label: formMessages.certifyRecordToBride },
+            { value: 'GROOM', label: formMessages.certifyRecordToGroom },
             { value: 'OTHER', label: formMessages.someoneElseCollector },
             {
               value: 'PRINT_IN_ADVANCE',
@@ -998,8 +997,8 @@ const birthCertCollectorOptions = [
 ]
 
 const marriageCertCollectorOptions = [
-  { value: 'BRIDE', label: formMessages.brideName },
-  { value: 'GROOM', label: formMessages.groomName }
+  { value: 'BRIDE', label: formMessages.certifyRecordToBride },
+  { value: 'GROOM', label: formMessages.certifyRecordToGroom }
 ]
 
 const birthIssueCollectorFormOptions = [
@@ -1023,7 +1022,7 @@ function getCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: formMessages.certifyRecordToInformant,
       param: {
-        informant: labelFormatterForInformant(informant)
+        informant: informant
       }
     },
     { value: 'OTHER', label: formMessages.someoneElseCollector },
@@ -1088,7 +1087,7 @@ export function getIssueCertCollectorGroupForEvent(
       value: 'INFORMANT',
       label: issueMessages.issueToInformant,
       param: {
-        informant: labelFormatterForInformant(informant)
+        informant: informant
       }
     },
     { value: 'OTHER', label: issueMessages.issueToSomeoneElse }

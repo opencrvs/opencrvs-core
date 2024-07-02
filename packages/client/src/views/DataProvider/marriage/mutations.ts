@@ -10,7 +10,7 @@
  */
 import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
-import { REQUEST_MARRIAGE_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 const SUBMIT_MARRIAGE_DECLARATION = gql`
   mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
@@ -33,42 +33,7 @@ const REGISTER_MARRIAGE_DECLARATION = gql`
     $id: ID!
     $details: MarriageRegistrationInput!
   ) {
-    markMarriageAsRegistered(id: $id, details: $details) {
-      id
-      registration {
-        id
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            systemRole
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-      }
-    }
+    markMarriageAsRegistered(id: $id, details: $details)
   }
 `
 const REJECT_MARRIAGE_DECLARATION = gql`
@@ -132,7 +97,7 @@ export function getMarriageMutation(action: SubmissionAction) {
       return COLLECT_MARRIAGE_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_MARRIAGE_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
-      return REQUEST_MARRIAGE_REG_CORRECTION
+    case SubmissionAction.MAKE_CORRECTION:
+      return REQUEST_REG_CORRECTION
   }
 }

@@ -68,7 +68,7 @@ export const SideNav = () => (
 
 SideNav.args = {
   applicationName: 'OpenCRVS',
-  applicationVersion: '1.3.0',
+  applicationVersion: '1.6.0',
   buildVersion: 'Development'
 }
 

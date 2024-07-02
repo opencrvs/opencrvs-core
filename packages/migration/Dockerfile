@@ -1,5 +1,7 @@
-FROM node:gallium-alpine
+FROM node:hydrogen-alpine
 WORKDIR /app
+
+RUN apk update && apk upgrade
 
 ## Add the wait script to the image
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /app/wait
@@ -18,5 +20,10 @@ RUN yarn install
 RUN yarn build
 
 WORKDIR /app/packages/migration
+
+# FIXME: to be replaced later with whole build running as node
+RUN chown -R node:node /app
+
+USER node
 
 CMD /app/wait && yarn start:prod

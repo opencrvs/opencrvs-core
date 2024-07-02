@@ -559,7 +559,7 @@ describe('Certificate collector test for a death registration', () => {
     })
 
     it('informant will be spouse', async () => {
-      const element = await waitForElement(component, '#type_INFORMANT_Spouse')
+      const element = await waitForElement(component, '#type_INFORMANT_SPOUSE')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -611,7 +611,7 @@ describe('Certificate collector test for a marriage registration', () => {
     })
 
     it('informant will be grrom', async () => {
-      const element = await waitForElement(component, '#type_INFORMANT_Groom')
+      const element = await waitForElement(component, '#type_INFORMANT_GROOM')
       expect(element.hostNodes()).toHaveLength(1)
     })
 
@@ -669,7 +669,7 @@ describe('Certificate collector test for a birth registration without father and
     })
 
     it('informant will be mother', () => {
-      expect(component.find('#type_INFORMANT_Mother').hostNodes()).toHaveLength(
+      expect(component.find('#type_INFORMANT_MOTHER').hostNodes()).toHaveLength(
         1
       )
     })

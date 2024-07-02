@@ -24,7 +24,7 @@ import {
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
@@ -148,7 +148,6 @@ const getIndexByAction = (histories: any, index: number): number => {
         item.action === newHistories[index].action &&
         (item.regStatus === 'ISSUED' || item.regStatus === 'CERTIFIED')
     )
-    .reverse()
     .findIndex((item) => item.uuid === uid)
 
   return actionIndex
@@ -210,10 +209,12 @@ export const GetHistory = ({
     })
   }
 
-  if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-    allHistoryData = allHistoryData.filter(({ regStatus }: History) => {
-      return regStatus !== RegStatus.WaitingValidation
-    })
+  if (!window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE) {
+    allHistoryData = allHistoryData.filter(
+      ({ regStatus }: Partial<History>) => {
+        return regStatus !== RegStatus.WaitingValidation
+      }
+    )
   }
 
   // TODO: We need to figure out a way to sort the history in backend

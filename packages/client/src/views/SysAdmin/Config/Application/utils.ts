@@ -66,7 +66,7 @@ export const getAmountWithCurrencySymbol = (
   return amountWithSymbol.normalize('NFKD').replace(/[\u0300-\u036F]/g, '')
 }
 
-export const getCurrencySymbol = (currency: ICurrency) => {
+export const getCurrencySymbol = (currency: ICurrency): string => {
   const currencySymbol = lookup.currencies({
     code: currency.isoCode
   })[0].symbol

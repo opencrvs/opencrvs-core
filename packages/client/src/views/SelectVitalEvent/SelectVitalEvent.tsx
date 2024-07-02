@@ -147,8 +147,7 @@ class SelectVitalEventView extends React.Component<
                 this.setState({ goTo: 'birth', noEventSelectedError: false })
               }
             />
-            {typeof window.config.DEATH_REGISTRATION === 'boolean' &&
-            window.config.DEATH_REGISTRATION === false ? null : (
+            {window.config.FEATURES.DEATH_REGISTRATION && (
               <RadioButton
                 size="large"
                 key="deathevent"
@@ -162,7 +161,7 @@ class SelectVitalEventView extends React.Component<
                 }
               />
             )}
-            {window.config.MARRIAGE_REGISTRATION && (
+            {window.config.FEATURES.MARRIAGE_REGISTRATION && (
               <RadioButton
                 size="large"
                 key="marriagevent"

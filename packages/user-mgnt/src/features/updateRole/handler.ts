@@ -11,7 +11,7 @@
 
 import * as Hapi from '@hapi/hapi'
 import { Types } from 'mongoose'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import { UserRole } from '@user-mgnt/model/user'
 import SystemRole, {
   ISystemRoleModel,

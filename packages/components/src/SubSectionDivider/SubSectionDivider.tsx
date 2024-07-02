@@ -37,18 +37,18 @@ export interface ISubSectionProps {
   disabled?: boolean
 }
 
-export class SubSectionDivider extends React.Component<ISubSectionProps> {
-  render() {
-    const { label, required, optionalLabel } = this.props
-    return (
-      <SubSectionWrapper>
-        <Title>{label}</Title>
-        {required === false && (
-          <Optional disabled={this.props.disabled}>
-            &nbsp;&nbsp;•&nbsp;{optionalLabel}
-          </Optional>
-        )}
-      </SubSectionWrapper>
-    )
-  }
-}
+export const SubSectionDivider = ({
+  label,
+  required,
+  optionalLabel,
+  disabled
+}: ISubSectionProps) => (
+  <SubSectionWrapper>
+    <Title>{label}</Title>
+    {required === false && (
+      <Optional disabled={disabled}>
+        &nbsp;&nbsp;•&nbsp;{optionalLabel}
+      </Optional>
+    )}
+  </SubSectionWrapper>
+)

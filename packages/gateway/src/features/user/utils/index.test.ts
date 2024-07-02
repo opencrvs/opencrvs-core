@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import { getUserMobile } from '@gateway/features/user/utils/'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any

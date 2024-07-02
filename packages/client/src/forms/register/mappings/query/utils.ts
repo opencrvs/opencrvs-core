@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData } from '@client/forms'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 
 export function transformStatusData(
   transformedData: IFormData,

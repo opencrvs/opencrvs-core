@@ -49,7 +49,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLMixedTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
@@ -568,6 +568,7 @@ function RegistrationListComponent(props: IProps) {
     >
       <Content
         title={intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+        showTitleOnMobile={true}
         size={ContentSize.LARGE}
         filterContent={
           <>

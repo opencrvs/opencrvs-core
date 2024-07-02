@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { internal } from '@hapi/boom'
 import { removeDuplicate } from '@search/features/registration/deduplicate/service'
 import { client } from '@search/elasticsearch/client'

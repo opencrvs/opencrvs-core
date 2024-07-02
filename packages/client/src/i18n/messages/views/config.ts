@@ -8,128 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
-interface IConfigMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  applicationSettings: MessageDescriptor
-  advancedSearch: MessageDescriptor
-  advancedSearchInstruction: MessageDescriptor
-  vsexport: MessageDescriptor
-  vitalStatisticsExport: MessageDescriptor
-  export: MessageDescriptor
-  vsEmptyStateText: MessageDescriptor
-  vsExportDownloadFailed: MessageDescriptor
-  applicationNameChangeMessage: MessageDescriptor
-  applicationNameChangeNotification: MessageDescriptor
-  govtLogoChangeMessage: MessageDescriptor
-  govtLogoChangeNotification: MessageDescriptor
-  backgroundImageChangeNotification: MessageDescriptor
-  backgroundImageFileLimitError: MessageDescriptor
-  govtLogoChangeError: MessageDescriptor
-  govtLogoFileLimitError: MessageDescriptor
-  applicationConfigChangeError: MessageDescriptor
-  certificateConfiguration: MessageDescriptor
-  printTemplate: MessageDescriptor
-  downloadTemplate: MessageDescriptor
-  uploadTemplate: MessageDescriptor
-  listTitle: MessageDescriptor
-  listDetails: MessageDescriptor
-  birthTemplate: MessageDescriptor
-  deathTemplate: MessageDescriptor
-  certificateTemplate: MessageDescriptor
-  template: MessageDescriptor
-  options: MessageDescriptor
-  allowPrinting: MessageDescriptor
-  allowPrintingDescription: MessageDescriptor
-  marriageTemplate: MessageDescriptor
-  birthDefaultTempDesc: MessageDescriptor
-  eventUpdatedTempDesc: MessageDescriptor
-  deathDefaultTempDesc: MessageDescriptor
-  marriageDefaultTempDesc: MessageDescriptor
-  certificateUploading: MessageDescriptor
-  certificateUpdated: MessageDescriptor
-  certificateValidationError: MessageDescriptor
-  uploadCertificateDialogTitle: MessageDescriptor
-  uploadCertificateDialogDescription: MessageDescriptor
-  uploadCertificateDialogConfirm: MessageDescriptor
-  uploadCertificateDialogCancel: MessageDescriptor
-  listDetailsQsn: MessageDescriptor
-  applicationNameLabel: MessageDescriptor
-  govermentLogoLabel: MessageDescriptor
-  loginBackgroundLabel: MessageDescriptor
-  loginImageText: MessageDescriptor
-  backgroundImageError: MessageDescriptor
-  currencyLabel: MessageDescriptor
-  applicationCurrencyChangeNotification: MessageDescriptor
-  applicationBirthRegTargetChangeNotification: MessageDescriptor
-  applicationBirthLateRegTargetChangeNotification: MessageDescriptor
-  applicationDeathRegTargetChangeNotification: MessageDescriptor
-  applicationBirthOnTimeFeeChangeNotification: MessageDescriptor
-  applicationBirthLateFeeChangeNotification: MessageDescriptor
-  applicationBirthDelayedFeeChangeNotification: MessageDescriptor
-  applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
-  applicationDeathDelayedFeeChangeNotification: MessageDescriptor
-  applicationMarriageRegTargetChangeNotification: MessageDescriptor
-  applicationMarriageOnTimeFeeChangeNotification: MessageDescriptor
-  applicationMarriageDelayedFeeChangeNotification: MessageDescriptor
-  applicationCurrencyChangeMessage: MessageDescriptor
-  applicationConfigUpdatingMessage: MessageDescriptor
-  phoneNumberLabel: MessageDescriptor
-  birthLegallySpecifiedDialogTitle: MessageDescriptor
-  birthDelayedDialogTitle: MessageDescriptor
-  deathLegallySpecifiedDialogTitle: MessageDescriptor
-  marriageLegallySpecifiedDialogTitle: MessageDescriptor
-  onTimeFeeDialogTitle: MessageDescriptor
-  lateFeeDialogTitle: MessageDescriptor
-  delayedFeeDialogTitle: MessageDescriptor
-  nidPatternTitle: MessageDescriptor
-  nidPatternChangeMessage: MessageDescriptor
-  nidPatternChangeError: MessageDescriptor
-  nidPatternChangeNotification: MessageDescriptor
-  phoneNumberPatternTitle: MessageDescriptor
-  phoneNumberChangeMessage: MessageDescriptor
-  phoneNumberChangeError: MessageDescriptor
-  phoneNumberChangeNotification: MessageDescriptor
-  legallySpecifiedLabel: MessageDescriptor
-  legallySpecifiedValue: MessageDescriptor
-  lateRegistrationLabel: MessageDescriptor
-  lateRegistrationValue: MessageDescriptor
-  delayedRegistrationLabel: MessageDescriptor
-  delayedRegistrationValue: MessageDescriptor
-  withinLegallySpecifiedTimeLabel: MessageDescriptor
-  generalTabTitle: MessageDescriptor
-  birthTabTitle: MessageDescriptor
-  birthTabTitleExport: MessageDescriptor
-  deathTabTitle: MessageDescriptor
-  marriageTabTitle: MessageDescriptor
-  imageTabTitle: MessageDescriptor
-  colourTabTitle: MessageDescriptor
-  colourTabText: MessageDescriptor
-  deathTabTitleExport: MessageDescriptor
-  registrationTimePeriodsGroupTitle: MessageDescriptor
-  registrationFeesGroupTitle: MessageDescriptor
-  eventTargetInputLabel: MessageDescriptor
-  pattern: MessageDescriptor
-  example: MessageDescriptor
-  testNumber: MessageDescriptor
-  validExample: MessageDescriptor
-  invalidExample: MessageDescriptor
-  informantNotifications: MessageDescriptor
-  informantNotificationSubtitle: MessageDescriptor
-  inProgressSMS: MessageDescriptor
-  declarationSMS: MessageDescriptor
-  registrationSMS: MessageDescriptor
-  rejectionSMS: MessageDescriptor
-  informantNotificationUpdatingMessage: MessageDescriptor
-  userRoles: MessageDescriptor
-  userRolesSubtitle: MessageDescriptor
-  systemRoles: MessageDescriptor
-  role: MessageDescriptor
-  roleUpdateInstruction: MessageDescriptor
-  systemRoleSuccessMsg: MessageDescriptor
-}
+import { defineMessages } from 'react-intl'
 
-const messagesToDefine: IConfigMessages = {
+const messagesToDefine = {
   applicationSettings: {
     id: 'config.application.settings',
     defaultMessage: 'Application',
@@ -739,7 +620,28 @@ const messagesToDefine: IConfigMessages = {
   language: {
     id: 'config.userRoles.language',
     defaultMessage: '{language}'
+  },
+  emailAllUsersTitle: {
+    id: 'config.emailAllUsers.title',
+    defaultMessage: 'Email all users',
+    description: 'Title for email all users'
+  },
+  emailAllUsersSubtitle: {
+    id: 'config.emailAllUsers.subtitle',
+    defaultMessage:
+      'This email will be sent to all users you are active. Emails will be sent over the next 24 hours. Only one email can be sent per day',
+    description: 'Subtitle for email all users'
+  },
+  emailAllUsersModalTitle: {
+    id: 'config.emailAllUsers.modal.title',
+    defaultMessage: 'Send email to all users?',
+    description: 'Label for send email all users confirmation title'
+  },
+  emailAllUsersModalSupportingCopy: {
+    id: 'config.emailAllUsers.modal.supportingCopy',
+    defaultMessage: 'User will receive emails over the next 24 hours',
+    description: 'Label for send email all users confirmation supporting copy'
   }
 }
 
-export const messages: IConfigMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)

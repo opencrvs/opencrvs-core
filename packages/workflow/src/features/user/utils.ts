@@ -10,8 +10,19 @@
  */
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getTokenPayload } from '@workflow/utils/authUtils'
+import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  Practitioner,
+  SavedLocation,
+  SavedPractitioner
+} from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
+
+type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
+export type SearchCriteria = {
+  [K in UserSearchCriteria]?: string
+}
 
 export async function getUser(
   userId: string,
@@ -61,18 +72,9 @@ export async function getSystem(
   return body
 }
 
-// @todo remove this as it's not used anywhere (other than tests)
-export async function getLoggedInPractitionerPrimaryLocation(
-  token: string
-): Promise<fhir.Location> {
-  return getPrimaryLocationFromLocationList(
-    await getLoggedInPractitionerLocations(token)
-  )
-}
-
 export async function getPractitionerPrimaryLocation(
   practitionerId: string
-): Promise<fhir.Location> {
+): Promise<fhir3.Location> {
   return getPrimaryLocationFromLocationList(
     await getPractitionerLocations(practitionerId)
   )
@@ -80,15 +82,15 @@ export async function getPractitionerPrimaryLocation(
 
 export async function getPractitionerOffice(
   practitionerId: string
-): Promise<fhir.Location> {
+): Promise<fhir3.Location> {
   return getOfficeLocationFromLocationList(
     await getPractitionerLocations(practitionerId)
   )
 }
 
 export function getPrimaryLocationFromLocationList(
-  locations: [fhir.Location]
-): fhir.Location {
+  locations: [fhir3.Location]
+): fhir3.Location {
   const primaryOffice = getOfficeLocationFromLocationList(locations)
   const primaryLocationId =
     primaryOffice &&
@@ -99,7 +101,6 @@ export function getPrimaryLocationFromLocationList(
   if (!primaryLocationId) {
     throw new Error('No primary location found')
   }
-
   const location = locations.find((loc) => loc.id === primaryLocationId)
   if (!location) {
     throw new Error(
@@ -110,10 +111,10 @@ export function getPrimaryLocationFromLocationList(
 }
 
 function getOfficeLocationFromLocationList(
-  locations: fhir.Location[]
-): fhir.Location {
-  let office: fhir.Location | undefined
-  locations.forEach((location: fhir.Location) => {
+  locations: fhir3.Location[]
+): fhir3.Location {
+  let office: fhir3.Location | undefined
+  locations.forEach((location: fhir3.Location) => {
     if (location.type && location.type.coding) {
       location.type.coding.forEach((code) => {
         if (code.code === 'CRVS_OFFICE') {
@@ -128,21 +129,57 @@ function getOfficeLocationFromLocationList(
   return office
 }
 
-export async function getLoggedInPractitionerLocations(
-  token: string
-): Promise<[fhir.Location]> {
-  const practitionerResource = await getLoggedInPractitionerResource(token)
+export async function getUserByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
 
-  if (!practitionerResource || !practitionerResource.id) {
-    throw new Error('Invalid practioner found')
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user in workflow. Error: ${res.status} status received`
+    )
   }
-  /* getting location list for practitioner */
-  return await getPractitionerLocations(practitionerResource.id)
+
+  const body = await res.json()
+
+  return body
+}
+
+export async function getSystemByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
 }
 
 export async function getLoggedInPractitionerResource(
   token: string
-): Promise<fhir.Practitioner> {
+): Promise<SavedPractitioner> {
   const tokenPayload = getTokenPayload(token)
   const isNotificationAPIUser =
     tokenPayload.scope.indexOf('notification-api') > -1
@@ -162,9 +199,15 @@ export async function getLoggedInPractitionerResource(
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
 }
 
+export async function getLocationOrOfficeById(
+  locationId: string
+): Promise<SavedLocation> {
+  return await getFromFhir(`/Location/${locationId}`)
+}
+
 export async function getPractitionerLocations(
   practitionerId: string
-): Promise<[fhir.Location]> {
+): Promise<[fhir3.Location]> {
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
@@ -175,7 +218,7 @@ export async function getPractitionerLocations(
   const locList = []
   for (const location of roleEntry.location) {
     const splitRef = location.reference.split('/')
-    const locationResponse: fhir.Location = await getFromFhir(
+    const locationResponse: fhir3.Location = await getFromFhir(
       `/Location/${splitRef[1]}`
     )
     if (!locationResponse) {
@@ -183,12 +226,14 @@ export async function getPractitionerLocations(
     }
     locList.push(locationResponse)
   }
-  return locList as [fhir.Location]
+  return locList as [fhir3.Location]
 }
 
-export function getPractitionerRef(practitioner: fhir.Practitioner): string {
+export function getPractitionerRef(practitioner: Practitioner) {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  return `Practitioner/${practitioner.id}`
+  return `Practitioner/${
+    practitioner.id as UUID /* @todo move to practitioner */
+  }` as const
 }

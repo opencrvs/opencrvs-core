@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import {
   SuccessButton,
@@ -81,160 +81,147 @@ const UnderLayBackground = styled.div`
   }
 `
 
-interface IIDVerifierState {
-  showPrompt: boolean
-}
+const IDVerifierComponent = ({
+  correctorInformation,
+  intl,
+  actionProps,
+  id,
+  title
+}: IIDVerifierProps & IntlShapeProps) => {
+  const [showPrompt, setShowPrompt] = useState(false)
 
-class IDVerifierComponent extends React.Component<
-  IIDVerifierProps & IntlShapeProps,
-  IIDVerifierState
-> {
-  state = { showPrompt: false }
-
-  togglePrompt = () => {
-    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  const togglePrompt = () => {
+    setShowPrompt(!showPrompt)
   }
 
-  renderLabelValue = () => {
-    const { correctorInformation, intl } = this.props
+  const renderLabelValue = () => (
+    <>
+      {correctorInformation && correctorInformation.iD && (
+        <LabelValuePair
+          label={intl.formatMessage(constantsMessages.id)}
+          value={
+            intl.formatMessage(
+              identityNameMapper(correctorInformation.iDType as string)
+            ) +
+            ' | ' +
+            correctorInformation.iD
+          }
+        />
+      )}
+      {correctorInformation && correctorInformation.firstNames && (
+        <LabelValuePair
+          label={intl.formatMessage(certificateMessages.firstName)}
+          value={String(correctorInformation.firstNames)}
+        />
+      )}
 
-    return (
-      <>
-        {correctorInformation && correctorInformation.iD && (
-          <LabelValuePair
-            label={intl.formatMessage(constantsMessages.id)}
-            value={
-              intl.formatMessage(
-                identityNameMapper(correctorInformation.iDType as string)
-              ) +
-              ' | ' +
-              correctorInformation.iD
-            }
-          />
-        )}
-        {correctorInformation && correctorInformation.firstNames && (
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.firstName)}
-            value={String(correctorInformation.firstNames)}
-          />
-        )}
+      {correctorInformation && correctorInformation.familyName && (
+        <LabelValuePair
+          label={intl.formatMessage(certificateMessages.familyName)}
+          value={String(correctorInformation.familyName)}
+        />
+      )}
 
-        {correctorInformation && correctorInformation.familyName && (
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.familyName)}
-            value={String(correctorInformation.familyName)}
-          />
-        )}
+      {
+        <LabelValuePair
+          label={intl.formatMessage(certificateMessages.dateOfBirth)}
+          value={
+            correctorInformation?.birthDate &&
+            isValidPlainDate(correctorInformation.birthDate)
+              ? formatPlainDate(correctorInformation.birthDate)
+              : '-'
+          }
+        />
+      }
 
-        {
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={
-              correctorInformation?.birthDate &&
-              isValidPlainDate(correctorInformation.birthDate)
-                ? formatPlainDate(correctorInformation.birthDate)
-                : '-'
-            }
-          />
-        }
+      {correctorInformation?.age && (
+        <LabelValuePair
+          label={intl.formatMessage(certificateMessages.age)}
+          value={String(correctorInformation.age as string)}
+        />
+      )}
 
-        {correctorInformation?.age && (
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.age)}
-            value={String(correctorInformation.age as string)}
-          />
-        )}
+      {correctorInformation && correctorInformation.nationality && (
+        <LabelValuePair
+          label={intl.formatMessage(certificateMessages.nationality)}
+          value={intl.formatMessage(
+            countryMessages[correctorInformation.nationality as string]
+          )}
+        />
+      )}
+    </>
+  )
 
-        {correctorInformation && correctorInformation.nationality && (
-          <LabelValuePair
-            label={intl.formatMessage(certificateMessages.nationality)}
-            value={intl.formatMessage(
-              countryMessages[correctorInformation.nationality as string]
-            )}
-          />
-        )}
-      </>
-    )
-  }
+  const { positiveAction, negativeAction } = actionProps
 
-  render() {
-    const { positiveAction, negativeAction } = this.props.actionProps
-    const { showPrompt } = this.state
-    const { correctorInformation, intl, id } = this.props
+  const positiveActionButton = (
+    <SuccessButton
+      id="verifyPositive"
+      key="verifyPositive"
+      onClick={positiveAction.handler}
+      icon={() => <Check />}
+      align={ICON_ALIGNMENT.LEFT}
+    >
+      {positiveAction.label}
+    </SuccessButton>
+  )
 
-    const positiveActionButton = (
-      <SuccessButton
-        id="verifyPositive"
-        key="verifyPositive"
-        onClick={positiveAction.handler}
-        icon={() => <Check />}
-        align={ICON_ALIGNMENT.LEFT}
+  const negativeActionButton = (
+    <DangerButton
+      id="verifyNegative"
+      key="verifyNegative"
+      onClick={togglePrompt}
+      icon={() => <Cross color="currentColor" />}
+      align={ICON_ALIGNMENT.LEFT}
+    >
+      {negativeAction.label}
+    </DangerButton>
+  )
+
+  return (
+    <div id={id}>
+      <Content
+        title={title}
+        showTitleOnMobile={true}
+        bottomActionButtons={[positiveActionButton, negativeActionButton]}
       >
-        {positiveAction.label}
-      </SuccessButton>
-    )
-
-    const negativeActionButton = (
-      <DangerButton
-        id="verifyNegative"
-        key="verifyNegative"
-        onClick={this.togglePrompt}
-        icon={() => <Cross color="currentColor" />}
-        align={ICON_ALIGNMENT.LEFT}
+        {correctorInformation && (
+          <Container>
+            <UnderLayBackground />
+            {renderLabelValue()}
+          </Container>
+        )}
+      </Content>
+      <ResponsiveModal
+        id="withoutVerificationPrompt"
+        show={showPrompt}
+        title={intl.formatMessage(
+          certificateMessages.idCheckForCorrectionTitle
+        )}
+        contentHeight={96}
+        handleClose={togglePrompt}
+        actions={[
+          <TertiaryButton id="cancel" key="cancel" onClick={togglePrompt}>
+            {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
+          </TertiaryButton>,
+          <PrimaryButton
+            id="send"
+            key="continue"
+            onClick={() => {
+              actionProps.negativeAction.handler()
+              togglePrompt()
+            }}
+          >
+            {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
+          </PrimaryButton>
+        ]}
       >
-        {negativeAction.label}
-      </DangerButton>
-    )
-
-    return (
-      <div id={id}>
-        <Content
-          title={this.props.title}
-          showTitleOnMobile={true}
-          bottomActionButtons={[positiveActionButton, negativeActionButton]}
-        >
-          {correctorInformation && (
-            <Container>
-              <UnderLayBackground />
-              {this.renderLabelValue()}
-            </Container>
-          )}
-        </Content>
-        <ResponsiveModal
-          id="withoutVerificationPrompt"
-          show={showPrompt}
-          title={intl.formatMessage(
-            certificateMessages.idCheckForCorrectionTitle
-          )}
-          contentHeight={96}
-          handleClose={this.togglePrompt}
-          actions={[
-            <TertiaryButton
-              id="cancel"
-              key="cancel"
-              onClick={this.togglePrompt}
-            >
-              {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              id="send"
-              key="continue"
-              onClick={() => {
-                this.props.actionProps.negativeAction.handler()
-                this.togglePrompt()
-              }}
-            >
-              {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
-            </PrimaryButton>
-          ]}
-        >
-          {intl.formatMessage(
-            certificateMessages.correctorIDCheckDialogDescription
-          )}
-        </ResponsiveModal>
-      </div>
-    )
-  }
+        {intl.formatMessage(
+          certificateMessages.correctorIDCheckDialogDescription
+        )}
+      </ResponsiveModal>
+    </div>
+  )
 }
 
 export const IDVerifier = injectIntl(IDVerifierComponent)

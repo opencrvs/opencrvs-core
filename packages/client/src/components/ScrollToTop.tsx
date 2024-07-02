@@ -8,20 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useEffect, ReactNode } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 
-class ScrollToTop extends React.Component<
-  RouteComponentProps<{}> & { children?: React.ReactNode }
-> {
-  componentDidUpdate(prevProps: RouteComponentProps<{}>) {
-    if (this.props.location !== prevProps.location) {
-      window.scrollTo(0, 0)
-    }
-  }
-  render() {
-    return this.props.children
-  }
+type ScrollToTopProps = RouteComponentProps & { children?: ReactNode }
+
+const ScrollToTop = ({ children, location }: ScrollToTopProps) => {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location])
+
+  return <>{children}</>
 }
 
 export default withRouter(ScrollToTop)

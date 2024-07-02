@@ -68,6 +68,10 @@ import { Link, Text, Toggle } from '@client/../../components/lib'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  bytesToMB,
+  IMAGE_UPLOAD_MAX_SIZE_IN_BYTES
+} from '@client/utils/imageUtils'
 
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -341,7 +345,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     } catch (err) {
       this.setState({
         imageLoadingError: this.props.intl.formatMessage(
-          imageUploadMessages.imageFormat
+          imageUploadMessages.imageFormat,
+          {
+            maxSize: bytesToMB(IMAGE_UPLOAD_MAX_SIZE_IN_BYTES)
+          }
         )
       })
     }

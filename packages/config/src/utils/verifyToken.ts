@@ -10,8 +10,7 @@
  */
 import * as jwt from 'jsonwebtoken'
 import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { chainW, tryCatch } from 'fp-ts/Either'
+import { function as f, either as e } from 'fp-ts'
 import { publicCert } from '@config/server'
 import * as decode from 'jwt-decode'
 
@@ -26,7 +25,7 @@ const tokenPayload = t.type({
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
 function safeVerifyJwt(token: string) {
-  return tryCatch(
+  return e.tryCatch(
     () =>
       jwt.verify(token, publicCert, {
         issuer: 'opencrvs:auth-service',
@@ -37,7 +36,7 @@ function safeVerifyJwt(token: string) {
 }
 
 export function verifyToken(token: string) {
-  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
+  return f.pipe(token, safeVerifyJwt, e.chainW(tokenPayload.decode))
 }
 
 export const getTokenPayload = (token: string) => {

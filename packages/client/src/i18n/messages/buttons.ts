@@ -50,6 +50,7 @@ interface IButtonsMessages
   refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
+  printDeclaration: MessageDescriptor
   closeDeclaration: MessageDescriptor
   reactivate: MessageDescriptor
   search: MessageDescriptor
@@ -279,6 +280,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Delete declaration',
     description: 'Delete declaration button text',
     id: 'buttons.deleteDeclaration'
+  },
+  printDeclaration: {
+    id: 'buttons.printDeclaration',
+    defaultMessage: 'Print declaration',
+    description: 'Print declaration button text'
   },
   closeDeclaration: {
     defaultMessage: 'Close declaration',

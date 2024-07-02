@@ -8,7 +8,6 @@ title: Fetch birth registration (mark as downloaded)
 sequenceDiagram
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth
@@ -38,7 +37,7 @@ sequenceDiagram
     Workflow->>OpenHIM: Trigger mark event as downloaded
 
     OpenHIM--)Metrics: Trigger mark event as downloaded
-    Metrics->>InfluxDB: Write audit point "RETRIEVED"
+    Metrics->>Influx DB: Write audit point "RETRIEVED"
 
     GraphQL gateway->>OpenHIM: Fetch full Composition
     OpenHIM->>Gateway: Fetch full Composition (forward request)

@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers } from '@gateway/features/search/root-resolvers'
+import { resolvers as typeResolvers } from '@gateway/features/search/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-
+import { TestResolvers } from '@gateway/utils/testUtils'
+const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
 beforeEach(() => {
@@ -28,7 +29,7 @@ describe('Search root resolvers', () => {
       fetch.resetMocks()
       const validUserTokenRegister = jwt.sign(
         { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -41,7 +42,7 @@ describe('Search root resolvers', () => {
       }
       const validUserTokenDeclare = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -309,7 +310,7 @@ describe('Search root resolvers', () => {
       fetch.resetMocks()
       const declareToken = jwt.sign(
         { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',
@@ -322,7 +323,7 @@ describe('Search root resolvers', () => {
       }
       const sysadminUserToken = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
           algorithm: 'RS256',

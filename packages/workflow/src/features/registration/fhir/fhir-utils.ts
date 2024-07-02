@@ -15,14 +15,13 @@ import {
   EVENT_TYPE,
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
+import { FHIR_URL, getDefaultLanguage } from '@workflow/constants'
 import {
-  getTaskResource,
-  findPersonEntry,
   getSectionEntryBySectionCode,
-  findRelatedPersonEntry
+  findRelatedPersonEntry,
+  getTaskResourceFromFhirBundle
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 import {
   getComposition,
@@ -30,29 +29,48 @@ import {
   getPatientBySection
 } from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@workflow/logger'
 import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import {
+  Bundle,
+  BundleEntry,
+  Composition,
+  Location,
+  OpenCRVSPatientName,
+  Patient,
+  Resource,
+  Saved,
+  Task,
+  findExtension,
+  isSaved
+} from '@opencrvs/commons/types'
+import { logger } from '@opencrvs/commons'
 
-export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
+export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getPhoneNo(
+    getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
+    getEventType(fhirBundle)
+  )
 }
 
-export async function getSharedContactEmail(fhirBundle: fhir.Bundle) {
+export async function getSharedContactEmail(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return getEmailAddress(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getEmailAddress(
+    getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
+    getEventType(fhirBundle)
+  )
 }
 
-export function concatenateName(fhirNames: fhir.HumanName[]) {
+export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
-  const name = fhirNames.find((humanName: fhir.HumanName) => {
+  const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
-  }) as (Omit<fhir.HumanName, 'family'> & { family?: string[] }) | undefined
+  }) as (Omit<fhir3.HumanName, 'family'> & { family?: string[] }) | undefined
 
   if (!name) {
     throw new Error(`Didn't found informant's ${language} name`)
@@ -62,23 +80,8 @@ export function concatenateName(fhirNames: fhir.HumanName[]) {
     .join(' ')
 }
 
-export async function getSubjectName(
-  fhirBundle: fhir.Bundle,
-  sectionCode: string = CHILD_SECTION_CODE
-) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
-  }
-  const person = await findPersonEntry(sectionCode, fhirBundle)
-  if (!person || !person.name) {
-    throw new Error("Didn't find subject's name information")
-  }
-
-  return concatenateName(person.name)
-}
-
 export async function getInformantName(
-  fhirBundle: fhir.Bundle,
+  fhirBundle: Bundle,
   sectionCode: string = CHILD_SECTION_CODE
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -91,45 +94,21 @@ export async function getInformantName(
   return concatenateName(informant.name)
 }
 
-export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
+export async function getRegistrationLocation(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
     )
   }
-  const taskResource = getTaskResource(fhirBundle)
-  const regLastOfficeExt = taskResource?.extension?.find(
-    (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
-  )
-  if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
-    throw new Error('No last registration office found on the bundle')
-  }
-  const office: fhir.Location = await getFromFhir(
-    `/${regLastOfficeExt.valueReference.reference}`
-  )
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? office.name
-      : (office.alias && office.alias[0]) || office.name) || ''
-  )
-}
-
-export async function getRegistrationLocation(fhirBundle: fhir.Bundle) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
-    )
-  }
-  const taskResource = getTaskResource(fhirBundle)
-  const regLastLocationExt = taskResource?.extension?.find(
-    (ext) =>
-      ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+  const taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  const regLastLocationExt = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+    taskResource?.extension || []
   )
   if (!regLastLocationExt || !regLastLocationExt.valueReference) {
     throw new Error('No last registration office found on the bundle')
   }
-  const location: fhir.Location = await getFromFhir(
+  const location: Location = await getFromFhir(
     `/${regLastLocationExt.valueReference.reference}`
   )
   const language = getDefaultLanguage()
@@ -140,7 +119,7 @@ export async function getRegistrationLocation(fhirBundle: fhir.Bundle) {
   )
 }
 
-export function getTrackingId(fhirBundle: fhir.Bundle) {
+export function getTrackingId(fhirBundle: Bundle) {
   const resource =
     fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
   if (!resource) {
@@ -148,7 +127,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   }
   switch (resource.resourceType) {
     case 'Composition':
-      const composition = resource as fhir.Composition
+      const composition = resource as Composition
       if (!composition.identifier) {
         throw new Error(
           'getTrackingId: Invalid FHIR bundle found for declaration'
@@ -156,14 +135,14 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
       }
       return composition.identifier.value
     case 'Task':
-      return getTrackingIdFromTaskResource(resource as fhir.Task)
+      return getTrackingIdFromTaskResource(resource as Task)
     default:
       return undefined
   }
 }
 
-export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
-  const eventType = getTaskEventType(taskResource) as EVENT_TYPE
+export function getTrackingIdFromTaskResource(taskResource: Task) {
+  const eventType = getTaskEventType(taskResource as Task) as EVENT_TYPE
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&
@@ -180,7 +159,7 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
 }
 
 export function getRegistrationNumber(
-  taskResource: fhir.Task,
+  taskResource: Task,
   eventType: EVENT_TYPE
 ) {
   const brnIdentifier =
@@ -199,18 +178,21 @@ export function getRegistrationNumber(
 }
 
 export function hasRegistrationNumber(
-  fhirBundle: fhir.Bundle,
+  fhirBundle: Bundle,
   eventType: EVENT_TYPE
 ) {
   try {
-    getRegistrationNumber(getTaskResource(fhirBundle), eventType)
+    getRegistrationNumber(
+      getTaskResourceFromFhirBundle(fhirBundle as Bundle) as Task,
+      eventType
+    )
     return true
   } catch (error) {
     return false
   }
 }
 
-export function getPaperFormID(taskResource: fhir.Task) {
+export function getPaperFormID(taskResource: Task) {
   const paperFormIdentifier =
     taskResource &&
     taskResource.identifier &&
@@ -240,11 +222,11 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
   }
 }
 
-export function getEntryId(fhirBundle: fhir.Bundle) {
+export function getEntryId(fhirBundle: Bundle) {
   const composition =
     fhirBundle &&
     fhirBundle.entry &&
-    (fhirBundle.entry[0].resource as fhir.Composition)
+    (fhirBundle.entry[0].resource as Composition)
 
   if (!composition || !composition.id) {
     throw new Error('getEntryId: Invalid FHIR bundle found for declaration')
@@ -252,12 +234,15 @@ export function getEntryId(fhirBundle: fhir.Bundle) {
   return composition.id
 }
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${HEARTH_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }
   })
     .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to resolve "${suffix}" from hearth`)
+      }
       return response.json()
     })
     .catch((error) => {
@@ -267,7 +252,8 @@ export const getFromFhir = (suffix: string) => {
 
 export async function forwardToHearth(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  payloadBundle?: Bundle
 ) {
   logger.info(
     `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
@@ -285,11 +271,11 @@ export async function forwardToHearth(
 
   let path = request.path
   if (request.method === 'post' || request.method === 'put') {
-    requestOpts.body = JSON.stringify(request.payload)
+    requestOpts.body = JSON.stringify(payloadBundle || request.payload)
   } else if (request.method === 'get') {
     path = `${request.path}${request.url.search}`
   }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
+  const res = await fetch(FHIR_URL + path.replace('/fhir', ''), requestOpts)
   const resBody = await res.text()
   const response = h.response(resBody)
 
@@ -303,7 +289,7 @@ export async function forwardToHearth(
 
 export async function postToHearth(payload: any) {
   /* hearth will do put calls if it finds id on the bundle */
-  const res = await fetch(HEARTH_URL, {
+  const res = await fetch(FHIR_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
@@ -318,9 +304,9 @@ export async function postToHearth(payload: any) {
   return res.json()
 }
 
-export async function updateResourceInHearth(resource: fhir.ResourceBase) {
+export async function updateResourceInHearth(resource: Resource) {
   const res = await fetch(
-    `${HEARTH_URL}/${resource.resourceType}/${resource.id}`,
+    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
     {
       method: 'PUT',
       body: JSON.stringify(resource),
@@ -341,18 +327,14 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
 }
 
 //TODO: need to modifty for marriage event
-export function getPhoneNo(taskResource: fhir.Task, eventType: EVENT_TYPE) {
+export function getPhoneNo(taskResource: Task, eventType: EVENT_TYPE) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
-    const phoneExtension =
-      taskResource &&
-      taskResource.extension &&
-      taskResource.extension.find((extension) => {
-        return (
-          extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
-        )
-      })
+    const phoneExtension = findExtension(
+      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
+      taskResource.extension || []
+    )
+
     phoneNumber = phoneExtension && phoneExtension.valueString
   }
   if (!phoneNumber) {
@@ -362,21 +344,14 @@ export function getPhoneNo(taskResource: fhir.Task, eventType: EVENT_TYPE) {
 }
 
 //TODO: need to modifty for marriage event
-export function getEmailAddress(
-  taskResource: fhir.Task,
-  eventType: EVENT_TYPE
-) {
+export function getEmailAddress(taskResource: Task, eventType: EVENT_TYPE) {
   let emailAddress
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
-    const emailExtension =
-      taskResource &&
-      taskResource.extension &&
-      taskResource.extension.find((extension) => {
-        return (
-          extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
-        )
-      })
+    const emailExtension = findExtension(
+      `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+      taskResource.extension || []
+    )
+
     emailAddress = emailExtension && emailExtension.valueString
   }
   if (!emailAddress) {
@@ -387,7 +362,7 @@ export function getEmailAddress(
 
 //TODO: need to modifty for marriage event
 export async function getEventInformantName(
-  composition: fhir.Composition,
+  composition: Composition,
   eventType: EVENT_TYPE
 ) {
   let subjectSection
@@ -412,7 +387,7 @@ export async function getEventInformantName(
   return concatenateName(subject.name)
 }
 
-export function generateEmptyBundle(): fhir.Bundle {
+export function generateEmptyBundle(): Bundle {
   return {
     resourceType: 'Bundle',
     type: 'document',
@@ -421,7 +396,7 @@ export function generateEmptyBundle(): fhir.Bundle {
 }
 
 export async function fetchExistingRegStatusCode(taskId: string | undefined) {
-  const existingTaskResource: fhir.Task = await getFromFhir(`/Task/${taskId}`)
+  const existingTaskResource: Task = await getFromFhir(`/Task/${taskId}`)
   const existingRegStatusCode =
     existingTaskResource &&
     existingTaskResource.businessStatus &&
@@ -434,10 +409,10 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
 }
 
 function mergeFhirIdentifiers(
-  currentIdentifiers: fhir.Identifier[],
-  newIdentifiers: fhir.Identifier[]
-): fhir.Identifier[] {
-  const identifierMap = new Map<string, fhir.Identifier>()
+  currentIdentifiers: fhir3.Identifier[],
+  newIdentifiers: fhir3.Identifier[]
+): fhir3.Identifier[] {
+  const identifierMap = new Map<string, fhir3.Identifier>()
   currentIdentifiers
     .filter((identifier) => Boolean(identifier.type?.coding?.[0]?.code))
     .forEach((identifier) =>
@@ -451,36 +426,34 @@ function mergeFhirIdentifiers(
   return [...identifierMap.values()]
 }
 
-export async function mergePatientIdentifier(bundle: fhir.Bundle) {
+export async function mergePatientIdentifier(bundle: Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
   return Promise.all(
     SECTION_CODE[event].map(async (sectionCode: string) => {
       const section = getSectionEntryBySectionCode(composition, sectionCode)
       const patient = getPatientBySection(bundle, section)
-      const patientFromFhir: fhir.Patient = await getFromFhir(
+      const patientFromFhir: Patient = await getFromFhir(
         `/Patient/${patient?.id}`
       )
       if (patientFromFhir) {
-        bundle.entry =
-          bundle &&
-          bundle.entry &&
-          bundle.entry.map((entry) => {
-            if (entry.resource?.id === patientFromFhir.id) {
-              return {
-                ...entry,
-                resource: {
-                  ...entry.resource,
-                  identifier: mergeFhirIdentifiers(
-                    patientFromFhir.identifier ?? [],
-                    (entry.resource as fhir.Patient).identifier ?? []
-                  )
-                }
+        bundle.entry = bundle.entry.map((entry) => {
+          const resource = entry.resource
+          if (isSaved(resource) && resource?.id === patientFromFhir.id) {
+            const newEntry = {
+              ...entry,
+              resource: {
+                ...resource,
+                identifier: mergeFhirIdentifiers(
+                  patientFromFhir.identifier ?? [],
+                  (entry.resource as Saved<Patient>).identifier ?? []
+                )
               }
-            } else {
-              return entry
             }
-          })
+            return newEntry
+          }
+          return entry
+        })
       }
     })
   )
@@ -494,11 +467,11 @@ export async function forwardEntriesToHearth(
     `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
   )
 
-  const payload = request.payload as fhir.Bundle & { entry: fhir.BundleEntry[] }
+  const payload = request.payload as Bundle & { entry: BundleEntry[] }
   const res = await Promise.all(
     payload.entry.map((entry) => {
       return fetch(
-        `${HEARTH_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
+        `${FHIR_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
         {
           method: 'PUT',
           body: JSON.stringify(entry.resource),

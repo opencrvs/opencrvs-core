@@ -8,33 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { useIntl } from 'react-intl'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  IInProgressStatus,
+  INPROGRESS_STATUS,
+  IRetryStatus,
+  isSubmissionAction
+} from '@client/SubmissionController'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import { declarationReadyForStatusChange } from '@client/declarations/submissionMiddleware'
 import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import {
-  ColumnContentAlignment,
-  COLUMNS,
-  Workqueue,
-  SORT_ORDER
-} from '@opencrvs/components/lib/Workqueue'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/notifications'
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import {
-  ConnectionError,
-  StatusSubmissionWaiting as StatusWaiting
-} from '@opencrvs/components/lib/icons'
-import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { useOnlineStatus } from '@client/utils'
 import {
   formatPlainDate,
   isValidPlainDate
 } from '@client/utils/date-formatting'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -45,15 +41,21 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import {
-  ALLOWED_STATUS_FOR_RETRY,
-  IInProgressStatus,
-  INPROGRESS_STATUS,
-  IRetryStatus
-} from '@client/SubmissionController'
-import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib'
-import { getDeclarationFullName } from '@client/utils/draftUtils'
+import {
+  COLUMNS,
+  ColumnContentAlignment,
+  SORT_ORDER,
+  Workqueue
+} from '@opencrvs/components/lib/Workqueue'
+import {
+  ConnectionError,
+  StatusSubmissionWaiting as StatusWaiting
+} from '@opencrvs/components/lib/icons'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
@@ -66,6 +68,7 @@ const statusMessageMap = {
   [SUBMISSION_STATUS.REGISTERING]: messages.statusRegistering,
   [SUBMISSION_STATUS.REQUESTING_CORRECTION]:
     messages.statusRequestingCorrection,
+  [SUBMISSION_STATUS.CORRECTION_REQUESTED]: messages.statusRequestingCorrection,
   [SUBMISSION_STATUS.READY_TO_REJECT]: messages.statusWaitingToReject,
   [SUBMISSION_STATUS.REJECTING]: messages.statusRejecting,
   [SUBMISSION_STATUS.READY_TO_REINSTATE]: messages.statusWaitingToBeReinstated,
@@ -76,7 +79,8 @@ const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_ISSUE]: messages.statusWaitingToIssue,
   [SUBMISSION_STATUS.CERTIFYING]: messages.statusCertifying,
   [SUBMISSION_STATUS.ISSUING]: messages.statusIssuing,
-  [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry
+  [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry,
+  [SUBMISSION_STATUS.FAILED]: messages.failed
 } as const
 
 const statusInprogressIconIdMap = {
@@ -91,7 +95,10 @@ const statusInprogressIconIdMap = {
   [SUBMISSION_STATUS.ISSUING]: 'issuing'
 }
 
-type OutboxSubmissionStatus = IRetryStatus | IInProgressStatus
+type OutboxSubmissionStatus =
+  | IRetryStatus
+  | IInProgressStatus
+  | SUBMISSION_STATUS.FAILED
 
 function isInprogressStatus(
   status: OutboxSubmissionStatus
@@ -129,7 +136,11 @@ const isOutboxDeclaration = (
 } =>
   Boolean(declaration.submissionStatus) &&
   (
-    [...ALLOWED_STATUS_FOR_RETRY, ...INPROGRESS_STATUS] as SUBMISSION_STATUS[]
+    [
+      ...ALLOWED_STATUS_FOR_RETRY,
+      ...INPROGRESS_STATUS,
+      SUBMISSION_STATUS.FAILED
+    ] as SUBMISSION_STATUS[]
   ).includes(declaration.submissionStatus as SUBMISSION_STATUS)
 
 export function Outbox() {
@@ -142,6 +153,7 @@ export function Outbox() {
   const declarations = useSelector((state: IStoreState) =>
     state.declarationsState?.declarations.filter(isOutboxDeclaration)
   )
+  const dispatch = useDispatch()
 
   React.useEffect(() => {
     function recordWindowWidth() {
@@ -213,7 +225,33 @@ export function Outbox() {
           />
         ),
         submissionStatus: statusText,
-        statusIndicator: icon ? [{ actionComponent: icon }] : null,
+        statusIndicator:
+          declaration.submissionStatus === SUBMISSION_STATUS.FAILED
+            ? [
+                {
+                  label: intl.formatMessage(messages.retry),
+                  disabled: false,
+                  handler: (
+                    e:
+                      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+                      | undefined
+                  ) => {
+                    e && e.stopPropagation()
+                    if (!isSubmissionAction(declaration.action!)) {
+                      return
+                    }
+                    dispatch(
+                      declarationReadyForStatusChange({
+                        ...declaration,
+                        action: declaration.action
+                      })
+                    )
+                  }
+                }
+              ]
+            : icon
+            ? [{ actionComponent: icon }]
+            : null,
         dateOfEvent
       }
     })
@@ -266,14 +304,14 @@ export function Outbox() {
           },
           {
             label: '',
-            width: 21,
+            width: 15,
             key: 'submissionStatus',
             alignment: ColumnContentAlignment.RIGHT,
             color: theme.colors.supportingCopy
           },
           {
             label: '',
-            width: 4,
+            width: 10,
             key: 'statusIndicator',
             isActionColumn: true
           }

@@ -31,7 +31,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger } from '@auth/logger'
+import { logger } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import { chainW, tryCatch } from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'

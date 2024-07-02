@@ -32,7 +32,7 @@ describe('Verify handlers', () => {
         {
           scope: ['anonymous']
         },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -59,7 +59,7 @@ describe('Verify handlers', () => {
         {
           scope: ['register']
         },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -92,7 +92,7 @@ describe('Verify handlers', () => {
         {
           scope: ['register']
         },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -164,7 +164,7 @@ describe('Verify handlers', () => {
         {
           scope: ['register', 'validate', 'declare']
         },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',

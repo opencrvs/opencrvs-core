@@ -271,9 +271,25 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
+        requesterOther
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus
@@ -339,12 +355,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
@@ -540,6 +556,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       history {
         otherReason
         requester
+        requesterOther
         date
         action
         regStatus
@@ -604,12 +621,12 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument

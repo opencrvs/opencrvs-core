@@ -22,7 +22,7 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
-import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToFieldAgentList } from '@client/navigation'

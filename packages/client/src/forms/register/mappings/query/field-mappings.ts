@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
+import type {
   GQLAddress,
   GQLHumanName,
   GQLAttachment
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   BirthRegistration,
   DeathRegistration,
@@ -831,13 +831,12 @@ const setAddressPropFromFHIRProp = (
   fieldName: string,
   offlineData?: IOfflineData
 ) => {
-  const value =
-    fhirProp === 'country'
-      ? (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
-          ?.label.defaultMessage as string) || ''
-      : addressFromQuery[fhirProp] || ''
+  const value = addressFromQuery[fhirProp] || ''
+
   if (fhirProp === 'country') {
-    transformedData[sectionId][fieldName] = value
+    transformedData[sectionId][fieldName] =
+      (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
+        ?.label as MessageDescriptor as IFormData) || ''
   } else if (
     addressFromQuery?.['country'] === window.config.COUNTRY &&
     !fieldName.includes('international')
@@ -946,34 +945,35 @@ export const eventLocationAddressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
 
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
+    ) {
+      if (!offlineData || !location) {
+        return
+      }
+      const facility =
+        offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
+
+      if (!facility) {
+        return
+      }
+      const locationHierarchy = getLocationHierarchy(
+        facility.partOf.split('/').at(1)!,
+        offlineData.locations
+      )
+      const locationId = locationHierarchy[location]
+      if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
+        transformedData[sectionId][transformedFieldName] =
+          offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
+        transformedData[sectionId][`${transformedFieldName}Id`] = locationId
+      }
+      return
+    }
+
     const addressFromQuery = queryData.eventLocation?.address
 
     if (addressFromQuery?.line) {
-      if (
-        queryData.eventLocation?.type &&
-        queryData.eventLocation?.type === 'HEALTH_FACILITY'
-      ) {
-        if (!offlineData || !location) {
-          return
-        }
-        const facility =
-          offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
-
-        if (!facility) {
-          return
-        }
-        const locationHierarchy = getLocationHierarchy(
-          facility.partOf.split('/').at(1)!,
-          offlineData.locations
-        )
-        const locationId = locationHierarchy[location]
-        if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
-          transformedData[sectionId][transformedFieldName] =
-            offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
-          transformedData[sectionId][`${transformedFieldName}Id`] = locationId
-        }
-        return
-      }
       const idOrValue = addressFromQuery.line[lineNumber] || ''
       if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
         transformedData[sectionId][transformedFieldName] =

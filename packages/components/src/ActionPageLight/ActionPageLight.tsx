@@ -57,15 +57,20 @@ interface IProps {
   id?: string
   goHome?: () => void
   children?: React.ReactNode
+  goBack: () => void
 }
 
-export class ActionPageLight extends React.Component<
-  IProps & {
-    goBack: () => void
-  }
-> {
-  getHeaderLeft = () => {
-    const { icon, goBack, backLabel } = this.props
+export const ActionPageLight = ({
+  id,
+  title,
+  hideBackground,
+  icon,
+  backLabel,
+  goBack,
+  goHome,
+  children
+}: IProps) => {
+  const getHeaderLeft = () => {
     return (
       <BackButtonContainer
         id="action_page_back_button"
@@ -77,8 +82,8 @@ export class ActionPageLight extends React.Component<
       </BackButtonContainer>
     )
   }
-  getHeaderRight = () => {
-    const { goHome } = this.props
+
+  const getHeaderRight = () => {
     return (
       goHome && (
         <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
@@ -88,26 +93,20 @@ export class ActionPageLight extends React.Component<
     )
   }
 
-  render() {
-    const { id, title, hideBackground } = this.props
-
-    const appBarProps: IAppBarProps = {
-      id: 'appBar',
-      mobileTitle: title,
-      mobileLeft: this.getHeaderLeft(),
-      mobileRight: this.getHeaderRight(),
-      desktopTitle: title,
-      desktopLeft: this.getHeaderLeft(),
-      desktopRight: this.getHeaderRight()
-    }
-
-    return (
-      <ActionContainer id={id}>
-        <AppBar {...appBarProps} />
-        <Container hideBackground={hideBackground}>
-          {this.props.children}
-        </Container>
-      </ActionContainer>
-    )
+  const appBarProps: IAppBarProps = {
+    id: 'appBar',
+    mobileTitle: title,
+    mobileLeft: getHeaderLeft(),
+    mobileRight: getHeaderRight(),
+    desktopTitle: title,
+    desktopLeft: getHeaderLeft(),
+    desktopRight: getHeaderRight()
   }
+
+  return (
+    <ActionContainer id={id}>
+      <AppBar {...appBarProps} />
+      <Container hideBackground={hideBackground}>{children}</Container>
+    </ActionContainer>
+  )
 }

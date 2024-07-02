@@ -10,7 +10,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import * as Joi from 'joi'
 import InformantSMSNotification from '@config/models/informantSMSNotifications'
 import { badRequest } from '@hapi/boom'

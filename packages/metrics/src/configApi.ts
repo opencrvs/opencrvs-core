@@ -91,15 +91,13 @@ export async function getApplicationConfig(
     })
 }
 
-export async function getDashboardQueries(
-  authorization: string
-): Promise<Array<{ collection: string; aggregate: Document[] }>> {
-  const token = authorization.replace('Bearer ', '')
+export async function getDashboardQueries(): Promise<
+  Array<{ collection: string; aggregate: Document[] }>
+> {
   return fetch(`${CONFIG_API_URL}/dashboardQueries`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     }
   })
     .then((response) => {

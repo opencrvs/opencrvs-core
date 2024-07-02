@@ -1,5 +1,3 @@
 // Vitest Snapshot v1
 
 exports[`image upload component > renders without crashing 1`] = `ShallowWrapper {}`;
-
-exports[`image upload component renders without crashing 1`] = `ShallowWrapper {}`;

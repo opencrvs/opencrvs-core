@@ -45,7 +45,7 @@ describe('.populateBundleFromPayload()', () => {
       {
         resourceType: 'Task',
         focus: { reference: 'Composition/123' },
-        status: 'requested',
+        status: 'ready',
         intent: ''
       },
       'Bearer xyz'
@@ -85,7 +85,7 @@ describe('.populateBundleFromPayload()', () => {
       populateBundleFromPayload(
         {
           resourceType: 'Task',
-          status: 'requested',
+          status: 'ready',
           intent: ''
         },
         'Bearer xyz'
@@ -103,7 +103,7 @@ describe('.populateBundleFromPayload()', () => {
         {
           resourceType: 'Task',
           focus: { reference: 'Composition/123' },
-          status: 'requested',
+          status: 'ready',
           intent: ''
         },
         'Bearer xyz'

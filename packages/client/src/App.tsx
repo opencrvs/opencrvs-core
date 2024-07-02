@@ -25,7 +25,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
-import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
@@ -48,8 +47,6 @@ import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { ApplicationConfig } from './views/SysAdmin/Config/Application'
-import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
@@ -63,14 +60,16 @@ import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
+import { PrintRecord } from './views/PrintRecord/PrintRecord'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
+import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
+import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -234,6 +233,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              path={routes.REVIEW_CORRECTION}
+                                              component={ReviewCorrection}
+                                            />
+                                            <ProtectedRoute
+                                              exact
                                               path={routes.REGISTRAR_HOME}
                                               component={OfficeHome}
                                             />
@@ -254,18 +258,8 @@ export function App(props: IAppProps) {
                                               roles={[
                                                 SystemRoleType.NationalSystemAdmin
                                               ]}
-                                              path={routes.CERTIFICATE_CONFIG}
-                                              component={CertificatesConfig}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={
-                                                routes.INFORMANT_NOTIFICATION
-                                              }
-                                              component={InformantNotification}
+                                              path={routes.ALL_USER_EMAIL}
+                                              component={AllUserEmail}
                                             />
                                             <ProtectedRoute
                                               exact
@@ -288,22 +282,6 @@ export function App(props: IAppProps) {
                                                 routes.ADVANCED_SEARCH_RESULT
                                               }
                                               component={AdvancedSearchResult}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={routes.APPLICATION_CONFIG}
-                                              component={ApplicationConfig}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={routes.USER_ROLES_CONFIG}
-                                              component={UserRoles}
                                             />
                                             <ProtectedRoute
                                               path={
@@ -338,9 +316,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               path={routes.REVIEW_CERTIFICATE}
-                                              component={
-                                                ReviewCertificateAction
-                                              }
+                                              component={ReviewCertificate}
                                             />
                                             <ProtectedRoute
                                               path={
@@ -563,6 +539,11 @@ export function App(props: IAppProps) {
                                               component={
                                                 OIDPVerificationCallback
                                               }
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.PRINT_RECORD}
+                                              component={PrintRecord}
                                             />
                                           </Switch>
                                         </TransitionWrapper>
