@@ -901,6 +901,7 @@ class FormSectionComponent extends React.Component<Props> {
             `${field.name}-mm`,
             `${field.name}-yyyy`
           ]
+          // for date range picker fields
           const dateRangeFields = [
             `${field.name}exact-dd`,
             `${field.name}exact-mm`,
@@ -914,7 +915,7 @@ class FormSectionComponent extends React.Component<Props> {
             touched[field.name] = areFieldsTouched(dateFields)
           }
 
-          if (isDateRangePickerField && areFieldsTouched(dateFields)) {
+          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
             touched[field.name] = areFieldsTouched(dateRangeFields)
           }
 
