@@ -127,35 +127,12 @@ type IDispatchProps = {
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
-  section = correctionFeesPaymentSection
-  group = this.section.groups[0]
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       isFileUploading: false,
       showPrompt: false
     }
-  }
-
-  componentDidMount() {
-    this.group = {
-      ...this.group,
-      fields: replaceInitialValues(
-        this.group.fields,
-        this.props.declaration.data[this.section.id] || {},
-        this.props.declaration.data
-      )
-    }
-    const currency = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
-
-    ;(
-      this.group.fields[0].nestedFields as any
-    ).REQUIRED[0].label.defaultMessage = this.props.intl.formatMessage(
-      messages.correctionSummaryTotalPaymentLabel,
-      { currency }
-    )
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
@@ -178,6 +155,21 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration: { event },
       userRole
     } = this.props
+
+    const currencySymbol = getCurrencySymbol(
+      this.props.offlineResources.config.CURRENCY
+    )
+    const section = correctionFeesPaymentSection(currencySymbol)
+
+    const group = {
+      ...section.groups[0],
+      fields: replaceInitialValues(
+        section.groups[0].fields,
+        this.props.declaration.data[section.id] || {},
+        this.props.declaration.data
+      )
+    }
+
     const { showPrompt } = this.state
     const formSections = getViewableSection(registerForm[event], declaration)
     const relationShip = (
@@ -202,13 +194,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <SuccessButton
         id="make_correction"
         key="make_correction"
-        onClick={() => {
-          userRole === ROLE_REGISTRATION_AGENT
-            ? this.togglePrompt()
-            : this.makeCorrection(userRole)
-        }}
+        onClick={this.togglePrompt}
         disabled={
-          sectionHasError(this.group, this.section, declaration) ||
+          sectionHasError(group, section, declaration) ||
           this.state.isFileUploading
         }
         icon={() => <Check />}
@@ -365,16 +353,16 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
             <FormFieldGenerator
-              id={this.group.id}
+              id={group.id}
               onChange={(values) => {
                 this.modifyDeclaration(
                   values,
-                  correctionFeesPaymentSection,
+                  correctionFeesPaymentSection(currencySymbol),
                   declaration
                 )
               }}
               setAllFieldsDirty={false}
-              fields={this.group.fields}
+              fields={group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
               requiredErrorMessage={messages.correctionRequiredLabel}
@@ -384,7 +372,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <Dialog
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
-          title={intl.formatMessage(messages.correctionForApprovalDialogTitle)}
+          title={intl.formatMessage(
+            this.props.userRole === ROLE_REGISTRATION_AGENT
+              ? messages.correctionForApprovalDialogTitle
+              : messages.correctRecordDialogTitle
+          )}
           onClose={this.togglePrompt}
           actions={[
             <Button
@@ -413,7 +405,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                messages.correctionForApprovalDialogDescription
+                this.props.userRole === ROLE_REGISTRATION_AGENT
+                  ? messages.correctionForApprovalDialogDescription
+                  : messages.correctRecordDialogDescription
               )}
             </Text>
           </p>
