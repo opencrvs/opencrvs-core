@@ -19,6 +19,11 @@ import {
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
+type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
+export type SearchCriteria = {
+  [K in UserSearchCriteria]?: string
+}
+
 export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
@@ -96,7 +101,6 @@ export function getPrimaryLocationFromLocationList(
   if (!primaryLocationId) {
     throw new Error('No primary location found')
   }
-
   const location = locations.find((loc) => loc.id === primaryLocationId)
   if (!location) {
     throw new Error(
@@ -119,23 +123,58 @@ function getOfficeLocationFromLocationList(
       })
     }
   })
-
   if (!office) {
     throw new Error('No CRVS office found')
   }
   return office
 }
 
-export async function getLoggedInPractitionerLocations(
-  token: string
-): Promise<[fhir3.Location]> {
-  const practitionerResource = await getLoggedInPractitionerResource(token)
+export async function getUserByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
 
-  if (!practitionerResource || !practitionerResource.id) {
-    throw new Error('Invalid practioner found')
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user in workflow. Error: ${res.status} status received`
+    )
   }
-  /* getting location list for practitioner */
-  return await getPractitionerLocations(practitionerResource.id)
+
+  const body = await res.json()
+
+  return body
+}
+
+export async function getSystemByCriteria(
+  authHeader: { Authorization: string },
+  criteria: SearchCriteria
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
+    method: 'POST',
+    body: JSON.stringify(criteria),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system in workflow. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
 }
 
 export async function getLoggedInPractitionerResource(

@@ -26,6 +26,11 @@ interface ISearchEventDataTemplate {
 }
 interface ISearchDataTemplate {
   [key: string]: any
+  compositionId: string
+  informantType?: string
+  contactNumber?: string
+  contactEmail?: string
+  eventLocationId?: string
 }
 
 interface IAssignment {
@@ -326,6 +331,15 @@ export const searchTypeResolvers: GQLResolver = {
     },
     duplicates(searchData: ISearchDataTemplate) {
       return searchData.relatesTo
+    },
+    contactRelationship(searchData: ISearchDataTemplate) {
+      return searchData.informantType
+    },
+    contactNumber(searchData: ISearchDataTemplate) {
+      return searchData.contactNumber
+    },
+    contactEmail(searchData: ISearchDataTemplate) {
+      return searchData.contactEmail
     }
   },
   OperationHistorySearchSet: {

@@ -119,7 +119,9 @@ export const internationaliseFieldObject = (
   const base = {
     ...field,
     label:
-      field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
+      field.type === PARAGRAPH
+        ? field.label
+        : intl.formatMessage(field.label, field.labelParam),
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
     unit: field.unit && intl.formatMessage(field.unit),

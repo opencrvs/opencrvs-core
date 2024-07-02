@@ -19,13 +19,13 @@ import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, logger, findAssignment } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { hasScope, inScope } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
-import { logger } from '@opencrvs/commons'
 import { auditEvent } from '@workflow/records/audit'
+import { getUserOrSystem } from '@workflow/records/user'
 
 function getDownloadedOrAssignedExtension(
   authHeader: IAuthHeader,
@@ -55,6 +55,15 @@ export async function downloadRecordHandler(
   const token = getToken(request)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
+  const assignment = findAssignment(record)
+
+  if (assignment) {
+    const userOrSystem = await getUserOrSystem(token)
+    const practitionerId = userOrSystem.practitionerId
+
+    if (assignment.practitioner.id !== practitionerId)
+      throw new Error('Record is assigned to a different user')
+  }
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)

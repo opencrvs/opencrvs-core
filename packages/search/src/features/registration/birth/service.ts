@@ -38,14 +38,15 @@ import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   SavedBundle,
   Patient,
   getFromBundleById,
   getTaskFromSavedBundle,
   SavedTask,
   resourceIdentifierToUUID,
-  SavedRelatedPerson
+  SavedRelatedPerson,
+  getInformantType,
+  ValidRecord
 } from '@opencrvs/commons/types'
 
 const MOTHER_CODE = 'mother-details'
@@ -309,10 +310,14 @@ async function createDeclarationIndex(
       (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.informantType =
+  const otherInformantType =
     (contactPersonRelationshipExtention &&
       contactPersonRelationshipExtention.valueString) ||
     (contactPersonExtention && contactPersonExtention.valueString)
+
+  const informantType = getInformantType(bundle as ValidRecord)
+
+  body.informantType = informantType || otherInformantType
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.contactEmail = emailExtension && emailExtension.valueString

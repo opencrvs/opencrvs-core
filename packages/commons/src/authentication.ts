@@ -85,7 +85,7 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: string[]
+  scope: Scope[]
 }
 
 export function hasScope(authHeader: IAuthHeader, scope: Scope) {
