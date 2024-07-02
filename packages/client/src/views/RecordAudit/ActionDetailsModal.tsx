@@ -82,6 +82,16 @@ function retrieveUniqueComments(
   return comments
 }
 
+function retrieveCorrectionComment(actionDetailsData: History) {
+  if (!Array.isArray(actionDetailsData.comments)) {
+    return []
+  }
+
+  const comment = actionDetailsData.comments[1]?.comment
+
+  return comment ? [{ comment }] : []
+}
+
 function getHistories(draft: IDeclaration | null) {
   const histories: History[] =
     draft?.data.history && Array.isArray(draft.data.history)
@@ -113,9 +123,12 @@ function prepareComments(
   }
 
   const histories = getHistories(draft)
-  const currentHistoryItemIndex = histories.findIndex(
-    (item) => item.date === actionDetailsData.date
-  )
+  const currentHistoryItemIndex = histories
+    .filter(({ regStatus }: Partial<History>) => {
+      return regStatus !== RegStatus.WaitingValidation
+    })
+    .findIndex((item) => item.date === actionDetailsData.date)
+
   const previousHistoryItemIndex =
     currentHistoryItemIndex < 0
       ? currentHistoryItemIndex
@@ -130,6 +143,13 @@ function prepareComments(
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
   }
+
+  if (
+    [RegAction.RequestedCorrection, RegAction.Corrected].includes(
+      actionDetailsData.action as RegAction
+    )
+  )
+    return retrieveCorrectionComment(actionDetailsData)
 
   return retrieveUniqueComments(
     histories,
