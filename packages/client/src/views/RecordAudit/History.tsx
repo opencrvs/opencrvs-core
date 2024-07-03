@@ -25,7 +25,7 @@ import {
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
-import { getIndividualNameObj, getUserRole } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
@@ -40,6 +40,7 @@ import { useSelector } from 'react-redux'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { ILocation } from '@client/offline/reducer'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 
 const TableDiv = styled.div`
   overflow: auto;
