@@ -93,6 +93,9 @@ Array [
     "lastModified": "STATIC",
     "note": Array [
       Object {
+        "text": "Both mother and father were present",
+      },
+      Object {
         "text": "Note",
       },
     ],

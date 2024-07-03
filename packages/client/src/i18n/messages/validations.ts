@@ -8,9 +8,52 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const messagesToDefine = {
+interface IValidationMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
+  phoneNumberNotValid: MessageDescriptor
+  bengaliOnlyNameFormat: MessageDescriptor
+  blockAlphaNumericDot: MessageDescriptor
+  dateFormat: MessageDescriptor
+  dobEarlierThanDom: MessageDescriptor
+  domLaterThanDob: MessageDescriptor
+  emailAddressFormat: MessageDescriptor
+  englishOnlyNameFormat: MessageDescriptor
+  facilityMustBeSelected: MessageDescriptor
+  officeMustBeSelected: MessageDescriptor
+  greaterThanZero: MessageDescriptor
+  isValidBirthDate: MessageDescriptor
+  isValidDateOfDeath: MessageDescriptor
+  isDateNotBeforeBirth: MessageDescriptor
+  isDateNotAfterDeath: MessageDescriptor
+  isMoVisitBeforeBirth: MessageDescriptor
+  isMoVisitAfterDeath: MessageDescriptor
+  isInformantOfLegalAge: MessageDescriptor
+  illegalMarriageAge: MessageDescriptor
+  maxLength: MessageDescriptor
+  minLength: MessageDescriptor
+  notGreaterThan: MessageDescriptor
+  numberRequired: MessageDescriptor
+  phoneNumberFormat: MessageDescriptor
+  range: MessageDescriptor
+  requiredBasic: MessageDescriptor
+  required: MessageDescriptor
+  requiredForNewUser: MessageDescriptor
+  requiredReasonForCorrection: MessageDescriptor
+  requiredSymbol: MessageDescriptor
+  validBirthRegistrationNumber: MessageDescriptor
+  validDeathRegistrationNumber: MessageDescriptor
+  validNationalId: MessageDescriptor
+  validNationalIDLengths: MessageDescriptor
+  duplicateNationalID: MessageDescriptor
+  validPassportNumber: MessageDescriptor
+  validDrivingLicenseNumber: MessageDescriptor
+  nonDecimalPointNumber: MessageDescriptor
+  invalidDate: MessageDescriptor
+}
+
+const messagesToDefine: IValidationMessages = {
   phoneNumberNotValid: {
     id: 'register.SelectContactPoint.phoneNoError',
     defaultMessage: 'Not a valid mobile number',
@@ -239,6 +282,11 @@ const messagesToDefine = {
     defaultMessage: 'Can not have any decimal point number',
     description:
       'The error message that appeards when any decimal point number is used'
+  },
+  invalidDate: {
+    id: 'validations.invalidDate',
+    defaultMessage: 'Invalid date field',
+    description: 'The error message that appears when a date field is invalid'
   }
 }
 
