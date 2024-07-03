@@ -27,9 +27,15 @@ const CertificateSchema = z.array(
   })
 )
 
-async function getCertificate() {
+async function getCertificate(token: string) {
   const url = new URL('certificates', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
   if (!res.ok) {
     raise(`Expected to get the certificates from ${url}`)
   }
@@ -118,7 +124,7 @@ async function uploadCertificate(token: string, certificate: CertificateInput) {
 }
 
 export async function seedCertificate(token: string) {
-  const certificates = await getCertificate()
+  const certificates = await getCertificate(token)
   await Promise.all(
     certificates.map(async ({ fileName, ...certificate }) => {
       await uploadCertificate(token, {
