@@ -227,7 +227,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
 
   const getComments = () => {
     const reason = correctionRequestTask
-    return reason?.comments && (reason.comments[0]?.comment as string)
+    return reason?.comments && (reason.comments[1]?.comment as string)
   }
 
   const getFieldValue = (
