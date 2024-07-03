@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { withTheme } from 'styled-components'
@@ -32,15 +32,7 @@ import {
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import {
-  BRN_DRN_TEXT,
-  EMPTY_STRING,
-  NAME_TEXT,
-  NATIONAL_ID_TEXT,
-  PHONE_TEXT,
-  SEARCH_RESULT_SORT,
-  TRACKING_ID_TEXT
-} from '@client/utils/constants'
+import { EMPTY_STRING } from '@client/utils/constants'
 import {
   buttonMessages,
   constantsMessages,
@@ -48,7 +40,6 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
@@ -73,7 +64,6 @@ import {
   NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
@@ -86,6 +76,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -136,9 +127,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     (properties: string | null) =>
       properties === null || properties === EMPTY_STRING
   )
+
   const offlineData = useSelector(getOfflineData)
   const DEFAULT_PAGE_SIZE = 10
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+
+  const searchEventsQueryVariables = {
+    advancedSearchParameters: filteredAdvancedSearchParams,
+    count: DEFAULT_PAGE_SIZE,
+    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
+  }
 
   useEffect(() => {
     const recordWindowWidth = () => {
@@ -253,8 +251,6 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { match, userDetails } = props
-        const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
@@ -316,25 +312,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 refetchQueries: [
                   {
                     query: SEARCH_EVENTS,
-                    variables: {
-                      advancedSearchParameters: {
-                        trackingId:
-                          searchType === TRACKING_ID_TEXT ? searchText : '',
-                        nationalId:
-                          searchType === NATIONAL_ID_TEXT ? searchText : '',
-                        registrationNumber:
-                          searchType === BRN_DRN_TEXT ? searchText : '',
-                        contactNumber:
-                          searchType === PHONE_TEXT
-                            ? convertToMSISDN(searchText, window.config.COUNTRY)
-                            : '',
-                        name: searchType === NAME_TEXT ? searchText : '',
-                        declarationLocationId: userDetails
-                          ? getUserLocation(userDetails).id
-                          : ''
-                      },
-                      sort: SEARCH_RESULT_SORT
-                    }
+                    variables: searchEventsQueryVariables
                   }
                 ],
                 action:
@@ -417,13 +395,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
       {isEnoughParams() && (
         <Query<SearchEventsQuery>
           query={SEARCH_EVENTS}
-          variables={{
-            advancedSearchParameters: {
-              ...filteredAdvancedSearchParams
-            },
-            count: DEFAULT_PAGE_SIZE,
-            skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
-          }}
+          variables={searchEventsQueryVariables}
           fetchPolicy="cache-and-network"
         >
           {({ loading, error, data }) => {
