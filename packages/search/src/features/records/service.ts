@@ -506,13 +506,6 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       'Observation'
     ),
 
-    // Get DocumentReferences by Encounter ids
-    // (Encounter.id -> DocumentReference.subject.reference)
-    ...joinFromResourcesIdToResourceIdentifier(
-      'Encounter',
-      'subject.reference',
-      'DocumentReference'
-    ),
     {
       $addFields: {
         /*
@@ -670,6 +663,13 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    // Get DocumentReferences by Encounter ids
+    // (Encounter.id -> DocumentReference.subject.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'subject.reference',
+      'DocumentReference'
+    ),
     // Get Locations by Encounter location ids
     {
       $lookup: {
