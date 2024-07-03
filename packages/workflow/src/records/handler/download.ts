@@ -55,15 +55,6 @@ export async function downloadRecordHandler(
   const token = getToken(request)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
-  const assignment = findAssignment(record)
-
-  if (assignment) {
-    const userOrSystem = await getUserOrSystem(token)
-    const practitionerId = userOrSystem.practitionerId
-
-    if (assignment.practitioner.id !== practitionerId)
-      throw new Error('Record is assigned to a different user')
-  }
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)
@@ -85,8 +76,17 @@ export async function downloadRecordHandler(
 
   const auditRecordEvent =
     extensionUrl === 'http://opencrvs.org/specs/extension/regDownloaded'
-      ? 'downloaded'
+      ? 'downloaded' // retrieve event
       : 'assigned'
+
+  const assignment = findAssignment(record)
+  if (assignment && auditRecordEvent === 'assigned') {
+    const userOrSystem = await getUserOrSystem(token)
+    const practitionerId = userOrSystem.practitionerId
+
+    if (assignment.practitioner.id !== practitionerId)
+      throw new Error('Record is assigned to a different user')
+  }
 
   /*
    * Storing the details of the downloaded record in the database(s) is slow.
