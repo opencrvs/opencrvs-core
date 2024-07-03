@@ -1035,6 +1035,9 @@ export function createCorrectionRequestTask(
     },
     note: [
       {
+        text: previousTask.note?.[0]?.text || ''
+      },
+      {
         text: correctionDetails.note
       }
     ],
