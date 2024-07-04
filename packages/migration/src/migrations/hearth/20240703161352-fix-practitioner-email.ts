@@ -17,9 +17,9 @@ const USER_MGNT_MONGO_URL =
 export const up = async (db: Db, client: MongoClient) => {
   const userMgntDb = (await new MongoClient(USER_MGNT_MONGO_URL).connect()).db()
 
-  const practitioners = await db.collection('Practitioner').find({}).toArray()
+  const practitioners = db.collection('Practitioner').find({})
 
-  for (const practitioner of practitioners) {
+  for await (const practitioner of practitioners) {
     const user = await userMgntDb
       .collection('users')
       .findOne({ practitionerId: practitioner.id })
