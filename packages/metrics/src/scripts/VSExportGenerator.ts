@@ -162,8 +162,10 @@ const EDUCATION_LEVEL_MAP = {
 const connect = async () => {
   try {
     await client.connect()
+    // eslint-disable-next-line no-console
     console.log('Connected to mongoDB')
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log('Error occured while connecting to mongoDB', err)
   }
 }
@@ -171,8 +173,10 @@ const connect = async () => {
 const disconnect = async () => {
   try {
     await client.close()
+    // eslint-disable-next-line no-console
     console.log('Closed mongoDB connection.')
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log('Error occured while disconnecting to mongoDB', err)
   }
 }
@@ -652,6 +656,7 @@ async function makeCompositionAndExportCSVReport(
         const percentage = Math.round(
           (processedDatacount / totalCompositionCount) * 100
         )
+        // eslint-disable-next-line no-console
         console.log(
           `VSEXPORT GENERATION: Vital statistics export for month ${DateFNS.format(
             new Date(startDate),
@@ -884,6 +889,7 @@ const startScript = async () => {
   const birthCSVWriter = await createBirthDeclarationCSVWriter()
   const deathCSVWriter = await createDeathDeclarationCSVWriter()
   for (let month = 0; month < totalMonths; month++) {
+    // eslint-disable-next-line no-console
     console.log(
       `VSEXPORT GENERATION: Commencing vital statistics export for month ${
         month + 1
