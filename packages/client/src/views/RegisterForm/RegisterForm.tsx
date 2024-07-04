@@ -17,7 +17,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -92,7 +92,6 @@ import {
   ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
 import {
   bytesToSize,
   isCorrection,
@@ -1093,7 +1092,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     </Frame.SectionFormBackAction>
                     <Frame.Section>
                       <Content
-                        size={ContentSize.NORMAL}
+                        size={ContentSize.SMALL}
                         key={activeSectionGroup.id}
                         id="register_form"
                         title={
@@ -1103,6 +1102,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             intl.formatMessage(activeSection.title))
                         }
                         showTitleOnMobile={true}
+                        bottomActionDirection="column"
                         bottomActionButtons={
                           [
                             nextSectionGroup && (
@@ -1111,6 +1111,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 key="next_section"
                                 type="primary"
                                 size="large"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
@@ -1134,6 +1135,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 type="secondary"
                                 size="large"
                                 className="item"
+                                fullWidth
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
@@ -1355,15 +1357,10 @@ function getValidSectionGroup(
   }
 }
 
-function getInitialValue(
-  field: IFormField,
-  data: IFormData,
-  userDetails?: UserDetails | null
-) {
+function getInitialValue(field: IFormField, data: IFormData) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
-    fieldInitialValue =
-      getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
+    fieldInitialValue = get(data, field.initialValueKey, '')
   }
 
   return fieldInitialValue
@@ -1372,15 +1369,14 @@ function getInitialValue(
 export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
-  data?: IFormData,
-  userDetails?: UserDetails | null
+  data?: IFormData
 ) {
   return fields.map((field) => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
       isNull(sectionValues[field.name])
-        ? getInitialValue(field, data || {}, userDetails)
+        ? getInitialValue(field, data || {})
         : sectionValues[field.name]
   }))
 }
@@ -1421,8 +1417,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
     declaration.data[activeSection.id] || {},
-    declaration.data,
-    userDetails
+    declaration.data
   )
 
   let updatedFields: IFormField[] = []

@@ -12,13 +12,12 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
-const DEFAULT_SEARCH_TYPE = 'compositions'
 
-export function formatSearchParams(
+export async function formatSearchParams(
   searchPayload: ISearchCriteria,
   isExternalSearch: boolean
 ) {
@@ -31,15 +30,26 @@ export function formatSearchParams(
     parameters
   } = searchPayload
 
-  const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
+  const sort = sortBy ?? [
+    {
+      [sortColumn]: {
+        order: searchPayload.sort ?? SortOrder.ASC,
+        unmapped_type: 'keyword'
+      }
+    }
+  ]
+  const query = await advancedQueryBuilder(
+    parameters,
+    createdBy,
+    isExternalSearch
+  )
 
   return {
     index: OPENCRVS_INDEX_NAME,
-    type: DEFAULT_SEARCH_TYPE,
     from,
     size,
     body: {
-      query: advancedQueryBuilder(parameters, createdBy, isExternalSearch),
+      query,
       sort
     }
   }
@@ -49,7 +59,7 @@ export const advancedSearch = async (
   isExternalSearch: boolean,
   payload: ISearchCriteria
 ) => {
-  const formattedParams = formatSearchParams(payload, isExternalSearch)
+  const formattedParams = await formatSearchParams(payload, isExternalSearch)
   let response: ApiResponse<ISearchResponse<any>>
   try {
     response = await client.search(formattedParams, {
@@ -57,7 +67,7 @@ export const advancedSearch = async (
     })
   } catch (error) {
     if (error.statusCode === 400) {
-      logger.error('Search: bad request')
+      logger.error(`ElasticSearch: bad request. Error: ${error.message}`)
     } else {
       logger.error('Search error: ', error)
     }

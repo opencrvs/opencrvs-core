@@ -21,7 +21,7 @@
     "start:prod": "yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
-    "generate-gateway-types": "graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
+    "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",
     "serve": "node serve-static.js"
   },
@@ -42,7 +42,6 @@
     "@sentry/tracing": "^7.12.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
-    "@types/json2csv": "^4.4.0",
     "@types/nock": "^10.0.3",
     "@types/pdfmake": "^0.2.0",
     "@types/react-redux": "^7.1.5",
@@ -109,8 +108,8 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "@graphql-codegen/add": "^3.1.1",
-    "@graphql-codegen/cli": "^3.0.0",
+    "@graphql-codegen/add": "^5.0.0",
+    "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/introspection": "^3.0.0",
     "@graphql-codegen/typescript": "^3.0.0",
     "@graphql-codegen/typescript-operations": "^3.0.0",
@@ -151,9 +150,8 @@
     "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-react-hooks": "^4.0.8",
     "express": "^4.17.1",
-    "fetch-mock": "^9.0.0",
+    "fetch-mock": "^10.0.0",
     "glob": "^7.1.2",
-    "json2csv": "^4.3.2",
     "jsonwebtoken": "^9.0.0",
     "opener": "^1.5.1",
     "prettier": "2.8.8",

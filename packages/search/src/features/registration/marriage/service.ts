@@ -15,13 +15,13 @@ import {
 import {
   createStatusHistory,
   EVENT,
-  getCreatedBy,
-  getStatus,
-  ICompositionBody,
-  IMarriageCompositionBody,
+  SearchDocument,
+  MarriageDocument,
   IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  composeOperationHistories,
+  composeAssignment
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -29,25 +29,26 @@ import {
   findNameLocale,
   findTaskExtension,
   findTaskIdentifier,
-  getdeclarationJurisdictionIds,
   addEventLocation,
   findExtension
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
-import { getSubmittedIdentifier } from '@search/features/search/utils'
 import {
   getComposition,
   SavedComposition,
-  ValidRecord,
   getFromBundleById,
   getTaskFromSavedBundle,
   Patient,
   SavedBundle,
   resourceIdentifierToUUID,
-  SavedRelatedPerson
+  SavedRelatedPerson,
+  findFirstTaskHistory,
+  getInformantType,
+  ValidRecord
 } from '@opencrvs/commons/types'
+import { findAssignment } from '@opencrvs/commons/assignment'
+import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -55,31 +56,21 @@ const WITNESS_ONE_CODE = 'witness-one-details'
 const WITNESS_TWO_CODE = 'witness-two-details'
 const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 
-export async function upsertEvent(requestBundle: Hapi.Request) {
-  const bundle = requestBundle.payload as ValidRecord
-  const authHeader = requestBundle.headers.authorization
-
-  const composition = getComposition(bundle)
-
-  await indexDeclaration(composition, authHeader, bundle)
-}
-
-async function indexDeclaration(
-  composition: SavedComposition,
-  authHeader: string,
-  bundle: SavedBundle
-) {
-  const compositionId = composition.id
-  const result = await searchByCompositionId(compositionId, client)
+export const composeDocument = (
+  bundle: SavedBundle,
+  existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
+) => {
   const task = getTaskFromSavedBundle(bundle)
-  const body: ICompositionBody = {
+  const composition = getComposition(bundle)
+  const body: SearchDocument = {
+    compositionId: composition.id,
     event: EVENT.MARRIAGE,
     createdAt:
-      (result &&
-        result.body.hits.hits.length > 0 &&
-        result.body.hits.hits[0]._source.createdAt) ||
+      (existingDocument &&
+        existingDocument.body.hits.hits.length > 0 &&
+        existingDocument.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
-    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
+    operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
 
   body.type =
@@ -108,28 +99,38 @@ async function indexDeclaration(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
-  await createIndexBody(body, composition, authHeader, bundle)
-  await indexComposition(compositionId, body, client)
+  createIndexBody(body, composition, bundle)
+  return body
 }
 
-async function createIndexBody(
-  body: IMarriageCompositionBody,
+export async function indexRecord(bundle: SavedBundle) {
+  const { id: compositionId } = getComposition(bundle)
+  const existingDocument = await searchByCompositionId(compositionId, client)
+  const document = composeDocument(bundle, existingDocument)
+  await indexComposition(compositionId, document, client)
+}
+
+function createIndexBody(
+  body: MarriageDocument,
   composition: SavedComposition,
-  authHeader: string,
   bundle: SavedBundle
 ) {
-  await createBrideIndex(body, composition, bundle)
-  await createGroomIndex(body, composition, bundle)
+  createBrideIndex(body, composition, bundle)
+  createGroomIndex(body, composition, bundle)
   createWitnessOneIndex(body, composition, bundle)
   createWitnessTwoIndex(body, composition, bundle)
-  await addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
-  await createDeclarationIndex(body, composition, bundle)
+  addEventLocation(bundle, body, MARRIAGE_ENCOUNTER_CODE)
+  createDeclarationIndex(body, composition, bundle)
   const task = getTaskFromSavedBundle(bundle)
-  await createStatusHistory(body, task, authHeader, bundle)
+  createStatusHistory(body, task)
+
+  const assignment = findAssignment(bundle)
+  body.assignment =
+    assignment && composeAssignment(assignment.office, assignment.practitioner)
 }
 
-async function createBrideIndex(
-  body: IMarriageCompositionBody,
+function createBrideIndex(
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -154,13 +155,12 @@ async function createBrideIndex(
     body.marriageDate = marriageExtension.valueDateTime
   }
 
-  body.brideIdentifier =
-    bride && bride.identifier && getSubmittedIdentifier(bride.identifier)
+  body.brideIdentifier = bride && findPatientPrimaryIdentifier(bride)?.value
   body.brideDoB = bride && bride.birthDate
 }
 
-async function createGroomIndex(
-  body: IMarriageCompositionBody,
+function createGroomIndex(
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -186,13 +186,12 @@ async function createGroomIndex(
     body.marriageDate = marriageExtension.valueDateTime
   }
 
-  body.groomIdentifier =
-    groom && groom.identifier && getSubmittedIdentifier(groom.identifier)
+  body.groomIdentifier = groom && findPatientPrimaryIdentifier(groom)?.value
   body.groomDoB = groom && groom.birthDate
 }
 
 function createWitnessOneIndex(
-  body: IMarriageCompositionBody,
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -229,7 +228,7 @@ function createWitnessOneIndex(
 }
 
 function createWitnessTwoIndex(
-  body: IMarriageCompositionBody,
+  body: MarriageDocument,
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
@@ -264,8 +263,8 @@ function createWitnessTwoIndex(
     witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
 }
 
-async function createDeclarationIndex(
-  body: IMarriageCompositionBody,
+function createDeclarationIndex(
+  body: MarriageDocument,
   composition: fhir.Composition,
   bundle: SavedBundle
 ) {
@@ -317,10 +316,14 @@ async function createDeclarationIndex(
       (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.informantType =
+  const otherInformantType =
     (contactPersonRelationshipExtention &&
       contactPersonRelationshipExtention.valueString) ||
     (contactPersonExtention && contactPersonExtention.valueString)
+
+  const informantType = getInformantType(bundle as ValidRecord)
+
+  body.informantType = informantType || otherInformantType
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.contactEmail = emailExtension && emailExtension.valueString
@@ -338,16 +341,24 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-
-  body.declarationJurisdictionIds = await getdeclarationJurisdictionIds(
-    body.declarationLocationId
-  )
+  body.declarationJurisdictionIds = body.declarationLocationId
+    ? [body.declarationLocationId]
+    : []
 
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'marriage-declaration'
 
-  const createdBy = await getCreatedBy(composition.id as string)
+  const firstTaskHistory = findFirstTaskHistory(bundle)
+  const firstRegLastUserExtension =
+    firstTaskHistory &&
+    findTaskExtension(
+      firstTaskHistory,
+      'http://opencrvs.org/specs/extension/regLastUser'
+    )
+  const firstRegLastUser =
+    firstRegLastUserExtension &&
+    resourceIdentifierToUUID(firstRegLastUserExtension.valueReference.reference)
 
-  body.createdBy = createdBy || regLastUser
+  body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
 }

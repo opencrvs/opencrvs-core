@@ -17,6 +17,7 @@ import {
   USER_MANAGEMENT_URL,
   DOCUMENTS_URL
 } from '@metrics/constants'
+import { logger } from '@opencrvs/commons'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -63,14 +64,6 @@ export async function fetchLocationsByType(
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
-export async function fetchParentLocationByLocationID(
-  locationID: string,
-  authHeader: IAuthHeader
-) {
-  const location = await fetchFHIR(locationID, authHeader)
-  return location && location.partOf && location.partOf.reference
-}
-
 export async function fetchTaskIdByCompositionID(
   compositionId: string,
   authHeader: IAuthHeader
@@ -99,17 +92,6 @@ export async function fetchChildLocationsByParentId(
 ): Promise<fhir.Location[]> {
   const bundle = await fetchFHIR(
     `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`,
-    authHeader
-  )
-  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
-}
-
-export async function fetchAllChildLocationsByParentId(
-  locationId: string,
-  authHeader: IAuthHeader
-): Promise<(fhir.Location & { id: string })[]> {
-  const bundle = await fetchFHIR(
-    `Location?_count=0&partof=${locationId}`,
     authHeader
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
@@ -233,7 +215,7 @@ export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
     const res = await result.json()
     return res.refUrl
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     return err
   }
 }

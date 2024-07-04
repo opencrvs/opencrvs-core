@@ -133,7 +133,6 @@ export function StepTwoContainer() {
                       touched={Boolean(meta.touched)}
                       label={intl.formatMessage(messages.verficationCodeLabel)}
                       optionalLabel={intl.formatMessage(messages.optionalLabel)}
-                      ignoreMediaQuery
                       hideAsterisk
                     >
                       <TextInput
@@ -141,7 +140,6 @@ export function StepTwoContainer() {
                         {...input}
                         touched={Boolean(meta.touched)}
                         error={Boolean(meta.error)}
-                        ignoreMediaQuery
                       />
                     </InputField>
                   )}

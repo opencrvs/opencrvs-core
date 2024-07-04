@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { IUserModel, Event } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
@@ -25,7 +25,8 @@ enum RegStatus {
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
-  ISSUED = 'ISSUED'
+  ISSUED = 'ISSUED',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED'
 }
 interface IUserCreateSearchPayload {
   userId: string
@@ -170,7 +171,8 @@ export const createSearchrequestSchema = Joi.object({
         RegStatus.REGISTERED,
         RegStatus.CERTIFIED,
         RegStatus.REJECTED,
-        RegStatus.ISSUED
+        RegStatus.ISSUED,
+        RegStatus.CORRECTION_REQUESTED
       )
     ),
     dateOfEvent: Joi.string(),

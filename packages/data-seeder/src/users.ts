@@ -65,9 +65,15 @@ const createUserMutation = print(gql`
   }
 `)
 
-async function getUseres() {
+async function getUsers(token: string) {
   const url = new URL('users', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
@@ -123,7 +129,15 @@ async function getOfficeIdFromIdentifier(identifier: string) {
       }
     }
   )
+  if (!response.ok) {
+    console.error(
+      `Error fetching location with identifier ${identifier}`,
+      response.statusText
+    )
+    throw new Error('Error fetching location')
+  }
   const locationBundle: fhir3.Bundle<fhir3.Location> = await response.json()
+
   return locationBundle.entry?.[0]?.resource?.id
 }
 
@@ -147,7 +161,7 @@ export async function seedUsers(
   token: string,
   roleIdMap: Record<string, string | undefined>
 ) {
-  const rawUsers = await getUseres()
+  const rawUsers = await getUsers(token)
   for (const userMetadata of rawUsers) {
     const {
       givenNames,

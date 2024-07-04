@@ -204,14 +204,6 @@ export interface IVisitedGroupId {
 export interface ITaskHistory {
   operationType?: string
   operatedOn?: string
-  operatorRole?: string
-  operatorName?: Array<GQLHumanName | null>
-  operatorOfficeName?: string
-  operatorOfficeAlias?: Array<string | null>
-  notificationFacilityName?: string
-  notificationFacilityAlias?: Array<string | null>
-  rejectReason?: string
-  rejectComment?: string
 }
 
 export interface IDuplicates {
@@ -454,6 +446,7 @@ interface IUnassignDeclarationSuccess {
   payload: {
     id: string
     client: ApolloClient<{}>
+    refetchQueries: InternalRefetchQueriesInclude
   }
 }
 
@@ -1235,15 +1228,17 @@ export function unassignDeclaration(
   }
 }
 
-function unassignDeclarationSuccess([id, client]: [
+function unassignDeclarationSuccess([id, client, refetchQueries]: [
   string,
-  ApolloClient<{}>
+  ApolloClient<{}>,
+  InternalRefetchQueriesInclude
 ]): IUnassignDeclarationSuccess {
   return {
     type: UNASSIGN_DECLARATION_SUCCESS,
     payload: {
       id,
-      client
+      client,
+      refetchQueries
     }
   }
 }
@@ -1846,7 +1841,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               variables: { id: action.payload.id },
               refetchQueries: action.payload.refetchQueries
             })
-            return [action.payload.id, action.payload.client]
+            return [
+              action.payload.id,
+              action.payload.client,
+              action.payload.refetchQueries
+            ]
           },
           {
             successActionCreator: unassignDeclarationSuccess
@@ -1874,7 +1873,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               ? Cmd.action(
                   executeUnassignDeclaration(
                     declarationNextToUnassign.id,
-                    action.payload.client
+                    action.payload.client,
+                    action.payload.refetchQueries
                   )
                 )
               : Cmd.none

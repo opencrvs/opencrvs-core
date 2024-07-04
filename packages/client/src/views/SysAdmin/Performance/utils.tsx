@@ -26,9 +26,6 @@ import { FormattedNumber, IntlShape } from 'react-intl'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { constantsMessages } from '@client/i18n/messages'
-import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
-import { colors } from '@opencrvs/components/lib/colors'
-import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 import {
   PERFORMANCE_METRICS,
   PERFORMANCE_STATS,
@@ -215,28 +212,6 @@ export function getPrimaryLocationIdOfOffice(
   return location.id
 }
 
-export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: UserDetails
-) {
-  const location =
-    userDetails.catchmentArea &&
-    userDetails.catchmentArea.find((location) => {
-      const jurisdictionTypeIdentifier =
-        location?.identifier &&
-        location?.identifier.find(
-          (identifier) =>
-            identifier?.system ===
-            'http://opencrvs.org/specs/id/jurisdiction-type'
-        )
-      return (
-        // Needs to be an administrative location with jurisdiction
-        jurisdictionTypeIdentifier && jurisdictionTypeIdentifier.value
-      )
-    })
-
-  return location && location.id
-}
-
 export enum CompletenessRateTime {
   WithinTarget = 'withinTarget',
   Within1Year = 'within1Year',
@@ -257,61 +232,6 @@ export function getAdditionalLocations(intl: IntlShape) {
 
 export function isCountry(location: ISearchLocation) {
   return location.id === NATIONAL_ADMINISTRATIVE_LEVEL
-}
-
-export const StatusMapping: IStatusMapping = {
-  IN_PROGRESS: {
-    labelDescriptor: statusMessages.inProgress,
-    color: colors.purple
-  },
-  DECLARED: {
-    labelDescriptor: statusMessages.readyForReview,
-    color: colors.orange
-  },
-  REJECTED: {
-    labelDescriptor: statusMessages.sentForUpdates,
-    color: colors.red
-  },
-  VALIDATED: {
-    labelDescriptor: statusMessages.sentForApprovals,
-    color: colors.grey300
-  },
-  WAITING_VALIDATION: {
-    labelDescriptor: statusMessages.sentForExternalValidation,
-    color: colors.grey500
-  },
-  REGISTERED: {
-    labelDescriptor: statusMessages.readyToPrint,
-    color: colors.green
-  },
-  CERTIFIED: {
-    labelDescriptor: statusMessages.certified,
-    color: colors.blue
-  },
-  REQUESTED_CORRECTION: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
-  CORRECTED: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
-  APPROVED_CORRECTION: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
-  REJECTED_CORRECTION: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
-  ARCHIVED: {
-    labelDescriptor: statusMessages.archived,
-    color: colors.blue
-  },
-  MARKED_AS_DUPLICATE: {
-    labelDescriptor: statusMessages.archived,
-    color: colors.blue
-  }
 }
 
 export const mockPerformanceMetricsRequest = {

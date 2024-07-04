@@ -9,18 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  findPatientIdentifier,
+  Patient,
+  SUPPORTED_PATIENT_IDENTIFIER_CODES
+} from '@opencrvs/commons/types'
+import {
   CERTIFIED_STATUS,
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
+import { transformDeprecatedParamsToSupported } from './deprecation-support'
+import { resolveLocationChildren } from './location'
 
-export function advancedQueryBuilder(
+export async function advancedQueryBuilder(
   params: IAdvancedSearchParam,
   createdBy: string,
   isExternalSearch: boolean
 ) {
+  params = transformDeprecatedParamsToSupported(params)
+
   const must: any[] = []
-  const should: any[] = []
 
   if (params.event) {
     must.push({
@@ -156,12 +164,12 @@ export function advancedQueryBuilder(
   }
 
   if (params.declarationJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
+      params.declarationJurisdictionId
+    )
     must.push({
-      match: {
-        declarationJurisdictionIds: {
-          query: params.declarationJurisdictionId,
-          boost: 2.0
-        }
+      terms: {
+        'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
       }
     })
   }
@@ -182,21 +190,14 @@ export function advancedQueryBuilder(
     })
   }
 
-  const eventJurisdictionIds = [
-    params.eventLocationLevel1,
-    params.eventLocationLevel2,
-    params.eventLocationLevel3,
-    params.eventLocationLevel4,
-    params.eventLocationLevel5
-  ].filter((id) => Boolean(id))
-
-  if (eventJurisdictionIds.length > 0) {
-    eventJurisdictionIds.forEach((locationId) => {
-      must.push({
-        match: {
-          eventJurisdictionIds: locationId
-        }
-      })
+  if (params.eventJurisdictionId) {
+    const leafLevelJurisdictionIds = await resolveLocationChildren(
+      params.eventJurisdictionId
+    )
+    must.push({
+      terms: {
+        'eventJurisdictionIds.keyword': leafLevelJurisdictionIds
+      }
     })
   }
 
@@ -437,6 +438,14 @@ export function advancedQueryBuilder(
     must.push({
       match: {
         deceasedIdentifier: params.deceasedIdentifier
+      }
+    })
+  }
+
+  if (params.spouseIdentifier) {
+    must.push({
+      match: {
+        spouseIdentifier: params.spouseIdentifier
       }
     })
   }
@@ -697,6 +706,11 @@ export function advancedQueryBuilder(
             match: {
               groomIdentifier: params.nationalId
             }
+          },
+          {
+            match: {
+              spouseIdentifier: params.nationalId
+            }
           }
         ]
       }
@@ -723,39 +737,22 @@ export function advancedQueryBuilder(
 
   return {
     bool: {
-      must,
-      should
+      must
     }
   }
 }
-
-export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export function getSubmittedIdentifier(identifiers: fhir.Identifier[]) {
-  const supportedIdentifiers = [
-    'PASSPORT',
-    'NATIONAL_ID',
-    'MOSIP_PSUT_TOKEN_ID',
-    'DECEASED_PATIENT_ENTRY',
-    'BIRTH_PATIENT_ENTRY',
-    'DRIVING_LICENSE',
-    'BIRTH_REGISTRATION_NUMBER',
-    'DEATH_REGISTRATION_NUMBER',
-    'REFUGEE_NUMBER',
-    'ALIEN_NUMBER',
-    'OTHER',
-    'SOCIAL_SECURITY_NO'
-  ]
-  let value = ''
-  identifiers.find((item) => {
-    const coding = item.type?.coding || []
-    coding.some((codeObj) => {
-      codeObj?.code && supportedIdentifiers.includes(codeObj?.code)
-        ? (value = `${item.value}`)
-        : (value = '')
-    })
-  })
-  return value
-}
+export const findPatientPrimaryIdentifier = (patient: Patient) =>
+  findPatientIdentifier(
+    patient,
+    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter(
+      (code) =>
+        ![
+          'BIRTH_REGISTRATION_NUMBER',
+          'DEATH_REGISTRATION_NUMBER',
+          'MARRIAGE_REGISTRATION_NUMBER',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+        ].includes(code)
+    )
+  )

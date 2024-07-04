@@ -326,15 +326,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         2000
       )
     } catch (error) {
-      if (!(error instanceof ApolloError)) {
-        updateDeclaration(dispatch, {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.FAILED
-        })
-        captureException(error)
-        return
-      }
       if (
+        error instanceof ApolloError &&
         error.graphQLErrors.length > 0 &&
         error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
       ) {
@@ -346,11 +339,19 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         dispatch(deleteDeclaration(declaration.id, client))
         return
       }
+      if (error instanceof ApolloError && error.networkError) {
+        updateDeclaration(dispatch, {
+          ...declaration,
+          submissionStatus: SUBMISSION_STATUS.FAILED_NETWORK
+        })
+        captureException(error)
+        return
+      }
+
       updateDeclaration(dispatch, {
         ...declaration,
-        submissionStatus: error.networkError
-          ? SUBMISSION_STATUS.FAILED_NETWORK
-          : SUBMISSION_STATUS.FAILED
+        submissionStatus: SUBMISSION_STATUS.FAILED
       })
+      captureException(error)
     }
   }

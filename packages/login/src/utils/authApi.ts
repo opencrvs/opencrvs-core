@@ -85,6 +85,7 @@ export function request<T>(options: AxiosRequestConfig) {
       // other than 2xx
     } else {
       // Something else happened while setting up the request
+      // eslint-disable-next-line no-console
       console.error('Error Message:', error.message)
       Sentry.captureException(error)
     }
@@ -117,7 +118,7 @@ const resendAuthenticationCode = (
 ) => {
   return request({
     url: new URL(
-      '/resendAuthenticationCode',
+      'resendAuthenticationCode',
       window.config.AUTH_API_URL
     ).toString(),
     method: 'POST',

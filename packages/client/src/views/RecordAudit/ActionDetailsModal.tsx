@@ -44,7 +44,6 @@ import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { labelFormatterForInformant } from '@client/views/CorrectionForm/utils'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -83,6 +82,16 @@ function retrieveUniqueComments(
   return comments
 }
 
+function retrieveCorrectionComment(actionDetailsData: History) {
+  if (!Array.isArray(actionDetailsData.comments)) {
+    return []
+  }
+
+  const comment = actionDetailsData.comments[1]?.comment
+
+  return comment ? [{ comment }] : []
+}
+
 function getHistories(draft: IDeclaration | null) {
   const histories: History[] =
     draft?.data.history && Array.isArray(draft.data.history)
@@ -107,15 +116,19 @@ function prepareComments(
   if (
     !draft ||
     (actionDetailsData.action &&
-      actionDetailsData.action !== RegAction.RequestedCorrection)
+      actionDetailsData.action !== RegAction.RequestedCorrection &&
+      actionDetailsData.action !== RegAction.Corrected)
   ) {
     return []
   }
 
   const histories = getHistories(draft)
-  const currentHistoryItemIndex = histories.findIndex(
-    (item) => item.date === actionDetailsData.date
-  )
+  const currentHistoryItemIndex = histories
+    .filter(({ regStatus }: Partial<History>) => {
+      return regStatus !== RegStatus.WaitingValidation
+    })
+    .findIndex((item) => item.date === actionDetailsData.date)
+
   const previousHistoryItemIndex =
     currentHistoryItemIndex < 0
       ? currentHistoryItemIndex
@@ -130,6 +143,13 @@ function prepareComments(
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
   }
+
+  if (
+    [RegAction.RequestedCorrection, RegAction.Corrected].includes(
+      actionDetailsData.action as RegAction
+    )
+  )
+    return retrieveCorrectionComment(actionDetailsData)
 
   return retrieveUniqueComments(
     histories,
@@ -153,7 +173,7 @@ const requesterLabelMapper = (
   // informant info added for corrector being informant
   return requesterIndividual?.label
     ? intl.formatMessage(requesterIndividual.label, {
-        informant: labelFormatterForInformant(informant)
+        informant
       })
     : ''
 }
@@ -447,7 +467,8 @@ const ActionDetailsModalListTable = ({
 
       {/* Correction Requester */}
       {actionDetailsData.requester &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={requesterColumn}
@@ -455,17 +476,17 @@ const ActionDetailsModalListTable = ({
           />
         )}
       {/* Correction rejected */}
-      {actionDetailsData.requester &&
-        actionDetailsData.action === RegAction.RejectedCorrection && (
-          <Table
-            noResultText=" "
-            columns={reasonColumn}
-            content={[{ text: actionDetailsData.reason }]}
-          />
-        )}
+      {actionDetailsData.action === RegAction.RejectedCorrection && (
+        <Table
+          noResultText=" "
+          columns={reasonColumn}
+          content={[{ text: actionDetailsData.reason }]}
+        />
+      )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.action === RegAction.RequestedCorrection &&
+      {(actionDetailsData.action === RegAction.RequestedCorrection ||
+        actionDetailsData.action === RegAction.Corrected) &&
         actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
@@ -490,7 +511,8 @@ const ActionDetailsModalListTable = ({
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
-        actionDetailsData.action === RegAction.RequestedCorrection && (
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.action === RegAction.Corrected) && (
           <Table
             noResultText=" "
             columns={correctionReasonColumn}

@@ -21,6 +21,7 @@ export const validateRoute = createRoute({
   path: '/records/{recordId}/validate',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'VALIDATE',
+  includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(

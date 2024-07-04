@@ -27,8 +27,6 @@ import { Events } from '@metrics/features/metrics/constants'
 import * as api from '@metrics/api'
 
 const fetchLocation = api.fetchLocation as jest.Mock
-const fetchParentLocationByLocationID =
-  api.fetchParentLocationByLocationID as jest.Mock
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
 
 const AUTH_HEADER = {
@@ -119,10 +117,6 @@ beforeEach(() => {
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
 
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
@@ -135,11 +129,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
-        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2'
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
@@ -147,7 +137,7 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('Only populates level5 and office location data if rest of the tree is missing', async () => {
+  it('Only populates office location if rest of the tree is missing', async () => {
     const payload = cloneDeep(testPayload)
 
     // @ts-ignore
@@ -176,8 +166,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
-        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
@@ -188,9 +177,6 @@ describe('Verify point generation', () => {
   it('Populates partial location tree in-case data unavailibility', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce(null)
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-declaration-registered',
@@ -201,9 +187,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
-        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
-        locationLevel4: 'Location/4'
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
@@ -228,10 +212,6 @@ describe('Verify point generation', () => {
   it('Return valid death registration point to insert in influx', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeathRegPoint(
       cloneDeep(testDeathPayload),
       'mark-existing-declaration-registered',
@@ -244,11 +224,7 @@ describe('Verify point generation', () => {
         gender: 'male',
         causeOfDeath: 'Old age',
         mannerOfDeath: 'NATURAL_CAUSES',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
@@ -280,8 +256,7 @@ describe('Verify point generation', () => {
       tags: {
         paymentType: 'certification',
         eventType: 'DEATH',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
@@ -306,10 +281,6 @@ describe('Verify point generation', () => {
     ).rejects.toThrowError('Payment reconciliation not found')
   })
   it('returns declarations started point for field agent', async () => {
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
@@ -320,11 +291,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
@@ -334,10 +301,6 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for registration agent', async () => {
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
@@ -348,11 +311,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
@@ -362,10 +321,6 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for registrar', async () => {
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
@@ -374,10 +329,7 @@ describe('Verify point generation', () => {
     expect(point).toMatchObject({
       measurement: 'declarations_started',
       tags: {
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
@@ -387,10 +339,6 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for field agent', async () => {
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
@@ -401,11 +349,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
@@ -416,13 +360,8 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for notification api', async () => {
     const payload = cloneDeep(testDeclaration)
-    // @ts-ignore
-    payload.entry[0].resource.type?.coding[0].code = 'birth-notification'
+    payload.entry[0].resource.type!.coding[0].code = 'birth-notification'
 
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateDeclarationStartedPoint(
       cloneDeep(payload),
       AUTH_HEADER,
@@ -431,10 +370,9 @@ describe('Verify point generation', () => {
     expect(point).toMatchObject({
       measurement: 'declarations_started',
       tags: {
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+        eventType: 'BIRTH',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182'
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
@@ -450,21 +388,13 @@ describe('Verify point generation', () => {
     const taskHistory = require('./test-data/task-history.json')
 
     fetchTaskHistory.mockResolvedValueOnce(taskHistory)
-    fetchParentLocationByLocationID
-      .mockResolvedValueOnce('Location/4')
-      .mockResolvedValueOnce('Location/3')
-      .mockResolvedValueOnce('Location/2')
     const point = await generateRejectedPoints(payload, AUTH_HEADER)
     expect(point).toMatchObject({
       measurement: 'declarations_rejected',
       tags: {
         eventType: 'BIRTH',
         startedBy: 'fe16875f-3e5f-47bc-85d6-16482a63e7df',
-        officeLocation: 'Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155',
-        locationLevel4: 'Location/4',
-        locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
-        locationLevel5: 'Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8'
+        officeLocation: 'Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155'
       },
       fields: {
         compositionId: '81278acf-6105-435e-b1c2-91619c8cf6e1'

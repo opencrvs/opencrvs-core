@@ -40,13 +40,6 @@ export interface IPoint {
   time?: string
 }
 
-export interface IPointLocation {
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
-}
-
 export type IAuthHeader =
   | {
       Authorization: string
@@ -66,10 +59,6 @@ export interface IBirthRegistrationTags {
   ageLabel: string | undefined
   dateLabel: string | undefined
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface IMarriageRegistrationTags {
@@ -79,11 +68,6 @@ export interface IMarriageRegistrationTags {
   registrarPractitionerId: string
   practitionerRole: string
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
-  locationLevel1?: string
 }
 
 export interface IUserAuditTags {
@@ -103,10 +87,6 @@ export interface IDeathRegistrationTags {
   mannerOfDeath: string
   causeOfDeath: string
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface IInProgressDeclarationFields {
@@ -120,26 +100,14 @@ export interface IInProgressDeclarationTags {
   missingFieldId: string
   eventType: string
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 export interface ICertifiedTags {
   eventType: DECLARATION_TYPE
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
-export interface ILocationTags {
+interface ILocationTags {
   officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface ITimeLoggedFields {
@@ -156,10 +124,6 @@ export interface ITimeLoggedTags {
   eventType: string
   officeLocation?: string
   practitionerId?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface IDurationFields {

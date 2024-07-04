@@ -43,15 +43,39 @@ export const user = {
   },
   practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
   primaryOfficeId: 'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-  catchmentAreaIds: [
-    'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-    '0f7684aa-8c65-4901-8318-bf1e22c247cb',
-    'ed6195ff-0f83-4852-832e-dc9db07151ff'
-  ],
   scope: ['declare', 'demo'],
   status: 'active',
   securityQuestionAnswers: [],
   creationDate: 1701241360173,
+  auditHistory: [],
+  searches: [],
+  __v: 0
+}
+
+export const registrar = {
+  _id: '66619331a6a4a835aa689dfd',
+  name: [
+    {
+      use: 'en',
+      given: ['Kennedy'],
+      family: 'Mweene'
+    }
+  ],
+  username: 'k.mweene',
+  identifiers: [],
+  email: '',
+  emailForNotification: 'kalushabwalya1.7@gmail.com',
+  mobile: '0933333333',
+  passwordHash: '$2a$10$Ss1IOh7BmD6wje96VMppheEpHywYjfQgvAy6BRB.ISwM79TvjfnN6',
+  salt: '$2a$10$Ss1IOh7BmD6wje96VMpphe',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: '66619330a6a4a835aa689ddb',
+  practitionerId: '648c914d-de38-4c24-bdc9-ce8ee8cacd4c',
+  primaryOfficeId: '435e5301-063d-4f22-958e-24176cfb4e54',
+  scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
+  securityQuestionAnswers: [],
+  creationDate: 1717670705858,
   auditHistory: [],
   searches: [],
   __v: 0

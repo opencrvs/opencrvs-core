@@ -557,14 +557,7 @@ const registeredRecord = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/5faae48b-bdfc-478d-a069-6aa121ad4273'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/04e457a5-5c0f-4efe-b561-825b6005fc37'
             }
@@ -1319,14 +1312,7 @@ const nationalIdBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/5faae48b-bdfc-478d-a069-6aa121ad4273'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/04e457a5-5c0f-4efe-b561-825b6005fc37'
             }
@@ -1593,14 +1579,7 @@ const permissionsBundle = {
             }
           },
           {
-            url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: {
-              reference: 'Location/5faae48b-bdfc-478d-a069-6aa121ad4273'
-            }
-          },
-          {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueString: 'Ibombo District Office',
             valueReference: {
               reference: 'Location/04e457a5-5c0f-4efe-b561-825b6005fc37'
             }

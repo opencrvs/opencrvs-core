@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { AUDIT_ACTION, AUDIT_REASON, IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
@@ -45,7 +45,6 @@ const mockUser: IUser & { _id: string } = {
   systemRole: 'LOCAL_REGISTRAR',
   status: 'active',
   primaryOfficeId: '321',
-  catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
   passwordHash:

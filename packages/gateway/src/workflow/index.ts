@@ -15,7 +15,6 @@ import {
   SavedBundle,
   Resource,
   Bundle,
-  SavedTask,
   CertifiedRecord,
   ReadyForReviewRecord,
   RejectedRecord,
@@ -177,7 +176,7 @@ export async function unassignRegistration(
   id: string,
   authHeader: IAuthHeader
 ) {
-  return await createRequest<Bundle<SavedTask>>(
+  return await createRequest<SavedBundle<Resource>>(
     'POST',
     '/unassign-record',
     authHeader,

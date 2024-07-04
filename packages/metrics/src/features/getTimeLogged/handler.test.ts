@@ -12,7 +12,11 @@ import { createServer } from '@metrics/server'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import * as fetchMock from 'jest-fetch-mock'
+import * as fixtures from '@opencrvs/commons/fixtures'
+import { UUID } from '@opencrvs/commons'
 const readPoints = influx.query as jest.Mock
+const fetch = fetchMock as fetchMock.FetchMock
 
 describe('verify time logged handler', () => {
   let server: any
@@ -88,9 +92,25 @@ describe('verify time logged by practitioner handler', () => {
 
   beforeEach(async () => {
     server = await createServer()
+    fetch.resetMocks()
   })
 
   it('returns ok for valid request', async () => {
+    const hierarchy = [
+      fixtures.savedLocation({
+        id: '94429795-0a09-4de8-8e1e-dssdr323' as UUID,
+        partOf: undefined
+      }),
+      fixtures.savedLocation({
+        id: 'uuid2' as UUID,
+        partOf: {
+          reference: 'Location/94429795-0a09-4de8-8e1e-dssdr323'
+        }
+      })
+    ]
+    fetch.mockResponseOnce(JSON.stringify(hierarchy))
+    fetch.mockResponseOnce(JSON.stringify(hierarchy))
+
     readPoints.mockResolvedValueOnce([
       {
         status: 'DECLARED',

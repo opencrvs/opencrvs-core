@@ -123,7 +123,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
@@ -141,13 +141,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const LocationSearchFormField = styled(LocationSearch)`
-  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 344px;
-  }`}
+    ignoreBottomMargin ? '0px' : '22px'};
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -215,9 +209,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       hideAsterisk: fieldDefinition.hideAsterisk,
       hideInputHeader: fieldDefinition.hideHeader,
       error,
-      touched,
-      mode: fieldDefinition.mode,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      touched
     }
 
     const intl = useIntl()
@@ -235,8 +227,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder,
-      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      placeholder: fieldDefinition.placeholder
     }
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
@@ -274,6 +265,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               onSetFieldValue(fieldDefinition.name, files)
               setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
+            compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
+            maxSizeMB={fieldDefinition.maxSizeMB}
             onUploadingStateChanged={onUploadingStateChanged}
             requiredErrorMessage={requiredErrorMessage}
           />
@@ -444,8 +437,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps}>
           <TextArea
-            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
             {...inputProps}
+            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            value={value.toString()}
           />
         </InputField>
       )
@@ -578,7 +572,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       return (
         <InputField {...inputFieldProps}>
-          <LocationSearchFormField
+          <LocationSearch
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             {...inputProps}
             selectedLocation={selectedLocation}
@@ -627,8 +621,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ignoreMediaQuery, ...allowedInputProps } =
-        inputProps
+      const { error, touched, ...allowedInputProps } = inputProps
 
       return (
         <input
@@ -711,7 +704,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IBaseAdvancedSearchState
+  initialValues?: IAdvancedSearchFormState
 }
 
 interface IStateProps {
@@ -901,16 +894,29 @@ class FormSectionComponent extends React.Component<Props> {
             (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
               getFieldType(field as IDynamicFormField, values) === DATE)
 
-          if (
-            isDateField &&
-            touched[`${field.name}-dd`] !== undefined &&
-            touched[`${field.name}-mm`] !== undefined &&
-            touched[`${field.name}-yyyy`] !== undefined
-          ) {
-            touched[field.name] =
-              touched[`${field.name}-dd`] &&
-              touched[`${field.name}-mm`] &&
-              touched[`${field.name}-yyyy`]
+          const isDateRangePickerField = field.type === DATE_RANGE_PICKER
+
+          const dateFields = [
+            `${field.name}-dd`,
+            `${field.name}-mm`,
+            `${field.name}-yyyy`
+          ]
+          // for date range picker fields
+          const dateRangeFields = [
+            `${field.name}exact-dd`,
+            `${field.name}exact-mm`,
+            `${field.name}exact-yyyy`
+          ]
+
+          const areFieldsTouched = (fields: string[]) =>
+            fields.every((field) => touched[field])
+
+          if (isDateField && areFieldsTouched(dateFields)) {
+            touched[field.name] = areFieldsTouched(dateFields)
+          }
+
+          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
+            touched[field.name] = areFieldsTouched(dateRangeFields)
           }
 
           const withDynamicallyGeneratedFields =

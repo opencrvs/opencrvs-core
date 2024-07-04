@@ -26,7 +26,6 @@ import {
   Text,
   TextArea
 } from '@opencrvs/components/lib'
-import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToHome } from '@client/navigation'
 
@@ -39,14 +38,6 @@ const SubPageContent = styled(Content)`
   max-width: 100%;
 `
 
-const StyledSelect = styled(Select)`
-  width: 192px;
-  ${({ theme }) => theme.fonts.reg18};
-  padding-bottom: 20px;
-  .react-select__control {
-    border-radius: 4px;
-  }
-`
 const StyledText = styled(Text)`
   padding-bottom: 4px;
 `
@@ -90,7 +81,9 @@ export const DuplicateForm = (props: IProps) => {
     setShowModal((prev) => !prev)
   }
 
-  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setComment(event.target.value)
   }
 
@@ -104,6 +97,7 @@ export const DuplicateForm = (props: IProps) => {
     <Button
       id="not-a-duplicate"
       key="btn-not-a-duplicate"
+      fullWidth
       onClick={() => {
         toggleNotDuplicateModal()
       }}
@@ -118,6 +112,7 @@ export const DuplicateForm = (props: IProps) => {
     <Button
       id="mark-as-duplicate"
       key="btn-mark-as-duplicate"
+      fullWidth
       onClick={() => {
         toggleModal()
       }}
@@ -135,6 +130,7 @@ export const DuplicateForm = (props: IProps) => {
             name: getName(),
             trackingId: String(data.registration.trackingId)
           })}
+          showTitleOnMobile={true}
           subtitle={intl.formatMessage(
             duplicateMessages.duplicateContentSubtitle,
             {
@@ -142,6 +138,7 @@ export const DuplicateForm = (props: IProps) => {
             }
           )}
           bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+          bottomActionDirection="row"
         ></SubPageContent>
       </div>
 
@@ -158,9 +155,14 @@ export const DuplicateForm = (props: IProps) => {
         titleHeightAuto={true}
         show={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
+          </Button>,
           <Button
             key="mark-as-duplicate-button"
             id="mark-as-duplicate-button"
@@ -178,7 +180,7 @@ export const DuplicateForm = (props: IProps) => {
                 dispatch(goToHome())
               }
             }}
-            disabled={!Boolean(selectedTrackingId)}
+            disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
           >
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
@@ -191,7 +193,7 @@ export const DuplicateForm = (props: IProps) => {
               <Text variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
               </Text>
-              <StyledSelect
+              <Select
                 id="selectTrackingId"
                 isDisabled={false}
                 value={selectedTrackingId}
@@ -203,11 +205,11 @@ export const DuplicateForm = (props: IProps) => {
                   label: id.trackingId
                 }))}
               />
-              <StyledText id="describe-reason" variant="reg18" element="span">
+              <StyledText variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
               </StyledText>
               <StyledTextArea
-                ignoreMediaQuery
+                id="describe-reason"
                 {...{
                   onChange: handleCommentChange
                 }}

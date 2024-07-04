@@ -20,6 +20,7 @@ import {
   sendNotification
 } from '@workflow/records/notification'
 import { invokeWebhooks } from '@workflow/records/webhooks'
+import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 
 export interface EventRegistrationPayload {
   trackingId: string
@@ -27,7 +28,7 @@ export interface EventRegistrationPayload {
   error: string
   compositionId: string
   childIdentifiers?: {
-    type: string
+    type: SupportedPatientIdentifierCode
     value: string
   }[]
 }
@@ -47,7 +48,8 @@ export async function markEventAsRegisteredCallbackHandler(
   const savedRecord = await getRecordById(
     compositionId,
     request.headers.authorization,
-    ['WAITING_VALIDATION']
+    ['WAITING_VALIDATION'],
+    true
   )
   if (!savedRecord) {
     throw new Error('Could not find record in elastic search!')

@@ -8,40 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { upsertEvent as upsertBirthEvent } from '@search/features/registration/birth/service'
-import { upsertEvent as upsertDeathEvent } from '@search/features/registration/death/service'
-import { upsertEvent as upsertMarriageEvent } from '@search/features/registration/marriage/service'
+import { indexRecord as upsertBirthEvent } from '@search/features/registration/birth/service'
+import { indexRecord as upsertDeathEvent } from '@search/features/registration/death/service'
+import { indexRecord as upsertMarriageEvent } from '@search/features/registration/marriage/service'
 
 import * as Hapi from '@hapi/hapi'
-
-function getEventType(bundle: fhir.Bundle) {
-  const task = bundle
-    .entry!.map(({ resource }) => resource)
-    .find(
-      (resource): resource is fhir.Task => resource!.resourceType === 'Task'
-    )
-  if (!task) {
-    throw new Error('No task found')
-  }
-  const type = task.code!.coding![0].code
-  return type
-}
+import { ValidRecord } from '@opencrvs/commons/types'
+import { getEventType } from '@search/utils/event'
 
 export async function recordHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const bundle = request.payload as fhir.Bundle
+  const record = request.payload as ValidRecord
 
-  switch (getEventType(bundle)) {
+  switch (getEventType(record)) {
     case 'BIRTH':
-      await upsertBirthEvent(request)
+      await upsertBirthEvent(record)
       break
     case 'DEATH':
-      await upsertDeathEvent(request)
+      await upsertDeathEvent(record)
       break
     case 'MARRIAGE':
-      await upsertMarriageEvent(request)
+      await upsertMarriageEvent(record)
       break
     default:
       throw new Error('Unsupported event type')

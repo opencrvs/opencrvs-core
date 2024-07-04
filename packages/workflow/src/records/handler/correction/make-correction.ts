@@ -20,7 +20,10 @@ import {
 } from '@opencrvs/commons/types'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getEventType } from '@workflow/features/registration/utils'
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerOfficeId
+} from '@workflow/features/user/utils'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
@@ -36,6 +39,7 @@ export const makeCorrectionRoute = createRoute({
   path: '/records/{recordId}/make-correction',
   allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
   action: 'MAKE_CORRECTION',
+  includeHistoryResources: true,
   handler: async (request, record): Promise<RegisteredRecord> => {
     const recordInput = request.payload as
       | BirthRegistration
@@ -46,6 +50,27 @@ export const makeCorrectionRoute = createRoute({
       CorrectionRequestInput,
       recordInput.registration?.correction
     )
+    /* Fhir builders put the comment value provided in `registration.status.comments`
+     * inside `task.note`
+     */
+    if (
+      recordInput.registration?.correction?.note &&
+      recordInput.registration?.status?.[0]
+    ) {
+      if (
+        !recordInput.registration.status[0].comments ||
+        recordInput.registration.status[0].comments.length == 0
+      )
+        recordInput.registration.status[0].comments = [
+          {
+            comment: ''
+          }
+        ]
+      recordInput.registration.status[0].comments.push({
+        comment: recordInput.registration?.correction?.note
+      })
+    }
+
     const token = getToken(request)
 
     if (findActiveCorrectionRequest(record)) {
@@ -54,6 +79,7 @@ export const makeCorrectionRoute = createRoute({
       )
     }
     const practitioner = await getLoggedInPractitionerResource(token)
+    const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
 
     const recordInputWithUploadedAttachments =
       await uploadBase64AttachmentsToDocumentsStore(
@@ -72,6 +98,7 @@ export const makeCorrectionRoute = createRoute({
     const recordInCorrectedState = await toCorrected(
       record,
       practitioner,
+      practitionerOfficeId,
       correctionDetails,
       proofOfLegalCorrectionAttachments,
       paymentAttachmentUrl
