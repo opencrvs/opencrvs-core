@@ -1236,25 +1236,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   hasFieldChanged(
     field: IFormField,
-    data: IFormSectionData,
-    originalData?: IFormSectionData
+    sectionData: IFormSectionData,
+    originalSectionData?: IFormSectionData
   ) {
-    if (!originalData) return false
-    if (data[field.name] && (data[field.name] as IFormData).value) {
+    if (!originalSectionData) {
+      const isCustomSection = sectionData && sectionData[field.name]
+      if (isCustomSection) {
+        this.hasChangesBeenMade = true
+        return true
+      }
+      return false
+    }
+    if (
+      sectionData[field.name] &&
+      (sectionData[field.name] as IFormData).value
+    ) {
       return this.hasNestedDataChanged(
-        data[field.name] as IFormData,
-        originalData[field.name] as IFormData
+        sectionData[field.name] as IFormData,
+        originalSectionData[field.name] as IFormData
       )
     }
     /*
      * data section might have some values as empty string
      * whereas original data section have them as undefined
      */
-    if (!originalData[field.name] && data[field.name] === '') {
+    if (!originalSectionData[field.name] && sectionData[field.name] === '') {
       return false
     }
 
-    const hasChanged = data[field.name] !== originalData[field.name]
+    const hasChanged =
+      sectionData[field.name] !== originalSectionData[field.name]
     this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
     return hasChanged
   }
