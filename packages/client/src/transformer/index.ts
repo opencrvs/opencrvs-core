@@ -36,7 +36,7 @@ import {
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -61,6 +61,24 @@ const nestedFieldsMapping = (
   }
 }
 
+const documentChangedValue = (
+  section: IFormSection,
+  fieldDef: IFormField,
+  draftData: IFormData,
+  originalDraftData: IFormData
+): CorrectionValueInput => {
+  const generateValue = (data: IFormData, prefix: string) =>
+    isEmpty(data[section.id][fieldDef.name])
+      ? ''
+      : `${prefix} ${fieldDef.label.defaultMessage}`
+
+  return {
+    section: section.id,
+    fieldName: fieldDef.name,
+    newValue: generateValue(draftData, 'New'),
+    oldValue: generateValue(originalDraftData, 'Old')
+  }
+}
 const toCorrectionValue = (
   section: IFormSection,
   fieldDef: IFormField,
@@ -124,6 +142,10 @@ const toCorrectionValue = (
         changedValues.push(...nestedChangedValues)
       }
     }
+  } else if (section.id === 'documents') {
+    changedValues.push(
+      documentChangedValue(section, fieldDef, draftData, originalDraftData)
+    )
   } else {
     changedValues.push({
       section: section.id,
@@ -176,7 +198,6 @@ export function getChangedValues(
         if (
           !conditionalActions.includes('hide') &&
           !conditionalActions.includes('disable') &&
-          !(section.id === 'documents') &&
           hasFieldChanged(
             fieldDef,
             draftData[section.id],
