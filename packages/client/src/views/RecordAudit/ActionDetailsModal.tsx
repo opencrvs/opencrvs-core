@@ -87,9 +87,9 @@ function retrieveCorrectionComment(actionDetailsData: History) {
     return []
   }
 
-  const comment = actionDetailsData.comments[1]?.comment
+  const comment = actionDetailsData.comments[1]?.comment || ''
 
-  return comment ? [{ comment }] : []
+  return [{ comment }]
 }
 
 function getHistories(draft: IDeclaration | null) {
