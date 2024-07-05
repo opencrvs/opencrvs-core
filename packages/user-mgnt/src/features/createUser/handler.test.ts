@@ -130,7 +130,7 @@ describe('createUser handler', () => {
         ],
         username: 'j.doe1',
         identifiers: [{ system: 'NID', value: '1234' }],
-        email: 'j.doe@gmail.com',
+        emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
         role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
