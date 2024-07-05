@@ -13,7 +13,7 @@ WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN yarn install --frozen-lockfile && yarn build
 
-FROM nginx:1.25
+FROM nginx:1.27
 RUN apt-get update && apt-get upgrade -y
 
 COPY --from=0 /app/packages/client/build/ /usr/share/nginx/html/

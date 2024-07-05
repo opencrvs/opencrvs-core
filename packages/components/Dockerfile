@@ -12,7 +12,7 @@ RUN yarn build-storybook
 
 # Step 2. Build the actual image
 
-FROM nginx:1.25
+FROM nginx:1.27
 
 RUN apt-get update && apt-get upgrade -y
 
