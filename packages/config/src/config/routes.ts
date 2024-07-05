@@ -19,9 +19,7 @@ import {
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
-  getLoginConfigHandler,
-  updateApplicationConfig,
-  updateApplicationConfigHandler
+  getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createInformantSMSNotificationHandler, {
   requestSchema as createInformantSMSNotificationReqSchema
@@ -203,21 +201,6 @@ export default function getRoutes(): ServerRoute[] {
         description: 'Delete certificate',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateApplicationConfig',
-      handler: updateApplicationConfigHandler,
-      options: {
-        tags: ['api'],
-        description: 'Updates an existing Config',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateApplicationConfig
         }
       }
     },

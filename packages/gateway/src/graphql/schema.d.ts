@@ -105,7 +105,6 @@ export interface GQLMutation {
   resetPasswordInvite?: string
   updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
-  updateApplicationConfig?: GQLApplicationConfiguration
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -715,42 +714,6 @@ export interface GQLCertificateSVGInput {
   status: GQLCertificateStatus
 }
 
-export interface GQLApplicationConfiguration {
-  APPLICATION_NAME?: string
-  BIRTH?: GQLBirth
-  COUNTRY_LOGO?: GQLCountryLogo
-  CURRENCY?: GQLCurrency
-  DEATH?: GQLDeath
-  MARRIAGE?: GQLMarriage
-  FEATURES?: GQLFeatures
-  FIELD_AGENT_AUDIT_LOCATIONS?: string
-  PHONE_NUMBER_PATTERN?: string
-  NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE_REQUIRED?: boolean
-  USER_NOTIFICATION_DELIVERY_METHOD?: string
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
-  DATE_OF_BIRTH_UNKNOWN?: boolean
-  LOGIN_BACKGROUND?: GQLLoginBackground
-}
-
-export interface GQLApplicationConfigurationInput {
-  APPLICATION_NAME?: string
-  BIRTH?: GQLBirthInput
-  COUNTRY_LOGO?: GQLCountryLogoInput
-  CURRENCY?: GQLCurrencyInput
-  DEATH?: GQLDeathInput
-  MARRIAGE?: GQLMarriageInput
-  FEATURES?: GQLFeaturesInput
-  FIELD_AGENT_AUDIT_LOCATIONS?: string
-  PHONE_NUMBER_PATTERN?: string
-  NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE_REQUIRED?: boolean
-  USER_NOTIFICATION_DELIVERY_METHOD?: string
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
-  DATE_OF_BIRTH_UNKNOWN?: boolean
-  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
-}
-
 export interface GQLSystemSecret {
   system: GQLSystem
   clientSecret: string
@@ -1330,92 +1293,6 @@ export interface GQLRoleInput {
   labels: Array<GQLLabelInput>
 }
 
-export interface GQLBirth {
-  REGISTRATION_TARGET?: number
-  LATE_REGISTRATION_TARGET?: number
-  FEE?: GQLBirthFee
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLCountryLogo {
-  fileName?: string
-  file?: string
-}
-
-export interface GQLCurrency {
-  isoCode?: string
-  languagesAndCountry?: Array<string | null>
-}
-
-export interface GQLDeath {
-  REGISTRATION_TARGET?: number
-  FEE?: GQLDeathFee
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLMarriage {
-  REGISTRATION_TARGET?: number
-  FEE?: GQLMarriageFee
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLFeatures {
-  DEATH_REGISTRATION?: boolean
-  MARRIAGE_REGISTRATION?: boolean
-  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
-  INFORMANT_SIGNATURE?: boolean
-  PRINT_DECLARATION?: boolean
-}
-
-export interface GQLLoginBackground {
-  backgroundColor?: string
-  backgroundImage?: string
-  imageFit?: GQLImageFit
-}
-
-export interface GQLBirthInput {
-  REGISTRATION_TARGET?: number
-  LATE_REGISTRATION_TARGET?: number
-  FEE?: GQLBirthFeeInput
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLCountryLogoInput {
-  fileName?: string
-  file?: string
-}
-
-export interface GQLCurrencyInput {
-  isoCode?: string
-  languagesAndCountry?: Array<string | null>
-}
-
-export interface GQLDeathInput {
-  REGISTRATION_TARGET?: number
-  FEE?: GQLDeathFeeInput
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLMarriageInput {
-  REGISTRATION_TARGET?: number
-  FEE?: GQLMarriageFeeInput
-  PRINT_IN_ADVANCE?: boolean
-}
-
-export interface GQLFeaturesInput {
-  DEATH_REGISTRATION?: boolean
-  MARRIAGE_REGISTRATION?: boolean
-  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
-  INFORMANT_SIGNATURE?: boolean
-  PRINT_DECLARATION?: boolean
-}
-
-export interface GQLLoginBackgroundInput {
-  backgroundColor?: string
-  backgroundImage?: string
-  imageFit?: GQLImageFit
-}
-
 export interface GQLSystemSettingsInput {
   dailyQuota?: number
   webhook?: Array<GQLWebhookInput | null>
@@ -1814,43 +1691,6 @@ export interface GQLLabelInput {
   label: string
 }
 
-export interface GQLBirthFee {
-  ON_TIME?: number
-  LATE?: number
-  DELAYED?: number
-}
-
-export interface GQLDeathFee {
-  ON_TIME?: number
-  DELAYED?: number
-}
-
-export interface GQLMarriageFee {
-  ON_TIME?: number
-  DELAYED?: number
-}
-
-export const enum GQLImageFit {
-  FILL = 'FILL',
-  TILE = 'TILE'
-}
-
-export interface GQLBirthFeeInput {
-  ON_TIME?: number
-  LATE?: number
-  DELAYED?: number
-}
-
-export interface GQLDeathFeeInput {
-  ON_TIME?: number
-  DELAYED?: number
-}
-
-export interface GQLMarriageFeeInput {
-  ON_TIME?: number
-  DELAYED?: number
-}
-
 export interface GQLAuditLogItemBase {
   time: string
   ipAddress: string
@@ -1984,7 +1824,6 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   Response?: GQLResponseTypeResolver
-  ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
   Map?: GraphQLScalarType
@@ -2024,13 +1863,6 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   SystemSettings?: GQLSystemSettingsTypeResolver
   OIDPUserInfo?: GQLOIDPUserInfoTypeResolver
-  Birth?: GQLBirthTypeResolver
-  CountryLogo?: GQLCountryLogoTypeResolver
-  Currency?: GQLCurrencyTypeResolver
-  Death?: GQLDeathTypeResolver
-  Marriage?: GQLMarriageTypeResolver
-  Features?: GQLFeaturesTypeResolver
-  LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -2056,9 +1888,6 @@ export interface GQLResolver {
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
   FieldValue?: GraphQLScalarType
-  BirthFee?: GQLBirthFeeTypeResolver
-  DeathFee?: GQLDeathFeeTypeResolver
-  MarriageFee?: GQLMarriageFeeTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
@@ -2828,7 +2657,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
-  updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
@@ -3565,21 +3393,6 @@ export interface MutationToCreateOrUpdateCertificateSVGResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateCertificateSVGArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdateApplicationConfigArgs {
-  applicationConfig?: GQLApplicationConfigurationInput
-}
-export interface MutationToUpdateApplicationConfigResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToUpdateApplicationConfigArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6246,204 +6059,6 @@ export interface ResponseToRoleIdMapResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
-  APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
-  BIRTH?: ApplicationConfigurationToBIRTHResolver<TParent>
-  COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
-  CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
-  DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
-  MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
-  FEATURES?: ApplicationConfigurationToFEATURESResolver<TParent>
-  FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
-  PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
-  NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
-  INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
-  USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
-  DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
-  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
-}
-
-export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToBIRTHResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToCOUNTRY_LOGOResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToCURRENCYResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToDEATHResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToMARRIAGEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToFEATURESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLSystemSecretTypeResolver<TParent = any> {
   system?: SystemSecretToSystemResolver<TParent>
   clientSecret?: SystemSecretToClientSecretResolver<TParent>
@@ -8903,289 +8518,6 @@ export interface OIDPUserInfoToAddressResolver<TParent = any, TResult = any> {
 }
 
 export interface OIDPUserInfoToUpdated_atResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLBirthTypeResolver<TParent = any> {
-  REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
-  LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
-  FEE?: BirthToFEEResolver<TParent>
-  PRINT_IN_ADVANCE?: BirthToPRINT_IN_ADVANCEResolver<TParent>
-}
-
-export interface BirthToREGISTRATION_TARGETResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthToLATE_REGISTRATION_TARGETResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthToFEEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCountryLogoTypeResolver<TParent = any> {
-  fileName?: CountryLogoToFileNameResolver<TParent>
-  file?: CountryLogoToFileResolver<TParent>
-}
-
-export interface CountryLogoToFileNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CountryLogoToFileResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCurrencyTypeResolver<TParent = any> {
-  isoCode?: CurrencyToIsoCodeResolver<TParent>
-  languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
-}
-
-export interface CurrencyToIsoCodeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CurrencyToLanguagesAndCountryResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDeathTypeResolver<TParent = any> {
-  REGISTRATION_TARGET?: DeathToREGISTRATION_TARGETResolver<TParent>
-  FEE?: DeathToFEEResolver<TParent>
-  PRINT_IN_ADVANCE?: DeathToPRINT_IN_ADVANCEResolver<TParent>
-}
-
-export interface DeathToREGISTRATION_TARGETResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DeathToFEEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLMarriageTypeResolver<TParent = any> {
-  REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
-  FEE?: MarriageToFEEResolver<TParent>
-  PRINT_IN_ADVANCE?: MarriageToPRINT_IN_ADVANCEResolver<TParent>
-}
-
-export interface MarriageToREGISTRATION_TARGETResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MarriageToFEEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MarriageToPRINT_IN_ADVANCEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLFeaturesTypeResolver<TParent = any> {
-  DEATH_REGISTRATION?: FeaturesToDEATH_REGISTRATIONResolver<TParent>
-  MARRIAGE_REGISTRATION?: FeaturesToMARRIAGE_REGISTRATIONResolver<TParent>
-  EXTERNAL_VALIDATION_WORKQUEUE?: FeaturesToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
-  INFORMANT_SIGNATURE?: FeaturesToINFORMANT_SIGNATUREResolver<TParent>
-  PRINT_DECLARATION?: FeaturesToPRINT_DECLARATIONResolver<TParent>
-}
-
-export interface FeaturesToDEATH_REGISTRATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FeaturesToMARRIAGE_REGISTRATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FeaturesToEXTERNAL_VALIDATION_WORKQUEUEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FeaturesToINFORMANT_SIGNATUREResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FeaturesToPRINT_DECLARATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLLoginBackgroundTypeResolver<TParent = any> {
-  backgroundColor?: LoginBackgroundToBackgroundColorResolver<TParent>
-  backgroundImage?: LoginBackgroundToBackgroundImageResolver<TParent>
-  imageFit?: LoginBackgroundToImageFitResolver<TParent>
-}
-
-export interface LoginBackgroundToBackgroundColorResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LoginBackgroundToBackgroundImageResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LoginBackgroundToImageFitResolver<
   TParent = any,
   TResult = any
 > {
@@ -11704,85 +11036,6 @@ export interface OIDPUserAddressToCountryResolver<
   TParent = any,
   TResult = any
 > {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLBirthFeeTypeResolver<TParent = any> {
-  ON_TIME?: BirthFeeToON_TIMEResolver<TParent>
-  LATE?: BirthFeeToLATEResolver<TParent>
-  DELAYED?: BirthFeeToDELAYEDResolver<TParent>
-}
-
-export interface BirthFeeToON_TIMEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthFeeToLATEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDeathFeeTypeResolver<TParent = any> {
-  ON_TIME?: DeathFeeToON_TIMEResolver<TParent>
-  DELAYED?: DeathFeeToDELAYEDResolver<TParent>
-}
-
-export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLMarriageFeeTypeResolver<TParent = any> {
-  ON_TIME?: MarriageFeeToON_TIMEResolver<TParent>
-  DELAYED?: MarriageFeeToDELAYEDResolver<TParent>
-}
-
-export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
