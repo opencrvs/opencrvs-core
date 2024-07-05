@@ -36,8 +36,6 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CERTIFICATE_CONFIG,
-  APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
@@ -50,9 +48,7 @@ import {
   PERFORMANCE_LEADER_BOARDS,
   PERFORMANCE_STATISTICS,
   PERFORMANCE_DASHBOARD,
-  USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
@@ -160,18 +156,6 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToCertificateConfig() {
-  return push(CERTIFICATE_CONFIG)
-}
-
-export function goToUserRolesConfig() {
-  return push(USER_ROLES_CONFIG)
-}
-
-export function goToInformantNotification() {
-  return push(INFORMANT_NOTIFICATION)
-}
-
 export function goToAllUserEmail() {
   return push(ALL_USER_EMAIL)
 }
@@ -192,10 +176,6 @@ export function goToDashboardView() {
 
 export function goToAdvancedSearch() {
   return push(ADVANCED_SEARCH)
-}
-
-export function goToApplicationConfig() {
-  return push(APPLICATION_CONFIG)
 }
 
 export function goToHomeTab(
