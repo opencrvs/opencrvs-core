@@ -11,12 +11,10 @@
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  flushPromises,
   mockDeathDeclarationData,
   mockDeclarationData,
   mockUserResponse,

@@ -283,7 +283,6 @@ describe('OfficeHome sent for review tab related tests', () => {
   })
 
   it('renders all items returned from graphql query in ready for review', async () => {
-    const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(

@@ -13,7 +13,6 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event, RegStatus } from '@client/utils/gateway'
-import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,

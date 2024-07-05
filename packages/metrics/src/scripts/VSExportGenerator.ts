@@ -868,13 +868,16 @@ async function makeCompositionAndExportCSVReport(
           }
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.log('Sorry. Something went wrong!', error)
       }
     }
+    // eslint-disable-next-line no-console
     console.log(
       `VSEXPORT GENERATION: Successfully generated CSV report for birth and death declarations from ${startDate} to ${endDate}`
     )
   } else {
+    // eslint-disable-next-line no-console
     console.log(
       `VSEXPORT GENERATION: No record found from ${startDate} to ${endDate}`
     )

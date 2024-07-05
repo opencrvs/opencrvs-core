@@ -17,10 +17,9 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import formatDate from '@client/utils/date-formatting'
 import { camelCase } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useRouteMatch } from 'react-router'
-import { v4 as uuid } from 'uuid'
 
 interface OIDPUserAddress {
   formatted?: string | null
