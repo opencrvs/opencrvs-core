@@ -19,8 +19,7 @@ describe('authenticate handler receives a request', () => {
 
   beforeEach(async () => {
     server = await createServerWithEnvironment({
-      NODE_ENV: 'production',
-      LOG_LEVEL: 'error'
+      NODE_ENV: 'production'
     })
   })
 
