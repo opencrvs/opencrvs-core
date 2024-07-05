@@ -17,6 +17,7 @@ import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from 'styled-components'
 import { getSchema } from '@client/tests/graphql-schema-mock'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/build/dist/authentication'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { join } from 'path'
@@ -305,9 +306,9 @@ export const userDetails: UserDetails = {
   systemRole: SystemRoleType.FieldAgent,
   role: {
     label: {
-      id: 'userRoles.entrepreneur',
-      defaultMessage: 'Entrepreneur',
-      description: 'Entrepreneur'
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
     }
   },
   mobile: '01677701431',
@@ -371,6 +372,13 @@ export const mockUserResponse = {
         ]
       },
       systemRole: 'LOCAL_REGISTRAR',
+      role: {
+        label: {
+          id: 'userRoles.localRegistar',
+          defaultMessage: 'Local Registrar',
+          description: 'Label for local registrar'
+        }
+      },
       practitionerId: '9202fa3c-7eb7-4898-bea5-5895f7f99534'
     }
   }
@@ -387,6 +395,13 @@ export const mockLocalSysAdminUserResponse = {
         __typename: 'Location'
       },
       systemRole: 'LOCAL_SYSTEM_ADMIN',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -421,6 +436,11 @@ export const mockRegistrarUserResponse = {
         __typename: 'Location'
       },
       systemRole: 'LOCAL_REGISTRAR',
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'Name for user role Local Registrar',
+        id: 'userRole.localRegistrar'
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1073,217 +1093,7 @@ export function createRouterProps<
 
 export const mockRoles = {
   data: {
-    getSystemRoles: [
-      {
-        id: '63c7ebee48dc29888b5b020d',
-        value: 'FIELD_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c279',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Health Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Professionnel de Santé',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Police Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Agent de Police',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27b',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Social Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Travailleur Social',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27c',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Leader',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Leader Local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020e',
-        value: 'REGISTRATION_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27d',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Registration Agent',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: "Agent d'enregistrement",
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020f',
-        value: 'LOCAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27e',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0210',
-        value: 'LOCAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27f',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0211',
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c280',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0212',
-        value: 'PERFORMANCE_MANAGEMENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c281',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Performance Manager',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Gestion des performances',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0213',
-        value: 'NATIONAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c282',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      }
-    ]
+    getUserRoles: DEFAULT_ROLES_DEFINITION
   }
 }
 
@@ -1295,6 +1105,16 @@ export const mockFetchRoleGraphqlOperation = {
   result: {
     data: {
       getUserRoles: [
+        {
+          id: 'HOSPITAL',
+          label: {
+            defaultMessage: 'Field Agent in a Hospital',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.hospitalFieldAgent'
+          },
+          systemRole: 'FIELD_AGENT',
+          scopes: ['declare']
+        },
         {
           id: 'FIELD_AGENT',
           label: {

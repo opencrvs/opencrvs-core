@@ -8,13 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import { AvatarSmall } from '@client/components/Avatar'
+import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { ILocation } from '@client/offline/reducer'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { Avatar, History, RegStatus, SystemType } from '@client/utils/gateway'
+import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { Link } from '@opencrvs/components'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Divider } from '@opencrvs/components/lib/Divider'
+import { Box } from '@opencrvs/components/lib/icons/Box'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
-import { Divider } from '@opencrvs/components/lib/Divider'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { v4 as uuid } from 'uuid'
+import { CMethodParams } from './ActionButtons'
 import {
   getPageItems,
   getStatusLabel,
@@ -22,24 +38,6 @@ import {
   isSystemInitiated,
   isVerifiedAction
 } from './utils'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { CMethodParams } from './ActionButtons'
-import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
-import { getIndividualNameObj, getUserRole } from '@client/utils/userUtils'
-import { AvatarSmall } from '@client/components/Avatar'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
-import { useIntl } from 'react-intl'
-import { Box } from '@opencrvs/components/lib/icons/Box'
-import { v4 as uuid } from 'uuid'
-import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
-import { Link } from '@opencrvs/components'
-import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { getLanguage } from '@client/i18n/selectors'
-import { useSelector } from 'react-redux'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
-import { ILocation } from '@client/offline/reducer'
 
 const TableDiv = styled.div`
   overflow: auto;

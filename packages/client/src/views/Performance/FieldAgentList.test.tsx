@@ -68,7 +68,15 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '1',
                   fullName: 'Sakib Al Hasan',
-                  role: 'HA',
+                  role: {
+                    label: {
+                      id: 'userRole.socialWorker',
+                      defaultMessage: 'Social Worker',
+                      description: 'Name for user role Social Worker',
+                      __typename: 'I18nMessage'
+                    },
+                    __typename: 'UserRole'
+                  },
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1488076708000',
@@ -80,7 +88,15 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '2',
                   fullName: 'Naeem Hossain',
-                  role: 'HA',
+                  role: {
+                    label: {
+                      id: 'userRole.socialWorker',
+                      defaultMessage: 'Social Worker',
+                      description: 'Name for user role Social Worker',
+                      __typename: 'I18nMessage'
+                    },
+                    __typename: 'UserRole'
+                  },
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1487076708000',

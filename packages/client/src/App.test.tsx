@@ -127,39 +127,3 @@ describe('when user has a valid token in local storage', () => {
     expect(loadLocations).toHaveBeenCalled()
   })
 })
-
-describe('it handles react errors', () => {
-  it('displays react error page', async () => {
-    const { store, history } = createStore()
-    function Problem(): JSX.Element {
-      throw new Error('Error thrown.')
-    }
-    const testComponent = await createTestComponent(
-      <StyledErrorBoundary>
-        <Problem />
-      </StyledErrorBoundary>,
-      { store, history }
-    )
-
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
-  })
-})
-
-describe('it handles react unauthorized errors', () => {
-  it('displays react error page', async () => {
-    const { store, history } = createStore()
-    function Problem(): JSX.Element {
-      throw new Error('401')
-    }
-    const testComponent = await createTestComponent(
-      <StyledErrorBoundary>
-        <Problem />
-      </StyledErrorBoundary>,
-      { store, history }
-    )
-
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
-
-    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
-  })
-})

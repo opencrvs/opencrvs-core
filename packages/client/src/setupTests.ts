@@ -211,16 +211,12 @@ vi.doMock(
   })
 )
 
-vi.doMock(
-  '@client/utils/authApi',
-  (): {
-    authApi: typeof authApi
-  } => ({
-    authApi: {
-      invalidateToken: () => Promise.resolve()
-    }
-  })
-)
+vi.mock('@client/utils/authApi', () => ({
+  invalidateToken: () => Promise.resolve()
+}))
+vi.mock('@client/pdfRenderer', () => ({
+  printPDF: () => Promise.resolve()
+}))
 
 beforeEach(() => {
   /*

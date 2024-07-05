@@ -13,6 +13,7 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
+import path from 'node:path'
 
 // fixes issue where Cypress was not able to resolve Vite's localhost
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
@@ -90,7 +91,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: 'crypto-js'
+        crypto: 'crypto-js',
+        '@opencrvs/commons/build/dist/authentication':
+          '@opencrvs/commons/authentication'
       }
     },
     plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],

@@ -25,7 +25,7 @@ import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
 import * as Router from 'react-router'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { SystemRoleType } from '@client/utils/gateway'
+import { GetUserQuery, Status, SystemRoleType } from '@client/utils/gateway'
 import * as profileSelectors from '@client/profile/profileSelectors'
 
 const useParams = Router.useParams as Mock
@@ -59,17 +59,18 @@ const mockAuditedUserGqlResponse = {
           system: 'NATIONAL_ID',
           value: '1014881922'
         },
-        systemRole: 'FIELD_AGENT',
+        systemRole: SystemRoleType.FieldAgent,
         role: {
-          _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-          labels: [
-            {
-              lang: 'en',
-              label: 'CHA'
-            }
-          ]
+          id: 'SOCIAL_WORKER',
+          label: {
+            id: 'userRole.socialWorker',
+            defaultMessage: 'Social Worker',
+            description: 'Name for user role Social Worker',
+            __typename: 'I18nMessage'
+          },
+          __typename: 'UserRole'
         },
-        status: 'active',
+        status: Status.Active,
         underInvestigation: true,
         practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
         primaryOffice: {
@@ -78,7 +79,7 @@ const mockAuditedUserGqlResponse = {
           alias: ['নরসিংদী পৌরসভা']
         },
         creationDate: '2019-03-31T18:00:00.000Z'
-      }
+      } satisfies GetUserQuery['getUser']
     }
   }
 }

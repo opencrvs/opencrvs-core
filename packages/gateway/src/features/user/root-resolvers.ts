@@ -144,7 +144,7 @@ export const resolvers: GQLResolver = {
           skip = 0,
           sort = 'desc'
         },
-        { headers: authHeader }
+        { headers: authHeader, dataSources }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search field agents
         if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -213,8 +213,12 @@ export const resolvers: GQLResolver = {
           authHeader
         )
 
+        const roles = await dataSources.countryConfigAPI.getRoles()
+
         const fieldAgentList: GQLSearchFieldAgentResponse[] =
           userResponse.results.map((user: IUserModelData) => {
+            const role = roles.find((role) => role.id === user.role)
+
             const metricsData = metricsForPractitioners.find(
               (metricsForPractitioner: { practitionerId: string }) =>
                 metricsForPractitioner.practitionerId === user.practitionerId
@@ -222,7 +226,7 @@ export const resolvers: GQLResolver = {
             return {
               practitionerId: user.practitionerId,
               fullName: getFullName(user, language),
-              role: user.role,
+              role: role,
               status: user.status,
               avatar: user.avatar,
               primaryOfficeId: user.primaryOfficeId,

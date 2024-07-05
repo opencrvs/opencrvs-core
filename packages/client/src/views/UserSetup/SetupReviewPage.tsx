@@ -63,6 +63,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const email = (userDetails && (userDetails.email as string)) || ''
   const role = userDetails && intl.formatMessage(userDetails.role.label)
+
   const primaryOffice =
     (userDetails &&
       userDetails.primaryOffice &&

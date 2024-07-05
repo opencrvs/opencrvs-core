@@ -394,7 +394,6 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           }))
         })
       )
-      console.log({ loaded: userRoles })
 
       return {
         ...state,

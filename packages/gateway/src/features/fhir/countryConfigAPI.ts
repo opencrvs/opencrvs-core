@@ -11,13 +11,13 @@
 // eslint-disable-next-line import/no-relative-parent-imports
 
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { Roles } from '@opencrvs/commons'
 
 export default class CountryConfigAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = APPLICATION_CONFIG_URL
+    this.baseURL = COUNTRY_CONFIG_URL
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {

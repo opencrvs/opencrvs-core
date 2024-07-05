@@ -27,6 +27,7 @@ import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 import { vi, Mock } from 'vitest'
+import { SearchUsersQuery, Status, SystemRoleType } from '@client/utils/gateway'
 
 describe('user list without admin scope', () => {
   let store: AppStore
@@ -253,9 +254,16 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
+                    systemRole: SystemRoleType.RegistrationAgent,
+                    role: {
+                      id: 'REGISTRATION_AGENT',
+                      label: {
+                        id: 'userRoles.registrationAgent',
+                        defaultMessage: 'Registration_agent',
+                        description: ''
+                      }
+                    },
+                    status: Status.Active,
                     underInvestigation: false
                   },
                   {
@@ -268,9 +276,16 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
+                    systemRole: SystemRoleType.LocalRegistrar,
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        id: 'userRoles.localRegistrar',
+                        defaultMessage: 'Local Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Active,
                     underInvestigation: false
                   },
                   {
@@ -283,9 +298,16 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'pending',
+                    systemRole: SystemRoleType.LocalRegistrar,
+                    role: {
+                      id: 'DISTRICT_REGISTRAR',
+                      label: {
+                        id: 'userRoles.districtRegistrar',
+                        defaultMessage: 'District Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Pending,
                     underInvestigation: false
                   },
                   {
@@ -298,9 +320,16 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'deactivated',
+                    systemRole: SystemRoleType.LocalRegistrar,
+                    role: {
+                      id: 'STATE_REGISTRAR',
+                      label: {
+                        id: 'userRoles.stateRegistrar',
+                        defaultMessage: 'State Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Deactivated,
                     underInvestigation: true
                   },
                   {
@@ -313,13 +342,20 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'disabled',
+                    systemRole: SystemRoleType.FieldAgent,
+                    role: {
+                      id: 'FIELD_AGENT',
+                      label: {
+                        id: 'userRoles.fieldAgent',
+                        defaultMessage: 'Field Agent',
+                        description: ''
+                      }
+                    },
+                    status: Status.Disabled,
                     underInvestigation: false
                   }
                 ]
-              }
+              } satisfies SearchUsersQuery['searchUsers']
             }
           }
         }
@@ -615,747 +651,4 @@ describe('User list tests', () => {
       })
     })
   })
-
-  /* Todo: fix after adding pagination in ListView */
-
-  /*describe('Pagination test', () => {
-    it('renders no pagination block when the total amount of data is not applicable for pagination', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 5,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'pending',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'disabled',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#pagination').hostNodes()).toHaveLength(0)
-    })
-    it('renders pagination block with proper page value when the total amount of data is applicable for pagination', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#load_more_button').hostNodes().text()).toContain(
-        'Show next 10'
-      )
-    })
-    it('renders next page of the user list when the next page button is pressed', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 20
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b800',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'a.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b801',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Beauty',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'b.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b802',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'a.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b803',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 's.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b804',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'j.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
-
-      app.find('#load_more_button').hostNodes().simulate('click')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      expect(app.find('#load_more_button').hostNodes()).toHaveLength(0)
-    })
-  })*/
 })

@@ -36,6 +36,12 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
+import {
+  FetchUserQuery,
+  GetUserQuery,
+  Status,
+  SystemRoleType
+} from '@client/utils/gateway'
 
 const mockUsers = {
   data: {
@@ -276,6 +282,8 @@ describe('create new user tests', () => {
         />,
         { store, history }
       )
+      // Wait until roles are loaded
+      await waitForElement(testComponent, '#content-name')
     })
 
     it('renders review header', () => {
@@ -337,15 +345,16 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            identifier: {
-              system: 'NATIONAL_ID',
-              value: '101488192',
-              __typename: 'Identifier'
+            systemRole: SystemRoleType.NationalRegistrar,
+            role: {
+              id: 'NATIONAL_REGISTRAR',
+              label: {
+                id: 'userRoles.nationalRegistrar',
+                defaultMessage: 'National Registrar',
+                description: ''
+              }
             },
-            systemRole: 'NATIONAL_REGISTRAR',
-            role: { _id: '63ef9466f708ea080777c27a' },
-            status: 'active',
-            underInvestigation: false,
+            status: Status.Active,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
               id: '895cc945-94a9-4195-9a29-22e9310f3385',
@@ -359,7 +368,7 @@ describe('edit user tests', () => {
             }),
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
-          }
+          } satisfies GetUserQuery['getUser']
         }
       }
     }

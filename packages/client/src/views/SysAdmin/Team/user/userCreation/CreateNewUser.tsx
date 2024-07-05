@@ -111,6 +111,7 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
 
   renderLoadingPage = () => {
     const { intl, userId } = this.props
+
     return (
       <ActionPageLight
         title={

@@ -232,7 +232,6 @@ class UserReviewFormComponent extends React.Component<
     }
 
     const role = userRoles.find(({ id }) => id === formData.role)
-    console.log({ userRoles })
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
@@ -295,6 +294,7 @@ class UserReviewFormComponent extends React.Component<
       )
     } else {
       title = section.title && intl.formatMessage(section.title)
+
       actionComponent = (
         <Button
           id="submit_user_form"

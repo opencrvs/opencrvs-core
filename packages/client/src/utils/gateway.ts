@@ -2399,7 +2399,6 @@ export type UserInput = {
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
   status?: InputMaybe<Status>
-  systemRole: SystemRoleType
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -3221,6 +3220,7 @@ export type GetUserQuery = {
     } | null
     role: {
       __typename?: 'UserRole'
+      id: string
       label: {
         __typename?: 'I18nMessage'
         id: string
@@ -7678,6 +7678,7 @@ export type GetEventsWithProgressQuery = {
         status?: string | null
         contactNumber?: string | null
         contactRelationship?: string | null
+        contactEmail?: string | null
         dateOfDeclaration?: any | null
         trackingId?: string | null
         registrationNumber?: string | null
