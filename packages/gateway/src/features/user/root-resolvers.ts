@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
-import { Roles } from '@opencrvs/commons/authentication'
+import {
+  Roles,
+  logger,
+  isBase64FileString,
+  joinURL,
+  fetchJSON
+} from '@opencrvs/commons'
 import {
   IUserModelData,
   IUserPayload,
@@ -29,12 +35,6 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import {
-  logger,
-  isBase64FileString,
-  joinURL,
-  fetchJSON
-} from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
@@ -45,28 +45,30 @@ import { rateLimitedResolver } from '@gateway/rate-limit'
 
 export const resolvers: GQLResolver = {
   Query: {
-    getUser: async (_, { userId }, { dataSources }) => {
-      const user = await dataSources.usersAPI.getUserById(userId!)
-
-      return user
-    },
+    getUser: rateLimitedResolver(
+      { requestsPerMinute: 20 },
+      async (_, { userId }, { dataSources }) => {
+        const user = await dataSources.usersAPI.getUserById(userId!)
+        return user
+      }
+    ),
 
     getUserByMobile: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {
         return dataSources.usersAPI.getUserByMobile(mobile!)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       (_, { email }, { dataSources }) => {
         return dataSources.usersAPI.getUserByEmail(email!)
       }
     ),
 
     searchUsers: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {
@@ -127,7 +129,7 @@ export const resolvers: GQLResolver = {
     ),
 
     searchFieldAgents: rateLimitedResolver(
-      { requestsPerMinute: 10 },
+      { requestsPerMinute: 20 },
       async (
         _,
         {
@@ -322,7 +324,7 @@ export const resolvers: GQLResolver = {
       } else if (res.status !== 201) {
         return await Promise.reject(
           new Error(
-            `Something went wrong on user-mgnt service. Couldn't ${action} user`
+            `Something went wrong on user-mgnt service. Couldn't perform ${action}`
           )
         )
       }

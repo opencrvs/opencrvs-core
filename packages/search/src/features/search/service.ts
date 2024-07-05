@@ -30,7 +30,14 @@ export async function formatSearchParams(
     parameters
   } = searchPayload
 
-  const sort = sortBy ?? [{ [sortColumn]: searchPayload.sort ?? SortOrder.ASC }]
+  const sort = sortBy ?? [
+    {
+      [sortColumn]: {
+        order: searchPayload.sort ?? SortOrder.ASC,
+        unmapped_type: 'keyword'
+      }
+    }
+  ]
   const query = await advancedQueryBuilder(
     parameters,
     createdBy,
@@ -60,7 +67,7 @@ export const advancedSearch = async (
     })
   } catch (error) {
     if (error.statusCode === 400) {
-      logger.error(`Search: bad request. ${error.message}`)
+      logger.error(`ElasticSearch: bad request. Error: ${error.message}`)
     } else {
       logger.error('Search error: ', error)
     }

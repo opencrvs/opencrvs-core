@@ -58,16 +58,10 @@ describe('User type resolvers', () => {
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
     creationDate: '1559054406433',
-    role: {
-      labels: [
-        {
-          lang: 'en',
-          label: 'MAYOR'
-        }
-      ]
-    },
+    role: 'MAYOR',
     device: ''
   }
+
   it('return id type', () => {
     const res = userTypeResolvers.User!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')

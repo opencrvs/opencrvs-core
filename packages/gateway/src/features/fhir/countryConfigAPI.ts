@@ -9,19 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { METRICS_URL } from '@gateway/constants'
+
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { Roles } from '@opencrvs/commons'
 
-export interface ITimeLoggedResponse {
-  status?: string
-  timeSpentEditing: number
-}
-
-export default class MetricsAPI extends RESTDataSource {
+export default class CountryConfigAPI extends RESTDataSource {
   constructor() {
     super()
-    this.baseURL = `${METRICS_URL}`
+    this.baseURL = APPLICATION_CONFIG_URL
   }
+
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
     const { headers } = this.context
     const headerKeys = Object.keys(headers)
@@ -30,7 +28,7 @@ export default class MetricsAPI extends RESTDataSource {
     }
   }
 
-  getTimeLogged(recordId: string) {
-    return this.get(`/timeLogged?compositionId=${recordId}`)
+  getRoles(): Promise<Roles> {
+    return this.get(`/roles`)
   }
 }

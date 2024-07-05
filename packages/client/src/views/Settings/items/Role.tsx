@@ -19,7 +19,6 @@ import {
 } from '@client/views/Settings/items/components'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function Role() {

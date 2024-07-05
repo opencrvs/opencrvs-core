@@ -144,7 +144,7 @@ const getUserFullName = (history: History): string => {
 
 const getUserRole = (history: History): MessageDescriptor => {
   return (
-    (history?.user && userMessages[history.user.systemRole]) || {
+    history?.user?.role.label || {
       defaultMessage: ' ',
       description: 'empty string',
       id: 'form.field.label.empty'

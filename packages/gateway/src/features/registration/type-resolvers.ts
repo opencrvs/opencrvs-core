@@ -1545,17 +1545,16 @@ export const typeResolvers: GQLResolver = {
         return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
       })
 
-      const role = targetCode?.coding?.[0].code
+      const roleId = targetCode?.coding?.[0].code
 
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      if (role) {
-        userResponse.role.labels = JSON.parse(role)
-      }
+      const allRoles = await dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)
 
-      return userResponse
+      return { ...userResponse, role }
     },
     system: async (task: Task, _: any, { headers: authHeader }) => {
       const systemIdentifier = task.identifier?.find(

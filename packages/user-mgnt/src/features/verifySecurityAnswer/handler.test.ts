@@ -56,7 +56,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
       )
     }
   ],
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'

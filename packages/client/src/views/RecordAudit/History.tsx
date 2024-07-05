@@ -35,7 +35,6 @@ import { v4 as uuid } from 'uuid'
 import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -171,7 +170,6 @@ export const GetHistory = ({
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
-  const currentLanguage = useSelector(getLanguage)
 
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)

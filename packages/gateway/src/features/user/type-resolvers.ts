@@ -25,7 +25,7 @@ import {
   GQLSignatureInput,
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
-import { Roles } from '@opencrvs/commons/authentication'
+import { Roles } from '@opencrvs/commons'
 import {
   Bundle,
   Extension,

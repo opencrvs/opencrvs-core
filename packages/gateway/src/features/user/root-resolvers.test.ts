@@ -18,6 +18,7 @@ const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
 
 let container: StartedTestContainer
 
@@ -945,12 +946,15 @@ describe('User root resolvers', () => {
       mobile: '+8801733333333',
       email: 'test@test.org',
       systemRole: 'LOCAL_REGISTRAR',
-      role: 'HOSPITAL',
+      role: 'LOCAL_REGISTRAR',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }
 
     it('creates user for sysadmin', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -970,6 +974,9 @@ describe('User root resolvers', () => {
     })
 
     it('updates an user for sysadmin', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -1001,6 +1008,9 @@ describe('User root resolvers', () => {
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'
@@ -1015,7 +1025,7 @@ describe('User root resolvers', () => {
           { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
-        "Something went wrong on user-mgnt service. Couldn't create user"
+        "Something went wrong on user-mgnt service. Couldn't perform createUser"
       )
     })
   })

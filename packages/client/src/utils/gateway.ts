@@ -7367,106 +7367,6 @@ export type EmailAllUsersQuery = {
   } | null
 }
 
-export type ToggleInformantSmsNotificationMutationVariables = Exact<{
-  smsNotifications?: InputMaybe<
-    Array<SmsNotificationInput> | SmsNotificationInput
-  >
-}>
-
-export type ToggleInformantSmsNotificationMutation = {
-  __typename?: 'Mutation'
-  toggleInformantSMSNotification?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
-}
-
-export type GetInformantSmsNotificationsQueryVariables = Exact<{
-  [key: string]: never
-}>
-
-export type GetInformantSmsNotificationsQuery = {
-  __typename?: 'Query'
-  informantSMSNotifications?: Array<{
-    __typename?: 'SMSNotification'
-    id?: string | null
-    name: string
-    enabled: boolean
-    updatedAt: string
-    createdAt: string
-  }> | null
-}
-
-export type UpdateApplicationConfigMutationVariables = Exact<{
-  applicationConfig?: InputMaybe<ApplicationConfigurationInput>
-}>
-
-export type UpdateApplicationConfigMutation = {
-  __typename?: 'Mutation'
-  updateApplicationConfig?: {
-    __typename?: 'ApplicationConfiguration'
-    APPLICATION_NAME?: string | null
-    NID_NUMBER_PATTERN?: string | null
-    PHONE_NUMBER_PATTERN?: string | null
-    DATE_OF_BIRTH_UNKNOWN?: boolean | null
-    INFORMANT_SIGNATURE_REQUIRED?: boolean | null
-    USER_NOTIFICATION_DELIVERY_METHOD?: string | null
-    INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string | null
-    LOGIN_BACKGROUND?: {
-      __typename?: 'LoginBackground'
-      backgroundColor?: string | null
-      backgroundImage?: string | null
-      imageFit?: ImageFit | null
-    } | null
-    COUNTRY_LOGO?: {
-      __typename?: 'CountryLogo'
-      fileName?: string | null
-      file?: string | null
-    } | null
-    CURRENCY?: {
-      __typename?: 'Currency'
-      languagesAndCountry?: Array<string | null> | null
-      isoCode?: string | null
-    } | null
-    BIRTH?: {
-      __typename?: 'Birth'
-      REGISTRATION_TARGET?: number | null
-      LATE_REGISTRATION_TARGET?: number | null
-      PRINT_IN_ADVANCE?: boolean | null
-      FEE?: {
-        __typename?: 'BirthFee'
-        ON_TIME?: number | null
-        LATE?: number | null
-        DELAYED?: number | null
-      } | null
-    } | null
-    DEATH?: {
-      __typename?: 'Death'
-      REGISTRATION_TARGET?: number | null
-      PRINT_IN_ADVANCE?: boolean | null
-      FEE?: {
-        __typename?: 'DeathFee'
-        ON_TIME?: number | null
-        DELAYED?: number | null
-      } | null
-    } | null
-    MARRIAGE?: {
-      __typename?: 'Marriage'
-      REGISTRATION_TARGET?: number | null
-      PRINT_IN_ADVANCE?: boolean | null
-      FEE?: {
-        __typename?: 'MarriageFee'
-        ON_TIME?: number | null
-        DELAYED?: number | null
-      } | null
-    } | null
-  } | null
-}
-
 export type RegisterSystemMutationVariables = Exact<{
   system?: InputMaybe<SystemInput>
 }>
@@ -8114,6 +8014,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           __typename?: 'History'
           action?: RegAction | null
           regStatus?: RegStatus | null
+          date?: any | null
           user?: {
             __typename?: 'User'
             primaryOffice?: {

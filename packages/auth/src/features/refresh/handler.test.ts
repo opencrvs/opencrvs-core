@@ -9,25 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServerWithEnvironment } from '@auth/tests/util'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 describe('authenticate handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
-    server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+    server = await createServerWithEnvironment({
+      NODE_ENV: 'production'
+    })
   })
 
   describe('refresh expiring token', () => {
-    it('verifies a token and generates a new token', async () => {
+    it.only('verifies a token and generates a new token', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const codeService = require('../verifyCode/service')
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        scope: ['admin'],
+        role: 'NATIONAL_SYSTEM_ADMIN',
         mobile: '+345345343'
       })
 
@@ -63,7 +74,7 @@ describe('authenticate handler receives a request', () => {
 
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual(['admin'])
+      expect(body.scope).toEqual(['sysadmin', 'natlsysadmin'])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
@@ -73,7 +84,7 @@ describe('authenticate handler receives a request', () => {
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
-        userId: '1',
+        id: '1',
         scope: ['admin'],
         username: '+345345343'
       })

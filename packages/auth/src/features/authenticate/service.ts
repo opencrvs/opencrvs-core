@@ -135,9 +135,6 @@ export async function createToken(
   issuer: string,
   temporary?: boolean
 ): Promise<string> {
-  if (typeof userId === undefined) {
-    throw new Error('Invalid userId found for token creation')
-  }
   return sign({ scope }, cert, {
     subject: userId,
     algorithm: 'RS256',

@@ -17,7 +17,7 @@ import {
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { DEFAULT_ROLE_SCOPES } from '@opencrvs/commons/authentication'
+import { DEFAULT_CORE_ROLE_SCOPES } from '@opencrvs/commons/authentication'
 import { logger } from '@opencrvs/commons'
 
 interface IAuthPayload {
@@ -43,7 +43,7 @@ export default async function authenticateSuperUserHandler(
     throw unauthorized()
   }
 
-  const scope = DEFAULT_ROLE_SCOPES.SUPER_ADMIN
+  const scope = DEFAULT_CORE_ROLE_SCOPES.SUPER_ADMIN
 
   const token = await createToken(
     result.userId,

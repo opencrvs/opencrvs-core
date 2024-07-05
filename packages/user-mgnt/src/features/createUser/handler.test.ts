@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import User, { IUser, UserRole } from '@user-mgnt/model/user'
+import User, { IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
-import { Types } from 'mongoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -41,9 +40,8 @@ const mockUser = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
-  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+  role: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
-  scope: ['register'],
   deviceId: 'D444',
   password: 'test',
   signature: {
@@ -81,25 +79,6 @@ describe('createUser handler', () => {
       ['', { status: 200 }]
     )
 
-    mockingoose(UserRole).toReturn(
-      {
-        _id: '6348acd2e1a47ca32e79f46f',
-        labels: [
-          {
-            lang: 'en',
-            label: 'Field Agent'
-          },
-          {
-            lang: 'fr',
-            label: 'Agent de terrain'
-          }
-        ],
-        createdAt: '1685959052687',
-        updatedAt: '1685959052687'
-      },
-      'findOne'
-    )
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
@@ -116,7 +95,7 @@ describe('createUser handler', () => {
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
-        role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+        role: 'FIELD_AGENT',
         primaryOfficeId: '321',
         deviceId: 'D444',
         password: 'test'
@@ -145,14 +124,6 @@ describe('createUser handler', () => {
             {
               system: 'http://opencrvs.org/specs/roles',
               code: 'FIELD_AGENT'
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Field Agent"},{"lang":"fr","label":"Agent de terrain"}]'
             }
           ]
         }

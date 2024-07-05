@@ -9,12 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServerWithEnvironment } from '@auth/tests/util'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import * as fetchMock from 'jest-fetch-mock'
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 describe('authenticate handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
-    server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+    server = await createServerWithEnvironment({
+      NODE_ENV: 'production',
+      LOG_LEVEL: 'error'
+    })
   })
 
   describe('user management service says credentials are valid', () => {
@@ -25,6 +32,10 @@ describe('authenticate handler receives a request', () => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
+
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         name: [
           {
@@ -34,7 +45,7 @@ describe('authenticate handler receives a request', () => {
           }
         ],
         userId: '1',
-        scope: ['admin'],
+        role: 'NATIONAL_SYSTEM_ADMIN',
         status: 'active',
         mobile: '+345345343',
         email: 'test@test.org'
@@ -60,7 +71,7 @@ describe('authenticate handler receives a request', () => {
       expect(res.result.token.split('.')).toHaveLength(3)
       const [, payload] = res.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual(['admin'])
+      expect(body.scope).toEqual(['sysadmin', 'natlsysadmin'])
       expect(body.sub).toBe('1')
     })
   })
@@ -69,7 +80,7 @@ describe('authenticate handler receives a request', () => {
       // eslint-disable-next-line
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
-        userId: '1',
+        id: '1',
         scope: ['admin'],
         status: 'active',
         mobile: '+345345343'

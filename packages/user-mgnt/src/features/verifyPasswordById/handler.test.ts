@@ -51,25 +51,6 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
   expect(res.result.statusCode).toBe(401)
 })
 
-test('verifyPassHandler should return 200 and the user scope when the user exists and the password hash matches', async () => {
-  const entry = {
-    mobile: '27555555555',
-    passwordHash:
-      '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
-    salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe',
-    scope: ['test']
-  }
-  mockingoose(User).toReturn(entry, 'findOne')
-
-  const res = await server.server.inject({
-    method: 'POST',
-    url: '/verifyPasswordById',
-    payload: { id: '27555555555', password: 'test' }
-  })
-
-  expect([...res.result.scope]).toMatchObject(['test'])
-})
-
 test('verifyPassHandler should throw when User.findOne throws', async () => {
   const spy = jest.spyOn(User, 'findOne').mockImplementationOnce(() => {
     throw new Error('boom')

@@ -8,10 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  CoreUserRole as CommonUserRole,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { CoreUserRole as CommonUserRole } from '@opencrvs/commons/authentication'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { Document, model, Schema } from 'mongoose'
 
@@ -308,7 +305,6 @@ const userSchema = new Schema({
   role: { type: String },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
-  scope: { type: [String], enum: Object.values(SCOPES), required: true },
   status: {
     type: String,
     enum: [

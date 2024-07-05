@@ -42,7 +42,6 @@ const mockUser = {
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
-  scope: ['register'],
   deviceId: 'D444',
   password: 'test',
   signature: {

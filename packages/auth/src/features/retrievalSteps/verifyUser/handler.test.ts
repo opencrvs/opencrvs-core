@@ -49,7 +49,7 @@ describe('verifyUser handler receives a request', () => {
       jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
       fetch.mockResponse(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           username: 'fake_user_name',
           status: 'active',
           scope: ['demo'],
@@ -75,7 +75,7 @@ describe('verifyUser handler receives a request', () => {
 
       fetch.mockResponse(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           username: 'fake_user_name',
           status: 'active',
           scope: ['admin'],

@@ -60,6 +60,119 @@ export const DEFAULT_CORE_ROLE_SCOPES = {
   ]
 }
 
+export const DEFAULT_ROLES_DEFINITION = [
+  {
+    id: 'FIELD_AGENT',
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    },
+    systemRole: 'FIELD_AGENT',
+    scopes: ['declare']
+  },
+  {
+    id: 'POLICE_OFFICER',
+    label: {
+      defaultMessage: 'Police Officer',
+      description: 'Name for user role Police Officer',
+      id: 'userRole.policeOfficer'
+    },
+    systemRole: 'FIELD_AGENT',
+    scopes: ['declare']
+  },
+  {
+    id: 'SOCIAL_WORKER',
+    label: {
+      defaultMessage: 'Social Worker',
+      description: 'Name for user role Social Worker',
+      id: 'userRole.socialWorker'
+    },
+    systemRole: 'FIELD_AGENT',
+    scopes: ['declare']
+  },
+  {
+    id: 'HEALTHCARE_WORKER',
+    label: {
+      defaultMessage: 'Healthcare Worker',
+      description: 'Name for user role Healthcare Worker',
+      id: 'userRole.healthcareWorker'
+    },
+    systemRole: 'FIELD_AGENT',
+    scopes: ['declare']
+  },
+  {
+    id: 'LOCAL_LEADER',
+    label: {
+      defaultMessage: 'Local Leader',
+      description: 'Name for user role Local Leader',
+      id: 'userRole.localLeader'
+    },
+    systemRole: 'FIELD_AGENT',
+    scopes: ['declare']
+  },
+  {
+    id: 'REGISTRATION_AGENT',
+    label: {
+      defaultMessage: 'Registration Agent',
+      description: 'Name for user role Registration Agent',
+      id: 'userRole.registrationAgent'
+    },
+    systemRole: 'REGISTRATION_AGENT',
+    scopes: ['validate', 'performance', 'certify']
+  },
+  {
+    id: 'LOCAL_REGISTRAR',
+    label: {
+      defaultMessage: 'Local Registrar',
+      description: 'Name for user role Local Registrar',
+      id: 'userRole.localRegistrar'
+    },
+    systemRole: 'LOCAL_REGISTRAR',
+    scopes: ['register', 'performance', 'certify']
+  },
+  {
+    id: 'LOCAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'Local System Admin',
+      description: 'Name for user role Local System Admin',
+      id: 'userRole.localSystemAdmin'
+    },
+    systemRole: 'LOCAL_SYSTEM_ADMIN',
+    scopes: ['sysadmin']
+  },
+  {
+    id: 'NATIONAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'National System Admin',
+      description: 'Name for user role National System Admin',
+      id: 'userRole.nationalSystemAdmin'
+    },
+    systemRole: 'NATIONAL_SYSTEM_ADMIN',
+    scopes: ['sysadmin', 'natlsysadmin']
+  },
+  {
+    id: 'PERFORMANCE_MANAGER',
+    label: {
+      defaultMessage: 'Performance Manager',
+      description: 'Name for user role Performance Manager',
+      id: 'userRole.performanceManager'
+    },
+    systemRole: 'PERFORMANCE_MANAGEMENT',
+    scopes: ['performance']
+  },
+  {
+    id: 'NATIONAL_REGISTRAR',
+    label: {
+      defaultMessage: 'National Registrar',
+      description: 'Name for user role National Registrar',
+      id: 'userRole.nationalRegistrar'
+    },
+    systemRole: 'NATIONAL_REGISTRAR',
+    scopes: ['register', 'performance', 'certify', 'config', 'teams']
+  }
+]
+
 export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   HEALTH: [
     SYSTEM_INTEGRATION_SCOPES.declare,
@@ -88,13 +201,6 @@ export type UserScope = (typeof SCOPES)[keyof typeof SCOPES]
 export type SystemScope =
   (typeof SYSTEM_INTEGRATION_SCOPES)[keyof typeof SYSTEM_INTEGRATION_SCOPES]
 export type Scope = UserScope | SystemScope
-
-export type Roles = Array<{
-  id: string
-  systemRole: CoreUserRole
-  labels: Array<{ language: string; label: string }>
-  scopes: Scope[]
-}>
 
 export interface ITokenPayload {
   sub: string

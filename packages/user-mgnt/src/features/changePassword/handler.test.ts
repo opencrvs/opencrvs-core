@@ -43,7 +43,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
   systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
@@ -65,7 +64,6 @@ const mockExistingUser: Partial<IUser & { _id: string }> = {
   systemRole: 'LOCAL_REGISTRAR',
   status: 'active',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'

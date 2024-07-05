@@ -64,6 +64,7 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge } from 'lodash'
+import CountryConfigAPI from '@gateway/features/fhir/countryConfigAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -253,6 +254,7 @@ export function getDataSources(): Context['dataSources'] {
     documentsAPI: new DocumentsAPI(),
     paymentsAPI: new PaymentsAPI(),
     locationsAPI: new LocationsAPI(),
+    countryConfigAPI: new CountryConfigAPI(),
     usersAPI: new UsersAPI(),
     fhirAPI: new FHIRAPI(),
     patientAPI: new PatientAPI(),

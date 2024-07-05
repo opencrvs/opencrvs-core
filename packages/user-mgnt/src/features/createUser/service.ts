@@ -82,14 +82,6 @@ export const createFhirPractitionerRole = async (
               code: 'AUTOMATED'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: 'SYSTEM'
-            }
-          ]
         }
       ],
       location: [{ reference: `Location/${user.primaryOfficeId}` }]
@@ -106,14 +98,6 @@ export const createFhirPractitionerRole = async (
             {
               system: `http://opencrvs.org/specs/roles`,
               code: user.systemRole
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: user.role
             }
           ]
         }
