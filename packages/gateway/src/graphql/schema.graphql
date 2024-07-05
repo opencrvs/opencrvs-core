@@ -156,7 +156,6 @@ type Query {
   getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
-  informantSMSNotifications: [SMSNotification!]
   getOIDPUserInfo(
     code: String!
     clientId: String!
@@ -284,9 +283,6 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
-  toggleInformantSMSNotification(
-    smsNotifications: [SMSNotificationInput!]
-  ): [SMSNotification!]
 }
 
 type Dummy {
@@ -685,14 +681,6 @@ type System {
   settings: SystemSettings
 }
 
-type SMSNotification {
-  id: String
-  name: String!
-  enabled: Boolean!
-  updatedAt: String!
-  createdAt: String!
-}
-
 type UserInfo {
   oidpUserInfo: OIDPUserInfo
   districtFhirId: String
@@ -880,12 +868,6 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
-}
-
-input SMSNotificationInput {
-  id: String!
-  name: String!
-  enabled: Boolean!
 }
 
 scalar Map

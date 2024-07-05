@@ -32,7 +32,6 @@ import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
@@ -51,7 +50,6 @@ import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
-import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
 import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
@@ -90,8 +88,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   correctionRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  informantSMSNotificationResolvers as IResolvers,
-  informantSMSNotiTypeResolvers as IResolvers,
   OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({

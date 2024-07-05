@@ -997,7 +997,6 @@ export type Mutation = {
   requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
   resetPasswordInvite?: Maybe<Scalars['String']>
-  toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
@@ -1246,10 +1245,6 @@ export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
 }
 
-export type MutationToggleInformantSmsNotificationArgs = {
-  smsNotifications?: InputMaybe<Array<SmsNotificationInput>>
-}
-
 export type MutationUpdateBirthRegistrationArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
@@ -1487,7 +1482,6 @@ export type Query = {
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
-  informantSMSNotifications?: Maybe<Array<SmsNotification>>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
   queryPersonByIdentifier?: Maybe<Person>
@@ -1995,21 +1989,6 @@ export type RoleLabel = {
   __typename?: 'RoleLabel'
   label: Scalars['String']
   lang: Scalars['String']
-}
-
-export type SmsNotification = {
-  __typename?: 'SMSNotification'
-  createdAt: Scalars['String']
-  enabled: Scalars['Boolean']
-  id?: Maybe<Scalars['String']>
-  name: Scalars['String']
-  updatedAt: Scalars['String']
-}
-
-export type SmsNotificationInput = {
-  enabled: Scalars['Boolean']
-  id: Scalars['String']
-  name: Scalars['String']
 }
 
 export type SearchFieldAgentResponse = {
