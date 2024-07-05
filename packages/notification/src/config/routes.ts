@@ -59,6 +59,10 @@ import {
   birthRegisterNotification,
   deathRegisterNotification
 } from '@notification/features/register/handler'
+import {
+  birthSentForUpdatesNotification,
+  deathSentForUpdatesNotification
+} from '@notification/features/sentForUpdates/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -188,6 +192,28 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description:
           'Sends a notification to country config for death register declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-for-updates',
+      handler: birthSentForUpdatesNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for rejected birth declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-for-updates',
+      handler: deathSentForUpdatesNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for rejected death declaration',
         validate: recordValidation
       }
     },
