@@ -218,8 +218,6 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-const currentUserId = '123'
-
 export const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',

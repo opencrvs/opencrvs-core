@@ -39,10 +39,6 @@ import { vi } from 'vitest'
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
-interface IPersonDetails {
-  [key: string]: any
-}
-
 describe('when draft data is transformed to graphql', () => {
   let app: ReactWrapper
   let history: History

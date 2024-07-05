@@ -17,7 +17,6 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import * as React from 'react'
 import { FieldAgentList } from './FieldAgentList'
 import { vi } from 'vitest'
@@ -25,11 +24,10 @@ import { vi } from 'vitest'
 describe('Field agent list tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createTestStore())
+    ;({ store } = await createTestStore())
   })
 
   beforeEach(async () => {
