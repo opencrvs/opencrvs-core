@@ -91,7 +91,7 @@ const sendNotificationHandler = rest.post(
   'http://localhost:2020/birth/:event',
   (req, res, ctx) => {
     const { event } = req.params
-    const knownActions = ['ready-for-review']
+    const knownActions = ['ready-for-review', 'sent-for-updates']
     if (!knownActions.includes(event as string)) {
       throw new Error(`no mock set for "${event}" notification event`)
     }
