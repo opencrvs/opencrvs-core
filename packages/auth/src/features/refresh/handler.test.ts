@@ -23,7 +23,7 @@ describe('authenticate handler receives a request', () => {
   })
 
   describe('refresh expiring token', () => {
-    it.only('verifies a token and generates a new token', async () => {
+    it('verifies a token and generates a new token', async () => {
       fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
         status: 200
       })
