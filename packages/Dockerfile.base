@@ -15,4 +15,8 @@ COPY --chown=node:node yarn.lock .
 RUN yarn install --production --frozen-lockfile
 
 COPY --chown=node:node packages/commons /app/packages/commons
-RUN cd packages/commons && yarn install --frozen-lockfile && yarn build
+
+WORKDIR /app/packages/commons
+
+RUN yarn install --frozen-lockfile
+RUN yarn build
