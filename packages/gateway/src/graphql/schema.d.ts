@@ -53,7 +53,6 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   fetchSystem?: GQLSystem
-  informantSMSNotifications?: Array<GQLSMSNotification>
   getOIDPUserInfo?: GQLUserInfo
 }
 
@@ -113,7 +112,6 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
-  toggleInformantSMSNotification?: Array<GQLSMSNotification>
 }
 
 export interface GQLDummy {
@@ -549,14 +547,6 @@ export interface GQLSystem {
   settings?: GQLSystemSettings
 }
 
-export interface GQLSMSNotification {
-  id?: string
-  name: string
-  enabled: boolean
-  updatedAt: string
-  createdAt: string
-}
-
 export interface GQLUserInfo {
   oidpUserInfo?: GQLOIDPUserInfo
   districtFhirId?: string
@@ -744,12 +734,6 @@ export interface GQLBookmarkSearchInput {
 export interface GQLRemoveBookmarkedSeachInput {
   userId: string
   searchId: string
-}
-
-export interface GQLSMSNotificationInput {
-  id: string
-  name: string
-  enabled: boolean
 }
 
 export type GQLMap = any
@@ -1818,7 +1802,6 @@ export interface GQLResolver {
   SystemRole?: GQLSystemRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   System?: GQLSystemTypeResolver
-  SMSNotification?: GQLSMSNotificationTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
@@ -1935,7 +1918,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
-  informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
 }
 
@@ -2582,18 +2564,6 @@ export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToInformantSMSNotificationsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface QueryToGetOIDPUserInfoArgs {
   code: string
   clientId: string
@@ -2665,7 +2635,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
-  toggleInformantSMSNotification?: MutationToToggleInformantSMSNotificationResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -3510,21 +3479,6 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToToggleInformantSMSNotificationArgs {
-  smsNotifications?: Array<GQLSMSNotificationInput>
-}
-export interface MutationToToggleInformantSMSNotificationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToToggleInformantSMSNotificationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5836,68 +5790,6 @@ export interface SystemToIntegratingSystemTypeResolver<
 }
 
 export interface SystemToSettingsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLSMSNotificationTypeResolver<TParent = any> {
-  id?: SMSNotificationToIdResolver<TParent>
-  name?: SMSNotificationToNameResolver<TParent>
-  enabled?: SMSNotificationToEnabledResolver<TParent>
-  updatedAt?: SMSNotificationToUpdatedAtResolver<TParent>
-  createdAt?: SMSNotificationToCreatedAtResolver<TParent>
-}
-
-export interface SMSNotificationToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SMSNotificationToNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SMSNotificationToEnabledResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SMSNotificationToUpdatedAtResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SMSNotificationToCreatedAtResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
