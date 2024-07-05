@@ -32,7 +32,7 @@ import {
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/utils/redis'
-import { badRequest, Boom } from '@hapi/boom'
+import { badRequest, Boom, isBoom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -100,6 +100,13 @@ export async function createServer() {
   })
 
   app.ext('onPreResponse', (request, reply) => {
+    if (!isBoom(request.response)) {
+      request.response.header(
+        'X-Version',
+        process.env.npm_package_version || '1.5.0'
+      )
+    }
+
     if (request.response instanceof RateLimitError) {
       return reply
         .response({
