@@ -97,19 +97,21 @@ function ApplicationSourcesReport(
             </PerformanceValue>
           }
           actions={
-            <LinkButton
-              id="field-agent-list-view"
-              onClick={() =>
-                props.goToFieldAgentList(
-                  props.timeStart,
-                  props.timeEnd,
-                  props.locationId,
-                  props.event
-                )
-              }
-            >
-              {intl.formatMessage(buttonMessages.view)}
-            </LinkButton>
+            isAccessibleOffice && (
+              <LinkButton
+                id="field-agent-list-view"
+                onClick={() =>
+                  props.goToFieldAgentList(
+                    props.timeStart,
+                    props.timeEnd,
+                    props.locationId,
+                    props.event
+                  )
+                }
+              >
+                {intl.formatMessage(buttonMessages.view)}
+              </LinkButton>
+            )
           }
         />
         <ListViewItemSimplified
