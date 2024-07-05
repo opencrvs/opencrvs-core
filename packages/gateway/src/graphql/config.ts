@@ -31,7 +31,6 @@ import { resolvers as searchRootResolvers } from '@gateway/features/search/root-
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
@@ -89,7 +88,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   roleTypeResolvers as IResolvers,
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  applicationRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
   informantSMSNotificationResolvers as IResolvers,

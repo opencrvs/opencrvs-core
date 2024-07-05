@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import ApplicationConfig, {
-  IApplicationConfigurationModel
-} from '@config/models/config'
+import ApplicationConfig from '@config/models/config'
 import { logger } from '@opencrvs/commons'
 import { badData, internal } from '@hapi/boom'
 import * as Joi from 'joi'
@@ -142,78 +140,6 @@ export async function getLoginConfigHandler(
   ])
   return { config: refineConfigResponse }
 }
-
-export async function updateApplicationConfigHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    let applicationConfig
-    const configFromDB = await ApplicationConfig.findOne({})
-    const changeConfig = request.payload as IApplicationConfigurationModel
-
-    if (configFromDB !== null) {
-      applicationConfig = merge(configFromDB, changeConfig)
-    }
-    applicationConfig = changeConfig
-    await ApplicationConfig.findOneAndUpdate(
-      {},
-      { $set: applicationConfig },
-      { upsert: true }
-    )
-
-    return h.response(await getApplicationConfig()).code(201)
-  } catch (err) {
-    logger.error(err)
-    // return 400 if there is a validation error when saving to mongo
-    return h.response().code(400)
-  }
-}
-
-export const updateApplicationConfig = Joi.object({
-  APPLICATION_NAME: Joi.string(),
-  COUNTRY_LOGO: Joi.object().keys({
-    fileName: Joi.string(),
-    file: Joi.string()
-  }),
-  LOGIN_BACKGROUND: Joi.object({
-    backgroundColor: Joi.string().allow('').optional(),
-    backgroundImage: Joi.string().allow('').optional(),
-    imageFit: Joi.string().allow('').optional()
-  }),
-  CURRENCY: Joi.object().keys({
-    isoCode: Joi.string(),
-    languagesAndCountry: Joi.array().items(Joi.string())
-  }),
-  PHONE_NUMBER_PATTERN: Joi.string(),
-  NID_NUMBER_PATTERN: Joi.string(),
-  BIRTH: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    LATE_REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      LATE: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  }),
-  DEATH: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  }),
-  MARRIAGE: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  })
-})
 
 const applicationConfigResponseValidation = Joi.object({
   APPLICATION_NAME: Joi.string().required(),
