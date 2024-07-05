@@ -108,8 +108,8 @@ export async function deathInProgressNotification(
   const inProgressRecord = req.payload as InProgressRecord
   await sendNotification(
     {
-      sms: messageKeys.birthInProgressNotification,
-      email: messageKeys.birthInProgressNotification
+      sms: messageKeys.deathInProgressNotification,
+      email: messageKeys.deathInProgressNotification
     },
     {
       sms: getContactPhoneNo(inProgressRecord),
