@@ -121,7 +121,13 @@ jobs:
 
       - name: Run Unit Test
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && yarn test --coverage
+        run: |
+          cd ${{ matrix.package }}
+          if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
+            yarn test --coverage
+          else
+            yarn test
+          fi
 
   security-scans:
     needs: setup
