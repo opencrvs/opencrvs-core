@@ -20,10 +20,12 @@ import {
   getTaskFromSavedBundle,
   Location,
   Patient,
+  InProgressRecord,
   ReadyForReviewRecord,
   RegisteredRecord,
   RelatedPerson,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { badRequest as boomBadRequest } from '@hapi/boom'
 
@@ -50,7 +52,11 @@ export function getContactEmail(
 }
 
 function error(
-  record: ReadyForReviewRecord | RegisteredRecord,
+  record:
+    | ReadyForReviewRecord
+    | RegisteredRecord
+    | InProgressRecord
+    | RejectedRecord,
   message: string
 ): never {
   const task = getTaskFromSavedBundle(record)
@@ -58,7 +64,13 @@ function error(
   throw boomBadRequest(`${message} in ${taskStatus} record`)
 }
 
-export function getOfficeName(record: ReadyForReviewRecord | RegisteredRecord) {
+export function getOfficeName(
+  record:
+    | ReadyForReviewRecord
+    | RegisteredRecord
+    | InProgressRecord
+    | RejectedRecord
+) {
   const task = getTaskFromSavedBundle(record)
   const officeExtension = findExtension(
     'http://opencrvs.org/specs/extension/regLastOffice',
@@ -121,7 +133,11 @@ export function getPersonName(
 }
 
 export function getRegistrationLocation(
-  record: ReadyForReviewRecord | RegisteredRecord
+  record:
+    | ReadyForReviewRecord
+    | RegisteredRecord
+    | InProgressRecord
+    | RejectedRecord
 ) {
   const task = getTaskFromSavedBundle(record)
   const locationExtension = findExtension(
