@@ -90,10 +90,7 @@ import {
 import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-import updateRole, {
-  systemRoleResponseSchema,
-  systemRolesRequestSchema
-} from '@user-mgnt/features/updateRole/handler'
+
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
@@ -717,25 +714,6 @@ export const getRoutes = () => {
         },
         response: {
           schema: SystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateRole',
-      handler: updateRole,
-      options: {
-        tags: ['api'],
-        description: 'Update user role for particular system role',
-        notes: 'This is responsible for update userRole',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: systemRolesRequestSchema
-        },
-        response: {
-          schema: systemRoleResponseSchema
         }
       }
     }
