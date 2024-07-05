@@ -92,7 +92,7 @@ describe('createUser handler', () => {
         ],
         username: 'j.doe1',
         identifiers: [{ system: 'NID', value: '1234' }],
-        email: 'j.doe@gmail.com',
+        emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
         role: 'FIELD_AGENT',

@@ -25,7 +25,7 @@ import {
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
-import { getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj, getUserRole } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'

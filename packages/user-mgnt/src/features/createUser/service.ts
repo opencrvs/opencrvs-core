@@ -23,7 +23,7 @@ export const createFhirPractitioner = (
       identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
-        { system: 'email', value: user.email }
+        { system: 'email', value: user.emailForNotification }
       ],
       name: [
         {
@@ -39,7 +39,7 @@ export const createFhirPractitioner = (
       identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
-        { system: 'email', value: user.email }
+        { system: 'email', value: user.emailForNotification }
       ],
       name: user.name,
       extension: user.signature && [

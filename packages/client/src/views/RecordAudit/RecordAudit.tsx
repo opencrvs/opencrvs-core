@@ -47,7 +47,7 @@ import {
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
   modifyDeclaration,
-  writeDeclaration
+  deleteDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
@@ -124,6 +124,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -248,14 +249,7 @@ function ReinstateButton({
       // update the store and indexDb with the latest status of the declaration
       onCompleted={(data) => {
         refetchDeclarationInfo?.()
-        dispatch(
-          writeDeclaration({
-            ...declaration,
-            submissionStatus: '',
-            registrationStatus: data.markEventAsReinstated
-              ?.registrationStatus as string
-          })
-        )
+        dispatch(deleteDeclaration(declaration.id, client))
       }}
     >
       {(reinstateDeclaration) => (

@@ -529,13 +529,6 @@ export const aggregateRecords = ({
       'Observation'
     ),
 
-    // Get DocumentReferences by Encounter ids
-    // (Encounter.id -> DocumentReference.subject.reference)
-    ...joinFromResourcesIdToResourceIdentifier(
-      'Encounter',
-      'subject.reference',
-      'DocumentReference'
-    ),
     {
       $addFields: {
         /*
@@ -693,6 +686,13 @@ export const aggregateRecords = ({
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
+    // Get DocumentReferences by Encounter ids
+    // (Encounter.id -> DocumentReference.subject.reference)
+    ...joinFromResourcesIdToResourceIdentifier(
+      'Encounter',
+      'subject.reference',
+      'DocumentReference'
+    ),
     // Get Locations by Encounter location ids
     {
       $lookup: {

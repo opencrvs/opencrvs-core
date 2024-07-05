@@ -235,10 +235,6 @@ class SearchResultView extends React.Component<
     return this.props.scope && this.props.scope.includes('certify')
   }
 
-  userHasValidateOrRegistrarScope() {
-    return this.userHasValidateScope() || this.userHasRegisterScope()
-  }
-
   transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
       return []
