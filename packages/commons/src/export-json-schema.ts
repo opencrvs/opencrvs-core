@@ -40,6 +40,16 @@ tsConfigPaths.register({
   paths: tsConfig.compilerOptions.paths
 })
 
+function parsePathParams(path: string) {
+  const regex = /{([^}]+)}/g
+  const params = []
+  let match
+  while ((match = regex.exec(path)) !== null) {
+    params.push(match[1])
+  }
+  return params
+}
+
 async function main() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createServer } = require(join(process.cwd(), serverModulePath)) as {
@@ -59,50 +69,51 @@ async function main() {
         type: 'object',
         additionalProperties: false,
         properties: {} as Record<string, any>,
-        required: [] as string[]
+        required: routes
+          .filter((r) => r.method === 'get')
+          .map((route) => route.path)
       },
       post: {
         type: 'object',
         additionalProperties: false,
         properties: {} as Record<string, any>,
-        required: [] as string[]
+        required: routes
+          .filter((r) => r.method === 'post')
+          .map((route) => route.path)
       },
       put: {
         type: 'object',
         additionalProperties: false,
         properties: {} as Record<string, any>,
-        required: [] as string[]
+        required: routes
+          .filter((r) => r.method === 'put')
+          .map((route) => route.path)
       },
       delete: {
         type: 'object',
         additionalProperties: false,
         properties: {} as Record<string, any>,
-        required: [] as string[]
+        required: routes
+          .filter((r) => r.method === 'delete')
+          .map((route) => route.path)
       }
     }
   }
+
   for (const route of routes) {
     const validation = route.settings.validate
 
     const schema = route.settings.response?.schema as any
     const method = route.method as keyof typeof root.properties
-
-    root.properties[method] = {
-      type: 'object',
-      additionalProperties: false,
-      required: routes
-        .filter((r) => r.method === method)
-        .map((route) => route.path),
-      properties: {}
-    }
+    const params = parsePathParams(route.path)
 
     root.properties[method].properties[route.path] = {
       type: 'object',
       additionalProperties: false,
-      required: ['response', 'request'],
+      required: ['response', 'request', 'params'],
       properties: {
         ...(!validation?.payload
-          ? { request: { not: {}, additionalProperties: false } }
+          ? { request: false }
           : {
               request: {
                 ...parse(validation.payload),
@@ -110,10 +121,23 @@ async function main() {
               }
             }),
         ...(!schema?.describe
-          ? { response: { not: {}, additionalProperties: false } }
+          ? { response: false }
           : {
               response: {
                 ...parse(route.settings.response?.schema),
+                additionalProperties: false
+              }
+            }),
+        ...(params.length === 0
+          ? { params: false }
+          : {
+              params: {
+                type: 'object',
+                properties: params.reduce((acc, param) => {
+                  acc[param] = { type: 'string' }
+                  return acc
+                }, {} as Record<string, any>),
+                required: params,
                 additionalProperties: false
               }
             })

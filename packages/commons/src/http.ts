@@ -71,6 +71,12 @@ const SERVICE_URLS = {
   workflow: process.env.WORKFLOW_URL
 }
 
+function parsePathParams(path: string, params: Record<string, string>) {
+  return path.replace(/{([^}]+)}/g, (_, key) => {
+    return params[key]
+  })
+}
+
 export function createServiceClient<ServiceName extends keyof Services>(
   service: ServiceName
 ) {
@@ -83,44 +89,65 @@ export function createServiceClient<ServiceName extends keyof Services>(
   }
 
   type Service = Services[ServiceName]
+  type IsNever<T> = [T] extends [never] ? true : false
+
+  type RequestOptions<
+    RequestMethod extends keyof Service,
+    Path extends keyof Service[RequestMethod]
+  > = (Service[RequestMethod][Path] extends { request: infer R }
+    ? IsNever<R> extends true
+      ? {}
+      : { body: R }
+    : {}) &
+    (Service[RequestMethod][Path] extends { params: infer P }
+      ? IsNever<P> extends true
+        ? {}
+        : { params: P }
+      : {})
+
   function request<
     Method extends keyof Service,
     Path extends keyof Service[Method]
-  >(
-    method: Method,
-    path: Path,
-    request: Service[Method][Path] extends { request: infer R } ? R : never
-  ) {
+  >(method: Method, path: Path, options: RequestOptions<Method, Path>) {
     if (!url) {
       throw new Error(
         `Missing URL for service ${service}. Make sure you have set the corresponding environment variable`
       )
     }
 
-    return fetchJSON(joinURL(url, path as string).href, {
+    const urlPathWithParams: string =
+      'params' in options
+        ? parsePathParams(
+            path as string,
+            options.params as Record<string, string>
+          )
+        : (path as string)
+
+    return fetchJSON(joinURL(url, urlPathWithParams).href, {
       method: (method as string).toUpperCase(),
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(request)
+      body: 'body' in options ? JSON.stringify(options.body) : undefined
     })
   }
+
   return {
     post: <Path extends keyof Service['post']>(
       path: Path,
-      payload: Service['post'][Path] extends { request: infer R } ? R : never
+      payload: RequestOptions<'post', Path>
     ) => request('post', path, payload),
     get: <Path extends keyof Service['get']>(
       path: Path,
-      payload: Service['get'][Path] extends { request: infer R } ? R : never
+      payload: RequestOptions<'get', Path>
     ) => request('get', path, payload),
     delete: <Path extends keyof Service['delete']>(
       path: Path,
-      payload: Service['delete'][Path] extends { request: infer R } ? R : never
+      payload: RequestOptions<'delete', Path>
     ) => request('delete', path, payload),
     put: <Path extends keyof Service['put']>(
       path: Path,
-      payload: Service['put'][Path] extends { request: infer R } ? R : never
+      payload: RequestOptions<'put', Path>
     ) => request('put', path, payload)
   }
 }
