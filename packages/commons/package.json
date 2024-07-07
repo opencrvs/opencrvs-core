@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "main": "./build/dist/index.js",
   "bin": {
-    "export-json-schema": "bin/export-json-schema.sh"
+    "export-json-schema": "bin/export-json-schema.js"
   },
   "exports": {
     ".": "./build/dist/index.js",
