@@ -29,7 +29,6 @@ export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
-export const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10)
 export const QUEUE_NAME = 'NOTIFY_URL'
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const DEFAULT_TIMEOUT = 600000
