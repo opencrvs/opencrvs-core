@@ -24,7 +24,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install && dev:secrets:gen
 
       - name: Generate schema definitions
         run: cd packages/commons && bash generate-api-types.sh
