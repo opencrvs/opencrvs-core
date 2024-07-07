@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "paths": {
       "@test/*": ["../test/*"],
-      "@workflow/*": ["./*"],
+      "@workflow/*": ["./*"]
     },
     "target": "es6",
     "module": "commonjs",

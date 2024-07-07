@@ -35,7 +35,7 @@ export async function createServer() {
   if (HOSTNAME[0] !== '*') {
     whitelist = [LOGIN_URL, CLIENT_APP_URL]
   }
-  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
+
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,
@@ -93,6 +93,7 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
+    logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
     server.log('info', `Config server started on ${HOST}:${PORT}`)
   }
 

@@ -2,9 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@config/*": [
-        "./*"
-      ]
+      "@config/*": ["./*"]
     },
     "target": "es6",
     "module": "commonjs",
@@ -13,11 +11,7 @@
     "sourceMap": true,
     "moduleResolution": "node16",
     "outDir": "build/dist",
-    "lib": [
-      "esnext.asynciterable",
-      "es6",
-      "es2017"
-    ],
+    "lib": ["esnext.asynciterable", "es6", "es2017"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -25,16 +19,8 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "types": [
-      "fhir",
-      "jest"
-    ],
+    "types": ["fhir", "jest"]
   },
-  "include": [
-    "src/**/*.ts",
-    "typings"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "typings"],
+  "exclude": ["node_modules"]
 }
