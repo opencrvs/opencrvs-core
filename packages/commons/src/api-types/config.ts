@@ -7,12 +7,200 @@
 
 export interface HapiRoutes {
   get: {
+    '/config': {
+      request: never
+      response: never
+      params: never
+    }
+    '/dashboardQueries': {
+      request: never
+      response: never
+      params: never
+    }
+    '/forms': {
+      request: never
+      response: never
+      params: never
+    }
+    '/getActiveCertificates': {
+      request: never
+      response: never
+      params: never
+    }
+    '/informantSMSNotification': {
+      request: never
+      response: never
+      params: never
+    }
+    '/integrationConfig': {
+      request: never
+      response: never
+      params: never
+    }
+    '/locations': {
+      request: never
+      response: never
+      params: never
+    }
+    '/ping': {
+      request: never
+      response: never
+      params: never
+    }
+    '/publicConfig': {
+      request: never
+      response: never
+      params: never
+    }
+    '/locations/{locationId}': {
+      request: never
+      response: never
+      params: {
+        locationId: string
+      }
+    }
+    '/locations/{locationId}/children': {
+      request: never
+      response: never
+      params: {
+        locationId: string
+      }
+    }
     '/locations/{locationId}/hierarchy': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        locationId: string
+      }
     }
   }
   post: {
+    '/createCertificate': {
+      request: {
+        svgCode?: string
+        svgFilename?: string
+        svgDateUpdated?: number
+        svgDateCreated?: number
+        user?: string
+        event?: string
+        status?: string
+      }
+      response: never
+      params: never
+    }
+    '/getCertificate': {
+      request: {
+        status: string
+        event: string
+      }
+      response: never
+      params: never
+    }
+    '/informantSMSNotification': {
+      request: {
+        name: string
+        enabled?: boolean
+      }[]
+      response: never
+      params: never
+    }
+    '/locations': {
+      request:
+        | {
+            statisticalID: string
+            name: string
+            alias?: string
+            partOf: string
+            code: 'ADMIN_STRUCTURE' | 'CRVS_OFFICE' | 'HEALTH_FACILITY'
+            jurisdictionType?:
+              | 'DISTRICT'
+              | 'STATE'
+              | 'LOCATION_LEVEL_1'
+              | 'LOCATION_LEVEL_2'
+              | 'LOCATION_LEVEL_3'
+              | 'LOCATION_LEVEL_4'
+              | 'LOCATION_LEVEL_5'
+            statistics?: {
+              year: number
+              male_population: number
+              female_population: number
+              population: number
+              crude_birth_rate: number
+            }[]
+          }
+        | {
+            statisticalID: string
+            name: string
+            alias?: string
+            partOf: string
+            code: 'ADMIN_STRUCTURE' | 'CRVS_OFFICE' | 'HEALTH_FACILITY'
+            jurisdictionType?:
+              | 'DISTRICT'
+              | 'STATE'
+              | 'LOCATION_LEVEL_1'
+              | 'LOCATION_LEVEL_2'
+              | 'LOCATION_LEVEL_3'
+              | 'LOCATION_LEVEL_4'
+              | 'LOCATION_LEVEL_5'
+            statistics?: {
+              year: number
+              male_population: number
+              female_population: number
+              population: number
+              crude_birth_rate: number
+            }[]
+          }[]
+      response: never
+      params: never
+    }
+    '/updateApplicationConfig': {
+      request: {
+        APPLICATION_NAME?: string
+        COUNTRY_LOGO?: {
+          fileName?: string
+          file?: string
+        }
+        LOGIN_BACKGROUND?: {
+          backgroundColor?: string
+          backgroundImage?: string
+          imageFit?: string
+        }
+        CURRENCY?: {
+          isoCode?: string
+          languagesAndCountry?: string[]
+        }
+        PHONE_NUMBER_PATTERN?: string
+        NID_NUMBER_PATTERN?: string
+        BIRTH?: {
+          REGISTRATION_TARGET?: number
+          LATE_REGISTRATION_TARGET?: number
+          FEE?: {
+            ON_TIME?: number
+            LATE?: number
+            DELAYED?: number
+          }
+          PRINT_IN_ADVANCE?: boolean
+        }
+        DEATH?: {
+          REGISTRATION_TARGET?: number
+          FEE?: {
+            ON_TIME?: number
+            DELAYED?: number
+          }
+          PRINT_IN_ADVANCE?: boolean
+        }
+        MARRIAGE?: {
+          REGISTRATION_TARGET?: number
+          FEE?: {
+            ON_TIME?: number
+            DELAYED?: number
+          }
+          PRINT_IN_ADVANCE?: boolean
+        }
+      }
+      response: never
+      params: never
+    }
     '/updateCertificate': {
       request: {
         id: string
@@ -24,10 +212,20 @@ export interface HapiRoutes {
         event?: string
         status?: string
       }
-      response: {}
+      response: never
+      params: never
     }
   }
   put: {
+    '/informantSMSNotification': {
+      request: {
+        id: string
+        name: string
+        enabled?: boolean
+      }[]
+      response: never
+      params: never
+    }
     '/locations/{locationId}': {
       request: {
         name?: string
@@ -41,13 +239,19 @@ export interface HapiRoutes {
           crude_birth_rate: number
         }
       }
-      response: {}
+      response: never
+      params: {
+        locationId: string
+      }
     }
   }
   delete: {
     '/certificate/{certificateId}': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        certificateId: string
+      }
     }
   }
 }

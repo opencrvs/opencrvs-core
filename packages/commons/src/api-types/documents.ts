@@ -7,15 +7,44 @@
 
 export interface HapiRoutes {
   get: {
+    '/ping': {
+      request: never
+      response: never
+      params: never
+    }
+    '/tokenTest': {
+      request: never
+      response: never
+      params: never
+    }
     '/presigned-url/ocrvs/{fileUri}': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        fileUri: string
+      }
     }
   }
   post: {
+    '/presigned-url': {
+      request: never
+      response: never
+      params: never
+    }
+    '/upload': {
+      request: never
+      response: never
+      params: never
+    }
+    '/upload-svg': {
+      request: never
+      response: never
+      params: never
+    }
     '/upload-vs-export': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   put?: {}

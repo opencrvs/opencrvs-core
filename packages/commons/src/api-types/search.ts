@@ -7,22 +7,119 @@
 
 export interface HapiRoutes {
   get: {
+    '/ping': {
+      request: never
+      response: never
+      params: never
+    }
+    '/tokenTest': {
+      request: never
+      response: never
+      params: never
+    }
+    '/records/{recordId}': {
+      request: never
+      response: never
+      params: {
+        recordId: string
+      }
+    }
     '/reindex/status/{jobId}': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        jobId: string
+      }
     }
   }
   post: {
+    '/advancedRecordSearch': {
+      request: never
+      response: never
+      params: never
+    }
+    '/record': {
+      request: never
+      response: never
+      params: never
+    }
+    '/reindex': {
+      request: never
+      response: never
+      params: never
+    }
+    '/statusWiseRegistrationCount': {
+      request: {
+        declarationJurisdictionId?: string
+        status: unknown[]
+        event?: string
+      }
+      response: never
+      params: never
+    }
+    '/events/assigned': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/not-duplicate': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/unassigned': {
+      request: never
+      response: never
+      params: never
+    }
+    '/search/all': {
+      request: never
+      response: never
+      params: never
+    }
+    '/search/assignment': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/birth/{eventType}': {
+      request: never
+      response: never
+      params: {
+        eventType: string
+      }
+    }
+    '/events/death/{eventType}': {
+      request: never
+      response: never
+      params: {
+        eventType: string
+      }
+    }
+    '/events/marriage/{eventType}': {
+      request: never
+      response: never
+      params: {
+        eventType: string
+      }
+    }
+    '/search/duplicates/birth': {
+      request: never
+      response: never
+      params: never
+    }
     '/search/duplicates/death': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   put?: {}
   delete: {
     '/elasticIndex': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
 }

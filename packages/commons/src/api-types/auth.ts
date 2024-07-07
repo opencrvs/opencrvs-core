@@ -7,12 +7,143 @@
 
 export interface HapiRoutes {
   get: {
+    '/.well-known': {
+      request: never
+      response: never
+      params: never
+    }
+    '/anonymous-token': {
+      request: never
+      response: {
+        token?: string
+      }
+      params: never
+    }
     '/ping': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   post: {
+    '/authenticate': {
+      request: {
+        username?: string
+        password?: string
+      }
+      response: {
+        nonce?: string
+        mobile?: string
+        email?: string
+        status?: string
+        token?: string
+      }
+      params: never
+    }
+    '/authenticate-super-user': {
+      request: {
+        username?: string
+        password?: string
+      }
+      response: {
+        nonce?: string
+        mobile?: string
+        email?: string
+        status?: string
+        token?: string
+      }
+      params: never
+    }
+    '/changePassword': {
+      request: {
+        newPassword?: string
+        nonce?: string
+      }
+      response: never
+      params: never
+    }
+    '/invalidateToken': {
+      request: {
+        token?: string
+      }
+      response: never
+      params: never
+    }
+    '/refreshToken': {
+      request: {
+        nonce?: string
+        token?: string
+      }
+      response: {
+        token?: string
+      }
+      params: never
+    }
+    '/resendAuthenticationCode': {
+      request: {
+        nonce?: string
+        notificationEvent: string
+        retrievalFlow?: boolean
+      }
+      response: {
+        nonce?: string
+      }
+      params: never
+    }
+    '/sendUserName': {
+      request: {
+        nonce: string
+      }
+      response: never
+      params: never
+    }
+    '/token': {
+      request: never
+      response: never
+      params: never
+    }
+    '/verifyCode': {
+      request: {
+        nonce?: string
+        code?: string
+      }
+      response: {
+        token?: string
+      }
+      params: never
+    }
+    '/verifyNumber': {
+      request: {
+        nonce: string
+        code: string
+      }
+      response: {
+        nonce?: string
+        securityQuestionKey?: string
+      }
+      params: never
+    }
+    '/verifySecurityAnswer': {
+      request: {
+        answer: string
+        nonce: string
+      }
+      response: {
+        matched: boolean
+        securityQuestionKey?: string
+        nonce: string
+      }
+      params: never
+    }
+    '/verifyToken': {
+      request: {
+        token?: string
+      }
+      response: {
+        valid?: boolean
+      }
+      params: never
+    }
     '/verifyUser': {
       request: {
         mobile?: string
@@ -23,6 +154,7 @@ export interface HapiRoutes {
         nonce: string
         securityQuestionKey?: string
       }
+      params: never
     }
   }
   put?: {}

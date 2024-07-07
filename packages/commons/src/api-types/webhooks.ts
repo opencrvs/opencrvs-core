@@ -7,22 +7,59 @@
 
 export interface HapiRoutes {
   get: {
+    '/ping': {
+      request: never
+      response: never
+      params: never
+    }
     '/webhooks': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   post: {
+    '/deleteWebhooksByClientId': {
+      request: never
+      response: never
+      params: never
+    }
+    '/webhooks': {
+      request: {
+        hub?: {
+          callback?: string
+          mode?: string
+          topic?: string
+          secret?: string
+        }
+      }
+      response: never
+      params: never
+    }
+    '/events/birth/mark-registered': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/death/mark-registered': {
+      request: never
+      response: never
+      params: never
+    }
     '/events/marriage/mark-registered': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   put?: {}
   delete: {
     '/webhooks/{webhookId}': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        webhookId: string
+      }
     }
   }
 }

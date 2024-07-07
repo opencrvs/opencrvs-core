@@ -7,12 +7,516 @@
 
 export interface HapiRoutes {
   get: {
+    '/check-token': {
+      request: never
+      response: never
+      params: never
+    }
+    '/getAllSystems': {
+      request: never
+      response: never
+      params: never
+    }
     '/ping': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   post: {
+    '/activateUser': {
+      request: {
+        userId: string
+        password: string
+        securityQNAs: {
+          questionKey: string
+          answer: string
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/auditUser': {
+      request: {
+        userId: string
+        auditedBy: string
+        action: string
+        reason: string
+        comment?: string
+      }
+      response: never
+      params: never
+    }
+    '/changePassword': {
+      request: {
+        userId: string
+        existingPassword?: string
+        password: string
+      }
+      response: never
+      params: never
+    }
+    '/changeUserAvatar': {
+      request: {
+        userId: string
+        avatar?: {
+          type: string
+          data: string
+        }
+      }
+      response: never
+      params: never
+    }
+    '/changeUserEmail': {
+      request: {
+        userId: string
+        email: string
+      }
+      response: never
+      params: never
+    }
+    '/changeUserPassword': {
+      request: {
+        userId: string
+        existingPassword?: string
+        password: string
+      }
+      response: never
+      params: never
+    }
+    '/changeUserPhone': {
+      request: {
+        userId: string
+        phoneNumber: string
+      }
+      response: never
+      params: never
+    }
+    '/countUsersByLocation': {
+      request: {
+        systemRole: string
+        locationId?: string
+      }
+      response: never
+      params: never
+    }
+    '/createUser': {
+      request: never
+      response: never
+      params: never
+    }
+    '/deactivateSystem': {
+      request: {
+        clientId?: string
+      }
+      response: {
+        _id?: string
+        name?: string
+        status?: string
+        type?: string
+        integratingSystemType?: string
+        shaSecret?: string
+        clientId?: string
+        settings?: {
+          dailyQuota?: number
+          openIdProviderBaseUrl?: string
+          openIdProviderClientId?: string
+          openIdProviderClaims?: string
+          webhook?: {
+            event: string
+            permissions?: string[]
+            [k: string]: unknown | undefined
+          }[]
+        }
+      }
+      params: never
+    }
+    '/deleteSystem': {
+      request: {
+        clientId?: string
+      }
+      response: {
+        _id?: string
+        name?: string
+        status?: string
+        type?: string
+        integratingSystemType?: string
+        shaSecret?: string
+        clientId?: string
+        settings?: {
+          dailyQuota?: number
+          openIdProviderBaseUrl?: string
+          openIdProviderClientId?: string
+          openIdProviderClaims?: string
+          webhook?: {
+            event: string
+            permissions?: string[]
+            [k: string]: unknown | undefined
+          }[]
+        }
+      }
+      params: never
+    }
+    '/getSystem': {
+      request: {
+        systemId?: string
+        clientId?: string
+      }
+      response: {
+        name?: string
+        createdBy?: string
+        username?: string
+        client_id?: string
+        status?: string
+        scope?: string[]
+        sha_secret?: string
+        practitionerId?: string
+        type?: string
+        settings?: {
+          dailyQuota?: number
+          openIdProviderBaseUrl?: string
+          openIdProviderClientId?: string
+          openIdProviderClaims?: string
+          webhook?: {
+            event: string
+            permissions?: string[]
+            [k: string]: unknown | undefined
+          }[]
+        }
+      }
+      params: never
+    }
+    '/getSystemRoles': {
+      request: {
+        value?: {
+          $eq?: string
+          $gt?: string
+          $lt?: string
+          $gte?: string
+          $lte?: string
+          $ne?: string
+          $in?: string[]
+          $nin?: string[]
+        }
+        role?: string
+        active?: boolean
+        sortBy?: string
+        sortOrder?: 'asc' | 'desc'
+      }
+      response: never
+      params: never
+    }
+    '/getUser': {
+      request: {
+        userId?: string
+        email?: string
+        practitionerId?: string
+        mobile?: string
+      }
+      response: never
+      params: never
+    }
+    '/getUserMobile': {
+      request: {
+        userId: string
+      }
+      response: {
+        mobile?: string
+      }
+      params: never
+    }
+    '/reactivateSystem': {
+      request: {
+        clientId?: string
+      }
+      response: {
+        _id?: string
+        name?: string
+        status?: string
+        type?: string
+        integratingSystemType?: string
+        shaSecret?: string
+        clientId?: string
+        settings?: {
+          dailyQuota?: number
+          openIdProviderBaseUrl?: string
+          openIdProviderClientId?: string
+          openIdProviderClaims?: string
+          webhook?: {
+            event: string
+            permissions?: string[]
+            [k: string]: unknown | undefined
+          }[]
+        }
+      }
+      params: never
+    }
+    '/refreshSystemSecret': {
+      request: {
+        clientId?: string
+      }
+      response: {
+        clientSecret?: string
+        system?: {
+          _id?: string
+          name?: string
+          status?: string
+          type?: string
+          integratingSystemType?: string
+          shaSecret?: string
+          clientId?: string
+          settings?: {
+            dailyQuota?: number
+            openIdProviderBaseUrl?: string
+            openIdProviderClientId?: string
+            openIdProviderClaims?: string
+            webhook?: {
+              event: string
+              permissions?: string[]
+              [k: string]: unknown | undefined
+            }[]
+          }
+        }
+      }
+      params: never
+    }
+    '/registerSystem': {
+      request: {
+        type: string
+        name: string
+        integratingSystemType?: string
+        settings?: {
+          dailyQuota?: number
+          webhook?: {
+            event: string
+            permissions?: string[]
+            [k: string]: unknown | undefined
+          }[]
+        }
+      }
+      response: {
+        clientSecret?: string
+        system?: {
+          _id?: string
+          name?: string
+          status?: string
+          type?: string
+          integratingSystemType?: string
+          shaSecret?: string
+          clientId?: string
+          settings?: {
+            dailyQuota?: number
+            openIdProviderBaseUrl?: string
+            openIdProviderClientId?: string
+            openIdProviderClaims?: string
+            webhook?: {
+              event: string
+              permissions?: string[]
+              [k: string]: unknown | undefined
+            }[]
+          }
+        }
+      }
+      params: never
+    }
+    '/resendInvite': {
+      request: {
+        userId: string
+      }
+      response: never
+      params: never
+    }
+    '/resetPasswordInvite': {
+      request: {
+        userId: string
+      }
+      response: never
+      params: never
+    }
+    '/searchUsers': {
+      request: {
+        username?: string
+        mobile?: string
+        systemRole?: string
+        status?: string
+        primaryOfficeId?: string
+        locationId?: string
+        count: number
+        skip: number
+        sortOrder: 'asc' | 'desc'
+      }
+      response: never
+      params: never
+    }
+    '/searches': {
+      request: {
+        userId: string
+        name: string
+        parameters?: {
+          event?: 'birth' | 'death'
+          registrationStatuses?: (
+            | 'IN_PROGRESS'
+            | 'ARCHIVED'
+            | 'DECLARED'
+            | 'DECLARATION_UPDATED'
+            | 'WAITING_VALIDATION'
+            | 'VALIDATED'
+            | 'REGISTERED'
+            | 'CERTIFIED'
+            | 'REJECTED'
+            | 'ISSUED'
+            | 'CORRECTION_REQUESTED'
+          )[]
+          dateOfEvent?: string
+          dateOfEventStart?: string
+          dateOfEventEnd?: string
+          registrationNumber?: string
+          trackingId?: string
+          dateOfRegistration?: string
+          dateOfRegistrationStart?: string
+          dateOfRegistrationEnd?: string
+          declarationLocationId?: string
+          declarationJurisdictionId?: string
+          eventCountry?: string
+          eventLocationId?: string
+          eventLocationLevel1?: string
+          eventLocationLevel2?: string
+          eventLocationLevel3?: string
+          eventLocationLevel4?: string
+          eventLocationLevel5?: string
+          childFirstNames?: string
+          childLastName?: string
+          childDoB?: string
+          childDoBStart?: string
+          childDoBEnd?: string
+          childGender?: string
+          deceasedFirstNames?: string
+          deceasedFamilyName?: string
+          deceasedGender?: string
+          deceasedDoB?: string
+          deceasedDoBStart?: string
+          deceasedDoBEnd?: string
+          motherFirstNames?: string
+          motherFamilyName?: string
+          motherDoB?: string
+          motherDoBStart?: string
+          motherDoBEnd?: string
+          fatherFirstNames?: string
+          fatherFamilyName?: string
+          fatherDoB?: string
+          fatherDoBStart?: string
+          fatherDoBEnd?: string
+          informantFirstNames?: string
+          informantFamilyName?: string
+          informantDoB?: string
+          informantDoBStart?: string
+          informantDoBEnd?: string
+        }
+      }
+      response: never
+      params: never
+    }
+    '/updatePermissions': {
+      request: {
+        clientId: string
+        webhook: {
+          event: string
+          permissions?: string[]
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/updateRole': {
+      request: {
+        id: string
+        value?: string
+        roles?: {
+          _id?: string
+          labels: {
+            lang: string
+            label: string
+          }[]
+        }[]
+        active?: boolean
+      }
+      response: {
+        roleIdMap: {}
+      }
+      params: never
+    }
+    '/updateUser': {
+      request: never
+      response: never
+      params: never
+    }
+    '/usernameReminder': {
+      request: {
+        userId: string
+      }
+      response: never
+      params: never
+    }
+    '/verifyPassword': {
+      request: {
+        username: string
+        password: string
+      }
+      response: {
+        name?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+        mobile?: string
+        email?: string | null
+        scope?: string[]
+        status?: string
+        id?: string
+        practitionerId?: string
+      }
+      params: never
+    }
+    '/verifyPasswordById': {
+      request: {
+        id: string
+        password: string
+      }
+      response: {
+        username?: string
+        mobile?: string
+        scope?: string[]
+        status?: string
+        id?: string
+      }
+      params: never
+    }
+    '/verifySecurityAnswer': {
+      request: {
+        userId: string
+        questionKey: string
+        answer: string
+      }
+      response: {
+        matched?: boolean
+        questionKey?: string
+      }
+      params: never
+    }
+    '/verifySystem': {
+      request: {
+        client_id: string
+        client_secret: string
+      }
+      response: {
+        scope?: string[]
+        status?: string
+        id?: string
+      }
+      params: never
+    }
     '/verifyUser': {
       request: {
         mobile?: string
@@ -34,6 +538,7 @@ export interface HapiRoutes {
         username?: string
         practitionerId?: string
       }
+      params: never
     }
   }
   put?: {}
@@ -43,7 +548,8 @@ export interface HapiRoutes {
         userId: string
         searchId: string
       }
-      response: {}
+      response: never
+      params: never
     }
   }
 }

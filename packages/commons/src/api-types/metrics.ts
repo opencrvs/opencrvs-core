@@ -7,22 +7,294 @@
 
 export interface HapiRoutes {
   get: {
+    '/advancedSearch': {
+      request: never
+      response: {
+        total?: number
+      }
+      params: never
+    }
+    '/declarationsStarted': {
+      request: never
+      response: never
+      params: never
+    }
+    '/eventDuration': {
+      request: never
+      response: never
+      params: never
+    }
+    '/export': {
+      request: never
+      response: never
+      params: never
+    }
+    '/fetchVSExport': {
+      request: never
+      response: never
+      params: never
+    }
+    '/locationStatistics': {
+      request: never
+      response: never
+      params: never
+    }
+    '/locationWiseEventEstimations': {
+      request: never
+      response: never
+      params: never
+    }
+    '/metrics': {
+      request: never
+      response: never
+      params: never
+    }
+    '/monthWiseEventEstimations': {
+      request: never
+      response: never
+      params: never
+    }
+    '/monthlyExport': {
+      request: never
+      response: never
+      params: never
+    }
+    '/ping': {
+      request: never
+      response: never
+      params: never
+    }
+    '/refreshPerformanceData': {
+      request: never
+      response: never
+      params: never
+    }
+    '/timeLogged': {
+      request: never
+      response: never
+      params: never
+    }
+    '/timeLoggedMetricsByPractitioner': {
+      request: never
+      response: never
+      params: never
+    }
+    '/tokenTest': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalCertifications': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalCorrections': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalMetrics': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalMetricsByLocation': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalMetricsByRegistrar': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalMetricsByTime': {
+      request: never
+      response: never
+      params: never
+    }
+    '/totalPayments': {
+      request: never
+      response: never
+      params: never
+    }
+    '/vsExport': {
+      request: never
+      response: never
+      params: never
+    }
     '/audit/events': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   post: {
+    '/advancedSearch': {
+      request: never
+      response: never
+      params: never
+    }
+    '/declarationStartedMetricsByPractitioners': {
+      request: {
+        timeStart: string
+        timeEnd: string
+        locationId: string
+        event?: string
+        practitionerIds: unknown[]
+      }
+      response: never
+      params: never
+    }
+    '/audit/events': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/updated': {
+      request: never
+      response: never
+      params: never
+    }
+    '/events/{event}/reinstated': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/viewed': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/assigned': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/make-correction': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/sent-for-updates': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/certified': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/not-duplicate': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/waiting-external-validation': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/sent-notification-for-review': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/sent-notification': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/sent-for-approval': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/marked-as-duplicate': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/registered': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/issued': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/request-correction': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/downloaded': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
+    '/events/{event}/archived': {
+      request: never
+      response: never
+      params: {
+        event: string
+      }
+    }
     '/events/{event}/unassigned': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: {
+        event: string
+      }
     }
   }
   put?: {}
   delete: {
+    '/influxMeasurement': {
+      request: never
+      response: never
+      params: never
+    }
     '/performance': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
 }

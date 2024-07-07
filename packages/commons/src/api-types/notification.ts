@@ -8,14 +8,302 @@
 export interface HapiRoutes {
   get: {
     '/ping': {
-      request: {}
-      response: {}
+      request: never
+      response: never
+      params: never
     }
   }
   post: {
+    '/allUsersEmail': {
+      request: {
+        subject: string
+        body: string
+        bcc: string[]
+        locale: string
+        requestId: string
+      }
+      response: never
+      params: never
+    }
+    '/approveCorrectionRequest': {
+      request: {
+        msisdn?: string
+        email?: string
+        event: string
+        trackingId: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/authenticationCode': {
+      request: {
+        msisdn?: string
+        email?: string
+        code: string
+        notificationEvent: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/birthDeclarationSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        name: string
+        informantName?: string
+      }
+      response: never
+      params: never
+    }
+    '/birthInProgressSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        informantName?: string
+      }
+      response: never
+      params: never
+    }
+    '/birthRegistrationSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        name: string
+        informantName?: string
+        crvsOffice: string
+        registrationLocation: string
+        trackingId: string
+        registrationNumber: string
+      }
+      response: never
+      params: never
+    }
+    '/birthRejectionSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        informantName?: string
+        name: string
+      }
+      response: never
+      params: never
+    }
+    '/deathDeclarationSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        name: string
+        informantName?: string
+      }
+      response: never
+      params: never
+    }
+    '/deathInProgressSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        informantName?: string
+      }
+      response: never
+      params: never
+    }
+    '/deathRegistrationSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        name: string
+        informantName?: string
+        crvsOffice: string
+        registrationLocation: string
+        trackingId: string
+        registrationNumber: string
+      }
+      response: never
+      params: never
+    }
+    '/deathRejectionSMS': {
+      request: {
+        recipient?: {
+          email?: string | null
+          sms?: string | null
+        }
+        trackingId: string
+        crvsOffice: string
+        registrationLocation: string
+        informantName?: string
+        name: string
+      }
+      response: never
+      params: never
+    }
+    '/rejectCorrectionRequest': {
+      request: {
+        msisdn?: string
+        email?: string
+        event: string
+        trackingId: string
+        reason: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/resetPasswordInvite': {
+      request: {
+        msisdn?: string
+        email?: string
+        password: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/retrieveUserName': {
+      request: {
+        msisdn?: string
+        email?: string
+        username: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/updateUserNameSMS': {
+      request: {
+        msisdn?: string
+        email?: string
+        username: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/userCredentialsInvite': {
+      request: {
+        msisdn?: string
+        email?: string
+        username: string
+        password: string
+        userFullName?: {
+          given: string[]
+          use: string
+          family: string
+          [k: string]: unknown | undefined
+        }[]
+      }
+      response: never
+      params: never
+    }
+    '/birth/registered': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/birth/sent-for-approval': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/birth/sent-for-updates': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/birth/sent-notification': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/birth/sent-notification-for-review': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/death/registered': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/death/sent-for-approval': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/death/sent-for-updates': {
+      request: {}
+      response: never
+      params: never
+    }
+    '/death/sent-notification': {
+      request: {}
+      response: never
+      params: never
+    }
     '/death/sent-notification-for-review': {
       request: {}
-      response: {}
+      response: never
+      params: never
     }
   }
   put?: {}
