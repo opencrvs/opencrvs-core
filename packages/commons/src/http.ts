@@ -59,18 +59,6 @@ export async function fetchJSON<ResponseType = any>(
 
 type Services = AllRoutes
 
-const SERVICE_URLS = {
-  'user-mgnt': process.env.USER_MANAGEMENT_URL,
-  auth: process.env.AUTH_URL,
-  config: process.env.CONFIG_URL,
-  documents: process.env.DOCUMENTS_URL,
-  metrics: process.env.METRICS_URL,
-  notification: process.env.NOTIFICATION_SERVICE_URL,
-  search: process.env.SEARCH_URL,
-  webhooks: process.env.WEBHOOKS_URL,
-  workflow: process.env.WORKFLOW_URL
-}
-
 function parsePathParams(path: string, params: Record<string, string>) {
   return path.replace(/{([^}]+)}/g, (_, key) => {
     return params[key]
@@ -78,16 +66,9 @@ function parsePathParams(path: string, params: Record<string, string>) {
 }
 
 export function createServiceClient<ServiceName extends keyof Services>(
-  service: ServiceName
+  service: ServiceName,
+  baseUrl: string
 ) {
-  const url = SERVICE_URLS[service]
-
-  if (!url) {
-    throw new Error(
-      `Missing URL for service ${service}. Make sure you have set the corresponding environment variable`
-    )
-  }
-
   type Service = Services[ServiceName]
   type IsNever<T> = [T] extends [never] ? true : false
 
@@ -109,12 +90,6 @@ export function createServiceClient<ServiceName extends keyof Services>(
     Method extends keyof Service,
     Path extends keyof Service[Method]
   >(method: Method, path: Path, options: RequestOptions<Method, Path>) {
-    if (!url) {
-      throw new Error(
-        `Missing URL for service ${service}. Make sure you have set the corresponding environment variable`
-      )
-    }
-
     const urlPathWithParams: string =
       'params' in options
         ? parsePathParams(
@@ -123,7 +98,9 @@ export function createServiceClient<ServiceName extends keyof Services>(
           )
         : (path as string)
 
-    return fetchJSON(joinURL(url, urlPathWithParams).href, {
+    return fetchJSON<
+      Service[Method][Path] extends { response: infer R } ? R : unknown
+    >(joinURL(baseUrl, urlPathWithParams).href, {
       method: (method as string).toUpperCase(),
       headers: {
         'Content-Type': 'application/json'
