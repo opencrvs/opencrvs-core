@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { getTrackingId, InProgressRecord } from '@opencrvs/commons/types'
+import { getTrackingId, RejectedRecord } from '@opencrvs/commons/types'
 import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
 import {
@@ -22,51 +22,51 @@ import {
   getInformantName
 } from '@notification/features/utilsForPartiallyCompletedRecord'
 
-export async function birthInProgressNotification(
+export async function birthSentForUpdatesNotification(
   req: Request,
   h: ResponseToolkit
 ) {
-  const inProgressRecord = req.payload as InProgressRecord
+  const rejectedRecord = req.payload as RejectedRecord
   await sendNotification(
     {
-      sms: messageKeys.birthInProgressNotification,
-      email: messageKeys.birthInProgressNotification
+      sms: messageKeys.birthRejectionNotification,
+      email: messageKeys.birthRejectionNotification
     },
     {
-      sms: getContactPhoneNo(inProgressRecord),
-      email: getContactEmail(inProgressRecord)
+      sms: getContactPhoneNo(rejectedRecord),
+      email: getContactEmail(rejectedRecord)
     },
     'informant',
     {
-      trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: getOfficeName(inProgressRecord),
-      registrationLocation: getRegistrationLocation(inProgressRecord),
-      informantName: getInformantName(inProgressRecord)
+      trackingId: getTrackingId(rejectedRecord),
+      crvsOffice: getOfficeName(rejectedRecord),
+      registrationLocation: getRegistrationLocation(rejectedRecord),
+      informantName: getInformantName(rejectedRecord)
     }
   )
   return h.response().code(200)
 }
 
-export async function deathInProgressNotification(
+export async function deathSentForUpdatesNotification(
   req: Request,
   h: ResponseToolkit
 ) {
-  const inProgressRecord = req.payload as InProgressRecord
+  const rejectedRecord = req.payload as RejectedRecord
   await sendNotification(
     {
-      sms: messageKeys.deathInProgressNotification,
-      email: messageKeys.deathInProgressNotification
+      sms: messageKeys.deathRejectionNotification,
+      email: messageKeys.deathRejectionNotification
     },
     {
-      sms: getContactPhoneNo(inProgressRecord),
-      email: getContactEmail(inProgressRecord)
+      sms: getContactPhoneNo(rejectedRecord),
+      email: getContactEmail(rejectedRecord)
     },
     'informant',
     {
-      trackingId: getTrackingId(inProgressRecord),
-      crvsOffice: getOfficeName(inProgressRecord),
-      registrationLocation: getRegistrationLocation(inProgressRecord),
-      informantName: getInformantName(inProgressRecord)
+      trackingId: getTrackingId(rejectedRecord),
+      crvsOffice: getOfficeName(rejectedRecord),
+      registrationLocation: getRegistrationLocation(rejectedRecord),
+      informantName: getInformantName(rejectedRecord)
     }
   )
   return h.response().code(200)

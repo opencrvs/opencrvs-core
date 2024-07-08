@@ -25,7 +25,8 @@ import {
   ReadyForReviewRecord,
   RegisteredRecord,
   RelatedPerson,
-  resourceIdentifierToUUID
+  resourceIdentifierToUUID,
+  RejectedRecord
 } from '@opencrvs/commons/types'
 import { badRequest as boomBadRequest } from '@hapi/boom'
 
@@ -52,7 +53,7 @@ export function getContactEmail(
 }
 
 function error(
-  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord,
+  record: ReadyForReviewRecord | RegisteredRecord,
   message: string
 ): never {
   const task = getTaskFromSavedBundle(record)
@@ -61,7 +62,11 @@ function error(
 }
 
 export function getOfficeName(
-  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
+  record:
+    | ReadyForReviewRecord
+    | RegisteredRecord
+    | InProgressRecord
+    | RejectedRecord
 ) {
   const office = findLastOfficeFromSavedBundle(record)
   return office.name
@@ -118,7 +123,11 @@ export function getPersonName(
 }
 
 export function getRegistrationLocation(
-  record: ReadyForReviewRecord | RegisteredRecord | InProgressRecord
+  record:
+    | ReadyForReviewRecord
+    | RegisteredRecord
+    | InProgressRecord
+    | RejectedRecord
 ) {
   const location = findLastOfficeLocationFromSavedBundle(record)
   const language = getDefaultLanguage()
