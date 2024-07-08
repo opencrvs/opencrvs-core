@@ -14,8 +14,7 @@
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "build:clean": "rm -rf build",
-    "debug": "../../debug-service-in-chrome.sh 9090"
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.13.1",
