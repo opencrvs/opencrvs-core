@@ -23,10 +23,6 @@ import {
   validationMessages
 } from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
-import {
-  ApplyButton,
-  CancelButton
-} from '@client/views/SysAdmin/Config/Application/Components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -165,21 +161,23 @@ export function SignatureUploader({
         width={600}
         show={signatureDialogOpen}
         actions={[
-          <CancelButton
+          <Button
             key="cancel"
             id="modal_cancel"
+            type="tertiary"
             onClick={() => setSignatureDialogOpen(false)}
           >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="positive"
             disabled={!Boolean(signatureValue)}
             onClick={apply}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
         handleClose={() => setSignatureDialogOpen(false)}
       >

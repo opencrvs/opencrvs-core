@@ -36,7 +36,7 @@ export async function unassignRecordHandler(
   const tokenPayload = getTokenPayload(token)
   const record = await getRecordById(
     // Task history is fetched rather than the task only
-    `${payload.id}?includeHistoryResources`,
+    payload.id,
     token,
     [
       'CERTIFIED',

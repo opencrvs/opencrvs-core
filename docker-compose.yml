@@ -6,7 +6,6 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-
 services:
   base:
     image: opencrvs/ocrvs-base:${VERSION}
@@ -196,7 +195,7 @@ services:
     depends_on:
       - base
     environment:
-      - REDIS_HOST=redis://redis:6379
+      - REDIS_HOST=redis
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/

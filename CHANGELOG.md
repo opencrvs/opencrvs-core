@@ -80,10 +80,12 @@
   - `compressImagesToSizeMB` : An optional prop of number type to define a compressed size. Compression is ignored when the input file is already smaller or equal of the given value or a falsy given value.
   - `maxSizeMB`: An optional validation prop to prevent input of a file bigger than a defined value.
 - Metabase default credentials now must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start [#6578](https://github.com/opencrvs/opencrvs-core/issues/6578)
+- Introduce rate limiting to routes that could potentially be bruteforced or extracted PII from [#6145](https://github.com/opencrvs/opencrvs-core/pull/6145)
 
 ## Improvements
 
-- Development time logs are now much tidier and errors easier to point out. Production logging will still remain as is.
+- Development time logs are now much tidier and errors easier to point out. Production logging will still remain as is. [#7022](https://github.com/opencrvs/opencrvs-core/pull/7022)
+- Mask emails and phone numbers from notification logs [#7204](https://github.com/opencrvs/opencrvs-core/pull/7204)
 
 ## Bug fixes
 
@@ -91,6 +93,7 @@
 - Fix certificate verification QR code for a death declaration [#6230](https://github.com/opencrvs/opencrvs-core/issues/6230#issuecomment-1996766125)
 - Fix certificate verification QR code crashing when gender is unknown [#6422](https://github.com/opencrvs/opencrvs-core/issues/6422)
 - Fix certificate verification page missing registration center and the name of registrar [#6614](https://github.com/opencrvs/opencrvs-core/issues/6614)
+- Amend certificate verification showing the certifying date instead of records creation date [#7098](https://github.com/opencrvs/opencrvs-core/pull/7098)
 - Fix records not getting issued [#6216] (https://github.com/opencrvs/opencrvs-core/issues/6216)
 - Fix record correction e2e failing due to stale data getting saved on redux
 - Convert eventDates to LocalDate before formatting [#6719](https://github.com/opencrvs/opencrvs-core/issues/6719)
@@ -104,6 +107,7 @@
 - Fix Registrar of any location should be able to review a correction request [#6247](https://github.com/opencrvs/opencrvs-core/issues/6247)
 - remove upload button when no supporting docs are configured [#5944](https://github.com/opencrvs/opencrvs-core/issues/5944)
 - Fix issues of invisible inputs when navigating from can't login link in login page [#6163](https://github.com/opencrvs/opencrvs-core/issues/6163)
+- Fix the "Continue" button being disabled when changes in correction form is made [#6780](https://github.com/opencrvs/opencrvs-core/issues/6780)
 - Remove leading slash from `resendAuthenticationCode` in login to fix resend email button [#6987](https://github.com/opencrvs/opencrvs-core/issues/6987) [#7037](https://github.com/opencrvs/opencrvs-core/issues/7037)
 - Fix dashboard cron jobs not working [#7016](https://github.com/opencrvs/opencrvs-core/issues/7016)
 - Fix client modal glitches on integrations page [#7002] (https://github.com/opencrvs/opencrvs-core/issues/7002)
@@ -124,6 +128,11 @@
 - Fix certificate overflowing in preview certificate view [#7157](https://github.com/opencrvs/opencrvs-core/pull/7157)
 - Fix records going completely missing when an unexpected error happens in the backend [#7021](https://github.com/opencrvs/opencrvs-core/pull/7021)
 - Fix search indexing BRN's in place of identifiers. Adds spouseIdentifier to search with [#7189](https://github.com/opencrvs/opencrvs-core/pull/7189)
+- Rename `farajaland-map.geojson` in dashboards to `map.geojson` to not tie opencrvs-core into a specific country implementation name [#7251](https://github.com/opencrvs/opencrvs-core/pull/7251)
+- Update advanced search list properly when assignments change [#7307](https://github.com/opencrvs/opencrvs-core/pull/7307)
+- Update Content-Security-Policy to allow loading fonts from country configuration [#7296](https://github.com/opencrvs/opencrvs-core/pull/7296)
+- Fix frontend crashing on 'Registration by Status' under performance due to missing translations [#7129](https://github.com/opencrvs/opencrvs-core/pull/7129)
+- Fix email of practitioner to be saved in hearth. A migration is added to correct the email of practitoiner in existing db. [7315](https://github.com/opencrvs/opencrvs-core/pull/7315)
 
 ## Refactor
 
