@@ -17,7 +17,7 @@ SERVICES=(
   "metrics:1050"
   "notification:2020"
   "search:9090"
-  "mgnt:3030"
+  "user-mgnt:3030"
   "webhooks:2525"
   "countryconfig:3040"
 )
