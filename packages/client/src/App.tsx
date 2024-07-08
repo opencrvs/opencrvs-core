@@ -42,7 +42,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { Route, Switch } from 'react-router'
+import { Route, Switch } from 'react-router-dom'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
@@ -70,6 +70,7 @@ import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { WorkqueueView } from './views/Workqueue/Workqueue'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -130,6 +131,11 @@ export function App(props: IAppProps) {
                                               exact
                                               path={routes.HOME}
                                               component={Home}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.WORKQUEUE}
+                                              component={WorkqueueView}
                                             />
                                             <ProtectedRoute
                                               exact
