@@ -132,7 +132,7 @@ async function getEventCertificate(
   return { svgCode: responseText, event }
 }
 
-export async function getApplicationConfig(
+async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
