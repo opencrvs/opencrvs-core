@@ -77,7 +77,8 @@ type System {
   name: String!
 }
 
-# Fields type, underInvestigation, primaryOffice and localRegistrar
+# @TODO: Is it actually so that there are users without primaryOffice?
+# Fields type, underInvestigation and localRegistrar
 # are optional when a Local System Admin creates new user.
 type User {
   id: ID!
@@ -91,7 +92,7 @@ type User {
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature

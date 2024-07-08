@@ -303,7 +303,7 @@ export interface GQLUser {
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
-  primaryOffice?: GQLLocation
+  primaryOffice: GQLLocation
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature

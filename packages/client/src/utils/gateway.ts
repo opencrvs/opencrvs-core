@@ -2333,7 +2333,7 @@ export type User = {
   mobile?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
-  primaryOffice?: Maybe<Location>
+  primaryOffice: Location
   role: UserRole
   searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
@@ -2855,13 +2855,13 @@ export type FetchUserQuery = {
       firstNames?: string | null
       familyName?: string | null
     }>
-    primaryOffice?: {
+    primaryOffice: {
       __typename?: 'Location'
       id: string
       name?: string | null
       alias?: Array<string> | null
       status?: string | null
-    } | null
+    }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
       role: SystemRoleType
@@ -3228,12 +3228,12 @@ export type GetUserQuery = {
         description: string
       }
     }
-    primaryOffice?: {
+    primaryOffice: {
       __typename?: 'Location'
       id: string
       name?: string | null
       alias?: Array<string> | null
-    } | null
+    }
     signature?: {
       __typename?: 'Signature'
       type?: string | null
@@ -7766,11 +7766,11 @@ export type GetRegistrationsListByFilterQuery = {
                 description: string
               }
             }
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               name?: string | null
               id: string
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -7956,7 +7956,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           date?: any | null
           user?: {
             __typename?: 'User'
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               hierarchy?: Array<{
                 __typename?: 'Location'
@@ -7964,7 +7964,7 @@ export type FetchRecordDetailsForVerificationQuery = {
                 name?: string | null
                 alias?: Array<string> | null
               }> | null
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8018,7 +8018,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           date?: any | null
           user?: {
             __typename?: 'User'
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               hierarchy?: Array<{
                 __typename?: 'Location'
@@ -8026,7 +8026,7 @@ export type FetchRecordDetailsForVerificationQuery = {
                 name?: string | null
                 alias?: Array<string> | null
               }> | null
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

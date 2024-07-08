@@ -10,14 +10,26 @@
  */
 
 import { useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { PERFORMANCE_MANAGEMENT_ROLES } from '@client/utils/constants'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { Scope } from '@opencrvs/commons/authentication'
+import { User } from '@client/utils/gateway'
 
-export function useAuthorization() {
-  const userDetails = useSelector(getUserDetails)
-  const isPerformanceManager =
-    userDetails?.systemRole &&
-    PERFORMANCE_MANAGEMENT_ROLES.includes(userDetails.systemRole)
+export function usePermissions() {
+  const userScopes = useSelector(getScope)
+  const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
 
-  return { isPerformanceManager }
+  const hasScopes = (neededScopes: Scope[]) =>
+    neededScopes.every((scope) => userScopes?.includes(scope))
+
+  const hasScope = (neededScope: Scope) => hasScopes([neededScope])
+
+  const canReadUser = (user: User) => {
+    if (hasScope('user.read:all')) return true
+    if (hasScope('user.read:my-office'))
+      return user.primaryOffice.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  return { hasScopes, hasScope, canReadUser }
 }

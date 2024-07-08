@@ -70,15 +70,15 @@ export const scopes = [
   'organisation.read',
   'organisation.read-locations:my-office',
   'organisation.read-locations:all',
-  'organisation.read-users',
-  'organisation.read-users:my-office',
-  'organisation.read-users:all',
 
   // user
-  'user.read',
+  'user.read:all',
+  'user.read:my-office',
   'user.create',
   'user.update',
   'user.update:resend-invite',
   'user.update:reset-password',
   'user.update:deactivate-reactivate'
 ] as const
+
+export type Scope = (typeof scopes)[number]

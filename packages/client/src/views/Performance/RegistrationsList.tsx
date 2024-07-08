@@ -59,7 +59,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
-import { useAuthorization } from '@client/hooks/useAuthorization'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { formatLongDate } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
@@ -172,7 +172,7 @@ function RegistrationListComponent(props: IProps) {
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-  const { isPerformanceManager } = useAuthorization()
+  const { canReadUser } = usePermissions()
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -414,7 +414,7 @@ function RegistrationListComponent(props: IProps) {
                 avatar={result.registrarPractitioner.avatar}
               />
               <>
-                {!isPerformanceManager ? (
+                {canReadUser(result.registrarPractitioner) ? (
                   <Link
                     font="bold14"
                     onClick={() => {
@@ -439,7 +439,7 @@ function RegistrationListComponent(props: IProps) {
           ),
           location: (
             <>
-              {!isPerformanceManager ? (
+              {canReadUser(result.registrarPractitioner) ? (
                 <Link
                   font="bold14"
                   onClick={() => {

@@ -12,6 +12,9 @@
 import { IAuthHeader } from './http'
 import * as decode from 'jwt-decode'
 
+import { Scope } from './scopes'
+export { scopes, Scope } from './scopes'
+
 /** All the scopes user can be assigned to */
 export const SCOPES = {
   demo: 'demo',
@@ -119,7 +122,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     systemRole: 'REGISTRATION_AGENT',
-    scopes: ['validate', 'performance', 'certify']
+    scopes: ['record.register', 'validate', 'performance', 'certify']
   },
   {
     id: 'LOCAL_REGISTRAR',
@@ -129,7 +132,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     systemRole: 'LOCAL_REGISTRAR',
-    scopes: ['register', 'performance', 'certify']
+    scopes: ['record.register', 'register', 'performance', 'certify']
   },
   {
     id: 'LOCAL_SYSTEM_ADMIN',
@@ -200,7 +203,6 @@ export type SystemIntegrationRole =
 export type UserScope = (typeof SCOPES)[keyof typeof SCOPES]
 export type SystemScope =
   (typeof SYSTEM_INTEGRATION_SCOPES)[keyof typeof SYSTEM_INTEGRATION_SCOPES]
-export type Scope = UserScope | SystemScope
 
 export interface ITokenPayload {
   sub: string

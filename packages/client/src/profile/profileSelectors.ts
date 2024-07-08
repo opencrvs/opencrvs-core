@@ -10,7 +10,7 @@
  */
 import { ProfileState } from '@client/profile/profileReducer'
 import { IStoreState } from '@client/store'
-import { Scope } from '@client/utils/authUtils'
+import { Scope } from '@opencrvs/commons/authentication'
 
 const getPartialState = (store: IStoreState): ProfileState => store.profile
 

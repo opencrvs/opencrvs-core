@@ -13,8 +13,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { SystemRoleType } from '@client/utils/gateway'
-import { UserDetails } from './userUtils'
+import { Scope } from '@opencrvs/commons/authentication'
 
 export const USER_SCOPES = [
   'demo',
@@ -29,7 +28,6 @@ export const USER_SCOPES = [
   'teams',
   'config'
 ]
-export type Scope = (typeof USER_SCOPES)[number]
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -121,36 +119,4 @@ export const enum AuthScope {
   SYSADMIN = 'sysadmin',
   VALIDATE = 'validate',
   NATLSYSADMIN = 'natlsysadmin'
-}
-
-export const hasNatlSysAdminScope = (scope: Scope[] | null): boolean => {
-  if (scope?.includes(AuthScope.NATLSYSADMIN)) {
-    return true
-  }
-  return false
-}
-
-export const hasRegisterScope = (scope: Scope[] | null): boolean => {
-  if (scope?.includes(AuthScope.REGISTER)) {
-    return true
-  }
-  return false
-}
-
-export const hasRegistrationClerkScope = (scope: Scope[] | null): boolean => {
-  if (scope?.includes(AuthScope.VALIDATE)) {
-    return true
-  }
-  return false
-}
-
-export const hasAccessToRoute = (
-  roles: SystemRoleType[],
-  userDetails: UserDetails
-): boolean => {
-  const userRole = userDetails.systemRole
-  if (roles.includes(userRole)) {
-    return true
-  }
-  return false
 }

@@ -17,7 +17,6 @@ import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -63,6 +62,8 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { Scope } from '@opencrvs/commons/authentication'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -102,10 +103,7 @@ const ReadyForReviewComponent = ({
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-
-  const userHasRegisterScope = () => {
-    return scope && hasRegisterScope(scope)
-  }
+  const { hasScope } = usePermissions()
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -181,9 +179,7 @@ const ReadyForReviewComponent = ({
         ''
       const isValidatedOnReview =
         reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        userHasRegisterScope()
-          ? true
-          : false
+        hasScope('record.register')
       const dateOfEvent =
         (reg.dateOfEvent &&
           reg.dateOfEvent.length > 0 &&
