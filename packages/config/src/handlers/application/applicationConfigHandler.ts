@@ -95,7 +95,7 @@ function stripIdFromApplicationConfig(config: Record<string, unknown>) {
   )
 }
 
-export async function getApplicationConfig(
+async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
