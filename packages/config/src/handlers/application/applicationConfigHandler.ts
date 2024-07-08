@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import ApplicationConfig from '@config/models/config'
 import { logger } from '@opencrvs/commons'
-import { badData, internal } from '@hapi/boom'
+import { badData } from '@hapi/boom'
 import * as Joi from 'joi'
-import { merge, pick } from 'lodash'
+import { pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
 import { getDocumentUrl } from '@config/services/documents'
@@ -61,15 +60,11 @@ export default async function configHandler(
   }
 }
 
-async function getConfigFromCountry(authToken?: string) {
+async function getConfigFromCountry() {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url, {
-    headers: authToken
-      ? {
-          Authorization: `Bearer ${authToken}`
-        }
-      : {}
+    headers: {}
   })
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
@@ -99,31 +94,19 @@ async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
-  const configFromCountryConfig = await getConfigFromCountry(
-    request?.headers?.authorization
-  )
+  const configFromCountryConfig = await getConfigFromCountry()
   const stripApplicationConfig = stripIdFromApplicationConfig(
     configFromCountryConfig
   )
-  const { error, value } = applicationConfigResponseValidation.validate(
-    stripApplicationConfig,
-    { allowUnknown: true }
-  )
+  const { error, value: updatedConfigFromCountryConfig } =
+    applicationConfigResponseValidation.validate(stripApplicationConfig, {
+      allowUnknown: true
+    })
   if (error) {
     throw badData(error.details[0].message)
   }
-  const updatedConfigFromCountryConfig = value
 
-  try {
-    const configFromDB = await ApplicationConfig.findOne({})
-    const finalConfig = merge(
-      updatedConfigFromCountryConfig,
-      configFromDB?.toObject()
-    )
-    return finalConfig
-  } catch (error) {
-    throw internal('Error when fetching application config from Mongo', error)
-  }
+  return updatedConfigFromCountryConfig
 }
 
 export async function getLoginConfigHandler(
