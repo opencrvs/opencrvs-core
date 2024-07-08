@@ -18,34 +18,35 @@ export const scopes = [
   'record.declare-marriage',
   'record.submit-incomplete',
   'record.submit-for-review',
-  'record.submit-for-approval',
-  'record.submit-for-updates',
   'record.assign-unassign-myself',
   'record.unassign-others',
 
   // validate
-  'record.update',
+  'record.declaration-review',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
   'record.review-duplicates',
-  'record.archive',
-  'record.reinstate',
-  'record.verify-certified',
+  'record.submit-for-approval',
+  'record.submit-for-updates',
+  'record.registration-verify-certified-copies',
 
   // register
   'record.register',
 
-  // correct
-  'record.request-correction',
-  'record.correct',
-  'record.request-revocation',
-  'record.revoke',
-  'record.request-reinstatement',
-  'record.reinstate',
+  // certify
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.bulk-print-certified-copies',
 
-  // audit
-  'record.read',
-  'record.read-audit',
-  'record.read-comments',
-  'record.create-comments',
+  // correct
+  'record.registration-request-correction',
+  'record.registration-correct',
+  'record.registration-request-revocation',
+  'record.registration-revoke',
+  'record.registration-request-reinstatement',
+  'record.registration-reinstate',
 
   // search
   'search.birth',
@@ -54,6 +55,12 @@ export const scopes = [
   'search.death:my-jurisdiction',
   'search.marriage',
   'search.marriage:my-jurisdiction',
+
+  // audit
+  'record.read',
+  'record.read-audit',
+  'record.read-comments',
+  'record.create-comments',
 
   // profile
   'profile.update-signature',

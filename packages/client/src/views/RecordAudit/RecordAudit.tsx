@@ -332,7 +332,7 @@ function RecordAuditBody({
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (
-    hasScope('record.correct') &&
+    hasScope('record.registration-correct') &&
     isDownloaded &&
     declaration.type !== Event.Marriage &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
