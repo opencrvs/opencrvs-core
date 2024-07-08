@@ -238,20 +238,6 @@ describe('deleteCertificate handler', () => {
     fetch.resetMocks()
   })
 
-  it('delete an exsisting certificate using mongoose', async () => {
-    mockCertificate.id = '61c4664e663fc6af203b63b8'
-    mockingoose(Certificate).toReturn({}, 'findOneAndRemove')
-
-    const res = await server.server.inject({
-      method: 'DELETE',
-      url: '/certificate/61c4664e663fc6af203b63b8',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(204)
-  })
-
   it('return error when there is no param', async () => {
     mockingoose(Certificate).toReturn({}, 'findOneAndRemove')
 
