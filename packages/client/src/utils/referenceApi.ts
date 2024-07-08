@@ -29,6 +29,14 @@ export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
 
+export type SearchCriteria =
+  | 'TRACKING_ID'
+  | 'REGISTRATION_NUMBER'
+  | 'NATIONAL_ID'
+  | 'NAME'
+  | 'PHONE_NUMBER'
+  | 'EMAIL'
+
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
@@ -134,6 +142,7 @@ export interface IApplicationConfig {
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
+  SEARCH_DEFAULT_CRITERIA: SearchCriteria[]
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
