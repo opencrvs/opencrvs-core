@@ -64,6 +64,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
+import { useWorkqueues } from '@client/hooks/useWorkqueues'
+import { Link } from 'react-router-dom'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -313,6 +315,9 @@ const NavigationView = (props: IFullProps) => {
     goToAllUserEmail,
     className
   } = props
+
+  const { links } = useWorkqueues()
+
   const tabId = deselectAllTabs
     ? ''
     : match.params.tabId
@@ -413,6 +418,14 @@ const NavigationView = (props: IFullProps) => {
       avatar={() => userInfo && userInfo.avatar}
       className={className}
     >
+      <NavigationGroup>
+        {links?.map(({ path, label }) => (
+          <NavigationItem key={path} label={''}>
+            <Link to={path}>{label}</Link>
+          </NavigationItem>
+        ))}
+      </NavigationGroup>
+
       {userDetails?.systemRole === 'FIELD_AGENT' ? (
         <>
           <NavigationGroup>

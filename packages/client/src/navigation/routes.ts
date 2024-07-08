@@ -12,6 +12,7 @@ import { Event } from '@client/utils/gateway'
 
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
+export const WORKQUEUE = '/workqueue/:slug'
 
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`

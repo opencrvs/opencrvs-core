@@ -35,6 +35,7 @@ import { resolvers as applicationRootResolvers } from '@gateway/features/applica
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import { resolvers as workqueueResolvers } from '@gateway/features/workqueue/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -95,6 +96,7 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   informantSMSNotificationResolvers as IResolvers,
   informantSMSNotiTypeResolvers as IResolvers,
   OIDPUserInfoResolvers as IResolvers,
+  workqueueResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({
       name: 'FieldValue',

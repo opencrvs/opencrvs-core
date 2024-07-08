@@ -163,6 +163,8 @@ type Query {
     redirectUri: String!
     grantType: String
   ): UserInfo
+  getWorkqueues: [WorkqueueConfiguration!]!
+  getWorkqueue(slug: String!): EventSearchResultSet!
 }
 
 type Mutation {
@@ -550,7 +552,7 @@ type UserAuditLogResultSet {
 }
 
 type EventSearchResultSet {
-  results: [EventSearchSet]
+  results: [EventSearchSet!]!
   totalItems: Int
 }
 
@@ -701,6 +703,12 @@ type UserInfo {
   districtFhirId: String
   stateFhirId: String
   locationLevel3FhirId: String
+}
+
+type WorkqueueConfiguration {
+  slug: String!
+  name: [Translation!]!
+  query: WorkqueueQuery
 }
 
 input NotificationInput {
@@ -1265,6 +1273,15 @@ type OIDPUserInfo {
   phone_number_verified: Boolean
   address: OIDPUserAddress
   updated_at: Int
+}
+
+type Translation {
+  language: String!
+  text: String!
+}
+
+type WorkqueueQuery {
+  registrationStatuses: [String!]!
 }
 
 input PersonInput {

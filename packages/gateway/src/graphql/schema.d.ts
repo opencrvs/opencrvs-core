@@ -55,6 +55,8 @@ export interface GQLQuery {
   fetchSystem?: GQLSystem
   informantSMSNotifications?: Array<GQLSMSNotification>
   getOIDPUserInfo?: GQLUserInfo
+  getWorkqueues: Array<GQLWorkqueueConfiguration>
+  getWorkqueue: GQLEventSearchResultSet
 }
 
 export interface GQLMutation {
@@ -412,7 +414,7 @@ export interface GQLUserAuditLogResultSet {
 }
 
 export interface GQLEventSearchResultSet {
-  results?: Array<GQLEventSearchSet | null>
+  results: Array<GQLEventSearchSet>
   totalItems?: number
 }
 
@@ -563,6 +565,12 @@ export interface GQLUserInfo {
   districtFhirId?: string
   stateFhirId?: string
   locationLevel3FhirId?: string
+}
+
+export interface GQLWorkqueueConfiguration {
+  slug: string
+  name: Array<GQLTranslation>
+  query?: GQLWorkqueueQuery
 }
 
 export interface GQLNotificationInput {
@@ -1151,6 +1159,15 @@ export interface GQLOIDPUserInfo {
   phone_number_verified?: boolean
   address?: GQLOIDPUserAddress
   updated_at?: number
+}
+
+export interface GQLTranslation {
+  language: string
+  text: string
+}
+
+export interface GQLWorkqueueQuery {
+  registrationStatuses: Array<string>
 }
 
 export interface GQLPersonInput {
@@ -1985,6 +2002,7 @@ export interface GQLResolver {
   System?: GQLSystemTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
+  WorkqueueConfiguration?: GQLWorkqueueConfigurationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -2029,6 +2047,8 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   SystemSettings?: GQLSystemSettingsTypeResolver
   OIDPUserInfo?: GQLOIDPUserInfoTypeResolver
+  Translation?: GQLTranslationTypeResolver
+  WorkqueueQuery?: GQLWorkqueueQueryTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
@@ -2113,6 +2133,8 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
+  getWorkqueues?: QueryToGetWorkqueuesResolver<TParent>
+  getWorkqueue?: QueryToGetWorkqueueResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2780,6 +2802,27 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetOIDPUserInfoArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetWorkqueuesResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetWorkqueueArgs {
+  slug: string
+}
+export interface QueryToGetWorkqueueResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetWorkqueueArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6147,6 +6190,48 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
   ): TResult
 }
 
+export interface GQLWorkqueueConfigurationTypeResolver<TParent = any> {
+  slug?: WorkqueueConfigurationToSlugResolver<TParent>
+  name?: WorkqueueConfigurationToNameResolver<TParent>
+  query?: WorkqueueConfigurationToQueryResolver<TParent>
+}
+
+export interface WorkqueueConfigurationToSlugResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface WorkqueueConfigurationToNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface WorkqueueConfigurationToQueryResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -8973,6 +9058,45 @@ export interface OIDPUserInfoToAddressResolver<TParent = any, TResult = any> {
 }
 
 export interface OIDPUserInfoToUpdated_atResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLTranslationTypeResolver<TParent = any> {
+  language?: TranslationToLanguageResolver<TParent>
+  text?: TranslationToTextResolver<TParent>
+}
+
+export interface TranslationToLanguageResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface TranslationToTextResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLWorkqueueQueryTypeResolver<TParent = any> {
+  registrationStatuses?: WorkqueueQueryToRegistrationStatusesResolver<TParent>
+}
+
+export interface WorkqueueQueryToRegistrationStatusesResolver<
   TParent = any,
   TResult = any
 > {

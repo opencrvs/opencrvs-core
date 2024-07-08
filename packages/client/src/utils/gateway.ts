@@ -802,7 +802,7 @@ export type EventRegistration = {
 
 export type EventSearchResultSet = {
   __typename?: 'EventSearchResultSet'
-  results?: Maybe<Array<Maybe<EventSearchSet>>>
+  results: Array<EventSearchSet>
   totalItems?: Maybe<Scalars['Int']>
 }
 
@@ -1661,6 +1661,8 @@ export type Query = {
   getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
+  getWorkqueue: EventSearchResultSet
+  getWorkqueues: Array<WorkqueueConfiguration>
   hasChildLocation?: Maybe<Location>
   informantSMSNotifications?: Maybe<Array<SmsNotification>>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
@@ -1825,6 +1827,10 @@ export type QueryGetUserByEmailArgs = {
 
 export type QueryGetUserByMobileArgs = {
   mobile?: InputMaybe<Scalars['String']>
+}
+
+export type QueryGetWorkqueueArgs = {
+  slug: Scalars['String']
 }
 
 export type QueryHasChildLocationArgs = {
@@ -2376,6 +2382,12 @@ export type TotalVsExport = {
   results?: Maybe<Array<VsExport>>
 }
 
+export type Translation = {
+  __typename?: 'Translation'
+  language: Scalars['String']
+  text: Scalars['String']
+}
+
 export type UpdatePermissionsInput = {
   clientId: Scalars['String']
   webhook: Array<WebhookInput>
@@ -2491,6 +2503,18 @@ export type WebhookPermission = {
   __typename?: 'WebhookPermission'
   event: Scalars['String']
   permissions: Array<Scalars['String']>
+}
+
+export type WorkqueueConfiguration = {
+  __typename?: 'WorkqueueConfiguration'
+  name: Array<Translation>
+  query?: Maybe<WorkqueueQuery>
+  slug: Scalars['String']
+}
+
+export type WorkqueueQuery = {
+  __typename?: 'WorkqueueQuery'
+  registrationStatuses: Array<Scalars['String']>
 }
 
 export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{
@@ -2680,6 +2704,33 @@ export type UpdateRoleMutationVariables = Exact<{
 export type UpdateRoleMutation = {
   __typename?: 'Mutation'
   updateRole: { __typename?: 'Response'; roleIdMap: any }
+}
+
+export type GetWorkqueueQueryVariables = Exact<{
+  slug: Scalars['String']
+}>
+
+export type GetWorkqueueQuery = {
+  __typename?: 'Query'
+  getWorkqueue: {
+    __typename?: 'EventSearchResultSet'
+    results: Array<
+      | { __typename?: 'BirthEventSearchSet'; id: string }
+      | { __typename?: 'DeathEventSearchSet'; id: string }
+      | { __typename?: 'MarriageEventSearchSet'; id: string }
+    >
+  }
+}
+
+export type GetWorkqueuesQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetWorkqueuesQuery = {
+  __typename?: 'Query'
+  getWorkqueues: Array<{
+    __typename?: 'WorkqueueConfiguration'
+    slug: string
+    name: Array<{ __typename?: 'Translation'; language: string; text: string }>
+  }>
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -3014,7 +3065,7 @@ export type SearchEventsQuery = {
   searchEvents?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -3136,8 +3187,7 @@ export type SearchEventsQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
 }
 
@@ -5842,7 +5892,7 @@ export type RegistrationHomeQuery = {
   inProgressTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -5967,13 +6017,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   notificationTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6098,13 +6147,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   reviewTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6229,13 +6277,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   rejectTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6360,13 +6407,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   approvalTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6491,13 +6537,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   externalValidationTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6622,13 +6667,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   printTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6753,13 +6797,12 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   issueTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -6884,8 +6927,7 @@ export type RegistrationHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
 }
 
@@ -6902,7 +6944,7 @@ export type FieldAgentHomeQuery = {
   reviewTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -7027,13 +7069,12 @@ export type FieldAgentHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
   rejectTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
-    results?: Array<
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
@@ -7158,8 +7199,7 @@ export type FieldAgentHomeQuery = {
             operatedOn?: any | null
           } | null> | null
         }
-      | null
-    > | null
+    >
   } | null
 }
 
@@ -7717,6 +7757,7 @@ export type GetEventsWithProgressQuery = {
         status?: string | null
         contactNumber?: string | null
         contactRelationship?: string | null
+        contactEmail?: string | null
         dateOfDeclaration?: any | null
         trackingId?: string | null
         registrationNumber?: string | null
