@@ -10,7 +10,6 @@
  */
 import {
   createCertificateHandler,
-  deleteCertificateHandler,
   getActiveCertificatesHandler,
   getCertificateHandler,
   requestActiveCertificate,
@@ -182,18 +181,6 @@ export default function getRoutes(): ServerRoute[] {
         },
         validate: {
           payload: updateCertificate
-        }
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/certificate/{certificateId}',
-      handler: deleteCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Delete certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
         }
       }
     },
