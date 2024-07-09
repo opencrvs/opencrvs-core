@@ -77,7 +77,6 @@ export interface ITokenResponse {
 export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     const gatewayVersion = response.headers['x-version']
-    console.log(APP_VERSION)
 
     if (gatewayVersion && gatewayVersion !== APP_VERSION) {
       console.log(
