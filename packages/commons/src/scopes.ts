@@ -9,6 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const scopes = [
+  'natlsysadmin',
+  'bypassratelimit',
+
+  'demo',
+  'declare',
+  'register',
+  'certify',
+  'performance',
+  'sysadmin',
+  'validate',
+  'teams',
+  'config',
+
+  // systems / integrations
+  'nationalId',
+  'notification-api',
+  'recordsearch',
+
   // declare
   'record.declare-birth:my-jurisdiction',
   'record.declare-birth',
@@ -49,12 +67,12 @@ export const scopes = [
   'record.registration-reinstate',
 
   // search
-  'search.birth',
   'search.birth:my-jurisdiction',
-  'search.death',
+  'search.birth',
   'search.death:my-jurisdiction',
-  'search.marriage',
+  'search.death',
   'search.marriage:my-jurisdiction',
+  'search.marriage',
 
   // audit
   'record.read',
@@ -76,16 +94,14 @@ export const scopes = [
   // organisation
   'organisation.read',
   'organisation.read-locations:my-office',
-  'organisation.read-locations:all',
+  'organisation.read-locations',
 
   // user
-  'user.read:all',
   'user.read:my-office',
+  'user.read',
   'user.create',
-  'user.update',
-  'user.update:resend-invite',
-  'user.update:reset-password',
-  'user.update:deactivate-reactivate'
+  'user.update:my-office',
+  'user.update'
 ] as const
 
 export type Scope = (typeof scopes)[number]
