@@ -16,7 +16,6 @@ import { InputDescriptor } from './InputDescriptor'
 export type IInputLabel = {
   inputDescriptor?: string
   disabled?: boolean
-  color?: string
   required?: boolean
   hideAsterisk?: boolean
   tooltip?: string
@@ -24,8 +23,8 @@ export type IInputLabel = {
 
 const StyledInputLabel = styled.label<IInputLabel>`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;

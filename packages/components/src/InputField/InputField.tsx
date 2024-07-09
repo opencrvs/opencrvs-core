@@ -65,8 +65,6 @@ export const InputField = (props: IInputFieldProps) => {
   const postfix = props.postfix as React.ReactNode | string
   const unit = props.unit as React.ReactNode | string
 
-  let color: string | undefined
-
   const isDomElement = (
     nodeType: string | React.JSXElementConstructor<any>
   ) => {
@@ -92,7 +90,6 @@ export const InputField = (props: IInputFieldProps) => {
               id={`${id}_label`}
               inputDescriptor={helperText}
               disabled={props.disabled}
-              color={color}
               required={required}
               hideAsterisk={hideAsterisk}
               tooltip={tooltip}
@@ -109,9 +106,7 @@ export const InputField = (props: IInputFieldProps) => {
         <InputError id={props.id + '_error'}>{error}</InputError>
       )}
 
-      {description && (
-        <InputDescription color={color}>{description}</InputDescription>
-      )}
+      {description && <InputDescription>{description}</InputDescription>}
     </div>
   )
 }
