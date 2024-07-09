@@ -14,6 +14,14 @@ import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
 
+type SearchCriterias =
+  | 'TRACKING_ID'
+  | 'REGISTRATION_NUMBER'
+  | 'NATIONAL_ID'
+  | 'NAME'
+  | 'PHONE_NUMBER'
+  | 'EMAIL'
+
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
   box-sizing: border-box;
@@ -166,6 +174,7 @@ const ClearTextIcon = styled((props) => <ClearText {...props} />)`
   margin: 0 12px;
 `
 export interface ISearchType {
+  name: SearchCriterias // name is used to check default search field
   label: string
   value: string
   icon: React.ReactNode
