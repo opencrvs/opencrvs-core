@@ -14,7 +14,6 @@ import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Scope } from './authUtils'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -60,20 +59,4 @@ export function useUserName() {
     const { userDetails } = state.profile
     return getUserName(userDetails)
   })
-}
-
-export function useUserScopes() {
-  return useSelector<IStoreState, Scope[]>((state) => {
-    const { tokenPayload } = state.profile
-    return tokenPayload ? tokenPayload.scope : []
-  })
-}
-
-export function userHasScope(userScopes: Scope[], allowedScopes: Scope[]) {
-  return allowedScopes.every((scope) => userScopes.includes(scope))
-}
-
-export function useUserHasScope(allowedScopes: Scope[]) {
-  const userScopes = useUserScopes()
-  return userHasScope(userScopes, allowedScopes)
 }
