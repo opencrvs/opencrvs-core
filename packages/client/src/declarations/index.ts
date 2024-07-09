@@ -19,13 +19,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import {
-  Attachment,
-  Event,
-  History,
-  Query,
-  SystemRoleType
-} from '@client/utils/gateway'
+import { Attachment, Event, History, Query } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -36,7 +30,7 @@ import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
@@ -79,11 +73,7 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import {
-  EMPTY_STRING,
-  FIELD_AGENT_ROLES,
-  SIGNATURE_KEYS
-} from '@client/utils/constants'
+import { EMPTY_STRING, SIGNATURE_KEYS } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
@@ -647,15 +637,6 @@ export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
 }
 
-async function getCurrentUserSystemRole(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as UserDetails).systemRole || ''
-}
-
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
@@ -699,7 +680,6 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
-  const currentUserRole = await getCurrentUserSystemRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -720,7 +700,11 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   let currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
 
-  if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
+  if (
+    '@TODO: Ask what we are going to do with the field agent downloaded records getting pruned in 24 hours' ===
+      ('no' as any) &&
+    currentUserData
+  ) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
         const history = d.originalData?.history as unknown as IDynamicValues
@@ -1056,10 +1040,9 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      const userDetails = getUserDetails(getState())
-      if (
-        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
-      ) {
+      const scopes = getScope(getState())
+      // @TODO: Check is record.register equal to `!FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)`
+      if (scopes?.includes('record.register')) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(
@@ -1548,14 +1531,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           eventData.registration.status[0].type) ||
         ''
       const updateWorkqueue = () =>
-        updateRegistrarWorkqueue(
-          userDetails?.practitionerId,
-          10,
-          Boolean(
-            userDetails?.systemRole &&
-              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
-          )
-        )
+        updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
 
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
