@@ -23,7 +23,6 @@ export const SEARCH_USERS = gql`
           familyName
         }
         username
-        systemRole
         mobile
         email
         role {
@@ -101,7 +100,6 @@ export const GET_USER = gql`
         system
         value
       }
-      systemRole
       role {
         id
         label {

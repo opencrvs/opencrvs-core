@@ -264,7 +264,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               description
             }
           }
-          systemRole
           name {
             firstNames
             familyName
@@ -561,7 +560,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               description
             }
           }
-          systemRole
           name {
             firstNames
             familyName

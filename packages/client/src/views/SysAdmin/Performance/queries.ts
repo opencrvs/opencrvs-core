@@ -113,7 +113,6 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
             firstNames
             familyName
           }
-          systemRole
           role {
             id
             label {
@@ -166,7 +165,6 @@ export const FETCH_REGISTRATIONS = gql`
           delayed
           registrarPractitioner {
             id
-            systemRole
             role {
               id
               label {

@@ -15,7 +15,6 @@ export const getUserRolesQuery = gql`
   query getUserRoles {
     getUserRoles {
       id
-      systemRole
       label {
         id
         defaultMessage

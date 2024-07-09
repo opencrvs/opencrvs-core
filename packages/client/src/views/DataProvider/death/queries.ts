@@ -326,7 +326,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               description
             }
           }
-          systemRole
+
           name {
             firstNames
             familyName
@@ -593,7 +593,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
               description
             }
           }
-          systemRole
           name {
             firstNames
             familyName
