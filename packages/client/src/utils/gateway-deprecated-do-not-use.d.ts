@@ -298,7 +298,6 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile?: string
-  systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
   status: GQLStatus
@@ -667,7 +666,6 @@ export interface GQLUserInput {
   mobile?: string
   password?: string
   status?: GQLStatus
-  systemRole: GQLSystemRoleType
   role?: string
   email?: string
   primaryOffice?: string
@@ -2408,7 +2406,6 @@ export interface QueryToSearchUsersArgs {
   mobile?: string
   email?: string
   status?: string
-  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -3514,18 +3511,6 @@ export interface MutationToResetPasswordInviteResolver<
   ): TResult
 }
 
-export interface MutationToUpdateRoleArgs {
-  systemRole?: GQLSystemRoleInput
-}
-export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToUpdateRoleArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface MutationToCreateOrUpdateCertificateSVGArgs {
   certificateSVG: GQLCertificateSVGInput
 }
@@ -4432,7 +4417,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
-  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>

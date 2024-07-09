@@ -1882,7 +1882,6 @@ export type QuerySearchUsersArgs = {
   skip?: InputMaybe<Scalars['Int']>
   sort?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
-  systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2338,7 +2337,6 @@ export type User = {
   searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
   status: Status
-  systemRole: SystemRoleType
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2407,7 +2405,6 @@ export type UserRole = {
   id: Scalars['ID']
   label: I18nMessage
   scopes: Array<Scalars['String']>
-  systemRole: SystemRoleType
 }
 
 export type VsExport = {
@@ -2609,7 +2606,6 @@ export type GetUserRolesQuery = {
   getUserRoles: Array<{
     __typename?: 'UserRole'
     id: string
-    systemRole: SystemRoleType
     label: {
       __typename?: 'I18nMessage'
       id: string
@@ -2838,7 +2834,6 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     role: {
       __typename?: 'UserRole'
@@ -3124,7 +3119,6 @@ export type SearchUsersQuery = {
       __typename?: 'User'
       id: string
       username?: string | null
-      systemRole: SystemRoleType
       mobile?: string | null
       email?: string | null
       status: Status
@@ -3201,7 +3195,6 @@ export type GetUserQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -3649,7 +3642,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -3970,7 +3962,6 @@ export type FetchBirthRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -4454,7 +4445,6 @@ export type FetchDeathRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -4764,7 +4754,6 @@ export type FetchDeathRegistrationForCertificationQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -5177,7 +5166,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -5520,7 +5508,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
           __typename?: 'UserRole'
           id: string
@@ -7329,7 +7316,6 @@ export type GetUserByMobileQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'UserRole'; id: string }
   } | null
@@ -7347,7 +7333,6 @@ export type GetUserByEmailQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'UserRole'; id: string }
   } | null
@@ -7687,7 +7672,6 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        systemRole: SystemRoleType
         name: Array<{
           __typename?: 'HumanName'
           use?: string | null
@@ -7755,7 +7739,6 @@ export type GetRegistrationsListByFilterQuery = {
           registrarPractitioner?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
             role: {
               __typename?: 'UserRole'
               id: string
@@ -8275,7 +8258,6 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
             role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
@@ -8661,7 +8643,6 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
             role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
@@ -8979,7 +8960,6 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
             role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'

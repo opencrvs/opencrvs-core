@@ -21,15 +21,26 @@ export function usePermissions() {
   const hasScopes = (neededScopes: Scope[]) =>
     neededScopes.every((scope) => userScopes?.includes(scope))
 
-  const hasScope = (neededScope: Scope) => hasScopes([neededScope])
+  const hasAnyScope = (neededScopes: Scope[]) =>
+    neededScopes.some((scope) => userScopes?.includes(scope))
 
-  const canReadUser = (user: User) => {
-    if (hasScope('user.read:all')) return true
+  const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
+
+  const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
+    if (hasScope('user.read')) return true
     if (hasScope('user.read:my-office'))
       return user.primaryOffice.id === userPrimaryOffice?.id
 
     return false
   }
 
-  return { hasScopes, hasScope, canReadUser }
+  const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
+    if (hasScope('user.update')) return true
+    if (hasScope('user.update:my-office'))
+      return user.primaryOffice.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  return { hasScopes, hasScope, hasAnyScope, canReadUser, canEditUser }
 }
