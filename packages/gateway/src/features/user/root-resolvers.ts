@@ -74,7 +74,6 @@ export const resolvers: GQLResolver = {
         {
           username = null,
           mobile = null,
-          systemRole = null,
           status = null,
           primaryOfficeId = null,
           locationId = null,
@@ -103,9 +102,6 @@ export const resolvers: GQLResolver = {
         }
         if (mobile) {
           payload = { ...payload, mobile }
-        }
-        if (systemRole) {
-          payload = { ...payload, systemRole }
         }
         if (locationId) {
           payload = { ...payload, locationId }
@@ -164,7 +160,6 @@ export const resolvers: GQLResolver = {
         }
 
         let payload: IUserSearchPayload = {
-          systemRole: 'FIELD_AGENT',
           count,
           skip,
           sortOrder: sort
@@ -652,7 +647,6 @@ function createOrUpdateUserPayload(
       family: name.familyName?.trim() as string,
       given: [name.firstNames?.trim() || ''] as string[]
     })),
-    systemRole: roles.find(({ id }) => id === user.role)!.systemRole,
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),

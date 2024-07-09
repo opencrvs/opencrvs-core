@@ -16633,18 +16633,6 @@
                 "deprecationReason": null
               },
               {
-                "name": "systemRole",
-                "description": null,
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
                 "name": "username",
                 "description": null,
                 "type": {
@@ -20755,22 +20743,6 @@
             "deprecationReason": null
           },
           {
-            "name": "systemRole",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "SystemRoleType",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "underInvestigation",
             "description": null,
             "args": [],
@@ -21431,22 +21403,6 @@
                     "ofType": null
                   }
                 }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "systemRole",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "SystemRoleType",
-                "ofType": null
               }
             },
             "isDeprecated": false,

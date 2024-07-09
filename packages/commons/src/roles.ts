@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CoreUserRole, Scope } from './authentication'
+import { Scope } from './authentication'
 
 export type Roles = Array<{
   id: string
-  systemRole: CoreUserRole
   labels: Array<{ language: string; label: string }>
   scopes: Scope[]
 }>

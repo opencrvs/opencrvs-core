@@ -37,7 +37,6 @@ export const SYSTEM_INTEGRATION_SCOPES = {
   declare: 'declare',
   notificationApi: 'notification-api',
   validatorApi: 'validator-api',
-  ageVerificationApi: 'age-verification-api',
   webhook: 'webhook',
   nationalId: 'nationalId'
 } as const
@@ -71,7 +70,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Field Agent',
       id: 'userRole.fieldAgent'
     },
-    systemRole: 'FIELD_AGENT',
     scopes: ['declare']
   },
   {
@@ -81,7 +79,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Police Officer',
       id: 'userRole.policeOfficer'
     },
-    systemRole: 'FIELD_AGENT',
     scopes: ['declare']
   },
   {
@@ -91,7 +88,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Social Worker',
       id: 'userRole.socialWorker'
     },
-    systemRole: 'FIELD_AGENT',
     scopes: ['declare']
   },
   {
@@ -101,7 +97,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Healthcare Worker',
       id: 'userRole.healthcareWorker'
     },
-    systemRole: 'FIELD_AGENT',
     scopes: ['declare']
   },
   {
@@ -111,7 +106,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Local Leader',
       id: 'userRole.localLeader'
     },
-    systemRole: 'FIELD_AGENT',
     scopes: ['declare']
   },
   {
@@ -121,7 +115,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Registration Agent',
       id: 'userRole.registrationAgent'
     },
-    systemRole: 'REGISTRATION_AGENT',
     scopes: ['record.register', 'validate', 'performance', 'certify']
   },
   {
@@ -131,7 +124,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Local Registrar',
       id: 'userRole.localRegistrar'
     },
-    systemRole: 'LOCAL_REGISTRAR',
     scopes: ['record.register', 'register', 'performance', 'certify']
   },
   {
@@ -141,7 +133,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Local System Admin',
       id: 'userRole.localSystemAdmin'
     },
-    systemRole: 'LOCAL_SYSTEM_ADMIN',
     scopes: ['sysadmin']
   },
   {
@@ -151,7 +142,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role National System Admin',
       id: 'userRole.nationalSystemAdmin'
     },
-    systemRole: 'NATIONAL_SYSTEM_ADMIN',
     scopes: ['sysadmin', 'natlsysadmin']
   },
   {
@@ -161,7 +151,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Performance Manager',
       id: 'userRole.performanceManager'
     },
-    systemRole: 'PERFORMANCE_MANAGEMENT',
     scopes: ['performance']
   },
   {
@@ -171,7 +160,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role National Registrar',
       id: 'userRole.nationalRegistrar'
     },
-    systemRole: 'NATIONAL_REGISTRAR',
     scopes: ['register', 'performance', 'certify', 'config', 'teams']
   }
 ]
@@ -182,11 +170,6 @@ export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
     SYSTEM_INTEGRATION_SCOPES.notificationApi
   ],
   NATIONAL_ID: [SYSTEM_INTEGRATION_SCOPES.nationalId],
-  EXTERNAL_VALIDATION: [SYSTEM_INTEGRATION_SCOPES.validatorApi],
-  AGE_CHECK: [
-    SYSTEM_INTEGRATION_SCOPES.declare,
-    SYSTEM_INTEGRATION_SCOPES.ageVerificationApi
-  ],
   RECORD_SEARCH: [SYSTEM_INTEGRATION_SCOPES.recordsearch],
   WEBHOOK: [SYSTEM_INTEGRATION_SCOPES.webhook]
 }
@@ -195,7 +178,6 @@ export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
-export type CoreUserRole = keyof typeof DEFAULT_CORE_ROLE_SCOPES
 
 export type SystemIntegrationRole =
   keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES

@@ -13,11 +13,10 @@ import { UUID } from '@opencrvs/commons'
 import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
 
 type Payload = {
-  systemRole: string
   locationId?: UUID
 }
 
 export async function countUsersByLocationHandler(request: Hapi.Request) {
-  const { locationId, systemRole } = request.payload as Payload
-  return countUsersByLocation(systemRole, locationId)
+  const { locationId } = request.payload as Payload
+  return countUsersByLocation(locationId)
 }

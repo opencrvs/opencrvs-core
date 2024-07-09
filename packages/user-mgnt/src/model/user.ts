@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CoreUserRole as CommonUserRole } from '@opencrvs/commons/authentication'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { Document, model, Schema } from 'mongoose'
 
@@ -130,7 +129,6 @@ export interface IUser {
   passwordHash: string
   oldPasswordHash?: string
   salt: string
-  systemRole: CommonUserRole
   role: string
   practitionerId: string
   primaryOfficeId: string
@@ -301,7 +299,6 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   oldPasswordHash: { type: String },
   salt: { type: String, required: true },
-  systemRole: { type: String, required: true },
   role: { type: String },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },

@@ -14,7 +14,8 @@ import {
   UUID,
   fetchJSON,
   joinURL,
-  logger
+  logger,
+  Roles
 } from '@opencrvs/commons'
 
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
@@ -25,7 +26,6 @@ import {
   GQLSignatureInput,
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
-import { Roles } from '@opencrvs/commons'
 import {
   Bundle,
   Extension,
@@ -62,7 +62,6 @@ export interface IUserModelData {
   emailForNotification?: string
   mobile?: string
   status: string
-  systemRole: string
   role: string
   creationDate?: string
   practitionerId: string
@@ -112,7 +111,6 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -211,7 +209,7 @@ export const userTypeResolvers: GQLResolver = {
             practitionerId: `Practitioner/${
               userModel.practitionerId as UUID
             }` as const,
-            practitionerRole: userModel.systemRole
+            practitionerRole: userModel.role
           }
 
       if (!practitionerId) {
@@ -228,10 +226,7 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature =
-        userModel.systemRole === 'FIELD_AGENT'
-          ? null
-          : signatureExtension && signatureExtension.valueSignature
+      const signature = signatureExtension && signatureExtension?.valueSignature
 
       return {
         role: practitionerRole,

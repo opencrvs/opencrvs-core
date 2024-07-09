@@ -47,7 +47,6 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)

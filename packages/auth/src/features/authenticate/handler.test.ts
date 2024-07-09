@@ -119,7 +119,6 @@ describe('authenticate handler receives a request', () => {
           id: '1',
           status: 'pending',
           role: 'NATIONAL_SYSTEM_ADMIN',
-          systemRole: 'NATIONAL_SYSTEM_ADMIN',
           mobile: `+345345343`
         })
       )

@@ -32,10 +32,10 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger } from '@opencrvs/commons'
-import { CoreUserRole } from '@opencrvs/commons/authentication'
 import { unauthorized } from '@hapi/boom'
 
 import * as F from 'fp-ts'
+import { Scope } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 
@@ -59,14 +59,13 @@ export interface IAuthentication {
   userId: string
   status: string
   email?: string
-  systemRole: CoreUserRole
   role: string
 }
 
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: string[]
+  scope: Scope[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -97,7 +96,6 @@ export async function authenticate(
     name: body.name,
     userId: body.id,
     role: body.role,
-    systemRole: body.systemRole,
     status: body.status,
     mobile: body.mobile,
     email: body.email

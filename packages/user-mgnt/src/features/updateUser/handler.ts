@@ -66,8 +66,6 @@ export default async function updateUser(
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
-
-  existingUser.systemRole = user.systemRole
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {

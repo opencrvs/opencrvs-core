@@ -12,20 +12,11 @@ import { UUID } from '@opencrvs/commons'
 import User from '@user-mgnt/model/user'
 import { resolveLocationChildren } from '@user-mgnt/utils/location'
 
-export async function countUsersByLocation(
-  systemRole: string,
-  locationId: UUID | undefined
-) {
+// @TODO: Count these by scopes or deprecate for now from performance view
+export async function countUsersByLocation(locationId: UUID | undefined) {
   // For the whole country
   if (!locationId) {
-    const resArray = await User.aggregate([
-      {
-        $match: {
-          systemRole
-        }
-      },
-      { $count: 'registrars' }
-    ])
+    const resArray = await User.aggregate([{ $count: 'registrars' }])
     return resArray[0] ?? { registrars: 0 }
   }
 
@@ -34,8 +25,7 @@ export async function countUsersByLocation(
   const resArray = await User.aggregate([
     {
       $match: {
-        primaryOfficeId: { $in: locationChildren },
-        systemRole
+        primaryOfficeId: { $in: locationChildren }
       }
     },
     {

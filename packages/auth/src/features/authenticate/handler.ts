@@ -22,7 +22,6 @@ import {
 } from '@auth/features/verifyCode/service'
 import { forbidden, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { CoreUserRole } from '@opencrvs/commons/authentication'
 import * as Joi from 'joi'
 import { getUserRoleScopeMapping } from '@auth/features/scopes/service'
 
@@ -36,7 +35,6 @@ interface IAuthResponse {
   mobile?: string
   email?: string
   status: string
-  systemRole: CoreUserRole
   token?: string
 }
 
@@ -62,7 +60,6 @@ export default async function authenticateHandler(
     mobile: result.mobile,
     email: result.email,
     status: result.status,
-    systemRole: result.systemRole,
     nonce
   }
 
@@ -70,15 +67,8 @@ export default async function authenticateHandler(
 
   const roleScopeMappings = await getUserRoleScopeMapping()
 
-  let scopes = []
-
   const role = result.role as keyof typeof roleScopeMappings
-
-  if (roleScopeMappings[role]) {
-    scopes = roleScopeMappings[role]
-  } else {
-    scopes = roleScopeMappings[response.systemRole]
-  }
+  const scopes = roleScopeMappings[role]
 
   if (isPendingUser) {
     response.token = await createToken(
@@ -123,6 +113,5 @@ export const responseSchema = Joi.object({
   email: Joi.string().optional(),
   status: Joi.string(),
   role: Joi.string(),
-  systemRole: Joi.string(),
   token: Joi.string().optional()
 })

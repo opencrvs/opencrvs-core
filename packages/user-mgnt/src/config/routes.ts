@@ -673,7 +673,6 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            systemRole: Joi.string().required(),
             locationId: Joi.string()
           })
         }

@@ -19,7 +19,6 @@ import { UUID } from '@opencrvs/commons'
 interface IVerifyPayload {
   username?: string
   mobile?: string
-  systemRole?: string
   status?: string
   primaryOfficeId?: string
   locationId?: UUID
@@ -35,7 +34,6 @@ export default async function searchUsers(
   const {
     username,
     mobile,
-    systemRole,
     status,
     primaryOfficeId,
     locationId,
@@ -49,9 +47,6 @@ export default async function searchUsers(
   }
   if (mobile) {
     criteria = { ...criteria, mobile }
-  }
-  if (systemRole) {
-    criteria = { ...criteria, systemRole }
   }
   if (primaryOfficeId) {
     criteria = { ...criteria, primaryOfficeId }
@@ -80,7 +75,6 @@ export default async function searchUsers(
 export const searchSchema = Joi.object({
   username: Joi.string().optional(),
   mobile: Joi.string().optional(),
-  systemRole: Joi.string().optional(),
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
   locationId: Joi.string().optional(),

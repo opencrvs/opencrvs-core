@@ -92,16 +92,17 @@ export const createFhirPractitionerRole = async (
       practitioner: {
         reference: `Practitioner/${practitionerId}`
       },
-      code: [
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/roles`,
-              code: user.systemRole
-            }
-          ]
-        }
-      ],
+      // @TODO: This is needed for performanceQueries I think
+      // code: [
+      //   {
+      //     coding: [
+      //       {
+      //         system: `http://opencrvs.org/specs/roles`,
+      //         code: user.system Role
+      //       }
+      //     ]
+      //   }
+      // ],
       location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   }
