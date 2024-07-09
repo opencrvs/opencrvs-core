@@ -108,7 +108,6 @@ export const workqueueInitialState: WorkqueueState = {
 interface IWorkqueuePaginationParams {
   userId?: string
   pageSize: number
-  isFieldAgent: boolean
   inProgressSkip: number
   healthSystemSkip: number
   reviewSkip: number
@@ -121,15 +120,13 @@ interface IWorkqueuePaginationParams {
 
 export function updateRegistrarWorkqueue(
   userId?: string,
-  pageSize = 10,
-  isFieldAgent = false
+  pageSize = 10
 ): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
       userId,
-      pageSize,
-      isFieldAgent
+      pageSize
     }
   }
 }
@@ -355,9 +352,7 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
-    userId,
     pageSize,
-    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
@@ -372,7 +367,6 @@ async function getWorkqueueData(
     registrationLocationId,
     reviewStatuses,
     pageSize,
-    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
@@ -380,8 +374,7 @@ async function getWorkqueueData(
     approvalSkip,
     externalValidationSkip,
     printSkip,
-    issueSkip,
-    userId
+    issueSkip
   )
   let workqueue
   const { currentUserData } = await getUserData(
@@ -407,16 +400,10 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-  if (isFieldAgent) {
-    return mergeWorkQueueData(
-      state,
-      ['reviewTab', 'rejectTab'],
-      currentUserData && currentUserData.declarations,
-      workqueue
-    )
-  }
+
   return mergeWorkQueueData(
     state,
+    // @TODO: Test that this works with field agents still
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
     currentUserData && currentUserData.declarations,
     workqueue

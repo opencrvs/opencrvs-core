@@ -23,7 +23,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event, SystemRoleType } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -33,10 +33,6 @@ import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import type { AssignmentData } from '@client/utils/gateway'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
-import {
-  FIELD_AGENT_ROLES,
-  ROLE_REGISTRATION_AGENT
-} from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -44,6 +40,8 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
+import { getScope } from '@client/profile/profileSelectors'
+import { Scope } from '@opencrvs/commons/authentication'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -63,8 +61,8 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: SystemRoleType
   practitionerId?: string
+  scopes?: Scope[] | null
 }
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
@@ -110,7 +108,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: SystemRoleType,
+  scopes: Scope[],
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -139,10 +137,10 @@ function getAssignModalOptions(
       actions: [cancelAction, unassignAction]
     }
   } else if (assignment) {
-    if (
-      userRole === SystemRoleType.LocalRegistrar ||
-      userRole === SystemRoleType.NationalRegistrar
-    ) {
+    // userRole === SystemRoleType.LocalRegistrar ||
+    // userRole === SystemRoleType.NationalRegistrar
+    // @TODO: In DownloadButton, is it correct to assume that record.register can always unassign?
+    if (scopes.includes('record.register')) {
       return {
         title: conflictsMessages.unassignTitle,
         content: conflictsMessages.regUnassignDesc,
@@ -218,9 +216,9 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     className,
     downloadConfigs,
     downloadDeclaration,
-    userRole,
     practitionerId,
-    unassignDeclaration
+    unassignDeclaration,
+    scopes
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -252,19 +250,20 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadConfigs.declarationStatus &&
     ['VALIDATED', 'CORRECTION_REQUESTED'].includes(
       downloadConfigs.declarationStatus
-    ) &&
-    userRole === ROLE_REGISTRATION_AGENT
+    )
+  // && userRole === ROLE_REGISTRATION_AGENT
 
+  // @TODO: Ask JPF how this should be handled?
   // field agents can only retrieve declarations
-  const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
+  //const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
         (assignment?.practitionerId !== practitionerId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        !isRetrieveableDeclarationsOfRegAgent &&
-        isNotFieldAgent
+        !isRetrieveableDeclarationsOfRegAgent
+        // && isNotFieldAgent
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -280,7 +279,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
               },
               onCancel: hideModal
             },
-            userRole,
+            scopes ?? [],
             status === DOWNLOAD_STATUS.DOWNLOADED
           )
         )
@@ -295,9 +294,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       practitionerId,
       status,
       isRetrieveableDeclarationsOfRegAgent,
-      isNotFieldAgent,
+      // isNotFieldAgent,
       hideModal,
-      userRole,
       download,
       unassign
     ]
@@ -375,8 +373,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.systemRole,
-  practitionerId: state.profile.userDetails?.practitionerId
+  practitionerId: state.profile.userDetails?.practitionerId,
+  scopes: getScope(state)
 })
 
 const mapDispatchToProps = (

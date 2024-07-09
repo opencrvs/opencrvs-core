@@ -176,8 +176,9 @@ class UserReviewFormComponent extends React.Component<
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
                 !(
-                  field.name === 'registrationOffice' &&
-                  this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
+                  (field.name === 'registrationOffice') //&&
+                  // @TODO: Convert this component to a functional one to allow using `usePermissions`
+                  //this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
                   <Link
                     id={`btn_change_${field.name}`}
@@ -381,8 +382,6 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         delete variables.user.signature.name
         delete variables.user.signature.__typename //to fix updating registrar bug
       }
-
-      delete variables.user.systemRole
 
       dispatch(
         submitUserFormData(

@@ -16,24 +16,10 @@ import {
   PERFORMANCE_STATS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
-import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { UserDetails } from '@client/utils/userUtils'
-import {
-  FIELD_AGENT_ROLES,
-  NATIONAL_REGISTRAR_ROLES,
-  NATL_ADMIN_ROLES
-} from '@client/utils/constants'
 import { client } from '@client/utils/apolloClient'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { QueryOptions } from '@apollo/client/core'
-
-const isUserOfNationalScope = (userDetails: UserDetails) =>
-  [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
-    userDetails.systemRole
-  )
-const isFieldAgent = (userDetails: UserDetails) =>
-  FIELD_AGENT_ROLES.includes(userDetails.systemRole)
 
 function getQueriesToPrefetch(
   locationId: string,
@@ -95,11 +81,35 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
     if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
       const userDetails = getState().profile.userDetails
-      if (!isFieldAgent(userDetails!)) {
+      const scopes = getState().profile.tokenPayload!.scope!
+
+      if (
+        scopes.includes('organisation.read-locations') ||
+        scopes.includes('organisation.read-locations:my-office')
+      ) {
+        /*
+        export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
+  const role = userDetails?.systemRole
+  const primaryOfficeId = userDetails.primaryOffice?.id
+  if (role) {
+    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
+      return primaryOfficeId
+    } else if (
+      NATL_ADMIN_ROLES.includes(role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(role) ||
+      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
+    ) {
+      return // country wide
+    }
+  }
+}
+*/
         const defaultPerformanceLocationId = getDefaultPerformanceLocationId(
           userDetails!
         )
-        const officeSelected = !isUserOfNationalScope(userDetails!)
+        const officeSelected = scopes.includes(
+          'organisation.read-locations:my-office'
+        )
         const queriesToPrefetch = getQueriesToPrefetch(
           defaultPerformanceLocationId as string,
           officeSelected

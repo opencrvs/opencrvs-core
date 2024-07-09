@@ -116,7 +116,8 @@ export const usePrintableCertificate = (declarationId: string) => {
   const dispatch = useDispatch()
   const { hasScope } = usePermissions()
   const canUserCorrectRecord =
-    declaration?.event !== Event.Marriage && hasScope('record.correct')
+    declaration?.event !== Event.Marriage &&
+    hasScope('record.registration-correct')
 
   useEffect(() => {
     const certificateTemplate =

@@ -691,17 +691,28 @@ function mapStateToProps(
 ) {
   const offlineCountryConfiguration = getOfflineData(state)
   const scopes = getScope(state)
+  const userDetails = getUserDetails(state)
 
   const locations = offlineCountryConfiguration.locations
   const offices = offlineCountryConfiguration.offices
   const {
     location: { search }
   } = props
-  const { timeStart, timeEnd, locationId, event } = parse(
+  let { timeStart, timeEnd, locationId, event } = parse(
     search
   ) as unknown as ISearchParams
 
-  const selectedLocation = !locationId
+  // @TODO: Test the performance first page works properly.
+  // defaults empty to your primary office if you don't have access to all locations via the scope
+  if (
+    userDetails &&
+    !locationId &&
+    !scopes?.includes('organisation.read-locations')
+  ) {
+    locationId = userDetails.primaryOffice.id
+  }
+
+  let selectedLocation = !locationId
     ? getAdditionalLocations(props.intl)[0]
     : selectLocation(
         locationId,

@@ -61,13 +61,6 @@ import {
   ALL_USER_EMAIL,
   PRINT_RECORD
 } from '@client/navigation/routes'
-import {
-  NATL_ADMIN_ROLES,
-  NATIONAL_REGISTRAR_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES,
-  REGISTRAR_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -651,32 +644,8 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
-  const role = userDetails?.systemRole
-  const primaryOfficeId = userDetails.primaryOffice?.id
-  if (role) {
-    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
-      return primaryOfficeId
-    } else if (
-      NATL_ADMIN_ROLES.includes(role) ||
-      NATIONAL_REGISTRAR_ROLES.includes(role) ||
-      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
-    ) {
-      return // country wide
-    }
-  }
-  throw new Error(
-    `Performance view no default location selected for role: ${role}`
-  )
-}
-
-export function goToPerformanceView(userDetails: UserDetails) {
-  return goToPerformanceHome(
-    undefined,
-    undefined,
-    undefined,
-    getDefaultPerformanceLocationId(userDetails)
-  )
+export function goToPerformanceView() {
+  return goToPerformanceHome(undefined, undefined, undefined)
 }
 
 export function goToTeamView(userDetails: UserDetails) {

@@ -24,14 +24,12 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { userMutations } from '@client/user/mutations'
 import { GET_USER } from '@client/user/queries'
-import { Scope } from '@client/utils/authUtils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import {
   GetUserQuery,
   GetUserQueryVariables,
   HumanName,
-  SystemRoleType,
   User
 } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
@@ -52,6 +50,7 @@ import { IntlShape, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import styled from 'styled-components'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -85,7 +84,6 @@ const transformUserQueryResult = (
     name:
       createNamesMap(userData.name as HumanName[])[locale] ||
       createNamesMap(userData.name as HumanName[])[LANG_EN],
-    systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
     email: userData.email,
@@ -100,33 +98,6 @@ const transformUserQueryResult = (
     avatar: userData.avatar || undefined,
     device: userData.device
   }
-}
-
-function canEditUserDetails(
-  targetUser: Pick<User, 'systemRole'> & {
-    primaryOffice?: { id: string } | null
-  },
-  loggedInUser: Pick<User, 'systemRole'> & {
-    primaryOffice?: { id: string } | null
-  },
-  scopes: Scope[]
-) {
-  if (!scopes.includes('sysadmin')) {
-    return false
-  }
-  if (loggedInUser.systemRole === SystemRoleType.NationalSystemAdmin) {
-    return true
-  }
-  const usersInTheSameOffice =
-    loggedInUser.primaryOffice?.id === targetUser?.primaryOffice?.id
-
-  if (
-    loggedInUser.systemRole === SystemRoleType.LocalSystemAdmin &&
-    usersInTheSameOffice
-  ) {
-    return true
-  }
-  return false
 }
 
 export const UserAudit = () => {
@@ -156,6 +127,7 @@ export const UserAudit = () => {
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
   const userRole = user && intl.formatMessage(user.role.label)
+  const { canEditUser } = usePermissions()
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -296,7 +268,7 @@ export const UserAudit = () => {
                     user.id as string,
                     user.status as string
                   )}
-                  hide={!canEditUserDetails(user, userDetails, scope)}
+                  hide={!canEditUser(user)}
                 />
               </>
             )
@@ -337,7 +309,7 @@ export const UserAudit = () => {
                       user.id as string,
                       user.status as string
                     )}
-                    hide={!canEditUserDetails(user, userDetails, scope)}
+                    hide={!canEditUser(user)}
                   />
                 ]
               : []
@@ -374,7 +346,6 @@ export const UserAudit = () => {
               <UserAuditHistory
                 practitionerId={user.practitionerId}
                 practitionerName={user.name}
-                loggedInUserRole={userDetails!.systemRole}
               />
             )}
           </>
