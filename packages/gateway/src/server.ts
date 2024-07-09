@@ -101,6 +101,9 @@ export async function createServer() {
 
   app.ext('onPreResponse', (request, reply) => {
     if (!isBoom(request.response)) {
+      request.response.header('access-control-expose-headers', 'X-Version', {
+        append: true
+      })
       request.response.header(
         'X-Version',
         process.env.npm_package_version || '1.5.0'
