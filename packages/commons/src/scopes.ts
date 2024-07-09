@@ -23,6 +23,7 @@ export const scopes = [
   'config',
 
   // systems / integrations
+  'webhook',
   'nationalId',
   'notification-api',
   'recordsearch',

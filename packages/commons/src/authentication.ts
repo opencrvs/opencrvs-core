@@ -35,33 +35,30 @@ export const SCOPES = {
 export const SYSTEM_INTEGRATION_SCOPES = {
   recordsearch: 'recordsearch',
   declare: 'declare',
-  notificationApi: 'notification-api',
-  validatorApi: 'validator-api',
   webhook: 'webhook',
   nationalId: 'nationalId'
 } as const
 
 export const DEFAULT_CORE_ROLE_SCOPES = {
-  FIELD_AGENT: [SCOPES.declare],
-  REGISTRATION_AGENT: [SCOPES.validate, SCOPES.performance, SCOPES.certify],
-  LOCAL_REGISTRAR: [SCOPES.register, SCOPES.performance, SCOPES.certify],
-  LOCAL_SYSTEM_ADMIN: [SCOPES.systemAdmin],
-  NATIONAL_SYSTEM_ADMIN: [SCOPES.systemAdmin, SCOPES.nationalSystemAdmin],
-  PERFORMANCE_MANAGEMENT: [SCOPES.performance],
-  NATIONAL_REGISTRAR: [
-    SCOPES.register,
-    SCOPES.performance,
-    SCOPES.certify,
-    SCOPES.config,
-    SCOPES.teams
-  ],
-  SUPER_ADMIN: [
-    SCOPES.nationalSystemAdmin,
-    SCOPES.bypassRateLimit,
-    SCOPES.systemAdmin
-  ]
-}
+  FIELD_AGENT: ['declare'],
+  REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
+  LOCAL_REGISTRAR: [
+    'register',
+    'performance',
+    'certify',
 
+    'record.register',
+    'record.declaration-review',
+    'record.print-issue-certified-copies'
+  ],
+  LOCAL_SYSTEM_ADMIN: ['sysadmin'],
+  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'natlsysadmin'],
+  PERFORMANCE_MANAGEMENT: ['performance'],
+  NATIONAL_REGISTRAR: ['register', 'performance', 'certify', 'config', 'teams'],
+  SUPER_ADMIN: ['natlsysadmin', 'bypassratelimit', 'sysadmin']
+} satisfies Record<string, Scope[]>
+
+// @TODO: What is the point of this, should we use this in `packages/auth/src/features/scopes/service.ts`?
 export const DEFAULT_ROLES_DEFINITION = [
   {
     id: 'FIELD_AGENT',
@@ -165,26 +162,20 @@ export const DEFAULT_ROLES_DEFINITION = [
 ]
 
 export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
-  HEALTH: [
-    SYSTEM_INTEGRATION_SCOPES.declare,
-    SYSTEM_INTEGRATION_SCOPES.notificationApi
-  ],
-  NATIONAL_ID: [SYSTEM_INTEGRATION_SCOPES.nationalId],
-  RECORD_SEARCH: [SYSTEM_INTEGRATION_SCOPES.recordsearch],
-  WEBHOOK: [SYSTEM_INTEGRATION_SCOPES.webhook]
-}
+  HEALTH: ['declare', 'notification-api'],
+  NATIONAL_ID: ['nationalId'],
+  RECORD_SEARCH: ['recordsearch'],
+  WEBHOOK: ['webhook']
+} satisfies Record<string, Scope[]>
 
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-export type SystemIntegrationRole =
-  keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
-
 export type UserScope = (typeof SCOPES)[keyof typeof SCOPES]
 export type SystemScope =
-  (typeof SYSTEM_INTEGRATION_SCOPES)[keyof typeof SYSTEM_INTEGRATION_SCOPES]
+  (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
 
 export interface ITokenPayload {
   sub: string
