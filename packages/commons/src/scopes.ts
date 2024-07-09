@@ -88,6 +88,7 @@ export const scopes = [
   'profile.update-profile-image',
 
   // performance
+  'performance.read:my-office',
   'performance.read',
   'performance.read-dashboards',
   'performance.export-vital-statistics',
