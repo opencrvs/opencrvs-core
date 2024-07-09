@@ -76,10 +76,26 @@ export interface ITokenResponse {
 
 export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
+    const gatewayVersion = response.headers['x-version']
+    console.log(APP_VERSION)
+
+    if (gatewayVersion && gatewayVersion !== APP_VERSION) {
+      console.log(
+        `Version Mismatch: Frontend is running on ${APP_VERSION}, whereas backend is running on ${gatewayVersion}`
+      )
+      throw new AxiosError('Version_MisMatch')
+    }
     return response.data
   }
 
   const onError = (error: AxiosError) => {
+    const gatewayVersion = error.response?.headers['x-version']
+    if (gatewayVersion && gatewayVersion !== APP_VERSION) {
+      console.log(
+        `Version Mismatch: Frontend is running on ${APP_VERSION}, whereas backend is running on ${gatewayVersion}`
+      )
+      throw new AxiosError('Version_MisMatch')
+    }
     if (error.response) {
       // Request was made but server responded with something
       // other than 2xx

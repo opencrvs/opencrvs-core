@@ -51,6 +51,8 @@ export const GOTO_APP = 'login/GOTO_APP'
 
 export const CLIENT_REDIRECT_ROUTE = 'login/CLIENT_REDIRECT_ROUTE'
 
+export const RELOAD_MODAL_VISIBILITY = 'login/RELOAD_MODAL_VISIBILITY'
+
 export enum FORGOTTEN_ITEMS {
   USERNAME = 'username',
   PASSWORD = 'password'
@@ -133,6 +135,11 @@ export type GoToAppAction = {
   payload: string
 }
 
+export type StoreReloadModalVisibilityAction = {
+  type: typeof RELOAD_MODAL_VISIBILITY
+  payload: { visibility: boolean }
+}
+
 export type Action =
   | RouterAction
   | ApplicationConfigAction
@@ -151,6 +158,7 @@ export type Action =
   | AuthenticationFieldValidationAction
   | AuthenticationResetAction
   | StoreClientRedirectRouteAction
+  | StoreReloadModalVisibilityAction
 
 export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
   type: CONFIG_LOAD
@@ -241,6 +249,15 @@ export const storeClientRedirectRoute = (
   return {
     type: CLIENT_REDIRECT_ROUTE,
     payload: { url }
+  }
+}
+
+export const storeReloadModalVisibility = (
+  visibility: boolean
+): StoreReloadModalVisibilityAction => {
+  return {
+    type: RELOAD_MODAL_VISIBILITY,
+    payload: { visibility }
   }
 }
 
