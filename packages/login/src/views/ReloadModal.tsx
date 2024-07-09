@@ -19,7 +19,6 @@ import { getReloadModalVisibility } from '@login/login/selectors'
 export const ReloadModal = () => {
   const dispatch = useDispatch()
   const visibility = useSelector(getReloadModalVisibility)
-  console.log(visibility)
 
   return (
     <ResponsiveModal
