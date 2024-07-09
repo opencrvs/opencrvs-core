@@ -44,7 +44,7 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
+import { Scope } from '@opencrvs/commons/authentication'
 import {
   BRN_DRN_TEXT,
   EMAIL,
@@ -235,6 +235,15 @@ class SearchResultView extends React.Component<
     return this.props.scope && this.props.scope.includes('certify')
   }
 
+  canSearchAnywhere() {
+    return (
+      (this.props.scope?.includes('search.birth') ||
+        this.props.scope?.includes('search.death') ||
+        this.props.scope?.includes('search.marriage')) ??
+      false
+    )
+  }
+
   transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
       return []
@@ -365,12 +374,7 @@ class SearchResultView extends React.Component<
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
                         declarationLocationId:
-                          userDetails &&
-                          ![
-                            SystemRoleType.LocalRegistrar,
-                            SystemRoleType.NationalRegistrar,
-                            SystemRoleType.RegistrationAgent
-                          ].includes(userDetails.systemRole)
+                          this.canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -480,12 +484,7 @@ class SearchResultView extends React.Component<
             variables={{
               advancedSearchParameters: {
                 declarationLocationId:
-                  userDetails &&
-                  ![
-                    SystemRoleType.LocalRegistrar,
-                    SystemRoleType.NationalRegistrar,
-                    SystemRoleType.RegistrationAgent
-                  ].includes(userDetails.systemRole)
+                  this.canSearchAnywhere() && userDetails
                     ? getUserLocation(userDetails).id
                     : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
