@@ -680,11 +680,9 @@ export function goToPerformanceView(userDetails: UserDetails) {
 }
 
 export function goToTeamView(userDetails: UserDetails) {
-  if (userDetails && userDetails.systemRole) {
-    return goToTeamUserList(
-      (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-    )
-  }
+  return goToTeamUserList(
+    (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
+  )
 }
 
 export function goToOrganisationView(userDetails: UserDetails) {
