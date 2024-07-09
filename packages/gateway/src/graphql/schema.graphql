@@ -47,7 +47,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -442,7 +441,6 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
   role: UserRole!
   email: String
   status: Status!
@@ -633,7 +631,6 @@ type UserRole {
   id: ID!
   label: I18nMessage!
   scopes: [String!]!
-  systemRole: SystemRoleType!
 }
 
 type CertificateSVG {
@@ -1070,16 +1067,6 @@ type StatusWiseRegistrationCount {
 type Identifier {
   system: String
   value: String
-}
-
-enum SystemRoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
 }
 
 enum Status {
@@ -1594,6 +1581,16 @@ type Payment {
   outcome: PaymentOutcomeType!
   date: Date!
   attachmentURL: String
+}
+
+enum SystemRoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
 }
 
 type AdvancedSeachParameters {

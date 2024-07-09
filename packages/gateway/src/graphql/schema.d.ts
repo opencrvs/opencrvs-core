@@ -298,7 +298,6 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile?: string
-  systemRole: GQLSystemRoleType
   role: GQLUserRole
   email?: string
   status: GQLStatus
@@ -502,7 +501,6 @@ export interface GQLUserRole {
   id: string
   label: GQLI18nMessage
   scopes: Array<string>
-  systemRole: GQLSystemRoleType
 }
 
 export interface GQLCertificateSVG {
@@ -939,16 +937,6 @@ export interface GQLStatusWiseRegistrationCount {
 export interface GQLIdentifier {
   system?: string
   value?: string
-}
-
-export const enum GQLSystemRoleType {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export const enum GQLStatus {
@@ -1487,6 +1475,16 @@ export interface GQLPayment {
   outcome: GQLPaymentOutcomeType
   date: GQLDate
   attachmentURL?: string
+}
+
+export const enum GQLSystemRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export interface GQLAdvancedSeachParameters {
@@ -2387,7 +2385,6 @@ export interface QueryToSearchUsersArgs {
   mobile?: string
   email?: string
   status?: string
-  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -4946,7 +4943,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
-  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
@@ -5007,15 +5003,6 @@ export interface UserToUsernameResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToMobileResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -5758,7 +5745,6 @@ export interface GQLUserRoleTypeResolver<TParent = any> {
   id?: UserRoleToIdResolver<TParent>
   label?: UserRoleToLabelResolver<TParent>
   scopes?: UserRoleToScopesResolver<TParent>
-  systemRole?: UserRoleToSystemRoleResolver<TParent>
 }
 
 export interface UserRoleToIdResolver<TParent = any, TResult = any> {
@@ -5780,15 +5766,6 @@ export interface UserRoleToLabelResolver<TParent = any, TResult = any> {
 }
 
 export interface UserRoleToScopesResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface UserRoleToSystemRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
