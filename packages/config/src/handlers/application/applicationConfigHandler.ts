@@ -170,6 +170,15 @@ export async function updateApplicationConfigHandler(
   }
 }
 
+const searchCriteria = [
+  'TRACKING_ID',
+  'REGISTRATION_NUMBER',
+  'NATIONAL_ID',
+  'NAME',
+  'PHONE_NUMBER',
+  'EMAIL'
+]
+
 export const updateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
   COUNTRY_LOGO: Joi.object().keys({
@@ -289,5 +298,8 @@ const applicationConfigResponseValidation = Joi.object({
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   SIGNATURE_REQUIRED_FOR_ROLES: Joi.array().items(
     Joi.string().valid(...SystemRoleType)
-  )
+  ),
+  SEARCH_DEFAULT_CRITERIA: Joi.string()
+    .valid(...searchCriteria)
+    .required()
 })
