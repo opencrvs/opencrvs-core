@@ -502,10 +502,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === NUMBER) {
-      let inputFieldWidth = fieldDefinition.inputFieldWidth
-      if (fieldDefinition?.inputWidth) {
-        inputFieldWidth = fieldDefinition.inputWidth + 'px'
-      }
       return (
         <InputField {...inputFieldProps}>
           <TextInput
@@ -527,7 +523,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
-            inputFieldWidth={inputFieldWidth}
           />
         </InputField>
       )
