@@ -31,7 +31,7 @@ import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -72,11 +72,11 @@ import {
 } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
 import startOfMonth from 'date-fns/startOfMonth'
 import { UserDetails } from '@client/utils/userUtils'
+import { Scope } from '@opencrvs/commons/authentication'
 
 const Layout = styled.div`
   display: flex;
@@ -220,7 +220,9 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & {
+    scopes: Scope[] | null
+  } & IConnectProps & {
     theme: ITheme
   }
 
@@ -370,13 +372,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     if (
       selectedLocation &&
       this.isOfficeSelected(selectedLocation) &&
-      this.props.userDetails &&
-      this.props.userDetails.systemRole
+      this.props.userDetails
     ) {
-      if (this.props.userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
+      if (this.props.scopes?.includes('organisation.read-locations')) {
         return true
       } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.systemRole) &&
+        this.props.scopes?.includes('organisation.read-locations:my-office') &&
         this.props.userDetails.primaryOffice?.id === selectedLocation.id
       ) {
         return true
@@ -689,6 +690,7 @@ function mapStateToProps(
   props: RouteComponentProps & WrappedComponentProps
 ) {
   const offlineCountryConfiguration = getOfflineData(state)
+  const scopes = getScope(state)
 
   const locations = offlineCountryConfiguration.locations
   const offices = offlineCountryConfiguration.offices
@@ -722,7 +724,8 @@ function mapStateToProps(
     selectedLocation,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),
-    currency: offlineCountryConfiguration.config.CURRENCY
+    currency: offlineCountryConfiguration.config.CURRENCY,
+    scopes
   }
 }
 
