@@ -15,19 +15,8 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const collInfos = await db.listCollections().toArray()
-      const collectionNames = collInfos.map((col) => col.name)
-
-      const collectionsToDelete = ['configs', 'informantsmsnotifications']
-
-      for (const collectionName of collectionsToDelete) {
-        if (collectionNames.includes(collectionName)) {
-          await db.collection(collectionName).drop()
-          console.log(
-            `\x1b[36m${collectionName} is dropped from the db.\x1b[0m`
-          )
-        }
-      }
+      const result = await db.dropDatabase()
+      console.log(`Database drop result: ${result}`)
     })
   } finally {
     console.log(
