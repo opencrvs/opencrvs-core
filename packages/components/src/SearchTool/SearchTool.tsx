@@ -171,7 +171,6 @@ export interface ISearchType {
   icon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
-  shouldBeVisible?: boolean
 }
 export interface INavigationType {
   label: string
@@ -241,18 +240,16 @@ export const SearchTool = ({
       dropDownIsVisible && (
         <DropDownWrapper>
           {searchTypeList.map((item) => {
-            if (item.shouldBeVisible)
-              return (
-                <DropDownItem
-                  id={item.value}
-                  key={item.value}
-                  onClick={() => dropDownItemSelect(item)}
-                >
-                  {item.icon}
-                  {item.label}
-                </DropDownItem>
-              )
-            else return null
+            return (
+              <DropDownItem
+                id={item.value}
+                key={item.value}
+                onClick={() => dropDownItemSelect(item)}
+              >
+                {item.icon}
+                {item.label}
+              </DropDownItem>
+            )
           })}
           {navigationList?.map((item) => {
             return (

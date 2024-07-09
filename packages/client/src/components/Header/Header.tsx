@@ -64,7 +64,6 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { referenceApi, SearchCriteria } from '@client/utils/referenceApi'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -113,7 +112,6 @@ type IFullProps = IntlShapeProps &
 
 interface IState {
   showLogoutModal: boolean
-  searchCriteria: SearchCriteria[]
 }
 
 enum ACTIVE_MENU_ITEM {
@@ -159,15 +157,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     super(props)
 
     this.state = {
-      showLogoutModal: false,
-      searchCriteria: []
+      showLogoutModal: false
     }
-  }
-
-  async componentDidMount() {
-    const config = (await referenceApi.loadConfig()).config
-    const searchCriteria = config.SEARCH_DEFAULT_CRITERIA
-    this.setState({ searchCriteria })
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
@@ -312,28 +303,23 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     const searchTypeList: ISearchType[] = [
       {
-        label: intl.formatMessage(messages.typeName),
-        value: NAME_TEXT,
-        icon: <Icon name="User" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeholderName),
-        isDefault: true,
-        shouldBeVisible: this.state.searchCriteria.includes('NAME')
-      },
-      {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
-        shouldBeVisible: this.state.searchCriteria.includes('TRACKING_ID')
+        isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeRN),
         value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn),
-        shouldBeVisible: this.state.searchCriteria.includes(
-          'REGISTRATION_NUMBER'
-        )
+        placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
+      },
+      {
+        label: intl.formatMessage(messages.typeName),
+        value: NAME_TEXT,
+        icon: <Icon name="User" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
 
@@ -342,8 +328,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderPhone),
-        shouldBeVisible: this.state.searchCriteria.includes('PHONE_NUMBER')
+        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       })
     }
     if (
@@ -356,8 +341,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(constantsMessages.id),
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeholderId),
-        shouldBeVisible: this.state.searchCriteria.includes('NATIONAL_ID')
+        placeHolderText: intl.formatMessage(messages.placeholderId)
       })
     }
     if (fieldNames.includes('registrationEmail')) {
@@ -365,8 +349,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.email),
         value: EMAIL,
         icon: <Icon name="Envelope" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderEmail),
-        shouldBeVisible: this.state.searchCriteria.includes('EMAIL')
+        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })
     }
 
