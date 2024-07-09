@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
   DIVIDER,
   FIELD_GROUP_TITLE,
@@ -112,12 +111,6 @@ const SignatureImage = styled.img`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;
-`
-
-const DocumentUploaderContainer = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-right: 8px;
-  }
 `
 
 const Value = styled.span`

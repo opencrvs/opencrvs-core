@@ -87,6 +87,7 @@ import {
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
+import { getReviewForm } from '@client/forms/register/review-selectors'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -1169,7 +1170,7 @@ function downloadDeclarationSuccess({
   store: IStoreState
   client: ApolloClient<{}>
 }): IDownloadDeclarationSuccess {
-  const form = getRegisterForm(store)
+  const form = getReviewForm(store)
 
   return {
     type: DOWNLOAD_DECLARATION_SUCCESS,
