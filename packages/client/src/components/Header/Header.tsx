@@ -28,7 +28,7 @@ import {
   goToAdvancedSearch
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -36,14 +36,10 @@ import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
   NATIONAL_ID_TEXT,
-  FIELD_AGENT_ROLES,
   NAME_TEXT,
-  NATL_ADMIN_ROLES,
   PHONE_TEXT,
   ADVANCED_SEARCH_TEXT,
-  SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES,
   EMAIL
 } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
@@ -64,9 +60,11 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { Scope } from '@opencrvs/commons/authentication'
 
 type IStateProps = {
   userDetails: UserDetails | null
+  scopes: Scope[] | null
   fieldNames: string[]
   language: string
 }
@@ -147,11 +145,6 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-)
-
 class HeaderComp extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -159,6 +152,22 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     this.state = {
       showLogoutModal: false
     }
+  }
+
+  hasSearch() {
+    // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
+    return this.props.scopes?.some((scope) =>
+      (
+        [
+          'search.birth',
+          'search.birth:my-jurisdiction',
+          'search.death',
+          'search.death:my-jurisdiction',
+          'search.marriage',
+          'search.marriage:my-jurisdiction'
+        ] as Scope[]
+      ).includes(scope)
+    )
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
@@ -213,10 +222,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
             }
           ]
         }
-      } else if (
-        this.props.userDetails?.systemRole &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
-      ) {
+      } else if (this.props.scopes?.includes('user.create')) {
         return {
           mobileLeft: [
             {
@@ -249,10 +255,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ]
         }
       }
-    } else if (
-      this.props.userDetails?.systemRole &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
-    ) {
+    } else if (!this.hasSearch()) {
       return {
         mobileLeft: [
           {
@@ -371,13 +374,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        navigationList={
-          FIELD_AGENT_ROLES.includes(
-            this.props.userDetails?.systemRole as string
-          )
-            ? undefined
-            : navigationList
-        }
+        // @TODO: How to hide the navigation list from field agents? Ask JPF
+        navigationList={navigationList}
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
@@ -386,15 +384,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   goToTeamView(props: IFullProps) {
-    const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.systemRole) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
-        return goToTeamSearchAction()
-      } else {
-        return goToTeamUserListAction(
-          (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-        )
-      }
+    const {
+      userDetails,
+      goToTeamUserListAction,
+      goToTeamSearchAction,
+      scopes
+    } = props
+    if (scopes?.includes('organisation.read')) {
+      return goToTeamSearchAction()
+    } else {
+      return goToTeamUserListAction(userDetails?.primaryOffice.id || '')
     }
   }
 
@@ -429,10 +428,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         element: (
           <>
-            {!(
-              this.props.userDetails?.systemRole &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
-            ) && (
+            {this.hasSearch() && (
               <HeaderCenter>
                 <Button
                   type="iconPrimary"
@@ -459,13 +455,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       }
     ]
 
-    if (
-      activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(
-        this.props.userDetails?.systemRole as string
-      ) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
-    ) {
+    if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !this.hasSearch()) {
       rightMenu = [
         {
           element: <HistoryNavigator />
@@ -517,6 +507,7 @@ export const Header = connect(
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store),
+    scopes: getScope(store),
     fieldNames: Object.values(getRegisterForm(store))
       .flatMap((form) => form.sections)
       .flatMap((section) => section.groups)
