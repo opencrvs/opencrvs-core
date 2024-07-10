@@ -76,14 +76,13 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
-import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SystemRoleType } from '@client/utils/gateway'
 import { getCurrencySymbol } from '@client/utils/currencyUtils'
+import { Scope } from '@opencrvs/commons/authentication'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -94,10 +93,10 @@ const SupportingDocument = styled.div`
 `
 interface IProps {
   userPrimaryOffice?: UserDetails['primaryOffice']
-  userRole?: UserDetails['systemRole']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
+  scopes: Scope[] | null
 }
 
 type IStateProps = {
@@ -146,8 +145,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration,
       intl,
       goBack,
-      declaration: { event },
-      userRole
+      declaration: { event }
     } = this.props
 
     const currencySymbol = getCurrencySymbol(
@@ -197,7 +195,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         }
       >
         <Check />
-        {userRole === ROLE_REGISTRATION_AGENT
+        {this.props.scopes?.includes('record.registration-request-correction')
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
       </Button>
@@ -374,7 +372,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
           title={intl.formatMessage(
-            this.props.userRole === ROLE_REGISTRATION_AGENT
+            this.props.scopes?.includes(
+              'record.registration-request-correction'
+            )
               ? messages.correctionForApprovalDialogTitle
               : messages.correctRecordDialogTitle
           )}
@@ -395,7 +395,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               id="send"
               key="continue"
               onClick={() => {
-                this.makeCorrection(userRole)
+                this.makeCorrection()
                 this.togglePrompt()
               }}
             >
@@ -406,7 +406,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                this.props.userRole === ROLE_REGISTRATION_AGENT
+                this.props.scopes?.includes(
+                  'record.registration-request-correction'
+                )
                   ? messages.correctionForApprovalDialogDescription
                   : messages.correctRecordDialogDescription
               )}
@@ -976,9 +978,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
   }
 
-  makeCorrection = (userRole: SystemRoleType | undefined) => {
+  makeCorrection = () => {
     const declaration = this.props.declaration
-    if (userRole === ROLE_REGISTRATION_AGENT) {
+    if (this.props.scopes?.includes('record.registration-request-correction')) {
       declaration.action = SubmissionAction.REQUEST_CORRECTION
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -1001,7 +1003,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
     this.props.writeDeclaration(declaration)
 
-    if (userRole === ROLE_REGISTRATION_AGENT) {
+    if (this.props.scopes?.includes('record.registration-request-correction')) {
       this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
     } else {
       this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
@@ -1025,7 +1027,7 @@ export const CorrectionSummary = connect(
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
     userPrimaryOffice: getUserDetails(state)?.primaryOffice,
-    userRole: getUserDetails(state)?.systemRole
+    scopes: getScope(state)
   }),
   {
     modifyDeclaration,
