@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import {
   CompositionSectionCode,
   findCompositionSection,
@@ -130,10 +128,6 @@ export function getRegistrationLocation(
     | RejectedRecord
 ) {
   const location = findLastOfficeLocationFromSavedBundle(record)
-  const language = getDefaultLanguage()
-  return (
-    (language === 'en'
-      ? location.name
-      : location.alias?.[0] ?? location.name) ?? ''
-  )
+
+  return location.name || ''
 }
