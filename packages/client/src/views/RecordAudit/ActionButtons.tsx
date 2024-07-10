@@ -36,14 +36,13 @@ import {
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { SystemRoleType } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
 import { useDispatch } from 'react-redux'
 import { Button } from '@client/../../components/src/Button'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -60,30 +59,26 @@ export type CMethodParams = {
 
 export const ShowDownloadButton = ({
   declaration,
-  draft,
-  userDetails
+  draft
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
   userDetails: UserDetails | null
 }) => {
   const { id, type } = declaration || {}
+  const { hasScope } = usePermissions()
 
   if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
   let refetchQueries: InternalRefetchQueriesInclude = []
   if (
-    userDetails?.systemRole === 'FIELD_AGENT' &&
+    !hasScope('record.register') &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
 
-  if (
-    declaration.assignment &&
-    (userDetails?.systemRole === SystemRoleType.LocalRegistrar ||
-      userDetails?.systemRole === SystemRoleType.NationalRegistrar)
-  ) {
+  if (declaration.assignment && hasScope('record.register')) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
     ]
@@ -112,57 +107,23 @@ export const ShowDownloadButton = ({
 export const ShowUpdateButton = ({
   declaration,
   intl,
-  userDetails,
   draft,
   goToPage
 }: CMethodParams) => {
   const { id, type } = declaration || {}
+  const { hasScope } = usePermissions()
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
+  // @TODO: Here in "ShowUpdateButton", is submit-for-updates correct?
+  const showActionButton = hasScope('record.submit-for-updates')
 
   if (!showActionButton && !isDownloaded) {
     return <></>
   }
 
-  const updateButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    updateButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    )
-  ) {
+  if (showActionButton && type) {
     let PAGE_ROUTE: string, PAGE_ID: string
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
@@ -210,54 +171,19 @@ export const ShowUpdateButton = ({
 export const ShowPrintButton = ({
   declaration,
   intl,
-  userDetails,
   draft,
   goToPrintCertificate,
   clearCorrectionAndPrintChanges
 }: CMethodParams) => {
   const { id, type } = declaration || {}
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
+  const { hasScope } = usePermissions()
+
+  const showActionButton = hasScope('record.print-records')
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  const printButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    systemRole in printButtonRoleStatusMap &&
-    printButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    ) &&
-    showActionButton
-  ) {
+  if (type && showActionButton) {
     if (!isDownloaded) {
       return (
         <PrimaryButton
@@ -296,43 +222,14 @@ export const ShowIssueButton = ({
   draft
 }: CMethodParams) => {
   const dispatch = useDispatch()
+  const { hasScope } = usePermissions()
   const { id, type } = declaration || {}
-  const role = userDetails ? userDetails.systemRole : ''
-  const showActionButton = role
-    ? FIELD_AGENT_ROLES.includes(role)
-      ? false
-      : true
-    : false
+  const showActionButton = hasScope('record.print-issue-certified-copies')
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  const issueButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ]
-  }
-
-  if (
-    role &&
-    type &&
-    role in issueButtonRoleStatusMap &&
-    issueButtonRoleStatusMap[role].includes(declaration?.status as string) &&
-    showActionButton
-  ) {
+  if (type && showActionButton) {
     if (!isDownloaded) {
       return (
         <Button
@@ -372,44 +269,12 @@ export const ShowReviewButton = ({
   goToPage
 }: CMethodParams) => {
   const { id, type } = declaration || {}
+  const { hasScope } = usePermissions()
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
+  const showActionButton = hasScope('record.declaration-review')
 
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [],
-    REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
-    DISTRICT_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ],
-    LOCAL_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ],
-    NATIONAL_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    systemRole in reviewButtonRoleStatusMap &&
-    reviewButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    ) &&
-    showActionButton
-  ) {
+  if (type && showActionButton) {
     if (!isDownloaded) {
       return (
         <PrimaryButton

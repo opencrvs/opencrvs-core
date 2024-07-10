@@ -68,7 +68,6 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/workqueue'
@@ -357,13 +356,10 @@ function RecordAuditBody({
   }
 
   if (
-    hasScope('record.archive') &&
+    hasScope('record.declaration-archive') &&
     isDownloaded &&
     declaration.status &&
     ARCHIVABLE_STATUSES.includes(declaration.status)
-    // @TODO: Previously here a user with validate scope couldn't archive unless it's validated
-    // (userHasRegisterScope ||
-    // (userHasValidateScope && declaration.status !== VALIDATED))
   ) {
     actions.push(
       <Button
@@ -381,7 +377,7 @@ function RecordAuditBody({
   }
 
   if (
-    hasScope('record.archive') &&
+    hasScope('record.declaration-archive') &&
     isDownloaded &&
     declaration.status &&
     ARCHIVED.includes(declaration.status)
@@ -430,8 +426,7 @@ function RecordAuditBody({
       SUBMISSION_STATUS.VALIDATED,
       SUBMISSION_STATUS.CORRECTION_REQUESTED
     ].includes(declaration.status as SUBMISSION_STATUS) &&
-    userDetails?.systemRole &&
-    !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
+    hasScope('record.declaration-review')
   ) {
     actions.push(
       ShowReviewButton({
@@ -454,8 +449,7 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
       declaration.status === SUBMISSION_STATUS.REJECTED) &&
-      userDetails?.systemRole &&
-      !FIELD_AGENT_ROLES.includes(userDetails.systemRole))
+      hasScope('record.submit-for-updates'))
   ) {
     actions.push(
       ShowUpdateButton({
